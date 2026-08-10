@@ -111,6 +111,18 @@ bool fs_init(const char **rodirs, const char *gamedir, const char *writepath) {
     return true;
 }
 
+void fs_shutdown(void) {
+    while (fs_searchpaths) {
+        fs_dir_t *dir = fs_searchpaths;
+        fs_searchpaths = dir->next;
+        dir->packer->unmount(dir->pack);
+        free((void *) dir->realpath);
+        free(dir);
+    }
+    fs_gamedir[0] = '\0';
+    fs_writepath[0] = '\0';
+}
+
 bool fs_mount(const char *realpath) {
     if (fs_find_dir(realpath))
         return false; // already mounted

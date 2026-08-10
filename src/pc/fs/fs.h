@@ -83,6 +83,7 @@ typedef struct {
 // then does the same with `userdir`
 // initializes the `fs_gamedir` and `fs_userdir` variables
 bool fs_init(const char **rodirs, const char *gamedir, const char *userdir);
+void fs_shutdown(void);
 
 // mounts the pack at physical path `realpath` to the root of the filesystem
 // packs mounted later take priority over packs mounted earlier

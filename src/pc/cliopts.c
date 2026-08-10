@@ -1,7 +1,6 @@
 #include "cliopts.h"
 #include "configfile.h"
 #include "cheats.h"
-#include "pc_main.h"
 #include "platform.h"
 #include "macros.h"
 
@@ -41,7 +40,7 @@ static inline int arg_uint(UNUSED const char *name, const char *value, unsigned 
     return 1;
 }
 
-void parse_cli_opts(int argc, char* argv[]) {
+bool parse_cli_opts(int argc, char* argv[]) {
     // Initialize options with false values.
     memset(&gCLIOpts, 0, sizeof(gCLIOpts));
 
@@ -73,7 +72,8 @@ void parse_cli_opts(int argc, char* argv[]) {
         // Print help
         else if (strcmp(argv[i], "--help") == 0) {
             print_help();
-            game_exit();
+            return false;
         }
     }
+    return true;
 }

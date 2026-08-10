@@ -299,6 +299,8 @@ else
 endif
 
 LIBULTRA := $(BUILD_DIR)/libultra.a
+SM64_MODERN_CORE := $(BUILD_DIR)/libsm64core.a
+SM64_MODERN_ABI_SMOKE := $(BUILD_DIR)/sm64-modern-abi-smoke
 
 ifeq ($(TARGET_WEB),1)
 EXE := $(BUILD_DIR)/$(TARGET).html
@@ -449,6 +451,11 @@ ULTRA_O_FILES := $(foreach file,$(ULTRA_S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
 
 GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 
+SM64_MODERN_ENTRY_OBJ := $(BUILD_DIR)/src/pc/pc_main_entry.o
+SM64_MODERN_CORE_O_FILES = $(filter-out $(SM64_MODERN_ENTRY_OBJ),$(O_FILES)) \
+                           $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES)
+SM64_MODERN_ABI_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_abi_smoke.o
+
 RPC_LIBS :=
 ifeq ($(DISCORDRPC),1)
   ifeq ($(WINDOWS_BUILD),1)
@@ -490,6 +497,12 @@ else
 endif
 
 LD := $(CC)
+
+ifeq ($(TARGET_WEB),1)
+  AR := emar
+else ifeq ($(origin AR),default)
+  AR := $(CROSS)ar
+endif
 
 ifeq ($(DISCORDRPC),1)
   LD := $(CXX)
@@ -754,6 +767,11 @@ $(TEXTCONV):
 
 all: $(EXE)
 
+core: $(SM64_MODERN_CORE)
+
+abi-smoke: $(SM64_MODERN_ABI_SMOKE) $(BUILD_DIR)/sm64-modern-abi-cxx.ok
+	$(SM64_MODERN_ABI_SMOKE)
+
 # thank you apple very cool
 ifeq ($(HOST_OS),Darwin)
   CP := gcp
@@ -868,7 +886,7 @@ $(BUILD_DIR)/text/%/define_text.inc.c: text/define_text.inc.c text/%/courses.h t
 	$(CPP) $(VERSION_CFLAGS) $< -o - -I text/$*/ | $(TEXTCONV) charmap.txt - $@
 
 RSP_DIRS := $(BUILD_DIR)/rsp
-ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) $(ASM_DIRS) $(GODDARD_SRC_DIRS) $(ULTRA_SRC_DIRS) $(ULTRA_ASM_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) include) $(MIO0_DIR) $(addprefix $(MIO0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION) $(RSP_DIRS)
+ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) $(ASM_DIRS) $(GODDARD_SRC_DIRS) $(ULTRA_SRC_DIRS) $(ULTRA_ASM_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) include tests) $(MIO0_DIR) $(addprefix $(MIO0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION) $(RSP_DIRS)
 
 # Make sure build directory exists before compiling anything
 DUMMY := $(shell mkdir -p $(ALL_DIRS))
@@ -1069,12 +1087,23 @@ $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
 $(BUILD_DIR)/%.o: %.s
 	$(AS) $(ASFLAGS) -MD $(BUILD_DIR)/$*.d -o $@ $<
 
+$(BUILD_DIR)/sm64-modern-abi-cxx.ok: tests/sm64_modern_abi_smoke.c include/sm64_modern.h
+	$(CXX) -x c++ -fsyntax-only $(CFLAGS) tests/sm64_modern_abi_smoke.c
+	@touch $@
 
+$(SM64_MODERN_ABI_SMOKE_OBJ): include/sm64_modern.h
 
-$(EXE): $(O_FILES) $(MIO0_FILES:.mio0=.o) $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) $(if $(RPC_LIBS),$(BUILD_DIR)/$(RPC_LIBS),)
-	$(LD) -L $(BUILD_DIR) -o $@ $(O_FILES) $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) $(LDFLAGS)
+$(SM64_MODERN_CORE): $(SM64_MODERN_CORE_O_FILES)
+	$(RM) $@
+	$(AR) rcs $@ $(SM64_MODERN_CORE_O_FILES)
 
-.PHONY: all clean distclean default diff test load libultra res
+$(SM64_MODERN_ABI_SMOKE): $(SM64_MODERN_ABI_SMOKE_OBJ) $(SM64_MODERN_CORE)
+	$(LD) -L $(BUILD_DIR) -o $@ $(SM64_MODERN_ABI_SMOKE_OBJ) $(SM64_MODERN_CORE) $(LDFLAGS)
+
+$(EXE): $(SM64_MODERN_ENTRY_OBJ) $(SM64_MODERN_CORE) $(MIO0_FILES:.mio0=.o) $(if $(RPC_LIBS),$(BUILD_DIR)/$(RPC_LIBS),)
+	$(LD) -L $(BUILD_DIR) -o $@ $(SM64_MODERN_ENTRY_OBJ) $(SM64_MODERN_CORE) $(LDFLAGS)
+
+.PHONY: all core abi-smoke clean distclean default diff test load libultra res
 .PRECIOUS: $(BUILD_DIR)/bin/%.elf $(SOUND_BIN_DIR)/%.ctl $(SOUND_BIN_DIR)/%.tbl $(SOUND_SAMPLE_TABLES) $(SOUND_BIN_DIR)/%.s $(BUILD_DIR)/%
 .DELETE_ON_ERROR:
 

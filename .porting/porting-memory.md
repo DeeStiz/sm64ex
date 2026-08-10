@@ -1,5 +1,10 @@
 # SM64 Modern Porting Memory
 
+## Current Milestone
+
+- M1 success criterion: a callable static C core exposes versioned lifecycle, platform, and gameplay ABIs while the legacy executable still builds and runs.
+- Approved scope: split process entry from init/step/stop/shutdown, add versioned POD ABI headers and a private legacy backend adapter, build/link a static core plus ABI smoke consumer, and keep gameplay at `cAuthority` with only generic snapshot/effect envelopes until M6/M7.
+
 ## Watch List
 
 - The legal US ROM and extracted assets remain local/ignored; future clean builds must receive `BASEROM` or the matching `SM64_BASEROM_*` environment variable.

@@ -1,39 +1,27 @@
-#include <stdlib.h>
+#include <limits.h>
+#include <stdbool.h>
+#include <stdint.h>
 #include <stdio.h>
-
-#ifdef TARGET_WEB
-#include <emscripten.h>
-#include <emscripten/html5.h>
-#endif
+#include <stdlib.h>
+#include <string.h>
 
 #include "sm64.h"
+#include "sm64_modern.h"
 
-#include "game/memory.h"
 #include "audio/external.h"
-
+#include "game/display.h"
+#include "game/game_init.h"
+#include "game/main.h"
+#include "game/memory.h"
+#include "game/thread6.h"
 #include "gfx/gfx_pc.h"
 
-#include "gfx/gfx_opengl.h"
-#include "gfx/gfx_direct3d11.h"
-#include "gfx/gfx_direct3d12.h"
-
-#include "gfx/gfx_dxgi.h"
-#include "gfx/gfx_sdl.h"
-
-#include "audio/audio_api.h"
-#include "audio/audio_sdl.h"
-#include "audio/audio_null.h"
-
-#include "pc_main.h"
 #include "cliopts.h"
 #include "configfile.h"
 #include "controller/controller_api.h"
-#include "controller/controller_keyboard.h"
 #include "fs/fs.h"
-
-#include "game/game_init.h"
-#include "game/main.h"
-#include "game/thread6.h"
+#include "pc_main.h"
+#include "platform.h"
 
 #ifdef DISCORDRPC
 #include "pc/discord/discordrpc.h"
@@ -52,27 +40,34 @@ s32 gRumblePakPfs;
 struct RumbleData gRumbleDataQueue[3];
 struct StructSH8031D9B0 gCurrRumbleSettings;
 
-static struct AudioAPI *audio_api;
-static struct GfxWindowManagerAPI *wm_api;
-static struct GfxRenderingAPI *rendering_api;
-
 extern void gfx_run(Gfx *commands);
-extern void thread5_game_loop(void *arg);
 extern void create_next_audio_buffer(s16 *samples, u32 num_samples);
-void game_loop_one_iteration(void);
+
+static SM64ModernPlatformApiV1 sPlatform;
+static SM64ModernLifecycleState sLifecycleState = SM64_MODERN_LIFECYCLE_COLD;
+static void *sMainPoolMemory;
+static uint64_t sOwnerThread;
+static bool sPlatformInitialized;
+static bool sGameInitialized;
 
 void dispatch_audio_sptask(struct SPTask *spTask) {
+    (void) spTask;
 }
 
 void set_vblank_handler(s32 index, struct VblankHandler *handler, OSMesgQueue *queue, OSMesg *msg) {
+    (void) index;
+    (void) handler;
+    (void) queue;
+    (void) msg;
 }
 
-static bool inited = false;
-
-#include "game/display.h" // for gGlobalTimer
 void send_display_list(struct SPTask *spTask) {
-    if (!inited) return;
-    gfx_run((Gfx *)spTask->task.t.data_ptr);
+    if (sLifecycleState != SM64_MODERN_LIFECYCLE_RUNNING
+        || !(sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING)) {
+        return;
+    }
+
+    gfx_run((Gfx *) spTask->task.t.data_ptr);
 }
 
 #ifdef VERSION_EU
@@ -83,166 +78,152 @@ void send_display_list(struct SPTask *spTask) {
 #define SAMPLES_LOW 528
 #endif
 
-void produce_one_frame(void) {
-    gfx_start_frame();
-
-    const f32 master_mod = (f32)configMasterVolume / 127.0f;
-    set_sequence_player_volume(SEQ_PLAYER_LEVEL, (f32)configMusicVolume / 127.0f * master_mod);
-    set_sequence_player_volume(SEQ_PLAYER_SFX, (f32)configSfxVolume / 127.0f * master_mod);
-    set_sequence_player_volume(SEQ_PLAYER_ENV, (f32)configEnvVolume / 127.0f * master_mod);
-
-    game_loop_one_iteration();
-    thread6_rumble_loop(NULL);
-
-    int samples_left = audio_api->buffered();
-    u32 num_audio_samples = samples_left < audio_api->get_desired_buffered() ? SAMPLES_HIGH : SAMPLES_LOW;
-    //printf("Audio samples: %d %u\n", samples_left, num_audio_samples);
-    s16 audio_buffer[SAMPLES_HIGH * 2 * 2];
-    for (int i = 0; i < 2; i++) {
-        /*if (audio_cnt-- == 0) {
-            audio_cnt = 2;
-        }
-        u32 num_audio_samples = audio_cnt < 2 ? 528 : 544;*/
-        create_next_audio_buffer(audio_buffer + i * (num_audio_samples * 2), num_audio_samples);
-    }
-    //printf("Audio samples before submitting: %d\n", audio_api->buffered());
-
-    audio_api->play((u8 *)audio_buffer, 2 * num_audio_samples * 4);
-
-    gfx_end_frame();
+static bool has_terminated_string(const char *value, size_t capacity) {
+    return memchr(value, '\0', capacity) != NULL;
 }
 
-void audio_shutdown(void) {
-    if (audio_api) {
-        if (audio_api->shutdown) audio_api->shutdown();
-        audio_api = NULL;
+static void copy_string(char *destination, size_t capacity, const char *source) {
+    strncpy(destination, source, capacity);
+    destination[capacity - 1] = '\0';
+}
+
+static void report_error(SM64ModernStatus status, const char *message) {
+    if (sPlatform.error_reported) {
+        sPlatform.error_reported(sPlatform.context, status, message);
     }
 }
 
-void game_deinit(void) {
-#ifdef DISCORDRPC
-    discord_shutdown();
-#endif
-    configfile_save(configfile_name());
-    controller_shutdown();
-    audio_shutdown();
-    gfx_shutdown();
-    inited = false;
+static bool is_owner_thread(void) {
+    return sPlatform.current_thread && sPlatform.current_thread(sPlatform.context) == sOwnerThread;
 }
 
-void game_exit(void) {
-    game_deinit();
-#ifndef TARGET_WEB
-    exit(0);
-#endif
+SM64ModernStatus sm64_modern_validate_platform_api(const SM64ModernPlatformApiV1 *platform) {
+    if (!platform) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (platform->header.abi_version != SM64_MODERN_ABI_VERSION_1) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_VERSION;
+    }
+    if (platform->header.struct_size < sizeof(*platform)) {
+        return SM64_MODERN_STATUS_BUFFER_TOO_SMALL;
+    }
+    if (platform->reserved != 0 || !platform->initialize || !platform->shutdown || !platform->current_thread) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (platform->capabilities
+        & ~(SM64_MODERN_PLATFORM_CAP_RENDERING | SM64_MODERN_PLATFORM_CAP_AUDIO)) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if ((platform->capabilities & SM64_MODERN_PLATFORM_CAP_AUDIO)
+        && (!platform->audio_buffered || !platform->audio_desired_buffered || !platform->audio_play)) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    return SM64_MODERN_STATUS_OK;
 }
 
-#ifdef TARGET_WEB
-static void em_main_loop(void) {
+static SM64ModernStatus validate_lifecycle_config(const SM64ModernLifecycleConfigV1 *config) {
+    if (!config) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (config->header.abi_version != SM64_MODERN_ABI_VERSION_1) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_VERSION;
+    }
+    if (config->header.struct_size < sizeof(*config)) {
+        return SM64_MODERN_STATUS_BUFFER_TOO_SMALL;
+    }
+    if (config->main_pool_size > SIZE_MAX
+        || config->fullscreen_mode > SM64_MODERN_FULLSCREEN_FORCE_OFF
+        || !has_terminated_string(config->game_directory, sizeof(config->game_directory))
+        || !has_terminated_string(config->save_directory, sizeof(config->save_directory))
+        || !has_terminated_string(config->config_file, sizeof(config->config_file))
+        || !has_terminated_string(config->window_title, sizeof(config->window_title))) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    return SM64_MODERN_STATUS_OK;
 }
 
-static void request_anim_frame(void (*func)(double time)) {
-    EM_ASM(requestAnimationFrame(function(time) {
-        dynCall("vd", $0, [time]);
-    }), func);
-}
+static SM64ModernStatus lifecycle_initialize(const SM64ModernLifecycleConfigV1 *config,
+                                              const SM64ModernPlatformApiV1 *platform) {
+    SM64ModernStatus status;
+    const char *game_directory;
+    const char *save_directory;
+    const char *window_title;
+    size_t pool_size;
 
-static void on_anim_frame(double time) {
-    static double target_time;
-
-    time *= 0.03; // milliseconds to frame count (33.333 ms -> 1)
-
-    if (time >= target_time + 10.0) {
-        // We are lagging 10 frames behind, probably due to coming back after inactivity,
-        // so reset, with a small margin to avoid potential jitter later.
-        target_time = time - 0.010;
+    if (sLifecycleState != SM64_MODERN_LIFECYCLE_COLD) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
     }
 
-    for (int i = 0; i < 2; i++) {
-        // If refresh rate is 15 Hz or something we might need to generate two frames
-        if (time >= target_time) {
-            produce_one_frame();
-            target_time = target_time + 1.0;
-        }
+    status = validate_lifecycle_config(config);
+    if (status != SM64_MODERN_STATUS_OK) {
+        return status;
+    }
+    status = sm64_modern_validate_platform_api(platform);
+    if (status != SM64_MODERN_STATUS_OK) {
+        return status;
     }
 
-    if (inited) // only continue if the init flag is still set
-        request_anim_frame(on_anim_frame);
-}
-#endif
+    memcpy(&sPlatform, platform, sizeof(sPlatform));
+    sOwnerThread = sPlatform.current_thread(sPlatform.context);
+    sLifecycleState = SM64_MODERN_LIFECYCLE_INITIALIZING;
 
-void main_func(void) {
-    const char *gamedir = gCLIOpts.GameDir[0] ? gCLIOpts.GameDir : FS_BASEDIR;
-    const char *userpath = gCLIOpts.SavePath[0] ? gCLIOpts.SavePath : sys_user_path();
-    fs_init(sys_ropaths, gamedir, userpath);
+    copy_string(gCLIOpts.GameDir, sizeof(gCLIOpts.GameDir), config->game_directory);
+    copy_string(gCLIOpts.SavePath, sizeof(gCLIOpts.SavePath), config->save_directory);
+    copy_string(gCLIOpts.ConfigFile, sizeof(gCLIOpts.ConfigFile), config->config_file);
+    gCLIOpts.SkipIntro = config->skip_intro ? 1u : 0u;
+    gCLIOpts.FullScreen = config->fullscreen_mode;
+
+    game_directory = gCLIOpts.GameDir[0] ? gCLIOpts.GameDir : FS_BASEDIR;
+    save_directory = gCLIOpts.SavePath[0] ? gCLIOpts.SavePath : sys_user_path();
+    window_title = config->window_title[0] ? config->window_title : "SM64 Modern";
+
+    if (!fs_init(sys_ropaths, game_directory, save_directory)) {
+        report_error(SM64_MODERN_STATUS_PLATFORM_ERROR, "Could not initialize the virtual filesystem");
+        sLifecycleState = SM64_MODERN_LIFECYCLE_FAILED;
+        return SM64_MODERN_STATUS_PLATFORM_ERROR;
+    }
 
     configfile_load(configfile_name());
-
-    if (gCLIOpts.FullScreen == 1)
+    if (config->fullscreen_mode == SM64_MODERN_FULLSCREEN_FORCE_ON) {
         configWindow.fullscreen = true;
-    else if (gCLIOpts.FullScreen == 2)
+    } else if (config->fullscreen_mode == SM64_MODERN_FULLSCREEN_FORCE_OFF) {
         configWindow.fullscreen = false;
+    }
 
-    const size_t poolsize = gCLIOpts.PoolSize ? gCLIOpts.PoolSize : DEFAULT_POOL_SIZE;
-    u64 *pool = malloc(poolsize);
-    if (!pool) sys_fatal("Could not alloc %u bytes for main pool.\n", poolsize);
-    main_pool_init(pool, pool + poolsize / sizeof(pool[0]));
+    pool_size = config->main_pool_size ? (size_t) config->main_pool_size : DEFAULT_POOL_SIZE;
+    sMainPoolMemory = malloc(pool_size);
+    if (!sMainPoolMemory) {
+        report_error(SM64_MODERN_STATUS_OUT_OF_MEMORY, "Could not allocate the main game pool");
+        fs_shutdown();
+        sLifecycleState = SM64_MODERN_LIFECYCLE_FAILED;
+        return SM64_MODERN_STATUS_OUT_OF_MEMORY;
+    }
+    main_pool_init(sMainPoolMemory, (u64 *) sMainPoolMemory + pool_size / sizeof(u64));
     gEffectsMemoryPool = mem_pool_init(0x4000, MEMORY_POOL_LEFT);
 
-    #if defined(WAPI_SDL1) || defined(WAPI_SDL2)
-    wm_api = &gfx_sdl;
-    #elif defined(WAPI_DXGI)
-    wm_api = &gfx_dxgi;
-    #else
-    #error No window API!
-    #endif
-
-    #if defined(RAPI_D3D11)
-    rendering_api = &gfx_direct3d11_api;
-    # define RAPI_NAME "DirectX 11"
-    #elif defined(RAPI_D3D12)
-    rendering_api = &gfx_direct3d12_api;
-    # define RAPI_NAME "DirectX 12"
-    #elif defined(RAPI_GL) || defined(RAPI_GL_LEGACY)
-    rendering_api = &gfx_opengl_api;
-    # ifdef USE_GLES
-    #  define RAPI_NAME "OpenGL ES"
-    # else
-    #  define RAPI_NAME "OpenGL"
-    # endif
-    #else
-    #error No rendering API!
-    #endif
-
-    char window_title[96] =
-    "Super Mario 64 EX (" RAPI_NAME ")"
-    #ifdef NIGHTLY
-    " nightly " GIT_HASH
-    #endif
-    ;
-
-    gfx_init(wm_api, rendering_api, window_title);
-    wm_api->set_keyboard_callbacks(keyboard_on_key_down, keyboard_on_key_up, keyboard_on_all_keys_up);
-
-    #if defined(AAPI_SDL1) || defined(AAPI_SDL2)
-    if (audio_api == NULL && audio_sdl.init()) 
-        audio_api = &audio_sdl;
-    #endif
-
-    if (audio_api == NULL) {
-        audio_api = &audio_null;
+    status = sPlatform.initialize(sPlatform.context, window_title);
+    if (status != SM64_MODERN_STATUS_OK) {
+        report_error(status, "The host platform failed to initialize");
+        // A platform initializer may fail after acquiring only part of its
+        // state; the paired shutdown callback owns that partial cleanup.
+        sPlatform.shutdown(sPlatform.context);
+        gEffectsMemoryPool = NULL;
+        free(sMainPoolMemory);
+        sMainPoolMemory = NULL;
+        fs_shutdown();
+        sLifecycleState = SM64_MODERN_LIFECYCLE_FAILED;
+        return status;
     }
+    sPlatformInitialized = true;
 
     audio_init();
     sound_init();
-
     thread5_game_loop(NULL);
-
-    inited = true;
+    sGameInitialized = true;
+    sLifecycleState = SM64_MODERN_LIFECYCLE_RUNNING;
 
 #ifdef EXTERNAL_DATA
-    // precache data if needed
-    if (configPrecacheRes) {
+    if (configPrecacheRes && (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING)) {
         fprintf(stdout, "precaching data\n");
         fflush(stdout);
         gfx_precache_textures();
@@ -253,21 +234,187 @@ void main_func(void) {
     discord_init();
 #endif
 
-#ifdef TARGET_WEB
-    emscripten_set_main_loop(em_main_loop, 0, 0);
-    request_anim_frame(on_anim_frame);
-#else
-    while (true) {
-        wm_api->main_loop(produce_one_frame);
-#ifdef DISCORDRPC
-        discord_update_rich_presence();
-#endif
-    }
-#endif
+    return SM64_MODERN_STATUS_OK;
 }
 
-int main(int argc, char *argv[]) {
-    parse_cli_opts(argc, argv);
-    main_func();
-    return 0;
+static SM64ModernStatus lifecycle_step(void) {
+    if (sLifecycleState == SM64_MODERN_LIFECYCLE_STOP_REQUESTED) {
+        return SM64_MODERN_STATUS_STOP_REQUESTED;
+    }
+    if (sLifecycleState != SM64_MODERN_LIFECYCLE_RUNNING || !is_owner_thread()) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+
+    if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING) {
+        gfx_start_frame();
+    }
+
+    const f32 master_mod = (f32) configMasterVolume / 127.0f;
+    set_sequence_player_volume(SEQ_PLAYER_LEVEL, (f32) configMusicVolume / 127.0f * master_mod);
+    set_sequence_player_volume(SEQ_PLAYER_SFX, (f32) configSfxVolume / 127.0f * master_mod);
+    set_sequence_player_volume(SEQ_PLAYER_ENV, (f32) configEnvVolume / 127.0f * master_mod);
+
+    game_loop_one_iteration();
+    thread6_rumble_loop(NULL);
+
+    if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_AUDIO) {
+        int samples_left = sPlatform.audio_buffered(sPlatform.context);
+        u32 num_audio_samples = samples_left < (int) sPlatform.audio_desired_buffered(sPlatform.context)
+            ? SAMPLES_HIGH : SAMPLES_LOW;
+        s16 audio_buffer[SAMPLES_HIGH * 2 * 2];
+        for (int i = 0; i < 2; i++) {
+            create_next_audio_buffer(audio_buffer + i * (num_audio_samples * 2), num_audio_samples);
+        }
+        sPlatform.audio_play(sPlatform.context, audio_buffer, 2 * num_audio_samples);
+    }
+
+    if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING) {
+        gfx_end_frame();
+    }
+
+#ifdef DISCORDRPC
+    discord_update_rich_presence();
+#endif
+
+    return sLifecycleState == SM64_MODERN_LIFECYCLE_STOP_REQUESTED
+        ? SM64_MODERN_STATUS_STOP_REQUESTED : SM64_MODERN_STATUS_OK;
+}
+
+static SM64ModernStatus lifecycle_request_stop(SM64ModernExitReason reason) {
+    if (reason < SM64_MODERN_EXIT_USER_REQUESTED || reason > SM64_MODERN_EXIT_PLATFORM_REQUESTED) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (sLifecycleState == SM64_MODERN_LIFECYCLE_STOP_REQUESTED) {
+        return SM64_MODERN_STATUS_STOP_REQUESTED;
+    }
+    if (sLifecycleState != SM64_MODERN_LIFECYCLE_RUNNING || !is_owner_thread()) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+
+    sLifecycleState = SM64_MODERN_LIFECYCLE_STOP_REQUESTED;
+    if (sPlatform.exit_requested) {
+        sPlatform.exit_requested(sPlatform.context, reason);
+    }
+    return SM64_MODERN_STATUS_STOP_REQUESTED;
+}
+
+static SM64ModernStatus lifecycle_shutdown(void) {
+    if (sLifecycleState == SM64_MODERN_LIFECYCLE_STOPPED) {
+        return SM64_MODERN_STATUS_OK;
+    }
+    if ((sLifecycleState != SM64_MODERN_LIFECYCLE_RUNNING
+         && sLifecycleState != SM64_MODERN_LIFECYCLE_STOP_REQUESTED
+         && sLifecycleState != SM64_MODERN_LIFECYCLE_FAILED)
+        || (sPlatform.current_thread && !is_owner_thread())) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+
+#ifdef DISCORDRPC
+    if (sGameInitialized) {
+        discord_shutdown();
+    }
+#endif
+    if (sGameInitialized) {
+        configfile_save(configfile_name());
+        controller_shutdown();
+        sGameInitialized = false;
+    }
+    if (sPlatformInitialized) {
+        sPlatform.shutdown(sPlatform.context);
+        sPlatformInitialized = false;
+    }
+    fs_shutdown();
+    gEffectsMemoryPool = NULL;
+    free(sMainPoolMemory);
+    sMainPoolMemory = NULL;
+    memset(&sPlatform, 0, sizeof(sPlatform));
+    sOwnerThread = 0;
+    sLifecycleState = SM64_MODERN_LIFECYCLE_STOPPED;
+    return SM64_MODERN_STATUS_OK;
+}
+
+static SM64ModernStatus lifecycle_get_state(SM64ModernLifecycleState *out_state) {
+    if (!out_state) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    *out_state = sLifecycleState;
+    return SM64_MODERN_STATUS_OK;
+}
+
+static SM64ModernStatus gameplay_get_authority(SM64ModernGameplaySubsystem subsystem,
+                                                SM64ModernAuthority *out_authority) {
+    if (subsystem != SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL || !out_authority) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    *out_authority = SM64_MODERN_AUTHORITY_C;
+    return SM64_MODERN_STATUS_OK;
+}
+
+static SM64ModernStatus gameplay_set_authority(SM64ModernGameplaySubsystem subsystem,
+                                                SM64ModernAuthority authority) {
+    if (subsystem != SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL
+        || authority > SM64_MODERN_AUTHORITY_SWIFT) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    return authority == SM64_MODERN_AUTHORITY_C
+        ? SM64_MODERN_STATUS_OK : SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY;
+}
+
+SM64ModernStatus sm64_modern_get_lifecycle_api(uint32_t requested_version,
+                                               uint32_t output_size,
+                                               SM64ModernLifecycleApiV1 *out_api) {
+    const SM64ModernLifecycleApiV1 api = {
+        { SM64_MODERN_ABI_VERSION_1, sizeof(SM64ModernLifecycleApiV1) },
+        lifecycle_initialize,
+        lifecycle_step,
+        lifecycle_request_stop,
+        lifecycle_shutdown,
+        lifecycle_get_state,
+    };
+
+    if (!out_api) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (requested_version != SM64_MODERN_ABI_VERSION_1) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_VERSION;
+    }
+    if (output_size < sizeof(api)) {
+        return SM64_MODERN_STATUS_BUFFER_TOO_SMALL;
+    }
+    memcpy(out_api, &api, sizeof(api));
+    return SM64_MODERN_STATUS_OK;
+}
+
+SM64ModernStatus sm64_modern_get_gameplay_api(uint32_t requested_version,
+                                              uint32_t output_size,
+                                              SM64ModernGameplayApiV1 *out_api) {
+    const SM64ModernGameplayApiV1 api = {
+        { SM64_MODERN_ABI_VERSION_1, sizeof(SM64ModernGameplayApiV1) },
+        gameplay_get_authority,
+        gameplay_set_authority,
+    };
+
+    if (!out_api) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (requested_version != SM64_MODERN_ABI_VERSION_1) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_VERSION;
+    }
+    if (output_size < sizeof(api)) {
+        return SM64_MODERN_STATUS_BUFFER_TOO_SMALL;
+    }
+    memcpy(out_api, &api, sizeof(api));
+    return SM64_MODERN_STATUS_OK;
+}
+
+void produce_one_frame(void) {
+    (void) lifecycle_step();
+}
+
+void game_deinit(void) {
+    (void) lifecycle_shutdown();
+}
+
+void game_exit(void) {
+    (void) lifecycle_request_stop(SM64_MODERN_EXIT_GAME_REQUESTED);
 }

@@ -14,6 +14,6 @@ struct PCCLIOptions  {
 
 extern struct PCCLIOptions gCLIOpts;
 
-void parse_cli_opts(int argc, char* argv[]);
+bool parse_cli_opts(int argc, char* argv[]);
 
 #endif // _CLIOPTS_H
