@@ -30,8 +30,12 @@ final class GameViewController: NSViewController {
         }
         gameView.updateDrawableSize()
         let size = gameView.metalLayer.drawableSize
+        precondition(size.width > 0 && size.height > 0, "Engine startup requires a drawable-sized surface")
         logger.notice("window_ready layer=CAMetalLayer drawable=\(Int(size.width))x\(Int(size.height))")
 
+        // STUB(M3): configure the Metal device and presentation loop here.
+        // STUB(M5): install native keyboard, mouse, and controller routing
+        // before the engine begins consuming input.
         // The C lifecycle starts last so AppKit owns a complete, measurable
         // surface before the dedicated thread begins stepping the game.
         engineHost.start()

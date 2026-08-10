@@ -57,10 +57,13 @@ final class EngineHost: @unchecked Sendable {
         case idle
         case starting
         case running
-        case stopping
         case stopped
         case failed
     }
+
+    // STUB(M8): replace legacy 30 Hz pacing with the audited deterministic
+    // 1/60-second full-world clock.
+    private static let legacyStepInterval = 1.0 / 30.0
 
     private let condition = NSCondition()
     private var state: State = .idle
@@ -154,7 +157,7 @@ final class EngineHost: @unchecked Sendable {
                 }
             }
 
-            nextStep.addTimeInterval(1.0 / 30.0)
+            nextStep.addTimeInterval(Self.legacyStepInterval)
             condition.lock()
             if !stopRequested {
                 _ = condition.wait(until: nextStep)
@@ -212,6 +215,9 @@ final class EngineHost: @unchecked Sendable {
         var platform = SM64ModernPlatformApiV1()
         platform.header.abi_version = SM64_MODERN_ABI_VERSION_1
         platform.header.struct_size = UInt32(MemoryLayout<SM64ModernPlatformApiV1>.size)
+        // STUB(M3): publish rendering capability after the Metal 4 device and
+        // presentation path exist. STUB(M5): publish audio capability after
+        // AVAudioEngine implements the platform callbacks.
         platform.capabilities = 0
         platform.reserved = 0
         platform.context = Unmanaged.passUnretained(self).toOpaque()

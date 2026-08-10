@@ -464,8 +464,27 @@ GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 
 SM64_MODERN_ENTRY_OBJ := $(BUILD_DIR)/src/pc/pc_main_entry.o
 SM64_MODERN_LEGACY_PLATFORM_OBJ := $(BUILD_DIR)/src/pc/sm64_modern_legacy.o
+# API-selected backend translation units compile empty with the native NONE
+# configuration. Keep even those empty members out of the host-facing archive
+# so it contains only engine/core code and the platform-neutral controller glue.
+SM64_MODERN_NATIVE_BACKEND_O_FILES := $(addprefix $(BUILD_DIR)/, \
+  src/pc/audio/audio_sdl1.o \
+  src/pc/audio/audio_sdl2.o \
+  src/pc/controller/controller_emscripten_keyboard.o \
+  src/pc/controller/controller_sdl1.o \
+  src/pc/controller/controller_sdl2.o \
+  src/pc/gfx/gfx_direct3d11.o \
+  src/pc/gfx/gfx_direct3d12.o \
+  src/pc/gfx/gfx_direct3d_common.o \
+  src/pc/gfx/gfx_dxgi.o \
+  src/pc/gfx/gfx_opengl.o \
+  src/pc/gfx/gfx_opengl_legacy.o \
+  src/pc/gfx/gfx_sdl1.o \
+  src/pc/gfx/gfx_sdl2.o)
 SM64_MODERN_CORE_EXCLUDED_O_FILES := $(SM64_MODERN_ENTRY_OBJ) \
-                                      $(if $(filter 1,$(SM64_MODERN_NATIVE)),$(SM64_MODERN_LEGACY_PLATFORM_OBJ))
+                                      $(if $(filter 1,$(SM64_MODERN_NATIVE)), \
+                                        $(SM64_MODERN_LEGACY_PLATFORM_OBJ) \
+                                        $(SM64_MODERN_NATIVE_BACKEND_O_FILES))
 SM64_MODERN_CORE_O_FILES = $(filter-out $(SM64_MODERN_CORE_EXCLUDED_O_FILES),$(O_FILES)) \
                            $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES)
 SM64_MODERN_ABI_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_abi_smoke.o
@@ -1109,7 +1128,7 @@ $(BUILD_DIR)/sm64-modern-abi-cxx.ok: tests/sm64_modern_abi_smoke.c include/sm64_
 
 $(SM64_MODERN_ABI_SMOKE_OBJ): include/sm64_modern.h
 
-$(SM64_MODERN_CORE): $(SM64_MODERN_CORE_O_FILES)
+$(SM64_MODERN_CORE): Makefile $(SM64_MODERN_CORE_O_FILES)
 	$(RM) $@
 	$(AR) rcs $@ $(SM64_MODERN_CORE_O_FILES)
 
