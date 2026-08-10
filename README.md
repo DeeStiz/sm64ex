@@ -28,3 +28,26 @@ For example `--savepath .` will read saves from the current directory (which not
 For building instructions, please refer to the [wiki](https://github.com/sm64pc/sm64ex/wiki).
 
 **Make sure you have MXE first before attempting to compile for Windows on Linux and WSL. Follow the guide on the wiki.**
+
+### macOS baseline build
+
+The macOS build uses Xcode's Apple Clang and discovers SDL2 and GLEW with
+`pkg-config`. With those dependencies installed, a legal ROM can remain outside
+the repository:
+
+```sh
+brew install sdl2-compat glew pkgconf mingw-w64
+make VERSION=us BASEROM=/absolute/path/to/baserom.us.z64
+```
+
+For an isolated AddressSanitizer build, use a separate build directory:
+
+```sh
+make DEBUG=1 SANITIZE=address BUILD_DIR_BASE=build-asan \
+  VERSION=us BASEROM=/absolute/path/to/baserom.us.z64
+```
+
+`BASEROM` is read directly during local asset extraction; it is not copied into
+the repository. `SM64_BASEROM_US`, `SM64_BASEROM_JP`, and
+`SM64_BASEROM_EU` provide the equivalent per-version environment variables for
+multi-version automation.

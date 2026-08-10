@@ -139,7 +139,7 @@ $(BUILD_DIR)/levels/%/leveldata.elf: SEGMENT_ADDRESS := 0x07000000
 
 # TODO: Generate these rules from the level configs?
 
-define level_rules = 
+define level_rules
     $(1)_SEG7_FILES     := $$(patsubst %.png,%.inc.c,$$(wildcard levels/$(1)/*.png))
     $$(BUILD_DIR)/levels/$(1)/leveldata.o: $$(addprefix $$(BUILD_DIR)/,$$($(1)_SEG7_FILES))
     $$(BUILD_DIR)/levels/$(1)/leveldata.elf: TEXTURE_BIN := $(2)
@@ -149,6 +149,9 @@ ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(MAKECMDGOALS),distclean)
 $(BUILD_DIR)/level_rules.mk: levels/level_rules.mk levels/level_defines.h
 	$(CPP) $(VERSION_CFLAGS) -I . -o $@ $<
+ifeq ($(NOEXTRACT),0)
+$(BUILD_DIR)/level_rules.mk: .assets-local.txt
+endif
 include $(BUILD_DIR)/level_rules.mk
 endif
 endif

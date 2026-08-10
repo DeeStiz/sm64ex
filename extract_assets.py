@@ -17,6 +17,13 @@ def read_local_asset_list(f):
         ret.append(line.strip())
     return ret
 
+
+def baserom_path(lang, lang_count):
+    """Return a local ROM path without requiring a repo-root ROM copy."""
+    version_path = os.environ.get("SM64_BASEROM_" + lang.upper())
+    shared_path = os.environ.get("SM64_BASEROM") if lang_count == 1 else None
+    return os.path.abspath(os.path.expanduser(version_path or shared_path or ("baserom." + lang + ".z64")))
+
 def asset_needs_update(asset, version):
     if version <= 5 and asset == "textures/spooky/bbh_textures.00800.rgba16.png":
         return True
@@ -127,12 +134,17 @@ def main():
     # Load ROMs
     roms = {}
     for lang in langs:
-        fname = "baserom." + lang + ".z64"
+        fname = baserom_path(lang, len(langs))
         try:
             with open(fname, "rb") as f:
                 roms[lang] = f.read()
         except Exception as e:
             print("Failed to open " + fname + "! " + str(e))
+            print(
+                "Set SM64_BASEROM_"
+                + lang.upper()
+                + " (or SM64_BASEROM for a single version) to a legal ROM path."
+            )
             sys.exit(1)
         sha1 = hashlib.sha1(roms[lang]).hexdigest()
         with open("sm64." + lang + ".sha1", "r") as f:
@@ -201,7 +213,7 @@ def main():
                     "-d",
                     "-o",
                     str(mio0),
-                    "baserom." + lang + ".z64",
+                    baserom_path(lang, len(langs)),
                     "-",
                 ],
                 check=True,

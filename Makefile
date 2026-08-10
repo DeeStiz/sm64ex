@@ -30,6 +30,14 @@ TARGET_WEB ?= 0
 # Makeflag to enable OSX fixes
 OSX_BUILD ?= 0
 
+# Optional path to a legally obtained ROM used for local asset extraction.
+# The path is passed to extract_assets.py without copying the ROM into the repo.
+BASEROM ?=
+
+# Optional Clang sanitizer name (for example, address or undefined). Keeping
+# this separate from CC preserves parse-time tool bootstrap commands.
+SANITIZE ?=
+
 # Enable -no-pie linker option
 NO_PIE ?= 1
 
@@ -112,25 +120,27 @@ endif
 # macOS overrides
 ifeq ($(HOST_OS),Darwin)
   OSX_BUILD := 1
-  # Using Homebrew?
-  ifeq ($(shell which brew >/dev/null 2>&1 && echo y),y)
-	PLATFORM := $(shell uname -m)
-	OSX_GCC_VER = $(shell find `brew --prefix`/bin/gcc* | grep -oE '[[:digit:]]+' | sort -n | uniq | tail -1)
-	CC := gcc-$(OSX_GCC_VER)
-	CXX := g++-$(OSX_GCC_VER)
-	CPP := cpp-$(OSX_GCC_VER) -P
-	PLATFORM_CFLAGS := -I $(shell brew --prefix)/include
-	PLATFORM_LDFLAGS := -L $(shell brew --prefix)/lib
-  # Using MacPorts?
+  PLATFORM := $(shell uname -m)
+
+  # Xcode's Apple Clang is the supported default on macOS. Command-line and
+  # environment overrides still win, which keeps custom toolchains usable.
+  ifeq ($(origin CC),default)
+    CC := clang
+  endif
+  ifeq ($(origin CXX),default)
+    CXX := clang++
+  endif
+  ifeq ($(origin CPP),default)
+    # Clang otherwise treats extensionless and .mk inputs as linker inputs.
+    CPP := clang -E -P -x c
+  endif
+
+  ifeq ($(shell command -v brew >/dev/null 2>&1 && echo y),y)
+    PLATFORM_CFLAGS := -I$(shell brew --prefix)/include
+    PLATFORM_LDFLAGS := -L$(shell brew --prefix)/lib
   else ifeq ($(shell test -d /opt/local/lib && echo y),y)
-	OSX_GCC_VER = $(shell find /opt/local/bin/gcc* | grep -oE '[[:digit:]]+' | sort -n | uniq | tail -1)
-	CC := gcc-mp-$(OSX_GCC_VER)
-	CXX := g++-mp-$(OSX_GCC_VER)
-	CPP := cpp-mp-$(OSX_GCC_VER) -P
-	PLATFORM_CFLAGS := -I /opt/local/include
-	PLATFORM_LDFLAGS := -L /opt/local/lib
-  else
-	$(error No suitable macOS toolchain found, have you installed Homebrew?)
+    PLATFORM_CFLAGS := -I/opt/local/include
+    PLATFORM_LDFLAGS := -L/opt/local/lib
   endif
 endif
 
@@ -258,14 +268,17 @@ ifneq ($(MAKECMDGOALS),distclean)
 # Make sure assets exist
 NOEXTRACT ?= 0
 ifeq ($(NOEXTRACT),0)
-DUMMY != ./extract_assets.py $(VERSION) >&2 || echo FAIL
+ifneq ($(strip $(BASEROM)),)
+  EXTRACT_ROM_ENV := SM64_BASEROM="$(abspath $(BASEROM))"
+endif
+DUMMY := $(shell $(EXTRACT_ROM_ENV) ./extract_assets.py $(VERSION) >&2 || echo FAIL)
 ifeq ($(DUMMY),FAIL)
   $(error Failed to extract assets)
 endif
 endif
 
 # Make tools if out of date
-DUMMY != CC=$(CC) CXX=$(CXX) $(MAKE) -C tools -j1 >&2 || echo FAIL
+DUMMY := $(shell CC=$(CC) CXX=$(CXX) $(MAKE) -C tools -j1 >&2 || echo FAIL)
 ifeq ($(DUMMY),FAIL)
   $(error Failed to build tools)
 endif
@@ -463,7 +476,9 @@ ENDIAN_BITWIDTH := $(BUILD_DIR)/endian-and-bitwidth
 AS := $(CROSS)as
 
 ifeq ($(OSX_BUILD),1)
-AS := i686-w64-mingw32-as
+  # The single source-authored sequence uses GNU assembler macros. Keep the
+  # game on Apple Clang while using MinGW binutils for this data-only object.
+  AS := i686-w64-mingw32-as
 endif
 
 ifneq ($(TARGET_WEB),1) # As in, not-web PC port
@@ -493,6 +508,8 @@ ifeq ($(WINDOWS_BUILD),1) # fixes compilation in MXE on Linux and WSL
   OBJCOPY := objcopy
   OBJDUMP := $(CROSS)objdump
 else ifeq ($(OSX_BUILD),1)
+  # Source-authored sequence data is assembled into a temporary PE/COFF
+  # object, then its .rodata section is copied to the portable .m64 payload.
   OBJDUMP := i686-w64-mingw32-objdump
   OBJCOPY := i686-w64-mingw32-objcopy
 else # Linux & other builds
@@ -528,6 +545,7 @@ else ifeq ($(findstring SDL,$(WINDOW_API)),SDL)
   else ifeq ($(TARGET_RPI),1)
     BACKEND_LDFLAGS += -lGLESv2
   else ifeq ($(OSX_BUILD),1)
+    BACKEND_CFLAGS += $(shell pkg-config --cflags glew)
     BACKEND_LDFLAGS += -framework OpenGL $(shell pkg-config --libs glew)
   else
     BACKEND_LDFLAGS += -lGL
@@ -685,6 +703,20 @@ else
 
 endif # End of LDFLAGS
 
+ifneq ($(strip $(SANITIZE)),)
+  SANITIZER_FLAGS := -fsanitize=$(SANITIZE) -fno-omit-frame-pointer
+  CFLAGS += $(SANITIZER_FLAGS)
+  LDFLAGS += $(SANITIZER_FLAGS)
+  ifeq ($(OSX_BUILD)$(SDL2_USED),11)
+    # sdl2-compat loads SDL3 dynamically. ASan does not preserve the
+    # compatibility dylib's loader-relative lookup on current macOS betas.
+    SANITIZER_SDL3_LIBDIR := $(shell pkg-config --variable=libdir sdl3)
+    ifneq ($(strip $(SANITIZER_SDL3_LIBDIR)),)
+      LDFLAGS += -Wl,-rpath,$(SANITIZER_SDL3_LIBDIR)
+    endif
+  endif
+endif
+
 # Prevent a crash with -sopt
 export LANG := C
 
@@ -707,6 +739,12 @@ LOADER = loader64
 LOADER_FLAGS = -vwf
 SHA1SUM = sha1sum
 ZEROTERM = $(PYTHON) $(TOOLS_DIR)/zeroterm.py
+
+# Generated header rules historically assumed the parse-time tool bootstrap
+# had already produced textconv. Keep the dependency explicit so clean and
+# parallel builds cannot race the tool build.
+$(TEXTCONV):
+	CC=$(CC) CXX=$(CXX) $(MAKE) -C $(TOOLS_DIR) textconv
 
 ###################### Dependency Check #####################
 
@@ -786,13 +824,16 @@ $(BUILD_DIR)/lib/rsp.o: $(BUILD_DIR)/rsp/rspboot.bin $(BUILD_DIR)/rsp/fast3d.bin
 #Required so the compiler doesn't complain about this not existing.
 $(BUILD_DIR)/src/game/camera.o: $(BUILD_DIR)/include/text_strings.h
 
-$(BUILD_DIR)/include/text_strings.h: include/text_strings.h.in
+$(BUILD_DIR)/include/text_strings.h: include/text_strings.h.in $(TEXTCONV)
+	@mkdir -p $(dir $@)
 	$(TEXTCONV) charmap.txt $< $@
 
-$(BUILD_DIR)/include/text_menu_strings.h: include/text_menu_strings.h.in
+$(BUILD_DIR)/include/text_menu_strings.h: include/text_menu_strings.h.in $(TEXTCONV)
+	@mkdir -p $(dir $@)
 	$(TEXTCONV) charmap_menu.txt $< $@
 
-$(BUILD_DIR)/include/text_options_strings.h: include/text_options_strings.h.in
+$(BUILD_DIR)/include/text_options_strings.h: include/text_options_strings.h.in $(TEXTCONV)
+	@mkdir -p $(dir $@)
 	$(TEXTCONV) charmap.txt $< $@
 
 ifeq ($(VERSION),eu)
@@ -830,7 +871,7 @@ RSP_DIRS := $(BUILD_DIR)/rsp
 ALL_DIRS := $(BUILD_DIR) $(addprefix $(BUILD_DIR)/,$(SRC_DIRS) $(ASM_DIRS) $(GODDARD_SRC_DIRS) $(ULTRA_SRC_DIRS) $(ULTRA_ASM_DIRS) $(ULTRA_BIN_DIRS) $(BIN_DIRS) $(TEXTURE_DIRS) $(TEXT_DIRS) $(SOUND_SAMPLE_DIRS) $(addprefix levels/,$(LEVEL_DIRS)) include) $(MIO0_DIR) $(addprefix $(MIO0_DIR)/,$(VERSION)) $(SOUND_BIN_DIR) $(SOUND_BIN_DIR)/sequences/$(VERSION) $(RSP_DIRS)
 
 # Make sure build directory exists before compiling anything
-DUMMY != mkdir -p $(ALL_DIRS)
+DUMMY := $(shell mkdir -p $(ALL_DIRS))
 
 $(BUILD_DIR)/include/text_strings.h: $(BUILD_DIR)/include/text_menu_strings.h
 $(BUILD_DIR)/include/text_strings.h: $(BUILD_DIR)/include/text_options_strings.h

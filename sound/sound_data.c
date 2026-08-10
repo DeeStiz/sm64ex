@@ -10,6 +10,9 @@ unsigned char gMusicData[] = {
 #include "sound/sequences.bin.inc.c"
 };
 
-unsigned char gBankSetsData[] = {
+// Audio initialization performs the original fixed 0x100-byte DMA. Pad the
+// generated table to that complete accessible range instead of reading beyond
+// a shorter regional payload into adjacent globals.
+unsigned char gBankSetsData[0x100] = {
 #include "sound/bank_sets.inc.c"
 };
