@@ -1,0 +1,70 @@
+name: SM64Modern
+options:
+  createIntermediateGroups: true
+  deploymentTarget:
+    macOS: "27.0"
+
+settings:
+  base:
+    ARCHS: arm64
+    CODE_SIGN_IDENTITY: Apple Development
+    CODE_SIGNING_ALLOWED: NO
+    CODE_SIGN_STYLE: Manual
+    ENABLE_HARDENED_RUNTIME: YES
+    MACOSX_DEPLOYMENT_TARGET: "27.0"
+    ONLY_ACTIVE_ARCH: YES
+    SWIFT_OBJC_BRIDGING_HEADER: SM64Modern/SM64Modern-Bridging-Header.h
+    SWIFT_STRICT_CONCURRENCY: complete
+    SWIFT_VERSION: "6.0"
+
+targets:
+  SM64Modern:
+    type: application
+    platform: macOS
+    deploymentTarget: "27.0"
+    sources:
+      - path: SM64Modern
+        excludes:
+          - Info.plist
+          - SM64Modern.entitlements
+          - SM64Modern-Bridging-Header.h
+    preBuildScripts:
+      - name: Build Native SM64 Core
+        script: '"$SRCROOT/script/build_native_core.sh" "$CONFIGURATION"'
+        basedOnDependencyAnalysis: false
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: NO
+        HEADER_SEARCH_PATHS:
+          - "$(inherited)"
+          - "$(SRCROOT)/include"
+        INFOPLIST_FILE: SM64Modern/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: io.github.deestiz.sm64modern
+        PRODUCT_NAME: SM64 Modern
+        SM64_MODERN_PROJECT_ROOT: "$(SRCROOT)"
+      configs:
+        Debug:
+          CODE_SIGN_ENTITLEMENTS: SM64Modern/SM64ModernDebug.entitlements
+          GCC_OPTIMIZATION_LEVEL: "0"
+          OTHER_LDFLAGS:
+            - "$(inherited)"
+            - "$(SRCROOT)/build/sm64-modern-debug/us_pc/libsm64core.a"
+            - -lm
+            - -lpthread
+          SM64_MODERN_SAVE_ROOT: "$(SRCROOT)/build/sm64-modern-state"
+        Release:
+          CODE_SIGN_ENTITLEMENTS: SM64Modern/SM64Modern.entitlements
+          OTHER_LDFLAGS:
+            - "$(inherited)"
+            - "$(SRCROOT)/build/sm64-modern-release/us_pc/libsm64core.a"
+            - -lm
+            - -lpthread
+          SM64_MODERN_SAVE_ROOT: ""
+
+schemes:
+  SM64Modern:
+    build:
+      targets:
+        SM64Modern: all
+    run:
+      config: Debug

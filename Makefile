@@ -60,6 +60,10 @@ EXTERNAL_DATA ?= 0
 # Enable Discord Rich Presence
 DISCORDRPC ?= 0
 
+# Build the callable core without the legacy process/platform adapter. The
+# native AppKit host supplies platform services through sm64_modern.h instead.
+SM64_MODERN_NATIVE ?= 0
+
 # Various workarounds for weird toolchains
 
 NO_BZERO_BCOPY ?= 0
@@ -75,6 +79,13 @@ WINDOW_API ?= SDL2
 AUDIO_API ?= SDL2
 # Controller backends (can have multiple, space separated): SDL2, SDL1
 CONTROLLER_API ?= SDL2
+
+ifeq ($(SM64_MODERN_NATIVE),1)
+  RENDER_API := NONE
+  WINDOW_API := NONE
+  AUDIO_API := NONE
+  CONTROLLER_API := NONE
+endif
 
 # Misc settings for EXTERNAL_DATA
 
@@ -452,7 +463,10 @@ ULTRA_O_FILES := $(foreach file,$(ULTRA_S_FILES),$(BUILD_DIR)/$(file:.s=.o)) \
 GODDARD_O_FILES := $(foreach file,$(GODDARD_C_FILES),$(BUILD_DIR)/$(file:.c=.o))
 
 SM64_MODERN_ENTRY_OBJ := $(BUILD_DIR)/src/pc/pc_main_entry.o
-SM64_MODERN_CORE_O_FILES = $(filter-out $(SM64_MODERN_ENTRY_OBJ),$(O_FILES)) \
+SM64_MODERN_LEGACY_PLATFORM_OBJ := $(BUILD_DIR)/src/pc/sm64_modern_legacy.o
+SM64_MODERN_CORE_EXCLUDED_O_FILES := $(SM64_MODERN_ENTRY_OBJ) \
+                                      $(if $(filter 1,$(SM64_MODERN_NATIVE)),$(SM64_MODERN_LEGACY_PLATFORM_OBJ))
+SM64_MODERN_CORE_O_FILES = $(filter-out $(SM64_MODERN_CORE_EXCLUDED_O_FILES),$(O_FILES)) \
                            $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES)
 SM64_MODERN_ABI_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_abi_smoke.o
 
@@ -768,6 +782,8 @@ $(TEXTCONV):
 all: $(EXE)
 
 core: $(SM64_MODERN_CORE)
+
+native-core: $(SM64_MODERN_CORE)
 
 abi-smoke: $(SM64_MODERN_ABI_SMOKE) $(BUILD_DIR)/sm64-modern-abi-cxx.ok
 	$(SM64_MODERN_ABI_SMOKE)
@@ -1103,7 +1119,7 @@ $(SM64_MODERN_ABI_SMOKE): $(SM64_MODERN_ABI_SMOKE_OBJ) $(SM64_MODERN_CORE)
 $(EXE): $(SM64_MODERN_ENTRY_OBJ) $(SM64_MODERN_CORE) $(MIO0_FILES:.mio0=.o) $(if $(RPC_LIBS),$(BUILD_DIR)/$(RPC_LIBS),)
 	$(LD) -L $(BUILD_DIR) -o $@ $(SM64_MODERN_ENTRY_OBJ) $(SM64_MODERN_CORE) $(LDFLAGS)
 
-.PHONY: all core abi-smoke clean distclean default diff test load libultra res
+.PHONY: all core native-core abi-smoke clean distclean default diff test load libultra res
 .PRECIOUS: $(BUILD_DIR)/bin/%.elf $(SOUND_BIN_DIR)/%.ctl $(SOUND_BIN_DIR)/%.tbl $(SOUND_SAMPLE_TABLES) $(SOUND_BIN_DIR)/%.s $(BUILD_DIR)/%
 .DELETE_ON_ERROR:
 

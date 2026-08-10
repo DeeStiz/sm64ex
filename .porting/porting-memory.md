@@ -3,7 +3,8 @@
 ## Current Milestone
 
 - M2 success criterion: a signed development app opens, owns a `CAMetalLayer`, and drives a dedicated engine thread.
-- Start M2 with `/porting-start-milestone`; use the M1 handoff and callable C ABI rather than moving legacy engine object pointers into Swift.
+- Approved M2 scope: add a native-core Make flavor, XcodeGen Swift/AppKit app, `CAMetalLayer` view, owner-thread lifecycle host paced at legacy 30 Hz, isolated local paths, and one build/run/verification entrypoint.
+- M2 keeps rendering/audio capabilities disabled and leaves `MTLDevice`, display link, clear/present, native input/audio, and 60 Hz simulation to M3/M5/M8.
 
 ## Watch List
 
@@ -15,6 +16,7 @@
 - Apple AddressSanitizer leak detection is unavailable on this platform; later long-run leak acceptance needs another supported instrument.
 - Full Linux, Windows, and web legacy builds remain regression gates; M1's changed C paths passed MinGW C syntax checks, not full product builds.
 - Developer ID Application signing is not currently available; development/App Store identities do not satisfy direct notarized distribution.
+- `com.apple.developer.sustained-execution` is retained for provisioned builds; local M2 Debug signing omits it because no matching `io.github.deestiz.sm64modern` development profile is installed.
 
 ## Feature Status
 
