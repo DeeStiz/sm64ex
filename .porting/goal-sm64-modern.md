@@ -17,7 +17,7 @@ Create a parallel Apple-silicon macOS 27 application using Swift 6.4, AppKit, Me
 | Milestone | Success criterion | Status |
 |---|---|---|
 | M0: Legacy macOS baseline | Apple Clang build launches with externally supplied legal ROM assets and baseline evidence can be collected. | Complete |
-| M1: Callable C core | Static core exposes versioned lifecycle/platform/gameplay ABIs while legacy executable still builds. | In progress |
+| M1: Callable C core | Static core exposes versioned lifecycle/platform/gameplay ABIs while legacy executable still builds. | Complete |
 | M2: AppKit host | Signed development app opens, owns a CAMetalLayer, and drives a dedicated engine thread. | Pending |
 | M3: Metal 4 clear | Device, queue, command allocator, drawable residency, clear, and present validate cleanly. | Pending |
 | M4: Metal 4 scene | Dynamic MSL shaders, textures, depth, samplers, state, and display lists render a complete scene. | Pending |
