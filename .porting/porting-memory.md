@@ -2,9 +2,9 @@
 
 ## Current Milestone
 
-- M2 success criterion: a signed development app opens, owns a `CAMetalLayer`, and drives a dedicated engine thread.
-- Approved M2 scope: add a native-core Make flavor, XcodeGen Swift/AppKit app, `CAMetalLayer` view, owner-thread lifecycle host paced at legacy 30 Hz, isolated local paths, and one build/run/verification entrypoint.
-- M2 keeps rendering/audio capabilities disabled and leaves `MTLDevice`, display link, clear/present, native input/audio, and 60 Hz simulation to M3/M5/M8.
+- M3 success criterion: device, queue, command allocator, drawable residency, clear, and present validate cleanly.
+- Start M3 with `/porting-start-milestone m3`; preserve M2's AppKit/lifecycle boundaries and load `porting-handoff-sm64-modern-M2.md` before changing the layer or engine host.
+- M3 may enable rendering capability only after its Metal device and presentation path are complete; native input/audio and 60 Hz simulation remain M5/M8 work.
 
 ## Watch List
 
@@ -12,7 +12,7 @@
 - macOS still needs `i686-w64-mingw32-as` and `objcopy` for the one source-authored N64 sequence even though all game C/C++ uses Apple Clang.
 - The existing `60fps_ex.patch` renders interpolated frames but keeps gameplay at 30 Hz; it is not the target 60 Hz simulation.
 - M0/M1 screenshots and the short M0 performance trace are ignored local evidence, not checked-in ground truth or sustained-performance acceptance.
-- The raw SDL host emits bundle-identity/AppIntents warnings, and SDL AudioQueue shutdown emitted `-66671`; these are deferred to M2 and M5.
+- The native AppKit host resolves the raw SDL bundle-identity warning; the legacy SDL AudioQueue shutdown code `-66671` remains deferred to M5.
 - Apple AddressSanitizer leak detection is unavailable on this platform; later long-run leak acceptance needs another supported instrument.
 - Full Linux, Windows, and web legacy builds remain regression gates; M1's changed C paths passed MinGW C syntax checks, not full product builds.
 - Developer ID Application signing is not currently available; development/App Store identities do not satisfy direct notarized distribution.
@@ -24,14 +24,14 @@
 |---|---|
 | macOS legacy build | Implemented — Apple Clang arm64 build, external ROM extraction, OpenGL launch, LLDB/visual evidence, and ASan route pass |
 | Callable C core | Implemented — versioned lifecycle/platform/gameplay POD ABI, static archive, legacy adapter, and C/C++ smoke consumer |
-| AppKit host | Not started |
+| AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 30 Hz C-core owner thread with clean shutdown |
 | Metal 4 device/presentation | Not started |
 | Metal 4 rendering | Not started |
 | Native input/audio | Not started |
 | Gameplay parity | Not started |
 | Swift gameplay | Not started |
 | Full-world 60 Hz | Not started |
-| Signing/notarization | Not started |
+| Signing/notarization | Partial — hardened Apple Development Debug signing works; sustained-execution Release provisioning and Developer ID/notarization remain external/future gates |
 
 ## Curated Knowledge
 
@@ -45,3 +45,8 @@
 - Lifecycle `initialize`, `step`, `request_stop`, and `shutdown` are single-owner-thread calls. Deep `game_exit()` requests a stop; the host loop owns orderly teardown.
 - The core copies versioned configuration/platform tables during initialization; the platform `context` remains host-owned. Keep Swift away from the legacy C object graph.
 - Gameplay remains at global `cAuthority`; the generic snapshot/effect envelope is intentionally marked `STUB(M6)` until deterministic schemas and record streams exist.
+- M2 is committed as `8069b55` plus validation fixes `5f8304a`; `project.yml` generates the Swift 6.4/macOS 27 AppKit target and `script/build_and_run.sh` is the canonical build, sign, launch, logging, debugger, and verification entrypoint.
+- The native `SM64_MODERN_NATIVE=1` archive uses `*_NONE`, excludes entry/legacy/API-backend members, and rebuilds when `Makefile` changes; legacy archives retain their original backend objects.
+- `GameView.makeBackingLayer()` owns a `CAMetalLayer` whose `drawableSize` is updated in backing pixels. M2 deliberately creates no `MTLDevice`, display link, drawable, or render commands.
+- `EngineHost` owns lifecycle calls on one dedicated thread, paces legacy simulation at 30 Hz, and synchronously completes owner-thread stop/shutdown before AppKit termination.
+- M2 validation passed LLDB, fullscreen/red-close shutdown, Metal-negative validation, full Swift+C ASan, `leaks` (0 bytes), ABI smoke, signature/package checks, and a clean legacy rebuild; the ignored black-window capture is `build/sm64-modern-m2-validation.png`.
