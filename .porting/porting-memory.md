@@ -3,8 +3,10 @@
 ## Current Milestone
 
 - M3 success criterion: device, queue, command allocator, drawable residency, clear, and present validate cleanly.
-- Start M3 with `/porting-start-milestone m3`; preserve M2's AppKit/lifecycle boundaries and load `porting-handoff-sm64-modern-M2.md` before changing the layer or engine host.
-- M3 may enable rendering capability only after its Metal device and presentation path are complete; native input/audio and 60 Hz simulation remain M5/M8 work.
+- Approved M3 scope: configure the existing raw `CAMetalLayer`; add an owner-thread `CAMetalDisplayLink` and reusable Metal 4 clear/present frame slots; hand resize changes to that thread; drain GPU work before shutdown; add validation/capture-ready telemetry and launch modes.
+- Approved bring-up defaults: `BGRA8Unorm`, two in-flight frame slots, and a fixed dark SM64-blue diagnostic clear.
+- Keep `SM64_MODERN_PLATFORM_CAP_RENDERING` disabled until M4 supplies the native scene backend; native input/audio and 60 Hz simulation remain M5/M8 work.
+- M3 implementation is complete and awaiting `/porting-validate`; the milestone remains in progress until Phase 3 finishes.
 
 ## Watch List
 
@@ -25,7 +27,7 @@
 | macOS legacy build | Implemented — Apple Clang arm64 build, external ROM extraction, OpenGL launch, LLDB/visual evidence, and ASan route pass |
 | Callable C core | Implemented — versioned lifecycle/platform/gameplay POD ABI, static archive, legacy adapter, and C/C++ smoke consumer |
 | AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 30 Hz C-core owner thread with clean shutdown |
-| Metal 4 device/presentation | Not started |
+| Metal 4 device/presentation | Implemented, pending validation — raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
 | Metal 4 rendering | Not started |
 | Native input/audio | Not started |
 | Gameplay parity | Not started |
@@ -50,3 +52,6 @@
 - `GameView.makeBackingLayer()` owns a `CAMetalLayer` whose `drawableSize` is updated in backing pixels. M2 deliberately creates no `MTLDevice`, display link, drawable, or render commands.
 - `EngineHost` owns lifecycle calls on one dedicated thread, paces legacy simulation at 30 Hz, and synchronously completes owner-thread stop/shutdown before AppKit termination.
 - M2 validation passed LLDB, fullscreen/red-close shutdown, Metal-negative validation, full Swift+C ASan, `leaks` (0 bytes), ABI smoke, signature/package checks, and a clean legacy rebuild; the ignored black-window capture is `build/sm64-modern-m2-validation.png`.
+- M3 keeps the core rendering capability at zero while `MetalRenderer` independently proves the native substrate: `BGRA8Unorm`, two reusable Metal 4 command-buffer/allocator slots, the layer residency set on the queue, shared-event slot reuse, exact wait/commit/signal/present ordering, and apply-after-present resize publication.
+- The dedicated engine thread now runs a real `CFRunLoop` with a 30 Hz lifecycle timer and an owner-thread `CAMetalDisplayLink`; AppKit only publishes pixel-size changes and synchronously stops the run loop for teardown.
+- M3 implementation evidence on Apple M5 Max: strict Swift 6 Debug build passed; Metal API and GPU validation enabled with no Metal validation errors; final shutdown drained completion value 3 and exited status 0; `/tmp/sm64-modern-m3-clean.gputrace` is 2.7 MB with one labeled command buffer/clear encoder and a 960x720 `BGRA8Unorm` Clear/Store drawable; the fetched ignored visual is `build/sm64-modern-m3-clear.png`.

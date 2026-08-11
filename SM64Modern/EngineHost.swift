@@ -1,6 +1,8 @@
 import AppKit
 import Darwin
 import Foundation
+import Metal
+import QuartzCore
 import os
 
 private let engineLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "EngineHost")
@@ -18,6 +20,12 @@ private func platformInitialize(
         return SM64_MODERN_STATUS_INVALID_STATE
     }
     let title = windowTitle.map(String.init(cString:)) ?? ""
+    do {
+        try host.initializeMetalOnEngineThread()
+    } catch {
+        engineLogger.error("metal_initialize_failed error=\(error.localizedDescription, privacy: .public)")
+        return SM64_MODERN_STATUS_PLATFORM_ERROR
+    }
     engineLogger.notice("platform_initialized title=\(title, privacy: .public)")
     return SM64_MODERN_STATUS_OK
 }
@@ -25,7 +33,12 @@ private func platformInitialize(
 private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     guard let host = engineHost(from: context) else { return }
     assert(host.isCurrentEngineThread)
-    engineLogger.notice("platform_shutdown")
+    do {
+        try host.shutdownMetalOnEngineThread()
+        engineLogger.notice("platform_shutdown")
+    } catch {
+        engineLogger.fault("platform_shutdown_failed error=\(error.localizedDescription, privacy: .public)")
+    }
 }
 
 private func platformCurrentThread(_ context: UnsafeMutableRawPointer?) -> UInt64 {
@@ -53,6 +66,12 @@ private func platformError(
 }
 
 final class EngineHost: @unchecked Sendable {
+    private struct MetalConfiguration {
+        let device: any MTLDevice
+        let layer: CAMetalLayer
+        let drawableSize: CGSize
+    }
+
     private enum State {
         case idle
         case starting
@@ -71,11 +90,35 @@ final class EngineHost: @unchecked Sendable {
     private var requestedExitReason = SM64_MODERN_EXIT_USER_REQUESTED
     private var engineThreadIdentifier: UInt64 = 0
     private var stepCount: UInt64 = 0
+    private var engineRunStatus = SM64_MODERN_STATUS_OK
     private var lifecycle = SM64ModernLifecycleApiV1()
+    private var metalConfiguration: MetalConfiguration?
+    private var metalRenderer: MetalRenderer?
+    private var pendingDrawableSize: CGSize?
+    private var engineRunLoop: CFRunLoop?
 
     var isCurrentEngineThread: Bool {
         condition.withLock {
             engineThreadIdentifier != 0 && engineThreadIdentifier == Self.currentThreadIdentifier()
+        }
+    }
+
+    func configureMetal(device: any MTLDevice, layer: CAMetalLayer, drawableSize: CGSize) {
+        precondition(Thread.isMainThread, "AppKit must configure the Metal surface")
+        condition.withLock {
+            precondition(state == .idle, "Metal must be configured before EngineHost.start")
+            metalConfiguration = MetalConfiguration(device: device, layer: layer, drawableSize: drawableSize)
+        }
+    }
+
+    func requestDrawableSize(_ size: CGSize) {
+        guard size.width > 0, size.height > 0 else { return }
+        let runLoop = condition.withLock { () -> CFRunLoop? in
+            pendingDrawableSize = size
+            return engineRunLoop
+        }
+        if let runLoop {
+            CFRunLoopWakeUp(runLoop)
         }
     }
 
@@ -103,7 +146,11 @@ final class EngineHost: @unchecked Sendable {
         }
         stopRequested = true
         requestedExitReason = reason
+        let runLoop = engineRunLoop
         condition.broadcast()
+        if let runLoop {
+            CFRunLoopStop(runLoop)
+        }
         while state != .stopped && state != .failed {
             condition.wait()
         }
@@ -121,6 +168,7 @@ final class EngineHost: @unchecked Sendable {
         let identifier = Self.currentThreadIdentifier()
         condition.withLock {
             engineThreadIdentifier = identifier
+            engineRunLoop = CFRunLoopGetCurrent()
         }
         engineLogger.notice("engine_thread_started token=\(identifier) main=\(Thread.isMainThread)")
 
@@ -139,37 +187,22 @@ final class EngineHost: @unchecked Sendable {
         }
         engineLogger.notice("lifecycle_running cadence_hz=30 capabilities=0")
 
-        var nextStep = Date()
-        var runStatus = SM64_MODERN_STATUS_OK
-        while runStatus == SM64_MODERN_STATUS_OK {
-            let shouldStop = condition.withLock { stopRequested }
-            if shouldStop {
-                let reason = condition.withLock { requestedExitReason }
-                runStatus = lifecycle.request_stop(reason)
-                break
-            }
+        engineRunStatus = SM64_MODERN_STATUS_OK
+        let stepTimer = Timer(timeInterval: Self.legacyStepInterval, repeats: true) { [self] _ in
+            stepCoreOnEngineThread()
+        }
+        RunLoop.current.add(stepTimer, forMode: .common)
+        stepTimer.fire()
+        CFRunLoopRun()
+        stepTimer.invalidate()
 
-            runStatus = lifecycle.step()
-            if runStatus == SM64_MODERN_STATUS_OK {
-                stepCount += 1
-                if stepCount == 1 || stepCount.isMultiple(of: 300) {
-                    engineLogger.notice("lifecycle_step count=\(self.stepCount)")
-                }
-            }
-
-            nextStep.addTimeInterval(Self.legacyStepInterval)
-            condition.lock()
-            if !stopRequested {
-                _ = condition.wait(until: nextStep)
-            }
-            condition.unlock()
-            if nextStep.timeIntervalSinceNow < -0.25 {
-                nextStep = Date()
-            }
+        if engineRunStatus == SM64_MODERN_STATUS_OK && condition.withLock({ stopRequested }) {
+            let reason = condition.withLock { requestedExitReason }
+            engineRunStatus = lifecycle.request_stop(reason)
         }
 
-        if runStatus != SM64_MODERN_STATUS_OK && runStatus != SM64_MODERN_STATUS_STOP_REQUESTED {
-            engineLogger.error("lifecycle_step_failed status=\(runStatus)")
+        if engineRunStatus != SM64_MODERN_STATUS_OK && engineRunStatus != SM64_MODERN_STATUS_STOP_REQUESTED {
+            engineLogger.error("lifecycle_step_failed status=\(self.engineRunStatus)")
         }
 
         let shutdownStatus = lifecycle.shutdown()
@@ -180,6 +213,24 @@ final class EngineHost: @unchecked Sendable {
             DispatchQueue.main.async {
                 NSApplication.shared.terminate(nil)
             }
+        }
+    }
+
+    private func stepCoreOnEngineThread() {
+        precondition(isCurrentEngineThread)
+        if condition.withLock({ stopRequested }) {
+            CFRunLoopStop(CFRunLoopGetCurrent())
+            return
+        }
+
+        engineRunStatus = lifecycle.step()
+        if engineRunStatus == SM64_MODERN_STATUS_OK {
+            stepCount += 1
+            if stepCount == 1 || stepCount.isMultiple(of: 300) {
+                engineLogger.notice("lifecycle_step count=\(self.stepCount)")
+            }
+        } else {
+            CFRunLoopStop(CFRunLoopGetCurrent())
         }
     }
 
@@ -215,9 +266,9 @@ final class EngineHost: @unchecked Sendable {
         var platform = SM64ModernPlatformApiV1()
         platform.header.abi_version = SM64_MODERN_ABI_VERSION_1
         platform.header.struct_size = UInt32(MemoryLayout<SM64ModernPlatformApiV1>.size)
-        // STUB(M3): publish rendering capability after the Metal 4 device and
-        // presentation path exist. STUB(M5): publish audio capability after
-        // AVAudioEngine implements the platform callbacks.
+        // STUB(M4): publish rendering capability only after the native scene
+        // backend implements the core rendering callbacks. STUB(M5): publish
+        // audio capability after AVAudioEngine implements the platform callbacks.
         platform.capabilities = 0
         platform.reserved = 0
         platform.context = Unmanaged.passUnretained(self).toOpaque()
@@ -235,9 +286,40 @@ final class EngineHost: @unchecked Sendable {
     private func finish(state: State, status: SM64ModernStatus) {
         condition.withLock {
             self.state = state
+            engineRunLoop = nil
             condition.broadcast()
         }
         engineLogger.notice("engine_thread_finished status=\(status) steps=\(self.stepCount)")
+    }
+
+    fileprivate func initializeMetalOnEngineThread() throws {
+        precondition(isCurrentEngineThread)
+        let configuration = condition.withLock { metalConfiguration }
+        guard let configuration else {
+            throw MetalRendererError.configurationUnavailable
+        }
+        precondition(configuration.layer.drawableSize == configuration.drawableSize)
+        let renderer = try MetalRenderer(
+            device: configuration.device,
+            layer: configuration.layer,
+            consumeDrawableSize: { [weak self] in self?.consumePendingDrawableSize() }
+        )
+        metalRenderer = renderer
+        renderer.start(on: .current)
+    }
+
+    fileprivate func shutdownMetalOnEngineThread() throws {
+        precondition(isCurrentEngineThread)
+        defer { metalRenderer = nil }
+        try metalRenderer?.shutdownAndDrain()
+    }
+
+    private func consumePendingDrawableSize() -> CGSize? {
+        precondition(isCurrentEngineThread)
+        return condition.withLock {
+            defer { pendingDrawableSize = nil }
+            return pendingDrawableSize
+        }
     }
 
     private static func currentThreadIdentifier() -> UInt64 {

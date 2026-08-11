@@ -62,6 +62,22 @@ case "$MODE" in
     open_app
     /usr/bin/log stream --info --style compact --predicate "subsystem == \"$BUNDLE_ID\""
     ;;
+  --metal-validation|metal-validation)
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env MTL_DEBUG_LAYER=1 \
+      --env MTL_SHADER_VALIDATION=1 \
+      --env MTL_SHADER_VALIDATION_REPORT_TO_STDERR=1
+    ;;
+  --metal-hud|metal-hud)
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env MTL_HUD_ENABLED=1 \
+      --env MTL_HUD_LOG_ENABLED=1
+    ;;
+  --metal-capture|metal-capture)
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env MTL_CAPTURE_ENABLED=1 \
+      --env MTLCAPTURE_WAIT_FOR_SIGNAL=1
+    ;;
   --verify|verify)
     open_app
     app_pid=""
@@ -79,13 +95,16 @@ case "$MODE" in
       --predicate "processIdentifier == $app_pid && subsystem == \"$BUNDLE_ID\"")"
     for expected in \
       'window_ready layer=CAMetalLayer' \
+      'metal_device_ready' \
+      'metal_display_link_started owner_main=false' \
+      'metal_presented frame=1' \
       'engine_thread_started' \
       'lifecycle_running cadence_hz=30 capabilities=0' \
       'lifecycle_step count=1'; do
       grep -Fq "$expected" <<< "$runtime_log"
     done
     printf '%s\n' "$runtime_log" \
-      | grep -E 'window_ready layer=CAMetalLayer|engine_thread_started|lifecycle_running|lifecycle_step count=1'
+      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_presented frame=1|engine_thread_started|lifecycle_running|lifecycle_step count=1'
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do
       if ! kill -0 "$app_pid" >/dev/null 2>&1; then
@@ -93,12 +112,13 @@ case "$MODE" in
           --predicate "processIdentifier == $app_pid && subsystem == \"$BUNDLE_ID\"")"
         for expected in \
           'platform_shutdown' \
+          'metal_shutdown_drained' \
           'engine_thread_finished status=0' \
           'application_stopped'; do
           grep -Fq "$expected" <<< "$shutdown_log"
         done
         printf '%s\n' "$shutdown_log" \
-          | grep -E 'platform_shutdown|engine_thread_finished status=0|application_stopped'
+          | grep -E 'metal_shutdown_drained|platform_shutdown|engine_thread_finished status=0|application_stopped'
         exit 0
       fi
       sleep 0.1
@@ -107,7 +127,7 @@ case "$MODE" in
     exit 1
     ;;
   *)
-    echo "usage: $0 [run|--debug|--logs|--telemetry|--verify]" >&2
+    echo "usage: $0 [run|--debug|--logs|--telemetry|--metal-validation|--metal-hud|--metal-capture|--verify]" >&2
     exit 2
     ;;
 esac

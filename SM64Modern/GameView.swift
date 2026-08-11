@@ -1,8 +1,11 @@
 import AppKit
+import Metal
 import QuartzCore
 
 @MainActor
 final class GameView: NSView {
+    private var drawableSizeHandler: (@Sendable (CGSize) -> Void)?
+
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
         configureLayerOwnership()
@@ -23,7 +26,7 @@ final class GameView: NSView {
 
     override func layout() {
         super.layout()
-        updateDrawableSize()
+        publishDrawableSize()
     }
 
     var metalLayer: CAMetalLayer {
@@ -33,10 +36,40 @@ final class GameView: NSView {
         return layer
     }
 
-    func updateDrawableSize() {
+    func configureMetal(device: any MTLDevice) -> CGSize {
+        let metalLayer = metalLayer
+        metalLayer.device = device
+        // HARDCODED(M3): approved SDR/double-buffered bring-up settings; M4
+        // sources presentation format and pacing from native renderer settings.
+        metalLayer.pixelFormat = .bgra8Unorm
+        metalLayer.framebufferOnly = true
+        metalLayer.maximumDrawableCount = 2
+        metalLayer.displaySyncEnabled = true
+        metalLayer.allowsNextDrawableTimeout = true
+        metalLayer.colorspace = CGColorSpace(name: CGColorSpace.sRGB)
+
+        let size = drawableSize()
+        metalLayer.drawableSize = size
+        return size
+    }
+
+    func installDrawableSizeHandler(_ handler: @escaping @Sendable (CGSize) -> Void) {
+        drawableSizeHandler = handler
+    }
+
+    func publishDrawableSize() {
+        let size = drawableSize()
+        guard size.width > 0, size.height > 0 else { return }
+        if let drawableSizeHandler {
+            drawableSizeHandler(size)
+        } else {
+            metalLayer.drawableSize = size
+        }
+    }
+
+    private func drawableSize() -> CGSize {
         let pixelBounds = convertToBacking(bounds)
-        guard pixelBounds.width > 0, pixelBounds.height > 0 else { return }
-        metalLayer.drawableSize = pixelBounds.size
+        return pixelBounds.size
     }
 
     private func configureLayerOwnership() {

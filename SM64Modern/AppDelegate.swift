@@ -41,7 +41,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             queue: .main
         ) { [weak controller] _ in
             MainActor.assumeIsolated {
-                (controller?.view as? GameView)?.updateDrawableSize()
+                (controller?.view as? GameView)?.publishDrawableSize()
             }
         }
 

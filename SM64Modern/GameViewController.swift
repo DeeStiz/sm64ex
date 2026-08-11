@@ -1,4 +1,5 @@
 import AppKit
+import Metal
 import os
 
 @MainActor
@@ -28,12 +29,21 @@ final class GameViewController: NSViewController {
         guard let gameView = view as? GameView else {
             preconditionFailure("GameViewController requires GameView")
         }
-        gameView.updateDrawableSize()
-        let size = gameView.metalLayer.drawableSize
+        guard let device = MTLCreateSystemDefaultDevice() else {
+            logger.fault("metal_device_unavailable")
+            NSApplication.shared.terminate(nil)
+            return
+        }
+        let size = gameView.configureMetal(device: device)
         precondition(size.width > 0 && size.height > 0, "Engine startup requires a drawable-sized surface")
-        logger.notice("window_ready layer=CAMetalLayer drawable=\(Int(size.width))x\(Int(size.height))")
+        engineHost.configureMetal(device: device, layer: gameView.metalLayer, drawableSize: size)
+        gameView.installDrawableSizeHandler { [engineHost] size in
+            engineHost.requestDrawableSize(size)
+        }
+        logger.notice(
+            "window_ready layer=CAMetalLayer drawable=\(Int(size.width))x\(Int(size.height)) device=\(device.name, privacy: .public)"
+        )
 
-        // STUB(M3): configure the Metal device and presentation loop here.
         // STUB(M5): install native keyboard, mouse, and controller routing
         // before the engine begins consuming input.
         // The C lifecycle starts last so AppKit owns a complete, measurable
