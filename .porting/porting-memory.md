@@ -2,21 +2,19 @@
 
 ## Current Milestone
 
-- M5a success criterion: GameController, keyboard, and existing mouse-button bindings feed the current controller contracts with focus-safe state clearing.
-- Approved M5a work items: add a versioned fixed-width input snapshot/capability and ABI coverage; add a native controller adapter that preserves legacy bindings and raw-key semantics; install a Swift current-controller/AppKit input service before `EngineHost.start()`; clear held state on focus loss; add the controller-interaction plist key and bounded telemetry; validate real keyboard, mouse-button, and physical-controller input.
-- M5a excludes relative mouse-look because `BETTERCAMERA=0`, controller rumble, AVAudioEngine, M6 deterministic records, and M8 fixed 60 Hz simulation.
-- M5b follows as a separate milestone for a real-time-safe AVAudioEngine adapter to the existing 32 kHz stereo PCM contract.
-- Preserve the dedicated engine owner thread, versioned POD C boundary, complete M4 Metal scene path, and legacy portable backends. Publish input capability only after the complete callback table and native service are installed.
+- M5b success criterion: AVAudioEngine output feeds the existing 32 kHz stereo PCM contract through a real-time-safe buffer.
+- Preserve the dedicated engine owner thread, versioned POD C boundary, complete M4 Metal scene path, validated M5a input service, and legacy portable backends.
+- Publish audio capability only after the complete callback table, buffer ownership, underrun behavior, and native service are installed successfully.
 
-### M5a Execution Status
+### M5a Completion Evidence
 
-- The approved implementation is present and builds cleanly: a versioned fixed-width input snapshot and capability, the `CAPI_NONE` controller adapter, Swift GameController/AppKit capture, focus clearing, plist metadata, ABI checks, and bounded launch/activity telemetry.
+- M5a implementation is commit `33c4db2`: a versioned fixed-width input snapshot and capability, the `CAPI_NONE` controller adapter, Swift GameController/AppKit capture, focus clearing, plist metadata, ABI checks, and bounded launch/activity telemetry.
 - Native Debug launch verified the input bridge and snapshot callback on the engine owner thread; real AppKit L-key and left-mouse events reached the service, and Space advanced the C game from the title screen into gameplay. An Xbox Wireless Controller then enumerated and supplied analog-stick plus menu input, exposing missed short face-button edges at the opening dialog.
 - The controller service now configures Apple's physical-input queue to depth 20 and drains immutable buffered states each 30 Hz engine tick, carrying a press/release pair forward for one tick while preserving the latest analog/held state. The signed build and runtime verifier pass; live telemetry recorded `controller_buffered_press_recovered buttons=0x4`, and the corresponding Xbox X / SM64 B input cleared the opening dialog.
 - `make abi-smoke`, the Swift 6 Debug app build, signed `script/build_and_run.sh --verify`, and the legacy SDL/OpenGL macOS link pass.
 - Physical Xbox acceptance now covers movement, A/jump, right-stick camera rotation, and menu input. The user reported that the C-stick camera direction feels inverted; source comparison confirms the native left/right/up/down translation matches both SDL backends exactly, so this is a legacy Lakitu/C-button ergonomics caveat rather than an accidental GameController axis-sign regression. Do not reverse the compatibility mapping without an explicit camera-control product decision.
 - M5a validation passed signed runtime/LLDB, visual scene inspection, Metal API+GPU validation, full Swift+C ASan, `leaks` (0 leaks/0 bytes), bounded Metal HUD/RSS memory, ABI smoke, unsigned Release, the legacy macOS link, and x86_64/i686 MinGW syntax checks. GPU capture and reference-artifact comparison were not applicable to this input-only slice. The validation pass also added one-tick keyboard/mouse press latches, corrected negative full-scale axis mapping to -32768, and limited controller queue configuration to connection time.
-- M5a is ready for handoff; automated and functional evidence still do not prove every controller model or subjective camera feel.
+- Automated and functional evidence still do not prove every controller model or subjective camera feel.
 
 ### M4 Completion Evidence
 
@@ -30,13 +28,13 @@
 - The legal US ROM and extracted assets remain local/ignored; future clean builds must receive `BASEROM` or the matching `SM64_BASEROM_*` environment variable.
 - macOS still needs `i686-w64-mingw32-as` and `objcopy` for the one source-authored N64 sequence even though all game C/C++ uses Apple Clang.
 - The existing `60fps_ex.patch` renders interpolated frames but keeps gameplay at 30 Hz; it is not the target 60 Hz simulation.
-- Discovery has no checked-in GPU ground truth; M0-M3 captures and screenshots are ignored local evidence, not cross-implementation or sustained-performance acceptance.
+- Discovery has no checked-in GPU ground truth; local captures and screenshots are ignored evidence, not cross-implementation or sustained-performance acceptance.
 - The native AppKit host resolves the raw SDL bundle-identity warning; the legacy SDL AudioQueue shutdown code `-66671` remains deferred to M5b.
 - Apple AddressSanitizer leak detection is unavailable on this platform; later long-run leak acceptance needs another supported instrument.
 - Full Linux, Windows, and web legacy builds remain regression gates; M1's changed C paths passed MinGW C syntax checks, not full product builds.
 - Developer ID Application signing is not currently available; development/App Store identities do not satisfy direct notarized distribution.
 - `com.apple.developer.sustained-execution` is retained for provisioned builds; local M2 Debug signing omits it because no matching `io.github.deestiz.sm64modern` development profile is installed.
-- M5a must validate real keyboard, mouse-button, and physical-controller input with human/device evidence; automated callback/build evidence alone cannot prove control feel or latency.
+- M5a physical acceptance covered Xbox movement, jump, camera, and menu input; other controller models, subjective camera feel, and input latency remain unproven.
 - M5b must validate audible AVAudioEngine output and routing with human/device evidence; automated callback/build evidence alone cannot prove latency or audio quality.
 - Keep native service callbacks real-time safe and owner-explicit: do not expose the legacy object graph to Swift, block the audio render thread, or publish input/audio capabilities before installation succeeds.
 
@@ -82,3 +80,7 @@
 - M4 validation removed the temporary locked-session offscreen/readback route, added owner-thread and texture-size preconditions, suppressed redundant state bindings/compiler warnings, and captured the final scene from the real layer drawable.
 - The selected final M4 frame and the local OpenGL baseline show the same title background and Mario-face scene semantics; animation phase changes face scale/lighting and blinking text/sparkles, so deterministic pixel comparison remains M6 work.
 - M5a and M5b should implement native input and audio through separate existing platform contracts without disturbing `gfx_sm64_modern.c`, the immutable render packet boundary, or the M3/M4 presentation owner.
+- M5a maps AppKit hardware key codes and GameController semantic controls into the persisted SDL virtual-key namespace. `GCController.current` supplies one active controller; immutable queued states recover short button edges while live captures retain current analog/held state.
+- Configure `GCControllerInput.inputStateQueueDepth = 20` only when a controller connects, then drain `nextInputState()` once per 30 Hz engine tick. One-tick keyboard/mouse press latches cover the same between-tick edge case; focus loss clears held and pending state.
+- GameController already supplies normalized deadzone/saturation behavior, so the native adapter adds no second deadzone. Full-scale axes preserve the signed `-32768...32767` range before legacy `/ 256` conversion.
+- Native right-stick signs intentionally match both SDL controller backends' C-button mapping. The user's inverted-camera impression is a legacy Lakitu ergonomics caveat; do not reverse compatibility signs without an explicit camera-control decision.
