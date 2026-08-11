@@ -111,7 +111,9 @@ SM64ModernStatus sm64_modern_validate_platform_api(const SM64ModernPlatformApiV1
         return SM64_MODERN_STATUS_INVALID_ARGUMENT;
     }
     if (platform->capabilities
-        & ~(SM64_MODERN_PLATFORM_CAP_RENDERING | SM64_MODERN_PLATFORM_CAP_AUDIO)) {
+        & ~(SM64_MODERN_PLATFORM_CAP_RENDERING
+            | SM64_MODERN_PLATFORM_CAP_AUDIO
+            | SM64_MODERN_PLATFORM_CAP_INPUT)) {
         return SM64_MODERN_STATUS_INVALID_ARGUMENT;
     }
     if ((platform->capabilities & SM64_MODERN_PLATFORM_CAP_AUDIO)
@@ -216,6 +218,19 @@ static SM64ModernStatus lifecycle_initialize(const SM64ModernLifecycleConfigV1 *
     }
     sPlatformInitialized = true;
 
+    if ((sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_INPUT)
+        && sm64_modern_input_status() != SM64_MODERN_STATUS_OK) {
+        report_error(SM64_MODERN_STATUS_PLATFORM_ERROR, "The native input API was not installed");
+        sPlatform.shutdown(sPlatform.context);
+        sPlatformInitialized = false;
+        gEffectsMemoryPool = NULL;
+        free(sMainPoolMemory);
+        sMainPoolMemory = NULL;
+        fs_shutdown();
+        sLifecycleState = SM64_MODERN_LIFECYCLE_FAILED;
+        return SM64_MODERN_STATUS_PLATFORM_ERROR;
+    }
+
     audio_init();
     sound_init();
     thread5_game_loop(NULL);
@@ -256,6 +271,14 @@ static SM64ModernStatus lifecycle_step(void) {
 
     game_loop_one_iteration();
     thread6_rumble_loop(NULL);
+
+    if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_INPUT) {
+        const SM64ModernStatus input_status = sm64_modern_input_status();
+        if (input_status != SM64_MODERN_STATUS_OK) {
+            report_error(input_status, "The native input backend failed");
+            return input_status;
+        }
+    }
 
     if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_AUDIO) {
         int samples_left = sPlatform.audio_buffered(sPlatform.context);

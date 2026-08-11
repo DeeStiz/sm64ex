@@ -11,6 +11,10 @@ extern "C" {
 #define SM64_MODERN_ABI_VERSION_1 1u
 #define SM64_MODERN_PATH_MAX 1024u
 #define SM64_MODERN_WINDOW_TITLE_MAX 96u
+#define SM64_MODERN_INPUT_KEYBOARD_WORD_COUNT 16u
+#define SM64_MODERN_INPUT_GAMEPAD_BUTTON_COUNT 32u
+#define SM64_MODERN_INPUT_MOUSE_BUTTON_COUNT 8u
+#define SM64_MODERN_INPUT_NO_KEY UINT32_MAX
 
 typedef uint32_t SM64ModernStatus;
 
@@ -49,6 +53,7 @@ typedef uint32_t SM64ModernPlatformCapabilities;
 
 #define SM64_MODERN_PLATFORM_CAP_RENDERING (1u << 0)
 #define SM64_MODERN_PLATFORM_CAP_AUDIO (1u << 1)
+#define SM64_MODERN_PLATFORM_CAP_INPUT (1u << 2)
 
 typedef uint32_t SM64ModernAuthority;
 
@@ -106,6 +111,31 @@ typedef struct SM64ModernPlatformApiV1 {
     SM64ModernPlatformExitRequestedFn exit_requested;
     SM64ModernPlatformErrorFn error_reported;
 } SM64ModernPlatformApiV1;
+
+// Input crosses the Swift/C boundary as physical state in the legacy virtual
+// key namespace. The C controller adapter remains authoritative for bindings
+// and N64 pad conversion, so existing configuration files keep their meaning.
+typedef struct SM64ModernInputSnapshotV1 {
+    SM64ModernAbiHeader header;
+    uint32_t keyboard_keys[SM64_MODERN_INPUT_KEYBOARD_WORD_COUNT];
+    uint32_t gamepad_buttons;
+    uint32_t mouse_buttons;
+    int16_t left_stick_x;
+    int16_t left_stick_y;
+    int16_t right_stick_x;
+    int16_t right_stick_y;
+    uint32_t last_virtual_key;
+    uint32_t reserved;
+} SM64ModernInputSnapshotV1;
+
+typedef SM64ModernStatus (*SM64ModernInputReadFn)(void *context,
+                                                   SM64ModernInputSnapshotV1 *out_snapshot);
+
+typedef struct SM64ModernInputApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernInputReadFn read;
+} SM64ModernInputApiV1;
 
 // The native renderer is installed from the platform initialize callback, on
 // the lifecycle owner thread. Every pointer passed to a callback is borrowed
@@ -198,8 +228,8 @@ typedef struct SM64ModernLifecycleApiV1 {
 } SM64ModernLifecycleApiV1;
 
 // initialize, step, request_stop, and shutdown are single-owner-thread calls.
-// The core copies both versioned input structs during initialize and never
-// retains pointers to the caller's configuration storage.
+// The core copies the versioned lifecycle configuration and platform table
+// during initialize and never retains their caller-owned storage.
 
 typedef struct SM64ModernGameplayApiV1 {
     SM64ModernAbiHeader header;
@@ -213,6 +243,10 @@ SM64ModernStatus sm64_modern_get_lifecycle_api(uint32_t requested_version,
                                                uint32_t output_size,
                                                SM64ModernLifecycleApiV1 *out_api);
 SM64ModernStatus sm64_modern_validate_platform_api(const SM64ModernPlatformApiV1 *platform);
+SM64ModernStatus sm64_modern_validate_input_api(const SM64ModernInputApiV1 *input);
+SM64ModernStatus sm64_modern_install_input_api(const SM64ModernInputApiV1 *input);
+void sm64_modern_uninstall_input_api(void);
+SM64ModernStatus sm64_modern_input_status(void);
 SM64ModernStatus sm64_modern_validate_rendering_api(const SM64ModernRenderingApiV1 *rendering);
 SM64ModernStatus sm64_modern_install_rendering_api(const SM64ModernRenderingApiV1 *rendering);
 void sm64_modern_uninstall_rendering_api(void);

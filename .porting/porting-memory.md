@@ -2,10 +2,21 @@
 
 ## Current Milestone
 
-- M5 success criterion: GameController/keyboard/mouse input and AVAudioEngine output feed the existing engine contracts.
-- Start M5 with `/porting-start-milestone m5`; read `porting-handoff-sm64-modern-M4.md` before changing host callbacks or publishing input/audio capabilities.
-- Preserve the dedicated engine owner thread, versioned POD C boundary, complete M4 Metal scene path, and legacy portable backends while adding native Apple services.
-- Publish input/audio capabilities only after their complete callback tables and native services are installed; M6 deterministic records and M8 fixed 60 Hz simulation remain out of scope.
+- M5a success criterion: GameController, keyboard, and existing mouse-button bindings feed the current controller contracts with focus-safe state clearing.
+- Approved M5a work items: add a versioned fixed-width input snapshot/capability and ABI coverage; add a native controller adapter that preserves legacy bindings and raw-key semantics; install a Swift current-controller/AppKit input service before `EngineHost.start()`; clear held state on focus loss; add the controller-interaction plist key and bounded telemetry; validate real keyboard, mouse-button, and physical-controller input.
+- M5a excludes relative mouse-look because `BETTERCAMERA=0`, controller rumble, AVAudioEngine, M6 deterministic records, and M8 fixed 60 Hz simulation.
+- M5b follows as a separate milestone for a real-time-safe AVAudioEngine adapter to the existing 32 kHz stereo PCM contract.
+- Preserve the dedicated engine owner thread, versioned POD C boundary, complete M4 Metal scene path, and legacy portable backends. Publish input capability only after the complete callback table and native service are installed.
+
+### M5a Execution Status
+
+- The approved implementation is present and builds cleanly: a versioned fixed-width input snapshot and capability, the `CAPI_NONE` controller adapter, Swift GameController/AppKit capture, focus clearing, plist metadata, ABI checks, and bounded launch/activity telemetry.
+- Native Debug launch verified the input bridge and snapshot callback on the engine owner thread; real AppKit L-key and left-mouse events reached the service, and Space advanced the C game from the title screen into gameplay. An Xbox Wireless Controller then enumerated and supplied analog-stick plus menu input, exposing missed short face-button edges at the opening dialog.
+- The controller service now configures Apple's physical-input queue to depth 20 and drains immutable buffered states each 30 Hz engine tick, carrying a press/release pair forward for one tick while preserving the latest analog/held state. The signed build and runtime verifier pass; live telemetry recorded `controller_buffered_press_recovered buttons=0x4`, and the corresponding Xbox X / SM64 B input cleared the opening dialog.
+- `make abi-smoke`, the Swift 6 Debug app build, signed `script/build_and_run.sh --verify`, and the legacy SDL/OpenGL macOS link pass.
+- Physical Xbox acceptance now covers movement, A/jump, right-stick camera rotation, and menu input. The user reported that the C-stick camera direction feels inverted; source comparison confirms the native left/right/up/down translation matches both SDL backends exactly, so this is a legacy Lakitu/C-button ergonomics caveat rather than an accidental GameController axis-sign regression. Do not reverse the compatibility mapping without an explicit camera-control product decision.
+- M5a validation passed signed runtime/LLDB, visual scene inspection, Metal API+GPU validation, full Swift+C ASan, `leaks` (0 leaks/0 bytes), bounded Metal HUD/RSS memory, ABI smoke, unsigned Release, the legacy macOS link, and x86_64/i686 MinGW syntax checks. GPU capture and reference-artifact comparison were not applicable to this input-only slice. The validation pass also added one-tick keyboard/mouse press latches, corrected negative full-scale axis mapping to -32768, and limited controller queue configuration to connection time.
+- M5a is ready for handoff; automated and functional evidence still do not prove every controller model or subjective camera feel.
 
 ### M4 Completion Evidence
 
@@ -20,12 +31,13 @@
 - macOS still needs `i686-w64-mingw32-as` and `objcopy` for the one source-authored N64 sequence even though all game C/C++ uses Apple Clang.
 - The existing `60fps_ex.patch` renders interpolated frames but keeps gameplay at 30 Hz; it is not the target 60 Hz simulation.
 - Discovery has no checked-in GPU ground truth; M0-M3 captures and screenshots are ignored local evidence, not cross-implementation or sustained-performance acceptance.
-- The native AppKit host resolves the raw SDL bundle-identity warning; the legacy SDL AudioQueue shutdown code `-66671` remains deferred to M5.
+- The native AppKit host resolves the raw SDL bundle-identity warning; the legacy SDL AudioQueue shutdown code `-66671` remains deferred to M5b.
 - Apple AddressSanitizer leak detection is unavailable on this platform; later long-run leak acceptance needs another supported instrument.
 - Full Linux, Windows, and web legacy builds remain regression gates; M1's changed C paths passed MinGW C syntax checks, not full product builds.
 - Developer ID Application signing is not currently available; development/App Store identities do not satisfy direct notarized distribution.
 - `com.apple.developer.sustained-execution` is retained for provisioned builds; local M2 Debug signing omits it because no matching `io.github.deestiz.sm64modern` development profile is installed.
-- M5 must validate real keyboard/mouse/controller input and audible AVAudioEngine output with human/device evidence; automated callback/build evidence alone cannot prove control feel, latency, routing, or audio quality.
+- M5a must validate real keyboard, mouse-button, and physical-controller input with human/device evidence; automated callback/build evidence alone cannot prove control feel or latency.
+- M5b must validate audible AVAudioEngine output and routing with human/device evidence; automated callback/build evidence alone cannot prove latency or audio quality.
 - Keep native service callbacks real-time safe and owner-explicit: do not expose the legacy object graph to Swift, block the audio render thread, or publish input/audio capabilities before installation succeeds.
 
 ## Feature Status
@@ -37,7 +49,8 @@
 | AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 30 Hz C-core owner thread with clean shutdown |
 | Metal 4 device/presentation | Implemented — validated raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
 | Metal 4 rendering | Implemented — complete-scene POD bridge/replay with dynamic MSL, private textures, memoryless depth, samplers, state, display lists, explicit residency/barriers, trace inspection, and clean Metal validation |
-| Native input/audio | Not started |
+| Native input | Implemented — keyboard/mouse runtime passed; Xbox movement, jump, camera, and menu passed; legacy C-camera ergonomics caveat recorded |
+| Native audio | Not started |
 | Gameplay parity | Not started |
 | Swift gameplay | Not started |
 | Full-world 60 Hz | Not started |
@@ -68,4 +81,4 @@
 - `MetalShaderCompiler` uses runtime MSL and Metal 4 compiler/pipeline descriptors; `MetalRenderer` owns packet replay, private textures, explicit blit/fragment barriers, memoryless depth, sampler/depth caches, argument tables, queue residency, retirement, and completion-safe resource reuse.
 - M4 validation removed the temporary locked-session offscreen/readback route, added owner-thread and texture-size preconditions, suppressed redundant state bindings/compiler warnings, and captured the final scene from the real layer drawable.
 - The selected final M4 frame and the local OpenGL baseline show the same title background and Mario-face scene semantics; animation phase changes face scale/lighting and blinking text/sparkles, so deterministic pixel comparison remains M6 work.
-- M5 should implement native input/audio through the existing platform contracts without disturbing `gfx_sm64_modern.c`, the immutable render packet boundary, or the M3/M4 presentation owner.
+- M5a and M5b should implement native input and audio through separate existing platform contracts without disturbing `gfx_sm64_modern.c`, the immutable render packet boundary, or the M3/M4 presentation owner.

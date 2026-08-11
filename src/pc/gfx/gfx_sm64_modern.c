@@ -50,7 +50,9 @@ static void modern_window_init(const char *window_title) {
 static void modern_window_set_keyboard_callbacks(kb_callback_t on_key_down,
                                                  kb_callback_t on_key_up,
                                                  void (*on_all_keys_up)(void)) {
-    // STUB(M5): native AppKit input installs the controller callbacks.
+    // M5a input is pulled through the versioned snapshot API by ControllerAPI.
+    // Keeping this no-op preserves GfxWindowManagerAPI without sharing callback
+    // pointers across the AppKit-main/engine-owner concurrency boundary.
     (void) on_key_down;
     (void) on_key_up;
     (void) on_all_keys_up;

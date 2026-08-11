@@ -35,6 +35,24 @@ private func platformInitialize(
         }
         return renderingStatus
     }
+    guard let inputService = host.inputServiceOnEngineThread else {
+        sm64_modern_uninstall_rendering_api()
+        do { try host.shutdownMetalOnEngineThread() } catch {
+            engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
+        }
+        return SM64_MODERN_STATUS_INVALID_STATE
+    }
+    var input = makeAppleInputAPI(service: inputService)
+    let inputStatus = sm64_modern_install_input_api(&input)
+    guard inputStatus == SM64_MODERN_STATUS_OK else {
+        engineLogger.error("input_bridge_install_failed status=\(inputStatus)")
+        sm64_modern_uninstall_rendering_api()
+        do { try host.shutdownMetalOnEngineThread() } catch {
+            engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
+        }
+        return inputStatus
+    }
+    engineLogger.notice("input_bridge_installed abi=1")
     engineLogger.notice("platform_initialized title=\(title, privacy: .public)")
     return SM64_MODERN_STATUS_OK
 }
@@ -42,6 +60,7 @@ private func platformInitialize(
 private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     guard let host = engineHost(from: context) else { return }
     assert(host.isCurrentEngineThread)
+    sm64_modern_uninstall_input_api()
     sm64_modern_uninstall_rendering_api()
     engineLogger.notice("platform_shutdown")
 }
@@ -97,6 +116,7 @@ final class EngineHost: @unchecked Sendable {
     private var stepCount: UInt64 = 0
     private var engineRunStatus = SM64_MODERN_STATUS_OK
     private var lifecycle = SM64ModernLifecycleApiV1()
+    private var inputService: AppleInputService?
     private var metalConfiguration: MetalConfiguration?
     private var metalRenderer: MetalRenderer?
     private var pendingDrawableSize: CGSize?
@@ -113,6 +133,14 @@ final class EngineHost: @unchecked Sendable {
         condition.withLock {
             precondition(state == .idle, "Metal must be configured before EngineHost.start")
             metalConfiguration = MetalConfiguration(device: device, layer: layer, drawableSize: drawableSize)
+        }
+    }
+
+    func configureInput(_ service: AppleInputService) {
+        precondition(Thread.isMainThread, "AppKit must configure input")
+        condition.withLock {
+            precondition(state == .idle, "Input must be configured before EngineHost.start")
+            inputService = service
         }
     }
 
@@ -190,7 +218,7 @@ final class EngineHost: @unchecked Sendable {
             state = .running
             condition.broadcast()
         }
-        engineLogger.notice("lifecycle_running cadence_hz=30 capabilities=rendering")
+        engineLogger.notice("lifecycle_running cadence_hz=30 capabilities=rendering,input")
 
         engineRunStatus = SM64_MODERN_STATUS_OK
         let stepTimer = Timer(timeInterval: Self.legacyStepInterval, repeats: true) { [self] _ in
@@ -272,9 +300,9 @@ final class EngineHost: @unchecked Sendable {
         var platform = SM64ModernPlatformApiV1()
         platform.header.abi_version = SM64_MODERN_ABI_VERSION_1
         platform.header.struct_size = UInt32(MemoryLayout<SM64ModernPlatformApiV1>.size)
-        // STUB(M5): publish audio capability after AVAudioEngine implements
+        // STUB(M5b): publish audio capability after AVAudioEngine implements
         // the platform callbacks.
-        platform.capabilities = SM64_MODERN_PLATFORM_CAP_RENDERING
+        platform.capabilities = SM64_MODERN_PLATFORM_CAP_RENDERING | SM64_MODERN_PLATFORM_CAP_INPUT
         platform.reserved = 0
         platform.context = Unmanaged.passUnretained(self).toOpaque()
         platform.initialize = platformInitialize
@@ -311,6 +339,11 @@ final class EngineHost: @unchecked Sendable {
         )
         metalRenderer = renderer
         renderer.start(on: .current)
+    }
+
+    fileprivate var inputServiceOnEngineThread: AppleInputService? {
+        precondition(isCurrentEngineThread)
+        return condition.withLock { inputService }
     }
 
     fileprivate func shutdownMetalOnEngineThread() throws {

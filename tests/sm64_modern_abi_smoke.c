@@ -33,6 +33,17 @@ static uint64_t smoke_platform_thread(void *context) {
     return 1;
 }
 
+static SM64ModernStatus smoke_input_read(void *context, SM64ModernInputSnapshotV1 *out_snapshot) {
+    (void) context;
+    if (!out_snapshot) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    out_snapshot->header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    out_snapshot->header.struct_size = sizeof(*out_snapshot);
+    out_snapshot->last_virtual_key = SM64_MODERN_INPUT_NO_KEY;
+    return SM64_MODERN_STATUS_OK;
+}
+
 static SM64ModernStatus smoke_render_initialize(void *context, uint32_t filtering_mode) {
     (void) context;
     (void) filtering_mode;
@@ -148,6 +159,7 @@ int main(void) {
     SM64ModernLifecycleApiV1 lifecycle;
     SM64ModernGameplayApiV1 gameplay;
     SM64ModernPlatformApiV1 platform;
+    SM64ModernInputApiV1 input;
     SM64ModernRenderingApiV1 rendering;
     SM64ModernLifecycleState state = UINT32_MAX;
     SM64ModernAuthority authority = UINT32_MAX;
@@ -156,6 +168,7 @@ int main(void) {
     memset(&lifecycle, 0, sizeof(lifecycle));
     memset(&gameplay, 0, sizeof(gameplay));
     memset(&platform, 0, sizeof(platform));
+    memset(&input, 0, sizeof(input));
     memset(&rendering, 0, sizeof(rendering));
 
     platform.header.abi_version = SM64_MODERN_ABI_VERSION_1;
@@ -173,6 +186,29 @@ int main(void) {
     failures += expect_status("unsupported platform version", sm64_modern_validate_platform_api(&platform),
                               SM64_MODERN_STATUS_UNSUPPORTED_VERSION);
     platform.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.read = smoke_input_read;
+    failures += expect_status("input v1", sm64_modern_validate_input_api(&input),
+                              SM64_MODERN_STATUS_OK);
+    input.read = NULL;
+    failures += expect_status("input missing callback", sm64_modern_validate_input_api(&input),
+                              SM64_MODERN_STATUS_INVALID_ARGUMENT);
+    input.read = smoke_input_read;
+    input.header.struct_size--;
+    failures += expect_status("small input table", sm64_modern_validate_input_api(&input),
+                              SM64_MODERN_STATUS_BUFFER_TOO_SMALL);
+    input.header.struct_size = sizeof(input);
+    failures += expect_status("input install", sm64_modern_install_input_api(&input),
+                              SM64_MODERN_STATUS_OK);
+    failures += expect_status("input installed status", sm64_modern_input_status(),
+                              SM64_MODERN_STATUS_OK);
+    failures += expect_status("input double install", sm64_modern_install_input_api(&input),
+                              SM64_MODERN_STATUS_INVALID_STATE);
+    sm64_modern_uninstall_input_api();
+    failures += expect_status("input uninstalled status", sm64_modern_input_status(),
+                              SM64_MODERN_STATUS_INVALID_STATE);
 
     rendering.header.abi_version = SM64_MODERN_ABI_VERSION_1;
     rendering.header.struct_size = sizeof(rendering);
@@ -279,6 +315,8 @@ int main(void) {
 
     if (offsetof(SM64ModernLifecycleConfigV1, header) != 0
         || offsetof(SM64ModernPlatformApiV1, header) != 0
+        || offsetof(SM64ModernInputSnapshotV1, header) != 0
+        || offsetof(SM64ModernInputApiV1, header) != 0
         || offsetof(SM64ModernRenderingApiV1, header) != 0
         || offsetof(SM64ModernGameplayRecordEnvelopeV1, header) != 0) {
         fprintf(stderr, "versioned ABI headers must be the first field\n");

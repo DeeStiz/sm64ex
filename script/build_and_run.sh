@@ -100,12 +100,15 @@ case "$MODE" in
       'metal_scene_initialized' \
       'metal_scene_presented frame=1' \
       'engine_thread_started' \
-      'lifecycle_running cadence_hz=30 capabilities=rendering' \
+      'input_service_ready' \
+      'input_bridge_installed abi=1' \
+      'input_snapshot_started owner_main=false' \
+      'lifecycle_running cadence_hz=30 capabilities=rendering,input' \
       'lifecycle_step count=1'; do
       grep -Fq "$expected" <<< "$runtime_log"
     done
     printf '%s\n' "$runtime_log" \
-      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|lifecycle_running|lifecycle_step count=1'
+      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|input_snapshot_started|lifecycle_running|lifecycle_step count=1'
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do
       if ! kill -0 "$app_pid" >/dev/null 2>&1; then
