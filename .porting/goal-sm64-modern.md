@@ -20,7 +20,7 @@ Create a parallel Apple-silicon macOS 27 application using Swift 6.4, AppKit, Me
 | M1: Callable C core | Static core exposes versioned lifecycle/platform/gameplay ABIs while legacy executable still builds. | Complete |
 | M2: AppKit host | Signed development app opens, owns a CAMetalLayer, and drives a dedicated engine thread. | Complete |
 | M3: Metal 4 clear | Device, queue, command allocator, drawable residency, clear, and present validate cleanly. | Complete |
-| M4: Metal 4 scene | Dynamic MSL shaders, textures, depth, samplers, state, and display lists render a complete scene. | Pending |
+| M4: Metal 4 scene | Dynamic MSL shaders, textures, depth, samplers, state, and display lists render a complete scene. | In progress |
 | M5: Apple services | GameController/keyboard/mouse input and AVAudioEngine output feed existing engine contracts. | Pending |
 | M6: Gameplay parity | Deterministic replay and field/effect diagnostics gate Swift authority per subsystem. | Pending |
 | M7: Swift gameplay | Approved Mario and representative actor slices run under Swift authority. | Pending |

@@ -26,6 +26,15 @@ private func platformInitialize(
         engineLogger.error("metal_initialize_failed error=\(error.localizedDescription, privacy: .public)")
         return SM64_MODERN_STATUS_PLATFORM_ERROR
     }
+    var rendering = makeMetalRenderingAPI(host: host)
+    let renderingStatus = sm64_modern_install_rendering_api(&rendering)
+    guard renderingStatus == SM64_MODERN_STATUS_OK else {
+        engineLogger.error("rendering_bridge_install_failed status=\(renderingStatus)")
+        do { try host.shutdownMetalOnEngineThread() } catch {
+            engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
+        }
+        return renderingStatus
+    }
     engineLogger.notice("platform_initialized title=\(title, privacy: .public)")
     return SM64_MODERN_STATUS_OK
 }
@@ -33,12 +42,8 @@ private func platformInitialize(
 private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     guard let host = engineHost(from: context) else { return }
     assert(host.isCurrentEngineThread)
-    do {
-        try host.shutdownMetalOnEngineThread()
-        engineLogger.notice("platform_shutdown")
-    } catch {
-        engineLogger.fault("platform_shutdown_failed error=\(error.localizedDescription, privacy: .public)")
-    }
+    sm64_modern_uninstall_rendering_api()
+    engineLogger.notice("platform_shutdown")
 }
 
 private func platformCurrentThread(_ context: UnsafeMutableRawPointer?) -> UInt64 {
@@ -185,7 +190,7 @@ final class EngineHost: @unchecked Sendable {
             state = .running
             condition.broadcast()
         }
-        engineLogger.notice("lifecycle_running cadence_hz=30 capabilities=0")
+        engineLogger.notice("lifecycle_running cadence_hz=30 capabilities=rendering")
 
         engineRunStatus = SM64_MODERN_STATUS_OK
         let stepTimer = Timer(timeInterval: Self.legacyStepInterval, repeats: true) { [self] _ in
@@ -228,6 +233,7 @@ final class EngineHost: @unchecked Sendable {
             stepCount += 1
             if stepCount == 1 || stepCount.isMultiple(of: 300) {
                 engineLogger.notice("lifecycle_step count=\(self.stepCount)")
+                metalRenderer?.logSceneStatus(step: stepCount)
             }
         } else {
             CFRunLoopStop(CFRunLoopGetCurrent())
@@ -266,10 +272,9 @@ final class EngineHost: @unchecked Sendable {
         var platform = SM64ModernPlatformApiV1()
         platform.header.abi_version = SM64_MODERN_ABI_VERSION_1
         platform.header.struct_size = UInt32(MemoryLayout<SM64ModernPlatformApiV1>.size)
-        // STUB(M4): publish rendering capability only after the native scene
-        // backend implements the core rendering callbacks. STUB(M5): publish
-        // audio capability after AVAudioEngine implements the platform callbacks.
-        platform.capabilities = 0
+        // STUB(M5): publish audio capability after AVAudioEngine implements
+        // the platform callbacks.
+        platform.capabilities = SM64_MODERN_PLATFORM_CAP_RENDERING
         platform.reserved = 0
         platform.context = Unmanaged.passUnretained(self).toOpaque()
         platform.initialize = platformInitialize
@@ -312,6 +317,87 @@ final class EngineHost: @unchecked Sendable {
         precondition(isCurrentEngineThread)
         defer { metalRenderer = nil }
         try metalRenderer?.shutdownAndDrain()
+    }
+
+    func renderingInitialize(filteringMode: UInt32) -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return metalRenderer?.initializeScene(filteringMode: filteringMode) ?? SM64_MODERN_STATUS_INVALID_STATE
+    }
+
+    func renderingShutdown() {
+        precondition(isCurrentEngineThread)
+        do { try shutdownMetalOnEngineThread() }
+        catch { engineLogger.fault("metal_shutdown_failed error=\(error.localizedDescription, privacy: .public)") }
+    }
+
+    func renderingCreateShader(id: UInt32, filteringMode: UInt32, inputCount: UInt32, textureMask: UInt32) -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return metalRenderer?.registerShader(id: id, filteringMode: filteringMode, inputCount: inputCount, textureMask: textureMask)
+            ?? SM64_MODERN_STATUS_INVALID_STATE
+    }
+    func renderingSelectShader(_ id: UInt32) {
+        precondition(isCurrentEngineThread)
+        metalRenderer?.selectShader(id)
+    }
+    func renderingCreateTexture(_ id: UInt32) -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return metalRenderer?.createTexture(id) ?? SM64_MODERN_STATUS_INVALID_STATE
+    }
+    func renderingSelectTexture(tile: UInt32, id: UInt32) {
+        precondition(isCurrentEngineThread)
+        metalRenderer?.selectTexture(tile: tile, id: id)
+    }
+    func renderingUploadTexture(id: UInt32, pixels: UnsafePointer<UInt8>, width: UInt32, height: UInt32) -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return metalRenderer?.uploadTexture(id: id, pixels: pixels, width: width, height: height) ?? SM64_MODERN_STATUS_INVALID_STATE
+    }
+    func renderingSetSampler(tile: UInt32, linear: Bool, wrapS: UInt32, wrapT: UInt32) {
+        precondition(isCurrentEngineThread)
+        metalRenderer?.setSampler(tile: tile, linear: linear, wrapS: wrapS, wrapT: wrapT)
+    }
+    func renderingSetDepthTest(_ enabled: Bool) {
+        precondition(isCurrentEngineThread)
+        metalRenderer?.setDepthTest(enabled)
+    }
+    func renderingSetDepthWrite(_ enabled: Bool) {
+        precondition(isCurrentEngineThread)
+        metalRenderer?.setDepthWrite(enabled)
+    }
+    func renderingSetDecal(_ enabled: Bool) {
+        precondition(isCurrentEngineThread)
+        metalRenderer?.setDecal(enabled)
+    }
+    func renderingSetViewport(_ rect: MetalRect) {
+        precondition(isCurrentEngineThread)
+        metalRenderer?.setViewport(rect)
+    }
+    func renderingSetScissor(_ rect: MetalRect) {
+        precondition(isCurrentEngineThread)
+        metalRenderer?.setScissor(rect)
+    }
+    func renderingSetAlphaBlend(_ enabled: Bool) {
+        precondition(isCurrentEngineThread)
+        metalRenderer?.setAlphaBlend(enabled)
+    }
+    func renderingDraw(vertices: UnsafePointer<Float>?, floatCount: UInt32, triangleCount: UInt32) -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return metalRenderer?.draw(vertices: vertices, floatCount: floatCount, triangleCount: triangleCount) ?? SM64_MODERN_STATUS_INVALID_STATE
+    }
+    func renderingStartFrame() -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return metalRenderer?.startSceneFrame() ?? SM64_MODERN_STATUS_INVALID_STATE
+    }
+    func renderingEndFrame() -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return metalRenderer?.endSceneFrame() ?? SM64_MODERN_STATUS_INVALID_STATE
+    }
+    func renderingFinish() -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return metalRenderer?.finishScene() ?? SM64_MODERN_STATUS_INVALID_STATE
+    }
+    func renderingDimensions() -> (UInt32, UInt32) {
+        precondition(isCurrentEngineThread)
+        return metalRenderer?.dimensions() ?? (1, 1)
     }
 
     private func consumePendingDrawableSize() -> CGSize? {

@@ -270,6 +270,11 @@ static SM64ModernStatus lifecycle_step(void) {
 
     if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING) {
         gfx_end_frame();
+        const SM64ModernStatus rendering_status = sm64_modern_rendering_status();
+        if (rendering_status != SM64_MODERN_STATUS_OK) {
+            report_error(rendering_status, "The native rendering backend failed");
+            return rendering_status;
+        }
     }
 
 #ifdef DISCORDRPC

@@ -6,6 +6,18 @@
 - Start M4 with `/porting-start-milestone m4`; read `porting-handoff-sm64-modern-M3.md` before changing the Metal renderer or publishing rendering capability.
 - Build on M3's raw `CAMetalLayer`, owner-thread `CAMetalDisplayLink`, two reusable Metal 4 frame slots, shared-event reuse, layer residency, and GPU-drained shutdown rather than creating a parallel presentation path.
 - Keep `SM64_MODERN_PLATFORM_CAP_RENDERING` disabled until the M4 native scene backend implements the core rendering callbacks; native input/audio and 60 Hz simulation remain M5/M8 work.
+- Approved M4 scope: add a versioned POD C rendering bridge; record immutable display-list scene packets at 30 Hz; replay them from the existing display link with dynamic MSL/pipeline caching, argument tables, transient vertex/upload buffers, private RGBA textures, samplers, depth, state, residency, barriers, and completion-safe teardown.
+- M4 also owns capability publication, ABI/runtime smoke coverage, renderer telemetry, and removal of the M3 diagnostic clear placeholders; it does not own input, audio, gameplay migration, or the fixed 60 Hz simulation.
+
+### M4 Execution Evidence
+
+- The legacy `GfxRenderingAPI` now feeds a versioned fixed-width C ABI whose Swift recorder publishes immutable scene packets to the existing owner-thread `CAMetalDisplayLink`; the rendering capability is published only after the bridge and Metal renderer initialize.
+- The Metal 4 replay path dynamically compiles and caches MSL pipelines, uploads RGBA textures into private storage, binds argument tables and sampler/depth/blend/raster state, manages two completion-fenced transient slots and residency, and retains M3's exact wait/commit/signal/present and drain-before-shutdown contracts.
+- `make SM64_MODERN_NATIVE=1 DEBUG=1 BUILD_DIR_BASE=build/sm64-modern-debug abi-smoke -j8`, the canonical Debug `./script/build_and_run.sh --verify`, and a clean unsigned Release Xcode build passed during execution.
+- Metal API and GPU validation were enabled for complete-scene replay through 33 GPU completions with no Metal validation error or fault; shutdown drained cleanly with engine status 0.
+- GPU capture `build/sm64-modern-m4-execute.gputrace` contains 11 command buffers, 22 encoders, and 536 draws. A representative 85-draw command buffer includes explicit texture-upload, scene-render, and evidence-readback encoders, private RGBA8 textures, a memoryless Depth32Float target, point/linear and repeat/clamp/mirror samplers, depth states, and alpha-blended pipelines.
+- Ignored local evidence includes `build/sm64-modern-m4-trace-output.png`, fetched from the captured render target, and `build/sm64-modern-m4-dynamic-shader.metal`, fetched from the captured runtime-generated shader source.
+- The Mac was locked during automated execution, so the compositor originally delivered only three window display-link callbacks. The separate validation session regained live compositor access, captured the complete scene from the real layer drawable, and removed the temporary locked-session offscreen/readback path before final testing.
 
 ## Watch List
 
@@ -28,7 +40,7 @@
 | Callable C core | Implemented — versioned lifecycle/platform/gameplay POD ABI, static archive, legacy adapter, and C/C++ smoke consumer |
 | AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 30 Hz C-core owner thread with clean shutdown |
 | Metal 4 device/presentation | Implemented — validated raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
-| Metal 4 rendering | Not started |
+| Metal 4 rendering | In progress — complete-scene bridge/replay implemented with dynamic MSL, textures, depth, samplers, state, display lists, trace inspection, and clean Metal validation; awaiting the separate M4 validation gate |
 | Native input/audio | Not started |
 | Gameplay parity | Not started |
 | Swift gameplay | Not started |
@@ -56,3 +68,6 @@
 - The dedicated engine thread now runs a real `CFRunLoop` with a 30 Hz lifecycle timer and an owner-thread `CAMetalDisplayLink`; AppKit only publishes pixel-size changes and synchronously stops the run loop for teardown.
 - M3 is committed as `8d7a54b`. Validation on Apple M5 Max passed signed runtime/LLDB, Metal API and GPU validation, full Swift+C ASan, `leaks` (0 bytes), ABI smoke, and clean GPU-drained shutdown.
 - The final M3 capture `/tmp/sm64-modern-m3-validation-44458.gputrace` is 2.7 MB with one labeled reusable command buffer, one labeled clear encoder, zero draws, committed layer residency, a shared event, and a 960x720 `BGRA8Unorm` Clear/Store drawable. The fetched ignored output is `build/sm64-modern-m3-validation-gpu.png`.
+- M4 execute preserves the M3 presentation owner and adds the existing engine's rendering callbacks through `gfx_sm64_modern.c`; Swift never traverses the legacy display-list object graph and instead consumes copied POD draw/texture/state data.
+- `MetalShaderCompiler` uses runtime MSL and Metal 4 compiler/pipeline descriptors; `MetalRenderer` owns packet replay, private textures, explicit blit/fragment barriers, memoryless depth, sampler/depth caches, argument tables, queue residency, retirement, and completion-safe resource reuse.
+- M4 execution evidence is strong enough to begin `/porting-validate`, but it is not milestone acceptance: live human window inspection was blocked by the locked session, and native input/audio plus fixed 60 Hz simulation remain M5 and M8 respectively.

@@ -107,6 +107,74 @@ typedef struct SM64ModernPlatformApiV1 {
     SM64ModernPlatformErrorFn error_reported;
 } SM64ModernPlatformApiV1;
 
+// The native renderer is installed from the platform initialize callback, on
+// the lifecycle owner thread. Every pointer passed to a callback is borrowed
+// for that callback only; hosts must copy scene and texture data synchronously.
+typedef SM64ModernStatus (*SM64ModernRenderInitializeFn)(void *context,
+                                                         uint32_t filtering_mode);
+typedef void (*SM64ModernRenderShutdownFn)(void *context);
+typedef SM64ModernStatus (*SM64ModernRenderCreateShaderFn)(void *context,
+                                                           uint32_t shader_id,
+                                                           uint32_t filtering_mode,
+                                                           uint32_t num_inputs,
+                                                           uint32_t used_texture_mask);
+typedef void (*SM64ModernRenderSelectShaderFn)(void *context, uint32_t shader_id);
+typedef SM64ModernStatus (*SM64ModernRenderCreateTextureFn)(void *context,
+                                                            uint32_t texture_id);
+typedef void (*SM64ModernRenderSelectTextureFn)(void *context,
+                                                uint32_t tile,
+                                                uint32_t texture_id);
+typedef SM64ModernStatus (*SM64ModernRenderUploadTextureFn)(void *context,
+                                                            uint32_t tile,
+                                                            uint32_t texture_id,
+                                                            const uint8_t *rgba8,
+                                                            uint32_t width,
+                                                            uint32_t height);
+typedef void (*SM64ModernRenderSetSamplerFn)(void *context,
+                                             uint32_t tile,
+                                             uint32_t texture_id,
+                                             uint32_t linear_filter,
+                                             uint32_t cms,
+                                             uint32_t cmt);
+typedef void (*SM64ModernRenderSetBoolStateFn)(void *context, uint32_t enabled);
+typedef void (*SM64ModernRenderSetRectFn)(void *context,
+                                          int32_t x,
+                                          int32_t y,
+                                          int32_t width,
+                                          int32_t height);
+typedef SM64ModernStatus (*SM64ModernRenderDrawTrianglesFn)(void *context,
+                                                            const float *vertices,
+                                                            uint32_t float_count,
+                                                            uint32_t triangle_count);
+typedef SM64ModernStatus (*SM64ModernRenderFrameFn)(void *context);
+typedef void (*SM64ModernRenderGetDimensionsFn)(void *context,
+                                                uint32_t *out_width,
+                                                uint32_t *out_height);
+
+typedef struct SM64ModernRenderingApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernRenderInitializeFn initialize;
+    SM64ModernRenderShutdownFn shutdown;
+    SM64ModernRenderCreateShaderFn create_shader;
+    SM64ModernRenderSelectShaderFn select_shader;
+    SM64ModernRenderCreateTextureFn create_texture;
+    SM64ModernRenderSelectTextureFn select_texture;
+    SM64ModernRenderUploadTextureFn upload_texture;
+    SM64ModernRenderSetSamplerFn set_sampler_parameters;
+    SM64ModernRenderSetBoolStateFn set_depth_test;
+    SM64ModernRenderSetBoolStateFn set_depth_mask;
+    SM64ModernRenderSetBoolStateFn set_zmode_decal;
+    SM64ModernRenderSetRectFn set_viewport;
+    SM64ModernRenderSetRectFn set_scissor;
+    SM64ModernRenderSetBoolStateFn set_use_alpha;
+    SM64ModernRenderDrawTrianglesFn draw_triangles;
+    SM64ModernRenderFrameFn start_frame;
+    SM64ModernRenderFrameFn end_frame;
+    SM64ModernRenderFrameFn finish_render;
+    SM64ModernRenderGetDimensionsFn get_dimensions;
+} SM64ModernRenderingApiV1;
+
 typedef struct SM64ModernGameplayRecordEnvelopeV1 {
     SM64ModernAbiHeader header;
     uint64_t simulation_tick;
@@ -145,6 +213,10 @@ SM64ModernStatus sm64_modern_get_lifecycle_api(uint32_t requested_version,
                                                uint32_t output_size,
                                                SM64ModernLifecycleApiV1 *out_api);
 SM64ModernStatus sm64_modern_validate_platform_api(const SM64ModernPlatformApiV1 *platform);
+SM64ModernStatus sm64_modern_validate_rendering_api(const SM64ModernRenderingApiV1 *rendering);
+SM64ModernStatus sm64_modern_install_rendering_api(const SM64ModernRenderingApiV1 *rendering);
+void sm64_modern_uninstall_rendering_api(void);
+SM64ModernStatus sm64_modern_rendering_status(void);
 SM64ModernStatus sm64_modern_get_gameplay_api(uint32_t requested_version,
                                               uint32_t output_size,
                                               SM64ModernGameplayApiV1 *out_api);

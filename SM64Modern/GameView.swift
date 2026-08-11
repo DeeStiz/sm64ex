@@ -39,8 +39,8 @@ final class GameView: NSView {
     func configureMetal(device: any MTLDevice) -> CGSize {
         let metalLayer = metalLayer
         metalLayer.device = device
-        // HARDCODED(M3): approved SDR/double-buffered bring-up settings; M4
-        // sources presentation format and pacing from native renderer settings.
+        // M4 keeps the approved SDR surface and two-slot presentation contract;
+        // scene format and pacing are sourced by the native Metal renderer.
         metalLayer.pixelFormat = .bgra8Unorm
         metalLayer.framebufferOnly = true
         metalLayer.maximumDrawableCount = 2
