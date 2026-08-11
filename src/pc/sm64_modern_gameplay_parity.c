@@ -348,6 +348,11 @@ static void record_values(SM64ModernGameplaySubsystem subsystem,
     if (!subsystem_enabled(subsystem) || sStatus != SM64_MODERN_STATUS_OK) {
         return;
     }
+    if (value_count > SM64_MODERN_GAMEPLAY_RECORD_VALUE_CAPACITY
+        || (value_count > 0 && !values)) {
+        sStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        return;
+    }
     SM64ModernGameplayTraceRecordV1 record = make_record(subsystem,
                                                          kind,
                                                          record_id,

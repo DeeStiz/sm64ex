@@ -72,6 +72,13 @@ static SM64ModernGameplayParityConfigV1 make_config(SM64ModernGameplayParityMode
     return config;
 }
 
+static SM64ModernGameplayParityConfigV1 make_all_subsystems_config(
+    SM64ModernGameplayParityMode mode) {
+    SM64ModernGameplayParityConfigV1 config = make_config(mode);
+    config.subsystem_mask = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MASK_ALL;
+    return config;
+}
+
 static SM64ModernGameplayTraceStreamApiV1 make_stream(struct MemoryTrace *trace) {
     SM64ModernGameplayTraceStreamApiV1 stream;
     memset(&stream, 0, sizeof(stream));
@@ -96,6 +103,126 @@ static void emit_reference_tick(uint64_t mario_value, uint64_t camera_value) {
                                             &camera_value,
                                             1);
     sm64_modern_parity_end_tick();
+}
+
+static void begin_all_subsystem_reference_tick(void) {
+    sm64_modern_parity_begin_tick();
+    for (uint32_t subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO;
+         subsystem < SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT;
+         ++subsystem) {
+        const uint64_t value = subsystem * 10u;
+        sm64_modern_parity_record_test_snapshot(subsystem,
+                                                1000u + subsystem,
+                                                subsystem,
+                                                &value,
+                                                1);
+    }
+}
+
+static void verify_all_subsystem_gate_isolation(
+    const SM64ModernGameplayParityApiV1 *parity) {
+    struct MemoryTrace trace;
+    SM64ModernGameplayTraceStreamApiV1 stream;
+    SM64ModernGameplayParityConfigV1 config;
+    SM64ModernGameplayParityResultV1 result;
+
+    memset(&trace, 0, sizeof(trace));
+    stream = make_stream(&trace);
+    config = make_all_subsystems_config(SM64_MODERN_GAMEPLAY_PARITY_RECORD);
+    expect_status("all-subsystem record begin",
+                  parity->begin_session(&config, &stream),
+                  SM64_MODERN_STATUS_OK);
+    begin_all_subsystem_reference_tick();
+    sm64_modern_parity_end_tick();
+    expect_status("all-subsystem record end",
+                  parity->end_session(),
+                  SM64_MODERN_STATUS_OK);
+    expect_u64("all-subsystem record count",
+               trace.count,
+               SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT);
+
+    for (uint32_t divergent = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO;
+         divergent < SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT;
+         ++divergent) {
+        trace.cursor = 0;
+        config = make_all_subsystems_config(SM64_MODERN_GAMEPLAY_PARITY_SHADOW);
+        expect_status("all-subsystem shadow begin",
+                      parity->begin_session(&config, &stream),
+                      SM64_MODERN_STATUS_OK);
+        for (uint32_t subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO;
+             subsystem < SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT;
+             ++subsystem) {
+            expect_status("all-subsystem shadow authority",
+                          sm64_modern_gameplay_set_authority(
+                              subsystem, SM64_MODERN_AUTHORITY_SHADOW_SWIFT),
+                          SM64_MODERN_STATUS_OK);
+        }
+
+        begin_all_subsystem_reference_tick();
+        for (uint32_t subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO;
+             subsystem < SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT;
+             ++subsystem) {
+            SM64ModernGameplayTraceRecordV1 candidate = trace.records[subsystem];
+            if (subsystem == divergent) {
+                candidate.values[0]++;
+            }
+            expect_status("all-subsystem candidate",
+                          parity->submit_candidate_record(&candidate),
+                          subsystem == divergent
+                              ? SM64_MODERN_STATUS_PARITY_DIVERGED
+                              : SM64_MODERN_STATUS_OK);
+        }
+        sm64_modern_parity_end_tick();
+        expect_status("all-subsystem shadow end",
+                      parity->end_session(),
+                      SM64_MODERN_STATUS_PARITY_DIVERGED);
+
+        for (uint32_t subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO;
+             subsystem < SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT;
+             ++subsystem) {
+            memset(&result, 0, sizeof(result));
+            expect_status("all-subsystem result",
+                          parity->get_result(subsystem, &result),
+                          SM64_MODERN_STATUS_OK);
+            expect_u64("all-subsystem isolated gate",
+                       result.eligible_for_swift,
+                       subsystem == divergent ? 0 : 1);
+            expect_status("all-subsystem Swift authority",
+                          sm64_modern_gameplay_set_authority(
+                              subsystem, SM64_MODERN_AUTHORITY_SWIFT),
+                          subsystem == divergent
+                              ? SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY
+                              : SM64_MODERN_STATUS_OK);
+        }
+    }
+}
+
+static void verify_record_capacity_guard(const SM64ModernGameplayParityApiV1 *parity) {
+    struct MemoryTrace trace;
+    SM64ModernGameplayTraceStreamApiV1 stream;
+    SM64ModernGameplayParityConfigV1 config;
+    uint64_t oversized_values[SM64_MODERN_GAMEPLAY_RECORD_VALUE_CAPACITY + 1u] = { 0 };
+
+    memset(&trace, 0, sizeof(trace));
+    stream = make_stream(&trace);
+    config = make_config(SM64_MODERN_GAMEPLAY_PARITY_RECORD);
+    expect_status("capacity guard begin",
+                  parity->begin_session(&config, &stream),
+                  SM64_MODERN_STATUS_OK);
+    sm64_modern_parity_begin_tick();
+    sm64_modern_parity_record_test_snapshot(
+        SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO,
+        SM64_MODERN_FIELD_MARIO_ACTION,
+        0,
+        oversized_values,
+        SM64_MODERN_GAMEPLAY_RECORD_VALUE_CAPACITY + 1u);
+    expect_status("capacity guard status",
+                  sm64_modern_parity_status(),
+                  SM64_MODERN_STATUS_INVALID_ARGUMENT);
+    sm64_modern_parity_end_tick();
+    expect_status("capacity guard end",
+                  parity->end_session(),
+                  SM64_MODERN_STATUS_INVALID_ARGUMENT);
 }
 
 int main(void) {
@@ -259,6 +386,9 @@ int main(void) {
                       SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA,
                       SM64_MODERN_AUTHORITY_SWIFT),
                   SM64_MODERN_STATUS_OK);
+
+    verify_all_subsystem_gate_isolation(&parity);
+    verify_record_capacity_guard(&parity);
 
     if (failures != 0) {
         fprintf(stderr, "SM64 Modern gameplay parity smoke failed: %d failure(s)\n", failures);
