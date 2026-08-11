@@ -9,6 +9,22 @@ static uint32_t smoke_render_initialize_count;
 static uint32_t smoke_render_shutdown_count;
 static uint32_t smoke_render_shader_count;
 
+static int32_t smoke_audio_buffered(void *context) {
+    (void) context;
+    return 0;
+}
+
+static uint32_t smoke_audio_desired(void *context) {
+    (void) context;
+    return 1100;
+}
+
+static void smoke_audio_play(void *context, const int16_t *samples, uint32_t frame_count) {
+    (void) context;
+    (void) samples;
+    (void) frame_count;
+}
+
 static int expect_status(const char *operation, SM64ModernStatus actual, SM64ModernStatus expected) {
     if (actual == expected) {
         return 0;
@@ -178,10 +194,23 @@ int main(void) {
     platform.current_thread = smoke_platform_thread;
     failures += expect_status("platform v1", sm64_modern_validate_platform_api(&platform),
                               SM64_MODERN_STATUS_OK);
+    platform.capabilities = SM64_MODERN_PLATFORM_CAP_AUDIO;
+    failures += expect_status("audio capability missing callbacks", sm64_modern_validate_platform_api(&platform),
+                              SM64_MODERN_STATUS_INVALID_ARGUMENT);
+    platform.audio_buffered = smoke_audio_buffered;
+    platform.audio_desired_buffered = smoke_audio_desired;
+    failures += expect_status("audio capability missing play", sm64_modern_validate_platform_api(&platform),
+                              SM64_MODERN_STATUS_INVALID_ARGUMENT);
+    platform.audio_play = smoke_audio_play;
+    failures += expect_status("audio capability complete", sm64_modern_validate_platform_api(&platform),
+                              SM64_MODERN_STATUS_OK);
     platform.capabilities = 1u << 31;
     failures += expect_status("unknown platform capability", sm64_modern_validate_platform_api(&platform),
                               SM64_MODERN_STATUS_INVALID_ARGUMENT);
     platform.capabilities = 0;
+    platform.audio_buffered = NULL;
+    platform.audio_desired_buffered = NULL;
+    platform.audio_play = NULL;
     platform.header.abi_version++;
     failures += expect_status("unsupported platform version", sm64_modern_validate_platform_api(&platform),
                               SM64_MODERN_STATUS_UNSUPPORTED_VERSION);

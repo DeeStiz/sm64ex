@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		09C260568C8A5ECD27002AC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */; };
 		0C110C47F377370F18974E8D /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */; };
+		139E7960DE4C5B3DA9CE17B8 /* AppleAudioRing.c in Sources */ = {isa = PBXBuildFile; fileRef = A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */; };
 		15156FB40A2F0FB896A7D6EC /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C22E70845A716BECE93CE0 /* GameView.swift */; };
 		4542710AB513728A46A876F6 /* MetalCompilerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */; };
 		45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */; };
@@ -17,6 +18,7 @@
 		946B96572AA7C94347AF500E /* EngineHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C737B1A16857D51F7C7FE7A /* EngineHost.swift */; };
 		995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD8678B319AD274378179C /* MetalShaderCompiler.swift */; };
 		A03388793B2976FA562FE712 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5723E1972C2FF3BB21E3A5B /* AppMain.swift */; };
+		AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */ = {isa = PBXBuildFile; fileRef = 328470043E0C3F9278C1A80E /* AppleAudioService.m */; };
 		CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386378DD6ECB9F78AC003073 /* MetalRenderer.swift */; };
 /* End PBXBuildFile section */
 
@@ -25,14 +27,18 @@
 		1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderingBridge.swift; sourceTree = "<group>"; };
 		2CA0E28C4E523ADAE015243F /* MetalCompilerBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalCompilerBridge.h; sourceTree = "<group>"; };
 		2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalScene.swift; sourceTree = "<group>"; };
+		328470043E0C3F9278C1A80E /* AppleAudioService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleAudioService.m; sourceTree = "<group>"; };
 		386378DD6ECB9F78AC003073 /* MetalRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderer.swift; sourceTree = "<group>"; };
 		3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameViewController.swift; sourceTree = "<group>"; };
 		411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		5C737B1A16857D51F7C7FE7A /* EngineHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineHost.swift; sourceTree = "<group>"; };
 		667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SM64ModernDebug.entitlements; sourceTree = "<group>"; };
+		7316D473A3C5C7E718C32B2E /* AppleAudioRing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioRing.h; sourceTree = "<group>"; };
 		92C22E70845A716BECE93CE0 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		97BD8678B319AD274378179C /* MetalShaderCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalShaderCompiler.swift; sourceTree = "<group>"; };
+		A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = AppleAudioRing.c; sourceTree = "<group>"; };
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
+		CB4ABB8191E695DB49D9CF9E /* AppleAudioService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioService.h; sourceTree = "<group>"; };
 		D5723E1972C2FF3BB21E3A5B /* AppMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMain.swift; sourceTree = "<group>"; };
 		D8F9722E9A2207BC558A3023 /* SM64Modern.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SM64Modern.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -42,6 +48,10 @@
 			isa = PBXGroup;
 			children = (
 				411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */,
+				A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */,
+				7316D473A3C5C7E718C32B2E /* AppleAudioRing.h */,
+				CB4ABB8191E695DB49D9CF9E /* AppleAudioService.h */,
+				328470043E0C3F9278C1A80E /* AppleAudioService.m */,
 				C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */,
 				D5723E1972C2FF3BB21E3A5B /* AppMain.swift */,
 				5C737B1A16857D51F7C7FE7A /* EngineHost.swift */,
@@ -157,6 +167,8 @@
 			files = (
 				09C260568C8A5ECD27002AC5 /* AppDelegate.swift in Sources */,
 				A03388793B2976FA562FE712 /* AppMain.swift in Sources */,
+				139E7960DE4C5B3DA9CE17B8 /* AppleAudioRing.c in Sources */,
+				AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */,
 				45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */,
 				946B96572AA7C94347AF500E /* EngineHost.swift in Sources */,
 				15156FB40A2F0FB896A7D6EC /* GameView.swift in Sources */,

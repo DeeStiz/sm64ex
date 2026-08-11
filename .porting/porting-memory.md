@@ -5,6 +5,10 @@
 - M5b success criterion: AVAudioEngine output feeds the existing 32 kHz stereo PCM contract through a real-time-safe buffer.
 - Preserve the dedicated engine owner thread, versioned POD C boundary, complete M4 Metal scene path, validated M5a input service, and legacy portable backends.
 - Publish audio capability only after the complete callback table, buffer ownership, underrun behavior, and native service are installed successfully.
+- Approved M5b work: add a preallocated C11-atomic SPSC PCM ring and an Objective-C AVAudioSourceNode real-time-safe adapter; Swift remains lifecycle-only.
+- Preserve the existing 1,100-frame target and 6,000-frame backlog ceiling, zero-fill underruns, drop excess new input, and expose bounded owner-thread telemetry.
+- Start, recover default-output configuration changes, and stop AVAudioEngine on the engine owner thread; never allocate, lock, log, message Objective-C, call Swift, or mutate engine state from the render callback.
+- Wire the existing audio callbacks/capability only after successful service startup, then cover ring behavior, ABI validation, canonical runtime verification, legacy-build preservation, and human audible/routing evidence.
 
 ### M5a Completion Evidence
 

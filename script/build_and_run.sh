@@ -14,6 +14,7 @@ DEBUG_ENTITLEMENTS="$PROJECT_ROOT/SM64Modern/SM64ModernDebug.entitlements"
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
 cd "$PROJECT_ROOT"
+"$PROJECT_ROOT/script/test_audio_ring.sh"
 xcodegen generate --spec project.yml
 xcodebuild \
   -project SM64Modern.xcodeproj \
@@ -103,18 +104,22 @@ case "$MODE" in
       'input_service_ready' \
       'input_bridge_installed abi=1' \
       'input_snapshot_started owner_main=false' \
-      'lifecycle_running cadence_hz=30 capabilities=rendering,input' \
+      'audio_service_started input_hz=32000 format=s16_interleaved_stereo' \
+      'audio_enqueue_started' \
+      'audio_render_started' \
+      'lifecycle_running cadence_hz=30 capabilities=rendering,input,audio' \
       'lifecycle_step count=1'; do
       grep -Fq "$expected" <<< "$runtime_log"
     done
     printf '%s\n' "$runtime_log" \
-      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|input_snapshot_started|lifecycle_running|lifecycle_step count=1'
+      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|input_snapshot_started|audio_service_started|audio_enqueue_started|audio_render_started|lifecycle_running|lifecycle_step count=1'
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do
       if ! kill -0 "$app_pid" >/dev/null 2>&1; then
         shutdown_log="$(/usr/bin/log show --last 2m --style compact \
           --predicate "processIdentifier == $app_pid && subsystem == \"$BUNDLE_ID\"")"
         for expected in \
+          'audio_service_stopped' \
           'platform_shutdown' \
           'metal_shutdown_drained' \
           'engine_thread_finished status=0' \
@@ -122,7 +127,7 @@ case "$MODE" in
           grep -Fq "$expected" <<< "$shutdown_log"
         done
         printf '%s\n' "$shutdown_log" \
-          | grep -E 'metal_shutdown_drained|platform_shutdown|engine_thread_finished status=0|application_stopped'
+          | grep -E 'audio_service_stopped|metal_shutdown_drained|platform_shutdown|engine_thread_finished status=0|application_stopped'
         exit 0
       fi
       sleep 0.1

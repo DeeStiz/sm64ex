@@ -6,6 +6,7 @@ import QuartzCore
 import os
 
 private let engineLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "EngineHost")
+private let audioLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "Audio")
 
 private func engineHost(from context: UnsafeMutableRawPointer?) -> EngineHost? {
     guard let context else { return nil }
@@ -53,6 +54,17 @@ private func platformInitialize(
         return inputStatus
     }
     engineLogger.notice("input_bridge_installed abi=1")
+    do {
+        try host.initializeAudioOnEngineThread()
+    } catch {
+        audioLogger.error("audio_initialize_failed error=\(error.localizedDescription, privacy: .public)")
+        sm64_modern_uninstall_input_api()
+        sm64_modern_uninstall_rendering_api()
+        do { try host.shutdownMetalOnEngineThread() } catch {
+            engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
+        }
+        return SM64_MODERN_STATUS_PLATFORM_ERROR
+    }
     engineLogger.notice("platform_initialized title=\(title, privacy: .public)")
     return SM64_MODERN_STATUS_OK
 }
@@ -60,9 +72,33 @@ private func platformInitialize(
 private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     guard let host = engineHost(from: context) else { return }
     assert(host.isCurrentEngineThread)
+    host.shutdownAudioOnEngineThread()
     sm64_modern_uninstall_input_api()
     sm64_modern_uninstall_rendering_api()
     engineLogger.notice("platform_shutdown")
+}
+
+private func platformAudioBuffered(_ context: UnsafeMutableRawPointer?) -> Int32 {
+    guard let host = engineHost(from: context), host.isCurrentEngineThread else { return 0 }
+    return host.audioBufferedFrames()
+}
+
+private func platformAudioDesiredBuffered(_ context: UnsafeMutableRawPointer?) -> UInt32 {
+    guard let host = engineHost(from: context), host.isCurrentEngineThread else { return 0 }
+    return host.audioDesiredBufferedFrames()
+}
+
+private func platformAudioPlay(
+    _ context: UnsafeMutableRawPointer?,
+    _ samples: UnsafePointer<Int16>?,
+    _ frameCount: UInt32
+) {
+    guard let host = engineHost(from: context), host.isCurrentEngineThread else { return }
+    guard let samples else {
+        precondition(frameCount == 0, "Non-empty audio packets require sample storage")
+        return
+    }
+    host.audioPlay(samples: samples, frameCount: frameCount)
 }
 
 private func platformCurrentThread(_ context: UnsafeMutableRawPointer?) -> UInt64 {
@@ -117,6 +153,9 @@ final class EngineHost: @unchecked Sendable {
     private var engineRunStatus = SM64_MODERN_STATUS_OK
     private var lifecycle = SM64ModernLifecycleApiV1()
     private var inputService: AppleInputService?
+    private var audioService: SM64ModernAppleAudioService?
+    private var loggedAudioEnqueue = false
+    private var loggedAudioRender = false
     private var metalConfiguration: MetalConfiguration?
     private var metalRenderer: MetalRenderer?
     private var pendingDrawableSize: CGSize?
@@ -218,7 +257,7 @@ final class EngineHost: @unchecked Sendable {
             state = .running
             condition.broadcast()
         }
-        engineLogger.notice("lifecycle_running cadence_hz=30 capabilities=rendering,input")
+        engineLogger.notice("lifecycle_running cadence_hz=30 capabilities=rendering,input,audio")
 
         engineRunStatus = SM64_MODERN_STATUS_OK
         let stepTimer = Timer(timeInterval: Self.legacyStepInterval, repeats: true) { [self] _ in
@@ -256,15 +295,35 @@ final class EngineHost: @unchecked Sendable {
             return
         }
 
-        engineRunStatus = lifecycle.step()
-        if engineRunStatus == SM64_MODERN_STATUS_OK {
-            stepCount += 1
-            if stepCount == 1 || stepCount.isMultiple(of: 300) {
-                engineLogger.notice("lifecycle_step count=\(self.stepCount)")
-                metalRenderer?.logSceneStatus(step: stepCount)
+        do {
+            let recoveryWasPending = audioService?.recoveryPending() ?? false
+            try audioService?.recoverIfNeeded()
+            if recoveryWasPending, let status = audioService?.audioStatus() {
+                audioLogger.notice(
+                    "audio_route_recovered output_hz=\(status.output_sample_rate, privacy: .public) output_channels=\(status.output_channel_count, privacy: .public)"
+                )
             }
-        } else {
+        } catch {
+            audioLogger.error("audio_recovery_failed error=\(error.localizedDescription, privacy: .public)")
+            engineRunStatus = SM64_MODERN_STATUS_PLATFORM_ERROR
             CFRunLoopStop(CFRunLoopGetCurrent())
+            return
+        }
+
+        // Recover and discard stale route data before the core asks how much
+        // PCM is buffered, so this tick immediately refills the restarted graph.
+        engineRunStatus = lifecycle.step()
+        guard engineRunStatus == SM64_MODERN_STATUS_OK else {
+            CFRunLoopStop(CFRunLoopGetCurrent())
+            return
+        }
+
+        stepCount += 1
+        logAudioRenderIfNeeded()
+        if stepCount == 1 || stepCount.isMultiple(of: 300) {
+            engineLogger.notice("lifecycle_step count=\(self.stepCount)")
+            metalRenderer?.logSceneStatus(step: stepCount)
+            logAudioStatus()
         }
     }
 
@@ -300,13 +359,16 @@ final class EngineHost: @unchecked Sendable {
         var platform = SM64ModernPlatformApiV1()
         platform.header.abi_version = SM64_MODERN_ABI_VERSION_1
         platform.header.struct_size = UInt32(MemoryLayout<SM64ModernPlatformApiV1>.size)
-        // STUB(M5b): publish audio capability after AVAudioEngine implements
-        // the platform callbacks.
-        platform.capabilities = SM64_MODERN_PLATFORM_CAP_RENDERING | SM64_MODERN_PLATFORM_CAP_INPUT
+        platform.capabilities = SM64_MODERN_PLATFORM_CAP_RENDERING
+            | SM64_MODERN_PLATFORM_CAP_INPUT
+            | SM64_MODERN_PLATFORM_CAP_AUDIO
         platform.reserved = 0
         platform.context = Unmanaged.passUnretained(self).toOpaque()
         platform.initialize = platformInitialize
         platform.shutdown = platformShutdown
+        platform.audio_buffered = platformAudioBuffered
+        platform.audio_desired_buffered = platformAudioDesiredBuffered
+        platform.audio_play = platformAudioPlay
         platform.current_thread = platformCurrentThread
         platform.exit_requested = platformExitRequested
         platform.error_reported = platformError
@@ -344,6 +406,96 @@ final class EngineHost: @unchecked Sendable {
     fileprivate var inputServiceOnEngineThread: AppleInputService? {
         precondition(isCurrentEngineThread)
         return condition.withLock { inputService }
+    }
+
+    fileprivate func initializeAudioOnEngineThread() throws {
+        precondition(isCurrentEngineThread)
+        guard audioService == nil else {
+            throw NSError(
+                domain: "io.github.deestiz.sm64modern.Audio",
+                code: Int(SM64_MODERN_STATUS_INVALID_STATE),
+                userInfo: [NSLocalizedDescriptionKey: "Native audio is already initialized"]
+            )
+        }
+        guard let service = SM64ModernAppleAudioService.makeAudioService() else {
+            throw NSError(
+                domain: "io.github.deestiz.sm64modern.Audio",
+                code: Int(SM64_MODERN_STATUS_OUT_OF_MEMORY),
+                userInfo: [NSLocalizedDescriptionKey: "Could not allocate the native audio service"]
+            )
+        }
+        do {
+            try service.start()
+        } catch {
+            service.stop()
+            throw error
+        }
+        audioService = service
+        let status = service.audioStatus()
+        audioLogger.notice(
+            "audio_service_started input_hz=32000 format=s16_interleaved_stereo output_hz=\(status.output_sample_rate) output_channels=\(status.output_channel_count) capacity=\(status.capacity_frames) desired=\(status.desired_buffered_frames) backlog=\(status.backlog_ceiling_frames)"
+        )
+    }
+
+    fileprivate func shutdownAudioOnEngineThread() {
+        precondition(isCurrentEngineThread)
+        guard let audioService else { return }
+        audioService.stop()
+        let status = audioService.audioStatus()
+        self.audioService = nil
+        audioLogger.notice(
+            "audio_service_stopped enqueued=\(status.ring.enqueued_frames) rendered=\(status.ring.rendered_frames) underrun=\(status.ring.underrun_frames) dropped=\(status.ring.dropped_frames) render_calls=\(status.ring.render_calls)"
+        )
+    }
+
+    fileprivate func audioBufferedFrames() -> Int32 {
+        precondition(isCurrentEngineThread)
+        guard let audioService else {
+            assertionFailure("The advertised audio capability requires a live service")
+            return 0
+        }
+        return audioService.bufferedFrames()
+    }
+
+    fileprivate func audioDesiredBufferedFrames() -> UInt32 {
+        precondition(isCurrentEngineThread)
+        guard let audioService else {
+            assertionFailure("The advertised audio capability requires a live service")
+            return 0
+        }
+        return audioService.desiredBufferedFrames()
+    }
+
+    fileprivate func audioPlay(samples: UnsafePointer<Int16>, frameCount: UInt32) {
+        precondition(isCurrentEngineThread)
+        guard let audioService else {
+            assertionFailure("The advertised audio capability requires a live service")
+            return
+        }
+        audioService.enqueueInterleavedStereoSamples(samples, frameCount: frameCount)
+        if !loggedAudioEnqueue {
+            loggedAudioEnqueue = true
+            audioLogger.notice("audio_enqueue_started frames=\(frameCount)")
+        }
+    }
+
+    private func logAudioRenderIfNeeded() {
+        precondition(isCurrentEngineThread)
+        guard !loggedAudioRender, let status = audioService?.audioStatus(), status.ring.render_calls > 0 else {
+            return
+        }
+        loggedAudioRender = true
+        audioLogger.notice(
+            "audio_render_started calls=\(status.ring.render_calls) rendered=\(status.ring.rendered_frames) underrun=\(status.ring.underrun_frames)"
+        )
+    }
+
+    private func logAudioStatus() {
+        precondition(isCurrentEngineThread)
+        guard let status = audioService?.audioStatus() else { return }
+        audioLogger.notice(
+            "audio_status step=\(self.stepCount) running=\(status.running) buffered=\(status.buffered_frames) rendered=\(status.ring.rendered_frames) underrun=\(status.ring.underrun_frames) dropped=\(status.ring.dropped_frames) recovery_pending=\(status.recovery_pending)"
+        )
     }
 
     fileprivate func shutdownMetalOnEngineThread() throws {
