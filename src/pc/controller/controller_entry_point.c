@@ -8,6 +8,7 @@
 #include "controller_keyboard.h"
 #include "controller_sdl.h"
 #include "controller_sm64_modern.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 
 // Analog camera movement by Pathétique (github.com/vrmiguel), y0shin and Mors
 // Contribute or communicate bugs at github.com/vrmiguel/sm64-analog-camera
@@ -87,6 +88,7 @@ void controller_reconfigure(void) {
 }
 
 void controller_rumble_play(float str, float time) {
+    sm64_modern_parity_record_rumble_start(str, time);
     for (size_t i = 0; i < sizeof(controller_implementations) / sizeof(struct ControllerAPI *); i++) {
         if (controller_implementations[i]->rumble_play)
             controller_implementations[i]->rumble_play(str, time);
@@ -94,6 +96,7 @@ void controller_rumble_play(float str, float time) {
 }
 
 void controller_rumble_stop(void) {
+    sm64_modern_parity_record_rumble_stop();
     for (size_t i = 0; i < sizeof(controller_implementations) / sizeof(struct ControllerAPI *); i++) {
         if (controller_implementations[i]->rumble_stop)
             controller_implementations[i]->rumble_stop();

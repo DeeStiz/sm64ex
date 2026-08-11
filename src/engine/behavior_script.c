@@ -30,6 +30,10 @@
 
 static u16 gRandomSeed16;
 
+u16 random_seed_get(void) {
+    return gRandomSeed16;
+}
+
 // Unused function that directly jumps to a behavior command and resets the object's stack index.
 static void goto_behavior_unused(const BehaviorScript *bhvAddr) {
     gCurBhvCommand = segmented_to_virtual(bhvAddr);

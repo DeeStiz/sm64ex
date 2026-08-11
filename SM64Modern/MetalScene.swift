@@ -25,6 +25,7 @@ struct MetalRect: Hashable, Sendable {
 struct MetalSceneDraw: Sendable {
     let shader: MetalShaderKey
     let textureIDs: [UInt32]
+    let textureBindings: [MetalTextureBinding?]
     let samplers: [MetalSamplerKey]
     let depthTest: Bool
     let depthWrite: Bool
@@ -57,6 +58,8 @@ final class MetalSceneRecorder {
     private var draws: [MetalSceneDraw] = []
     private var nextSequence: UInt64 = 1
     private(set) var latestPacket: MetalScenePacket?
+
+    var currentTextureIDs: [UInt32] { selectedTextureIDs }
 
     func registerShader(
         id: UInt32,
@@ -101,10 +104,16 @@ final class MetalSceneRecorder {
         scissor = full
     }
 
-    func append(vertices: UnsafePointer<Float>, floatCount: UInt32, triangleCount: UInt32) -> Bool {
+    func append(
+        vertices: UnsafePointer<Float>,
+        floatCount: UInt32,
+        triangleCount: UInt32,
+        textureBindings: [MetalTextureBinding?]
+    ) -> Bool {
         guard let selectedShaderID, let registered = shaders[selectedShaderID], floatCount > 0 else {
             return false
         }
+        guard textureBindings.count == selectedTextureIDs.count else { return false }
         var shader = registered
         shader = MetalShaderKey(
             shaderID: shader.shaderID,
@@ -116,6 +125,7 @@ final class MetalSceneRecorder {
         let draw = MetalSceneDraw(
             shader: shader,
             textureIDs: selectedTextureIDs,
+            textureBindings: textureBindings,
             samplers: samplerKeys,
             depthTest: depthTest,
             depthWrite: depthWrite,

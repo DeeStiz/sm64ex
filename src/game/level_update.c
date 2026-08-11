@@ -32,6 +32,7 @@
 #include "../../include/libc/stdlib.h"
 
 #include "pc/pc_main.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 #include "pc/cliopts.h"
 #include "pc/configfile.h"
 
@@ -954,7 +955,9 @@ void basic_update(UNUSED s16 *arg) {
     update_hud_values();
 
     if (gCurrentArea != NULL) {
+        sm64_modern_parity_enter_subsystem(SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA);
         update_camera(gCurrentArea->camera);
+        sm64_modern_parity_leave_subsystem();
     }
 }
 
@@ -984,7 +987,9 @@ s32 play_mode_normal(void) {
     update_hud_values();
 
     if (gCurrentArea != NULL) {
+        sm64_modern_parity_enter_subsystem(SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA);
         update_camera(gCurrentArea->camera);
+        sm64_modern_parity_leave_subsystem();
     }
 
     initiate_painting_warp();
@@ -1072,7 +1077,9 @@ s32 play_mode_change_area(void) {
     //! This maybe was supposed to be sTransitionTimer == -1? sTransitionUpdate
     // is never set to -1.
     if (sTransitionUpdate == (void (*)(s16 *)) - 1) {
+        sm64_modern_parity_enter_subsystem(SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA);
         update_camera(gCurrentArea->camera);
+        sm64_modern_parity_leave_subsystem();
     } else if (sTransitionUpdate != NULL) {
         sTransitionUpdate(&sTransitionTimer);
     }

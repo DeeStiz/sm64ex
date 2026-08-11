@@ -88,7 +88,13 @@ private func renderingSetSampler(
     _ wrapS: UInt32,
     _ wrapT: UInt32
 ) {
-    renderingHost(from: context)?.renderingSetSampler(tile: tile, linear: linear != 0, wrapS: wrapS, wrapT: wrapT)
+    renderingHost(from: context)?.renderingSetSampler(
+        tile: tile,
+        id: textureID,
+        linear: linear != 0,
+        wrapS: wrapS,
+        wrapT: wrapT
+    )
 }
 
 private func renderingSetDepthTest(_ context: UnsafeMutableRawPointer?, _ enabled: UInt32) {

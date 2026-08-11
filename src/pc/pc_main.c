@@ -22,6 +22,7 @@
 #include "fs/fs.h"
 #include "pc_main.h"
 #include "platform.h"
+#include "sm64_modern_gameplay_parity.h"
 
 #ifdef DISCORDRPC
 #include "pc/discord/discordrpc.h"
@@ -168,6 +169,7 @@ static SM64ModernStatus lifecycle_initialize(const SM64ModernLifecycleConfigV1 *
     memcpy(&sPlatform, platform, sizeof(sPlatform));
     sOwnerThread = sPlatform.current_thread(sPlatform.context);
     sLifecycleState = SM64_MODERN_LIFECYCLE_INITIALIZING;
+    sm64_modern_parity_reset();
 
     copy_string(gCLIOpts.GameDir, sizeof(gCLIOpts.GameDir), config->game_directory);
     copy_string(gCLIOpts.SavePath, sizeof(gCLIOpts.SavePath), config->save_directory);
@@ -260,6 +262,8 @@ static SM64ModernStatus lifecycle_step(void) {
         return SM64_MODERN_STATUS_INVALID_STATE;
     }
 
+    sm64_modern_parity_begin_tick();
+
     if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING) {
         gfx_start_frame();
     }
@@ -275,6 +279,7 @@ static SM64ModernStatus lifecycle_step(void) {
     if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_INPUT) {
         const SM64ModernStatus input_status = sm64_modern_input_status();
         if (input_status != SM64_MODERN_STATUS_OK) {
+            sm64_modern_parity_end_tick();
             report_error(input_status, "The native input backend failed");
             return input_status;
         }
@@ -284,12 +289,17 @@ static SM64ModernStatus lifecycle_step(void) {
         int samples_left = sPlatform.audio_buffered(sPlatform.context);
         u32 num_audio_samples = samples_left < (int) sPlatform.audio_desired_buffered(sPlatform.context)
             ? SAMPLES_HIGH : SAMPLES_LOW;
+        num_audio_samples = sm64_modern_parity_audio_frame_count(SAMPLES_HIGH, num_audio_samples);
         s16 audio_buffer[SAMPLES_HIGH * 2 * 2];
         for (int i = 0; i < 2; i++) {
             create_next_audio_buffer(audio_buffer + i * (num_audio_samples * 2), num_audio_samples);
         }
+        sm64_modern_parity_record_pcm(audio_buffer, 2 * num_audio_samples);
         sPlatform.audio_play(sPlatform.context, audio_buffer, 2 * num_audio_samples);
     }
+
+    sm64_modern_parity_end_tick();
+    const SM64ModernStatus parity_status = sm64_modern_parity_status();
 
     if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING) {
         gfx_end_frame();
@@ -298,6 +308,11 @@ static SM64ModernStatus lifecycle_step(void) {
             report_error(rendering_status, "The native rendering backend failed");
             return rendering_status;
         }
+    }
+
+    if (parity_status != SM64_MODERN_STATUS_OK) {
+        report_error(parity_status, "Gameplay parity diverged or the trace stream failed");
+        return parity_status;
     }
 
 #ifdef DISCORDRPC
@@ -358,6 +373,7 @@ static SM64ModernStatus lifecycle_shutdown(void) {
     memset(&sPlatform, 0, sizeof(sPlatform));
     sOwnerThread = 0;
     sLifecycleState = SM64_MODERN_LIFECYCLE_STOPPED;
+    sm64_modern_parity_reset();
     return SM64_MODERN_STATUS_OK;
 }
 
@@ -371,21 +387,12 @@ static SM64ModernStatus lifecycle_get_state(SM64ModernLifecycleState *out_state)
 
 static SM64ModernStatus gameplay_get_authority(SM64ModernGameplaySubsystem subsystem,
                                                 SM64ModernAuthority *out_authority) {
-    if (subsystem != SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL || !out_authority) {
-        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
-    }
-    *out_authority = SM64_MODERN_AUTHORITY_C;
-    return SM64_MODERN_STATUS_OK;
+    return sm64_modern_gameplay_get_authority(subsystem, out_authority);
 }
 
 static SM64ModernStatus gameplay_set_authority(SM64ModernGameplaySubsystem subsystem,
                                                 SM64ModernAuthority authority) {
-    if (subsystem != SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL
-        || authority > SM64_MODERN_AUTHORITY_SWIFT) {
-        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
-    }
-    return authority == SM64_MODERN_AUTHORITY_C
-        ? SM64_MODERN_STATUS_OK : SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY;
+    return sm64_modern_gameplay_set_authority(subsystem, authority);
 }
 
 SM64ModernStatus sm64_modern_get_lifecycle_api(uint32_t requested_version,

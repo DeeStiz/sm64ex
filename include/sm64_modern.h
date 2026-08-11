@@ -27,6 +27,8 @@ typedef uint32_t SM64ModernStatus;
 #define SM64_MODERN_STATUS_OUT_OF_MEMORY 6u
 #define SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY 7u
 #define SM64_MODERN_STATUS_STOP_REQUESTED 8u
+#define SM64_MODERN_STATUS_END_OF_STREAM 9u
+#define SM64_MODERN_STATUS_PARITY_DIVERGED 10u
 
 typedef uint32_t SM64ModernLifecycleState;
 
@@ -63,14 +65,112 @@ typedef uint32_t SM64ModernAuthority;
 
 typedef uint32_t SM64ModernGameplaySubsystem;
 
-// M1 exposes one global gate. Stable subsystem identifiers arrive with the
-// concrete snapshot/effect schemas in M6 and M7.
 #define SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL 0u
+#define SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO 1u
+#define SM64_MODERN_GAMEPLAY_SUBSYSTEM_INTERACTION 2u
+#define SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA 3u
+#define SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_BOBOMB_BATTLEFIELD 4u
+#define SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_JOLLY_ROGER_BAY 5u
+#define SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_BOWSER_ONE 6u
+#define SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT 7u
+#define SM64_MODERN_GAMEPLAY_SUBSYSTEM_MASK(subsystem) (1u << (subsystem))
+#define SM64_MODERN_GAMEPLAY_SUBSYSTEM_MASK_ALL \
+    ((1u << SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT) - 1u)
 
 typedef uint32_t SM64ModernGameplayRecordKind;
 
 #define SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT 1u
 #define SM64_MODERN_GAMEPLAY_RECORD_EFFECT 2u
+#define SM64_MODERN_GAMEPLAY_RECORD_TRACE_HEADER 3u
+#define SM64_MODERN_GAMEPLAY_RECORD_INPUT 4u
+
+typedef uint32_t SM64ModernGameplayParityMode;
+
+#define SM64_MODERN_GAMEPLAY_PARITY_OFF 0u
+#define SM64_MODERN_GAMEPLAY_PARITY_RECORD 1u
+#define SM64_MODERN_GAMEPLAY_PARITY_REPLAY 2u
+#define SM64_MODERN_GAMEPLAY_PARITY_SHADOW 3u
+
+#define SM64_MODERN_GAMEPLAY_PARITY_SCHEMA_VERSION 1u
+
+typedef uint32_t SM64ModernGameplayField;
+
+#define SM64_MODERN_FIELD_GLOBAL_TIMER 1u
+#define SM64_MODERN_FIELD_LEVEL 2u
+#define SM64_MODERN_FIELD_AREA 3u
+#define SM64_MODERN_FIELD_ACT 4u
+#define SM64_MODERN_FIELD_COURSE 5u
+#define SM64_MODERN_FIELD_RANDOM_SEED 6u
+
+#define SM64_MODERN_FIELD_MARIO_INPUT 100u
+#define SM64_MODERN_FIELD_MARIO_FLAGS 101u
+#define SM64_MODERN_FIELD_MARIO_PARTICLE_FLAGS 102u
+#define SM64_MODERN_FIELD_MARIO_ACTION 103u
+#define SM64_MODERN_FIELD_MARIO_PREVIOUS_ACTION 104u
+#define SM64_MODERN_FIELD_MARIO_ACTION_STATE 105u
+#define SM64_MODERN_FIELD_MARIO_ACTION_TIMER 106u
+#define SM64_MODERN_FIELD_MARIO_ACTION_ARGUMENT 107u
+#define SM64_MODERN_FIELD_MARIO_INTENDED_MAGNITUDE 108u
+#define SM64_MODERN_FIELD_MARIO_INTENDED_YAW 109u
+#define SM64_MODERN_FIELD_MARIO_FACE_ANGLE 110u
+#define SM64_MODERN_FIELD_MARIO_POSITION 111u
+#define SM64_MODERN_FIELD_MARIO_VELOCITY 112u
+#define SM64_MODERN_FIELD_MARIO_FORWARD_VELOCITY 113u
+#define SM64_MODERN_FIELD_MARIO_HEALTH 114u
+#define SM64_MODERN_FIELD_MARIO_COINS 115u
+#define SM64_MODERN_FIELD_MARIO_STARS 116u
+
+#define SM64_MODERN_FIELD_INTERACTION_TYPES 200u
+#define SM64_MODERN_FIELD_INTERACTION_OBJECT 201u
+#define SM64_MODERN_FIELD_INTERACTION_HELD_OBJECT 202u
+#define SM64_MODERN_FIELD_INTERACTION_USED_OBJECT 203u
+#define SM64_MODERN_FIELD_INTERACTION_RIDDEN_OBJECT 204u
+#define SM64_MODERN_FIELD_INTERACTION_HURT_COUNTER 205u
+#define SM64_MODERN_FIELD_INTERACTION_HEAL_COUNTER 206u
+
+#define SM64_MODERN_FIELD_CAMERA_MODE 300u
+#define SM64_MODERN_FIELD_CAMERA_DEFAULT_MODE 301u
+#define SM64_MODERN_FIELD_CAMERA_CUTSCENE 302u
+#define SM64_MODERN_FIELD_CAMERA_YAW 303u
+#define SM64_MODERN_FIELD_CAMERA_NEXT_YAW 304u
+#define SM64_MODERN_FIELD_CAMERA_FOCUS 305u
+#define SM64_MODERN_FIELD_CAMERA_POSITION 306u
+
+#define SM64_MODERN_FIELD_ACTOR_BEHAVIOR 400u
+#define SM64_MODERN_FIELD_ACTOR_ACTIVE_FLAGS 401u
+#define SM64_MODERN_FIELD_ACTOR_ACTION 402u
+#define SM64_MODERN_FIELD_ACTOR_SUB_ACTION 403u
+#define SM64_MODERN_FIELD_ACTOR_TIMER 404u
+#define SM64_MODERN_FIELD_ACTOR_POSITION 405u
+#define SM64_MODERN_FIELD_ACTOR_VELOCITY 406u
+#define SM64_MODERN_FIELD_ACTOR_MOVE_ANGLE 407u
+#define SM64_MODERN_FIELD_ACTOR_MOVE_FLAGS 408u
+#define SM64_MODERN_FIELD_ACTOR_INTERACTION_STATUS 409u
+
+typedef uint32_t SM64ModernGameplayEffect;
+
+#define SM64_MODERN_EFFECT_SOUND 1u
+#define SM64_MODERN_EFFECT_RUMBLE_START 2u
+#define SM64_MODERN_EFFECT_RUMBLE_STOP 3u
+#define SM64_MODERN_EFFECT_OBJECT_SPAWN 4u
+#define SM64_MODERN_EFFECT_OBJECT_DESPAWN 5u
+#define SM64_MODERN_EFFECT_PCM_CHECKSUM 6u
+
+typedef uint32_t SM64ModernGameplayDivergenceReason;
+
+#define SM64_MODERN_DIVERGENCE_NONE 0u
+#define SM64_MODERN_DIVERGENCE_TRACE_HEADER 1u
+#define SM64_MODERN_DIVERGENCE_RECORD_MISSING 2u
+#define SM64_MODERN_DIVERGENCE_RECORD_EXTRA 3u
+#define SM64_MODERN_DIVERGENCE_RECORD_KIND 4u
+#define SM64_MODERN_DIVERGENCE_RECORD_ID 5u
+#define SM64_MODERN_DIVERGENCE_SUBJECT 6u
+#define SM64_MODERN_DIVERGENCE_SEQUENCE 7u
+#define SM64_MODERN_DIVERGENCE_VALUE_COUNT 8u
+#define SM64_MODERN_DIVERGENCE_VALUE 9u
+#define SM64_MODERN_DIVERGENCE_CANDIDATE_MISSING 10u
+#define SM64_MODERN_DIVERGENCE_CANDIDATE_EXTRA 11u
+#define SM64_MODERN_DIVERGENCE_SUBSYSTEM 12u
 
 typedef struct SM64ModernAbiHeader {
     uint32_t abi_version;
@@ -214,8 +314,80 @@ typedef struct SM64ModernGameplayRecordEnvelopeV1 {
     uint32_t reserved;
 } SM64ModernGameplayRecordEnvelopeV1;
 
-// STUB(M6): payload schemas and record streams — add deterministic snapshot
-// fields and effect records without exposing the C object graph.
+#define SM64_MODERN_GAMEPLAY_RECORD_VALUE_CAPACITY 4u
+
+// All trace values use fixed-width canonical encodings. Floating-point values
+// cross the ABI as their IEEE-754 bit pattern, and object identities are stable
+// one-based object-pool slots rather than process addresses.
+typedef struct SM64ModernGameplayTraceRecordV1 {
+    SM64ModernGameplayRecordEnvelopeV1 envelope;
+    uint32_t record_id;
+    uint32_t subject_id;
+    uint32_t sequence;
+    uint32_t value_count;
+    uint64_t values[SM64_MODERN_GAMEPLAY_RECORD_VALUE_CAPACITY];
+    uint64_t canonical_hash;
+} SM64ModernGameplayTraceRecordV1;
+
+typedef SM64ModernGameplayTraceRecordV1 SM64ModernGameplayInputRecordV1;
+typedef SM64ModernGameplayTraceRecordV1 SM64ModernGameplaySnapshotRecordV1;
+typedef SM64ModernGameplayTraceRecordV1 SM64ModernGameplayEffectRecordV1;
+
+typedef struct SM64ModernGameplayParityConfigV1 {
+    SM64ModernAbiHeader header;
+    SM64ModernGameplayParityMode mode;
+    uint32_t subsystem_mask;
+    uint64_t build_fingerprint;
+    uint64_t initial_state_fingerprint;
+} SM64ModernGameplayParityConfigV1;
+
+typedef SM64ModernStatus (*SM64ModernGameplayTraceWriteFn)(
+    void *context,
+    const SM64ModernGameplayTraceRecordV1 *record);
+typedef SM64ModernStatus (*SM64ModernGameplayTraceReadFn)(
+    void *context,
+    SM64ModernGameplayTraceRecordV1 *out_record);
+
+typedef struct SM64ModernGameplayTraceStreamApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernGameplayTraceWriteFn write;
+    SM64ModernGameplayTraceReadFn read;
+} SM64ModernGameplayTraceStreamApiV1;
+
+typedef struct SM64ModernGameplayParityResultV1 {
+    SM64ModernAbiHeader header;
+    uint32_t subsystem;
+    SM64ModernAuthority authority;
+    uint32_t eligible_for_swift;
+    SM64ModernStatus status;
+    uint64_t expected_records;
+    uint64_t actual_records;
+    uint64_t candidate_records;
+    uint64_t matched_records;
+    uint64_t expected_hash;
+    uint64_t actual_hash;
+    uint64_t candidate_hash;
+} SM64ModernGameplayParityResultV1;
+
+typedef struct SM64ModernGameplayDivergenceV1 {
+    SM64ModernAbiHeader header;
+    SM64ModernGameplayDivergenceReason reason;
+    uint32_t subsystem;
+    uint64_t simulation_tick;
+    uint32_t expected_kind;
+    uint32_t actual_kind;
+    uint32_t expected_record_id;
+    uint32_t actual_record_id;
+    uint32_t expected_subject_id;
+    uint32_t actual_subject_id;
+    uint32_t expected_sequence;
+    uint32_t actual_sequence;
+    uint32_t value_index;
+    uint32_t reserved;
+    uint64_t expected_value;
+    uint64_t actual_value;
+} SM64ModernGameplayDivergenceV1;
 
 typedef struct SM64ModernLifecycleApiV1 {
     SM64ModernAbiHeader header;
@@ -239,6 +411,18 @@ typedef struct SM64ModernGameplayApiV1 {
                                       SM64ModernAuthority authority);
 } SM64ModernGameplayApiV1;
 
+typedef struct SM64ModernGameplayParityApiV1 {
+    SM64ModernAbiHeader header;
+    SM64ModernStatus (*begin_session)(const SM64ModernGameplayParityConfigV1 *config,
+                                      const SM64ModernGameplayTraceStreamApiV1 *stream);
+    SM64ModernStatus (*end_session)(void);
+    SM64ModernStatus (*get_result)(SM64ModernGameplaySubsystem subsystem,
+                                   SM64ModernGameplayParityResultV1 *out_result);
+    SM64ModernStatus (*get_first_divergence)(SM64ModernGameplaySubsystem subsystem,
+                                             SM64ModernGameplayDivergenceV1 *out_divergence);
+    SM64ModernStatus (*submit_candidate_record)(const SM64ModernGameplayTraceRecordV1 *record);
+} SM64ModernGameplayParityApiV1;
+
 SM64ModernStatus sm64_modern_get_lifecycle_api(uint32_t requested_version,
                                                uint32_t output_size,
                                                SM64ModernLifecycleApiV1 *out_api);
@@ -254,6 +438,9 @@ SM64ModernStatus sm64_modern_rendering_status(void);
 SM64ModernStatus sm64_modern_get_gameplay_api(uint32_t requested_version,
                                               uint32_t output_size,
                                               SM64ModernGameplayApiV1 *out_api);
+SM64ModernStatus sm64_modern_get_gameplay_parity_api(uint32_t requested_version,
+                                                     uint32_t output_size,
+                                                     SM64ModernGameplayParityApiV1 *out_api);
 
 #ifdef __cplusplus
 }

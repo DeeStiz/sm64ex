@@ -12,6 +12,7 @@
 #include "engine/surface_collision.h"
 #include "game_init.h"
 #include "interaction.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 #include "level_update.h"
 #include "mario.h"
 #include "mario_step.h"
@@ -1738,6 +1739,7 @@ void check_kick_or_punch_wall(struct MarioState *m) {
 }
 
 void mario_process_interactions(struct MarioState *m) {
+    sm64_modern_parity_enter_subsystem(SM64_MODERN_GAMEPLAY_SUBSYSTEM_INTERACTION);
     sDelayInvincTimer = FALSE;
     sInvulnerable = (m->action & ACT_FLAG_INVULNERABLE) || m->invincTimer != 0;
 
@@ -1774,6 +1776,7 @@ void mario_process_interactions(struct MarioState *m) {
     if (!(m->marioObj->collidedObjInteractTypes & INTERACT_WARP)) {
         sJustTeleported = FALSE;
     }
+    sm64_modern_parity_leave_subsystem();
 }
 
 void check_death_barrier(struct MarioState *m) {

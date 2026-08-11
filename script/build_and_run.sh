@@ -48,6 +48,30 @@ open_app() {
   /usr/bin/open -n "$APP_BUNDLE"
 }
 
+wait_for_app_pid() {
+  local app_pid=""
+  for _ in {1..50}; do
+    app_pid="$(pgrep -x "$APP_NAME" | head -n 1 || true)"
+    if [[ -n "$app_pid" ]]; then
+      printf '%s\n' "$app_pid"
+      return 0
+    fi
+    sleep 0.1
+  done
+  return 1
+}
+
+wait_for_app_exit() {
+  local app_pid="$1"
+  for _ in {1..150}; do
+    if ! kill -0 "$app_pid" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.1
+  done
+  return 1
+}
+
 case "$MODE" in
   run)
     open_app
@@ -135,8 +159,49 @@ case "$MODE" in
     echo "$APP_NAME did not terminate cleanly" >&2
     exit 1
     ;;
+  --parity-verify|parity-verify)
+    PARITY_TEMP="$(mktemp -d "${TMPDIR:-/tmp}/sm64-modern-parity.XXXXXX")"
+    trap '/bin/rm -rf -- "$PARITY_TEMP"' EXIT
+    TRACE_PATH="$PARITY_TEMP/gameplay-v1.trace"
+    RECORD_SAVE="$PARITY_TEMP/record-save"
+    REPLAY_SAVE="$PARITY_TEMP/replay-save"
+    mkdir -p "$RECORD_SAVE" "$REPLAY_SAVE"
+
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_PARITY_MODE=record \
+      --env SM64_MODERN_PARITY_TRACE="$TRACE_PATH" \
+      --env SM64_MODERN_PARITY_TICKS=90 \
+      --env SM64_MODERN_SAVE_DIR="$RECORD_SAVE"
+    record_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$record_pid"
+    test -s "$TRACE_PATH"
+    record_log="$(/usr/bin/log show --last 2m --style compact \
+      --predicate "processIdentifier == $record_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=1 schema=1' <<< "$record_log"
+    grep -Fq 'bounded_parity_run_complete steps=90' <<< "$record_log"
+    grep -Fq 'parity_session_finished status=0' <<< "$record_log"
+
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_PARITY_MODE=replay \
+      --env SM64_MODERN_PARITY_TRACE="$TRACE_PATH" \
+      --env SM64_MODERN_PARITY_TICKS=90 \
+      --env SM64_MODERN_SAVE_DIR="$REPLAY_SAVE"
+    replay_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$replay_pid"
+    replay_log="$(/usr/bin/log show --last 2m --style compact \
+      --predicate "processIdentifier == $replay_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=2 schema=1' <<< "$replay_log"
+    grep -Fq 'bounded_parity_run_complete steps=90' <<< "$replay_log"
+    grep -Fq 'parity_session_finished status=0' <<< "$replay_log"
+    if grep -Fq 'parity_first_divergence' <<< "$replay_log"; then
+      echo "Replay reported a parity divergence" >&2
+      exit 1
+    fi
+    printf '%s\n' "$record_log" "$replay_log" \
+      | grep -E 'parity_session_started|bounded_parity_run_complete|parity_result subsystem=|parity_session_finished'
+    ;;
   *)
-    echo "usage: $0 [run|--debug|--logs|--telemetry|--metal-validation|--metal-hud|--metal-capture|--verify]" >&2
+    echo "usage: $0 [run|--debug|--logs|--telemetry|--metal-validation|--metal-hud|--metal-capture|--verify|--parity-verify]" >&2
     exit 2
     ;;
 esac

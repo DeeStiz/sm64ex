@@ -16,6 +16,7 @@
 #include "object_collision.h"
 #include "object_helpers.h"
 #include "object_list_processor.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 #include "platform_displacement.h"
 #include "profiler.h"
 #include "spawn_object.h"
@@ -297,7 +298,9 @@ s32 update_objects_starting_at(struct ObjectNode *objList, struct ObjectNode *fi
         gCurrentObject = (struct Object *) firstObj;
 
         gCurrentObject->header.gfx.node.flags |= GRAPH_RENDER_HAS_ANIMATION;
+        sm64_modern_parity_enter_object_update(gCurrentObject);
         cur_obj_update();
+        sm64_modern_parity_leave_subsystem();
 
         firstObj = firstObj->next;
         count += 1;
@@ -344,7 +347,9 @@ s32 update_objects_during_time_stop(struct ObjectNode *objList, struct ObjectNod
         // Only update if unfrozen
         if (unfrozen) {
             gCurrentObject->header.gfx.node.flags |= GRAPH_RENDER_HAS_ANIMATION;
+            sm64_modern_parity_enter_object_update(gCurrentObject);
             cur_obj_update();
+            sm64_modern_parity_leave_subsystem();
         } else {
             gCurrentObject->header.gfx.node.flags &= ~GRAPH_RENDER_HAS_ANIMATION;
         }

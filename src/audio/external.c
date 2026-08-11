@@ -13,6 +13,7 @@
 #include "seq_ids.h"
 #include "dialog_ids.h"
 #include "level_table.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 
 #ifdef VERSION_EU
 #define EU_FLOAT(x) x ## f
@@ -782,6 +783,7 @@ void create_next_audio_buffer(s16 *samples, u32 num_samples) {
 #endif
 
 void play_sound(s32 soundBits, f32 *pos) {
+    sm64_modern_parity_record_sound(soundBits, pos);
     sSoundRequests[sSoundRequestCount].soundBits = soundBits;
     sSoundRequests[sSoundRequestCount].position = pos;
     sSoundRequestCount++;

@@ -20,6 +20,7 @@
 #include "segment2.h"
 #include "segment_symbols.h"
 #include "thread6.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 #include <prevent_bss_reordering.h>
 #ifdef BETTERCAMERA
 #include "bettercamera.h"
@@ -455,6 +456,7 @@ void read_controller_inputs(void) {
     if (gControllerBits) {
         osRecvMesg(&gSIEventMesgQueue, &D_80339BEC, OS_MESG_BLOCK);
         osContGetReadData(&gControllerPads[0]);
+        sm64_modern_parity_filter_input(&gControllerPads[0]);
     }
     run_demo_inputs();
 
@@ -595,6 +597,7 @@ void game_loop_one_iteration(void) {
     config_gfx_pool();
     read_controller_inputs();
     levelCommandAddr = level_script_execute(levelCommandAddr);
+    sm64_modern_parity_capture_snapshots();
     display_and_vsync();
 
     // when debug info is enabled, print the "BUF %d" information.

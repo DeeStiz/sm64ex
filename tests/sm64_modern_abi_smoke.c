@@ -174,6 +174,7 @@ static void smoke_render_dimensions(void *context, uint32_t *out_width, uint32_t
 int main(void) {
     SM64ModernLifecycleApiV1 lifecycle;
     SM64ModernGameplayApiV1 gameplay;
+    SM64ModernGameplayParityApiV1 parity;
     SM64ModernPlatformApiV1 platform;
     SM64ModernInputApiV1 input;
     SM64ModernRenderingApiV1 rendering;
@@ -183,6 +184,7 @@ int main(void) {
 
     memset(&lifecycle, 0, sizeof(lifecycle));
     memset(&gameplay, 0, sizeof(gameplay));
+    memset(&parity, 0, sizeof(parity));
     memset(&platform, 0, sizeof(platform));
     memset(&input, 0, sizeof(input));
     memset(&rendering, 0, sizeof(rendering));
@@ -333,11 +335,21 @@ int main(void) {
                               gameplay.set_authority(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL,
                                                      SM64_MODERN_AUTHORITY_SHADOW_SWIFT),
                               SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY);
+    failures += expect_status("small parity buffer",
+                              sm64_modern_get_gameplay_parity_api(
+                                  SM64_MODERN_ABI_VERSION_1, sizeof(parity) - 1, &parity),
+                              SM64_MODERN_STATUS_BUFFER_TOO_SMALL);
+    failures += expect_status("parity v1",
+                              sm64_modern_get_gameplay_parity_api(
+                                  SM64_MODERN_ABI_VERSION_1, sizeof(parity), &parity),
+                              SM64_MODERN_STATUS_OK);
 
     if (lifecycle.header.abi_version != SM64_MODERN_ABI_VERSION_1
         || lifecycle.header.struct_size != sizeof(lifecycle)
         || gameplay.header.abi_version != SM64_MODERN_ABI_VERSION_1
-        || gameplay.header.struct_size != sizeof(gameplay)) {
+        || gameplay.header.struct_size != sizeof(gameplay)
+        || parity.header.abi_version != SM64_MODERN_ABI_VERSION_1
+        || parity.header.struct_size != sizeof(parity)) {
         fprintf(stderr, "ABI headers do not describe the returned v1 tables\n");
         failures++;
     }
@@ -347,8 +359,22 @@ int main(void) {
         || offsetof(SM64ModernInputSnapshotV1, header) != 0
         || offsetof(SM64ModernInputApiV1, header) != 0
         || offsetof(SM64ModernRenderingApiV1, header) != 0
-        || offsetof(SM64ModernGameplayRecordEnvelopeV1, header) != 0) {
+        || offsetof(SM64ModernGameplayRecordEnvelopeV1, header) != 0
+        || offsetof(SM64ModernGameplayTraceRecordV1, envelope) != 0
+        || offsetof(SM64ModernGameplayParityConfigV1, header) != 0
+        || offsetof(SM64ModernGameplayParityResultV1, header) != 0
+        || offsetof(SM64ModernGameplayDivergenceV1, header) != 0
+        || offsetof(SM64ModernGameplayParityApiV1, header) != 0) {
         fprintf(stderr, "versioned ABI headers must be the first field\n");
+        failures++;
+    }
+
+    if (sizeof(SM64ModernGameplayRecordEnvelopeV1) != 32
+        || sizeof(SM64ModernGameplayTraceRecordV1) != 88
+        || sizeof(SM64ModernGameplayParityConfigV1) != 32
+        || sizeof(SM64ModernGameplayParityResultV1) != 80
+        || sizeof(SM64ModernGameplayDivergenceV1) != 80) {
+        fprintf(stderr, "fixed gameplay parity record layout changed\n");
         failures++;
     }
 

@@ -152,6 +152,8 @@ final class EngineHost: @unchecked Sendable {
     private var stepCount: UInt64 = 0
     private var engineRunStatus = SM64_MODERN_STATUS_OK
     private var lifecycle = SM64ModernLifecycleApiV1()
+    private var parityCoordinator: GameplayParityCoordinator?
+    private var automaticTerminationRequested = false
     private var inputService: AppleInputService?
     private var audioService: SM64ModernAppleAudioService?
     private var loggedAudioEnqueue = false
@@ -277,11 +279,19 @@ final class EngineHost: @unchecked Sendable {
             engineLogger.error("lifecycle_step_failed status=\(self.engineRunStatus)")
         }
 
+        let parityStatus = parityCoordinator?.endAndReport() ?? SM64_MODERN_STATUS_OK
+        parityCoordinator = nil
         let shutdownStatus = lifecycle.shutdown()
-        let finalState: State = shutdownStatus == SM64_MODERN_STATUS_OK ? .stopped : .failed
-        finish(state: finalState, status: shutdownStatus)
+        let executionStatus = engineRunStatus != SM64_MODERN_STATUS_OK
+            && engineRunStatus != SM64_MODERN_STATUS_STOP_REQUESTED
+            ? engineRunStatus : SM64_MODERN_STATUS_OK
+        let finalStatus = shutdownStatus != SM64_MODERN_STATUS_OK
+            ? shutdownStatus
+            : (executionStatus != SM64_MODERN_STATUS_OK ? executionStatus : parityStatus)
+        let finalState: State = finalStatus == SM64_MODERN_STATUS_OK ? .stopped : .failed
+        finish(state: finalState, status: finalStatus)
 
-        if !condition.withLock({ stopRequested }) {
+        if automaticTerminationRequested || !condition.withLock({ stopRequested }) {
             DispatchQueue.main.async {
                 NSApplication.shared.terminate(nil)
             }
@@ -325,6 +335,15 @@ final class EngineHost: @unchecked Sendable {
             metalRenderer?.logSceneStatus(step: stepCount)
             logAudioStatus()
         }
+        if let tickLimit = parityCoordinator?.tickLimit, stepCount >= tickLimit {
+            condition.withLock {
+                stopRequested = true
+                requestedExitReason = SM64_MODERN_EXIT_PLATFORM_REQUESTED
+                automaticTerminationRequested = true
+            }
+            engineLogger.notice("bounded_parity_run_complete steps=\(self.stepCount)")
+            CFRunLoopStop(CFRunLoopGetCurrent())
+        }
     }
 
     private func initializeCore() -> SM64ModernStatus {
@@ -344,8 +363,9 @@ final class EngineHost: @unchecked Sendable {
         config.fullscreen_mode = SM64_MODERN_FULLSCREEN_FORCE_OFF
         config.skip_intro = 0
 
+        let paths: HostPaths
         do {
-            let paths = try HostPaths.resolve()
+            paths = try HostPaths.resolve()
             try withUnsafeMutableBytes(of: &config.game_directory) { try Self.copyCString(paths.gameDirectory, into: $0) }
             try withUnsafeMutableBytes(of: &config.save_directory) { try Self.copyCString(paths.saveDirectory, into: $0) }
             try withUnsafeMutableBytes(of: &config.config_file) { try Self.copyCString("sm64-modern-config.txt", into: $0) }
@@ -375,7 +395,18 @@ final class EngineHost: @unchecked Sendable {
 
         status = sm64_modern_validate_platform_api(&platform)
         guard status == SM64_MODERN_STATUS_OK else { return status }
-        return self.lifecycle.initialize(&config, &platform)
+        status = self.lifecycle.initialize(&config, &platform)
+        guard status == SM64_MODERN_STATUS_OK else { return status }
+
+        let parityStart = GameplayParityCoordinator.beginFromEnvironment(
+            saveDirectory: paths.saveDirectory
+        )
+        guard parityStart.status == SM64_MODERN_STATUS_OK else {
+            _ = self.lifecycle.shutdown()
+            return parityStart.status
+        }
+        parityCoordinator = parityStart.coordinator
+        return SM64_MODERN_STATUS_OK
     }
 
     private func finish(state: State, status: SM64ModernStatus) {
@@ -397,6 +428,7 @@ final class EngineHost: @unchecked Sendable {
         let renderer = try MetalRenderer(
             device: configuration.device,
             layer: configuration.layer,
+            isOwnerThread: { [weak self] in self?.isCurrentEngineThread == true },
             consumeDrawableSize: { [weak self] in self?.consumePendingDrawableSize() }
         )
         metalRenderer = renderer
@@ -536,9 +568,9 @@ final class EngineHost: @unchecked Sendable {
         precondition(isCurrentEngineThread)
         return metalRenderer?.uploadTexture(id: id, pixels: pixels, width: width, height: height) ?? SM64_MODERN_STATUS_INVALID_STATE
     }
-    func renderingSetSampler(tile: UInt32, linear: Bool, wrapS: UInt32, wrapT: UInt32) {
+    func renderingSetSampler(tile: UInt32, id: UInt32, linear: Bool, wrapS: UInt32, wrapT: UInt32) {
         precondition(isCurrentEngineThread)
-        metalRenderer?.setSampler(tile: tile, linear: linear, wrapS: wrapS, wrapT: wrapT)
+        metalRenderer?.setSampler(tile: tile, id: id, linear: linear, wrapS: wrapS, wrapT: wrapT)
     }
     func renderingSetDepthTest(_ enabled: Bool) {
         precondition(isCurrentEngineThread)

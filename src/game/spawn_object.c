@@ -12,6 +12,7 @@
 #include "object_list_processor.h"
 #include "spawn_object.h"
 #include "types.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 
 /**
  * An unused linked list struct that seems to have been replaced by ObjectNode.
@@ -184,6 +185,7 @@ static void unused_delete_leaf_nodes(struct Object *obj) {
  * Free the given object.
  */
 void unload_object(struct Object *obj) {
+    sm64_modern_parity_record_object_despawn(obj);
     obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
     obj->prevObj = NULL;
 

@@ -2,13 +2,22 @@
 
 ## Current Milestone
 
-- M5b success criterion: AVAudioEngine output feeds the existing 32 kHz stereo PCM contract through a real-time-safe buffer.
-- Preserve the dedicated engine owner thread, versioned POD C boundary, complete M4 Metal scene path, validated M5a input service, and legacy portable backends.
-- Publish audio capability only after the complete callback table, buffer ownership, underrun behavior, and native service are installed successfully.
-- Approved M5b work: add a preallocated C11-atomic SPSC PCM ring and an Objective-C AVAudioSourceNode real-time-safe adapter; Swift remains lifecycle-only.
-- Preserve the existing 1,100-frame target and 6,000-frame backlog ceiling, zero-fill underruns, drop excess new input, and expose bounded owner-thread telemetry.
-- Start, recover default-output configuration changes, and stop AVAudioEngine on the engine owner thread; never allocate, lock, log, message Objective-C, call Swift, or mutate engine state from the render callback.
-- Wire the existing audio callbacks/capability only after successful service startup, then cover ring behavior, ABI validation, canonical runtime verification, legacy-build preservation, and human audible/routing evidence.
+- M6 success criterion: deterministic replay and field/effect diagnostics gate Swift authority independently for each migrated gameplay subsystem.
+- Approved M6 scope: add stable Mario/interaction/camera/actor subsystem IDs; fixed-width input, snapshot, effect, result, and first-divergence POD records; canonical scalar/float-bit/object-slot identity; and host-owned local trace streams.
+- Record/replay the normalized N64 pad before pressed-state derivation, capture post-simulation state before presentation, and diagnose value, missing/extra record, schema, fingerprint, and finalization mismatches.
+- Record canonical sound, rumble, object spawn/despawn, and pre-device PCM checksum effects at existing owner-thread gateways; never enter the AVAudioEngine real-time callback.
+- Keep C authority as default. Shadow mode compares candidate streams; Swift authority remains rejected until that subsystem finalizes an exact compatible replay, independently of every other subsystem.
+- Add bounded Swift parity coordination/Logger telemetry plus C/C++ ABI, pure parity, deliberate-divergence, gate-isolation, and bounded real-engine record/replay coverage.
+- Preserve the dedicated engine owner thread, versioned POD boundary, current 30 Hz clock, M4/M5 rendering/input/audio contracts, legacy portable backends, save format, external ROM policy, and local-only traces. M6 does not implement Swift gameplay or the M8 clock.
+
+### M5b Completion Evidence
+
+- A preallocated C11-atomic SPSC ring retains the SDL policy: 1,100 desired frames, 6,000-frame backlog ceiling, 8,192-frame capacity, zero-filled underruns, and dropping excess new input without overwriting unread PCM.
+- `AppleAudioService` owns AVAudioEngine/source-node lifecycle and route recovery on the engine thread. Its real-time render block touches only the raw ring and performs no allocation, locking, logging, Objective-C/Swift calls, or engine-state mutation.
+- The audio capability and complete callback table publish only after service startup. Route recovery stops the consumer, discards stale PCM, restarts the graph before the next lifecycle step, and refills immediately.
+- The user passed audible playback and default-output route switching. Signed runtime telemetry showed clean startup/render/shutdown with zero dropped frames and zero underrun frames in the bounded final verification run.
+- Ring smoke and ThreadSanitizer, C/C++ ABI smoke, static analysis, signed Debug runtime/LLDB, Metal API+GPU validation, full Swift+C ASan, unsigned Release, forced legacy macOS/OpenGL rebuild, and visual regression capture passed.
+- `leaks` was inconsistent on macOS 27 beta: two live samples reported 8–9 KiB of AVAudio internal listener bindings while a stack-logged replay reported 0 bytes; bounded RSS was stable and no app-owned allocation was identified.
 
 ### M5a Completion Evidence
 
@@ -33,14 +42,16 @@
 - macOS still needs `i686-w64-mingw32-as` and `objcopy` for the one source-authored N64 sequence even though all game C/C++ uses Apple Clang.
 - The existing `60fps_ex.patch` renders interpolated frames but keeps gameplay at 30 Hz; it is not the target 60 Hz simulation.
 - Discovery has no checked-in GPU ground truth; local captures and screenshots are ignored evidence, not cross-implementation or sustained-performance acceptance.
-- The native AppKit host resolves the raw SDL bundle-identity warning; the legacy SDL AudioQueue shutdown code `-66671` remains deferred to M5b.
+- The native AppKit host resolves the raw SDL bundle-identity warning; the separate legacy SDL AudioQueue shutdown code `-66671` remains unresolved.
 - Apple AddressSanitizer leak detection is unavailable on this platform; later long-run leak acceptance needs another supported instrument.
 - Full Linux, Windows, and web legacy builds remain regression gates; M1's changed C paths passed MinGW C syntax checks, not full product builds.
 - Developer ID Application signing is not currently available; development/App Store identities do not satisfy direct notarized distribution.
 - `com.apple.developer.sustained-execution` is retained for provisioned builds; local M2 Debug signing omits it because no matching `io.github.deestiz.sm64modern` development profile is installed.
 - M5a physical acceptance covered Xbox movement, jump, camera, and menu input; other controller models, subjective camera feel, and input latency remain unproven.
-- M5b must validate audible AVAudioEngine output and routing with human/device evidence; automated callback/build evidence alone cannot prove latency or audio quality.
+- M5b human evidence covers audible playback and route switching, but does not prove broad device compatibility, subjective latency, or long-duration audio quality.
 - Keep native service callbacks real-time safe and owner-explicit: do not expose the legacy object graph to Swift, block the audio render thread, or publish input/audio capabilities before installation succeeds.
+- A sanitizer build reuses `build/sm64-modern-debug`; force a normal native-core rebuild afterward because Make does not encode sanitizer flags into dependency identity.
+- Recheck the macOS 27 AVAudio listener-binding `leaks` variance during long-duration M9 profiling; current bounded RSS was stable and attribution remained inside Apple audio frameworks.
 
 ## Feature Status
 
@@ -52,7 +63,7 @@
 | Metal 4 device/presentation | Implemented — validated raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
 | Metal 4 rendering | Implemented — complete-scene POD bridge/replay with dynamic MSL, private textures, memoryless depth, samplers, state, display lists, explicit residency/barriers, trace inspection, and clean Metal validation |
 | Native input | Implemented — keyboard/mouse runtime passed; Xbox movement, jump, camera, and menu passed; legacy C-camera ergonomics caveat recorded |
-| Native audio | Not started |
+| Native audio | Implemented — 32 kHz interleaved s16 stereo through a lock-free SPSC ring and owner-thread AVAudioEngine/source-node lifecycle with route recovery |
 | Gameplay parity | Not started |
 | Swift gameplay | Not started |
 | Full-world 60 Hz | Not started |
@@ -88,3 +99,7 @@
 - Configure `GCControllerInput.inputStateQueueDepth = 20` only when a controller connects, then drain `nextInputState()` once per 30 Hz engine tick. One-tick keyboard/mouse press latches cover the same between-tick edge case; focus loss clears held and pending state.
 - GameController already supplies normalized deadzone/saturation behavior, so the native adapter adds no second deadzone. Full-scale axes preserve the signed `-32768...32767` range before legacy `/ 256` conversion.
 - Native right-stick signs intentionally match both SDL controller backends' C-button mapping. The user's inverted-camera impression is a legacy Lakitu ergonomics caveat; do not reverse compatibility signs without an explicit camera-control decision.
+- M5b is committed as `4738681`. `AppleAudioRing` is the only object shared with the CoreAudio render thread; Swift owns lifecycle and telemetry but never enters the callback.
+- Audio route notifications only set an atomic flag. The engine owner thread stops the graph, discards buffered PCM, reconnects/restarts, and performs recovery before `lifecycle.step()` so the core sees an empty buffer and refills that tick.
+- Preserve audio buffering constants from the legacy SDL policy: 32 kHz interleaved s16 stereo, 1,100 desired frames, 6,000 backlog ceiling, and an 8,192-frame power-of-two ring.
+- M5b is non-rendering and discovery has no audio reference artifact. Validation used source-contract comparison, human audible/routing acceptance, a 960x720 visual regression capture, and Metal validation rather than GPU ground-truth capture.
