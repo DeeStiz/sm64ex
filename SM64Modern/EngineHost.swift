@@ -370,9 +370,9 @@ final class EngineHost: @unchecked Sendable {
             try withUnsafeMutableBytes(of: &config.save_directory) { try Self.copyCString(paths.saveDirectory, into: $0) }
             try withUnsafeMutableBytes(of: &config.config_file) { try Self.copyCString("sm64-modern-config.txt", into: $0) }
             try withUnsafeMutableBytes(of: &config.window_title) { try Self.copyCString("SM64 Modern", into: $0) }
-            engineLogger.notice("host_paths game=\(paths.gameDirectory, privacy: .public) save=\(paths.saveDirectory, privacy: .public)")
+            engineLogger.notice("host_paths_resolved")
         } catch {
-            engineLogger.error("host_path_error \(error.localizedDescription, privacy: .public)")
+            engineLogger.error("host_path_error \(error.localizedDescription, privacy: .private)")
             return SM64_MODERN_STATUS_PLATFORM_ERROR
         }
 
@@ -648,10 +648,8 @@ private struct HostPaths {
 
     static func resolve() throws -> HostPaths {
         let environment = ProcessInfo.processInfo.environment
-        let info = Bundle.main.infoDictionary ?? [:]
 
         let gameDirectory = environment["SM64_MODERN_GAME_DIR"]
-            ?? nonempty(info["SM64ModernDevelopmentRoot"] as? String)
         guard let gameDirectory else { throw HostPathError.missingGameDirectory }
 
         let defaultSave = try FileManager.default.url(
@@ -660,16 +658,9 @@ private struct HostPaths {
             appropriateFor: nil,
             create: true
         ).appending(path: "SM64 Modern", directoryHint: .isDirectory).path
-        let saveDirectory = environment["SM64_MODERN_SAVE_DIR"]
-            ?? nonempty(info["SM64ModernDevelopmentSaveRoot"] as? String)
-            ?? defaultSave
+        let saveDirectory = environment["SM64_MODERN_SAVE_DIR"] ?? defaultSave
         try FileManager.default.createDirectory(atPath: saveDirectory, withIntermediateDirectories: true)
         return HostPaths(gameDirectory: gameDirectory, saveDirectory: saveDirectory)
-    }
-
-    private static func nonempty(_ value: String?) -> String? {
-        guard let value, !value.isEmpty else { return nil }
-        return value
     }
 }
 

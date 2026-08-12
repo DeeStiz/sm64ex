@@ -30,9 +30,5 @@
     <true/>
     <key>NSPrincipalClass</key>
     <string>NSApplication</string>
-    <key>SM64ModernDevelopmentRoot</key>
-    <string>$(SM64_MODERN_PROJECT_ROOT)</string>
-    <key>SM64ModernDevelopmentSaveRoot</key>
-    <string>$(SM64_MODERN_SAVE_ROOT)</string>
 </dict>
 </plist>

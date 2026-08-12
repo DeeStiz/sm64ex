@@ -215,8 +215,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.deestiz.sm64modern;
 				PRODUCT_NAME = "SM64 Modern";
 				SDKROOT = macosx;
-				SM64_MODERN_PROJECT_ROOT = "$(SRCROOT)";
-				SM64_MODERN_SAVE_ROOT = "$(SRCROOT)/build/sm64-modern-state";
 			};
 			name = Debug;
 		};
@@ -310,8 +308,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.deestiz.sm64modern;
 				PRODUCT_NAME = "SM64 Modern";
 				SDKROOT = macosx;
-				SM64_MODERN_PROJECT_ROOT = "$(SRCROOT)";
-				SM64_MODERN_SAVE_ROOT = "";
 			};
 			name = Release;
 		};

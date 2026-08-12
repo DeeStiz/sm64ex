@@ -10,6 +10,7 @@ APP_BUNDLE="$DERIVED_DATA/Build/Products/Debug/$APP_NAME.app"
 APP_BINARY="$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 SIGNING_IDENTITY="${SM64_MODERN_CODE_SIGN_IDENTITY:-Apple Development}"
 DEBUG_ENTITLEMENTS="$PROJECT_ROOT/SM64Modern/SM64ModernDebug.entitlements"
+DEFAULT_SAVE_ROOT="$PROJECT_ROOT/build/sm64-modern-state"
 
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
@@ -45,7 +46,9 @@ codesign \
 codesign --verify --deep --strict "$APP_BUNDLE"
 
 open_app() {
-  /usr/bin/open -n "$APP_BUNDLE"
+  /usr/bin/open -n "$APP_BUNDLE" \
+    --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+    --env SM64_MODERN_SAVE_DIR="$DEFAULT_SAVE_ROOT"
 }
 
 wait_for_app_pid() {
@@ -77,7 +80,10 @@ case "$MODE" in
     open_app
     ;;
   --debug|debug)
-    lldb -- "$APP_BINARY"
+    env \
+      SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      SM64_MODERN_SAVE_DIR="$DEFAULT_SAVE_ROOT" \
+      lldb -- "$APP_BINARY"
     ;;
   --logs|logs)
     open_app
@@ -89,17 +95,23 @@ case "$MODE" in
     ;;
   --metal-validation|metal-validation)
     /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_SAVE_DIR="$DEFAULT_SAVE_ROOT" \
       --env MTL_DEBUG_LAYER=1 \
       --env MTL_SHADER_VALIDATION=1 \
       --env MTL_SHADER_VALIDATION_REPORT_TO_STDERR=1
     ;;
   --metal-hud|metal-hud)
     /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_SAVE_DIR="$DEFAULT_SAVE_ROOT" \
       --env MTL_HUD_ENABLED=1 \
       --env MTL_HUD_LOG_ENABLED=1
     ;;
   --metal-capture|metal-capture)
     /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_SAVE_DIR="$DEFAULT_SAVE_ROOT" \
       --env MTL_CAPTURE_ENABLED=1 \
       --env MTLCAPTURE_WAIT_FOR_SIGNAL=1
     ;;
@@ -168,6 +180,7 @@ case "$MODE" in
     mkdir -p "$RECORD_SAVE" "$REPLAY_SAVE"
 
     /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
       --env SM64_MODERN_PARITY_MODE=record \
       --env SM64_MODERN_PARITY_TRACE="$TRACE_PATH" \
       --env SM64_MODERN_PARITY_TICKS=90 \
@@ -182,6 +195,7 @@ case "$MODE" in
     grep -Fq 'parity_session_finished status=0' <<< "$record_log"
 
     /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
       --env SM64_MODERN_PARITY_MODE=replay \
       --env SM64_MODERN_PARITY_TRACE="$TRACE_PATH" \
       --env SM64_MODERN_PARITY_TICKS=90 \

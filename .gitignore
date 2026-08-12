@@ -79,6 +79,36 @@ sm64config.txt
 !/assets/**/*custom*.bin
 !/assets/**/*custom*/**/*.bin
 
-# macOS bullcrap directory settings file thats autocreated
+# macOS Finder metadata
 .DS_Store
 /build-asan
+
+# Local identity, signing, and credential material
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p8
+*.p12
+*.pfx
+*.mobileprovision
+*.cer
+*.der
+credentials*.json
+service-account*.json
+secrets*.json
+*.private.xcconfig
+Local.xcconfig
+
+# Per-user Apple/Xcode state
+xcuserdata/
+*.xcuserstate
+DerivedData/
+
+# Additional ROM and save formats
+*.n64
+*.v64
+*.srm
+*.eep
+*.fla

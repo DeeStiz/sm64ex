@@ -41,7 +41,6 @@ targets:
         INFOPLIST_FILE: SM64Modern/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: io.github.deestiz.sm64modern
         PRODUCT_NAME: SM64 Modern
-        SM64_MODERN_PROJECT_ROOT: "$(SRCROOT)"
       configs:
         Debug:
           CODE_SIGN_ENTITLEMENTS: SM64Modern/SM64ModernDebug.entitlements
@@ -51,7 +50,6 @@ targets:
             - "$(SRCROOT)/build/sm64-modern-debug/us_pc/libsm64core.a"
             - -lm
             - -lpthread
-          SM64_MODERN_SAVE_ROOT: "$(SRCROOT)/build/sm64-modern-state"
         Release:
           CODE_SIGN_ENTITLEMENTS: SM64Modern/SM64Modern.entitlements
           OTHER_LDFLAGS:
@@ -59,7 +57,6 @@ targets:
             - "$(SRCROOT)/build/sm64-modern-release/us_pc/libsm64core.a"
             - -lm
             - -lpthread
-          SM64_MODERN_SAVE_ROOT: ""
 
 schemes:
   SM64Modern:
