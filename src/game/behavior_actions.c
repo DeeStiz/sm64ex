@@ -45,6 +45,7 @@
 #include "thread6.h"
 #include "pc/sm64_modern_gameplay_migration.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 
 #define o gCurrentObject
 
@@ -124,6 +125,9 @@ struct SpawnParticlesInfo D_8032F270 = { 2, 20, MODEL_MIST, 0, 40, 5, 30, 20, 25
 
 // generate_wind_puffs/dust (something like that)
 void spawn_mist_particles_variable(s32 count, s32 offsetY, f32 size) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     D_8032F270.sizeBase = size;
     D_8032F270.sizeRange = size / 20.0;
     D_8032F270.offsetY = offsetY;
@@ -194,6 +198,9 @@ Gfx *geo_move_mario_part_from_parent(s32 run, UNUSED struct GraphNode *node, Mat
 // not in behavior file
 // n is the number of objects to spawn, r if the rate of change of phase (frequency?)
 void spawn_sparkle_particles(s32 n, s32 a1, s32 a2, s32 r) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     s32 i;
     s16 separation = 0x10000 / n; // Evenly spread around a circle
     for (i = 0; i < n; i++) {

@@ -1,9 +1,11 @@
 import AppKit
+import CoreHaptics
 import Foundation
 import GameController
 import os
 
 private let inputLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "Input")
+private let hapticLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "Haptics")
 // These bases are the persisted legacy configuration namespace declared by
 // VK_BASE_SDL_GAMEPAD and VK_BASE_SDL_MOUSE in the portable controller backend.
 private let gamepadVirtualKeyBase: UInt32 = 0x1000
@@ -22,6 +24,23 @@ private func inputRead(
         return SM64_MODERN_STATUS_INVALID_ARGUMENT
     }
     return service.read(into: outSnapshot)
+}
+
+// These private callbacks keep haptics on the same copied-POD boundary as
+// input. The C core resolves them weakly so standalone smoke binaries do not
+// need CoreHaptics, while the signed app routes rumble to GameController.
+@_cdecl("sm64_modern_input_rumble_play")
+func sm64ModernInputRumblePlay(
+    _ context: UnsafeMutableRawPointer?,
+    _ strength: Float,
+    _ duration: Float
+) {
+    appleInputService(from: context)?.playRumble(strength: strength, duration: duration)
+}
+
+@_cdecl("sm64_modern_input_rumble_stop")
+func sm64ModernInputRumbleStop(_ context: UnsafeMutableRawPointer?) {
+    appleInputService(from: context)?.stopRumble()
 }
 
 func makeAppleInputAPI(service: AppleInputService) -> SM64ModernInputApiV1 {
@@ -47,6 +66,7 @@ final class AppleInputService: @unchecked Sendable {
     }
 
     private let lock = NSLock()
+    private let hapticLock = NSLock()
     private var keyboardWords = [UInt32](repeating: 0, count: Int(SM64_MODERN_INPUT_KEYBOARD_WORD_COUNT))
     private var pendingKeyboardPressWords = [UInt32](
         repeating: 0,
@@ -62,26 +82,37 @@ final class AppleInputService: @unchecked Sendable {
     private var loggedControllerActivity = false
     private var loggedBufferedControllerActivity = false
     private var loggedSnapshotRead = false
+    private var hapticEngines: [ObjectIdentifier: CHHapticEngine] = [:]
+    private var hapticPlayers: [ObjectIdentifier: CHHapticPatternPlayer] = [:]
+    private var currentControllerID: ObjectIdentifier?
+    private var loggedHapticsUnavailable = false
     private var observers: [NSObjectProtocol] = []
 
     init() {
         precondition(Thread.isMainThread, "AppKit input must be installed on the main thread")
         for controller in GCController.controllers() {
-            Self.configure(controller)
+            configure(controller)
+        }
+        if let current = GCController.current {
+            setCurrentController(current)
         }
         let center = NotificationCenter.default
-        observers.append(center.addObserver(forName: .GCControllerDidConnect, object: nil, queue: .main) { note in
+        observers.append(center.addObserver(forName: .GCControllerDidConnect, object: nil, queue: .main) { [weak self] note in
             let controller = note.object as? GCController
-            if let controller { Self.configure(controller) }
+            if let controller { self?.configure(controller) }
             let name = controller?.vendorName ?? "unknown"
             inputLogger.notice("controller_connected name=\(name, privacy: .public)")
         })
-        observers.append(center.addObserver(forName: .GCControllerDidDisconnect, object: nil, queue: .main) { note in
-            let name = (note.object as? GCController)?.vendorName ?? "unknown"
+        observers.append(center.addObserver(forName: .GCControllerDidDisconnect, object: nil, queue: .main) { [weak self] note in
+            let controller = note.object as? GCController
+            if let controller { self?.disconnect(controller) }
+            let name = controller?.vendorName ?? "unknown"
             inputLogger.notice("controller_disconnected name=\(name, privacy: .public)")
         })
-        observers.append(center.addObserver(forName: .GCControllerDidBecomeCurrent, object: nil, queue: .main) { note in
-            let name = (note.object as? GCController)?.vendorName ?? "unknown"
+        observers.append(center.addObserver(forName: .GCControllerDidBecomeCurrent, object: nil, queue: .main) { [weak self] note in
+            let controller = note.object as? GCController
+            if let controller { self?.setCurrentController(controller) }
+            let name = controller?.vendorName ?? "unknown"
             inputLogger.notice("controller_current name=\(name, privacy: .public)")
         })
         inputLogger.notice("input_service_ready controllers=\(GCController.controllers().count)")
@@ -91,6 +122,14 @@ final class AppleInputService: @unchecked Sendable {
         for observer in observers {
             NotificationCenter.default.removeObserver(observer)
         }
+        hapticLock.lock()
+        let engines = Array(hapticEngines.values)
+        let players = Array(hapticPlayers.values)
+        hapticEngines.removeAll()
+        hapticPlayers.removeAll()
+        hapticLock.unlock()
+        for player in players { try? player.stop(atTime: CHHapticTimeImmediate) }
+        for engine in engines { engine.stop() }
     }
 
     func setFocused(_ value: Bool) {
@@ -106,6 +145,9 @@ final class AppleInputService: @unchecked Sendable {
             lastControllerButtons = 0
         }
         lock.unlock()
+        if !value {
+            stopRumble()
+        }
         if changed {
             inputLogger.notice("input_focus active=\(value)")
         }
@@ -238,11 +280,118 @@ final class AppleInputService: @unchecked Sendable {
         return SM64_MODERN_STATUS_OK
     }
 
-    private static func configure(_ controller: GCController) {
-        // The engine consumes input at 30 Hz. Apple's default depth of one can
-        // discard a complete press/release pair between ticks, so retain enough
-        // immutable input states for the engine thread to drain on its next read.
+    private func configure(_ controller: GCController) {
+        // The engine samples on every native 60 Hz step. Apple's default depth
+        // of one can still discard a complete press/release pair between ticks,
+        // so retain enough immutable input states for the owner thread to drain.
         controller.input.inputStateQueueDepth = 20
+
+        let identifier = ObjectIdentifier(controller)
+        guard let haptics = controller.haptics else {
+            hapticLogger.notice(
+                "controller_haptics_unavailable name=\(controller.vendorName ?? "unknown", privacy: .public)"
+            )
+            return
+        }
+        // Prefer the handle locality when available, then follow Apple's
+        // required default-locality fallback. A nil engine is supported when
+        // the user has disabled controller haptics.
+        guard let engine = haptics.createEngine(withLocality: .handles)
+            ?? haptics.createEngine(withLocality: .default) else {
+            hapticLogger.notice(
+                "controller_haptics_disabled name=\(controller.vendorName ?? "unknown", privacy: .public)"
+            )
+            return
+        }
+        engine.resetHandler = {
+            hapticLogger.notice("controller_haptics_reset")
+        }
+        engine.stoppedHandler = { reason in
+            // Core Haptics may auto-stop an engine after its idle window or
+            // after a device interruption. playRumble() synchronously starts
+            // the retained engine before every new pattern.
+            hapticLogger.notice(
+                "controller_haptics_stopped reason=\(String(describing: reason), privacy: .public)"
+            )
+        }
+        hapticLock.lock()
+        hapticEngines[identifier] = engine
+        if currentControllerID == nil {
+            currentControllerID = identifier
+        }
+        hapticLock.unlock()
+        hapticLogger.notice(
+            "controller_haptics_ready name=\(controller.vendorName ?? "unknown", privacy: .public)"
+        )
+    }
+
+    private func setCurrentController(_ controller: GCController) {
+        hapticLock.lock()
+        currentControllerID = ObjectIdentifier(controller)
+        hapticLock.unlock()
+    }
+
+    private func disconnect(_ controller: GCController) {
+        let identifier = ObjectIdentifier(controller)
+        hapticLock.lock()
+        let engine = hapticEngines.removeValue(forKey: identifier)
+        let player = hapticPlayers.removeValue(forKey: identifier)
+        if currentControllerID == identifier {
+            currentControllerID = nil
+        }
+        hapticLock.unlock()
+        try? player?.stop(atTime: CHHapticTimeImmediate)
+        engine?.stop()
+    }
+
+    fileprivate func playRumble(strength: Float, duration: Float) {
+        let intensity = strength.clamped(to: 0 ... 1)
+        let eventDuration = TimeInterval(duration.clamped(to: 0.01 ... 5.0))
+        hapticLock.lock()
+        guard let identifier = currentControllerID, let engine = hapticEngines[identifier] else {
+            let shouldLog = !loggedHapticsUnavailable
+            loggedHapticsUnavailable = true
+            hapticLock.unlock()
+            if shouldLog { hapticLogger.notice("rumble_unavailable") }
+            return
+        }
+        let previousPlayer = hapticPlayers.removeValue(forKey: identifier)
+        hapticLock.unlock()
+
+        try? previousPlayer?.stop(atTime: CHHapticTimeImmediate)
+        do {
+            try engine.start()
+            let event = CHHapticEvent(
+                eventType: .hapticContinuous,
+                parameters: [
+                    CHHapticEventParameter(parameterID: .hapticIntensity, value: intensity),
+                    CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.5),
+                ],
+                relativeTime: 0,
+                duration: eventDuration
+            )
+            let pattern = try CHHapticPattern(events: [event], parameters: [])
+            let player = try engine.makePlayer(with: pattern)
+            try player.start(atTime: CHHapticTimeImmediate)
+            hapticLock.lock()
+            hapticPlayers[identifier] = player
+            hapticLock.unlock()
+        } catch {
+            hapticLogger.error(
+                "rumble_start_failed error=\(error.localizedDescription, privacy: .public)"
+            )
+        }
+    }
+
+    fileprivate func stopRumble() {
+        hapticLock.lock()
+        guard let identifier = currentControllerID,
+              let player = hapticPlayers.removeValue(forKey: identifier) else {
+            hapticLock.unlock()
+            return
+        }
+        hapticLock.unlock()
+        try? player.stop(atTime: CHHapticTimeImmediate)
     }
 
     private static func captureCurrentController() -> (state: ControllerState, recoveredButtons: UInt32) {

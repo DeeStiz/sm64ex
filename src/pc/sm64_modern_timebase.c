@@ -146,6 +146,10 @@ uint32_t sm64_modern_timebase_pair_phase(void) {
     return sPairPhase;
 }
 
+uint32_t sm64_modern_timebase_simulation_ticks_per_legacy_tick(void) {
+    return sSimulationTicksPerLegacyTick;
+}
+
 static uint32_t greatest_common_divisor(uint32_t left, uint32_t right) {
     while (right != 0u) {
         const uint32_t remainder = left % right;

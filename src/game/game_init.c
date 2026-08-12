@@ -630,7 +630,12 @@ void game_loop_one_iteration(void) {
         osContStartReadData(&gSIEventMesgQueue);
     }
 
-    audio_game_loop_tick();
+    // The sound sequencer is a legacy-domain clock.  At native 60 Hz it must
+    // be signalled once per paired 30 Hz interval, while the PCM producer can
+    // still emit one quantum on each native step.
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        audio_game_loop_tick();
+    }
     config_gfx_pool();
     read_controller_inputs();
     levelCommandAddr = level_script_execute(levelCommandAddr);

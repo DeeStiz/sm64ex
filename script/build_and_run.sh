@@ -163,17 +163,18 @@ case "$MODE" in
       'gameplay_bridge_installed abi=1 slices=mario_buttons,bobomb_release' \
       'input_snapshot_started owner_main=false' \
       'audio_service_started input_hz=32000 format=s16_interleaved_stereo' \
-      'audio_enqueue_started' \
+      'audio_enqueue_started blocks_per_native_step=1' \
       'audio_render_started' \
-      'timebase_configured simulation_hz=30/1 legacy_hz=30/1 paired_ticks=1' \
+      'timebase_configured simulation_hz=60/1 legacy_hz=30/1 paired_ticks=2' \
       'fixed_step_scheduler_started clock=monotonic_raw max_catch_up=2' \
-      'lifecycle_running cadence_hz=30/1 capabilities=rendering,input,audio' \
+      'lifecycle_running cadence_hz=60/1 capabilities=rendering,input,audio' \
+      'presentation_cadence native_hz=60/1 legacy_hz=30/1 drawable_per_native_tick=true' \
       'fixed_step_scheduler_status step=1' \
       'lifecycle_step count=1'; do
       grep -Fq "$expected" <<< "$runtime_log"
     done
     printf '%s\n' "$runtime_log" \
-      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|input_snapshot_started|audio_service_started|audio_enqueue_started|audio_render_started|timebase_configured|fixed_step_scheduler_(started|status)|lifecycle_running|lifecycle_step count=1'
+      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|input_snapshot_started|audio_service_started|audio_enqueue_started|audio_render_started|timebase_configured|fixed_step_scheduler_(started|status)|lifecycle_running|presentation_cadence|lifecycle_step count=1'
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do
       if ! kill -0 "$app_pid" >/dev/null 2>&1; then

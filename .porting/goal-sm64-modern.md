@@ -27,8 +27,8 @@ Create a parallel Apple-silicon macOS 27 application using Swift 6.4, AppKit, Me
 | M7: Swift gameplay | Approved Mario and representative actor slices run under Swift authority. | Complete |
 | M8a: Timebase foundation | Native builds expose one rational simulation timebase, a monotonic fixed-step scheduler, timing telemetry, and deterministic test seams while shipping behavior remains 30 Hz. | Complete |
 | M8b: World cadence | Scripts, timers, animation, RNG, transitions, HUD, and event cadence preserve elapsed-time behavior on the 60 Hz timebase. | Complete |
-| M8c: World dynamics | Mario, actors, platforms, collisions, camera, particles, and environmental motion integrate coherently at 60 Hz. | In progress |
-| M8d: Full-world 60 Hz | Native input/audio/presentation integration and full-world deterministic/time-based gates pass with the 60 Hz clock active. | Pending |
+| M8c: World dynamics | Mario, actors, platforms, collisions, camera, particles, and environmental motion integrate coherently at 60 Hz. | Complete |
+| M8d: Full-world 60 Hz | Native input/audio/presentation integration and full-world deterministic/time-based gates pass with the 60 Hz clock active. | In progress |
 | M9: Release | Performance, validation, leaks, signing, notarization, and clean-machine checks pass. | Pending |
 
 ## Completed Milestone: M0

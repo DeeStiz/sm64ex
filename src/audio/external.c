@@ -14,6 +14,7 @@
 #include "dialog_ids.h"
 #include "level_table.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 
 #ifdef VERSION_EU
 #define EU_FLOAT(x) x ## f
@@ -783,6 +784,12 @@ void create_next_audio_buffer(s16 *samples, u32 num_samples) {
 #endif
 
 void play_sound(s32 soundBits, f32 *pos) {
+    // Sound requests are logical effects.  Native held dynamics may call the
+    // same action body twice per legacy interval, so only the boundary owns
+    // request insertion and parity recording.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     sm64_modern_parity_record_sound(soundBits, pos);
     sSoundRequests[sSoundRequestCount].soundBits = soundBits;
     sSoundRequests[sSoundRequestCount].position = pos;

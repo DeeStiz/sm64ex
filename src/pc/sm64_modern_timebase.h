@@ -25,5 +25,6 @@ bool sm64_modern_timebase_is_legacy_interval_final_step(void);
 uint64_t sm64_modern_timebase_simulation_tick(void);
 uint64_t sm64_modern_timebase_legacy_tick(void);
 uint32_t sm64_modern_timebase_pair_phase(void);
+uint32_t sm64_modern_timebase_simulation_ticks_per_legacy_tick(void);
 
 #endif // SM64_MODERN_TIMEBASE_H

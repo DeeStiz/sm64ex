@@ -56,6 +56,12 @@ void exec_anim_sound_state(struct SoundState *soundStates) {
  * (Breakable walls, King Bobomb exploding, etc)
  */
 void create_sound_spawner(s32 soundMagic) {
+    // This helper allocates a one-shot sound object. The native held half of
+    // a paired interval may revisit the same CALL_NATIVE body, but the
+    // logical sound event belongs to the admitted legacy boundary.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     struct Object *obj = spawn_object(gCurrentObject, 0, bhvSoundSpawner);
 
     obj->oSoundEffectUnkF4 = soundMagic;

@@ -255,6 +255,12 @@ void copy_mario_state_to_object(void) {
  * Spawn a particle at gCurrentObject's location.
  */
 void spawn_particle(u32 activeParticleFlag, s16 model, const BehaviorScript *behavior) {
+    // Particle creation is a legacy-domain effect.  The owning Mario/action
+    // dynamics still run on held native steps, but the same logical particle
+    // request must not allocate a second object before the pair closes.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (!(gCurrentObject->oActiveParticleFlags & activeParticleFlag)) {
         struct Object *particle;
         gCurrentObject->oActiveParticleFlags |= activeParticleFlag;

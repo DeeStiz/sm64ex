@@ -9,6 +9,7 @@
 #include "controller_sdl.h"
 #include "controller_sm64_modern.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 
 // Analog camera movement by Pathétique (github.com/vrmiguel), y0shin and Mors
 // Contribute or communicate bugs at github.com/vrmiguel/sm64-analog-camera
@@ -88,6 +89,11 @@ void controller_reconfigure(void) {
 }
 
 void controller_rumble_play(float str, float time) {
+    // Rumble state is advanced by thread6 on the logical legacy boundary.
+    // Ignore a duplicate request emitted by a held native behavior step.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     sm64_modern_parity_record_rumble_start(str, time);
     for (size_t i = 0; i < sizeof(controller_implementations) / sizeof(struct ControllerAPI *); i++) {
         if (controller_implementations[i]->rumble_play)
@@ -96,6 +102,9 @@ void controller_rumble_play(float str, float time) {
 }
 
 void controller_rumble_stop(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     sm64_modern_parity_record_rumble_stop();
     for (size_t i = 0; i < sizeof(controller_implementations) / sizeof(struct ControllerAPI *); i++) {
         if (controller_implementations[i]->rumble_stop)

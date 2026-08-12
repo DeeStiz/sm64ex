@@ -260,8 +260,8 @@ validate_cadence_manifest() {
   done
 
   # Mixed seams must retain both ownership records. The M8b row records
-  # elapsed-time progression; the M8d row records the device/delivery edge
-  # that is intentionally deferred until integration.
+  # elapsed-time progression; the M8d row records the active device/delivery
+  # edge and its native cadence ownership.
   local required_scoped_anchor
   local required_scoped_category
   local required_scoped_scope
@@ -284,15 +284,15 @@ validate_cadence_manifest() {
     $'demo\tM8b\tsrc/game/game_init.c\trun_demo_inputs\taudited'
     $'demo\tM8d\tsrc/game/game_init.c\trun_demo_inputs\tdeferred'
     $'input\tM8b\tsrc/game/game_init.c\tread_controller_inputs\taudited'
-    $'input\tM8d\tsrc/game/game_init.c\tread_controller_inputs\tdeferred'
+    $'input\tM8d\tsrc/game/game_init.c\tread_controller_inputs\taudited'
     $'rumble\tM8b\tsrc/game/thread6.c\tthread6_rumble_loop\taudited'
-    $'rumble\tM8d\tsrc/game/thread6.c\tthread6_rumble_loop\tdeferred'
+    $'rumble\tM8d\tsrc/game/thread6.c\tthread6_rumble_loop\taudited'
     $'global_timer\tM8b\tsrc/game/game_init.c\tdisplay_and_vsync\taudited'
-    $'presentation\tM8d\tsrc/game/game_init.c\tdisplay_and_vsync\tdeferred'
-    $'audio\tM8d\tsrc/pc/pc_main.c\tcreate_next_audio_buffer\tdeferred'
-    $'presentation\tM8d\tsrc/pc/sm64_modern_gameplay_parity.c\tsm64_modern_parity_begin_tick\tdeferred'
-    $'presentation\tM8d\tSM64Modern/EngineHost.swift\tinitializeCore\tdeferred'
-    $'presentation\tM8d\tSM64Modern/EngineHost.swift\trunFixedStepLoop\tdeferred'
+    $'presentation\tM8d\tsrc/game/game_init.c\tdisplay_and_vsync\taudited'
+    $'audio\tM8d\tsrc/pc/pc_main.c\tcreate_next_audio_buffer\taudited'
+    $'presentation\tM8d\tsrc/pc/sm64_modern_gameplay_parity.c\tsm64_modern_parity_begin_tick\taudited'
+    $'presentation\tM8d\tSM64Modern/EngineHost.swift\tinitializeCore\taudited'
+    $'presentation\tM8d\tSM64Modern/EngineHost.swift\trunFixedStepLoop\taudited'
   )
   for required_scoped_anchor in "${required_scoped_anchors[@]}"; do
     IFS=$'\t' read -r required_scoped_category required_scoped_scope \

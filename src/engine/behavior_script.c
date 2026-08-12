@@ -5,6 +5,7 @@
 #include "behavior_script.h"
 #include "game/area.h"
 #include "game/behavior_actions.h"
+#include "game/debug.h"
 #include "game/game_init.h"
 #include "game/mario.h"
 #include "game/memory.h"
@@ -44,6 +45,13 @@ static void goto_behavior_unused(const BehaviorScript *bhvAddr) {
 // Generate a pseudorandom integer from 0 to 65535 from the random seed, and update the seed.
 u16 random_u16(void) {
     u16 temp1, temp2;
+
+    // Randomness is part of the legacy event stream.  Native held steps may
+    // still run continuous behavior code, but must not consume a second RNG
+    // draw for the same logical interval.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return gRandomSeed16;
+    }
 
     if (gRandomSeed16 == 22026) {
         gRandomSeed16 = 0;
@@ -400,7 +408,15 @@ static void cur_obj_update_native_behavior(void) {
     // so the legacy program counter and stack remain untouched.
     do {
         gCurBhvCommand = command;
-        ((NativeBhvFunc) BHV_CMD_GET_VPTR(1))();
+        const NativeBhvFunc behaviorFunc = (NativeBhvFunc) BHV_CMD_GET_VPTR(1);
+        // Mario's contiguous body contains debug input/spawn helpers after
+        // the continuous action update.  Those helpers belong to the legacy
+        // boundary and must not consume a held native step's input or spawn
+        // an object twice.
+        if (behaviorFunc != try_print_debug_mario_level_info
+            && behaviorFunc != try_do_mario_debug_object_spawn) {
+            behaviorFunc();
+        }
         command += 2;
     } while (((*command >> 24) & 0xFFu) == 0x0Cu);
 }

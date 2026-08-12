@@ -1176,6 +1176,9 @@ s32 cur_obj_clear_interact_status_flag(s32 flag) {
  * Mark an object to be unloaded at the end of the frame.
  */
 void obj_mark_for_deletion(struct Object *obj) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     //! This clears all activeFlags. Since some of these flags disable behavior,
     //  setting it to 0 could potentially enable unexpected behavior. After an
     //  object is marked for deletion, it still updates on that frame (I think),
@@ -1643,6 +1646,9 @@ void cur_obj_set_hurtbox_radius_and_height(f32 radius, f32 height) {
 static void obj_spawn_loot_coins(struct Object *obj, s32 numCoins, f32 sp30,
                                     const BehaviorScript *coinBehavior,
                                     s16 posJitter, s16 model) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     s32 i;
     f32 spawnHeight;
     struct Surface *floor;
@@ -1677,6 +1683,9 @@ void obj_spawn_loot_yellow_coins(struct Object *obj, s32 numCoins, f32 sp28) {
 
 void cur_obj_spawn_loot_coin_at_mario_pos(void) {
     struct Object *coin;
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (o->oNumLootCoins <= 0) {
         return;
     }
@@ -2135,6 +2144,9 @@ s16 cur_obj_reflect_move_angle_off_wall(void) {
 }
 
 void cur_obj_spawn_particles(struct SpawnParticlesInfo *info) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     struct Object *particle;
     s32 i;
     f32 scale;
@@ -2934,6 +2946,9 @@ s32 cur_obj_check_interacted(void) {
 }
 
 void cur_obj_spawn_loot_blue_coin(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (o->oNumLootCoins >= 5) {
         spawn_object(o, MODEL_BLUE_COIN, bhvMrIBlueCoin);
         o->oNumLootCoins -= 5;

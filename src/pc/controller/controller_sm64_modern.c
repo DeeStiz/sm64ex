@@ -29,6 +29,13 @@ static struct ModernBind sBinds[MODERN_BIND_CAPACITY];
 static uint32_t sBindCount;
 static uint32_t sLastRawKey = VK_INVALID;
 
+// The native core is also linked by standalone C smoke tests.  Keep the
+// Swift haptic bridge weak so those tools retain their existing no-device
+// behavior while the signed app resolves the symbol from AppleInputService.
+extern void sm64_modern_input_rumble_play(void *context, float strength, float duration)
+    __attribute__((weak));
+extern void sm64_modern_input_rumble_stop(void *context) __attribute__((weak));
+
 static bool snapshot_key_down(const SM64ModernInputSnapshotV1 *snapshot, uint32_t virtual_key) {
     if (virtual_key < VK_BASE_SDL_GAMEPAD) {
         const uint32_t word = virtual_key / 32u;
@@ -197,6 +204,18 @@ static u32 modern_rawkey(void) {
     return key;
 }
 
+static void modern_rumble_play(float strength, float duration) {
+    if (sInputInstalled && sm64_modern_input_rumble_play) {
+        sm64_modern_input_rumble_play(sInput.context, strength, duration);
+    }
+}
+
+static void modern_rumble_stop(void) {
+    if (sInputInstalled && sm64_modern_input_rumble_stop) {
+        sm64_modern_input_rumble_stop(sInput.context);
+    }
+}
+
 static void modern_shutdown(void) {
     sLastRawKey = VK_INVALID;
 }
@@ -206,8 +225,8 @@ struct ControllerAPI controller_sm64_modern = {
     modern_init,
     modern_read,
     modern_rawkey,
-    NULL,
-    NULL,
+    modern_rumble_play,
+    modern_rumble_stop,
     bind_controls,
     modern_shutdown,
 };

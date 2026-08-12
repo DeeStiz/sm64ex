@@ -13,6 +13,7 @@
 #include "spawn_object.h"
 #include "types.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 
 /**
  * An unused linked list struct that seems to have been replaced by ObjectNode.
@@ -357,6 +358,9 @@ struct Object *create_object(const BehaviorScript *bhvScript) {
  * Mark an object to be unloaded at the end of the frame.
  */
 void mark_obj_for_deletion(struct Object *obj) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     //! Same issue as obj_mark_for_deletion
     obj->activeFlags = ACTIVE_FLAG_DEACTIVATED;
 }

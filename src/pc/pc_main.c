@@ -299,12 +299,18 @@ static SM64ModernStatus lifecycle_step(void) {
         u32 num_audio_samples = samples_left < (int) sPlatform.audio_desired_buffered(sPlatform.context)
             ? SAMPLES_HIGH : SAMPLES_LOW;
         num_audio_samples = sm64_modern_parity_audio_frame_count(SAMPLES_HIGH, num_audio_samples);
+        // A legacy 30 Hz tick historically emitted two audio quanta.  Once
+        // the native clock runs at 60 Hz, one quantum per native step keeps
+        // the 32 kHz contract and total PCM duration unchanged.
+        const u32 audio_block_count =
+            sm64_modern_timebase_simulation_ticks_per_legacy_tick() > 1u ? 1u : 2u;
+        const u32 audio_frame_count = audio_block_count * num_audio_samples;
         s16 audio_buffer[SAMPLES_HIGH * 2 * 2];
-        for (int i = 0; i < 2; i++) {
+        for (u32 i = 0; i < audio_block_count; i++) {
             create_next_audio_buffer(audio_buffer + i * (num_audio_samples * 2), num_audio_samples);
         }
-        sm64_modern_parity_record_pcm(audio_buffer, 2 * num_audio_samples);
-        sPlatform.audio_play(sPlatform.context, audio_buffer, 2 * num_audio_samples);
+        sm64_modern_parity_record_pcm(audio_buffer, audio_frame_count);
+        sPlatform.audio_play(sPlatform.context, audio_buffer, audio_frame_count);
     }
 
     sm64_modern_parity_end_tick();

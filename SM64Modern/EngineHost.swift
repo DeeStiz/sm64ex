@@ -279,7 +279,7 @@ final class EngineHost: @unchecked Sendable {
             condition.broadcast()
         }
         engineLogger.notice(
-            "lifecycle_running cadence_hz=\(self.timebaseSnapshot.simulation_rate_numerator)/\(self.timebaseSnapshot.simulation_rate_denominator) capabilities=rendering,input,audio"
+            "lifecycle_running cadence_hz=\(self.timebaseSnapshot.simulation_rate_numerator)/\(self.timebaseSnapshot.simulation_rate_denominator) capabilities=rendering,input,audio legacy_hz=\(self.timebaseSnapshot.legacy_rate_numerator)/\(self.timebaseSnapshot.legacy_rate_denominator) paired_ticks=\(self.timebaseSnapshot.simulation_ticks_per_legacy_tick)"
         )
 
         engineRunStatus = SM64_MODERN_STATUS_OK
@@ -443,9 +443,10 @@ final class EngineHost: @unchecked Sendable {
         var timebaseConfig = SM64ModernTimebaseConfigV1()
         timebaseConfig.header.abi_version = SM64_MODERN_ABI_VERSION_1
         timebaseConfig.header.struct_size = UInt32(MemoryLayout<SM64ModernTimebaseConfigV1>.size)
-        // M8a deliberately preserves the shipping cadence. STUB(M8d): switch
-        // native simulation to 60/1 only after M8b/M8c convert world timing.
-        timebaseConfig.simulation_rate_numerator = 30
+        // M8d activates the native product clock after M8b/M8c moved legacy
+        // state and world dynamics behind the paired-boundary contract.
+        // Legacy builds still configure 30/1 in their own host path.
+        timebaseConfig.simulation_rate_numerator = 60
         timebaseConfig.simulation_rate_denominator = 1
         timebaseConfig.legacy_rate_numerator = 30
         timebaseConfig.legacy_rate_denominator = 1
@@ -577,6 +578,9 @@ final class EngineHost: @unchecked Sendable {
         audioLogger.notice(
             "audio_service_started input_hz=32000 format=s16_interleaved_stereo output_hz=\(status.output_sample_rate) output_channels=\(status.output_channel_count) capacity=\(status.capacity_frames) desired=\(status.desired_buffered_frames) backlog=\(status.backlog_ceiling_frames)"
         )
+        engineLogger.notice(
+            "presentation_cadence native_hz=\(self.timebaseSnapshot.simulation_rate_numerator)/\(self.timebaseSnapshot.simulation_rate_denominator) legacy_hz=\(self.timebaseSnapshot.legacy_rate_numerator)/\(self.timebaseSnapshot.legacy_rate_denominator) drawable_per_native_tick=true"
+        )
     }
 
     fileprivate func shutdownAudioOnEngineThread() {
@@ -617,7 +621,10 @@ final class EngineHost: @unchecked Sendable {
         audioService.enqueueInterleavedStereoSamples(samples, frameCount: frameCount)
         if !loggedAudioEnqueue {
             loggedAudioEnqueue = true
-            audioLogger.notice("audio_enqueue_started frames=\(frameCount)")
+            let blocksPerNativeStep = self.timebaseSnapshot.simulation_ticks_per_legacy_tick > 1 ? 1 : 2
+            audioLogger.notice(
+                "audio_enqueue_started blocks_per_native_step=\(blocksPerNativeStep) frames=\(frameCount)"
+            )
         }
     }
 

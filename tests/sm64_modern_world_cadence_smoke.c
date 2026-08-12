@@ -26,6 +26,7 @@
 #define LOGICAL_INTERVAL_COUNT 12u
 #define MAX_EVENTS_PER_INTERVAL 64u
 #define ANIMATION_FIXED_STEP UINT32_C(0x00018001) /* 1.500015625 frames */
+#define AUDIO_QUANTUM_FRAMES 544u
 
 enum WorldCadenceEventKind {
     WORLD_EVENT_INPUT_EDGE = 1,
@@ -40,6 +41,10 @@ enum WorldCadenceEventKind {
     WORLD_EVENT_HUD_COUNTER,
     WORLD_EVENT_MENU_COUNTER,
     WORLD_EVENT_TIME_STOP,
+    WORLD_EVENT_SOUND_REQUEST,
+    WORLD_EVENT_RUMBLE_REQUEST,
+    WORLD_EVENT_OBJECT_SPAWN,
+    WORLD_EVENT_SAVE_WRITE,
 };
 
 typedef struct {
@@ -74,6 +79,10 @@ typedef struct {
     uint32_t collision_passes;
     uint32_t particle_updates;
     uint16_t intangible_timer;
+    uint32_t sound_requests;
+    uint32_t rumble_requests;
+    uint32_t object_spawns;
+    uint32_t save_writes;
 } WorldCadenceState;
 
 typedef struct {
@@ -177,6 +186,75 @@ static bool configure_timebase(const SM64ModernTimebaseApiV1 *timebase,
                   SM64_MODERN_STATUS_OK);
     expect_u64("cadence pair ratio", snapshot.simulation_ticks_per_legacy_tick, expected_pair);
     return snapshot.simulation_ticks_per_legacy_tick == expected_pair;
+}
+
+typedef struct {
+    uint32_t native_steps;
+    uint32_t legacy_ticks;
+    uint32_t audio_game_loop_ticks;
+    uint32_t audio_blocks;
+    uint32_t final_steps;
+    uint64_t audio_frames;
+} AudioCadenceStats;
+
+static void run_audio_cadence_contract(const SM64ModernTimebaseApiV1 *timebase) {
+    const uint32_t configurations[][5] = {
+        { 30u, 1u, 30u, 1u, 1u },
+        { 60u, 1u, 30u, 1u, 2u },
+    };
+    const uint64_t expected_native_steps[] = { LOGICAL_INTERVAL_COUNT, LOGICAL_INTERVAL_COUNT * 2u };
+    const uint64_t expected_audio_blocks[] = { LOGICAL_INTERVAL_COUNT * 2u, LOGICAL_INTERVAL_COUNT * 2u };
+
+    for (uint32_t configuration_index = 0u;
+         configuration_index < sizeof(configurations) / sizeof(configurations[0]);
+         ++configuration_index) {
+        if (!configure_timebase(timebase,
+                                configurations[configuration_index][0],
+                                configurations[configuration_index][1],
+                                configurations[configuration_index][2],
+                                configurations[configuration_index][3],
+                                configurations[configuration_index][4])) {
+            continue;
+        }
+
+        AudioCadenceStats stats;
+        memset(&stats, 0, sizeof(stats));
+        sm64_modern_timebase_set_lifecycle_active(true);
+        for (uint32_t native_step = 0u;
+             native_step < expected_native_steps[configuration_index];
+             ++native_step) {
+            sm64_modern_timebase_begin_simulation_step();
+            stats.native_steps++;
+            if (sm64_modern_timebase_should_advance_legacy_domain()) {
+                stats.legacy_ticks++;
+                stats.audio_game_loop_ticks++;
+            }
+            const uint32_t blocks =
+                sm64_modern_timebase_simulation_ticks_per_legacy_tick() > 1u ? 1u : 2u;
+            stats.audio_blocks += blocks;
+            stats.audio_frames += (uint64_t) blocks * AUDIO_QUANTUM_FRAMES;
+            if (sm64_modern_timebase_is_legacy_interval_final_step()) {
+                stats.final_steps++;
+            }
+        }
+        sm64_modern_timebase_set_lifecycle_active(false);
+
+        char operation[96];
+        snprintf(operation, sizeof(operation), "audio cadence %u native steps", configuration_index);
+        expect_u64(operation, stats.native_steps, expected_native_steps[configuration_index]);
+        snprintf(operation, sizeof(operation), "audio cadence %u legacy ticks", configuration_index);
+        expect_u64(operation, stats.legacy_ticks, LOGICAL_INTERVAL_COUNT);
+        snprintf(operation, sizeof(operation), "audio cadence %u sequencer ticks", configuration_index);
+        expect_u64(operation, stats.audio_game_loop_ticks, LOGICAL_INTERVAL_COUNT);
+        snprintf(operation, sizeof(operation), "audio cadence %u PCM blocks", configuration_index);
+        expect_u64(operation, stats.audio_blocks, expected_audio_blocks[configuration_index]);
+        snprintf(operation, sizeof(operation), "audio cadence %u PCM frames", configuration_index);
+        expect_u64(operation,
+                   stats.audio_frames,
+                   expected_audio_blocks[configuration_index] * AUDIO_QUANTUM_FRAMES);
+        snprintf(operation, sizeof(operation), "audio cadence %u final steps", configuration_index);
+        expect_u64(operation, stats.final_steps, LOGICAL_INTERVAL_COUNT);
+    }
 }
 
 static void initialize_model(WorldCadenceModel *model) {
@@ -361,6 +439,26 @@ static void advance_boundary(WorldCadenceModel *model, uint32_t interval) {
         model->state.menu_counter = (uint16_t) ((model->state.menu_counter + 1u) % 5u);
         append_event(model, WORLD_EVENT_MENU_COUNTER, model->state.menu_counter, interval, 0u);
     }
+
+    /* These are the held-CALL_NATIVE sinks that M8d must keep on the logical
+     * boundary.  The model deliberately schedules them at different periods
+     * so the paired trace catches both adjacent and non-adjacent event edges. */
+    if ((interval % 2u) == 0u) {
+        model->state.sound_requests++;
+        append_event(model, WORLD_EVENT_SOUND_REQUEST, model->state.sound_requests, interval, 0u);
+    }
+    if ((interval % 3u) == 1u) {
+        model->state.rumble_requests++;
+        append_event(model, WORLD_EVENT_RUMBLE_REQUEST, model->state.rumble_requests, interval, 0u);
+    }
+    if ((interval % 4u) == 2u) {
+        model->state.object_spawns++;
+        append_event(model, WORLD_EVENT_OBJECT_SPAWN, model->state.object_spawns, interval, 0u);
+    }
+    if ((interval % 5u) == 3u) {
+        model->state.save_writes++;
+        append_event(model, WORLD_EVENT_SAVE_WRITE, model->state.save_writes, interval, 0u);
+    }
 }
 
 static void capture_trace(const WorldCadenceModel *model, WorldCadenceTrace *trace) {
@@ -410,6 +508,10 @@ static void compare_state(uint32_t interval,
     CHECK_STATE(collision_passes);
     CHECK_STATE(particle_updates);
     CHECK_STATE(intangible_timer);
+    CHECK_STATE(sound_requests);
+    CHECK_STATE(rumble_requests);
+    CHECK_STATE(object_spawns);
+    CHECK_STATE(save_writes);
 #undef CHECK_STATE
 }
 
@@ -437,6 +539,10 @@ static void compare_legacy_state(uint32_t interval,
     CHECK_LEGACY_STATE(menu_open);
     CHECK_LEGACY_STATE(transition_active);
     CHECK_LEGACY_STATE(hud_timer_running);
+    CHECK_LEGACY_STATE(sound_requests);
+    CHECK_LEGACY_STATE(rumble_requests);
+    CHECK_LEGACY_STATE(object_spawns);
+    CHECK_LEGACY_STATE(save_writes);
 #undef CHECK_LEGACY_STATE
 }
 
@@ -635,6 +741,7 @@ int main(void) {
 
     WorldCadenceTrace reference[LOGICAL_INTERVAL_COUNT];
     memset(reference, 0, sizeof(reference));
+    run_audio_cadence_contract(&timebase);
     run_reference(&timebase, controls, reference);
     run_native_pair(&timebase, controls, reference);
 

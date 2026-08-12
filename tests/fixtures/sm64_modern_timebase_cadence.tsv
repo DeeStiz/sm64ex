@@ -63,6 +63,7 @@ save	M8b	src/menu/file_select.c	save_file_erase	legacy_frame	event_ordered	audit
 save	M8b	src/menu/file_select.c	save_file_copy	legacy_frame	event_ordered	audited	File-select copy persistence is a legacy menu event and must retain one ordered save operation per admitted boundary.
 save	M8b	src/game/paintings.c	save_file_set_flags	legacy_frame	event_ordered	audited	DDD moved-back save-flag persistence follows move_ddd_painting on the paired legacy boundary.
 save	M8c	src/game/interaction.c	save_file_set_cap_pos	native_tick	native_each_tick	audited	Cap-position persistence is reached by the native Mario interaction body once per dynamics step.
+save	M8d	src/game/interaction.c	save_file_set_cap_pos	legacy_frame	paired_boundary	audited	Cap-position persistence is narrowed to the admitted legacy boundary while the owning Mario interaction dynamics continue on native ticks.
 presentation	M8c	src/game/paintings.c	painting_update_floors	native_tick	native_each_tick	audited	Painting floor/ripple state is advanced by paintings_update_dynamics and rendering only consumes it.
 hud	M8b	src/game/hud.c	sPowerMeterVisibleTimer	legacy_frame	render_cadence	audited	Power-meter visibility/emphasis thresholds are legacy HUD timing.
 hud	M8b	src/game/hud.c	render_hud_power_meter	legacy_frame	render_cadence	audited	Power-meter render path currently mutates its timer and needs explicit paired ownership.
@@ -87,19 +88,19 @@ demo	M8d	src/game/game_init.c	record_demo	input_sample	defer_m8d	deferred	Demo r
 demo	M8b	src/game/game_init.c	run_demo_inputs	legacy_frame	paired_boundary	audited	Demo playback elapsed countdown and completion edges consume one legacy frame per paired boundary.
 demo	M8d	src/game/game_init.c	run_demo_inputs	input_sample	defer_m8d	deferred	Demo playback feeds the native input boundary and is excluded from M8b world cadence.
 input	M8b	src/game/game_init.c	read_controller_inputs	legacy_frame	event_ordered	audited	Legacy input edge-latch transitions are consumed once per M8b frame; device sampling remains the M8d row.
-input	M8d	src/game/game_init.c	read_controller_inputs	input_sample	input_boundary	deferred	Controller sampling is a native input boundary and must not be duplicated by M8b.
-input	M8d	src/pc/controller/controller_sm64_modern.c	sm64_modern_input_status	input_sample	defer_m8d	deferred	Native input service status is an M8d integration concern.
-rumble	M8d	src/game/thread6.c	gRumblePakTimer	input_sample	defer_m8d	deferred	Rumble timer delivery belongs to native haptics/input integration.
-rumble	M8b	src/game/thread6.c	thread6_rumble_loop	legacy_frame	event_ordered	audited	Rumble timer/event progression follows the legacy cadence; native haptics delivery remains deferred.
-rumble	M8d	src/game/thread6.c	thread6_rumble_loop	input_sample	defer_m8d	deferred	Rumble loop scheduling is deferred with native input/haptics integration.
-audio	M8d	src/pc/pc_main.c	create_next_audio_buffer	audio_block	audio_block	deferred	Audio block production/delivery must not change while M8b converts world cadence.
-audio	M8d	src/game/sound_init.c	audio_game_loop_tick	audio_block	defer_m8d	deferred	Audio tick ownership and block counts are an M8d integration boundary.
-presentation	M8d	src/pc/pc_main.c	lifecycle_step	presentation_frame	defer_m8d	deferred	Native lifecycle presentation/input/audio sequencing is activated only after M8b/M8c.
-presentation	M8d	SM64Modern/EngineHost.swift	initializeCore	legacy_tick	defer_m8d	deferred	EngineHost deliberately ships with 30/30 simulation and legacy rates; native 60 Hz activation remains deferred until full-world M8d integration.
-presentation	M8d	SM64Modern/EngineHost.swift	runFixedStepLoop	presentation_frame	defer_m8d	deferred	The fixed-step host loop remains the single 30/30 owner through M8b; full native 60 Hz scheduling and presentation coupling are deferred to M8d.
-presentation	M8d	src/pc/sm64_modern_gameplay_parity.c	sm64_modern_parity_begin_tick	native_tick	defer_m8d	deferred	Cross-rate parity envelopes remain native-tick keyed; paired logical-boundary aggregation is deferred until full 60 Hz integration.
-presentation	M8d	src/pc/gfx/gfx_pc.c	gfx_start_frame	presentation_frame	presentation_frame	deferred	Legacy/native frame submission is presentation integration, not M8b world cadence.
-presentation	M8d	src/pc/gfx/gfx_pc.c	gfx_end_frame	presentation_frame	presentation_frame	deferred	Drawable submission/presentation remains an M8d boundary.
-global_timer	M8b	src/game/game_init.c	display_and_vsync	legacy_frame	paired_boundary	audited	The legacy display/vsync seam advances the global timer once per paired boundary; drawable presentation is deferred below.
+input	M8d	src/game/game_init.c	read_controller_inputs	input_sample	input_boundary	audited	Native input is sampled on every simulation tick while buttonPressed edges are retained until the admitted legacy boundary.
+input	M8d	src/pc/controller/controller_sm64_modern.c	sm64_modern_input_status	input_sample	input_boundary	audited	The Apple input bridge provides immutable 60 Hz snapshots with focus-neutral state and no second deadzone.
+rumble	M8d	src/game/thread6.c	gRumblePakTimer	input_sample	input_boundary	audited	Rumble timer progression remains one legacy-boundary update while native haptics delivery is routed through the installed controller service.
+rumble	M8b	src/game/thread6.c	thread6_rumble_loop	legacy_frame	event_ordered	audited	Rumble timer/event progression follows the legacy cadence; the M8d row owns native haptics delivery.
+rumble	M8d	src/game/thread6.c	thread6_rumble_loop	input_sample	input_boundary	audited	Rumble scheduling is admitted once per logical boundary and held native redraws cannot replay controller effects.
+audio	M8d	src/pc/pc_main.c	create_next_audio_buffer	audio_block	audio_block	audited	A 30 Hz lifecycle emits two PCM quanta per step; the active 60 Hz lifecycle emits one quantum per native step, preserving total 32 kHz duration.
+audio	M8d	src/game/sound_init.c	audio_game_loop_tick	audio_block	paired_boundary	audited	The sound sequencer is signalled on the legacy boundary while PCM production continues at native cadence.
+presentation	M8d	src/pc/pc_main.c	lifecycle_step	presentation_frame	presentation_frame	audited	Each native lifecycle step owns input, audio, parity, and drawable submission in the existing owner-thread order.
+presentation	M8d	SM64Modern/EngineHost.swift	initializeCore	legacy_tick	paired_boundary	audited	EngineHost configures the active product at 60/1 simulation over a 30/1 legacy domain with an integral pair ratio.
+presentation	M8d	SM64Modern/EngineHost.swift	runFixedStepLoop	presentation_frame	presentation_frame	audited	The monotonic fixed-step owner loop now schedules the native 60 Hz lifecycle and reports the paired legacy cadence.
+presentation	M8d	src/pc/sm64_modern_gameplay_parity.c	sm64_modern_parity_begin_tick	native_tick	native_each_tick	audited	Parity envelopes remain keyed to every native simulation tick and carry the active 60/30 timebase fingerprint.
+presentation	M8d	src/pc/gfx/gfx_pc.c	gfx_start_frame	presentation_frame	presentation_frame	audited	Native presentation starts one scene frame per lifecycle tick without changing the raw CAMetalLayer owner contract.
+presentation	M8d	src/pc/gfx/gfx_pc.c	gfx_end_frame	presentation_frame	presentation_frame	audited	Drawable completion remains ordered after scene encoding on every native tick.
+global_timer	M8b	src/game/game_init.c	display_and_vsync	legacy_frame	paired_boundary	audited	The legacy display/vsync seam advances the global timer once per paired boundary; native redraws retain the same elapsed-time ownership.
 presentation	M8d	src/game/mario_misc.c	geo_draw_mario_head_goddard	presentation_frame	defer_m8d	deferred	Goddard head drawable construction/presentation remains an M8d rendering concern.
-presentation	M8d	src/game/game_init.c	display_and_vsync	presentation_frame	presentation_frame	deferred	Display/vsync pacing must not be used as an M8b timer source.
+presentation	M8d	src/game/game_init.c	display_and_vsync	presentation_frame	presentation_frame	audited	Display/vsync remains a presentation edge and is not used as an M8b timer source.

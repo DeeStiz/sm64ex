@@ -12,6 +12,7 @@
 #include "thread6.h"
 #include "macros.h"
 #include "pc/ini.h"
+#include "pc/sm64_modern_timebase.h"
 
 #define MENU_DATA_MAGIC 0x4849
 #define SAVE_FILE_MAGIC 0x4441
@@ -342,6 +343,9 @@ static void save_file_bswap(struct SaveBuffer *buf) {
 }
 
 void save_file_do_save(s32 fileIndex) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (fileIndex < 0 || fileIndex >= NUM_SAVE_FILES)
         return;
 
@@ -373,6 +377,9 @@ void save_file_do_save(s32 fileIndex) {
 }
 
 void save_file_erase(s32 fileIndex) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (fileIndex < 0 || fileIndex >= NUM_SAVE_FILES)
         return;
 
@@ -385,6 +392,9 @@ void save_file_erase(s32 fileIndex) {
 
 //! Needs to be s32 to match on -O2, despite no return value.
 BAD_RETURN(s32) save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (srcFileIndex < 0 || srcFileIndex >= NUM_SAVE_FILES || destFileIndex < 0 || destFileIndex >= NUM_SAVE_FILES)
         return;
 
@@ -474,6 +484,9 @@ void save_file_reload(void) {
  * If coin score is greater than the current high score, update it.
  */
 void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     s32 fileIndex = gCurrSaveFileNum - 1;
     s32 courseIndex = gCurrCourseNum - 1;
 
@@ -583,11 +596,17 @@ s32 save_file_get_total_star_count(s32 fileIndex, s32 minCourse, s32 maxCourse) 
 }
 
 void save_file_set_flags(u32 flags) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= (flags | SAVE_FLAG_FILE_EXISTS);
     gSaveFileModified = TRUE;
 }
 
 void save_file_clear_flags(u32 flags) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags &= ~flags;
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
@@ -627,6 +646,9 @@ u32 save_file_get_cannon_flags(s32 fileIndex, s32 courseIndex) {
  * If course is -1, add to the bitset of obtained castle secret stars.
  */
 void save_file_set_star_flags(s32 fileIndex, s32 courseIndex, u32 starFlags) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (courseIndex == -1) {
         gSaveBuffer.files[fileIndex][0].flags |= starFlags << 24;
     } else {
@@ -652,12 +674,18 @@ s32 save_file_is_cannon_unlocked(void) {
  * Sets the cannon status to unlocked in the current course.
  */
 void save_file_set_cannon_unlocked(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] |= 0x80;
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
 }
 
 void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     struct SaveFile *saveFile = &gSaveBuffer.files[gCurrSaveFileNum - 1][0];
 
     saveFile->capLevel = gCurrLevelNum;
@@ -679,6 +707,9 @@ s32 save_file_get_cap_pos(Vec3s capPos) {
 }
 
 void save_file_set_sound_mode(u16 mode) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     set_sound_mode(mode);
     gSaveBuffer.menuData[0].soundMode = mode;
 

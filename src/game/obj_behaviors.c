@@ -33,6 +33,7 @@
 #include "spawn_sound.h"
 #include "pc/sm64_modern_gameplay_migration.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 
 /**
  * @file obj_behaviors.c
@@ -397,6 +398,13 @@ void obj_update_pos_vel_xz(void) {
 void obj_splash(s32 waterY, s32 objY) {
     u32 globalTimer = gGlobalTimer;
 
+    // Waves and bubbles are one-shot object effects. Position/velocity
+    // detection remains continuous, but allocation is admitted once per
+    // logical legacy interval.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
+
     // Spawns waves if near surface of water and plays a noise if entering.
     if ((f32)(waterY + 30) > o->oPosY && o->oPosY > (f32)(waterY - 30)) {
         spawn_object(o, MODEL_IDLE_WATER_WAVE, bhvObjectWaterWave);
@@ -621,6 +629,9 @@ s32 obj_find_wall_displacement(Vec3f dist, f32 x, f32 y, f32 z, f32 radius) {
  * with a random forward velocity, y velocity, and direction.
  */
 void obj_spawn_yellow_coins(struct Object *obj, s8 nCoins) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     struct Object *coin;
     s8 count;
 
@@ -764,7 +775,7 @@ s32 obj_lava_death(void) {
 void spawn_orange_number(s8 behParam, s16 relX, s16 relY, s16 relZ) {
     struct Object *orangeNumber;
 
-    if (behParam >= 10) {
+    if (behParam >= 10 || !sm64_modern_timebase_should_advance_legacy_domain()) {
         return;
     }
 
