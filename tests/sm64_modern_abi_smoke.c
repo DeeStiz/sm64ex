@@ -358,6 +358,11 @@ int main(void) {
         || offsetof(SM64ModernPlatformApiV1, header) != 0
         || offsetof(SM64ModernInputSnapshotV1, header) != 0
         || offsetof(SM64ModernInputApiV1, header) != 0
+        || offsetof(SM64ModernMarioButtonInputV1, header) != 0
+        || offsetof(SM64ModernMarioButtonOutputV1, header) != 0
+        || offsetof(SM64ModernBobombReleaseInputV1, header) != 0
+        || offsetof(SM64ModernBobombReleaseOutputV1, header) != 0
+        || offsetof(SM64ModernGameplayMigrationApiV1, header) != 0
         || offsetof(SM64ModernRenderingApiV1, header) != 0
         || offsetof(SM64ModernGameplayRecordEnvelopeV1, header) != 0
         || offsetof(SM64ModernGameplayTraceRecordV1, envelope) != 0
@@ -369,7 +374,12 @@ int main(void) {
         failures++;
     }
 
-    if (sizeof(SM64ModernGameplayRecordEnvelopeV1) != 32
+    if (sizeof(SM64ModernMarioButtonInputV1) != 48
+        || sizeof(SM64ModernMarioButtonOutputV1) != 24
+        || sizeof(SM64ModernBobombReleaseInputV1) != 40
+        || sizeof(SM64ModernBobombReleaseOutputV1) != 36
+        || sizeof(SM64ModernGameplayMigrationApiV1) != 40
+        || sizeof(SM64ModernGameplayRecordEnvelopeV1) != 32
         || sizeof(SM64ModernGameplayTraceRecordV1) != 88
         || sizeof(SM64ModernGameplayParityConfigV1) != 32
         || sizeof(SM64ModernGameplayParityResultV1) != 80

@@ -15,6 +15,7 @@
 #include "game/object_list_processor.h"
 #include "level_table.h"
 #include "object_fields.h"
+#include "sm64_modern_gameplay_migration.h"
 #include "sm64_modern_gameplay_parity.h"
 
 #define PARITY_FNV_OFFSET UINT64_C(1469598103934665603)
@@ -41,6 +42,8 @@ static uint64_t sSimulationTick;
 static SM64ModernStatus sStatus = SM64_MODERN_STATUS_OK;
 static bool sSessionActive;
 static bool sTickOpen;
+
+static SM64ModernStatus submit_candidate_record(const SM64ModernGameplayTraceRecordV1 *record);
 
 static bool valid_subsystem(SM64ModernGameplaySubsystem subsystem) {
     return subsystem < SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT;
@@ -337,6 +340,19 @@ static void process_actual_record(SM64ModernGameplayTraceRecordV1 *actual) {
     }
     result->matched_records++;
     append_candidate_reference(actual);
+    if (actual->envelope.subsystem != SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL
+        && sAuthorities[actual->envelope.subsystem] == SM64_MODERN_AUTHORITY_SHADOW_SWIFT
+        && sm64_modern_gameplay_migration_status() == SM64_MODERN_STATUS_OK) {
+        SM64ModernGameplayTraceRecordV1 candidate;
+        const SM64ModernStatus transform_status = sm64_modern_gameplay_transform_candidate(
+            actual, &candidate);
+        if (transform_status != SM64_MODERN_STATUS_OK) {
+            result->status = transform_status;
+            sStatus = transform_status;
+            return;
+        }
+        (void) submit_candidate_record(&candidate);
+    }
 }
 
 static void record_values(SM64ModernGameplaySubsystem subsystem,
@@ -380,6 +396,9 @@ static void finalize_candidate_tick(void) {
     }
     for (uint32_t subsystem = 1; subsystem < SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT; ++subsystem) {
         if (!subsystem_enabled(subsystem)) {
+            continue;
+        }
+        if (sAuthorities[subsystem] != SM64_MODERN_AUTHORITY_SHADOW_SWIFT) {
             continue;
         }
         struct CandidateRecords *candidate = &sCandidateRecords[subsystem];
@@ -488,7 +507,8 @@ static SM64ModernStatus end_session(void) {
     if (sConfig.mode == SM64_MODERN_GAMEPLAY_PARITY_SHADOW) {
         for (uint32_t subsystem = 1; subsystem < SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT; ++subsystem) {
             SM64ModernGameplayParityResultV1 *result = &sResults[subsystem];
-            result->eligible_for_swift = result->status == SM64_MODERN_STATUS_OK
+            result->eligible_for_swift = sAuthorities[subsystem] == SM64_MODERN_AUTHORITY_SHADOW_SWIFT
+                && result->status == SM64_MODERN_STATUS_OK
                 && result->actual_records > 0
                 && result->candidate_records == result->actual_records;
             if (result->status == SM64_MODERN_STATUS_PARITY_DIVERGED
@@ -811,6 +831,10 @@ static void capture_mario_snapshot(void) {
                   SM64_MODERN_FIELD_MARIO_COINS, 0, (uint16_t) mario->numCoins);
     record_scalar(SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO,
                   SM64_MODERN_FIELD_MARIO_STARS, 0, (uint16_t) mario->numStars);
+    record_scalar(SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO,
+                  SM64_MODERN_FIELD_MARIO_FRAMES_SINCE_A, 0, mario->framesSinceA);
+    record_scalar(SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO,
+                  SM64_MODERN_FIELD_MARIO_FRAMES_SINCE_B, 0, mario->framesSinceB);
 }
 
 static void capture_interaction_snapshot(void) {
@@ -904,6 +928,14 @@ static void capture_actor_snapshot(void) {
                       subject, object->oMoveFlags);
         record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_INTERACTION_STATUS,
                       subject, (uint32_t) object->oInteractStatus);
+        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_HELD_STATE,
+                      subject, object->oHeldState);
+        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_FLAGS,
+                      subject, object->oFlags);
+        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_FORWARD_VELOCITY,
+                      subject, float_bits(object->oForwardVel));
+        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_GRAPH_FLAGS,
+                      subject, (uint16_t) object->header.gfx.node.flags);
     }
 }
 
@@ -994,4 +1026,16 @@ void sm64_modern_parity_leave_subsystem(void) {
 
 SM64ModernStatus sm64_modern_parity_status(void) {
     return sStatus;
+}
+
+uint64_t sm64_modern_parity_simulation_tick(void) {
+    return sSimulationTick;
+}
+
+uint32_t sm64_modern_parity_object_slot(const struct Object *object) {
+    return object_slot(object);
+}
+
+SM64ModernGameplaySubsystem sm64_modern_parity_current_subsystem(void) {
+    return current_subsystem();
 }

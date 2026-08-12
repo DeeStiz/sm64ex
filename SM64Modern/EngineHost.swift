@@ -54,10 +54,24 @@ private func platformInitialize(
         return inputStatus
     }
     engineLogger.notice("input_bridge_installed abi=1")
+    let gameplayService = host.gameplayServiceOnEngineThread
+    var gameplay = makeSwiftGameplayMigrationAPI(service: gameplayService)
+    let gameplayStatus = sm64_modern_install_gameplay_migration_api(&gameplay)
+    guard gameplayStatus == SM64_MODERN_STATUS_OK else {
+        engineLogger.error("gameplay_bridge_install_failed status=\(gameplayStatus)")
+        sm64_modern_uninstall_input_api()
+        sm64_modern_uninstall_rendering_api()
+        do { try host.shutdownMetalOnEngineThread() } catch {
+            engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
+        }
+        return gameplayStatus
+    }
+    engineLogger.notice("gameplay_bridge_installed abi=1 slices=mario_buttons,bobomb_release")
     do {
         try host.initializeAudioOnEngineThread()
     } catch {
         audioLogger.error("audio_initialize_failed error=\(error.localizedDescription, privacy: .public)")
+        sm64_modern_uninstall_gameplay_migration_api()
         sm64_modern_uninstall_input_api()
         sm64_modern_uninstall_rendering_api()
         do { try host.shutdownMetalOnEngineThread() } catch {
@@ -73,6 +87,7 @@ private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     guard let host = engineHost(from: context) else { return }
     assert(host.isCurrentEngineThread)
     host.shutdownAudioOnEngineThread()
+    sm64_modern_uninstall_gameplay_migration_api()
     sm64_modern_uninstall_input_api()
     sm64_modern_uninstall_rendering_api()
     engineLogger.notice("platform_shutdown")
@@ -153,6 +168,7 @@ final class EngineHost: @unchecked Sendable {
     private var engineRunStatus = SM64_MODERN_STATUS_OK
     private var lifecycle = SM64ModernLifecycleApiV1()
     private var parityCoordinator: GameplayParityCoordinator?
+    private let gameplayService = SwiftGameplayService()
     private var automaticTerminationRequested = false
     private var inputService: AppleInputService?
     private var audioService: SM64ModernAppleAudioService?
@@ -335,14 +351,22 @@ final class EngineHost: @unchecked Sendable {
             metalRenderer?.logSceneStatus(step: stepCount)
             logAudioStatus()
         }
-        if let tickLimit = parityCoordinator?.tickLimit, stepCount >= tickLimit {
-            condition.withLock {
-                stopRequested = true
-                requestedExitReason = SM64_MODERN_EXIT_PLATFORM_REQUESTED
-                automaticTerminationRequested = true
+        if let parityCoordinator {
+            let boundary = parityCoordinator.handleTickBoundary(step: stepCount)
+            if boundary.status != SM64_MODERN_STATUS_OK {
+                engineRunStatus = boundary.status
+                CFRunLoopStop(CFRunLoopGetCurrent())
+                return
             }
-            engineLogger.notice("bounded_parity_run_complete steps=\(self.stepCount)")
-            CFRunLoopStop(CFRunLoopGetCurrent())
+            if boundary.shouldStop {
+                condition.withLock {
+                    stopRequested = true
+                    requestedExitReason = SM64_MODERN_EXIT_PLATFORM_REQUESTED
+                    automaticTerminationRequested = true
+                }
+                engineLogger.notice("bounded_parity_run_complete steps=\(self.stepCount)")
+                CFRunLoopStop(CFRunLoopGetCurrent())
+            }
         }
     }
 
@@ -399,7 +423,8 @@ final class EngineHost: @unchecked Sendable {
         guard status == SM64_MODERN_STATUS_OK else { return status }
 
         let parityStart = GameplayParityCoordinator.beginFromEnvironment(
-            saveDirectory: paths.saveDirectory
+            saveDirectory: paths.saveDirectory,
+            gameplayService: gameplayService
         )
         guard parityStart.status == SM64_MODERN_STATUS_OK else {
             _ = self.lifecycle.shutdown()
@@ -407,6 +432,11 @@ final class EngineHost: @unchecked Sendable {
         }
         parityCoordinator = parityStart.coordinator
         return SM64_MODERN_STATUS_OK
+    }
+
+    fileprivate var gameplayServiceOnEngineThread: SwiftGameplayService {
+        precondition(isCurrentEngineThread)
+        return gameplayService
     }
 
     private func finish(state: State, status: SM64ModernStatus) {

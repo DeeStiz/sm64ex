@@ -91,7 +91,26 @@ typedef uint32_t SM64ModernGameplayParityMode;
 #define SM64_MODERN_GAMEPLAY_PARITY_REPLAY 2u
 #define SM64_MODERN_GAMEPLAY_PARITY_SHADOW 3u
 
-#define SM64_MODERN_GAMEPLAY_PARITY_SCHEMA_VERSION 1u
+#define SM64_MODERN_GAMEPLAY_PARITY_SCHEMA_VERSION 2u
+
+// Stable scalar constants used by the bounded v1 Swift gameplay kernels.
+// These mirror PR/os_cont.h, sm64.h, object_constants.h, and graph_node.h;
+// keeping them in the public contract prevents Swift from importing engine headers.
+#define SM64_MODERN_N64_BUTTON_A 0x8000u
+#define SM64_MODERN_N64_BUTTON_B 0x4000u
+#define SM64_MODERN_N64_BUTTON_Z 0x2000u
+#define SM64_MODERN_MARIO_INPUT_A_PRESSED 0x0002u
+#define SM64_MODERN_MARIO_INPUT_A_DOWN 0x0080u
+#define SM64_MODERN_MARIO_INPUT_B_PRESSED 0x2000u
+#define SM64_MODERN_MARIO_INPUT_Z_DOWN 0x4000u
+#define SM64_MODERN_MARIO_INPUT_Z_PRESSED 0x8000u
+#define SM64_MODERN_BOBOMB_HELD_FREE 0u
+#define SM64_MODERN_BOBOMB_HELD_THROWN 2u
+#define SM64_MODERN_BOBOMB_HELD_DROPPED 3u
+#define SM64_MODERN_BOBOMB_ACTION_PATROL 0
+#define SM64_MODERN_BOBOMB_ACTION_LAUNCHED 1
+#define SM64_MODERN_BOBOMB_OBJECT_THROW_MATRIX_FLAG 0x8u
+#define SM64_MODERN_GRAPH_RENDER_INVISIBLE 0x10u
 
 typedef uint32_t SM64ModernGameplayField;
 
@@ -119,6 +138,8 @@ typedef uint32_t SM64ModernGameplayField;
 #define SM64_MODERN_FIELD_MARIO_HEALTH 114u
 #define SM64_MODERN_FIELD_MARIO_COINS 115u
 #define SM64_MODERN_FIELD_MARIO_STARS 116u
+#define SM64_MODERN_FIELD_MARIO_FRAMES_SINCE_A 117u
+#define SM64_MODERN_FIELD_MARIO_FRAMES_SINCE_B 118u
 
 #define SM64_MODERN_FIELD_INTERACTION_TYPES 200u
 #define SM64_MODERN_FIELD_INTERACTION_OBJECT 201u
@@ -146,6 +167,10 @@ typedef uint32_t SM64ModernGameplayField;
 #define SM64_MODERN_FIELD_ACTOR_MOVE_ANGLE 407u
 #define SM64_MODERN_FIELD_ACTOR_MOVE_FLAGS 408u
 #define SM64_MODERN_FIELD_ACTOR_INTERACTION_STATUS 409u
+#define SM64_MODERN_FIELD_ACTOR_HELD_STATE 410u
+#define SM64_MODERN_FIELD_ACTOR_FLAGS 411u
+#define SM64_MODERN_FIELD_ACTOR_FORWARD_VELOCITY 412u
+#define SM64_MODERN_FIELD_ACTOR_GRAPH_FLAGS 413u
 
 typedef uint32_t SM64ModernGameplayEffect;
 
@@ -236,6 +261,73 @@ typedef struct SM64ModernInputApiV1 {
     void *context;
     SM64ModernInputReadFn read;
 } SM64ModernInputApiV1;
+
+// Gameplay slices cross the language boundary as copied scalar state. Float
+// fields use their IEEE-754 bit patterns so shadow candidates remain exact.
+typedef struct SM64ModernMarioButtonInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t input;
+    uint32_t owned_input_mask;
+    uint32_t button_pressed;
+    uint32_t button_down;
+    uint32_t squish_timer;
+    uint32_t frames_since_a;
+    uint32_t frames_since_b;
+    uint32_t reserved;
+} SM64ModernMarioButtonInputV1;
+
+typedef struct SM64ModernMarioButtonOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t input;
+    uint32_t frames_since_a;
+    uint32_t frames_since_b;
+    uint32_t reserved;
+} SM64ModernMarioButtonOutputV1;
+
+typedef struct SM64ModernBobombReleaseInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t subject_id;
+    uint32_t subsystem;
+    uint32_t held_state;
+    uint32_t object_flags;
+    uint32_t graph_flags;
+    uint32_t reserved;
+} SM64ModernBobombReleaseInputV1;
+
+typedef struct SM64ModernBobombReleaseOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t held_state;
+    int32_t action;
+    uint32_t object_flags;
+    uint32_t graph_flags;
+    uint32_t forward_velocity_bits;
+    uint32_t velocity_y_bits;
+    uint32_t reserved;
+} SM64ModernBobombReleaseOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioButtonUpdateFn)(
+    void *context,
+    const SM64ModernMarioButtonInputV1 *input,
+    SM64ModernMarioButtonOutputV1 *out_output);
+typedef SM64ModernStatus (*SM64ModernBobombReleaseUpdateFn)(
+    void *context,
+    const SM64ModernBobombReleaseInputV1 *input,
+    SM64ModernBobombReleaseOutputV1 *out_output);
+struct SM64ModernGameplayTraceRecordV1;
+typedef SM64ModernStatus (*SM64ModernGameplayCandidateTransformFn)(
+    void *context,
+    const struct SM64ModernGameplayTraceRecordV1 *actual,
+    struct SM64ModernGameplayTraceRecordV1 *out_candidate);
+
+typedef struct SM64ModernGameplayMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioButtonUpdateFn update_mario_buttons;
+    SM64ModernBobombReleaseUpdateFn update_bobomb_release;
+    SM64ModernGameplayCandidateTransformFn transform_candidate;
+} SM64ModernGameplayMigrationApiV1;
 
 // The native renderer is installed from the platform initialize callback, on
 // the lifecycle owner thread. Every pointer passed to a callback is borrowed
@@ -431,6 +523,12 @@ SM64ModernStatus sm64_modern_validate_input_api(const SM64ModernInputApiV1 *inpu
 SM64ModernStatus sm64_modern_install_input_api(const SM64ModernInputApiV1 *input);
 void sm64_modern_uninstall_input_api(void);
 SM64ModernStatus sm64_modern_input_status(void);
+SM64ModernStatus sm64_modern_validate_gameplay_migration_api(
+    const SM64ModernGameplayMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_gameplay_migration_api(
+    const SM64ModernGameplayMigrationApiV1 *migration);
+void sm64_modern_uninstall_gameplay_migration_api(void);
+SM64ModernStatus sm64_modern_gameplay_migration_status(void);
 SM64ModernStatus sm64_modern_validate_rendering_api(const SM64ModernRenderingApiV1 *rendering);
 SM64ModernStatus sm64_modern_install_rendering_api(const SM64ModernRenderingApiV1 *rendering);
 void sm64_modern_uninstall_rendering_api(void);

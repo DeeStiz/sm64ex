@@ -35,6 +35,8 @@
 #include "thread6.h"
 #include "pc/configfile.h"
 #include "pc/cheats.h"
+#include "pc/sm64_modern_gameplay_migration.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 #ifdef BETTERCAMERA
 #include "bettercamera.h"
 #endif
@@ -1276,40 +1278,25 @@ void debug_print_speed_action_normal(struct MarioState *m) {
  * Update the button inputs for Mario.
  */
 void update_mario_button_inputs(struct MarioState *m) {
-    if (m->controller->buttonPressed & A_BUTTON) {
-        m->input |= INPUT_A_PRESSED;
+    const SM64ModernMarioButtonInputV1 input = {
+        { SM64_MODERN_ABI_VERSION_1, sizeof(SM64ModernMarioButtonInputV1) },
+        sm64_modern_parity_simulation_tick(),
+        m->input,
+        INPUT_A_PRESSED | INPUT_A_DOWN | INPUT_B_PRESSED | INPUT_Z_DOWN | INPUT_Z_PRESSED,
+        m->controller->buttonPressed,
+        m->controller->buttonDown,
+        m->squishTimer,
+        m->framesSinceA,
+        m->framesSinceB,
+        0,
+    };
+    SM64ModernMarioButtonOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_buttons(&input, &output) != SM64_MODERN_STATUS_OK) {
+        return;
     }
-
-    if (m->controller->buttonDown & A_BUTTON) {
-        m->input |= INPUT_A_DOWN;
-    }
-
-    // Don't update for these buttons if squished.
-    if (m->squishTimer == 0) {
-        if (m->controller->buttonPressed & B_BUTTON) {
-            m->input |= INPUT_B_PRESSED;
-        }
-
-        if (m->controller->buttonDown & Z_TRIG) {
-            m->input |= INPUT_Z_DOWN;
-        }
-
-        if (m->controller->buttonPressed & Z_TRIG) {
-            m->input |= INPUT_Z_PRESSED;
-        }
-    }
-
-    if (m->input & INPUT_A_PRESSED) {
-        m->framesSinceA = 0;
-    } else if (m->framesSinceA < 0xFF) {
-        m->framesSinceA += 1;
-    }
-
-    if (m->input & INPUT_B_PRESSED) {
-        m->framesSinceB = 0;
-    } else if (m->framesSinceB < 0xff) {
-        m->framesSinceB += 1;
-    }
+    m->input = (u16) output.input;
+    m->framesSinceA = (u8) output.frames_since_a;
+    m->framesSinceB = (u8) output.frames_since_b;
 }
 
 /**

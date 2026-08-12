@@ -31,6 +31,8 @@
 #include "save_file.h"
 #include "spawn_object.h"
 #include "spawn_sound.h"
+#include "pc/sm64_modern_gameplay_migration.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 
 /**
  * @file obj_behaviors.c

@@ -43,6 +43,8 @@
 #include "spawn_object.h"
 #include "spawn_sound.h"
 #include "thread6.h"
+#include "pc/sm64_modern_gameplay_migration.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 
 #define o gCurrentObject
 

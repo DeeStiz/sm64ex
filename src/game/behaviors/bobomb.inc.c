@@ -188,25 +188,42 @@ void bobomb_held_loop(void) {
     }
 }
 
+static void bobomb_apply_release_transition(u32 heldState) {
+    const SM64ModernBobombReleaseInputV1 input = {
+        { SM64_MODERN_ABI_VERSION_1, sizeof(SM64ModernBobombReleaseInputV1) },
+        sm64_modern_parity_simulation_tick(),
+        sm64_modern_parity_object_slot(o),
+        sm64_modern_parity_current_subsystem(),
+        heldState,
+        o->oFlags,
+        (u16) o->header.gfx.node.flags,
+        0,
+    };
+    SM64ModernBobombReleaseOutputV1 output;
+    if (sm64_modern_gameplay_update_bobomb_release(&input, &output) != SM64_MODERN_STATUS_OK) {
+        return;
+    }
+    o->oHeldState = output.held_state;
+    o->oAction = output.action;
+    o->oFlags = output.object_flags;
+    o->header.gfx.node.flags = (s16) output.graph_flags;
+    o->oForwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    o->oVelY = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+}
+
 void bobomb_dropped_loop(void) {
-    cur_obj_get_dropped();
-
-    o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
+    // Floor resolution and animation retain their existing C ownership; the
+    // gameplay state transition itself is the bounded Swift slice.
+    cur_obj_become_tangible();
+    cur_obj_enable_rendering_2();
+    cur_obj_prepare_move_after_thrown_or_dropped();
+    bobomb_apply_release_transition(HELD_DROPPED);
     cur_obj_init_animation(0);
-
-    o->oHeldState = 0;
-    o->oAction = BOBOMB_ACT_PATROL;
 }
 
 void bobomb_thrown_loop(void) {
     cur_obj_enable_rendering_2();
-
-    o->header.gfx.node.flags &= ~GRAPH_RENDER_INVISIBLE;
-    o->oHeldState = 0;
-    o->oFlags &= ~0x8; /* bit 3 */
-    o->oForwardVel = 25.0;
-    o->oVelY = 20.0;
-    o->oAction = BOBOMB_ACT_LAUNCHED;
+    bobomb_apply_release_transition(HELD_THROWN);
 }
 
 // sp18 = blinkTimer

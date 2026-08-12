@@ -26,6 +26,9 @@ void sm64_modern_parity_enter_subsystem(SM64ModernGameplaySubsystem subsystem);
 void sm64_modern_parity_enter_object_update(const struct Object *object);
 void sm64_modern_parity_leave_subsystem(void);
 SM64ModernStatus sm64_modern_parity_status(void);
+uint64_t sm64_modern_parity_simulation_tick(void);
+uint32_t sm64_modern_parity_object_slot(const struct Object *object);
+SM64ModernGameplaySubsystem sm64_modern_parity_current_subsystem(void);
 
 // Internal deterministic harness seam. This is deliberately absent from the
 // public ABI and exercises the same canonical record path as engine snapshots.

@@ -15,35 +15,43 @@ DEFAULT_SAVE_ROOT="$PROJECT_ROOT/build/sm64-modern-state"
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
 cd "$PROJECT_ROOT"
-"$PROJECT_ROOT/script/test_audio_ring.sh"
-xcodegen generate --spec project.yml
-xcodebuild \
-  -project SM64Modern.xcodeproj \
-  -scheme SM64Modern \
-  -configuration Debug \
-  -derivedDataPath "$DERIVED_DATA" \
-  build \
-  CODE_SIGNING_ALLOWED=NO
+if [[ "$MODE" == "--m7-shadow-live" || "$MODE" == "m7-shadow-live" ]]; then
+  # The trace fingerprints the signed app directory. Re-linking between the
+  # live record and shadow passes would correctly reject the trace at tick 0,
+  # so shadow must reuse the exact product that produced the record.
+  test -x "$APP_BINARY"
+  codesign --verify --deep --strict "$APP_BUNDLE"
+else
+  "$PROJECT_ROOT/script/test_audio_ring.sh"
+  xcodegen generate --spec project.yml
+  xcodebuild \
+    -project SM64Modern.xcodeproj \
+    -scheme SM64Modern \
+    -configuration Debug \
+    -derivedDataPath "$DERIVED_DATA" \
+    build \
+    CODE_SIGNING_ALLOWED=NO
 
-# The sustained-execution entitlement remains on Release. Debug uses the
-# locally available Apple Development identity without mutating portal state.
-while IFS= read -r nested_code; do
+  # The sustained-execution entitlement remains on Release. Debug uses the
+  # locally available Apple Development identity without mutating portal state.
+  while IFS= read -r nested_code; do
+    codesign \
+      --force \
+      --options runtime \
+      --timestamp=none \
+      --sign "$SIGNING_IDENTITY" \
+      "$nested_code"
+  done < <(find "$APP_BUNDLE/Contents" -type f -name '*.dylib' -print)
+
   codesign \
     --force \
     --options runtime \
     --timestamp=none \
+    --entitlements "$DEBUG_ENTITLEMENTS" \
     --sign "$SIGNING_IDENTITY" \
-    "$nested_code"
-done < <(find "$APP_BUNDLE/Contents" -type f -name '*.dylib' -print)
-
-codesign \
-  --force \
-  --options runtime \
-  --timestamp=none \
-  --entitlements "$DEBUG_ENTITLEMENTS" \
-  --sign "$SIGNING_IDENTITY" \
-  "$APP_BUNDLE"
-codesign --verify --deep --strict "$APP_BUNDLE"
+    "$APP_BUNDLE"
+  codesign --verify --deep --strict "$APP_BUNDLE"
+fi
 
 open_app() {
   /usr/bin/open -n "$APP_BUNDLE" \
@@ -67,6 +75,17 @@ wait_for_app_pid() {
 wait_for_app_exit() {
   local app_pid="$1"
   for _ in {1..150}; do
+    if ! kill -0 "$app_pid" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.1
+  done
+  return 1
+}
+
+wait_for_app_exit_long() {
+  local app_pid="$1"
+  for _ in {1..3600}; do
     if ! kill -0 "$app_pid" >/dev/null 2>&1; then
       return 0
     fi
@@ -139,6 +158,7 @@ case "$MODE" in
       'engine_thread_started' \
       'input_service_ready' \
       'input_bridge_installed abi=1' \
+      'gameplay_bridge_installed abi=1 slices=mario_buttons,bobomb_release' \
       'input_snapshot_started owner_main=false' \
       'audio_service_started input_hz=32000 format=s16_interleaved_stereo' \
       'audio_enqueue_started' \
@@ -174,7 +194,7 @@ case "$MODE" in
   --parity-verify|parity-verify)
     PARITY_TEMP="$(mktemp -d "${TMPDIR:-/tmp}/sm64-modern-parity.XXXXXX")"
     trap '/bin/rm -rf -- "$PARITY_TEMP"' EXIT
-    TRACE_PATH="$PARITY_TEMP/gameplay-v1.trace"
+    TRACE_PATH="$PARITY_TEMP/gameplay-v2.trace"
     RECORD_SAVE="$PARITY_TEMP/record-save"
     REPLAY_SAVE="$PARITY_TEMP/replay-save"
     mkdir -p "$RECORD_SAVE" "$REPLAY_SAVE"
@@ -190,7 +210,7 @@ case "$MODE" in
     test -s "$TRACE_PATH"
     record_log="$(/usr/bin/log show --last 2m --style compact \
       --predicate "processIdentifier == $record_pid && subsystem == \"$BUNDLE_ID\"")"
-    grep -Fq 'parity_session_started mode=1 schema=1' <<< "$record_log"
+    grep -Fq 'parity_session_started mode=1 schema=2' <<< "$record_log"
     grep -Fq 'bounded_parity_run_complete steps=90' <<< "$record_log"
     grep -Fq 'parity_session_finished status=0' <<< "$record_log"
 
@@ -204,7 +224,7 @@ case "$MODE" in
     wait_for_app_exit "$replay_pid"
     replay_log="$(/usr/bin/log show --last 2m --style compact \
       --predicate "processIdentifier == $replay_pid && subsystem == \"$BUNDLE_ID\"")"
-    grep -Fq 'parity_session_started mode=2 schema=1' <<< "$replay_log"
+    grep -Fq 'parity_session_started mode=2 schema=2' <<< "$replay_log"
     grep -Fq 'bounded_parity_run_complete steps=90' <<< "$replay_log"
     grep -Fq 'parity_session_finished status=0' <<< "$replay_log"
     if grep -Fq 'parity_first_divergence' <<< "$replay_log"; then
@@ -214,8 +234,82 @@ case "$MODE" in
     printf '%s\n' "$record_log" "$replay_log" \
       | grep -E 'parity_session_started|bounded_parity_run_complete|parity_result subsystem=|parity_session_finished'
     ;;
+  --m7-record-live|m7-record-live)
+    M7_DIR="${SM64_MODERN_M7_DIR:-$PROJECT_ROOT/build/sm64-modern-m7-live}"
+    M7_SOURCE_SAVE="${SM64_MODERN_M7_SOURCE_SAVE:-$PROJECT_ROOT/build/sm64-modern-state}"
+    M7_TICKS="${SM64_MODERN_M7_TICKS:-1800}"
+    M7_BASELINE_SAVE="$M7_DIR/baseline-save"
+    M7_RECORD_SAVE="$M7_DIR/record-save"
+    M7_TRACE="$M7_DIR/bob-gameplay-v2.trace"
+    if [[ -e "$M7_DIR" ]]; then
+      echo "M7 record directory already exists: $M7_DIR" >&2
+      echo "Set SM64_MODERN_M7_DIR to a new directory to preserve the existing evidence." >&2
+      exit 2
+    fi
+    mkdir -p "$M7_DIR"
+    if [[ -d "$M7_SOURCE_SAVE" ]]; then
+      /usr/bin/ditto "$M7_SOURCE_SAVE" "$M7_BASELINE_SAVE"
+    else
+      mkdir -p "$M7_BASELINE_SAVE"
+    fi
+    /usr/bin/ditto "$M7_BASELINE_SAVE" "$M7_RECORD_SAVE"
+
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=record \
+      --env SM64_MODERN_PARITY_TRACE="$M7_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M7_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M7_RECORD_SAVE"
+    record_pid="$(wait_for_app_pid)"
+    wait_for_app_exit_long "$record_pid"
+    test -s "$M7_TRACE"
+    record_log="$(/usr/bin/log show --last 15m --style compact \
+      --predicate "processIdentifier == $record_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=1 schema=2' <<< "$record_log"
+    grep -Fq "bounded_parity_run_complete steps=$M7_TICKS" <<< "$record_log"
+    grep -Fq 'parity_result subsystem=4 status=0' <<< "$record_log"
+    grep -Fq 'parity_session_finished status=0' <<< "$record_log"
+    printf '%s\n' "$record_log" \
+      | grep -E 'parity_session_started|bounded_parity_run_complete|parity_result subsystem=4|parity_session_finished'
+    echo "M7 live trace recorded at $M7_TRACE"
+    ;;
+  --m7-shadow-live|m7-shadow-live)
+    M7_DIR="${SM64_MODERN_M7_DIR:-$PROJECT_ROOT/build/sm64-modern-m7-live}"
+    M7_TICKS="${SM64_MODERN_M7_TICKS:-1800}"
+    M7_SWIFT_TICKS="${SM64_MODERN_M7_SWIFT_TICKS:-1800}"
+    M7_BASELINE_SAVE="$M7_DIR/baseline-save"
+    M7_TRACE="$M7_DIR/bob-gameplay-v2.trace"
+    M7_SHADOW_SAVE="$M7_DIR/shadow-save-$(date +%Y%m%d-%H%M%S)"
+    test -d "$M7_BASELINE_SAVE"
+    test -s "$M7_TRACE"
+    /usr/bin/ditto "$M7_BASELINE_SAVE" "$M7_SHADOW_SAVE"
+
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=shadow \
+      --env SM64_MODERN_PARITY_TRACE="$M7_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M7_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M7_SHADOW_SAVE" \
+      --env SM64_MODERN_SWIFT_SLICES=mario-buttons,bobomb-release \
+      --env SM64_MODERN_SWIFT_PROMOTE=1 \
+      --env SM64_MODERN_SWIFT_AUTHORITY_TICKS="$M7_SWIFT_TICKS"
+    shadow_pid="$(wait_for_app_pid)"
+    wait_for_app_exit_long "$shadow_pid"
+    shadow_log="$(/usr/bin/log show --last 15m --style compact \
+      --predicate "processIdentifier == $shadow_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=3 schema=2' <<< "$shadow_log"
+    grep -Fq 'parity_result subsystem=1 status=0' <<< "$shadow_log"
+    grep -Fq 'parity_result subsystem=4 status=0' <<< "$shadow_log"
+    grep -Fq 'swift_authority_promoted subsystems=1,4' <<< "$shadow_log"
+    grep -Fq 'bounded_swift_authority_run_complete' <<< "$shadow_log"
+    test "$(grep -Fc 'swift_gameplay_slice_exercised slice=mario_buttons' <<< "$shadow_log")" -ge 2
+    test "$(grep -Fc 'swift_gameplay_slice_exercised slice=bobomb_release' <<< "$shadow_log")" -ge 2
+    grep -Fq 'engine_thread_finished status=0' <<< "$shadow_log"
+    printf '%s\n' "$shadow_log" \
+      | grep -E 'swift_shadow_started|swift_gameplay_slice_exercised|parity_result subsystem=(1|4)|swift_authority_promoted|bounded_swift_authority_run_complete|engine_thread_finished status=0'
+    ;;
   *)
-    echo "usage: $0 [run|--debug|--logs|--telemetry|--metal-validation|--metal-hud|--metal-capture|--verify|--parity-verify]" >&2
+    echo "usage: $0 [run|--debug|--logs|--telemetry|--metal-validation|--metal-hud|--metal-capture|--verify|--parity-verify|--m7-record-live|--m7-shadow-live]" >&2
     exit 2
     ;;
 esac

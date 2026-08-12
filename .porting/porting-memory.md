@@ -2,13 +2,23 @@
 
 ## Current Milestone
 
-- M6 success criterion: deterministic replay and field/effect diagnostics gate Swift authority independently for each migrated gameplay subsystem.
-- Approved M6 scope: add stable Mario/interaction/camera/actor subsystem IDs; fixed-width input, snapshot, effect, result, and first-divergence POD records; canonical scalar/float-bit/object-slot identity; and host-owned local trace streams.
-- Record/replay the normalized N64 pad before pressed-state derivation, capture post-simulation state before presentation, and diagnose value, missing/extra record, schema, fingerprint, and finalization mismatches.
-- Record canonical sound, rumble, object spawn/despawn, and pre-device PCM checksum effects at existing owner-thread gateways; never enter the AVAudioEngine real-time callback.
-- Keep C authority as default. Shadow mode compares candidate streams; Swift authority remains rejected until that subsystem finalizes an exact compatible replay, independently of every other subsystem.
-- Add bounded Swift parity coordination/Logger telemetry plus C/C++ ABI, pure parity, deliberate-divergence, gate-isolation, and bounded real-engine record/replay coverage.
-- Preserve the dedicated engine owner thread, versioned POD boundary, current 30 Hz clock, M4/M5 rendering/input/audio contracts, legacy portable backends, save format, external ROM policy, and local-only traces. M6 does not implement Swift gameplay or the M8 clock.
+- M7 success criterion: approved Mario button-edge handling and Bob-omb Battlefield thrown/dropped actor transitions run under Swift authority after their individual exact shadow gates pass.
+- Approved M7 scope: add a copied, versioned POD gameplay-migration callback table; migrate Mario A/B/Z flags plus `framesSinceA/B`; migrate black Bob-omb thrown/dropped action, held, flags, velocity, and visibility outputs; and keep C-only animation/render helpers as narrow adapters.
+- Shadow mode must run C and Swift from the same POD pre-state, submit a complete candidate stream with only Swift-owned fields substituted, preserve gate isolation, and promote only after exact schema/build/save/sequence/value completion. Missing or failed callbacks are hard failures, never silent C fallback.
+- Add bounded Swift coordination and `Logger` telemetry plus ABI, migration, parity, deliberate-divergence, callback-failure, gate-isolation, and local live BOB record/shadow coverage.
+- Exclude full Mario actions, patrol/chase/explosion logic, other actors/levels, interaction/camera migration, M8's 60 Hz clock, rendering changes, release work, and committed ROM/trace assets.
+- Keep C authority as the default and preserve the dedicated owner thread, versioned POD boundary, 30 Hz clock, M4/M5 contracts, portable backends, save compatibility, external ROM policy, and local-only traces.
+
+### M6 Completion Evidence
+
+- M6 implementation is commit `8abe446`; validation hardening is commit `b42df20`.
+- Stable global/Mario/interaction/camera/representative-actor IDs and fixed-width input, snapshot, effect, result, and first-divergence records use canonical scalar, float-bit, behavior, and object-slot identities across the C ABI.
+- Normalized N64 pad replay occurs before pressed-state derivation; post-simulation snapshots occur before presentation; sound, rumble, spawn/despawn, and pre-device PCM effects are recorded at owner-thread gateways outside the AVAudioEngine callback.
+- Host-owned local streams validate schema/build/save fingerprints and diagnose value, missing/extra record, sequence, fingerprint, candidate, and finalization failures. C stays authoritative by default; exact shadow completion opens only that subsystem's Swift gate.
+- The 90-tick signed record/replay matched global 753/753, Mario 1530/1530, and interaction 630/630 records. The unattended title sequence did not exercise camera or actor streams; the pure parity suite deliberately diverged each of all six non-global subsystems and proved the other gates remained independently eligible.
+- Validation fixed a four-value record-capacity overrun risk and added exhaustive gate-isolation coverage. ABI/parity smoke, LLDB, signed Debug, static analysis, full Swift+C ASan, unsigned Release, legacy macOS/OpenGL, and x86_64/i686 MinGW syntax checks passed.
+- A final 1920x1440 GPU trace contains one labeled Metal 4 command buffer, one scene pass, 86 draws, private textures with persistent samplers, a Clear/Store drawable, and memoryless Clear/DontCare depth. Metal API/GPU validation emitted no Metal fault.
+- M6 also fixed camera-dependent texture corruption by persisting sampler state, honoring clamp precedence, and retaining exact texture generations through GPU completion. A display-link owner-thread guard prevented the screenshot/Spaces crash path; the reproduction then shut down cleanly.
 
 ### M5b Completion Evidence
 
@@ -51,7 +61,9 @@
 - M5b human evidence covers audible playback and route switching, but does not prove broad device compatibility, subjective latency, or long-duration audio quality.
 - Keep native service callbacks real-time safe and owner-explicit: do not expose the legacy object graph to Swift, block the audio render thread, or publish input/audio capabilities before installation succeeds.
 - A sanitizer build reuses `build/sm64-modern-debug`; force a normal native-core rebuild afterward because Make does not encode sanitizer flags into dependency identity.
-- Recheck the macOS 27 AVAudio listener-binding `leaks` variance during long-duration M9 profiling; current bounded RSS was stable and attribution remained inside Apple audio frameworks.
+- Recheck the macOS 27 AVAudio listener-binding `leaks` variance during long-duration M9 profiling; M6 reported 134 allocations/8,544 bytes almost entirely in Apple audio bindings, bounded RSS stabilized near 116.8 MiB, and no M6-owned allocation was identified.
+- M6's unattended real-engine replay covered global/Mario/interaction only. Before migrating a camera or representative actor slice in M7, capture that subsystem in a live scene and require its exact shadow gate to pass.
+- Preserve per-texture sampler state, clamp precedence, exact texture-generation retention, and the display-link owner-thread guard; weakening any of these reopens the M6 texture-corruption or screenshot/Spaces crash regressions.
 
 ## Feature Status
 
@@ -64,7 +76,7 @@
 | Metal 4 rendering | Implemented — complete-scene POD bridge/replay with dynamic MSL, private textures, memoryless depth, samplers, state, display lists, explicit residency/barriers, trace inspection, and clean Metal validation |
 | Native input | Implemented — keyboard/mouse runtime passed; Xbox movement, jump, camera, and menu passed; legacy C-camera ergonomics caveat recorded |
 | Native audio | Implemented — 32 kHz interleaved s16 stereo through a lock-free SPSC ring and owner-thread AVAudioEngine/source-node lifecycle with route recovery |
-| Gameplay parity | Not started |
+| Gameplay parity | Implemented — fixed-width deterministic input/snapshot/effect traces, compatibility fingerprints, first-divergence diagnostics, bounded host streams, and independent per-subsystem Swift authority gates |
 | Swift gameplay | Not started |
 | Full-world 60 Hz | Not started |
 | Signing/notarization | Partial — hardened Apple Development Debug signing works; sustained-execution Release provisioning and Developer ID/notarization remain external/future gates |
@@ -80,7 +92,7 @@
 - M1 is committed as `69b89e0`; `include/sm64_modern.h` is the public ABI, `libsm64core.a` excludes `pc_main_entry.o`, and `make abi-smoke` exercises C/C++ consumption.
 - Lifecycle `initialize`, `step`, `request_stop`, and `shutdown` are single-owner-thread calls. Deep `game_exit()` requests a stop; the host loop owns orderly teardown.
 - The core copies versioned configuration/platform tables during initialization; the platform `context` remains host-owned. Keep Swift away from the legacy C object graph.
-- Gameplay remains at global `cAuthority`; the generic snapshot/effect envelope is intentionally marked `STUB(M6)` until deterministic schemas and record streams exist.
+- Gameplay parity ABI v1 uses fixed-width POD records and host-owned local streams. Never serialize raw pointers or expose C object graphs to Swift; use canonical float bits, behavior identities, and stable object slots.
 - M2 is committed as `8069b55` plus validation fixes `5f8304a`; `project.yml` generates the Swift 6.4/macOS 27 AppKit target and `script/build_and_run.sh` is the canonical build, sign, launch, logging, debugger, and verification entrypoint.
 - The native `SM64_MODERN_NATIVE=1` archive uses `*_NONE`, excludes entry/legacy/API-backend members, and rebuilds when `Makefile` changes; legacy archives retain their original backend objects.
 - `GameView.makeBackingLayer()` owns a `CAMetalLayer` whose `drawableSize` is updated in backing pixels. M2 deliberately creates no `MTLDevice`, display link, drawable, or render commands.
@@ -103,3 +115,8 @@
 - Audio route notifications only set an atomic flag. The engine owner thread stops the graph, discards buffered PCM, reconnects/restarts, and performs recovery before `lifecycle.step()` so the core sees an empty buffer and refills that tick.
 - Preserve audio buffering constants from the legacy SDL policy: 32 kHz interleaved s16 stereo, 1,100 desired frames, 6,000 backlog ceiling, and an 8,192-frame power-of-two ring.
 - M5b is non-rendering and discovery has no audio reference artifact. Validation used source-contract comparison, human audible/routing acceptance, a 960x720 visual regression capture, and Metal validation rather than GPU ground-truth capture.
+- M6 records the normalized pad before `buttonPressed` derivation and captures snapshots after simulation but before presentation. Do not move either boundary when adding Swift candidates.
+- Shadow candidates compare against the C record stream per tick; one subsystem's divergence must not close another subsystem's gate. Swift authority remains unsupported until that subsystem finalizes exact compatible shadow results.
+- Trace headers fingerprint schema, build, initial save state, and subsystem mask. A mismatch is an intentional hard failure rather than a best-effort replay fallback.
+- Sound, rumble, object lifecycle, and PCM checksums are deterministic effects. PCM is hashed before device delivery; parity code must never enter or instrument the real-time AVAudioEngine callback.
+- Renderer texture records own sampler intent per texture generation. Clamp beats mirror/repeat when both legacy flags appear, and retired generations remain alive/resident until shared-event completion.

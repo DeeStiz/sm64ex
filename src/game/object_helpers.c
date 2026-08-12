@@ -1078,7 +1078,7 @@ void cur_obj_unrender_and_reset_state(s32 sp18, s32 sp1C) {
     o->oAction = sp1C;
 }
 
-static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
+void cur_obj_prepare_move_after_thrown_or_dropped(void) {
     o->oMoveFlags = 0;
     o->oFloorHeight = find_floor_height(o->oPosX, o->oPosY + 160.0f, o->oPosZ);
 
@@ -1089,6 +1089,10 @@ static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
         obj_copy_pos(o, gMarioObject);
         o->oFloorHeight = find_floor_height(o->oPosX, o->oPosY, o->oPosZ);
     }
+}
+
+static void cur_obj_move_after_thrown_or_dropped(f32 forwardVel, f32 velY) {
+    cur_obj_prepare_move_after_thrown_or_dropped();
 
     o->oForwardVel = forwardVel;
     o->oVelY = velY;

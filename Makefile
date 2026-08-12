@@ -313,6 +313,7 @@ LIBULTRA := $(BUILD_DIR)/libultra.a
 SM64_MODERN_CORE := $(BUILD_DIR)/libsm64core.a
 SM64_MODERN_ABI_SMOKE := $(BUILD_DIR)/sm64-modern-abi-smoke
 SM64_MODERN_PARITY_SMOKE := $(BUILD_DIR)/sm64-modern-parity-smoke
+SM64_MODERN_MIGRATION_SMOKE := $(BUILD_DIR)/sm64-modern-migration-smoke
 
 ifeq ($(TARGET_WEB),1)
 EXE := $(BUILD_DIR)/$(TARGET).html
@@ -490,6 +491,7 @@ SM64_MODERN_CORE_O_FILES = $(filter-out $(SM64_MODERN_CORE_EXCLUDED_O_FILES),$(O
                            $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES)
 SM64_MODERN_ABI_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_abi_smoke.o
 SM64_MODERN_PARITY_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_gameplay_parity_smoke.o
+SM64_MODERN_MIGRATION_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_gameplay_migration_smoke.o
 
 RPC_LIBS :=
 ifeq ($(DISCORDRPC),1)
@@ -811,6 +813,9 @@ abi-smoke: $(SM64_MODERN_ABI_SMOKE) $(BUILD_DIR)/sm64-modern-abi-cxx.ok
 
 parity-smoke: $(SM64_MODERN_PARITY_SMOKE)
 	$(SM64_MODERN_PARITY_SMOKE)
+
+migration-smoke: $(SM64_MODERN_MIGRATION_SMOKE)
+	$(SM64_MODERN_MIGRATION_SMOKE)
 
 # thank you apple very cool
 ifeq ($(HOST_OS),Darwin)
@@ -1135,6 +1140,8 @@ $(SM64_MODERN_ABI_SMOKE_OBJ): include/sm64_modern.h
 
 $(SM64_MODERN_PARITY_SMOKE_OBJ): include/sm64_modern.h src/pc/sm64_modern_gameplay_parity.h
 
+$(SM64_MODERN_MIGRATION_SMOKE_OBJ): include/sm64_modern.h src/pc/sm64_modern_gameplay_migration.h
+
 $(SM64_MODERN_CORE): Makefile $(SM64_MODERN_CORE_O_FILES)
 	$(RM) $@
 	$(AR) rcs $@ $(SM64_MODERN_CORE_O_FILES)
@@ -1145,10 +1152,13 @@ $(SM64_MODERN_ABI_SMOKE): $(SM64_MODERN_ABI_SMOKE_OBJ) $(SM64_MODERN_CORE)
 $(SM64_MODERN_PARITY_SMOKE): $(SM64_MODERN_PARITY_SMOKE_OBJ) $(SM64_MODERN_CORE)
 	$(LD) -L $(BUILD_DIR) -o $@ $(SM64_MODERN_PARITY_SMOKE_OBJ) $(SM64_MODERN_CORE) $(LDFLAGS)
 
+$(SM64_MODERN_MIGRATION_SMOKE): $(SM64_MODERN_MIGRATION_SMOKE_OBJ) $(SM64_MODERN_CORE)
+	$(LD) -L $(BUILD_DIR) -o $@ $(SM64_MODERN_MIGRATION_SMOKE_OBJ) $(SM64_MODERN_CORE) $(LDFLAGS)
+
 $(EXE): $(SM64_MODERN_ENTRY_OBJ) $(SM64_MODERN_CORE) $(MIO0_FILES:.mio0=.o) $(if $(RPC_LIBS),$(BUILD_DIR)/$(RPC_LIBS),)
 	$(LD) -L $(BUILD_DIR) -o $@ $(SM64_MODERN_ENTRY_OBJ) $(SM64_MODERN_CORE) $(LDFLAGS)
 
-.PHONY: all core native-core abi-smoke parity-smoke clean distclean default diff test load libultra res
+.PHONY: all core native-core abi-smoke parity-smoke migration-smoke clean distclean default diff test load libultra res
 .PRECIOUS: $(BUILD_DIR)/bin/%.elf $(SOUND_BIN_DIR)/%.ctl $(SOUND_BIN_DIR)/%.tbl $(SOUND_SAMPLE_TABLES) $(SOUND_BIN_DIR)/%.s $(BUILD_DIR)/%
 .DELETE_ON_ERROR:
 

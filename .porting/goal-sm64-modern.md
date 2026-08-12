@@ -23,8 +23,8 @@ Create a parallel Apple-silicon macOS 27 application using Swift 6.4, AppKit, Me
 | M4: Metal 4 scene | Dynamic MSL shaders, textures, depth, samplers, state, and display lists render a complete scene. | Complete |
 | M5a: Apple input | GameController, keyboard, and existing mouse-button bindings feed the current controller contracts with focus-safe state clearing. | Complete |
 | M5b: Apple audio | AVAudioEngine output feeds the existing 32 kHz stereo PCM contract through a real-time-safe buffer. | Complete |
-| M6: Gameplay parity | Deterministic replay and field/effect diagnostics gate Swift authority per subsystem. | In progress |
-| M7: Swift gameplay | Approved Mario and representative actor slices run under Swift authority. | Pending |
+| M6: Gameplay parity | Deterministic replay and field/effect diagnostics gate Swift authority per subsystem. | Complete |
+| M7: Swift gameplay | Approved Mario and representative actor slices run under Swift authority. | In progress |
 | M8: Full-world 60 Hz | All interacting logic uses one fixed 1/60-second clock and passes deterministic/time-based gates. | Pending |
 | M9: Release | Performance, validation, leaks, signing, notarization, and clean-machine checks pass. | Pending |
 
