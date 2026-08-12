@@ -2,11 +2,10 @@
 
 ## Current Milestone
 
-- M8 is approved as four bounded slices: M8a timebase foundation, M8b world cadence, M8c world dynamics, and M8d native integration/full-world activation.
-- M8a success criterion: native builds expose one rational simulation timebase, a monotonic fixed-step scheduler, timing telemetry, and deterministic test seams while shipping behavior remains 30 Hz.
-- Approved M8a work: define a native-only rational timebase without changing legacy 30/25 Hz products; replace the coalescing host timer with a single-owner monotonic fixed-step scheduler; add bounded deadline/catch-up telemetry; inventory time-dependent call sites into enforceable test/audit seams; version deterministic traces or fingerprints for the timebase; and add scheduler/timebase smoke coverage through the canonical build/run path.
-- Paired-boundary acceptance is required: every two future native 60 Hz ticks should match one legacy 30 Hz interval wherever state is exactly representable, with explicit documented tolerances reserved for floating-point motion and collision work in M8c.
-- M8a excludes world timer/motion conversion, audio block-count changes, 60 Hz product activation, new Swift gameplay slices, rendering redesign, release work, committed ROM/trace assets, and Git publication.
+- M8a is complete in commit `a6606b5`; the next bounded slice is M8b world cadence.
+- M8b success criterion: scripts, timers, animation, RNG, transitions, HUD, and event cadence preserve elapsed-time behavior on the 60 Hz timebase.
+- Prepare M8b from the checked-in timing inventory and paired-boundary seams. Every two native 60 Hz ticks must match one legacy 30 Hz interval wherever state is exactly representable; do not defer floating-point motion/collision tolerances into this cadence-only slice.
+- M8b must not activate or retune Mario/actor/platform/collision/camera/environmental dynamics, change audio block counts, add Swift gameplay slices, redesign rendering, or broaden into M8c/M8d/M9.
 - Preserve the M7 copied POD boundary and per-subsystem `cAuthority` -> `shadowSwift` -> `swiftAuthority` gates; M8 must not expose the C object graph to Swift, create a second simulation/presentation owner, replace the raw `CAMetalLayer`, or disturb the existing Metal queue/shared-event retirement contract.
 
 ### M8a Execute Evidence
@@ -23,10 +22,11 @@
 - Validation tightened the portable boundary so non-native builds accept only their compiled 30 Hz or EU 25 Hz product clock, including a legacy smoke that rejects a matched 60/60 reconfiguration.
 - The signed Debug app built, launched, ran the 30/1 monotonic scheduler, and shut down at status 0. LLDB stopped in `sm64_modern_get_timebase_api` on the named engine owner thread with the expected Swift-to-C stack.
 - Schema-3 signed record/replay matched 90 ticks exactly: global 753/753, Mario 1710/1710, and interaction 630/630. Focused scheduler/timebase/ABI/parity/migration/audit/audio tests and `git diff --check` passed.
-- A 960x720 window capture showed the intact title scene. A bounded 180-tick API+shader-validation run emitted no Metal fault and drained 357 frames; GPU capture was not applicable because M8a does not modify rendering resources or bindings. Human visual acceptance remains separate.
+- A 960x720 window capture showed the intact title scene. The user identified three black pinholes in the logo O; comparison with legacy OpenGL proved a one-unit duplicated-vertex mismatch in shared title geometry, and welding Y `102` to `103` removed the pinholes in ten sampled Metal and ten sampled OpenGL startup scales without changing the silhouette or materials.
+- A bounded 180-tick API+shader-validation run emitted no Metal fault and drained 357 frames; GPU capture was not applicable because M8a does not modify rendering resources or bindings. Human visual acceptance remains separate beyond the reviewed O repair.
 - Full Swift+C ASan completed a bounded 90-tick app run without a report; the normal native archive was force-rebuilt afterward and contains no ASan references. HUD RSS changed by 208 KiB over the bounded sample.
 - Normal non-HUD `leaks` remained in the known macOS 27 Apple audio `ListenerBinding` family (145-147 allocations, 9,280-9,408 bytes); no M8a-owned scheduler/timebase root was identified. Long-duration leak acceptance remains M9 work.
-- Xcode static analysis, unsigned arm64 Release, the legacy arm64 SDL/OpenGL executable, native and legacy timebase smokes, and x86_64/i686 MinGW timebase syntax checks passed. M8a is validated and awaits `/porting-handoff`; no commit or push was made.
+- Xcode static analysis, unsigned arm64 Release, the legacy arm64 SDL/OpenGL executable, native and legacy timebase smokes, and x86_64/i686 MinGW timebase syntax checks passed. M8a implementation and its reviewed O repair are committed as `a6606b5`.
 
 ### M7 Completion Evidence
 
@@ -95,6 +95,7 @@
 - Repeat the full 3,000-tick live BOB record/shadow, Metal validation, and memory-safety pass against commit `5f0bb63`; the accepted long trace predates the bundle/logging rebrand and is not current-product proof.
 - Verify an unmodified normal entrance to Bob-omb Battlefield has BOB music and motions. Debugger-routed validation deliberately bypassed normal transition state and produced castle intro audio/motion over BOB geometry.
 - M7 live traces fingerprint the signed app directory. Record first, then shadow the exact same product; do not rebuild, relink, or re-sign between those phases.
+- M8b must preserve paired-boundary determinism while converting cadence. Do not change world dynamics or treat display-link presentation frequency as simulation authority.
 
 ## Feature Status
 
@@ -109,7 +110,7 @@
 | Native audio | Implemented — 32 kHz interleaved s16 stereo through a lock-free SPSC ring and owner-thread AVAudioEngine/source-node lifecycle with route recovery |
 | Gameplay parity | Implemented — fixed-width deterministic input/snapshot/effect traces, compatibility fingerprints, first-divergence diagnostics, bounded host streams, and independent per-subsystem Swift authority gates |
 | Swift gameplay | Implemented — copied POD callbacks and exact per-subsystem gates for Mario A/B/Z edges and Bob-omb thrown/dropped release transitions; fresh current-product long validation remains on the watch list |
-| Native timebase | Implemented, validation pending — rational paired-rate ABI, lifecycle-frozen configuration, monotonic fixed-step host scheduler, telemetry, trace fingerprinting, and timing-inventory seams; product remains 30 Hz |
+| Native timebase | Implemented — rational paired-rate ABI, lifecycle-frozen configuration, monotonic fixed-step host scheduler, telemetry, trace fingerprinting, and timing-inventory seams; product remains 30 Hz |
 | Full-world 60 Hz | Not started |
 | Signing/notarization | Partial — hardened Apple Development Debug signing works; sustained-execution Release provisioning and Developer ID/notarization remain external/future gates |
 
@@ -155,3 +156,5 @@
 - M7 Swift kernels own only declared scalar outputs. C retains animation, floor resolution, render helpers, the object graph, and every non-migrated behavior branch through narrow adapters.
 - Candidate transformation substitutes only Swift-owned fields in the complete C reference stream; callback absence/failure, incomplete candidates, or any value mismatch are hard failures rather than silent C fallback.
 - A parity trace fingerprints the signed app directory. Rebuilding or re-signing between record and shadow invalidates the trace at tick zero, so the shadow harness deliberately verifies and reuses the record product.
+- M8a is committed as `a6606b5`. `sm64_modern_timebase` owns exact rational simulation/legacy rates and the compatibility fingerprint; `FixedStepScheduler` owns monotonic deadlines and bounded catch-up on the existing engine thread. Shipping configuration remains 30/1 until later M8 gates deliberately activate 60 Hz.
+- The title-logo O duplicated vertex at `(699, 102, -12)` did not match the adjoining `(699, 103, -12)` vertices, leaving three background pinholes in Metal and OpenGL. Keep the welded coordinate in `levels/intro/leveldata.c`; shader or texture workarounds are incorrect.
