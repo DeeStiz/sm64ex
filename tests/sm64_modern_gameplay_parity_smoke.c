@@ -227,6 +227,10 @@ static void verify_record_capacity_guard(const SM64ModernGameplayParityApiV1 *pa
 
 int main(void) {
     SM64ModernGameplayParityApiV1 parity;
+#ifdef SM64_MODERN_NATIVE
+    SM64ModernTimebaseApiV1 timebase;
+    SM64ModernTimebaseConfigV1 timebase_config;
+#endif
     SM64ModernGameplayParityConfigV1 config;
     SM64ModernGameplayTraceStreamApiV1 stream;
     SM64ModernGameplayParityResultV1 result;
@@ -234,6 +238,10 @@ int main(void) {
     struct MemoryTrace trace;
 
     memset(&parity, 0, sizeof(parity));
+#ifdef SM64_MODERN_NATIVE
+    memset(&timebase, 0, sizeof(timebase));
+    memset(&timebase_config, 0, sizeof(timebase_config));
+#endif
     memset(&trace, 0, sizeof(trace));
     expect_status("parity API",
                   sm64_modern_get_gameplay_parity_api(
@@ -273,6 +281,43 @@ int main(void) {
     expect_status("fingerprint mismatch end",
                   parity.end_session(),
                   SM64_MODERN_STATUS_PARITY_DIVERGED);
+
+#ifdef SM64_MODERN_NATIVE
+    expect_status("timebase API",
+                  sm64_modern_get_timebase_api(
+                      SM64_MODERN_ABI_VERSION_1, sizeof(timebase), &timebase),
+                  SM64_MODERN_STATUS_OK);
+    timebase_config.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    timebase_config.header.struct_size = sizeof(timebase_config);
+    timebase_config.simulation_rate_numerator = 60u;
+    timebase_config.simulation_rate_denominator = 1u;
+    timebase_config.legacy_rate_numerator = 30u;
+    timebase_config.legacy_rate_denominator = 1u;
+    timebase_config.max_catch_up_steps = 2u;
+    expect_status("60 Hz timebase",
+                  timebase.configure(&timebase_config),
+                  SM64_MODERN_STATUS_OK);
+    trace.cursor = 0;
+    config = make_config(SM64_MODERN_GAMEPLAY_PARITY_REPLAY);
+    expect_status("timebase mismatch begin",
+                  parity.begin_session(&config, &stream),
+                  SM64_MODERN_STATUS_PARITY_DIVERGED);
+    memset(&divergence, 0, sizeof(divergence));
+    expect_status("timebase mismatch detail",
+                  parity.get_first_divergence(
+                      SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL, &divergence),
+                  SM64_MODERN_STATUS_OK);
+    expect_u64("timebase mismatch reason",
+               divergence.reason,
+               SM64_MODERN_DIVERGENCE_TRACE_HEADER);
+    expect_status("timebase mismatch end",
+                  parity.end_session(),
+                  SM64_MODERN_STATUS_PARITY_DIVERGED);
+    timebase_config.simulation_rate_numerator = 30u;
+    expect_status("restore 30 Hz timebase",
+                  timebase.configure(&timebase_config),
+                  SM64_MODERN_STATUS_OK);
+#endif
 
     trace.cursor = 0;
     config = make_config(SM64_MODERN_GAMEPLAY_PARITY_REPLAY);

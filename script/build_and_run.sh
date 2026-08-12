@@ -23,6 +23,8 @@ if [[ "$MODE" == "--m7-shadow-live" || "$MODE" == "m7-shadow-live" ]]; then
   codesign --verify --deep --strict "$APP_BUNDLE"
 else
   "$PROJECT_ROOT/script/test_audio_ring.sh"
+  "$PROJECT_ROOT/script/test_fixed_step_scheduler.sh"
+  "$PROJECT_ROOT/script/test_timebase_audit.sh"
   xcodegen generate --spec project.yml
   xcodebuild \
     -project SM64Modern.xcodeproj \
@@ -163,12 +165,15 @@ case "$MODE" in
       'audio_service_started input_hz=32000 format=s16_interleaved_stereo' \
       'audio_enqueue_started' \
       'audio_render_started' \
-      'lifecycle_running cadence_hz=30 capabilities=rendering,input,audio' \
+      'timebase_configured simulation_hz=30/1 legacy_hz=30/1 paired_ticks=1' \
+      'fixed_step_scheduler_started clock=monotonic_raw max_catch_up=2' \
+      'lifecycle_running cadence_hz=30/1 capabilities=rendering,input,audio' \
+      'fixed_step_scheduler_status step=1' \
       'lifecycle_step count=1'; do
       grep -Fq "$expected" <<< "$runtime_log"
     done
     printf '%s\n' "$runtime_log" \
-      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|input_snapshot_started|audio_service_started|audio_enqueue_started|audio_render_started|lifecycle_running|lifecycle_step count=1'
+      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|input_snapshot_started|audio_service_started|audio_enqueue_started|audio_render_started|timebase_configured|fixed_step_scheduler_(started|status)|lifecycle_running|lifecycle_step count=1'
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do
       if ! kill -0 "$app_pid" >/dev/null 2>&1; then
@@ -194,7 +199,7 @@ case "$MODE" in
   --parity-verify|parity-verify)
     PARITY_TEMP="$(mktemp -d "${TMPDIR:-/tmp}/sm64-modern-parity.XXXXXX")"
     trap '/bin/rm -rf -- "$PARITY_TEMP"' EXIT
-    TRACE_PATH="$PARITY_TEMP/gameplay-v2.trace"
+    TRACE_PATH="$PARITY_TEMP/gameplay-v3.trace"
     RECORD_SAVE="$PARITY_TEMP/record-save"
     REPLAY_SAVE="$PARITY_TEMP/replay-save"
     mkdir -p "$RECORD_SAVE" "$REPLAY_SAVE"
@@ -210,7 +215,7 @@ case "$MODE" in
     test -s "$TRACE_PATH"
     record_log="$(/usr/bin/log show --last 2m --style compact \
       --predicate "processIdentifier == $record_pid && subsystem == \"$BUNDLE_ID\"")"
-    grep -Fq 'parity_session_started mode=1 schema=2' <<< "$record_log"
+    grep -Fq 'parity_session_started mode=1 schema=3' <<< "$record_log"
     grep -Fq 'bounded_parity_run_complete steps=90' <<< "$record_log"
     grep -Fq 'parity_session_finished status=0' <<< "$record_log"
 
@@ -224,7 +229,7 @@ case "$MODE" in
     wait_for_app_exit "$replay_pid"
     replay_log="$(/usr/bin/log show --last 2m --style compact \
       --predicate "processIdentifier == $replay_pid && subsystem == \"$BUNDLE_ID\"")"
-    grep -Fq 'parity_session_started mode=2 schema=2' <<< "$replay_log"
+    grep -Fq 'parity_session_started mode=2 schema=3' <<< "$replay_log"
     grep -Fq 'bounded_parity_run_complete steps=90' <<< "$replay_log"
     grep -Fq 'parity_session_finished status=0' <<< "$replay_log"
     if grep -Fq 'parity_first_divergence' <<< "$replay_log"; then
@@ -240,7 +245,7 @@ case "$MODE" in
     M7_TICKS="${SM64_MODERN_M7_TICKS:-1800}"
     M7_BASELINE_SAVE="$M7_DIR/baseline-save"
     M7_RECORD_SAVE="$M7_DIR/record-save"
-    M7_TRACE="$M7_DIR/bob-gameplay-v2.trace"
+    M7_TRACE="$M7_DIR/bob-gameplay-v3.trace"
     if [[ -e "$M7_DIR" ]]; then
       echo "M7 record directory already exists: $M7_DIR" >&2
       echo "Set SM64_MODERN_M7_DIR to a new directory to preserve the existing evidence." >&2
@@ -265,7 +270,7 @@ case "$MODE" in
     test -s "$M7_TRACE"
     record_log="$(/usr/bin/log show --last 15m --style compact \
       --predicate "processIdentifier == $record_pid && subsystem == \"$BUNDLE_ID\"")"
-    grep -Fq 'parity_session_started mode=1 schema=2' <<< "$record_log"
+    grep -Fq 'parity_session_started mode=1 schema=3' <<< "$record_log"
     grep -Fq "bounded_parity_run_complete steps=$M7_TICKS" <<< "$record_log"
     grep -Fq 'parity_result subsystem=4 status=0' <<< "$record_log"
     grep -Fq 'parity_session_finished status=0' <<< "$record_log"
@@ -278,7 +283,7 @@ case "$MODE" in
     M7_TICKS="${SM64_MODERN_M7_TICKS:-1800}"
     M7_SWIFT_TICKS="${SM64_MODERN_M7_SWIFT_TICKS:-1800}"
     M7_BASELINE_SAVE="$M7_DIR/baseline-save"
-    M7_TRACE="$M7_DIR/bob-gameplay-v2.trace"
+    M7_TRACE="$M7_DIR/bob-gameplay-v3.trace"
     M7_SHADOW_SAVE="$M7_DIR/shadow-save-$(date +%Y%m%d-%H%M%S)"
     test -d "$M7_BASELINE_SAVE"
     test -s "$M7_TRACE"
@@ -297,7 +302,7 @@ case "$MODE" in
     wait_for_app_exit_long "$shadow_pid"
     shadow_log="$(/usr/bin/log show --last 15m --style compact \
       --predicate "processIdentifier == $shadow_pid && subsystem == \"$BUNDLE_ID\"")"
-    grep -Fq 'parity_session_started mode=3 schema=2' <<< "$shadow_log"
+    grep -Fq 'parity_session_started mode=3 schema=3' <<< "$shadow_log"
     grep -Fq 'parity_result subsystem=1 status=0' <<< "$shadow_log"
     grep -Fq 'parity_result subsystem=4 status=0' <<< "$shadow_log"
     grep -Fq 'swift_authority_promoted subsystems=1,4' <<< "$shadow_log"

@@ -2,12 +2,41 @@
 
 ## Current Milestone
 
-- M7 success criterion: approved Mario button-edge handling and Bob-omb Battlefield thrown/dropped actor transitions run under Swift authority after their individual exact shadow gates pass.
-- Approved M7 scope: add a copied, versioned POD gameplay-migration callback table; migrate Mario A/B/Z flags plus `framesSinceA/B`; migrate black Bob-omb thrown/dropped action, held, flags, velocity, and visibility outputs; and keep C-only animation/render helpers as narrow adapters.
-- Shadow mode must run C and Swift from the same POD pre-state, submit a complete candidate stream with only Swift-owned fields substituted, preserve gate isolation, and promote only after exact schema/build/save/sequence/value completion. Missing or failed callbacks are hard failures, never silent C fallback.
-- Add bounded Swift coordination and `Logger` telemetry plus ABI, migration, parity, deliberate-divergence, callback-failure, gate-isolation, and local live BOB record/shadow coverage.
-- Exclude full Mario actions, patrol/chase/explosion logic, other actors/levels, interaction/camera migration, M8's 60 Hz clock, rendering changes, release work, and committed ROM/trace assets.
-- Keep C authority as the default and preserve the dedicated owner thread, versioned POD boundary, 30 Hz clock, M4/M5 contracts, portable backends, save compatibility, external ROM policy, and local-only traces.
+- M8 is approved as four bounded slices: M8a timebase foundation, M8b world cadence, M8c world dynamics, and M8d native integration/full-world activation.
+- M8a success criterion: native builds expose one rational simulation timebase, a monotonic fixed-step scheduler, timing telemetry, and deterministic test seams while shipping behavior remains 30 Hz.
+- Approved M8a work: define a native-only rational timebase without changing legacy 30/25 Hz products; replace the coalescing host timer with a single-owner monotonic fixed-step scheduler; add bounded deadline/catch-up telemetry; inventory time-dependent call sites into enforceable test/audit seams; version deterministic traces or fingerprints for the timebase; and add scheduler/timebase smoke coverage through the canonical build/run path.
+- Paired-boundary acceptance is required: every two future native 60 Hz ticks should match one legacy 30 Hz interval wherever state is exactly representable, with explicit documented tolerances reserved for floating-point motion and collision work in M8c.
+- M8a excludes world timer/motion conversion, audio block-count changes, 60 Hz product activation, new Swift gameplay slices, rendering redesign, release work, committed ROM/trace assets, and Git publication.
+- Preserve the M7 copied POD boundary and per-subsystem `cAuthority` -> `shadowSwift` -> `swiftAuthority` gates; M8 must not expose the C object graph to Swift, create a second simulation/presentation owner, replace the raw `CAMetalLayer`, or disturb the existing Metal queue/shared-event retirement contract.
+
+### M8a Execute Evidence
+
+- A separate versioned timebase ABI normalizes exact rational simulation/legacy rates, requires an integral paired-boundary ratio, caps catch-up, fingerprints the complete contract, rejects non-native rate changes, and freezes configuration while the lifecycle is active. Existing lifecycle struct sizes remain unchanged.
+- The AppKit product explicitly configures 30/1 simulation and 30/1 legacy rates. `EngineHost` replaced its repeating Foundation timer with a `CLOCK_MONOTONIC_RAW` rational deadline scheduler on the existing engine owner thread; the run loop is only a wake/source pump, and excess debt is counted after a two-step catch-up bound.
+- Gameplay trace schema 3 qualifies the build fingerprint with the timebase fingerprint. Pure C coverage proves 30/60 paired ratios and tick-zero rejection of a 30 Hz trace under a 60 Hz timebase; Swift coverage proves exact fractional deadlines, early-wake behavior, bounded catch-up, dropped-debt accounting, and the two-to-one future 60/30 boundary.
+- `tests/fixtures/sm64_modern_timebase_audit.tsv` snapshots object timers, Mario action timers, the global timer, RNG calls, and animation sites. The canonical build fails when those categories drift without deliberate reclassification or if `EngineHost` regresses to a repeating Foundation timer.
+- Focused timebase, scheduler, ABI, parity, migration, audio-ring, and audit smokes passed. The signed Debug product built and ran at 30/1 with `paired_ticks=1`, one non-main engine owner, no startup catch-up/drop, unchanged display-link presentation, status-0 shutdown, and a schema-3 90-tick record/replay. A separate non-native SDL/OpenGL product linked successfully without `SM64_MODERN_NATIVE`.
+- This execute evidence was followed by the separate validation gate below; no 60 Hz world behavior has been activated or accepted.
+
+### M8a Validation Evidence
+
+- Validation tightened the portable boundary so non-native builds accept only their compiled 30 Hz or EU 25 Hz product clock, including a legacy smoke that rejects a matched 60/60 reconfiguration.
+- The signed Debug app built, launched, ran the 30/1 monotonic scheduler, and shut down at status 0. LLDB stopped in `sm64_modern_get_timebase_api` on the named engine owner thread with the expected Swift-to-C stack.
+- Schema-3 signed record/replay matched 90 ticks exactly: global 753/753, Mario 1710/1710, and interaction 630/630. Focused scheduler/timebase/ABI/parity/migration/audit/audio tests and `git diff --check` passed.
+- A 960x720 window capture showed the intact title scene. A bounded 180-tick API+shader-validation run emitted no Metal fault and drained 357 frames; GPU capture was not applicable because M8a does not modify rendering resources or bindings. Human visual acceptance remains separate.
+- Full Swift+C ASan completed a bounded 90-tick app run without a report; the normal native archive was force-rebuilt afterward and contains no ASan references. HUD RSS changed by 208 KiB over the bounded sample.
+- Normal non-HUD `leaks` remained in the known macOS 27 Apple audio `ListenerBinding` family (145-147 allocations, 9,280-9,408 bytes); no M8a-owned scheduler/timebase root was identified. Long-duration leak acceptance remains M9 work.
+- Xcode static analysis, unsigned arm64 Release, the legacy arm64 SDL/OpenGL executable, native and legacy timebase smokes, and x86_64/i686 MinGW timebase syntax checks passed. M8a is validated and awaits `/porting-handoff`; no commit or push was made.
+
+### M7 Completion Evidence
+
+- M7 implementation is commit `5f0bb63`: a copied, versioned gameplay-migration callback table plus bounded Swift kernels for Mario A/B/Z button edges and Bob-omb thrown/dropped release transitions.
+- C remains authoritative by default. Shadow Swift receives the same POD pre-state, transforms only its owned candidate fields, and can promote Mario and Bob-omb Battlefield independently only after exact finalization.
+- ABI, migration, and parity smoke tests passed; the current `io.github.deestiz.sm64modern` product rebuilt, signed, launched, shut down with status 0, and passed a 90-tick record/replay (global 753/753, Mario 1710/1710, interaction 630/630).
+- An earlier exact-product 3,000-tick BOB trace matched 4,203,307 actor records, exercised both Swift slices in shadow, promoted subsystems 1 and 4, and completed 1,800 Swift-authority ticks with status 0. Debugger pauses exceeded the wrapper timeout, but every wrapper log predicate passed afterward.
+- That long trace used the pre-rebrand signed product. Because the worktree changed to `io.github.deestiz.sm64modern` during validation, the full live BOB record/shadow and Metal/safety passes still need repetition against commit `5f0bb63` before they can be current-product evidence.
+- Debugger-only level routing mixed castle intro music/motion with BOB geometry. The user identified it during validation; it is harness contamination, not accepted normal-gameplay visual/audio evidence.
+- `script/build_and_run.sh --m7-shadow-live` reuses the exact signed record product rather than rebuilding, because the trace build fingerprint intentionally rejects a relinked app.
 
 ### M6 Completion Evidence
 
@@ -62,8 +91,10 @@
 - Keep native service callbacks real-time safe and owner-explicit: do not expose the legacy object graph to Swift, block the audio render thread, or publish input/audio capabilities before installation succeeds.
 - A sanitizer build reuses `build/sm64-modern-debug`; force a normal native-core rebuild afterward because Make does not encode sanitizer flags into dependency identity.
 - Recheck the macOS 27 AVAudio listener-binding `leaks` variance during long-duration M9 profiling; M6 reported 134 allocations/8,544 bytes almost entirely in Apple audio bindings, bounded RSS stabilized near 116.8 MiB, and no M6-owned allocation was identified.
-- M6's unattended real-engine replay covered global/Mario/interaction only. Before migrating a camera or representative actor slice in M7, capture that subsystem in a live scene and require its exact shadow gate to pass.
 - Preserve per-texture sampler state, clamp precedence, exact texture-generation retention, and the display-link owner-thread guard; weakening any of these reopens the M6 texture-corruption or screenshot/Spaces crash regressions.
+- Repeat the full 3,000-tick live BOB record/shadow, Metal validation, and memory-safety pass against commit `5f0bb63`; the accepted long trace predates the bundle/logging rebrand and is not current-product proof.
+- Verify an unmodified normal entrance to Bob-omb Battlefield has BOB music and motions. Debugger-routed validation deliberately bypassed normal transition state and produced castle intro audio/motion over BOB geometry.
+- M7 live traces fingerprint the signed app directory. Record first, then shadow the exact same product; do not rebuild, relink, or re-sign between those phases.
 
 ## Feature Status
 
@@ -77,7 +108,8 @@
 | Native input | Implemented — keyboard/mouse runtime passed; Xbox movement, jump, camera, and menu passed; legacy C-camera ergonomics caveat recorded |
 | Native audio | Implemented — 32 kHz interleaved s16 stereo through a lock-free SPSC ring and owner-thread AVAudioEngine/source-node lifecycle with route recovery |
 | Gameplay parity | Implemented — fixed-width deterministic input/snapshot/effect traces, compatibility fingerprints, first-divergence diagnostics, bounded host streams, and independent per-subsystem Swift authority gates |
-| Swift gameplay | Not started |
+| Swift gameplay | Implemented — copied POD callbacks and exact per-subsystem gates for Mario A/B/Z edges and Bob-omb thrown/dropped release transitions; fresh current-product long validation remains on the watch list |
+| Native timebase | Implemented, validation pending — rational paired-rate ABI, lifecycle-frozen configuration, monotonic fixed-step host scheduler, telemetry, trace fingerprinting, and timing-inventory seams; product remains 30 Hz |
 | Full-world 60 Hz | Not started |
 | Signing/notarization | Partial — hardened Apple Development Debug signing works; sustained-execution Release provisioning and Developer ID/notarization remain external/future gates |
 
@@ -96,10 +128,10 @@
 - M2 is committed as `8069b55` plus validation fixes `5f8304a`; `project.yml` generates the Swift 6.4/macOS 27 AppKit target and `script/build_and_run.sh` is the canonical build, sign, launch, logging, debugger, and verification entrypoint.
 - The native `SM64_MODERN_NATIVE=1` archive uses `*_NONE`, excludes entry/legacy/API-backend members, and rebuilds when `Makefile` changes; legacy archives retain their original backend objects.
 - `GameView.makeBackingLayer()` owns a `CAMetalLayer` whose `drawableSize` is updated in backing pixels. M2 deliberately creates no `MTLDevice`, display link, drawable, or render commands.
-- `EngineHost` owns lifecycle calls on one dedicated thread, paces legacy simulation at 30 Hz, and synchronously completes owner-thread stop/shutdown before AppKit termination.
+- `EngineHost` owns lifecycle calls on one dedicated thread, uses the rational monotonic fixed-step scheduler at the shipping 30/1 rate, and synchronously completes owner-thread stop/shutdown before AppKit termination.
 - M2 validation passed LLDB, fullscreen/red-close shutdown, Metal-negative validation, full Swift+C ASan, `leaks` (0 bytes), ABI smoke, signature/package checks, and a clean legacy rebuild; the ignored black-window capture is `build/sm64-modern-m2-validation.png`.
 - M3 keeps the core rendering capability at zero while `MetalRenderer` independently proves the native substrate: `BGRA8Unorm`, two reusable Metal 4 command-buffer/allocator slots, the layer residency set on the queue, shared-event slot reuse, exact wait/commit/signal/present ordering, and apply-after-present resize publication.
-- The dedicated engine thread now runs a real `CFRunLoop` with a 30 Hz lifecycle timer and an owner-thread `CAMetalDisplayLink`; AppKit only publishes pixel-size changes and synchronously stops the run loop for teardown.
+- The dedicated engine thread pumps its `CFRunLoop` as the wait/source mechanism for the rational fixed-step scheduler and owner-thread `CAMetalDisplayLink`; AppKit only publishes pixel-size changes and synchronously wakes/stops the run loop for teardown.
 - M3 is committed as `8d7a54b`. Validation on Apple M5 Max passed signed runtime/LLDB, Metal API and GPU validation, full Swift+C ASan, `leaks` (0 bytes), ABI smoke, and clean GPU-drained shutdown.
 - The final M3 capture `/tmp/sm64-modern-m3-validation-44458.gputrace` is 2.7 MB with one labeled reusable command buffer, one labeled clear encoder, zero draws, committed layer residency, a shared event, and a 960x720 `BGRA8Unorm` Clear/Store drawable. The fetched ignored output is `build/sm64-modern-m3-validation-gpu.png`.
 - M4 execute preserves the M3 presentation owner and adds the existing engine's rendering callbacks through `gfx_sm64_modern.c`; Swift never traverses the legacy display-list object graph and instead consumes copied POD draw/texture/state data.
@@ -120,3 +152,6 @@
 - Trace headers fingerprint schema, build, initial save state, and subsystem mask. A mismatch is an intentional hard failure rather than a best-effort replay fallback.
 - Sound, rumble, object lifecycle, and PCM checksums are deterministic effects. PCM is hashed before device delivery; parity code must never enter or instrument the real-time AVAudioEngine callback.
 - Renderer texture records own sampler intent per texture generation. Clamp beats mirror/repeat when both legacy flags appear, and retired generations remain alive/resident until shared-event completion.
+- M7 Swift kernels own only declared scalar outputs. C retains animation, floor resolution, render helpers, the object graph, and every non-migrated behavior branch through narrow adapters.
+- Candidate transformation substitutes only Swift-owned fields in the complete C reference stream; callback absence/failure, incomplete candidates, or any value mismatch are hard failures rather than silent C fallback.
+- A parity trace fingerprints the signed app directory. Rebuilding or re-signing between record and shadow invalidates the trace at tick zero, so the shadow harness deliberately verifies and reuses the record product.

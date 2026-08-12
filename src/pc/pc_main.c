@@ -24,6 +24,7 @@
 #include "platform.h"
 #include "sm64_modern_gameplay_migration.h"
 #include "sm64_modern_gameplay_parity.h"
+#include "sm64_modern_timebase.h"
 
 #ifdef DISCORDRPC
 #include "pc/discord/discordrpc.h"
@@ -239,6 +240,7 @@ static SM64ModernStatus lifecycle_initialize(const SM64ModernLifecycleConfigV1 *
     thread5_game_loop(NULL);
     sGameInitialized = true;
     sLifecycleState = SM64_MODERN_LIFECYCLE_RUNNING;
+    sm64_modern_timebase_set_lifecycle_active(true);
 
 #ifdef EXTERNAL_DATA
     if (configPrecacheRes && (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING)) {
@@ -379,6 +381,7 @@ static SM64ModernStatus lifecycle_shutdown(void) {
     memset(&sPlatform, 0, sizeof(sPlatform));
     sOwnerThread = 0;
     sLifecycleState = SM64_MODERN_LIFECYCLE_STOPPED;
+    sm64_modern_timebase_set_lifecycle_active(false);
     sm64_modern_parity_reset();
     return SM64_MODERN_STATUS_OK;
 }

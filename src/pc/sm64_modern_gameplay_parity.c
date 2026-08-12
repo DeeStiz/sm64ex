@@ -17,6 +17,7 @@
 #include "object_fields.h"
 #include "sm64_modern_gameplay_migration.h"
 #include "sm64_modern_gameplay_parity.h"
+#include "sm64_modern_timebase.h"
 
 #define PARITY_FNV_OFFSET UINT64_C(1469598103934665603)
 #define PARITY_FNV_PRIME UINT64_C(1099511628211)
@@ -462,9 +463,15 @@ static SM64ModernStatus begin_session(const SM64ModernGameplayParityConfigV1 *co
     memcpy(&sStream, stream, sizeof(sStream));
     sSessionActive = true;
 
+    // The build value is deliberately timebase-qualified. Traces captured at
+    // different simulation rates must diverge at their first record rather
+    // than being compared as if their tick numbers represented equal time.
+    const uint64_t timebase_qualified_build = hash_u64(
+        sConfig.build_fingerprint,
+        sm64_modern_timebase_fingerprint());
     const uint64_t header_values[4] = {
         SM64_MODERN_GAMEPLAY_PARITY_SCHEMA_VERSION,
-        sConfig.build_fingerprint,
+        timebase_qualified_build,
         sConfig.initial_state_fingerprint,
         sConfig.subsystem_mask,
     };

@@ -91,7 +91,10 @@ typedef uint32_t SM64ModernGameplayParityMode;
 #define SM64_MODERN_GAMEPLAY_PARITY_REPLAY 2u
 #define SM64_MODERN_GAMEPLAY_PARITY_SHADOW 3u
 
-#define SM64_MODERN_GAMEPLAY_PARITY_SCHEMA_VERSION 2u
+#define SM64_MODERN_GAMEPLAY_PARITY_SCHEMA_VERSION 3u
+
+#define SM64_MODERN_TIMEBASE_RATE_LIMIT 1000u
+#define SM64_MODERN_TIMEBASE_MAX_CATCH_UP_LIMIT 8u
 
 // Stable scalar constants used by the bounded v1 Swift gameplay kernels.
 // These mirror PR/os_cont.h, sm64.h, object_constants.h, and graph_node.h;
@@ -212,6 +215,30 @@ typedef struct SM64ModernLifecycleConfigV1 {
     char config_file[SM64_MODERN_PATH_MAX];
     char window_title[SM64_MODERN_WINDOW_TITLE_MAX];
 } SM64ModernLifecycleConfigV1;
+
+// Rates are exact rational ticks per second. The simulation rate must be an
+// integer multiple of the source product's legacy rate so paired boundaries
+// remain exact (for example, two 60 Hz ticks per one 30 Hz legacy tick).
+typedef struct SM64ModernTimebaseConfigV1 {
+    SM64ModernAbiHeader header;
+    uint32_t simulation_rate_numerator;
+    uint32_t simulation_rate_denominator;
+    uint32_t legacy_rate_numerator;
+    uint32_t legacy_rate_denominator;
+    uint32_t max_catch_up_steps;
+    uint32_t reserved;
+} SM64ModernTimebaseConfigV1;
+
+typedef struct SM64ModernTimebaseSnapshotV1 {
+    SM64ModernAbiHeader header;
+    uint32_t simulation_rate_numerator;
+    uint32_t simulation_rate_denominator;
+    uint32_t legacy_rate_numerator;
+    uint32_t legacy_rate_denominator;
+    uint32_t simulation_ticks_per_legacy_tick;
+    uint32_t max_catch_up_steps;
+    uint64_t fingerprint;
+} SM64ModernTimebaseSnapshotV1;
 
 typedef SM64ModernStatus (*SM64ModernPlatformInitializeFn)(void *context, const char *window_title);
 typedef void (*SM64ModernPlatformShutdownFn)(void *context);
@@ -491,6 +518,14 @@ typedef struct SM64ModernLifecycleApiV1 {
     SM64ModernStatus (*get_state)(SM64ModernLifecycleState *out_state);
 } SM64ModernLifecycleApiV1;
 
+typedef struct SM64ModernTimebaseApiV1 {
+    SM64ModernAbiHeader header;
+    // Configuration is accepted only before lifecycle initialization (or
+    // after shutdown); a running world cannot change rate underneath a tick.
+    SM64ModernStatus (*configure)(const SM64ModernTimebaseConfigV1 *config);
+    SM64ModernStatus (*get_snapshot)(SM64ModernTimebaseSnapshotV1 *out_snapshot);
+} SM64ModernTimebaseApiV1;
+
 // initialize, step, request_stop, and shutdown are single-owner-thread calls.
 // The core copies the versioned lifecycle configuration and platform table
 // during initialize and never retains their caller-owned storage.
@@ -518,6 +553,9 @@ typedef struct SM64ModernGameplayParityApiV1 {
 SM64ModernStatus sm64_modern_get_lifecycle_api(uint32_t requested_version,
                                                uint32_t output_size,
                                                SM64ModernLifecycleApiV1 *out_api);
+SM64ModernStatus sm64_modern_get_timebase_api(uint32_t requested_version,
+                                              uint32_t output_size,
+                                              SM64ModernTimebaseApiV1 *out_api);
 SM64ModernStatus sm64_modern_validate_platform_api(const SM64ModernPlatformApiV1 *platform);
 SM64ModernStatus sm64_modern_validate_input_api(const SM64ModernInputApiV1 *input);
 SM64ModernStatus sm64_modern_install_input_api(const SM64ModernInputApiV1 *input);

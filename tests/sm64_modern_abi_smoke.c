@@ -173,6 +173,7 @@ static void smoke_render_dimensions(void *context, uint32_t *out_width, uint32_t
 
 int main(void) {
     SM64ModernLifecycleApiV1 lifecycle;
+    SM64ModernTimebaseApiV1 timebase;
     SM64ModernGameplayApiV1 gameplay;
     SM64ModernGameplayParityApiV1 parity;
     SM64ModernPlatformApiV1 platform;
@@ -183,6 +184,7 @@ int main(void) {
     int failures = 0;
 
     memset(&lifecycle, 0, sizeof(lifecycle));
+    memset(&timebase, 0, sizeof(timebase));
     memset(&gameplay, 0, sizeof(gameplay));
     memset(&parity, 0, sizeof(parity));
     memset(&platform, 0, sizeof(platform));
@@ -309,6 +311,18 @@ int main(void) {
                                                             sizeof(lifecycle),
                                                             &lifecycle),
                               SM64_MODERN_STATUS_OK);
+    failures += expect_status("small timebase buffer",
+                              sm64_modern_get_timebase_api(
+                                  SM64_MODERN_ABI_VERSION_1,
+                                  sizeof(timebase) - 1,
+                                  &timebase),
+                              SM64_MODERN_STATUS_BUFFER_TOO_SMALL);
+    failures += expect_status("timebase v1",
+                              sm64_modern_get_timebase_api(
+                                  SM64_MODERN_ABI_VERSION_1,
+                                  sizeof(timebase),
+                                  &timebase),
+                              SM64_MODERN_STATUS_OK);
     failures += expect_status("cold lifecycle state", lifecycle.get_state(&state), SM64_MODERN_STATUS_OK);
     if (state != SM64_MODERN_LIFECYCLE_COLD) {
         fprintf(stderr, "cold lifecycle state: expected %u, got %u\n",
@@ -346,6 +360,8 @@ int main(void) {
 
     if (lifecycle.header.abi_version != SM64_MODERN_ABI_VERSION_1
         || lifecycle.header.struct_size != sizeof(lifecycle)
+        || timebase.header.abi_version != SM64_MODERN_ABI_VERSION_1
+        || timebase.header.struct_size != sizeof(timebase)
         || gameplay.header.abi_version != SM64_MODERN_ABI_VERSION_1
         || gameplay.header.struct_size != sizeof(gameplay)
         || parity.header.abi_version != SM64_MODERN_ABI_VERSION_1
@@ -355,6 +371,9 @@ int main(void) {
     }
 
     if (offsetof(SM64ModernLifecycleConfigV1, header) != 0
+        || offsetof(SM64ModernTimebaseConfigV1, header) != 0
+        || offsetof(SM64ModernTimebaseSnapshotV1, header) != 0
+        || offsetof(SM64ModernTimebaseApiV1, header) != 0
         || offsetof(SM64ModernPlatformApiV1, header) != 0
         || offsetof(SM64ModernInputSnapshotV1, header) != 0
         || offsetof(SM64ModernInputApiV1, header) != 0
@@ -374,7 +393,10 @@ int main(void) {
         failures++;
     }
 
-    if (sizeof(SM64ModernMarioButtonInputV1) != 48
+    if (sizeof(SM64ModernTimebaseConfigV1) != 32
+        || sizeof(SM64ModernTimebaseSnapshotV1) != 40
+        || sizeof(SM64ModernTimebaseApiV1) != 24
+        || sizeof(SM64ModernMarioButtonInputV1) != 48
         || sizeof(SM64ModernMarioButtonOutputV1) != 24
         || sizeof(SM64ModernBobombReleaseInputV1) != 40
         || sizeof(SM64ModernBobombReleaseOutputV1) != 36

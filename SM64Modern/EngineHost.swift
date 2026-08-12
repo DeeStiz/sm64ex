@@ -155,10 +155,6 @@ final class EngineHost: @unchecked Sendable {
         case failed
     }
 
-    // STUB(M8): replace legacy 30 Hz pacing with the audited deterministic
-    // 1/60-second full-world clock.
-    private static let legacyStepInterval = 1.0 / 30.0
-
     private let condition = NSCondition()
     private var state: State = .idle
     private var stopRequested = false
@@ -167,6 +163,7 @@ final class EngineHost: @unchecked Sendable {
     private var stepCount: UInt64 = 0
     private var engineRunStatus = SM64_MODERN_STATUS_OK
     private var lifecycle = SM64ModernLifecycleApiV1()
+    private var timebaseSnapshot = SM64ModernTimebaseSnapshotV1()
     private var parityCoordinator: GameplayParityCoordinator?
     private let gameplayService = SwiftGameplayService()
     private var automaticTerminationRequested = false
@@ -178,6 +175,11 @@ final class EngineHost: @unchecked Sendable {
     private var metalRenderer: MetalRenderer?
     private var pendingDrawableSize: CGSize?
     private var engineRunLoop: CFRunLoop?
+    private var schedulerWakeCount: UInt64 = 0
+    private var schedulerLateWakeCount: UInt64 = 0
+    private var schedulerCatchUpSteps: UInt64 = 0
+    private var schedulerDroppedSteps: UInt64 = 0
+    private var schedulerMaximumLatenessNanoseconds: UInt64 = 0
 
     var isCurrentEngineThread: Bool {
         condition.withLock {
@@ -240,6 +242,7 @@ final class EngineHost: @unchecked Sendable {
         condition.broadcast()
         if let runLoop {
             CFRunLoopStop(runLoop)
+            CFRunLoopWakeUp(runLoop)
         }
         while state != .stopped && state != .failed {
             condition.wait()
@@ -275,16 +278,12 @@ final class EngineHost: @unchecked Sendable {
             state = .running
             condition.broadcast()
         }
-        engineLogger.notice("lifecycle_running cadence_hz=30 capabilities=rendering,input,audio")
+        engineLogger.notice(
+            "lifecycle_running cadence_hz=\(self.timebaseSnapshot.simulation_rate_numerator)/\(self.timebaseSnapshot.simulation_rate_denominator) capabilities=rendering,input,audio"
+        )
 
         engineRunStatus = SM64_MODERN_STATUS_OK
-        let stepTimer = Timer(timeInterval: Self.legacyStepInterval, repeats: true) { [self] _ in
-            stepCoreOnEngineThread()
-        }
-        RunLoop.current.add(stepTimer, forMode: .common)
-        stepTimer.fire()
-        CFRunLoopRun()
-        stepTimer.invalidate()
+        runFixedStepLoop()
 
         if engineRunStatus == SM64_MODERN_STATUS_OK && condition.withLock({ stopRequested }) {
             let reason = condition.withLock { requestedExitReason }
@@ -312,6 +311,60 @@ final class EngineHost: @unchecked Sendable {
                 NSApplication.shared.terminate(nil)
             }
         }
+    }
+
+    private func runFixedStepLoop() {
+        precondition(isCurrentEngineThread)
+        var scheduler = RationalFixedStepScheduler(
+            rateNumerator: timebaseSnapshot.simulation_rate_numerator,
+            rateDenominator: timebaseSnapshot.simulation_rate_denominator,
+            maxCatchUpSteps: timebaseSnapshot.max_catch_up_steps
+        )
+        scheduler.start(atNanoseconds: MonotonicClock.nowNanoseconds())
+        engineLogger.notice(
+            "fixed_step_scheduler_started clock=monotonic_raw max_catch_up=\(self.timebaseSnapshot.max_catch_up_steps)"
+        )
+
+        while engineRunStatus == SM64_MODERN_STATUS_OK,
+              !condition.withLock({ stopRequested }) {
+            let plan = scheduler.plan(atNanoseconds: MonotonicClock.nowNanoseconds())
+            schedulerWakeCount += 1
+            if plan.latenessNanoseconds >= 1_000_000 {
+                schedulerLateWakeCount += 1
+            }
+            if plan.dueSteps > 1 {
+                schedulerCatchUpSteps += UInt64(plan.dueSteps - 1)
+            }
+            schedulerDroppedSteps += plan.droppedSteps
+            schedulerMaximumLatenessNanoseconds = max(
+                schedulerMaximumLatenessNanoseconds,
+                plan.latenessNanoseconds
+            )
+
+            if plan.dueSteps == 0 {
+                let waitSeconds = min(Double(plan.waitNanoseconds) / 1_000_000_000, 1.0)
+                _ = CFRunLoopRunInMode(.defaultMode, waitSeconds, true)
+                continue
+            }
+
+            for _ in 0..<plan.dueSteps {
+                stepCoreOnEngineThread()
+                if engineRunStatus != SM64_MODERN_STATUS_OK
+                    || condition.withLock({ stopRequested }) {
+                    break
+                }
+            }
+            if stepCount == 1 || stepCount.isMultiple(of: 300) {
+                logSchedulerStatus()
+            }
+        }
+        logSchedulerStatus(event: "fixed_step_scheduler_finished")
+    }
+
+    private func logSchedulerStatus(event: String = "fixed_step_scheduler_status") {
+        engineLogger.notice(
+            "\(event, privacy: .public) step=\(self.stepCount) wakes=\(self.schedulerWakeCount) late_wakes=\(self.schedulerLateWakeCount) catch_up_steps=\(self.schedulerCatchUpSteps) dropped_steps=\(self.schedulerDroppedSteps) max_late_ns=\(self.schedulerMaximumLatenessNanoseconds)"
+        )
     }
 
     private func stepCoreOnEngineThread() {
@@ -379,6 +432,33 @@ final class EngineHost: @unchecked Sendable {
         )
         guard status == SM64_MODERN_STATUS_OK else { return status }
         self.lifecycle = lifecycle
+
+        var timebase = SM64ModernTimebaseApiV1()
+        status = sm64_modern_get_timebase_api(
+            SM64_MODERN_ABI_VERSION_1,
+            UInt32(MemoryLayout<SM64ModernTimebaseApiV1>.size),
+            &timebase
+        )
+        guard status == SM64_MODERN_STATUS_OK else { return status }
+        var timebaseConfig = SM64ModernTimebaseConfigV1()
+        timebaseConfig.header.abi_version = SM64_MODERN_ABI_VERSION_1
+        timebaseConfig.header.struct_size = UInt32(MemoryLayout<SM64ModernTimebaseConfigV1>.size)
+        // M8a deliberately preserves the shipping cadence. STUB(M8d): switch
+        // native simulation to 60/1 only after M8b/M8c convert world timing.
+        timebaseConfig.simulation_rate_numerator = 30
+        timebaseConfig.simulation_rate_denominator = 1
+        timebaseConfig.legacy_rate_numerator = 30
+        timebaseConfig.legacy_rate_denominator = 1
+        timebaseConfig.max_catch_up_steps = 2
+        status = timebase.configure(&timebaseConfig)
+        guard status == SM64_MODERN_STATUS_OK else { return status }
+        var timebaseSnapshot = SM64ModernTimebaseSnapshotV1()
+        status = timebase.get_snapshot(&timebaseSnapshot)
+        guard status == SM64_MODERN_STATUS_OK else { return status }
+        self.timebaseSnapshot = timebaseSnapshot
+        engineLogger.notice(
+            "timebase_configured simulation_hz=\(timebaseSnapshot.simulation_rate_numerator)/\(timebaseSnapshot.simulation_rate_denominator) legacy_hz=\(timebaseSnapshot.legacy_rate_numerator)/\(timebaseSnapshot.legacy_rate_denominator) paired_ticks=\(timebaseSnapshot.simulation_ticks_per_legacy_tick) fingerprint=\(timebaseSnapshot.fingerprint)"
+        )
 
         var config = SM64ModernLifecycleConfigV1()
         config.header.abi_version = SM64_MODERN_ABI_VERSION_1
