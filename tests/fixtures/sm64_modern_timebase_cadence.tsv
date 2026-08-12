@@ -1,18 +1,19 @@
 category	scope	source	symbol	unit	cadence_policy	status	reason
 named_timer_field	M8b	include/object_fields.h	oTimer	legacy_frame	paired_boundary	audited	Generic object timer is a legacy-domain script clock; its paired advance must remain one 30 Hz interval.
-named_timer_field	M8c	include/object_fields.h	oIntangibleTimer	native_tick	defer_m8c	deferred	Intangibility lifetime is object/interaction dynamics and remains outside M8b.
+named_timer_field	M8c	include/object_fields.h	oIntangibleTimer	native_tick	native_each_tick	audited	Intangibility lifetime is cleared and decremented by the native collision pass.
 named_timer_field	M8b	include/object_fields.h	oUnlockDoorStarTimer	legacy_frame	paired_boundary	audited	Unlock-door star presentation is a cutscene/event timer and must preserve legacy thresholds.
 named_timer_field	M8b	include/object_fields.h	oUkikiTextboxTimer	legacy_frame	event_ordered	audited	Ukiki textbox sequencing is a legacy event clock; sound delivery remains a later boundary.
 named_timer_field	M8b	include/object_fields.h	oTTCPendulumSoundTimer	legacy_frame	event_ordered	audited	Pendulum sound-event timing is retained in legacy frame units while delivery is deferred.
-named_timer_field	M8c	include/object_fields.h	oPlatformTimer	native_tick	defer_m8c	deferred	Platform motion/lifetime is M8c dynamics, not an M8b timer conversion.
+named_timer_field	M8c	include/object_fields.h	oPlatformTimer	native_tick	native_each_tick	audited	Platform motion/lifetime is advanced by native object behavior bodies.
 named_timer_field	M8b	include/types.h	animTimer	legacy_frame	paired_boundary	audited	Animation double-update suppression follows the legacy area-update cadence.
 named_timer_field	M8b	include/types.h	bhvDelayTimer	legacy_frame	paired_boundary	audited	Behavior DELAY state advances on the legacy script cadence.
-named_timer_field	M8c	include/types.h	actionTimer	native_tick	defer_m8c	deferred	Generic Mario actionTimer remains on the interim whole-pass legacy hold pending the M8c action and dynamics split; it is not independently retimed in M8b.
-named_timer_field	M8c	include/types.h	capTimer	native_tick	defer_m8c	deferred	Mario cap lifetime is gameplay dynamics and waits for M8c ownership.
+named_timer_field	M8c	include/types.h	actionTimer	native_tick	native_each_tick	audited	Mario action bodies now run on every admitted native dynamics step.
+named_timer_field	M8c	include/types.h	capTimer	native_tick	native_each_tick	audited	Mario cap lifetime is owned by the native Mario dynamics body.
 object_timer	M8b	src/engine/behavior_script.c	cur_obj_update	legacy_frame	paired_boundary	audited	The behavior-script step owns generic oTimer reset/increment and must not run twice per legacy frame.
-object_timer	M8c	src/game/obj_behaviors_2.c	obj_move_for_one_second	native_tick	defer_m8c	deferred	Object movement and one-second lifetime are dynamics explicitly excluded from M8b.
+object_timer	M8c	src/game/obj_behaviors_2.c	obj_move_for_one_second	native_tick	native_each_tick	audited	Object movement and lifetime run from the current native behavior body.
+behavior_script	M8c	src/engine/behavior_script.c	cur_obj_update_native_behavior	native_tick	native_each_tick	audited	Held native steps execute only the current CALL_NATIVE run without advancing legacy script control state.
 mario_action_timer	M8b	src/game/mario_actions_cutscene.c	act_reading_npc_dialog	legacy_frame	paired_boundary	audited	Cutscene/dialog action timing is a legacy event cadence.
-mario_action_timer	M8c	src/game/mario_actions_airborne.c	act_jump	native_tick	defer_m8c	deferred	Airborne action timing is coupled to Mario movement and physics.
+mario_action_timer	M8c	src/game/mario_actions_airborne.c	act_jump	native_tick	native_each_tick	audited	Airborne action timing is coupled to the native Mario movement step.
 level_script	M8b	src/engine/level_script.c	level_cmd_sleep	legacy_frame	paired_boundary	audited	SLEEP delay thresholds must consume one legacy frame over each native 60/30 pair.
 level_script	M8b	src/engine/level_script.c	level_cmd_sleep2	legacy_frame	paired_boundary	audited	SLEEP2 has an independent delay register that needs the same paired policy.
 level_script	M8b	src/engine/level_script.c	level_cmd_call_loop	legacy_frame	event_ordered	audited	CALL_LOOP pause/resume ordering is script cadence and must not be duplicated on the half tick.
@@ -22,17 +23,22 @@ behavior_script	M8b	src/engine/behavior_script.c	bhv_cmd_delay_var	legacy_frame	
 random_calls	M8b	src/engine/behavior_script.c	random_seed_get	legacy_frame	event_ordered	audited	The shared RNG state is an M8b determinism seam; draws must not be duplicated by a half tick.
 random_calls	M8b	src/engine/behavior_script.c	bhv_cmd_set_random_float	legacy_frame	event_ordered	audited	Script random commands preserve legacy draw count and order at paired boundaries.
 random_calls	M8b	src/engine/behavior_script.c	bhv_cmd_set_random_int	legacy_frame	event_ordered	audited	Script random integer commands preserve legacy draw count and order at paired boundaries.
-random_calls	M8c	src/game/object_helpers.c	random_f32_around_zero	native_tick	defer_m8c	deferred	Object random offsets feed actor/object dynamics and are outside M8b.
-random_calls	M8c	src/game/obj_behaviors_2.c	random_linear_offset	native_tick	defer_m8c	deferred	Behavior helper random offsets are consumed by object dynamics.
-random_calls	M8c	src/game/obj_behaviors_2.c	random_mod_offset	native_tick	defer_m8c	deferred	Behavior helper random modulo offsets are consumed by object dynamics.
-random_calls	M8c	src/game/obj_behaviors_2.c	obj_random_fixed_turn	native_tick	defer_m8c	deferred	Random turn selection belongs to actor movement and remains an M8c concern.
-random_calls	M8c	src/game/camera.c	random_vec3s	native_tick	defer_m8c	deferred	Camera random vectors are camera dynamics and are not converted in M8b.
+random_calls	M8c	src/game/object_helpers.c	random_f32_around_zero	native_tick	native_each_tick	audited	Object random offsets feed actor/object dynamics on native steps.
+random_calls	M8c	src/game/obj_behaviors_2.c	random_linear_offset	native_tick	native_each_tick	audited	Behavior helper random offsets are consumed by native object dynamics.
+random_calls	M8c	src/game/obj_behaviors_2.c	random_mod_offset	native_tick	native_each_tick	audited	Behavior helper random modulo offsets are consumed by native object dynamics.
+random_calls	M8c	src/game/obj_behaviors_2.c	obj_random_fixed_turn	native_tick	native_each_tick	audited	Random turn selection belongs to native actor movement.
+random_calls	M8c	src/game/camera.c	random_vec3s	native_tick	native_each_tick	audited	Camera random vectors are consumed by native camera dynamics.
 behavior_script	M8b	src/engine/behavior_script.c	bhv_cmd_animate	legacy_frame	paired_boundary	audited	Behavior animation command advances on the legacy world cadence.
 behavior_script	M8b	src/engine/behavior_script.c	bhv_cmd_animate_texture	legacy_frame	paired_boundary	audited	Texture animation modulo gGlobalTimer must preserve legacy frame thresholds.
 animation_sites	M8b	src/engine/graph_node.c	geo_update_animation_frame	legacy_frame	paired_boundary	audited	Central animation frame advancement is an M8b cadence seam.
 animation_sites	M8b	src/game/rendering_graph_node.c	geo_set_animation_globals	legacy_frame	paired_boundary	audited	The renderer-facing animation globals must observe one area-update value per legacy interval.
 area_cadence	M8b	src/game/rendering_graph_node.c	gAreaUpdateCounter	legacy_frame	paired_boundary	audited	Area counter is the shared legacy animation cadence and advances once per admitted area-update invocation; normal/basic-update, level-script transition, and menu callers own mode-specific invocation exclusivity.
-area_cadence	M8c	src/game/area.c	area_update_objects	native_tick	defer_m8c	deferred	Object update, collision, and dynamics remain M8c; this interim whole-pass legacy hold skips held native passes pending the M8c split.
+area_cadence	M8c	src/game/area.c	area_update_objects	native_tick	native_each_tick	audited	Object update, collision, platform, and dynamics passes are admitted on every native step while the area counter remains paired-boundary.
+presentation	M8c	src/game/paintings.c	paintings_update_dynamics	native_tick	native_each_tick	audited	Painting floor and ripple mutation has one simulation owner and is no longer render-owned.
+presentation	M8c	src/game/moving_texture.c	geo_movtex_pause_control	native_tick	native_each_tick	audited	Moving-texture offsets observe the admitted native simulation tick.
+presentation	M8c	src/game/level_geo.c	geo_envfx_main	native_tick	native_each_tick	audited	Environment particle cache invalidation follows native simulation cadence.
+presentation	M8c	src/game/platform_displacement.c	apply_mario_platform_displacement	native_tick	native_each_tick	audited	Mario receives moving-platform displacement on each native dynamics pass.
+transition	M8c	src/game/camera.c	update_camera	native_tick	native_each_tick	audited	Continuous camera follow and shake consume native object transforms; cutscene timers remain paired-boundary.
 animation_event	M8b	src/game/spawn_sound.c	exec_anim_sound_state	legacy_frame	event_ordered	audited	Animation-frame sound event selection preserves legacy frame order; audio output is deferred.
 animation_event	M8b	src/game/obj_behaviors_2.c	cur_obj_play_sound_at_anim_range	legacy_frame	event_ordered	audited	Animation-range event selection is M8b timing even though audio delivery is M8d.
 global_timer	M8b	src/game/game_init.c	gGlobalTimer	legacy_frame	paired_boundary	audited	Global timer consumers use legacy frame modulo/threshold semantics and require one paired advance.
@@ -51,12 +57,13 @@ transition	M8b	src/game/level_update.c	play_mode_change_level	legacy_frame	paire
 transition	M8b	src/game/camera.c	gCutsceneTimer	legacy_frame	paired_boundary	audited	Cutscene timer thresholds are legacy transition/event cadence; level_cmd_call_loop is the governing M8b gate for this camera seam.
 transition	M8b	src/game/camera.c	play_cutscene	legacy_frame	event_ordered	audited	Cutscene event dispatch preserves timer-triggered ordering under the level_cmd_call_loop gate; no direct camera 60 Hz edit is required.
 transition	M8b	src/game/paintings.c	move_ddd_painting	legacy_frame	paired_boundary	audited	DDD painting transition/save event advancement is paired-boundary M8b; continuous painting, floor, and ripple motion remains M8c.
+transition	M8c	src/game/paintings.c	move_ddd_painting	native_tick	native_each_tick	audited	DDD painting position advances continuously while the moved-back save flag remains boundary-gated.
 save	M8b	src/game/mario_actions_cutscene.c	handle_save_menu	legacy_frame	event_ordered	audited	Cutscene save-menu persistence is an M8b event sink; the owning action/object pass remains on the interim legacy hold until M8c splits dynamics.
 save	M8b	src/menu/file_select.c	save_file_erase	legacy_frame	event_ordered	audited	File-select erase persistence is gated by the legacy menu event boundary and must not repeat on a held native redraw.
 save	M8b	src/menu/file_select.c	save_file_copy	legacy_frame	event_ordered	audited	File-select copy persistence is a legacy menu event and must retain one ordered save operation per admitted boundary.
 save	M8b	src/game/paintings.c	save_file_set_flags	legacy_frame	event_ordered	audited	DDD moved-back save-flag persistence follows move_ddd_painting on the paired legacy boundary.
-save	M8c	src/game/interaction.c	save_file_set_cap_pos	native_tick	defer_m8c	deferred	Cap-position persistence is coupled to actor/interaction dynamics and remains outside M8b until M8c ownership is integrated.
-presentation	M8c	src/game/paintings.c	painting_update_floors	native_tick	defer_m8c	deferred	Continuous painting floor/ripple and render-mutation updates remain M8c dynamics/presentation and are not retimed in M8b.
+save	M8c	src/game/interaction.c	save_file_set_cap_pos	native_tick	native_each_tick	audited	Cap-position persistence is reached by the native Mario interaction body once per dynamics step.
+presentation	M8c	src/game/paintings.c	painting_update_floors	native_tick	native_each_tick	audited	Painting floor/ripple state is advanced by paintings_update_dynamics and rendering only consumes it.
 hud	M8b	src/game/hud.c	sPowerMeterVisibleTimer	legacy_frame	render_cadence	audited	Power-meter visibility/emphasis thresholds are legacy HUD timing.
 hud	M8b	src/game/hud.c	render_hud_power_meter	legacy_frame	render_cadence	audited	Power-meter render path currently mutates its timer and needs explicit paired ownership.
 hud	M8b	src/game/hud.c	render_hud_timer	legacy_frame	render_cadence	audited	HUD timer conversion is explicitly based on the legacy 30-frame contract.

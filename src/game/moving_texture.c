@@ -13,6 +13,7 @@
 #include "geo_misc.h"
 #include "rendering_graph_node.h"
 #include "object_list_processor.h"
+#include "pc/sm64_modern_timebase.h"
 
 /**
  * This file contains functions for generating display lists with moving textures
@@ -335,9 +336,12 @@ Gfx *geo_movtex_pause_control(s32 callContext, UNUSED struct GraphNode *node, UN
     if (callContext != GEO_CONTEXT_RENDER) {
         gMovtexCounterPrev = gAreaUpdateCounter - 1;
         gMovtexCounter = gAreaUpdateCounter;
-    } else {
+    } else if (sm64_modern_timebase_should_advance_native_dynamics()) {
+        // Moving-texture vertex offsets are continuous presentation state.
+        // Key them to the admitted native tick rather than the paired logical
+        // area counter so a held 60/30 redraw receives the current offset.
         gMovtexCounterPrev = gMovtexCounter;
-        gMovtexCounter = gAreaUpdateCounter;
+        gMovtexCounter = (s16) sm64_modern_timebase_simulation_tick();
     }
     return NULL;
 }

@@ -8,7 +8,7 @@
 
 #define TIMEBASE_FNV_OFFSET UINT64_C(1469598103934665603)
 #define TIMEBASE_FNV_PRIME UINT64_C(1099511628211)
-#define TIMEBASE_CADENCE_POLICY_VERSION 2u
+#define TIMEBASE_CADENCE_POLICY_VERSION 3u
 
 #ifdef VERSION_EU
 #define LEGACY_RATE_NUMERATOR 25u
@@ -93,6 +93,23 @@ bool sm64_modern_timebase_should_advance_legacy_domain(void) {
     return !sLifecycleActive
         || sSimulationTicksPerLegacyTick <= 1u
         || (sSimulationStepStarted && sLegacyBoundary);
+}
+
+bool sm64_modern_timebase_should_advance_native_dynamics(void) {
+    // Dynamics are admitted on every native simulation step.  Inactive
+    // callers retain the historical direct-call behavior, while an active
+    // lifecycle must first be admitted by begin_simulation_step() so setup
+    // code cannot mutate the world between lifecycle ticks.
+    return !sLifecycleActive
+        || sSimulationTicksPerLegacyTick <= 1u
+        || sSimulationStepStarted;
+}
+
+float sm64_modern_timebase_native_step_scale(void) {
+    if (!sLifecycleActive || sSimulationTicksPerLegacyTick <= 1u) {
+        return 1.0f;
+    }
+    return 1.0f / (float) sSimulationTicksPerLegacyTick;
 }
 
 bool sm64_modern_timebase_is_legacy_boundary(void) {

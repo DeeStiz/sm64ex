@@ -7,6 +7,7 @@
 #include "object_helpers.h"
 #include "object_list_processor.h"
 #include "platform_displacement.h"
+#include "pc/sm64_modern_timebase.h"
 #include "types.h"
 
 u16 D_8032FEC0 = 0;
@@ -103,6 +104,7 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
     UNUSED s16 unused2;
     UNUSED s16 unused3;
     f32 displaceMatrix[4][4];
+    const f32 nativeStepScale = sm64_modern_timebase_native_step_scale();
 
     rotation[0] = platform->oAngleVelPitch;
     rotation[1] = platform->oAngleVelYaw;
@@ -117,8 +119,8 @@ void apply_platform_displacement(u32 isMario, struct Object *platform) {
         z = gCurrentObject->oPosZ;
     }
 
-    x += platform->oVelX;
-    z += platform->oVelZ;
+    x += platform->oVelX * nativeStepScale;
+    z += platform->oVelZ * nativeStepScale;
 
     if (rotation[0] != 0 || rotation[1] != 0 || rotation[2] != 0) {
         unused1 = rotation[0];

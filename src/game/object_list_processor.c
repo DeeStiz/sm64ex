@@ -631,19 +631,21 @@ static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  */
 void update_objects(UNUSED s32 unused) {
     s64 cycleCounts[30];
+    const bool advanceLegacyDomain = sm64_modern_timebase_should_advance_legacy_domain();
 
-    // STUB(M8c): This pass still combines behavior scripts, timers, RNG,
-    // movement, collision preparation, and other continuous dynamics. Admit
-    // the complete pass only at the legacy boundary until M8c splits and
-    // retimes those domains. This guard covers every area_update_objects()
-    // entry point; cur_obj_update() has an additional direct-call fence.
-    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+    // The area entry point admits this pass on every native simulation step.
+    // Legacy counters and time-stop latches remain boundary-owned below,
+    // while surfaces, object-native behavior, platform displacement, and
+    // collision preparation are continuous dynamics.
+    if (!sm64_modern_timebase_should_advance_native_dynamics()) {
         return;
     }
 
     cycleCounts[0] = get_current_clock();
 
-    gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR;
+    if (advanceLegacyDomain) {
+        gTimeStopState &= ~TIME_STOP_MARIO_OPENED_DOOR;
+    }
 
     gNumRoomedObjectsInMarioRoom = 0;
     gNumRoomedObjectsNotInMarioRoom = 0;
@@ -689,12 +691,15 @@ void update_objects(UNUSED s32 unused) {
     cycleCounts[0] = 0;
     try_print_debug_mario_object_info();
 
-    // If time stop was enabled this frame, activate it now so that it will
-    // take effect next frame
-    if (gTimeStopState & TIME_STOP_ENABLED) {
-        gTimeStopState |= TIME_STOP_ACTIVE;
-    } else {
-        gTimeStopState &= ~TIME_STOP_ACTIVE;
+    // If time stop was enabled on the logical boundary, activate it now so
+    // that it will take effect on the next logical interval.  Held native
+    // steps must not toggle the latch twice.
+    if (advanceLegacyDomain) {
+        if (gTimeStopState & TIME_STOP_ENABLED) {
+            gTimeStopState |= TIME_STOP_ACTIVE;
+        } else {
+            gTimeStopState &= ~TIME_STOP_ACTIVE;
+        }
     }
 
     gPrevFrameObjectCount = gObjectCounter;

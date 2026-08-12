@@ -8,6 +8,7 @@
 #include "camera.h"
 #include "envfx_snow.h"
 #include "level_geo.h"
+#include "pc/sm64_modern_timebase.h"
 
 /**
  * Geo function that generates a displaylist for environment effects such as
@@ -24,8 +25,11 @@ Gfx *geo_envfx_main(s32 callContext, struct GraphNode *node, Mat4 mtxf) {
         struct GraphNodeGenerated *execNode = (struct GraphNodeGenerated *) node;
         u32 *params = &execNode->parameter; // accessed a s32 as 2 u16s by pointing to the variable and
                                             // casting to a local struct as necessary.
+        const u16 updateCounter = sm64_modern_timebase_lifecycle_active()
+            ? (u16) sm64_modern_timebase_simulation_tick()
+            : gAreaUpdateCounter;
 
-        if (GET_HIGH_U16_OF_32(*params) != gAreaUpdateCounter) {
+        if (GET_HIGH_U16_OF_32(*params) != updateCounter) {
             UNUSED struct Camera *sp2C = gCurGraphNodeCamera->config.camera;
             s32 snowMode = GET_LOW_U16_OF_32(*params);
 
@@ -42,7 +46,7 @@ Gfx *geo_envfx_main(s32 callContext, struct GraphNode *node, Mat4 mtxf) {
                 gSPBranchList(&gfx[1], VIRTUAL_TO_PHYSICAL(particleList));
                 execNode->fnNode.node.flags = (execNode->fnNode.node.flags & 0xFF) | 0x400;
             }
-            SET_HIGH_U16_OF_32(*params, gAreaUpdateCounter);
+            SET_HIGH_U16_OF_32(*params, updateCounter);
         }
     } else if (callContext == GEO_CONTEXT_AREA_INIT) {
         // Give these arguments some dummy values. Not used in ENVFX_MODE_NONE

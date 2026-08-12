@@ -1097,6 +1097,13 @@ s32 play_mode_change_area(void) {
         if (sTransitionTimer > 0) {
             sTransitionTimer -= 1;
         }
+    } else if (sm64_modern_timebase_should_advance_native_dynamics()
+               && sTransitionUpdate == (void (*)(s16 *)) - 1) {
+        // The sentinel transition has no script callback; keep its camera
+        // follow/shake continuous while the fade timer remains boundary-owned.
+        sm64_modern_parity_enter_subsystem(SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA);
+        update_camera(gCurrentArea->camera);
+        sm64_modern_parity_leave_subsystem();
     }
 
     //! If sTransitionTimer is -1, this will miss.

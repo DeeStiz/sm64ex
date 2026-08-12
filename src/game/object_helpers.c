@@ -1219,7 +1219,8 @@ static void apply_drag_to_value(f32 *value, f32 dragStrength) {
 
     if (*value != 0) {
         //! Can overshoot if |*value| > 1/(dragStrength * 0.0001)
-        decel = (*value) * (*value) * (dragStrength * 0.0001L);
+        decel = (*value) * (*value) * (dragStrength * 0.0001L)
+              * sm64_modern_timebase_native_step_scale();
 
         if (*value > 0) {
             *value -= decel;
@@ -1242,9 +1243,10 @@ void cur_obj_apply_drag_xz(f32 dragStrength) {
 
 static s32 cur_obj_move_xz(f32 steepSlopeNormalY, s32 careAboutEdgesAndSteepSlopes) {
     struct Surface *intendedFloor;
+    const f32 nativeStepScale = sm64_modern_timebase_native_step_scale();
 
-    f32 intendedX = o->oPosX + o->oVelX;
-    f32 intendedZ = o->oPosZ + o->oVelZ;
+    f32 intendedX = o->oPosX + o->oVelX * nativeStepScale;
+    f32 intendedZ = o->oPosZ + o->oVelZ * nativeStepScale;
 
     f32 intendedFloorHeight = find_floor(intendedX, o->oPosY, intendedZ, &intendedFloor);
     f32 deltaFloorHeight = intendedFloorHeight - o->oFloorHeight;
@@ -1353,13 +1355,14 @@ static void cur_obj_move_update_ground_air_flags(UNUSED f32 gravity, f32 bouncin
 
 static f32 cur_obj_move_y_and_get_water_level(f32 gravity, f32 buoyancy) {
     f32 waterLevel;
+    const f32 nativeStepScale = sm64_modern_timebase_native_step_scale();
 
-    o->oVelY += gravity + buoyancy;
+    o->oVelY += (gravity + buoyancy) * nativeStepScale;
     if (o->oVelY < -78.0f) {
         o->oVelY = -78.0f;
     }
 
-    o->oPosY += o->oVelY;
+    o->oPosY += o->oVelY * nativeStepScale;
     if (o->activeFlags & ACTIVE_FLAG_UNK10) {
         waterLevel = -11000.0f;
     } else {
@@ -1452,19 +1455,23 @@ s16 abs_angle_diff(s16 x0, s16 x1) {
 }
 
 void cur_obj_move_xz_using_fvel_and_yaw(void) {
+    const f32 nativeStepScale = sm64_modern_timebase_native_step_scale();
+
     o->oVelX = o->oForwardVel * sins(o->oMoveAngleYaw);
     o->oVelZ = o->oForwardVel * coss(o->oMoveAngleYaw);
 
-    o->oPosX += o->oVelX;
-    o->oPosZ += o->oVelZ;
+    o->oPosX += o->oVelX * nativeStepScale;
+    o->oPosZ += o->oVelZ * nativeStepScale;
 }
 
 void cur_obj_move_y_with_terminal_vel(void) {
+    const f32 nativeStepScale = sm64_modern_timebase_native_step_scale();
+
     if (o->oVelY < -70.0f) {
         o->oVelY = -70.0f;
     }
 
-    o->oPosY += o->oVelY;
+    o->oPosY += o->oVelY * nativeStepScale;
 }
 
 void cur_obj_compute_vel_xz(void) {

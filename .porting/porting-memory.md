@@ -2,10 +2,11 @@
 
 ## Current Milestone
 
-- M8b world cadence is complete in commit `3cb94db`; M8c world dynamics is next.
+- M8b world cadence is complete in commit `3cb94db`; M8c world dynamics is in progress.
 - M8b added a private, lifecycle-reset cadence context with simulation tick, legacy tick, pair phase, boundary/final-step predicates, and a fingerprinted policy. Public ABI v1 and schema-3 record layouts remain unchanged.
 - Exact cadence state advances once on the first native step of each synthetic 60/30 pair and remains held on the second redraw. Integer/16.16 animation steps, RNG draws, thresholds, events, transitions, HUD/dialog/menu/demo/save state, and input edges retain legacy elapsed-time ordering.
-- Whole object/action/dynamics passes remain on the interim legacy hold. M8c must split and integrate Mario, actors, platforms, collisions, camera, particles, paintings, and environmental motion before M8d activates the native 60 Hz product clock.
+- M8c now splits the whole object pass into paired-boundary script/event work plus native actor/Mario movement, platform displacement, collision preparation, camera, particle, painting, and environmental update seams; M8d still owns product 60 Hz activation/input/audio/presentation.
+- M8c execute contract is approved: keep the shipping AppKit host at 30/30, expose only a bounded native 60/30 dynamics path for this milestone, and keep legacy scripts/timers/RNG/one-shot sinks on paired boundaries while continuous world state advances on native steps.
 - Preserve the M7 copied POD boundary and per-subsystem `cAuthority` -> `shadowSwift` -> `swiftAuthority` gates; M8 must not expose the C object graph to Swift, create a second simulation/presentation owner, replace the raw `CAMetalLayer`, or disturb the existing Metal queue/shared-event retirement contract.
 
 ### M8b Completion Evidence
@@ -104,7 +105,7 @@
 - Repeat the full 3,000-tick live BOB record/shadow, Metal validation, and memory-safety pass against commit `5f0bb63`; the accepted long trace predates the bundle/logging rebrand and is not current-product proof.
 - Verify an unmodified normal entrance to Bob-omb Battlefield has BOB music and motions. Debugger-routed validation deliberately bypassed normal transition state and produced castle intro audio/motion over BOB geometry.
 - M7 live traces fingerprint the signed app directory. Record first, then shadow the exact same product; do not rebuild, relink, or re-sign between those phases.
-- M8c must remove the interim whole-pass hold only through explicit dynamics ownership; do not double-run behavior/event sinks, consume RNG on held steps, or treat render/display-link frequency as simulation authority.
+- M8c dynamics ownership is explicit: held native steps run the current CALL_NATIVE bodies and continuous state while behavior-script control, legacy timers, RNG/event ordering, and save sinks stay boundary-owned. Do not double-run those legacy sinks or treat render/display-link frequency as simulation authority.
 - The product still ships at 30/30. Cross-rate parity, native 60 Hz input/audio/presentation, and product activation remain M8d; the M8b model smoke is not full-world runtime proof.
 
 ## Feature Status
@@ -121,7 +122,7 @@
 | Gameplay parity | Implemented — fixed-width deterministic input/snapshot/effect traces, compatibility fingerprints, first-divergence diagnostics, bounded host streams, and independent per-subsystem Swift authority gates |
 | Swift gameplay | Implemented — copied POD callbacks and exact per-subsystem gates for Mario A/B/Z edges and Bob-omb thrown/dropped release transitions; fresh current-product long validation remains on the watch list |
 | Native timebase | Implemented — rational paired-rate ABI, lifecycle-frozen configuration, monotonic fixed-step host scheduler, telemetry, trace fingerprinting, and timing-inventory seams; product remains 30 Hz |
-| World cadence | Implemented — fingerprinted paired-boundary context gates scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, demo, and rumble progression; continuous world passes remain held for M8c |
+| World cadence | In progress — paired-boundary scripts/timers/events remain intact while native dynamics now advance object/Mario movement, platforms, collisions, camera, particles, paintings, and environment state; product remains 30/30 until M8d |
 | Full-world 60 Hz | Not started |
 | Signing/notarization | Partial — hardened Apple Development Debug signing works; sustained-execution Release provisioning and Developer ID/notarization remain external/future gates |
 

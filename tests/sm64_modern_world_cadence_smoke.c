@@ -1,11 +1,13 @@
 /*
- * M8b world-cadence contract smoke.
+ * M8c world-cadence contract smoke.
  *
  * This is intentionally a private, C-only model test.  It does not inspect
- * engine object graphs and it does not change the public parity ABI.  The
- * model contains only elapsed-time state that is exactly representable at a
- * 30 Hz logical boundary.  Continuous positions, collision, camera motion,
- * PCM, and presentation are deliberately outside this comparator.
+ * engine object graphs and it does not change the public parity ABI.  Legacy
+ * script/event state is compared at paired boundaries, while a compact
+ * fixed-point dynamics model advances on both native steps.  The latter
+ * covers Mario/actor/platform motion, collision lifetime, camera following,
+ * particles, painting ripple, and environmental motion without pretending to
+ * be live full-engine acceptance.
  *
  * The timebase uses the first-step boundary policy: with a 60/30 cadence the
  * first admitted native step closes the logical interval (pair phase 1), and
@@ -63,6 +65,15 @@ typedef struct {
     bool menu_open;
     bool transition_active;
     bool hud_timer_running;
+    uint32_t mario_position;
+    uint32_t actor_position;
+    uint32_t platform_position;
+    uint32_t camera_position;
+    uint32_t painting_ripple;
+    uint32_t environmental_motion;
+    uint32_t collision_passes;
+    uint32_t particle_updates;
+    uint16_t intangible_timer;
 } WorldCadenceState;
 
 typedef struct {
@@ -176,6 +187,29 @@ static void initialize_model(WorldCadenceModel *model) {
     model->state.random_seed = UINT16_C(0xACE1);
     model->state.fixed_animation_step = ANIMATION_FIXED_STEP;
     model->state.hud_timer_running = true;
+    model->state.intangible_timer = 4u;
+}
+
+static void advance_dynamics(WorldCadenceModel *model) {
+    /* Each call represents one admitted native dynamics step.  The reference
+     * path runs two calls per logical interval so it models the target 60/30
+     * world even while its public timebase remains ratio-one. */
+    model->state.mario_position += 3u;
+    model->state.actor_position += 5u;
+    model->state.platform_position += 2u;
+    if (model->state.camera_position < model->state.mario_position) {
+        model->state.camera_position++;
+    } else if (model->state.camera_position > model->state.mario_position) {
+        model->state.camera_position--;
+    }
+    model->state.painting_ripple = (model->state.painting_ripple + 7u) % 100u;
+    model->state.environmental_motion = (model->state.environmental_motion + 11u) % 256u;
+    model->state.collision_passes++;
+    model->state.particle_updates++;
+    if (model->state.intangible_timer > 0u) {
+        model->state.intangible_timer--;
+    }
+    model->state.action_timer++;
 }
 
 static void append_event(WorldCadenceModel *model,
@@ -245,7 +279,6 @@ static void advance_boundary(WorldCadenceModel *model, uint32_t interval) {
     }
 
     model->state.object_timer++;
-    model->state.action_timer++;
     if (action_changed) {
         append_event(model,
                      WORLD_EVENT_ACTION_RESET,
@@ -368,7 +401,43 @@ static void compare_state(uint32_t interval,
     CHECK_STATE(menu_open);
     CHECK_STATE(transition_active);
     CHECK_STATE(hud_timer_running);
+    CHECK_STATE(mario_position);
+    CHECK_STATE(actor_position);
+    CHECK_STATE(platform_position);
+    CHECK_STATE(camera_position);
+    CHECK_STATE(painting_ripple);
+    CHECK_STATE(environmental_motion);
+    CHECK_STATE(collision_passes);
+    CHECK_STATE(particle_updates);
+    CHECK_STATE(intangible_timer);
 #undef CHECK_STATE
+}
+
+static void compare_legacy_state(uint32_t interval,
+                                 const WorldCadenceState *expected,
+                                 const WorldCadenceState *actual) {
+#define CHECK_LEGACY_STATE(field) \
+    do { \
+        if (expected->field != actual->field) { \
+            failf("held state mismatch: " #field, interval, "legacy boundary"); \
+        } \
+    } while (0)
+    CHECK_LEGACY_STATE(script_delay);
+    CHECK_LEGACY_STATE(object_timer);
+    CHECK_LEGACY_STATE(action);
+    CHECK_LEGACY_STATE(previous_action);
+    CHECK_LEGACY_STATE(random_seed);
+    CHECK_LEGACY_STATE(random_draw_ordinal);
+    CHECK_LEGACY_STATE(integer_animation_frame);
+    CHECK_LEGACY_STATE(fixed_animation_position);
+    CHECK_LEGACY_STATE(fixed_animation_step);
+    CHECK_LEGACY_STATE(transition_timer);
+    CHECK_LEGACY_STATE(hud_timer);
+    CHECK_LEGACY_STATE(menu_counter);
+    CHECK_LEGACY_STATE(menu_open);
+    CHECK_LEGACY_STATE(transition_active);
+    CHECK_LEGACY_STATE(hud_timer_running);
+#undef CHECK_LEGACY_STATE
 }
 
 static void compare_latches(uint32_t interval,
@@ -458,7 +527,9 @@ static void run_reference(const SM64ModernTimebaseApiV1 *timebase,
             || sm64_modern_timebase_simulation_tick() != (uint64_t) interval + 1u) {
             failf("reference boundary", interval, "unexpected private timebase state");
         }
+        advance_dynamics(&model);
         advance_boundary(&model, interval);
+        advance_dynamics(&model);
         capture_trace(&model, &traces[interval]);
     }
     sm64_modern_timebase_set_lifecycle_active(false);
@@ -481,8 +552,46 @@ static void run_native_pair(const SM64ModernTimebaseApiV1 *timebase,
          * held step, proving that edge state survives until the next boundary. */
         if (native_tick == 0u) {
             feed_controls(&model, controls[0]);
-        } else if ((native_tick & 1u) != 0u) {
-            const uint32_t next_interval = (native_tick + 1u) / 2u;
+        }
+
+        sm64_modern_timebase_begin_simulation_step();
+        const uint32_t interval = native_tick / 2u;
+        WorldCadenceState before;
+        uint32_t event_count = 0u;
+        if ((native_tick & 1u) != 0u) {
+            before = model.state;
+            event_count = model.event_count;
+        }
+        advance_dynamics(&model);
+        if ((native_tick & 1u) == 0u) {
+            expect_first_step_boundary(interval);
+            advance_boundary(&model, interval);
+        } else {
+            expect_held_second_step(interval);
+            /* A held native step advances only continuous dynamics.  Legacy
+             * timers, scripts, RNG, animation, transitions, HUD/menu state,
+             * and ordered events remain unchanged. */
+            compare_legacy_state(interval, &before, &model.state);
+            if (event_count != model.event_count
+                || model.state.mario_position == before.mario_position
+                || model.state.actor_position == before.actor_position
+                || model.state.platform_position == before.platform_position
+                || model.state.camera_position == before.camera_position
+                || model.state.painting_ripple == before.painting_ripple
+                || model.state.environmental_motion == before.environmental_motion
+                || model.state.collision_passes == before.collision_passes
+                || model.state.particle_updates == before.particle_updates) {
+                failf("held native dynamics", interval, "continuous state did not advance cleanly");
+            }
+            WorldCadenceTrace actual;
+            memset(&actual, 0, sizeof(actual));
+            capture_trace(&model, &actual);
+            compare_traces(interval, &expected[interval], &actual);
+
+            /* Deliver the next interval's controls after the held sample has
+             * been compared.  They are now latched during the held native
+             * phase and will be consumed by the next boundary. */
+            const uint32_t next_interval = interval + 1u;
             if (next_interval < LOGICAL_INTERVAL_COUNT) {
                 feed_controls(&model, controls[next_interval]);
                 if ((controls[next_interval].input_edge && !model.latches.input_latched)
@@ -491,27 +600,6 @@ static void run_native_pair(const SM64ModernTimebaseApiV1 *timebase,
                         && !model.latches.transition_latched)) {
                     failf("held input/control latch", next_interval, "edge was not retained");
                 }
-            }
-        }
-
-        sm64_modern_timebase_begin_simulation_step();
-        const uint32_t interval = native_tick / 2u;
-        if ((native_tick & 1u) == 0u) {
-            expect_first_step_boundary(interval);
-            advance_boundary(&model, interval);
-            WorldCadenceTrace actual;
-            memset(&actual, 0, sizeof(actual));
-            capture_trace(&model, &actual);
-            compare_traces(interval, &expected[interval], &actual);
-        } else {
-            WorldCadenceState before = model.state;
-            const uint32_t event_count = model.event_count;
-            expect_held_second_step(interval);
-            /* A held native step may only receive host latches; it must not
-             * advance timers, consume RNG, move animation, or emit events. */
-            if (memcmp(&before, &model.state, sizeof(before)) != 0
-                || event_count != model.event_count) {
-                failf("held native world state", interval, "non-boundary mutation");
             }
         }
     }

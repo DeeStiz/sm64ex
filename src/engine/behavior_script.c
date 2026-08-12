@@ -380,6 +380,31 @@ static s32 bhv_cmd_call_native(void) {
     return BHV_PROC_CONTINUE;
 }
 
+/*
+ * A native behavior is the continuous part of a behavior-script loop.  On a
+ * held native half-step the script program counter and its legacy delay/loop
+ * state remain unchanged, but the current CALL_NATIVE body still owns actor
+ * movement, collision setup, and other native dynamics.  Calling only that
+ * body keeps the M8b script cadence paired without freezing the object.
+ */
+static void cur_obj_update_native_behavior(void) {
+    const BehaviorScript *command = gCurrentObject->curBhvCommand;
+
+    if (command == NULL || ((*command >> 24) & 0xFFu) != 0x0Cu) {
+        return;
+    }
+
+    // Behavior loops commonly contain more than one native body (Mario's
+    // loop, for example, has debug, action, and spawn bodies).  Walk only the
+    // contiguous CALL_NATIVE run; stop before END_LOOP or any script command
+    // so the legacy program counter and stack remain untouched.
+    do {
+        gCurBhvCommand = command;
+        ((NativeBhvFunc) BHV_CMD_GET_VPTR(1))();
+        command += 2;
+    } while (((*command >> 24) & 0xFFu) == 0x0Cu);
+}
+
 // Command 0x0E: Sets the specified field to a float.
 // Usage: SET_FLOAT(field, value)
 static s32 bhv_cmd_set_float(void) {
@@ -920,14 +945,10 @@ static BhvCommandProc BehaviorCmdTable[] = {
 void cur_obj_update(void) {
     UNUSED u32 unused;
 
-    // STUB(M8c): The object update still combines behavior scripts, timers,
-    // RNG, movement, and other continuous dynamics. Keep that complete pass
-    // on the legacy boundary until M8c splits and retimes those domains.
-    // This direct-entry fence also protects callers that bypass
-    // update_objects() from executing an object in a held native half-step.
-    // The helper is a pure query, so repeated calls in one admitted boundary
-    // retain the legacy behavior.
-    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+    const bool advanceLegacyDomain = sm64_modern_timebase_should_advance_legacy_domain();
+    const bool advanceNativeDynamics = sm64_modern_timebase_should_advance_native_dynamics();
+
+    if (!advanceNativeDynamics) {
         return;
     }
 
@@ -936,7 +957,9 @@ void cur_obj_update(void) {
     BhvCommandProc bhvCmdProc;
     s32 bhvProcResult;
 
-    // Calculate the distance from the object to Mario.
+    // Calculate the distance from the object to Mario.  These spatial values
+    // feed continuous actor steering and therefore refresh on every native
+    // dynamics step, including the held half of a paired interval.
     if (objFlags & OBJ_FLAG_COMPUTE_DIST_TO_MARIO) {
         gCurrentObject->oDistanceToMario = dist_between_objects(gCurrentObject, gMarioObject);
         distanceFromMario = gCurrentObject->oDistanceToMario;
@@ -949,29 +972,37 @@ void cur_obj_update(void) {
         gCurrentObject->oAngleToMario = obj_angle_to_object(gCurrentObject, gMarioObject);
     }
 
-    // If the object's action has changed, reset the action timer.
-    if (gCurrentObject->oAction != gCurrentObject->oPrevAction) {
+    // If the object's action has changed, reset the action timer.  The
+    // behavior-script transition itself remains legacy-boundary state.
+    if (advanceLegacyDomain && gCurrentObject->oAction != gCurrentObject->oPrevAction) {
         (void) (gCurrentObject->oTimer = 0, gCurrentObject->oSubAction = 0,
                 gCurrentObject->oPrevAction = gCurrentObject->oAction);
     }
 
-    // Execute the behavior script.
-    gCurBhvCommand = gCurrentObject->curBhvCommand;
+    if (advanceLegacyDomain) {
+        // Execute the behavior script and advance its logical timers once per
+        // paired legacy boundary.
+        gCurBhvCommand = gCurrentObject->curBhvCommand;
 
-    do {
-        bhvCmdProc = BehaviorCmdTable[*gCurBhvCommand >> 24];
-        bhvProcResult = bhvCmdProc();
-    } while (bhvProcResult == BHV_PROC_CONTINUE);
+        do {
+            bhvCmdProc = BehaviorCmdTable[*gCurBhvCommand >> 24];
+            bhvProcResult = bhvCmdProc();
+        } while (bhvProcResult == BHV_PROC_CONTINUE);
 
-    gCurrentObject->curBhvCommand = gCurBhvCommand;
+        gCurrentObject->curBhvCommand = gCurBhvCommand;
+    } else {
+        // A held native step runs only the current native behavior body.  It
+        // never advances DELAY/loop/script state or replays a boundary sink.
+        cur_obj_update_native_behavior();
+    }
 
     // Increment the object's timer.
-    if (gCurrentObject->oTimer < 0x3FFFFFFF) {
+    if (advanceLegacyDomain && gCurrentObject->oTimer < 0x3FFFFFFF) {
         gCurrentObject->oTimer++;
     }
 
     // If the object's action has changed, reset the action timer.
-    if (gCurrentObject->oAction != gCurrentObject->oPrevAction) {
+    if (advanceLegacyDomain && gCurrentObject->oAction != gCurrentObject->oPrevAction) {
         (void) (gCurrentObject->oTimer = 0, gCurrentObject->oSubAction = 0,
                 gCurrentObject->oPrevAction = gCurrentObject->oAction);
     }

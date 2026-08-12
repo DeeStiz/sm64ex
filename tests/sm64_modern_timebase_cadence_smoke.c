@@ -87,6 +87,10 @@ static void expect_step(const char *prefix,
     expect_bool(operation,
                 sm64_modern_timebase_should_advance_legacy_domain(),
                 legacy_boundary);
+    snprintf(operation, sizeof(operation), "%s native dynamics", prefix);
+    expect_bool(operation,
+                sm64_modern_timebase_should_advance_native_dynamics(),
+                true);
     snprintf(operation, sizeof(operation), "%s final step", prefix);
     expect_bool(operation,
                 sm64_modern_timebase_is_legacy_interval_final_step(),
@@ -112,6 +116,8 @@ int main(void) {
     expect_reset_state("inactive reset");
     expect_bool("inactive legacy safety",
                 sm64_modern_timebase_should_advance_legacy_domain(), true);
+    expect_bool("inactive native dynamics safety",
+                sm64_modern_timebase_should_advance_native_dynamics(), true);
     expect_bool("inactive boundary safety",
                 sm64_modern_timebase_is_legacy_boundary(), true);
     expect_bool("inactive final-step safety",
@@ -125,6 +131,12 @@ int main(void) {
     expect_reset_state("ratio-one active reset");
     expect_bool("ratio-one pre-step legacy safety",
                 sm64_modern_timebase_should_advance_legacy_domain(), true);
+    expect_bool("ratio-one pre-step native dynamics",
+                sm64_modern_timebase_should_advance_native_dynamics(), true);
+    if (sm64_modern_timebase_native_step_scale() != 1.0f) {
+        fputs("ratio-one native step scale was not 1.0\n", stderr);
+        failures++;
+    }
     expect_bool("ratio-one pre-step boundary safety",
                 sm64_modern_timebase_is_legacy_boundary(), true);
     expect_bool("ratio-one pre-step final-step safety",
@@ -161,6 +173,12 @@ int main(void) {
                     sm64_modern_timebase_is_legacy_boundary(), false);
         expect_bool("ratio-two pre-step final step",
                     sm64_modern_timebase_is_legacy_interval_final_step(), false);
+        expect_bool("ratio-two pre-step native dynamics",
+                    sm64_modern_timebase_should_advance_native_dynamics(), false);
+        if (sm64_modern_timebase_native_step_scale() != 0.5f) {
+            fputs("ratio-two native step scale was not 0.5\n", stderr);
+            failures++;
+        }
 
         sm64_modern_timebase_begin_simulation_step();
         expect_step("ratio-two step one", 1u, 1u, 1u, true, false);

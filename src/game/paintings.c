@@ -1118,8 +1118,12 @@ void move_ddd_painting(struct Painting *painting, f32 frontPos, f32 backPos, f32
         gDddPaintingStatus = BOWSERS_SUB_BEATEN;
         if (painting->posX >= backPos) {
             painting->posX = backPos;
-            // Tell the save file that we've moved DDD back.
-            save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK);
+            // The position is continuous, but persistence is a paired
+            // boundary sink.  A held native step must not write the save
+            // flag before the logical transition can consume it.
+            if (sm64_modern_timebase_should_advance_legacy_domain()) {
+                save_file_set_flags(SAVE_FLAG_DDD_MOVED_BACK);
+            }
         }
     } else if (bowsersSubBeaten && dddBack) {
         // If the painting has already moved back, place it in the back position.
@@ -1209,6 +1213,48 @@ void floor_painting_update(struct Painting *painting, struct Painting *paintingG
     }
 }
 
+/*
+ * Advance painting floor/ripple state from the simulation owner.  Rendering
+ * only consumes the resulting mesh parameters; it no longer owns a second
+ * update path that can run at a different cadence from object movement.
+ */
+void paintings_update_dynamics(void) {
+    struct Surface *surface = NULL;
+
+    if (!sm64_modern_timebase_should_advance_native_dynamics() || gMarioObject == NULL) {
+        return;
+    }
+
+    find_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &surface);
+    gPaintingMarioFloorType = surface != NULL ? surface->type : 0;
+    gPaintingMarioXPos = gMarioObject->oPosX;
+    gPaintingMarioYPos = gMarioObject->oPosY;
+    gPaintingMarioZPos = gMarioObject->oPosZ;
+
+    gLastPaintingUpdateCounter = gPaintingUpdateCounter;
+    gPaintingUpdateCounter = (s16) sm64_modern_timebase_simulation_tick();
+
+    for (s32 groupIndex = 0; groupIndex < (s32) (sizeof(sPaintingGroups) / sizeof(sPaintingGroups[0])); ++groupIndex) {
+        struct Painting **paintingGroup = sPaintingGroups[groupIndex];
+        for (s32 paintingIndex = 0; paintingGroup[paintingIndex] != NULL; ++paintingIndex) {
+            struct Painting *painting = segmented_to_virtual(paintingGroup[paintingIndex]);
+
+            painting_update_floors(painting);
+            if (groupIndex == 1 && painting->id == PAINTING_ID_DDD) {
+                move_ddd_painting(painting,
+                                  3456.0f,
+                                  5529.6f,
+                                  20.0f * sm64_modern_timebase_native_step_scale());
+            }
+            if (painting->pitch == 0.0f) {
+                wall_painting_update(painting, paintingGroup);
+            } else {
+                floor_painting_update(painting, paintingGroup);
+            }
+        }
+    }
+}
+
 /**
  * Render and update the painting whose id and group matches the values in the GraphNode's parameter.
  * Use PAINTING_ID(id, group) to set the right parameter in a level's geo layout.
@@ -1225,31 +1271,12 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
         reset_painting(painting);
     } else if (callContext == GEO_CONTEXT_RENDER) {
 
-        // Update the ddd painting before drawing
-        // STUB(M8c): DDD's continuous painting/floor dynamics remain legacy
-        // paced; avoid advancing its position/save flag twice on a held tick.
-        if (group == 1 && id == PAINTING_ID_DDD
-            && sm64_modern_timebase_should_advance_legacy_domain()) {
-            move_ddd_painting(painting, 3456.0f, 5529.6f, 20.0f);
-        }
-
         // Determine if the painting is transparent
         set_painting_layer(gen, painting);
 
-        // Draw before updating
+        // The simulation owner updates floor/ripple state before presentation;
+        // this callback only selects the current display list.
         paintingDlist = display_painting(painting);
-
-        // Update the painting
-        painting_update_floors(painting);
-        switch ((s16) painting->pitch) {
-            // only paintings with 0 pitch are treated as walls
-            case 0:
-                wall_painting_update(painting, paintingGroup);
-                break;
-            default:
-                floor_painting_update(painting, paintingGroup);
-                break;
-        }
     }
     return paintingDlist;
 }
@@ -1265,12 +1292,9 @@ Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED 
         gLastPaintingUpdateCounter = gAreaUpdateCounter - 1;
         gPaintingUpdateCounter = gAreaUpdateCounter;
     } else {
-        gLastPaintingUpdateCounter = gPaintingUpdateCounter;
-        gPaintingUpdateCounter = gAreaUpdateCounter;
-
         // Store Mario's floor and position
         find_floor(gMarioObject->oPosX, gMarioObject->oPosY, gMarioObject->oPosZ, &surface);
-        gPaintingMarioFloorType = surface->type;
+        gPaintingMarioFloorType = surface != NULL ? surface->type : 0;
         gPaintingMarioXPos = gMarioObject->oPosX;
         gPaintingMarioYPos = gMarioObject->oPosY;
         gPaintingMarioZPos = gMarioObject->oPosZ;

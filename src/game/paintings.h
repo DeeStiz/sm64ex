@@ -137,5 +137,6 @@ extern s8 gDddPaintingStatus;
 
 Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *context);
 Gfx *geo_painting_update(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 c);
+void paintings_update_dynamics(void);
 
 #endif // PAINTINGS_H

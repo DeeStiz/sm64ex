@@ -12,10 +12,14 @@ bool sm64_modern_timebase_lifecycle_active(void);
  * Private cadence contract: inactive and ratio-one lifecycles report legacy
  * safety/boundary/final-step true.  An active ratio above one reports all
  * three false before its first admitted step; the first step is boundary
- * phase 1, and the final held step is phase 0.
+ * phase 1, and the final held step is phase 0. Native dynamics are admitted
+ * on every lifecycle simulation step, including held steps between paired
+ * legacy boundaries.
  */
 void sm64_modern_timebase_begin_simulation_step(void);
 bool sm64_modern_timebase_should_advance_legacy_domain(void);
+bool sm64_modern_timebase_should_advance_native_dynamics(void);
+float sm64_modern_timebase_native_step_scale(void);
 bool sm64_modern_timebase_is_legacy_boundary(void);
 bool sm64_modern_timebase_is_legacy_interval_final_step(void);
 uint64_t sm64_modern_timebase_simulation_tick(void);
