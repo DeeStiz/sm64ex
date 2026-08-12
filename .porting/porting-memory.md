@@ -2,16 +2,20 @@
 
 ## Current Milestone
 
-- M8a is complete in commit `a6606b5`; M8b world-cadence execution is approved and in progress.
-- M8b success criterion: scripts, timers, animation, RNG, transitions, HUD, and event cadence preserve elapsed-time behavior on the 60 Hz timebase.
-- Add a private C cadence context with admitted simulation tick, legacy tick, pair phase, and a first-step legacy-boundary predicate. Reset it with lifecycle state, fingerprint its policy, and keep public v1 ABI layouts and schema-3 parity records unchanged.
-- Every two synthetic native 60 Hz ticks must match one legacy 30 Hz interval wherever state is exactly representable. Apply complete integer or 16.16 animation steps at the boundary; never halve thresholds, counters, random draws, or `animAccel`.
-- Convert logical script/behavior/action, transition, HUD, dialog/menu, demo, save, sound/rumble-event, and animation-frame-event cadence without executing held-frame side effects twice. Preserve input edges until the owning legacy boundary.
-- Replace the aggregate-only timing audit with an ownership-aware manifest for M8b/M8c/M8d seams while retaining its checked aggregate drift counts.
-- Prove the contract with a C-only 30-versus-paired-60 cadence smoke/trace and wire it into the native-core build. Keep continuous positions, collision/camera tolerances, PCM, and presentation outside that comparator.
-- Keep `SM64Modern/EngineHost.swift` at 30/1 through M8b. Do not activate a mixed-rate product, change audio block counts or M7 callback cadence, enlarge public ABI v1, or expand schema-3 trace records.
-- M8b must not activate or retune Mario/actor/platform/collision/camera/environmental dynamics, change audio block counts, add Swift gameplay slices, redesign rendering, or broaden into M8c/M8d/M9.
+- M8b world cadence is complete in commit `3cb94db`; M8c world dynamics is next.
+- M8b added a private, lifecycle-reset cadence context with simulation tick, legacy tick, pair phase, boundary/final-step predicates, and a fingerprinted policy. Public ABI v1 and schema-3 record layouts remain unchanged.
+- Exact cadence state advances once on the first native step of each synthetic 60/30 pair and remains held on the second redraw. Integer/16.16 animation steps, RNG draws, thresholds, events, transitions, HUD/dialog/menu/demo/save state, and input edges retain legacy elapsed-time ordering.
+- Whole object/action/dynamics passes remain on the interim legacy hold. M8c must split and integrate Mario, actors, platforms, collisions, camera, particles, paintings, and environmental motion before M8d activates the native 60 Hz product clock.
 - Preserve the M7 copied POD boundary and per-subsystem `cAuthority` -> `shadowSwift` -> `swiftAuthority` gates; M8 must not expose the C object graph to Swift, create a second simulation/presentation owner, replace the raw `CAMetalLayer`, or disturb the existing Metal queue/shared-event retirement contract.
+
+### M8b Completion Evidence
+
+- `tests/fixtures/sm64_modern_timebase_cadence.tsv` is the governing M8b/M8c/M8d ownership inventory; the aggregate fixture remains a checked drift detector. The audit includes scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, input/rumble boundaries, presentation, and Swift host deferrals.
+- Native timebase and world-model cadence smokes prove ratio-one compatibility, explicit ratio-two pre-step/boundary/final-step behavior, held input edges, ordered events, RNG draw counts, odd 16.16 animation steps, transitions, HUD/menu counters, and time-stop latching. The world smoke is a private model, not live full-engine 60 Hz acceptance.
+- Signed 30/30 runtime and LLDB validation passed on the single owner-thread path. Current-policy 12-tick schema-3 record/replay matched global 98/98, Mario 228/228, and interaction 84/84 with no divergence; cross-rate parity remains M8d work.
+- Metal API/GPU validation passed. The 960x720 title trace contained one command buffer, one scene pass, 65 valid draws, a Clear/Store `BGRA8Unorm` drawable, and memoryless Clear/DontCare depth; the title capture remained visually intact.
+- ASan and UBSan bounded app runs emitted no report. Normal `leaks` found 147 Apple AVFAudio listener bindings totaling 9,824 bytes and no app-owned root; post-warmup RSS varied by 2,944 KiB during the short sample.
+- Native Debug/Release, ABI/parity/migration/scheduler/audio/audit smokes, unsigned Xcode Release/analyze, forced legacy US arm64 SDL/OpenGL, and x86_64/i686 MinGW changed-file compilation passed. EU runtime and web remain unavailable validation gates.
 
 ### M8a Execute Evidence
 
@@ -100,7 +104,8 @@
 - Repeat the full 3,000-tick live BOB record/shadow, Metal validation, and memory-safety pass against commit `5f0bb63`; the accepted long trace predates the bundle/logging rebrand and is not current-product proof.
 - Verify an unmodified normal entrance to Bob-omb Battlefield has BOB music and motions. Debugger-routed validation deliberately bypassed normal transition state and produced castle intro audio/motion over BOB geometry.
 - M7 live traces fingerprint the signed app directory. Record first, then shadow the exact same product; do not rebuild, relink, or re-sign between those phases.
-- M8b must preserve paired-boundary determinism while converting cadence. Do not change world dynamics or treat display-link presentation frequency as simulation authority.
+- M8c must remove the interim whole-pass hold only through explicit dynamics ownership; do not double-run behavior/event sinks, consume RNG on held steps, or treat render/display-link frequency as simulation authority.
+- The product still ships at 30/30. Cross-rate parity, native 60 Hz input/audio/presentation, and product activation remain M8d; the M8b model smoke is not full-world runtime proof.
 
 ## Feature Status
 
@@ -116,6 +121,7 @@
 | Gameplay parity | Implemented — fixed-width deterministic input/snapshot/effect traces, compatibility fingerprints, first-divergence diagnostics, bounded host streams, and independent per-subsystem Swift authority gates |
 | Swift gameplay | Implemented — copied POD callbacks and exact per-subsystem gates for Mario A/B/Z edges and Bob-omb thrown/dropped release transitions; fresh current-product long validation remains on the watch list |
 | Native timebase | Implemented — rational paired-rate ABI, lifecycle-frozen configuration, monotonic fixed-step host scheduler, telemetry, trace fingerprinting, and timing-inventory seams; product remains 30 Hz |
+| World cadence | Implemented — fingerprinted paired-boundary context gates scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, demo, and rumble progression; continuous world passes remain held for M8c |
 | Full-world 60 Hz | Not started |
 | Signing/notarization | Partial — hardened Apple Development Debug signing works; sustained-execution Release provisioning and Developer ID/notarization remain external/future gates |
 
@@ -163,3 +169,6 @@
 - A parity trace fingerprints the signed app directory. Rebuilding or re-signing between record and shadow invalidates the trace at tick zero, so the shadow harness deliberately verifies and reuses the record product.
 - M8a is committed as `a6606b5`. `sm64_modern_timebase` owns exact rational simulation/legacy rates and the compatibility fingerprint; `FixedStepScheduler` owns monotonic deadlines and bounded catch-up on the existing engine thread. Shipping configuration remains 30/1 until later M8 gates deliberately activate 60 Hz.
 - The title-logo O duplicated vertex at `(699, 102, -12)` did not match the adjoining `(699, 103, -12)` vertices, leaving three background pinholes in Metal and OpenGL. Keep the welded coordinate in `levels/intro/leveldata.c`; shader or texture workarounds are incorrect.
+- M8b is committed as `3cb94db`. Its private policy advances legacy state on the first step of a 60/30 pair and exposes the second step as the final held redraw; active ratio-two pre-step queries return false until `begin_simulation_step()` establishes phase.
+- Gate mixed render/update functions at the state mutation or event seam while leaving redraw paths active. Whole integer/16.16 animation progression is authoritative; never halve thresholds, random draws, or `animAccel`.
+- Preserve held input edges until the next legacy boundary. Keep actual device sampling, PCM blocks, haptic delivery, display-link presentation, and schema-3 native-tick parity under M8d ownership.
