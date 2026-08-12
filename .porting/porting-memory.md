@@ -2,11 +2,11 @@
 
 ## Current Milestone
 
-- M8b world cadence is complete in commit `3cb94db`; M8c world dynamics is complete in commit `9cc69a8` with a bounded native 60/30 path while the product remains 30/30.
+- M8d full-world 60 Hz integration is complete in commit `f483cc0`; the native product now runs a 60/30 paired clock with input, audio, presentation, and parity gates active.
 - M8b added a private, lifecycle-reset cadence context with simulation tick, legacy tick, pair phase, boundary/final-step predicates, and a fingerprinted policy. Public ABI v1 and schema-3 record layouts remain unchanged.
 - Exact cadence state advances once on the first native step of each synthetic 60/30 pair and remains held on the second redraw. Integer/16.16 animation steps, RNG draws, thresholds, events, transitions, HUD/dialog/menu/demo/save state, and input edges retain legacy elapsed-time ordering.
-- M8c splits the whole object pass into paired-boundary script/event work plus native actor/Mario movement, platform displacement, collision preparation, camera, particle, painting, and environmental update seams; M8d still owns product 60 Hz activation/input/audio/presentation.
-- M8c execute contract is approved: keep the shipping AppKit host at 30/30, expose only a bounded native 60/30 dynamics path for this milestone, and keep legacy scripts/timers/RNG/one-shot sinks on paired boundaries while continuous world state advances on native steps.
+- M8c splits the whole object pass into paired-boundary script/event work plus native actor/Mario movement, platform displacement, collision preparation, camera, particle, painting, and environmental update seams; M8d activates that policy in the product.
+- Legacy scripts/timers/RNG/one-shot sinks remain paired-boundary owned while continuous world state advances on native steps; the private world smoke remains bounded-model evidence rather than independent full-world proof.
 - Preserve the M7 copied POD boundary and per-subsystem `cAuthority` -> `shadowSwift` -> `swiftAuthority` gates; M8 must not expose the C object graph to Swift, create a second simulation/presentation owner, replace the raw `CAMetalLayer`, or disturb the existing Metal queue/shared-event retirement contract.
 
 ### M8b Completion Evidence
@@ -20,12 +20,17 @@
 
 ### M8c Completion Evidence
 
-- Commit `9cc69a8` adds timebase policy v3 and a bounded native dynamics path: continuous Mario/actor/platform/collision/camera/particle/painting/environment state can advance on native steps while scripts, legacy timers, RNG, events, transitions, and one-shot sinks are intended to remain paired-boundary owned; the shipping AppKit product stays 30/30.
-- `./script/build_and_run.sh --verify` built, signed, launched, and shut down status 0. LLDB stopped in `sm64_modern_get_timebase_api` on the named `SM64 Modern Engine` thread with the expected Swift-to-C stack.
-- Native parity, ABI, migration, timebase, cadence, and world-model smokes passed. Signed `--parity-verify` recorded and replayed 90 ticks with global 753/753, Mario 1710/1710, and interaction 630/630 matches; this remains 30/30 evidence, not M8d cross-rate acceptance.
-- The legacy Apple-Clang SDL/OpenGL core and timebase smokes passed; the native-only world smoke correctly refuses non-native mode. Full Swift+C+Objective-C ASan launch produced no report, and normal `leaks` found only approximately 9.5 KB of Apple AudioToolbox listener bindings.
-- Metal API/shader validation emitted no Metal fault. The settled layer-boundary trace has one command buffer, one scene pass, and 103 draws; the live window and multiple captured drawable surfaces are visually intact, but the selected `@tex0` replay attachment is an intermediate brown surface and needs follow-up.
-- Static review found that held native steps currently execute contiguous `CALL_NATIVE` bodies, which can include Mario sound/rumble/spawn/save/RNG effects. Narrow or gate that seam before M8d activates ratio-two dynamics.
+- Commit `9cc69a8` established the bounded native dynamics seams while the shipping product remained 30/30; M8d now owns product activation and integration.
+- The paired-boundary policy remains the contract for script/event work, legacy timers, RNG, transitions, save sinks, and one-shot effects; continuous movement and environment state advance on native steps.
+- M8c's layer capture discrepancy was resolved for M8d by capturing the preferred drawable boundary and checking both the fetched output and live window.
+
+### M8d Completion Evidence
+
+- Commit `f483cc0` activates the native product at 60/1 simulation over a 30/1 legacy domain (`paired_ticks=2`), samples input every native tick with retained edges, emits one 32 kHz PCM block per native tick, and presents one drawable per native tick.
+- Timebase audit, native core/timebase/cadence/world smokes, signed `--verify`, LLDB, and final signed 90-tick record/replay passed; global 722/722, Mario 1710/1710, and interaction 630/630 matched.
+- Layer-boundary GPU capture showed one Metal 4 command buffer/pass, 74 draws, a 1920x1440 `BGRA8Unorm` drawable, and memoryless depth; the live title screenshot was intact. No external GPU ground truth exists.
+- Metal validation, static analysis, native and Swift+C ASan passed. `leaks` reported approximately 9.5 KB of Apple AVFAudio listener bindings; normal short verification ended with 492 audio underrun frames and zero drops.
+- No controller was connected during M8d validation, so physical haptic acceptance remains open; the private world smoke is not independent full-world cross-rate evidence.
 
 ### M8a Execute Evidence
 
@@ -114,9 +119,9 @@
 - Repeat the full 3,000-tick live BOB record/shadow, Metal validation, and memory-safety pass against commit `5f0bb63`; the accepted long trace predates the bundle/logging rebrand and is not current-product proof.
 - Verify an unmodified normal entrance to Bob-omb Battlefield has BOB music and motions. Debugger-routed validation deliberately bypassed normal transition state and produced castle intro audio/motion over BOB geometry.
 - M7 live traces fingerprint the signed app directory. Record first, then shadow the exact same product; do not rebuild, relink, or re-sign between those phases.
-- M8c dynamics ownership is explicit but incomplete: held native steps currently run contiguous CALL_NATIVE bodies as well as continuous state, while behavior-script control, legacy timers, RNG/event ordering, and save sinks are intended to stay boundary-owned. Audit and narrow/gate those bodies before ratio-two activation so legacy sinks cannot double-run.
-- The product still ships at 30/30. Cross-rate parity, native 60 Hz input/audio/presentation, and product activation remain M8d; the M8b model smoke is not full-world runtime proof.
-- The M8c layer-boundary GPU capture is structurally valid, but selected replay attachment `@tex0` is an intermediate brown surface; compare multiple drawable attachments and the live window before treating a capture mismatch as a rendering regression.
+- M8d native 60/30 product integration and parity passed; the private world smoke is still bounded-model evidence rather than independent full-world cross-rate proof, and physical controller/haptic acceptance remains untested.
+- The M8d layer-boundary trace and live window agree; discovery still has no external GPU ground truth, so local draw/pass counts are regression evidence only.
+- Normal short verification records a bounded audio underrun count (492 frames, zero drops); investigate sustained audio underruns during M9 profiling rather than treating this short teardown sample as clean audio evidence.
 
 ## Feature Status
 
@@ -124,16 +129,16 @@
 |---|---|
 | macOS legacy build | Implemented — Apple Clang arm64 build, external ROM extraction, OpenGL launch, LLDB/visual evidence, and ASan route pass |
 | Callable C core | Implemented — versioned lifecycle/platform/gameplay POD ABI, static archive, legacy adapter, and C/C++ smoke consumer |
-| AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 30 Hz C-core owner thread with clean shutdown |
+| AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 60/30 C-core owner thread with clean shutdown |
 | Metal 4 device/presentation | Implemented — validated raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
 | Metal 4 rendering | Implemented — complete-scene POD bridge/replay with dynamic MSL, private textures, memoryless depth, samplers, state, display lists, explicit residency/barriers, trace inspection, and clean Metal validation |
-| Native input | Implemented — keyboard/mouse runtime passed; Xbox movement, jump, camera, and menu passed; legacy C-camera ergonomics caveat recorded |
-| Native audio | Implemented — 32 kHz interleaved s16 stereo through a lock-free SPSC ring and owner-thread AVAudioEngine/source-node lifecycle with route recovery |
+| Native input | Implemented — native-tick snapshots, retained edges, keyboard/mouse bridge, and haptic bridge passed; no physical controller was connected in M8d |
+| Native audio | Implemented — 32 kHz interleaved s16 stereo through a lock-free SPSC ring, one block per native tick, and owner-thread AVAudioEngine/source-node lifecycle with route recovery |
 | Gameplay parity | Implemented — fixed-width deterministic input/snapshot/effect traces, compatibility fingerprints, first-divergence diagnostics, bounded host streams, and independent per-subsystem Swift authority gates |
 | Swift gameplay | Implemented — copied POD callbacks and exact per-subsystem gates for Mario A/B/Z edges and Bob-omb thrown/dropped release transitions; fresh current-product long validation remains on the watch list |
-| Native timebase | Implemented — rational paired-rate ABI, lifecycle-frozen configuration, monotonic fixed-step host scheduler, telemetry, trace fingerprinting, and timing-inventory seams; product remains 30 Hz |
-| World cadence | Partial — paired-boundary scripts/timers/events remain intact and the bounded native dynamics path advances object/Mario movement, platforms, collisions, camera, particles, paintings, and environment state; the held `CALL_NATIVE` sink seam and product 60/30 activation remain for M8d |
-| Full-world 60 Hz | Not started |
+| Native timebase | Implemented — rational paired-rate ABI, lifecycle-frozen configuration, monotonic fixed-step host scheduler, 60/30 telemetry, trace fingerprinting, and timing-inventory seams |
+| World cadence | Implemented — paired-boundary scripts/timers/events remain intact while native dynamics and product 60/30 activation pass the audited gates |
+| Full-world 60 Hz | Partial — native product input/audio/presentation/parity integration passes, but independent full-world cross-rate, external-ground-truth, and hardware acceptance remain open |
 | Signing/notarization | Partial — hardened Apple Development Debug signing works; sustained-execution Release provisioning and Developer ID/notarization remain external/future gates |
 
 ## Curated Knowledge
@@ -183,6 +188,6 @@
 - M8b is committed as `3cb94db`. Its private policy advances legacy state on the first step of a 60/30 pair and exposes the second step as the final held redraw; active ratio-two pre-step queries return false until `begin_simulation_step()` establishes phase.
 - Gate mixed render/update functions at the state mutation or event seam while leaving redraw paths active. Whole integer/16.16 animation progression is authoritative; never halve thresholds, random draws, or `animAccel`.
 - Preserve held input edges until the next legacy boundary. Keep actual device sampling, PCM blocks, haptic delivery, display-link presentation, and schema-3 native-tick parity under M8d ownership.
-- M8c is committed as `9cc69a8`. `sm64_modern_timebase_native_step_scale()` feeds continuous spatial deltas while paired-boundary admission protects legacy script/event work; `paintings_update_dynamics()` owns painting floor/ripple state and render callbacks do not mutate it.
-- `cur_obj_update_native_behavior()` currently walks contiguous `CALL_NATIVE` bodies on held steps. Mario's body includes `bhv_mario_update` and debug/spawn calls, so sound, rumble, object, save, and global-RNG effects must be explicitly separated before M8d ratio-two activation.
-- For GPU validation of dynamics-related rendering, capture at the `CAMetalLayer` boundary rather than device bring-up and inspect more than one drawable attachment; a valid live scene can coexist with an intermediate replay attachment.
+- M8c is committed as `9cc69a8`; `sm64_modern_timebase_native_step_scale()` feeds continuous spatial deltas while paired-boundary admission protects legacy script/event work; `paintings_update_dynamics()` owns painting floor/ripple state and render callbacks do not mutate it.
+- M8d is committed as `f483cc0`. The product uses a 60/30 pair (`paired_ticks=2`), samples input and presents at native cadence, emits one PCM block per native tick, and keeps legacy effects on paired boundaries.
+- For GPU validation, capture at the `CAMetalLayer` boundary and inspect more than one drawable attachment; the M8d live window and fetched color attachment agreed, but no external reference artifact exists.
