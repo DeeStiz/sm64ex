@@ -159,6 +159,9 @@ static SM64ModernStatus lifecycle_initialize(const SM64ModernLifecycleConfigV1 *
         return SM64_MODERN_STATUS_INVALID_STATE;
     }
 
+    // A failed initialization must not retain cadence phase from a prior run.
+    sm64_modern_timebase_set_lifecycle_active(false);
+
     status = validate_lifecycle_config(config);
     if (status != SM64_MODERN_STATUS_OK) {
         return status;
@@ -265,6 +268,7 @@ static SM64ModernStatus lifecycle_step(void) {
         return SM64_MODERN_STATUS_INVALID_STATE;
     }
 
+    sm64_modern_timebase_begin_simulation_step();
     sm64_modern_parity_begin_tick();
 
     if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING) {
@@ -277,7 +281,9 @@ static SM64ModernStatus lifecycle_step(void) {
     set_sequence_player_volume(SEQ_PLAYER_ENV, (f32) configEnvVolume / 127.0f * master_mod);
 
     game_loop_one_iteration();
-    thread6_rumble_loop(NULL);
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        thread6_rumble_loop(NULL);
+    }
 
     if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_INPUT) {
         const SM64ModernStatus input_status = sm64_modern_input_status();

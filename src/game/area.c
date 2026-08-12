@@ -21,6 +21,7 @@
 #include "engine/geo_layout.h"
 #include "save_file.h"
 #include "level_table.h"
+#include "pc/sm64_modern_timebase.h"
 
 #include "gfx_dimensions.h"
 
@@ -297,6 +298,13 @@ void change_area(s32 index) {
 }
 
 void area_update_objects(void) {
+    // STUB(M8c): object behavior and continuous world dynamics remain on the
+    // legacy authority until their 60 Hz integration is approved.  A held
+    // native tick must not run a second whole-world update.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
+
     gAreaUpdateCounter++;
     update_objects(0);
 }
@@ -407,7 +415,7 @@ void render_game(void) {
                         set_warp_transition_rgb(0, 0, 0);
                     }
                 }
-            } else {
+            } else if (sm64_modern_timebase_should_advance_legacy_domain()) {
                 gWarpTransDelay--;
             }
         }

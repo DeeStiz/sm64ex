@@ -27,6 +27,7 @@
 #include "spawn_object.h"
 #include "spawn_sound.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 
 s8 D_8032F0A0[] = { 0xF8, 0x08, 0xFC, 0x04 };
 s16 D_8032F0A4[] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
@@ -970,19 +971,27 @@ void cur_obj_set_vel_from_mario_vel(f32 f12, f32 f14) {
 }
 
 BAD_RETURN(s16) cur_obj_reverse_animation(void) {
-    if (o->header.gfx.unk38.animFrame >= 0) {
-        o->header.gfx.unk38.animFrame--;
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        if (o->header.gfx.unk38.animFrame >= 0) {
+            o->header.gfx.unk38.animFrame--;
+        }
     }
 }
 
 BAD_RETURN(s32) cur_obj_extend_animation_if_at_end(void) {
-    s32 sp4 = o->header.gfx.unk38.animFrame;
-    s32 sp0 = o->header.gfx.unk38.curAnim->unk08 - 2;
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        s32 sp4 = o->header.gfx.unk38.animFrame;
+        s32 sp0 = o->header.gfx.unk38.curAnim->unk08 - 2;
 
-    if (sp4 == sp0) o->header.gfx.unk38.animFrame--;
+        if (sp4 == sp0) o->header.gfx.unk38.animFrame--;
+    }
 }
 
 s32 cur_obj_check_if_near_animation_end(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return FALSE;
+    }
+
     u32 spC = (s32) o->header.gfx.unk38.curAnim->flags;
     s32 sp8 = o->header.gfx.unk38.animFrame;
     s32 sp4 = o->header.gfx.unk38.curAnim->unk08 - 2;
@@ -1002,6 +1011,10 @@ s32 cur_obj_check_if_near_animation_end(void) {
 }
 
 s32 cur_obj_check_if_at_animation_end(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return FALSE;
+    }
+
     s32 sp4 = o->header.gfx.unk38.animFrame;
     s32 sp0 = o->header.gfx.unk38.curAnim->unk08 - 1;
 
@@ -1013,6 +1026,10 @@ s32 cur_obj_check_if_at_animation_end(void) {
 }
 
 s32 cur_obj_check_anim_frame(s32 frame) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return FALSE;
+    }
+
     s32 animFrame = o->header.gfx.unk38.animFrame;
 
     if (animFrame == frame) {
@@ -1023,6 +1040,10 @@ s32 cur_obj_check_anim_frame(s32 frame) {
 }
 
 s32 cur_obj_check_anim_frame_in_range(s32 startFrame, s32 rangeLength) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return FALSE;
+    }
+
     s32 animFrame = o->header.gfx.unk38.animFrame;
 
     if (animFrame >= startFrame && animFrame < startFrame + rangeLength) {
@@ -1033,6 +1054,10 @@ s32 cur_obj_check_anim_frame_in_range(s32 startFrame, s32 rangeLength) {
 }
 
 s32 cur_obj_check_frame_prior_current_frame(s16 *a0) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return FALSE;
+    }
+
     s16 sp6 = o->header.gfx.unk38.animFrame;
 
     while (*a0 != -1) {

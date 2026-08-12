@@ -20,6 +20,7 @@
 #include "game/spawn_object.h"
 #include "sm64.h"
 #include "text_strings.h"
+#include "pc/sm64_modern_timebase.h"
 
 #include "eu_translation.h"
 #ifdef VERSION_EU
@@ -517,7 +518,8 @@ void bhv_menu_button_init(void) {
  * object scale for each button.
  */
 void bhv_menu_button_loop(void) {
-    switch (gCurrentObject->oMenuButtonState) {
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        switch (gCurrentObject->oMenuButtonState) {
         case MENU_BUTTON_STATE_DEFAULT: // Button state
             gCurrentObject->oMenuButtonOrigPosZ = gCurrentObject->oPosZ;
             break;
@@ -555,6 +557,7 @@ void bhv_menu_button_loop(void) {
             bhv_menu_button_zoom_out(gCurrentObject);
             sCursorClickingTimer = 4;
             break;
+        }
     }
     cur_obj_scale(gCurrentObject->oMenuButtonScale);
 }
@@ -647,6 +650,9 @@ void render_score_menu_buttons(struct Object *scoreButton) {
  * In the score menu, checks if a button was clicked to play a sound, button state and other functions.
  */
 void check_score_menu_clicked_buttons(struct Object *scoreButton) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (scoreButton->oMenuButtonState == MENU_BUTTON_STATE_FULLSCREEN) {
         s32 buttonID;
         // Configure score menu button group
@@ -825,6 +831,9 @@ void copy_action_file_button(struct Object *copyButton, s32 copyFileButtonID) {
  * In the copy menu, checks if a button was clicked to play a sound, button state and other functions.
  */
 void check_copy_menu_clicked_buttons(struct Object *copyButton) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (copyButton->oMenuButtonState == MENU_BUTTON_STATE_FULLSCREEN) {
         s32 buttonID;
         // Configure copy menu button group
@@ -969,6 +978,9 @@ void erase_action_file_button(struct Object *eraseButton, s32 eraseFileButtonID)
  * In the erase menu, checks if a button was clicked to play a sound, button state and other functions.
  */
 void check_erase_menu_clicked_buttons(struct Object *eraseButton) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (eraseButton->oMenuButtonState == MENU_BUTTON_STATE_FULLSCREEN) {
         s32 buttonID;
         // Configure erase menu button group
@@ -1060,6 +1072,9 @@ void render_sound_mode_menu_buttons(struct Object *soundModeButton) {
  * In the sound mode menu, checks if a button was clicked to change sound mode & button state.
  */
 void check_sound_mode_menu_clicked_buttons(struct Object *soundModeButton) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (soundModeButton->oMenuButtonState == MENU_BUTTON_STATE_FULLSCREEN) {
         s32 buttonID;
         // Configure sound mode menu button group
@@ -1364,6 +1379,9 @@ void bhv_menu_button_manager_init(void) {
  * Also play a sound and/or render buttons depending of the button ID selected.
  */
 void check_main_menu_clicked_buttons(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
 #ifdef VERSION_EU
     if (sMainMenuTimer >= 5) {
 #endif
@@ -1443,6 +1461,9 @@ void check_main_menu_clicked_buttons(void) {
  * is loaded, and that checks what buttonID is clicked in the main menu.
  */
 void bhv_menu_button_manager_loop(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     switch (sSelectedButtonID) {
         case MENU_BUTTON_NONE:
             check_main_menu_clicked_buttons();
@@ -1565,6 +1586,9 @@ void bhv_menu_button_manager_loop(void) {
  * If the cursor is clicked, sClickPos uses the same value as sCursorPos.
  */
 void handle_cursor_button_input(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     // If scoring a file, pressing A just changes the coin score mode.
     if (sSelectedButtonID == MENU_BUTTON_SCORE_FILE_A || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_B
         || sSelectedButtonID == MENU_BUTTON_SCORE_FILE_C
@@ -1600,6 +1624,9 @@ void handle_cursor_button_input(void) {
  * Cursor function that handles analog stick input and button presses with a function near the end.
  */
 void handle_controller_cursor_input(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     s16 rawStickX = gPlayer3Controller->rawStickX;
     s16 rawStickY = gPlayer3Controller->rawStickY;
 
@@ -1651,7 +1678,7 @@ void print_menu_cursor(void) {
         // Grabbing
         gSPDisplayList(gDisplayListHead++, dl_menu_grabbing_hand);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
-    if (sCursorClickingTimer != 0) {
+    if (sm64_modern_timebase_should_advance_legacy_domain() && sCursorClickingTimer != 0) {
         sCursorClickingTimer++; // This is a very strange way to implement a timer? It counts up and
                                 // then resets to 0 instead of just counting down to 0.
         if (sCursorClickingTimer == 5) {
@@ -1684,6 +1711,9 @@ void print_generic_string_fade(s16 x, s16 y, const unsigned char *text) {
  * Updates text fade at the top of a menu.
  */
 s32 update_text_fade_out(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return FALSE;
+    }
     if (sFadeOutText == TRUE) {
         sTextFadeAlpha += 50;
         if (sTextFadeAlpha == 250) {
@@ -2162,47 +2192,49 @@ void print_erase_menu_prompt(s16 x, s16 y) {
     s16 cursorX = sCursorPos[0] + CURSOR_X;
     s16 cursorY = sCursorPos[1] + 120.0f;
 
-    if (cursorX < MENU_ERASE_YES_MAX_X && cursorX >= MENU_ERASE_YES_MIN_X &&
-        cursorY < MENU_ERASE_YES_NO_MAX_Y && cursorY >= MENU_ERASE_YES_NO_MIN_Y) {
-        // Fade "YES" string color but keep "NO" gray
-        sYesNoColor[0] = sins(colorFade) * 50.0f + 205.0f;
-        sYesNoColor[1] = 150;
-        sEraseYesNoHoverState = MENU_ERASE_HOVER_YES;
-    } else if (cursorX < MENU_ERASE_NO_MAX_X && cursorX >= MENU_ERASE_NO_MIN_X
-        && cursorY < MENU_ERASE_YES_NO_MAX_Y && cursorY >= MENU_ERASE_YES_NO_MIN_Y) {
-        // Fade "NO" string color but keep "YES" gray
-        sYesNoColor[0] = 150;
-        sYesNoColor[1] = sins(colorFade) * 50.0f + 205.0f;
-        sEraseYesNoHoverState = MENU_ERASE_HOVER_NO;
-    } else {
-        // Don't fade both strings and keep them gray
-        sYesNoColor[0] = 150;
-        sYesNoColor[1] = 150;
-        sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
-    }
-    // If the cursor is clicked...
-    if (sCursorClickingTimer == 2) {
-        // ..and is hovering "YES", delete file
-        if (sEraseYesNoHoverState == MENU_ERASE_HOVER_YES) {
-            play_sound(SOUND_MARIO_WAAAOOOW, gDefaultSoundArgs);
-            sMainMenuButtons[MENU_BUTTON_ERASE]->oMenuButtonActionPhase = ERASE_PHASE_MARIO_ERASED;
-            sFadeOutText = TRUE;
-            sMainMenuTimer = 0;
-            save_file_erase(sSelectedFileIndex);
-            sMainMenuButtons[MENU_BUTTON_ERASE_MIN + sSelectedFileIndex]->header.gfx.sharedChild =
-                gLoadedGraphNodes[MODEL_MAIN_MENU_MARIO_NEW_BUTTON_FADE];
-            sMainMenuButtons[sSelectedFileIndex]->header.gfx.sharedChild =
-                gLoadedGraphNodes[MODEL_MAIN_MENU_MARIO_NEW_BUTTON_FADE];
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        if (cursorX < MENU_ERASE_YES_MAX_X && cursorX >= MENU_ERASE_YES_MIN_X &&
+            cursorY < MENU_ERASE_YES_NO_MAX_Y && cursorY >= MENU_ERASE_YES_NO_MIN_Y) {
+            // Fade "YES" string color but keep "NO" gray
+            sYesNoColor[0] = sins(colorFade) * 50.0f + 205.0f;
+            sYesNoColor[1] = 150;
+            sEraseYesNoHoverState = MENU_ERASE_HOVER_YES;
+        } else if (cursorX < MENU_ERASE_NO_MAX_X && cursorX >= MENU_ERASE_NO_MIN_X
+            && cursorY < MENU_ERASE_YES_NO_MAX_Y && cursorY >= MENU_ERASE_YES_NO_MIN_Y) {
+            // Fade "NO" string color but keep "YES" gray
+            sYesNoColor[0] = 150;
+            sYesNoColor[1] = sins(colorFade) * 50.0f + 205.0f;
+            sEraseYesNoHoverState = MENU_ERASE_HOVER_NO;
+        } else {
+            // Don't fade both strings and keep them gray
+            sYesNoColor[0] = 150;
+            sYesNoColor[1] = 150;
             sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
-            // ..and is hovering "NO", return back to main phase
-        } else if (sEraseYesNoHoverState == MENU_ERASE_HOVER_NO) {
-            play_sound(SOUND_MENU_CLICK_FILE_SELECT, gDefaultSoundArgs);
-            sMainMenuButtons[MENU_BUTTON_ERASE_MIN + sSelectedFileIndex]->oMenuButtonState =
-                MENU_BUTTON_STATE_ZOOM_OUT;
-            sMainMenuButtons[MENU_BUTTON_ERASE]->oMenuButtonActionPhase = ERASE_PHASE_MAIN;
-            sFadeOutText = TRUE;
-            sMainMenuTimer = 0;
-            sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
+        }
+        // If the cursor is clicked...
+        if (sCursorClickingTimer == 2) {
+            // ..and is hovering "YES", delete file
+            if (sEraseYesNoHoverState == MENU_ERASE_HOVER_YES) {
+                play_sound(SOUND_MARIO_WAAAOOOW, gDefaultSoundArgs);
+                sMainMenuButtons[MENU_BUTTON_ERASE]->oMenuButtonActionPhase = ERASE_PHASE_MARIO_ERASED;
+                sFadeOutText = TRUE;
+                sMainMenuTimer = 0;
+                save_file_erase(sSelectedFileIndex);
+                sMainMenuButtons[MENU_BUTTON_ERASE_MIN + sSelectedFileIndex]->header.gfx.sharedChild =
+                    gLoadedGraphNodes[MODEL_MAIN_MENU_MARIO_NEW_BUTTON_FADE];
+                sMainMenuButtons[sSelectedFileIndex]->header.gfx.sharedChild =
+                    gLoadedGraphNodes[MODEL_MAIN_MENU_MARIO_NEW_BUTTON_FADE];
+                sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
+                // ..and is hovering "NO", return back to main phase
+            } else if (sEraseYesNoHoverState == MENU_ERASE_HOVER_NO) {
+                play_sound(SOUND_MENU_CLICK_FILE_SELECT, gDefaultSoundArgs);
+                sMainMenuButtons[MENU_BUTTON_ERASE_MIN + sSelectedFileIndex]->oMenuButtonState =
+                    MENU_BUTTON_STATE_ZOOM_OUT;
+                sMainMenuButtons[MENU_BUTTON_ERASE]->oMenuButtonActionPhase = ERASE_PHASE_MAIN;
+                sFadeOutText = TRUE;
+                sMainMenuTimer = 0;
+                sEraseYesNoHoverState = MENU_ERASE_HOVER_NONE;
+            }
         }
     }
 
@@ -2750,19 +2782,22 @@ static void print_file_select_strings(void) {
             print_sound_mode_menu_strings();
             break;
     }
-    // If all 4 save file exists, define true to sAllFilesExist to prevent more copies in copy menu
-    if (save_file_exists(SAVE_FILE_A) == TRUE && save_file_exists(SAVE_FILE_B) == TRUE &&
-        save_file_exists(SAVE_FILE_C) == TRUE && save_file_exists(SAVE_FILE_D) == TRUE) {
-        sAllFilesExist = TRUE;
-    } else {
-        sAllFilesExist = FALSE;
-    }
-    // Timers for menu alpha text and the main menu itself
-    if (sTextBaseAlpha < 250) {
-        sTextBaseAlpha += 10;
-    }
-    if (sMainMenuTimer < 1000) {
-        sMainMenuTimer += 1;
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        // If all 4 save file exists, define true to sAllFilesExist to prevent more copies in copy menu
+        if (save_file_exists(SAVE_FILE_A) == TRUE && save_file_exists(SAVE_FILE_B) == TRUE &&
+            save_file_exists(SAVE_FILE_C) == TRUE && save_file_exists(SAVE_FILE_D) == TRUE) {
+            sAllFilesExist = TRUE;
+        } else {
+            sAllFilesExist = FALSE;
+        }
+        // Timers for menu alpha text and the main menu itself advance once per
+        // legacy menu tick; held native renders only redraw the current state.
+        if (sTextBaseAlpha < 250) {
+            sTextBaseAlpha += 10;
+        }
+        if (sMainMenuTimer < 1000) {
+            sMainMenuTimer += 1;
+        }
     }
 }
 

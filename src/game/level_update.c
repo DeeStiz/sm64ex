@@ -33,6 +33,7 @@
 
 #include "pc/pc_main.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 #include "pc/cliopts.h"
 #include "pc/configfile.h"
 
@@ -821,7 +822,8 @@ void initiate_delayed_warp(void) {
     struct ObjectWarpNode *warpNode;
     s32 destWarpNode;
 
-    if (sDelayedWarpOp != WARP_OP_NONE && --sDelayedWarpTimer == 0) {
+    if (sm64_modern_timebase_should_advance_legacy_domain()
+        && sDelayedWarpOp != WARP_OP_NONE && --sDelayedWarpTimer == 0) {
         reset_dialog_render_state();
 
         if (gDebugLevelSelect && (sDelayedWarpOp & WARP_OP_TRIGGERS_LEVEL_SELECT)) {
@@ -895,7 +897,8 @@ void update_hud_values(void) {
             gHudDisplay.flags &= ~HUD_DISPLAY_FLAG_COIN_COUNT;
         }
 
-        if (gHudDisplay.coins < gMarioState->numCoins) {
+        if (gHudDisplay.coins < gMarioState->numCoins
+            && sm64_modern_timebase_should_advance_legacy_domain()) {
             if (gGlobalTimer & 0x00000001) {
                 u32 coinSound;
                 if (gMarioState->action & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
@@ -979,7 +982,8 @@ s32 play_mode_normal(void) {
     warp_area();
     check_instant_warp();
 
-    if (sTimerRunning && gHudDisplay.timer < 17999) {
+    if (sTimerRunning && gHudDisplay.timer < 17999
+        && sm64_modern_timebase_should_advance_legacy_domain()) {
         gHudDisplay.timer += 1;
     }
 
@@ -1074,18 +1078,25 @@ void level_set_transition(s16 length, void (*updateFunction)(s16 *)) {
  * Play the transition and then return to normal play mode.
  */
 s32 play_mode_change_area(void) {
+    const bool advanceLegacyDomain = sm64_modern_timebase_should_advance_legacy_domain();
+
     //! This maybe was supposed to be sTransitionTimer == -1? sTransitionUpdate
     // is never set to -1.
-    if (sTransitionUpdate == (void (*)(s16 *)) - 1) {
-        sm64_modern_parity_enter_subsystem(SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA);
-        update_camera(gCurrentArea->camera);
-        sm64_modern_parity_leave_subsystem();
-    } else if (sTransitionUpdate != NULL) {
-        sTransitionUpdate(&sTransitionTimer);
-    }
+    // STUB(M8c): transition callbacks can update objects/camera.  Keep the
+    // callback on the legacy boundary until world dynamics are retuned; the
+    // held native tick must not run that full legacy update a second time.
+    if (advanceLegacyDomain) {
+        if (sTransitionUpdate == (void (*)(s16 *)) - 1) {
+            sm64_modern_parity_enter_subsystem(SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA);
+            update_camera(gCurrentArea->camera);
+            sm64_modern_parity_leave_subsystem();
+        } else if (sTransitionUpdate != NULL) {
+            sTransitionUpdate(&sTransitionTimer);
+        }
 
-    if (sTransitionTimer > 0) {
-        sTransitionTimer -= 1;
+        if (sTransitionTimer > 0) {
+            sTransitionTimer -= 1;
+        }
     }
 
     //! If sTransitionTimer is -1, this will miss.
@@ -1101,20 +1112,25 @@ s32 play_mode_change_area(void) {
  * Play the transition and then return to normal play mode.
  */
 s32 play_mode_change_level(void) {
-    if (sTransitionUpdate != NULL) {
-        sTransitionUpdate(&sTransitionTimer);
-    }
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        // STUB(M8c): this callback may run basic_update (objects/camera).
+        // Execute it only once per legacy boundary while world dynamics stay
+        // on their existing authority.
+        if (sTransitionUpdate != NULL) {
+            sTransitionUpdate(&sTransitionTimer);
+        }
 
-    //! If sTransitionTimer is -1, this will miss.
-    if (--sTransitionTimer == -1) {
-        gHudDisplay.flags = HUD_DISPLAY_NONE;
-        sTransitionTimer = 0;
-        sTransitionUpdate = NULL;
+        //! If sTransitionTimer is -1, this will miss.
+        if (--sTransitionTimer == -1) {
+            gHudDisplay.flags = HUD_DISPLAY_NONE;
+            sTransitionTimer = 0;
+            sTransitionUpdate = NULL;
 
-        if (sWarpDest.type != WARP_TYPE_NOT_WARPING) {
-            return sWarpDest.levelNum;
-        } else {
-            return D_80339EE0;
+            if (sWarpDest.type != WARP_TYPE_NOT_WARPING) {
+                return sWarpDest.levelNum;
+            } else {
+                return D_80339EE0;
+            }
         }
     }
 
@@ -1125,7 +1141,10 @@ s32 play_mode_change_level(void) {
  * Unused play mode. Doesn't call transition update and doesn't reset transition at the end.
  */
 static s32 play_mode_unused(void) {
-    if (--sTransitionTimer == -1) {
+    // STUB(M8c): retain this legacy transition fallback on the logical
+    // boundary if a future caller re-enables the unused mode.
+    if (sm64_modern_timebase_should_advance_legacy_domain()
+        && --sTransitionTimer == -1) {
         gHudDisplay.flags = HUD_DISPLAY_NONE;
 
         if (sWarpDest.type != WARP_TYPE_NOT_WARPING) {

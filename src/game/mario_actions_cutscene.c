@@ -30,6 +30,7 @@
 #include "thread6.h"
 #include "../../include/libc/stdlib.h"
 #include "pc/pc_main.h"
+#include "pc/sm64_modern_timebase.h"
 
 // TODO: put this elsewhere
 enum SaveOption { SAVE_OPT_SAVE_AND_CONTINUE = 1, SAVE_OPT_SAVE_AND_QUIT, SAVE_OPT_SAVE_EXIT_GAME, SAVE_OPT_CONTINUE_DONT_SAVE };
@@ -171,7 +172,9 @@ void print_displaying_credits_entry(void) {
         }
 
         dl_rgba16_stop_cutscene_msg_fade();
-        sDispCreditsEntry = NULL;
+        if (sm64_modern_timebase_is_legacy_interval_final_step()) {
+            sDispCreditsEntry = NULL;
+        }
     }
 }
 

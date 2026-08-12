@@ -24,6 +24,7 @@
 #include "types.h"
 #include "macros.h"
 #include "pc/cheats.h"
+#include "pc/sm64_modern_timebase.h"
 #ifdef BETTERCAMERA
 #include "bettercamera.h"
 #endif
@@ -732,6 +733,13 @@ void print_credits_string(s16 x, s16 y, const u8 *str) {
 void handle_menu_scrolling(s8 scrollDirection, s8 *currentIndex, s8 minIndex, s8 maxIndex) {
     u8 index = 0;
 
+    // Menu selection/hold state is a legacy-domain contract.  The native
+    // renderer may draw the same menu on the held half of a 60/30 pair, but
+    // it must not consume another repeat or play another selection sound.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
+
     if (scrollDirection == MENU_SCROLL_VERTICAL) {
         if (gPlayer3Controller->rawStickY > 60) {
             index++;
@@ -905,6 +913,9 @@ s16 get_dialog_id(void) {
 }
 
 void create_dialog_box(s16 dialog) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (gDialogID == -1) {
         gDialogID = dialog;
         gDialogBoxType = DIALOG_TYPE_ROTATE;
@@ -912,6 +923,9 @@ void create_dialog_box(s16 dialog) {
 }
 
 void create_dialog_box_with_var(s16 dialog, s32 dialogVar) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (gDialogID == -1) {
         gDialogID = dialog;
         gDialogVariable = dialogVar;
@@ -920,6 +934,9 @@ void create_dialog_box_with_var(s16 dialog, s32 dialogVar) {
 }
 
 void create_dialog_inverted_box(s16 dialog) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (gDialogID == -1) {
         gDialogID = dialog;
         gDialogBoxType = DIALOG_TYPE_ZOOM;
@@ -927,6 +944,9 @@ void create_dialog_inverted_box(s16 dialog) {
 }
 
 void create_dialog_box_with_response(s16 dialog) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (gDialogID == -1) {
         gDialogID = dialog;
         gDialogBoxType = DIALOG_TYPE_ROTATE;
@@ -935,6 +955,9 @@ void create_dialog_box_with_response(s16 dialog) {
 }
 
 void reset_dialog_render_state(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     level_set_transition(0, 0);
 
     if (gDialogBoxType == DIALOG_TYPE_ZOOM) {
@@ -1728,7 +1751,8 @@ void render_dialog_entries(void) {
     gDialogY = 0;
 #endif
 
-    switch (gDialogBoxState) {
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
             if (gDialogBoxOpenTimer == DEFAULT_DIALOG_BOX_ANGLE) {
                 play_dialog_sound(gDialogID);
@@ -1807,7 +1831,17 @@ void render_dialog_entries(void) {
             lowerBound = 1;
 #endif
             break;
+        }
     }
+#if !defined(VERSION_JP) && !defined(VERSION_SH)
+    // The second native render in a 60/30 pair must keep the current page and
+    // clipping window; only the first step advances the dialog state machine.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        lowerBound = (gDialogBoxState == DIALOG_STATE_HORIZONTAL)
+            ? (gDialogScrollOffsetY / 16) + 1
+            : 1;
+    }
+#endif
 
     render_dialog_box_type(dialog, dialog->linesPerBox);
 
@@ -1846,12 +1880,18 @@ void render_dialog_entries(void) {
 
 // Calls a gMenuMode value defined by render_menus_and_dialogs cases
 void set_menu_mode(s16 mode) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (gMenuMode == -1) {
         gMenuMode = mode;
     }
 }
 
 void reset_cutscene_msg_fade(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     gCutsceneMsgFade = 0;
 }
 
@@ -1863,10 +1903,12 @@ void dl_rgba16_begin_cutscene_msg_fade(void) {
 void dl_rgba16_stop_cutscene_msg_fade(void) {
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
-    if (gCutsceneMsgFade < 250) {
-        gCutsceneMsgFade += 25;
-    } else {
-        gCutsceneMsgFade = 255;
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        if (gCutsceneMsgFade < 250) {
+            gCutsceneMsgFade += 25;
+        } else {
+            gCutsceneMsgFade = 255;
+        }
     }
 }
 
@@ -1914,6 +1956,9 @@ void print_credits_str_ascii(s16 x, s16 y, const char *str) {
 }
 
 void set_cutscene_message(s16 xOffset, s16 yOffset, s16 msgIndex, s16 msgDuration) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     // is message done printing?
     if (gCutsceneMsgIndex == -1) {
         gCutsceneMsgIndex = msgIndex;
@@ -1968,9 +2013,10 @@ void do_cutscene_handler(void) {
 
     // if the timing variable is less than 5, increment
     // the fade until we are at full opacity.
-    if (gCutsceneMsgTimer < 5) {
-        gCutsceneMsgFade += 50;
-    }
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        if (gCutsceneMsgTimer < 5) {
+            gCutsceneMsgFade += 50;
+        }
 
     // if the cutscene frame length + the fade-in counter is
     // less than the timer, it means we have exceeded the
@@ -1978,20 +2024,21 @@ void do_cutscene_handler(void) {
     // screen. if (message_duration = 50) and (msg_timer = 55)
     // then after the first 5 frames, the message will remain
     // on screen for another 50 frames until it starts fading.
-    if (gCutsceneMsgDuration + 5 < gCutsceneMsgTimer) {
-        gCutsceneMsgFade -= 50;
-    }
+        if (gCutsceneMsgDuration + 5 < gCutsceneMsgTimer) {
+            gCutsceneMsgFade -= 50;
+        }
 
     // like the first check, it takes 5 frames to fade out, so
     // perform a + 10 to account for the earlier check (10-5=5).
-    if (gCutsceneMsgDuration + 10 < gCutsceneMsgTimer) {
-        gCutsceneMsgIndex = -1;
-        gCutsceneMsgFade = 0;
-        gCutsceneMsgTimer = 0;
-        return;
-    }
+        if (gCutsceneMsgDuration + 10 < gCutsceneMsgTimer) {
+            gCutsceneMsgIndex = -1;
+            gCutsceneMsgFade = 0;
+            gCutsceneMsgTimer = 0;
+            return;
+        }
 
-    gCutsceneMsgTimer++;
+        gCutsceneMsgTimer++;
+    }
 }
 
 #if defined(VERSION_JP) || defined(VERSION_SH)
@@ -2052,32 +2099,34 @@ void print_peach_letter_message(void) {
     gSPDisplayList(gDisplayListHead++, castle_grounds_seg7_us_dl_0700F2E8);
 #endif
 
-    // at the start/end of message, reset the fade.
-    if (gCutsceneMsgTimer == 0) {
-        gCutsceneMsgFade = 0;
-    }
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        // at the start/end of message, reset the fade.
+        if (gCutsceneMsgTimer == 0) {
+            gCutsceneMsgFade = 0;
+        }
 
     // we're less than 20 increments, so increase the fade.
-    if (gCutsceneMsgTimer < 20) {
-        gCutsceneMsgFade += 10;
-    }
+        if (gCutsceneMsgTimer < 20) {
+            gCutsceneMsgFade += 10;
+        }
 
     // we're after PEACH_MESSAGE_TIMER increments, so decrease the fade.
-    if (gCutsceneMsgTimer > PEACH_MESSAGE_TIMER) {
-        gCutsceneMsgFade -= 10;
-    }
+        if (gCutsceneMsgTimer > PEACH_MESSAGE_TIMER) {
+            gCutsceneMsgFade -= 10;
+        }
 
     // 20 increments after the start of the decrease, we're
     // back where we are, so reset everything at the end.
-    if (gCutsceneMsgTimer > (PEACH_MESSAGE_TIMER + 20)) {
-        gCutsceneMsgIndex = -1;
-        gCutsceneMsgFade = 0; //! uselessly reset since the next execution will just set it to 0 again.
-        gDialogID = -1;
-        gCutsceneMsgTimer = 0;
-        return; // return to avoid incrementing the timer
-    }
+        if (gCutsceneMsgTimer > (PEACH_MESSAGE_TIMER + 20)) {
+            gCutsceneMsgIndex = -1;
+            gCutsceneMsgFade = 0; //! uselessly reset since the next execution will just set it to 0 again.
+            gDialogID = -1;
+            gCutsceneMsgTimer = 0;
+            return; // return to avoid incrementing the timer
+        }
 
-    gCutsceneMsgTimer++;
+        gCutsceneMsgTimer++;
+    }
 }
 
 /**
@@ -2348,13 +2397,15 @@ void render_pause_camera_options(s16 x, s16 y, s8 *index, s16 xIndex) {
     gSPDisplayList(gDisplayListHead++, dl_draw_triangle);
     gSPPopMatrix(gDisplayListHead++, G_MTX_MODELVIEW);
 
-    switch (index[0]) {
-        case 1:
-            cam_select_alt_mode(1);
-            break;
-        case 2:
-            cam_select_alt_mode(2);
-            break;
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        switch (index[0]) {
+            case 1:
+                cam_select_alt_mode(1);
+                break;
+            case 2:
+                cam_select_alt_mode(2);
+                break;
+        }
     }
 }
 
@@ -2539,27 +2590,29 @@ void render_pause_castle_main_strings(s16 x, s16 y) {
     }
 #endif
 
-    handle_menu_scrolling(MENU_SCROLL_VERTICAL, &gDialogLineNum, -1, COURSE_STAGES_COUNT + 1);
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        handle_menu_scrolling(MENU_SCROLL_VERTICAL, &gDialogLineNum, -1, COURSE_STAGES_COUNT + 1);
 
-    if (gDialogLineNum == COURSE_STAGES_COUNT + 1) {
-        gDialogLineNum = 0;
-    }
+        if (gDialogLineNum == COURSE_STAGES_COUNT + 1) {
+            gDialogLineNum = 0;
+        }
 
-    if (gDialogLineNum == -1) {
-        gDialogLineNum = COURSE_STAGES_COUNT;
-    }
+        if (gDialogLineNum == -1) {
+            gDialogLineNum = COURSE_STAGES_COUNT;
+        }
 
-    if (gDialogLineNum != COURSE_STAGES_COUNT) {
-        while (save_file_get_course_star_count(gCurrSaveFileNum - 1, gDialogLineNum) == 0) {
-            if (gDialogLineNum >= starNum) {
-                gDialogLineNum++;
-            } else {
-                gDialogLineNum--;
-            }
+        if (gDialogLineNum != COURSE_STAGES_COUNT) {
+            while (save_file_get_course_star_count(gCurrSaveFileNum - 1, gDialogLineNum) == 0) {
+                if (gDialogLineNum >= starNum) {
+                    gDialogLineNum++;
+                } else {
+                    gDialogLineNum--;
+                }
 
-            if (gDialogLineNum == COURSE_STAGES_COUNT || gDialogLineNum == -1) {
-                gDialogLineNum = COURSE_STAGES_COUNT;
-                break;
+                if (gDialogLineNum == COURSE_STAGES_COUNT || gDialogLineNum == -1) {
+                    gDialogLineNum = COURSE_STAGES_COUNT;
+                    break;
+                }
             }
         }
     }
@@ -2601,6 +2654,7 @@ s8 gCourseCompleteCoinsEqual = 0;
 s32 gCourseDoneMenuTimer = 0;
 s32 gCourseCompleteCoins = 0;
 s8 gHudFlash = 0;
+static s8 sCourseCompleteHighScoreVisible = FALSE;
 
 s16 render_pause_courses_and_castle(void) {
     s16 num;
@@ -2613,21 +2667,23 @@ s16 render_pause_courses_and_castle(void) {
 #endif
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
-            gDialogLineNum = 1;
-            gDialogTextAlpha = 0;
-            level_set_transition(-1, 0);
+            if (sm64_modern_timebase_should_advance_legacy_domain()) {
+                gDialogLineNum = 1;
+                gDialogTextAlpha = 0;
+                level_set_transition(-1, 0);
 #if defined(VERSION_JP) || defined(VERSION_SH)
-            play_sound(SOUND_MENU_PAUSE, gDefaultSoundArgs);
+                play_sound(SOUND_MENU_PAUSE, gDefaultSoundArgs);
 #else
-            play_sound(SOUND_MENU_PAUSE_HIGHPRIO, gDefaultSoundArgs);
+                play_sound(SOUND_MENU_PAUSE_HIGHPRIO, gDefaultSoundArgs);
 #endif
 
-            if (gCurrCourseNum >= COURSE_MIN && gCurrCourseNum <= COURSE_MAX) {
-                change_dialog_camera_angle();
-                gDialogBoxState = DIALOG_STATE_VERTICAL;
-            } else {
-                highlight_last_course_complete_stars();
-                gDialogBoxState = DIALOG_STATE_HORIZONTAL;
+                if (gCurrCourseNum >= COURSE_MIN && gCurrCourseNum <= COURSE_MAX) {
+                    change_dialog_camera_angle();
+                    gDialogBoxState = DIALOG_STATE_VERTICAL;
+                } else {
+                    highlight_last_course_complete_stars();
+                    gDialogBoxState = DIALOG_STATE_HORIZONTAL;
+                }
             }
             break;
         case DIALOG_STATE_VERTICAL:
@@ -2641,10 +2697,12 @@ s16 render_pause_courses_and_castle(void) {
             }
 
 #ifdef VERSION_EU
-            if (gPlayer3Controller->buttonPressed & (A_BUTTON | Z_TRIG | START_BUTTON))
+            if (sm64_modern_timebase_should_advance_legacy_domain()
+                && (gPlayer3Controller->buttonPressed & (A_BUTTON | Z_TRIG | START_BUTTON)))
 #else
-            if (gPlayer3Controller->buttonPressed & A_BUTTON
-             || gPlayer3Controller->buttonPressed & START_BUTTON)
+            if (sm64_modern_timebase_should_advance_legacy_domain()
+                && (gPlayer3Controller->buttonPressed & A_BUTTON
+                 || gPlayer3Controller->buttonPressed & START_BUTTON))
 #endif
             {
                 level_set_transition(0, 0);
@@ -2668,10 +2726,12 @@ s16 render_pause_courses_and_castle(void) {
             render_pause_castle_main_strings(104, 60);
 
 #ifdef VERSION_EU
-            if (gPlayer3Controller->buttonPressed & (A_BUTTON | Z_TRIG | START_BUTTON))
+            if (sm64_modern_timebase_should_advance_legacy_domain()
+                && (gPlayer3Controller->buttonPressed & (A_BUTTON | Z_TRIG | START_BUTTON)))
 #else
-            if (gPlayer3Controller->buttonPressed & A_BUTTON
-             || gPlayer3Controller->buttonPressed & START_BUTTON)
+            if (sm64_modern_timebase_should_advance_legacy_domain()
+                && (gPlayer3Controller->buttonPressed & A_BUTTON
+                 || gPlayer3Controller->buttonPressed & START_BUTTON))
 #endif
             {
                 level_set_transition(0, 0);
@@ -2684,7 +2744,7 @@ s16 render_pause_courses_and_castle(void) {
             break;
     }
 
-    if (gDialogTextAlpha < 250) {
+    if (sm64_modern_timebase_should_advance_legacy_domain() && gDialogTextAlpha < 250) {
         gDialogTextAlpha += 25;
     }
 #ifdef EXT_OPTIONS_MENU
@@ -2692,7 +2752,9 @@ s16 render_pause_courses_and_castle(void) {
         shade_screen();
         optmenu_draw();
     }
-    optmenu_check_buttons();
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        optmenu_check_buttons();
+    }
     optmenu_draw_prompt();
 #endif
 
@@ -2769,31 +2831,42 @@ void print_hud_course_complete_coins(s16 x, s16 y) {
 
     gSPDisplayList(gDisplayListHead++, dl_rgba16_text_end);
 
-    if (gCourseCompleteCoins >= gHudDisplay.coins) {
-        gCourseCompleteCoinsEqual = 1;
-        gCourseCompleteCoins = gHudDisplay.coins;
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        // Capture the legacy frame's draw decision before its post-draw coin
+        // update, then reuse that decision for the paired held redraw.
+        sCourseCompleteHighScoreVisible =
+            gCourseCompleteCoins >= gHudDisplay.coins && gGotFileCoinHiScore != 0;
+        if (gCourseCompleteCoins >= gHudDisplay.coins) {
+            gCourseCompleteCoinsEqual = 1;
+            gCourseCompleteCoins = gHudDisplay.coins;
+        } else {
+            if ((gCourseDoneMenuTimer & 1) || gHudDisplay.coins > 70) {
+                gCourseCompleteCoins++;
+                play_sound(SOUND_MENU_YOSHI_GAIN_LIVES, gDefaultSoundArgs);
 
-        if (gGotFileCoinHiScore != 0) {
-            print_hud_course_complete_string(HUD_PRINT_HISCORE);
-        }
-    } else {
-        if ((gCourseDoneMenuTimer & 1) || gHudDisplay.coins > 70) {
-            gCourseCompleteCoins++;
-            play_sound(SOUND_MENU_YOSHI_GAIN_LIVES, gDefaultSoundArgs);
+                if (gCourseCompleteCoins == 50 || gCourseCompleteCoins == 100 || gCourseCompleteCoins == 150) {
+                    play_sound(SOUND_GENERAL_COLLECT_1UP, gDefaultSoundArgs);
+                    gMarioState[0].numLives++;
+                }
+            }
 
-            if (gCourseCompleteCoins == 50 || gCourseCompleteCoins == 100 || gCourseCompleteCoins == 150) {
-                play_sound(SOUND_GENERAL_COLLECT_1UP, gDefaultSoundArgs);
-                gMarioState[0].numLives++;
+            if (gHudDisplay.coins == gCourseCompleteCoins && gGotFileCoinHiScore != 0) {
+                play_sound(SOUND_MENU_MARIO_CASTLE_WARP2, gDefaultSoundArgs);
             }
         }
+    }
 
-        if (gHudDisplay.coins == gCourseCompleteCoins && gGotFileCoinHiScore != 0) {
-            play_sound(SOUND_MENU_MARIO_CASTLE_WARP2, gDefaultSoundArgs);
-        }
+    // Coin totals and sounds advance once per legacy interval, but the label
+    // must be emitted identically on both presentations of that interval.
+    if (sCourseCompleteHighScoreVisible) {
+        print_hud_course_complete_string(HUD_PRINT_HISCORE);
     }
 }
 
 void play_star_fanfare_and_flash_hud(s32 arg, u8 starNum) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     if (gHudDisplay.coins == gCourseCompleteCoins && (gCurrCourseStarFlags & starNum) == 0 && gHudFlash == 0) {
         play_star_fanfare();
         gHudFlash = arg;
@@ -3019,7 +3092,8 @@ s16 render_course_complete_screen(void) {
     switch (gDialogBoxState) {
         case DIALOG_STATE_OPENING:
             render_course_complete_lvl_info_and_hud_str();
-            if (gCourseDoneMenuTimer > 100 && gCourseCompleteCoinsEqual == 1) {
+            if (sm64_modern_timebase_should_advance_legacy_domain()
+                && gCourseDoneMenuTimer > 100 && gCourseCompleteCoinsEqual == 1) {
                 gDialogBoxState = DIALOG_STATE_VERTICAL;
                 level_set_transition(-1, 0);
                 gDialogTextAlpha = 0;
@@ -3035,7 +3109,8 @@ s16 render_course_complete_screen(void) {
             render_save_confirmation(100, 86, &gDialogLineNum, 20);
 #endif
 
-            if (gCourseDoneMenuTimer > 110
+            if (sm64_modern_timebase_should_advance_legacy_domain()
+                && gCourseDoneMenuTimer > 110
                 && (gPlayer3Controller->buttonPressed & A_BUTTON
                  || gPlayer3Controller->buttonPressed & START_BUTTON
 #ifdef VERSION_EU
@@ -3057,11 +3132,13 @@ s16 render_course_complete_screen(void) {
             break;
     }
 
-    if (gDialogTextAlpha < 250) {
-        gDialogTextAlpha += 25;
-    }
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        if (gDialogTextAlpha < 250) {
+            gDialogTextAlpha += 25;
+        }
 
-    gCourseDoneMenuTimer++;
+        gCourseDoneMenuTimer++;
+    }
 
     return 0;
 }
@@ -3088,7 +3165,9 @@ s16 render_menus_and_dialogs() {
                 break;
         }
 
-        gDialogColorFadeTimer = (s16) gDialogColorFadeTimer + 0x1000;
+        if (sm64_modern_timebase_should_advance_legacy_domain()) {
+            gDialogColorFadeTimer = (s16) gDialogColorFadeTimer + 0x1000;
+        }
     } else if (gDialogID != -1) {
         // The Peach "Dear Mario" message needs to be repositioned separately
         if (gDialogID == 20) {
@@ -3097,7 +3176,9 @@ s16 render_menus_and_dialogs() {
         }
 
         render_dialog_entries();
-        gDialogColorFadeTimer = (s16) gDialogColorFadeTimer + 0x1000;
+        if (sm64_modern_timebase_should_advance_legacy_domain()) {
+            gDialogColorFadeTimer = (s16) gDialogColorFadeTimer + 0x1000;
+        }
     }
     return mode;
 }

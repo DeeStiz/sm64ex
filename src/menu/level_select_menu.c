@@ -13,6 +13,7 @@
 #include "level_table.h"
 #include "seq_ids.h"
 #include "sm64.h"
+#include "pc/sm64_modern_timebase.h"
 
 #define PRESS_START_DEMO_TIMER 800
 
@@ -39,6 +40,10 @@ static s16 gameOverNotPlayed = 1;
 // don't shift this function from being the first function in the segment.
 // the level scripts assume this function is the first, so it cant be moved.
 int run_press_start_demo_timer(s32 timer) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return timer;
+    }
+
     gCurrDemoInput = NULL;
 
     if (timer == 0) {

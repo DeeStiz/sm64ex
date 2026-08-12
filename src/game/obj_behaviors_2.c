@@ -44,6 +44,7 @@
 #include "save_file.h"
 #include "seq_ids.h"
 #include "spawn_sound.h"
+#include "pc/sm64_modern_timebase.h"
 
 #define POS_OP_SAVE_POSITION 0
 #define POS_OP_COMPUTE_VELOCITY 1
@@ -361,6 +362,12 @@ static s32 cur_obj_set_anim_if_at_end(s32 arg0) {
 
 static s32 cur_obj_play_sound_at_anim_range(s8 arg0, s8 arg1, u32 sound) {
     s32 val04;
+
+    // A held animation frame is not a new legacy frame event. Keep the
+    // sound trigger on the same boundary as frame progression.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return FALSE;
+    }
 
     if ((val04 = o->header.gfx.unk38.animAccel / 0x10000) <= 0) {
         val04 = 1;

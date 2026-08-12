@@ -23,6 +23,7 @@
 #include "save_file.h"
 #include "skybox.h"
 #include "sound_init.h"
+#include "pc/sm64_modern_timebase.h"
 
 #define TOAD_STAR_1_REQUIREMENT 12
 #define TOAD_STAR_2_REQUIREMENT 25
@@ -72,6 +73,12 @@ static s8 gMarioAttackScaleAnimation[3 * 6] = {
 struct MarioBodyState gBodyStates[2]; // 2nd is never accessed in practice, most likely Luigi related
 struct GraphNodeObject gMirrorMario;  // copy of Mario's geo node for drawing mirror Mario
 
+/* Goddard display lists are generated once per legacy interval.  A held
+ * native redraw reuses the physical pointer so update_view_and_dl() and its
+ * cursor/face state are not advanced twice. */
+static void *sGoddardDisplayListPhysical[6];
+static u8 sGoddardDisplayListValid[6];
+
 // This whole file is weirdly organized. It has to be the same file due
 // to rodata boundaries and function aligns, which means the programmer
 // treated this like a "misc" file for vaguely Mario related things
@@ -85,16 +92,42 @@ Gfx *geo_draw_mario_head_goddard(s32 callContext, struct GraphNode *node, Mat4 *
     Gfx *gfx = NULL;
     s16 sfx = 0;
     struct GraphNodeGenerated *asGenerated = (struct GraphNodeGenerated *) node;
+    u32 parameter = asGenerated->parameter;
     UNUSED Mat4 *transform = c;
 
     if (callContext == GEO_CONTEXT_RENDER) {
-        if (gPlayer1Controller->controllerData != NULL && gWarpTransition.isActive == 0) {
-            gd_copy_p1_contpad(gPlayer1Controller->controllerData);
+        if (sm64_modern_timebase_should_advance_legacy_domain()) {
+            // Drop any stale pointer left by a boundary that never received
+            // its paired held redraw (for example, an immediate area change).
+            for (u32 i = 0; i < ARRAY_COUNT(sGoddardDisplayListValid); i++) {
+                sGoddardDisplayListValid[i] = FALSE;
+            }
+            if (gPlayer1Controller->controllerData != NULL && gWarpTransition.isActive == 0) {
+                gd_copy_p1_contpad(gPlayer1Controller->controllerData);
+            }
+            if (parameter < ARRAY_COUNT(sGoddardDisplayListPhysical)) {
+                sGoddardDisplayListPhysical[parameter] = gdm_gettestdl(parameter);
+                sGoddardDisplayListValid[parameter] = TRUE;
+                gfx = (Gfx *) PHYSICAL_TO_VIRTUAL(sGoddardDisplayListPhysical[parameter]);
+            } else {
+                /* Preserve the original Goddard range check on a boundary. */
+                gfx = (Gfx *) PHYSICAL_TO_VIRTUAL(gdm_gettestdl(parameter));
+            }
+            D_8032C6A0 = gd_vblank;
+            sfx = gd_sfx_to_play();
+            play_menu_sounds(sfx);
+        } else if (parameter < ARRAY_COUNT(sGoddardDisplayListPhysical)
+                   && sGoddardDisplayListValid[parameter]) {
+            gfx = (Gfx *) PHYSICAL_TO_VIRTUAL(sGoddardDisplayListPhysical[parameter]);
+        } else {
+            /* A held redraw before its first boundary is safely empty. */
+            gfx = NULL;
         }
-        gfx = (Gfx *) PHYSICAL_TO_VIRTUAL(gdm_gettestdl(asGenerated->parameter));
-        D_8032C6A0 = gd_vblank;
-        sfx = gd_sfx_to_play();
-        play_menu_sounds(sfx);
+        if (sm64_modern_timebase_is_legacy_interval_final_step()) {
+            for (u32 i = 0; i < ARRAY_COUNT(sGoddardDisplayListValid); i++) {
+                sGoddardDisplayListValid[i] = FALSE;
+            }
+        }
     }
     return gfx;
 }

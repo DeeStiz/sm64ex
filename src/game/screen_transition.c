@@ -12,12 +12,21 @@
 #include "screen_transition.h"
 #include "segment2.h"
 #include "sm64.h"
+#include "pc/sm64_modern_timebase.h"
 
 u8 sTransitionColorFadeCount[4] = { 0 };
 u16 sTransitionTextureFadeCount[2] = { 0 };
 
 s32 set_and_reset_transition_fade_timer(s8 fadeTimer, u8 transTime) {
     s32 reset = FALSE;
+
+    // Transition geometry is allowed to be emitted on every native render,
+    // but its frame counter belongs to the legacy cadence domain.  Holding
+    // this update on the second tick of a paired 60/30 interval prevents a
+    // presentation redraw from consuming another transition frame.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return reset;
+    }
 
     sTransitionColorFadeCount[fadeTimer]++;
 
@@ -200,7 +209,9 @@ s32 render_textured_transition(s8 fadeTimer, s8 transTime, struct WarpTransition
         gSPDisplayList(gDisplayListHead++, dl_draw_quad_verts_0123);
         gSPTexture(gDisplayListHead++, 0xFFFF, 0xFFFF, 0, G_TX_RENDERTILE, G_OFF);
         gSPDisplayList(gDisplayListHead++, dl_screen_transition_end);
-        sTransitionTextureFadeCount[fadeTimer] += transData->texTimer;
+        if (sm64_modern_timebase_should_advance_legacy_domain()) {
+            sTransitionTextureFadeCount[fadeTimer] += transData->texTimer;
+        }
     } else {
     }
     return set_and_reset_transition_fade_timer(fadeTimer, transTime);

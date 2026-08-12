@@ -15,6 +15,7 @@
 #include "save_file.h"
 #include "print.h"
 #include "pc/configfile.h"
+#include "pc/sm64_modern_timebase.h"
 
 /* @file hud.c
  * This file implements HUD rendering and power meter animations.
@@ -230,32 +231,44 @@ void handle_power_meter_actions(s16 numHealthWedges) {
  */
 void render_hud_power_meter(void) {
     s16 shownHealthWedges = gHudDisplay.wedges;
+    const bool advanceLegacyDomain = sm64_modern_timebase_should_advance_legacy_domain();
+    bool renderPowerMeter;
 
-    if (sPowerMeterHUD.animation != POWER_METER_HIDING) {
-        handle_power_meter_actions(shownHealthWedges);
+    if (advanceLegacyDomain) {
+        if (sPowerMeterHUD.animation != POWER_METER_HIDING) {
+            handle_power_meter_actions(shownHealthWedges);
+        }
+
+        // Match the legacy order: action handling can reveal a hidden meter on
+        // this frame, while a HIDING frame still draws once after becoming
+        // HIDDEN during its animation step.
+        renderPowerMeter = sPowerMeterHUD.animation != POWER_METER_HIDDEN;
+        if (renderPowerMeter) {
+            switch (sPowerMeterHUD.animation) {
+                case POWER_METER_EMPHASIZED:
+                    animate_power_meter_emphasized();
+                    break;
+                case POWER_METER_DEEMPHASIZING:
+                    animate_power_meter_deemphasizing();
+                    break;
+                case POWER_METER_HIDING:
+                    animate_power_meter_hiding();
+                    break;
+                default:
+                    break;
+            }
+        }
+    } else {
+        renderPowerMeter = sPowerMeterHUD.animation != POWER_METER_HIDDEN;
     }
 
-    if (sPowerMeterHUD.animation == POWER_METER_HIDDEN) {
-        return;
+    if (renderPowerMeter) {
+        render_dl_power_meter(shownHealthWedges);
     }
 
-    switch (sPowerMeterHUD.animation) {
-        case POWER_METER_EMPHASIZED:
-            animate_power_meter_emphasized();
-            break;
-        case POWER_METER_DEEMPHASIZING:
-            animate_power_meter_deemphasizing();
-            break;
-        case POWER_METER_HIDING:
-            animate_power_meter_hiding();
-            break;
-        default:
-            break;
+    if (advanceLegacyDomain && renderPowerMeter) {
+        sPowerMeterVisibleTimer += 1;
     }
-
-    render_dl_power_meter(shownHealthWedges);
-
-    sPowerMeterVisibleTimer += 1;
 }
 
 #ifdef VERSION_JP

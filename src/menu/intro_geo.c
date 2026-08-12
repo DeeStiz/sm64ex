@@ -8,6 +8,7 @@
 #include "textures.h"
 #include "types.h"
 #include "prevent_bss_reordering.h"
+#include "pc/sm64_modern_timebase.h"
 
 #include "gfx_dimensions.h"
 
@@ -115,7 +116,9 @@ Gfx *geo_title_screen(s32 sp50, struct GraphNode *sp54, UNUSED void *context) {
         gSPDisplayList(displayListIter++, &intro_seg7_dl_0700B3A0);
         gSPPopMatrix(displayListIter++, G_MTX_MODELVIEW);
         gSPEndDisplayList(displayListIter);
-        gTitleZoomCounter++;
+        if (sm64_modern_timebase_should_advance_legacy_domain()) {
+            gTitleZoomCounter++;
+        }
     }
     return displayList;
 }
@@ -144,7 +147,7 @@ Gfx *geo_fade_transition(s32 sp40, struct GraphNode *sp44, UNUSED void *context)
         }
         gSPDisplayList(displayListIter++, &intro_seg7_dl_0700C6A0);
         gSPEndDisplayList(displayListIter);
-        if (gTitleZoomCounter >= 0x13) {
+        if (sm64_modern_timebase_should_advance_legacy_domain() && gTitleZoomCounter >= 0x13) {
             gTitleFadeCounter += 0x1a;
             if (gTitleFadeCounter >= 0x100) {
                 gTitleFadeCounter = 0xFF;
@@ -232,21 +235,23 @@ Gfx *geo_game_over_tile(s32 sp40, struct GraphNode *sp44, UNUSED void *context) 
     } else {
         displayList = alloc_display_list(((num_tiles_h*3)+4) * sizeof(*displayList));
         displayListIter = displayList;
-        if (gGameOverTableIndex == -2) {
-            if (gGameOverFrameCounter == 180) {
-                gGameOverTableIndex++;
-                gGameOverFrameCounter = 0;
+        if (sm64_modern_timebase_should_advance_legacy_domain()) {
+            if (gGameOverTableIndex == -2) {
+                if (gGameOverFrameCounter == 180) {
+                    gGameOverTableIndex++;
+                    gGameOverFrameCounter = 0;
+                }
+            } else {
+                // transition tile from "Game Over" to "Super Mario 64"
+                if (gGameOverTableIndex != 11 && !(gGameOverFrameCounter & 0x1)) {
+                    gGameOverTableIndex++;
+                    gameOverBackgroundTable[gameOverBackgroundFlipOrder[gGameOverTableIndex]] =
+                        INTRO_BACKGROUND_SUPER_MARIO;
+                }
             }
-        } else {
-            // transition tile from "Game Over" to "Super Mario 64"
-            if (gGameOverTableIndex != 11 && !(gGameOverFrameCounter & 0x1)) {
-                gGameOverTableIndex++;
-                gameOverBackgroundTable[gameOverBackgroundFlipOrder[gGameOverTableIndex]] =
-                    INTRO_BACKGROUND_SUPER_MARIO;
+            if (gGameOverTableIndex != 11) {
+                gGameOverFrameCounter++;
             }
-        }
-        if (gGameOverTableIndex != 11) {
-            gGameOverFrameCounter++;
         }
         graphNode->flags = (graphNode->flags & 0xFF) | 0x100;
         gSPDisplayList(displayListIter++, &dl_proj_mtx_fullscreen);

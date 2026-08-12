@@ -17,6 +17,7 @@
 #include "object_helpers.h"
 #include "object_list_processor.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 #include "platform_displacement.h"
 #include "profiler.h"
 #include "spawn_object.h"
@@ -630,6 +631,15 @@ static u16 unused_get_elapsed_time(u64 *cycleCounts, s32 index) {
  */
 void update_objects(UNUSED s32 unused) {
     s64 cycleCounts[30];
+
+    // STUB(M8c): This pass still combines behavior scripts, timers, RNG,
+    // movement, collision preparation, and other continuous dynamics. Admit
+    // the complete pass only at the legacy boundary until M8c splits and
+    // retimes those domains. This guard covers every area_update_objects()
+    // entry point; cur_obj_update() has an additional direct-call fence.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
 
     cycleCounts[0] = get_current_clock();
 

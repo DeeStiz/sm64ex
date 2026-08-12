@@ -11,6 +11,7 @@
 #include "game/obj_behaviors_2.h"
 #include "game/object_helpers.h"
 #include "game/object_list_processor.h"
+#include "pc/sm64_modern_timebase.h"
 #include "graph_node.h"
 #include "surface_collision.h"
 
@@ -918,6 +919,17 @@ static BhvCommandProc BehaviorCmdTable[] = {
 // Execute the behavior script of the current object, process the object flags, and other miscellaneous code for updating objects.
 void cur_obj_update(void) {
     UNUSED u32 unused;
+
+    // STUB(M8c): The object update still combines behavior scripts, timers,
+    // RNG, movement, and other continuous dynamics. Keep that complete pass
+    // on the legacy boundary until M8c splits and retimes those domains.
+    // This direct-entry fence also protects callers that bypass
+    // update_objects() from executing an object in a held native half-step.
+    // The helper is a pure query, so repeated calls in one admitted boundary
+    // retain the legacy behavior.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
 
     s16 objFlags = gCurrentObject->oFlags;
     f32 distanceFromMario;

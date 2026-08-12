@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <stdbool.h>
 
 #include "sm64.h"
 #include "gfx_dimensions.h"
@@ -21,6 +22,7 @@
 #include "segment_symbols.h"
 #include "thread6.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 #include <prevent_bss_reordering.h>
 #ifdef BETTERCAMERA
 #include "bettercamera.h"
@@ -55,6 +57,9 @@ u32 gGlobalTimer = 0;
 
 static u16 sCurrFBNum = 0;
 u16 frameBufferIndex = 0;
+static u32 sGfxPoolFrameIndex = 0;
+static bool sGfxPoolFrameIndexInitialized = false;
+static u16 sPendingButtonPresses[3] = { 0 };
 void (*D_8032C6A0)(void) = NULL;
 struct Controller *gPlayer1Controller = &gControllers[0];
 struct Controller *gPlayer2Controller = &gControllers[1];
@@ -276,11 +281,26 @@ void rendering_init(void) {
     send_display_list(&gGfxPool->spTask);
 
     frameBufferIndex++;
-    gGlobalTimer++;
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        gGlobalTimer++;
+    }
+    /* Re-anchor the presentation pool counter when a lifecycle is rebuilt. */
+    sGfxPoolFrameIndexInitialized = false;
 }
 
 void config_gfx_pool(void) {
-    gGfxPool = &gGfxPools[gGlobalTimer % GFX_NUM_POOLS];
+    /*
+     * The global timer is now the logical legacy clock.  Keep display-list pool
+     * rotation on every presentation tick so a held native tick does not
+     * reuse the pool still being consumed by the previous frame.  The lazy
+     * anchor makes the 30 Hz path select exactly the historical pool index.
+     */
+    if (!sGfxPoolFrameIndexInitialized) {
+        sGfxPoolFrameIndex = gGlobalTimer;
+        sGfxPoolFrameIndexInitialized = true;
+    }
+    gGfxPool = &gGfxPools[sGfxPoolFrameIndex % GFX_NUM_POOLS];
+    sGfxPoolFrameIndex++;
     set_segment_base_addr(1, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
@@ -307,7 +327,9 @@ void display_and_vsync(void) {
     if (++frameBufferIndex == 3) {
         frameBufferIndex = 0;
     }
-    gGlobalTimer++;
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        gGlobalTimer++;
+    }
 }
 
 // this function records distinct inputs over a 255-frame interval to RAM locations and was likely
@@ -385,6 +407,8 @@ void adjust_analog_stick(struct Controller *controller) {
 // if a demo sequence exists, this will run the demo
 // input list until it is complete. called every frame.
 void run_demo_inputs(void) {
+    const bool advanceLegacyDomain = sm64_modern_timebase_should_advance_legacy_domain();
+
     // eliminate the unused bits.
     gControllers[0].controllerData->button &= VALID_BUTTONS;
 
@@ -440,7 +464,7 @@ void run_demo_inputs(void) {
 
             // run the current demo input's timer down. if it hits 0, advance the
             // demo input list.
-            if (--gCurrDemoInput->timer == 0) {
+            if (advanceLegacyDomain && --gCurrDemoInput->timer == 0) {
                 gCurrDemoInput++;
             }
         }
@@ -450,6 +474,7 @@ void run_demo_inputs(void) {
 // update the controller struct with available inputs if present.
 void read_controller_inputs(void) {
     s32 i;
+    const bool advanceLegacyDomain = sm64_modern_timebase_should_advance_legacy_domain();
 
     // if any controllers are plugged in, update the
     // controller information.
@@ -470,10 +495,17 @@ void read_controller_inputs(void) {
             controller->rawStickY = controller->controllerData->stick_y;
             controller->extStickX = controller->controllerData->ext_stick_x;
             controller->extStickY = controller->controllerData->ext_stick_y;
-            controller->buttonPressed = controller->controllerData->button
+            sPendingButtonPresses[i] |= controller->controllerData->button
                                         & (controller->controllerData->button ^ controller->buttonDown);
             // 0.5x A presses are a good meme
             controller->buttonDown = controller->controllerData->button;
+            if (advanceLegacyDomain) {
+                controller->buttonPressed = sPendingButtonPresses[i];
+                sPendingButtonPresses[i] = 0;
+            } else {
+                /* Hold edges for the next logical frame; do not replay them. */
+                controller->buttonPressed = 0;
+            }
             adjust_analog_stick(controller);
         } else {
             // otherwise, if the controllerData is NULL, 0 out all of the inputs.
@@ -483,6 +515,7 @@ void read_controller_inputs(void) {
             controller->extStickY = 0;
             controller->buttonPressed = 0;
             controller->buttonDown = 0;
+            sPendingButtonPresses[i] = 0;
             controller->stickX = 0;
             controller->stickY = 0;
             controller->stickMag = 0;
@@ -504,6 +537,10 @@ void read_controller_inputs(void) {
 // initialize the controller structs to point at the OSCont information.
 void init_controllers(void) {
     s16 port, cont;
+
+    for (cont = 0; cont < 3; cont++) {
+        sPendingButtonPresses[cont] = 0;
+    }
 
     // set controller 1 to point to the set of status/pads for input 1 and
     // init the controllers.

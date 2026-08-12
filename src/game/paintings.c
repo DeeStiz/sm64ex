@@ -14,6 +14,7 @@
 #include "moving_texture.h"
 #include "object_list_processor.h"
 #include "paintings.h"
+#include "pc/sm64_modern_timebase.h"
 #include "save_file.h"
 #include "segment2.h"
 
@@ -1225,7 +1226,10 @@ Gfx *geo_painting_draw(s32 callContext, struct GraphNode *node, UNUSED void *con
     } else if (callContext == GEO_CONTEXT_RENDER) {
 
         // Update the ddd painting before drawing
-        if (group == 1 && id == PAINTING_ID_DDD) {
+        // STUB(M8c): DDD's continuous painting/floor dynamics remain legacy
+        // paced; avoid advancing its position/save flag twice on a held tick.
+        if (group == 1 && id == PAINTING_ID_DDD
+            && sm64_modern_timebase_should_advance_legacy_domain()) {
             move_ddd_painting(painting, 3456.0f, 5529.6f, 20.0f);
         }
 

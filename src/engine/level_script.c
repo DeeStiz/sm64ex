@@ -23,6 +23,7 @@
 #include "surface_collision.h"
 #include "surface_load.h"
 #include "level_table.h"
+#include "pc/sm64_modern_timebase.h"
 
 #define CMD_GET(type, offset) (*(type *) (CMD_PROCESS_OFFSET(offset) + (u8 *) sCurrentCmd))
 
@@ -861,11 +862,21 @@ static void (*LevelScriptJumpTable[])(void) = {
 };
 
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {
-    sScriptStatus = SCRIPT_RUNNING;
     sCurrentCmd = cmd;
 
-    while (sScriptStatus == SCRIPT_RUNNING) {
-        LevelScriptJumpTable[sCurrentCmd->type]();
+    /*
+     * The native host may present a second tick for the same legacy frame.
+     * Keep the command pointer stable on that held tick, but do not invoke
+     * any script callback/opcode (including CALL_LOOP and CMD2D).  Rendering
+     * below remains per native tick so presentation is not tied to command
+     * progression.  At the legacy cadence this helper is always true, which
+     * preserves the original first-call and sleep semantics exactly.
+     */
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        sScriptStatus = SCRIPT_RUNNING;
+        while (sScriptStatus == SCRIPT_RUNNING) {
+            LevelScriptJumpTable[sCurrentCmd->type]();
+        }
     }
 
     profiler_log_thread5_time(LEVEL_SCRIPT_EXECUTE);

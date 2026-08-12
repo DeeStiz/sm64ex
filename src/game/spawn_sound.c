@@ -9,6 +9,7 @@
 #include "sm64.h"
 #include "spawn_sound.h"
 #include "thread6.h"
+#include "pc/sm64_modern_timebase.h"
 
 /*
  * execute an object's current sound state with a provided array
@@ -17,6 +18,12 @@
  */
 void exec_anim_sound_state(struct SoundState *soundStates) {
     s32 stateIdx = gCurrentObject->oSoundStateID;
+
+    // The animation frame is held on non-boundary native ticks. Do not
+    // replay a frame-triggered sound (or its paired rumble event) there.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
 
     switch (soundStates[stateIdx].playSound) {
         // since we have an array of sound states corresponding to

@@ -19,6 +19,7 @@
 #include "star_select.h"
 #include "text_strings.h"
 #include "prevent_bss_reordering.h"
+#include "pc/sm64_modern_timebase.h"
 
 /**
  * @file star_select.c
@@ -57,7 +58,8 @@ static s32 sActSelectorMenuTimer = 0;
  * Defines a select type for a star in the act selector.
  */
 void bhv_act_selector_star_type_loop(void) {
-    switch (gCurrentObject->oStarSelectorType) {
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        switch (gCurrentObject->oStarSelectorType) {
         // If a star is not selected, don't rotate or change size
         case STAR_SELECTOR_NOT_SELECTED:
             gCurrentObject->oStarSelectorSize -= 0.1;
@@ -78,11 +80,13 @@ void bhv_act_selector_star_type_loop(void) {
         case STAR_SELECTOR_100_COINS:
             gCurrentObject->oFaceAngleYaw += 0x800;
             break;
+        }
+        // Keep this visual pulse on the same legacy cadence as the selector
+        // state; the native half-step only redraws the held star transform.
+        gCurrentObject->oStarSelectorTimer++;
     }
     // Scale act selector stars depending of the type selected
     cur_obj_scale(gCurrentObject->oStarSelectorSize);
-    // Unused timer, only referenced here. Probably replaced by sActSelectorMenuTimer
-    gCurrentObject->oStarSelectorTimer++;
 }
 
 /**
@@ -167,6 +171,10 @@ void bhv_act_selector_loop(void) {
     s8 i;
     u8 starIndexCounter;
     u8 stars = save_file_get_star_flags(gCurrSaveFileNum - 1, gCurrCourseNum - 1);
+
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
 
     if (sObtainedStars != 6) {
         // Sometimes, stars are not selectable even if they appear on the screen.
@@ -414,7 +422,7 @@ s32 lvl_init_act_selector_values_and_stars(UNUSED s32 arg, UNUSED s32 unused) {
  * Also updates objects and returns act number selected after is chosen.
  */
 s32 lvl_update_obj_and_load_act_button_actions(UNUSED s32 arg, UNUSED s32 unused) {
-    if (sActSelectorMenuTimer >= 11) {
+    if (sm64_modern_timebase_should_advance_legacy_domain() && sActSelectorMenuTimer >= 11) {
         // If any of these buttons are pressed, play sound and go to course act
 #ifndef VERSION_EU
         if ((gPlayer3Controller->buttonPressed & A_BUTTON)
@@ -437,7 +445,9 @@ s32 lvl_update_obj_and_load_act_button_actions(UNUSED s32 arg, UNUSED s32 unused
         }
     }
 
-    area_update_objects();
-    sActSelectorMenuTimer++;
+    if (sm64_modern_timebase_should_advance_legacy_domain()) {
+        area_update_objects();
+        sActSelectorMenuTimer++;
+    }
     return sLoadedActNum;
 }

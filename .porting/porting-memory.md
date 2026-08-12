@@ -2,9 +2,14 @@
 
 ## Current Milestone
 
-- M8a is complete in commit `a6606b5`; the next bounded slice is M8b world cadence.
+- M8a is complete in commit `a6606b5`; M8b world-cadence execution is approved and in progress.
 - M8b success criterion: scripts, timers, animation, RNG, transitions, HUD, and event cadence preserve elapsed-time behavior on the 60 Hz timebase.
-- Prepare M8b from the checked-in timing inventory and paired-boundary seams. Every two native 60 Hz ticks must match one legacy 30 Hz interval wherever state is exactly representable; do not defer floating-point motion/collision tolerances into this cadence-only slice.
+- Add a private C cadence context with admitted simulation tick, legacy tick, pair phase, and a first-step legacy-boundary predicate. Reset it with lifecycle state, fingerprint its policy, and keep public v1 ABI layouts and schema-3 parity records unchanged.
+- Every two synthetic native 60 Hz ticks must match one legacy 30 Hz interval wherever state is exactly representable. Apply complete integer or 16.16 animation steps at the boundary; never halve thresholds, counters, random draws, or `animAccel`.
+- Convert logical script/behavior/action, transition, HUD, dialog/menu, demo, save, sound/rumble-event, and animation-frame-event cadence without executing held-frame side effects twice. Preserve input edges until the owning legacy boundary.
+- Replace the aggregate-only timing audit with an ownership-aware manifest for M8b/M8c/M8d seams while retaining its checked aggregate drift counts.
+- Prove the contract with a C-only 30-versus-paired-60 cadence smoke/trace and wire it into the native-core build. Keep continuous positions, collision/camera tolerances, PCM, and presentation outside that comparator.
+- Keep `SM64Modern/EngineHost.swift` at 30/1 through M8b. Do not activate a mixed-rate product, change audio block counts or M7 callback cadence, enlarge public ABI v1, or expand schema-3 trace records.
 - M8b must not activate or retune Mario/actor/platform/collision/camera/environmental dynamics, change audio block counts, add Swift gameplay slices, redesign rendering, or broaden into M8c/M8d/M9.
 - Preserve the M7 copied POD boundary and per-subsystem `cAuthority` -> `shadowSwift` -> `swiftAuthority` gates; M8 must not expose the C object graph to Swift, create a second simulation/presentation owner, replace the raw `CAMetalLayer`, or disturb the existing Metal queue/shared-event retirement contract.
 

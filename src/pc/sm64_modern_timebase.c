@@ -8,6 +8,7 @@
 
 #define TIMEBASE_FNV_OFFSET UINT64_C(1469598103934665603)
 #define TIMEBASE_FNV_PRIME UINT64_C(1099511628211)
+#define TIMEBASE_CADENCE_POLICY_VERSION 2u
 
 #ifdef VERSION_EU
 #define LEGACY_RATE_NUMERATOR 25u
@@ -26,9 +27,106 @@ static SM64ModernTimebaseConfigV1 sConfig = {
 };
 static uint32_t sSimulationTicksPerLegacyTick = 1u;
 static bool sLifecycleActive;
+static uint64_t sSimulationTick;
+static uint64_t sLegacyTick;
+static uint32_t sPairPhase;
+static bool sLegacyBoundary;
+static bool sSimulationStepStarted;
+
+static void reset_runtime_state(void) {
+    sSimulationTick = 0;
+    sLegacyTick = 0;
+    sPairPhase = 0;
+    sLegacyBoundary = false;
+    sSimulationStepStarted = false;
+}
 
 void sm64_modern_timebase_set_lifecycle_active(bool active) {
+    // Runtime cadence is scoped to one lifecycle. Reset on both edges so a
+    // failed or stopped run cannot leak phase into the next initialization.
+    reset_runtime_state();
     sLifecycleActive = active;
+}
+
+bool sm64_modern_timebase_lifecycle_active(void) {
+    return sLifecycleActive;
+}
+
+void sm64_modern_timebase_begin_simulation_step(void) {
+    if (!sLifecycleActive) {
+        // Legacy callers may run initialization helpers before the lifecycle
+        // is active. Keep those paths on their historical cadence without
+        // creating authoritative runtime ticks outside a running lifecycle.
+        sLegacyBoundary = true;
+        return;
+    }
+
+    sSimulationTick++;
+    sSimulationStepStarted = true;
+    if (sSimulationTicksPerLegacyTick <= 1u) {
+        sPairPhase = 0;
+        sLegacyBoundary = true;
+        sLegacyTick++;
+        return;
+    }
+
+    // The first admitted step closes a legacy interval. Subsequent steps in
+    // the pair hold the legacy domain until the phase wraps to zero.
+    if (sPairPhase == 0u) {
+        sPairPhase = 1u;
+        sLegacyBoundary = true;
+        sLegacyTick++;
+    } else if (sPairPhase >= sSimulationTicksPerLegacyTick - 1u) {
+        sPairPhase = 0u;
+        sLegacyBoundary = false;
+    } else {
+        sPairPhase++;
+        sLegacyBoundary = false;
+    }
+}
+
+bool sm64_modern_timebase_should_advance_legacy_domain(void) {
+    // Ratio-one builds retain their historical direct-call behavior even
+    // before the first lifecycle step. Faster paired modes require an admitted
+    // step to establish the boundary phase; before that step, no legacy
+    // interval exists to advance.
+    return !sLifecycleActive
+        || sSimulationTicksPerLegacyTick <= 1u
+        || (sSimulationStepStarted && sLegacyBoundary);
+}
+
+bool sm64_modern_timebase_is_legacy_boundary(void) {
+    return !sLifecycleActive
+        || sSimulationTicksPerLegacyTick <= 1u
+        || (sSimulationStepStarted && sLegacyBoundary);
+}
+
+bool sm64_modern_timebase_is_legacy_interval_final_step(void) {
+    if (!sLifecycleActive || sSimulationTicksPerLegacyTick <= 1u) {
+        return true;
+    }
+
+    if (!sSimulationStepStarted) {
+        return false;
+    }
+
+    // A paired interval advances legacy state on its first native step and
+    // keeps that state visible through the final held redraw.  The wrapped
+    // phase identifies the last step without making render code consume or
+    // mutate the cadence state.
+    return !sLegacyBoundary && sPairPhase == 0u;
+}
+
+uint64_t sm64_modern_timebase_simulation_tick(void) {
+    return sSimulationTick;
+}
+
+uint64_t sm64_modern_timebase_legacy_tick(void) {
+    return sLegacyTick;
+}
+
+uint32_t sm64_modern_timebase_pair_phase(void) {
+    return sPairPhase;
 }
 
 static uint32_t greatest_common_divisor(uint32_t left, uint32_t right) {
@@ -56,6 +154,7 @@ static uint64_t hash_u32(uint64_t hash, uint32_t value) {
 
 uint64_t sm64_modern_timebase_fingerprint(void) {
     uint64_t hash = TIMEBASE_FNV_OFFSET;
+    hash = hash_u32(hash, TIMEBASE_CADENCE_POLICY_VERSION);
     hash = hash_u32(hash, sConfig.simulation_rate_numerator);
     hash = hash_u32(hash, sConfig.simulation_rate_denominator);
     hash = hash_u32(hash, sConfig.legacy_rate_numerator);

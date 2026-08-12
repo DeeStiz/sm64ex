@@ -8,6 +8,7 @@
 #include "game/rendering_graph_node.h"
 #include "game/area.h"
 #include "geo_layout.h"
+#include "pc/sm64_modern_timebase.h"
 
 // unused Mtx(s)
 s16 identityMtx[4][4] = { { 1, 0, 0, 0 }, { 0, 1, 0, 0 }, { 0, 0, 1, 0 }, { 0, 0, 0, 1 } };
@@ -796,6 +797,17 @@ s16 geo_update_animation_frame(struct GraphNodeObject_sub *obj, s32 *accelAssist
     anim = obj->curAnim;
 
     if (obj->animTimer == gAreaUpdateCounter || anim->flags & ANIM_FLAG_2) {
+        if (accelAssist != NULL) {
+            accelAssist[0] = obj->animFrameAccelAssist;
+        }
+
+        return obj->animFrame;
+    }
+
+    // Animation data is authored in legacy frames. At a faster simulation
+    // rate, hold the current frame on the non-boundary step instead of
+    // splitting an integer or 16.16 advance (which would lose exactness).
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
         if (accelAssist != NULL) {
             accelAssist[0] = obj->animFrameAccelAssist;
         }

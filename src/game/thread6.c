@@ -4,6 +4,7 @@
 #include "buffers/buffers.h"
 #include "main.h"
 #include "thread6.h"
+#include "pc/sm64_modern_timebase.h"
 
 static s8 D_SH_8030CCB4;
 static s32 sUnusedDisableRumble;
@@ -225,6 +226,9 @@ void func_sh_8024CA04(void) {
 }
 
 void thread6_rumble_loop(UNUSED void *a0) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
     // OSMesg msg;
     // osRecvMesg(&gRumbleThreadVIMesgQueue, &msg, OS_MESG_BLOCK);
 
