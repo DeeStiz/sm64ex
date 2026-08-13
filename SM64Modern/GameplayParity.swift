@@ -70,7 +70,24 @@ final class GameplayParityCoordinator: @unchecked Sendable {
         gameplayService: SwiftGameplayService
     ) -> (coordinator: GameplayParityCoordinator?, status: SM64ModernStatus) {
         let environment = ProcessInfo.processInfo.environment
+        let requestedAuthority = environment["SM64_MODERN_SWIFT_AUTHORITY"]?.lowercased()
+        if let requestedAuthority,
+           requestedAuthority != "c" && requestedAuthority != "swift" {
+            parityLogger.error("parity_configuration_invalid key=swift_authority")
+            return (nil, SM64_MODERN_STATUS_INVALID_ARGUMENT)
+        }
         guard let modeName = environment["SM64_MODERN_PARITY_MODE"], !modeName.isEmpty else {
+            if requestedAuthority == "c" {
+                // C is the safe process-wide fallback when no bounded parity
+                // session is requested. Keep this explicit in telemetry so a
+                // launch configuration cannot silently imply Swift authority.
+                parityLogger.notice("swift_authority_fallback=c")
+                return (nil, SM64_MODERN_STATUS_OK)
+            }
+            if requestedAuthority == "swift" {
+                parityLogger.error("parity_configuration_invalid key=swift_authority_requires_shadow")
+                return (nil, SM64_MODERN_STATUS_INVALID_ARGUMENT)
+            }
             return (nil, SM64_MODERN_STATUS_OK)
         }
 
@@ -109,21 +126,34 @@ final class GameplayParityCoordinator: @unchecked Sendable {
         let tickLimit = environment["SM64_MODERN_PARITY_TICKS"]
             .flatMap(UInt64.init)
             .flatMap { $0 == 0 ? nil : $0 }
-        let promoteAfterShadow = environment["SM64_MODERN_SWIFT_PROMOTE"] == "1"
+        let environmentRequestsPromotion = environment["SM64_MODERN_SWIFT_PROMOTE"] == "1"
         let swiftAuthorityTicks = environment["SM64_MODERN_SWIFT_AUTHORITY_TICKS"]
             .flatMap(UInt64.init)
             .flatMap { $0 == 0 ? nil : $0 }
         let swiftSubsystems: [SM64ModernGameplaySubsystem]
-        do {
-            swiftSubsystems = try parseSwiftSubsystems(environment["SM64_MODERN_SWIFT_SLICES"])
-        } catch {
-            parityLogger.error("parity_configuration_invalid key=swift_slices")
-            try? handle.close()
-            return (nil, SM64_MODERN_STATUS_INVALID_ARGUMENT)
+        if requestedAuthority == "c" {
+            swiftSubsystems = []
+        } else {
+            do {
+                swiftSubsystems = try parseSwiftSubsystems(environment["SM64_MODERN_SWIFT_SLICES"])
+            } catch {
+                parityLogger.error("parity_configuration_invalid key=swift_slices")
+                try? handle.close()
+                return (nil, SM64_MODERN_STATUS_INVALID_ARGUMENT)
+            }
+        }
+        let nativeSwiftRequested = requestedAuthority == "swift"
+        let promoteAfterShadow = nativeSwiftRequested || environmentRequestsPromotion
+        if requestedAuthority == "c" {
+            parityLogger.notice("swift_authority_fallback=c")
+        } else if nativeSwiftRequested {
+            parityLogger.notice("swift_authority_requested mode=native")
         }
         if promoteAfterShadow && (mode != SM64_MODERN_GAMEPLAY_PARITY_SHADOW
             || tickLimit == nil || swiftSubsystems.isEmpty) {
-            parityLogger.error("parity_configuration_invalid key=swift_promote")
+            parityLogger.error(
+                "parity_configuration_invalid key=\(nativeSwiftRequested ? "swift_authority" : "swift_promote")"
+            )
             try? handle.close()
             return (nil, SM64_MODERN_STATUS_INVALID_ARGUMENT)
         }
@@ -268,6 +298,16 @@ final class GameplayParityCoordinator: @unchecked Sendable {
         }
         try? handle.close()
 
+        // Keep slice-execution evidence in the parity stream itself.  The
+        // SwiftGameplay logger is useful for diagnostics, but OSLog delivery
+        // can be coalesced or omitted when the app exits immediately after a
+        // bounded run.  This deterministic line is emitted on the owner
+        // thread while the evidence counters are still authoritative.
+        let evidence = gameplayService.evidence()
+        parityLogger.notice(
+            "swift_gameplay_evidence mario_buttons=\(evidence.marioButtonUpdates) mario_ground_speed=\(evidence.marioGroundSpeedUpdates) bobomb_release=\(evidence.bobombReleaseUpdates)"
+        )
+
         for index in 0..<SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT {
             var result = SM64ModernGameplayParityResultV1()
             let subsystem = SM64ModernGameplaySubsystem(index)
@@ -281,7 +321,7 @@ final class GameplayParityCoordinator: @unchecked Sendable {
             if api.get_first_divergence(subsystem, &divergence) == SM64_MODERN_STATUS_OK,
                divergence.reason != SM64_MODERN_DIVERGENCE_NONE {
                 parityLogger.error(
-                    "parity_first_divergence subsystem=\(subsystem) tick=\(divergence.simulation_tick) reason=\(divergence.reason) expected_id=\(divergence.expected_record_id) actual_id=\(divergence.actual_record_id) value_index=\(divergence.value_index)"
+                    "parity_first_divergence subsystem=\(subsystem) tick=\(divergence.simulation_tick) reason=\(divergence.reason) expected_id=\(divergence.expected_record_id) actual_id=\(divergence.actual_record_id) value_index=\(divergence.value_index) expected=0x\(divergence.expected_value, format: .hex) actual=0x\(divergence.actual_value, format: .hex)"
                 )
             }
         }

@@ -135,6 +135,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
     private var nextCompletionValue: UInt64 = 1
     private var presentedFrameCount: UInt64 = 0
     private var lastPresentedPacket: UInt64 = 0
+    private var pipelineWaitLogCount: UInt64 = 0
     private var renderFailure: Error?
     private var isRunning = false
 
@@ -227,19 +228,23 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
 
     func registerShader(id: UInt32, filteringMode: UInt32, inputCount: UInt32, textureMask: UInt32) -> SM64ModernStatus {
         recorder.registerShader(id: id, filteringMode: filteringMode, inputCount: inputCount, textureMask: textureMask)
-        do {
-            _ = try shaderCompiler.pipeline(for: MetalShaderKey(
+        let opaqueKey = MetalShaderKey(
+            shaderID: id,
+            filteringMode: filteringMode,
+            inputCount: inputCount,
+            textureMask: textureMask,
+            alphaBlend: false
+        )
+        let alphaKey = MetalShaderKey(
                 shaderID: id,
                 filteringMode: filteringMode,
                 inputCount: inputCount,
                 textureMask: textureMask,
-                alphaBlend: false
-            ))
-            return SM64_MODERN_STATUS_OK
-        } catch {
-            metalLogger.error("metal_shader_compile_failed shader=0x\(String(id, radix: 16), privacy: .public) error=\(error.localizedDescription, privacy: .public)")
-            return SM64_MODERN_STATUS_PLATFORM_ERROR
-        }
+                alphaBlend: true
+        )
+        shaderCompiler.prepare(opaqueKey)
+        shaderCompiler.prepare(alphaKey)
+        return SM64_MODERN_STATUS_OK
     }
 
     func selectShader(_ id: UInt32) { recorder.selectShader(id) }
@@ -284,12 +289,14 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
     func setAlphaBlend(_ enabled: Bool) { recorder.setAlphaBlend(enabled) }
 
     func draw(vertices: UnsafePointer<Float>?, floatCount: UInt32, triangleCount: UInt32) -> SM64ModernStatus {
-        let bindings = recorder.currentTextureIDs.map { textures[$0]?.binding }
+        let textureID0 = recorder.currentTextureID(tile: 0)
+        let textureID1 = recorder.currentTextureID(tile: 1)
         guard let vertices, recorder.append(
             vertices: vertices,
             floatCount: floatCount,
             triangleCount: triangleCount,
-            textureBindings: bindings
+            textureBinding0: textures[textureID0]?.binding,
+            textureBinding1: textures[textureID1]?.binding
         ) else {
             return SM64_MODERN_STATUS_INVALID_ARGUMENT
         }
@@ -368,7 +375,17 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
         var cursor = 0
         let frameTextureBindings = textureBindings(in: packet)
         let uploads = try prepareUploads(frameTextureBindings, into: slot.transientBuffer, cursor: &cursor)
-        let preparedDraws = try prepareDraws(packet, into: slot.transientBuffer, cursor: &cursor)
+        let preparedDraws: [PreparedDraw]
+        if let readyDraws = try prepareDraws(packet, into: slot.transientBuffer, cursor: &cursor) {
+            preparedDraws = readyDraws
+            pipelineWaitLogCount = 0
+        } else {
+            preparedDraws = []
+            pipelineWaitLogCount += 1
+            if pipelineWaitLogCount <= 3 || pipelineWaitLogCount.isMultiple(of: 120) {
+                metalLogger.notice("metal_scene_waiting_for_pipelines packet=\(packet?.sequence ?? 0) draws=\(packet?.draws.count ?? 0) wait_count=\(self.pipelineWaitLogCount)")
+            }
+        }
         try ensureDepthTexture(for: colorTexture, slot: slot)
 
         slot.allocator.reset()
@@ -452,11 +469,19 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
 
             slot.argumentTable.setAddress(slot.transientBuffer.gpuAddress + UInt64(prepared.vertexOffset), index: 0)
             slot.argumentTable.setAddress(slot.transientBuffer.gpuAddress + UInt64(prepared.uniformOffset), index: 1)
-            for tile in 0..<2 where draw.shader.textureMask & (1 << UInt32(tile)) != 0 {
-                let id = draw.textureIDs[tile]
-                guard let texture = draw.textureBindings[tile]?.texture else { throw MetalRendererError.textureUnavailable(id: id) }
-                slot.argumentTable.setTexture(texture.gpuResourceID, index: tile)
-                slot.argumentTable.setSamplerState(try sampler(for: draw.samplers[tile], filteringMode: draw.shader.filteringMode).gpuResourceID, index: tile)
+            if draw.shader.textureMask & 1 != 0 {
+                guard let texture = draw.textureBinding0?.texture else {
+                    throw MetalRendererError.textureUnavailable(id: draw.textureID0)
+                }
+                slot.argumentTable.setTexture(texture.gpuResourceID, index: 0)
+                slot.argumentTable.setSamplerState(try sampler(for: draw.sampler0, filteringMode: draw.shader.filteringMode).gpuResourceID, index: 0)
+            }
+            if draw.shader.textureMask & 2 != 0 {
+                guard let texture = draw.textureBinding1?.texture else {
+                    throw MetalRendererError.textureUnavailable(id: draw.textureID1)
+                }
+                slot.argumentTable.setTexture(texture.gpuResourceID, index: 1)
+                slot.argumentTable.setSamplerState(try sampler(for: draw.sampler1, filteringMode: draw.shader.filteringMode).gpuResourceID, index: 1)
             }
             encoder.setArgumentTable(slot.argumentTable, stages: [.vertex, .fragment])
             encoder.drawPrimitives(primitiveType: .triangle, vertexStart: 0, vertexCount: Int(draw.triangleCount) * 3)
@@ -491,7 +516,8 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
     private func requiredTransientBytes(for packet: MetalScenePacket?) -> Int {
         var total = textureBindings(in: packet).reduce(0) { $0 + ($1.pendingPixels?.count ?? 0) + 255 }
         if let packet {
-            for draw in packet.draws { total += draw.vertices.count * MemoryLayout<Float>.size + 512 }
+            total += packet.vertices.count * MemoryLayout<Float>.size
+            total += packet.draws.count * 512
         }
         return max(total, 256)
     }
@@ -546,25 +572,42 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
         return uploads
     }
 
-    private func prepareDraws(_ packet: MetalScenePacket?, into buffer: any MTLBuffer, cursor: inout Int) throws -> [PreparedDraw] {
+    private func prepareDraws(_ packet: MetalScenePacket?, into buffer: any MTLBuffer, cursor: inout Int) throws -> [PreparedDraw]? {
         guard let packet else { return [] }
         var prepared: [PreparedDraw] = []
-        for draw in packet.draws {
-            let pipeline = try shaderCompiler.pipeline(for: draw.shader)
-            let expected = Int(draw.triangleCount) * 3 * pipeline.vertexStride
-            guard expected == draw.vertices.count else { throw MetalRendererError.invalidDraw(shaderID: draw.shader.shaderID) }
-            cursor = aligned(cursor, to: 16)
-            let vertexOffset = cursor
-            draw.vertices.withUnsafeBytes { bytes in
-                buffer.contents().advanced(by: vertexOffset).copyMemory(from: bytes.baseAddress!, byteCount: bytes.count)
-                cursor += bytes.count
+        do {
+            try packet.vertices.withUnsafeBufferPointer { source in
+                for draw in packet.draws {
+                    guard let baseAddress = source.baseAddress,
+                          draw.vertexOffset >= 0,
+                          draw.floatCount >= 0,
+                          draw.vertexOffset <= source.count,
+                          draw.floatCount <= source.count - draw.vertexOffset else {
+                        throw MetalRendererError.invalidDraw(shaderID: draw.shader.shaderID)
+                    }
+                    let pipeline = try shaderCompiler.pipeline(for: draw.shader)
+                    let expected = Int(draw.triangleCount) * 3 * pipeline.vertexStride
+                    guard expected == draw.floatCount else {
+                        throw MetalRendererError.invalidDraw(shaderID: draw.shader.shaderID)
+                    }
+                    cursor = aligned(cursor, to: 16)
+                    let vertexOffset = cursor
+                    let byteCount = draw.floatCount * MemoryLayout<Float>.size
+                    buffer.contents().advanced(by: vertexOffset).copyMemory(
+                        from: baseAddress.advanced(by: draw.vertexOffset),
+                        byteCount: byteCount
+                    )
+                    cursor += byteCount
+                    cursor = aligned(cursor, to: 16)
+                    let uniformOffset = cursor
+                    buffer.contents().advanced(by: uniformOffset).assumingMemoryBound(to: UInt32.self).initialize(repeating: 0, count: 4)
+                    buffer.contents().advanced(by: uniformOffset).assumingMemoryBound(to: UInt32.self).pointee = UInt32(truncatingIfNeeded: packet.sequence)
+                    cursor += 16
+                    prepared.append(PreparedDraw(draw: draw, pipeline: pipeline, vertexOffset: vertexOffset, uniformOffset: uniformOffset))
+                }
             }
-            cursor = aligned(cursor, to: 16)
-            let uniformOffset = cursor
-            buffer.contents().advanced(by: uniformOffset).assumingMemoryBound(to: UInt32.self).initialize(repeating: 0, count: 4)
-            buffer.contents().advanced(by: uniformOffset).assumingMemoryBound(to: UInt32.self).pointee = UInt32(truncatingIfNeeded: packet.sequence)
-            cursor += 16
-            prepared.append(PreparedDraw(draw: draw, pipeline: pipeline, vertexOffset: vertexOffset, uniformOffset: uniformOffset))
+        } catch MetalShaderCompilerError.pipelineNotReady {
+            return nil
         }
         return prepared
     }
@@ -630,10 +673,19 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
     private func textureBindings(in packet: MetalScenePacket?) -> [MetalTextureBinding] {
         guard let packet else { return [] }
         var seen = Set<UInt64>()
-        return packet.draws.flatMap(\.textureBindings).compactMap { binding in
-            guard let binding, seen.insert(binding.generation).inserted else { return nil }
-            return binding
+        var result: [MetalTextureBinding] = []
+        result.reserveCapacity(packet.draws.count)
+
+        func appendIfNew(_ binding: MetalTextureBinding?) {
+            guard let binding, seen.insert(binding.generation).inserted else { return }
+            result.append(binding)
         }
+
+        for draw in packet.draws {
+            appendIfNew(draw.textureBinding0)
+            appendIfNew(draw.textureBinding1)
+        }
+        return result
     }
 
     private func collectUnusedTextureBindings() {

@@ -1,21 +1,27 @@
 import Foundation
 import Metal
+import os
+
+private let metalShaderLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "MetalShaderCompiler")
 
 enum MetalShaderCompilerError: LocalizedError {
     case compilerUnavailable
+    case pipelineNotReady(shaderID: UInt32)
     case pipelineUnavailable(shaderID: UInt32)
 
     var errorDescription: String? {
         switch self {
         case .compilerUnavailable:
             "Metal 4 shader compiler creation failed"
+        case let .pipelineNotReady(shaderID):
+            "Metal 4 pipeline 0x\(String(shaderID, radix: 16)) is still compiling"
         case let .pipelineUnavailable(shaderID):
             "Metal 4 pipeline creation failed for SM64 shader 0x\(String(shaderID, radix: 16))"
         }
     }
 }
 
-final class MetalShaderCompiler {
+final class MetalShaderCompiler: @unchecked Sendable {
     struct CompiledPipeline {
         let state: any MTLRenderPipelineState
         let vertexStride: Int
@@ -26,68 +32,190 @@ final class MetalShaderCompiler {
     private static let textureEdgeOption: UInt32 = 1 << 26
     private static let noiseOption: UInt32 = 1 << 27
 
+    private static let archiveSchema = 1
+    private static let rendererSchema = 2
+
     private let compiler: any MTL4Compiler
+    private let serializer: (any MTL4PipelineDataSetSerializer)?
+    private let archiveURL: URL?
+    private let descriptorCacheURL: URL?
+    private let lookupArchives: [any MTL4Archive]
+    private let compileQueue = DispatchQueue(label: "io.github.deestiz.sm64modern.metal4-pipeline", qos: .userInitiated)
+    private let lock = NSLock()
     private var cache: [MetalShaderKey: CompiledPipeline] = [:]
+    private var pending: Set<MetalShaderKey> = []
+    private var failures: [MetalShaderKey: Error] = [:]
 
     init(device: any MTLDevice) throws {
         let descriptor = MTL4CompilerDescriptor()
         descriptor.label = "SM64 Modern Dynamic MSL Compiler"
+        let serializer = SM64ModernMakePipelineDataSetSerializer(device)
+        descriptor.pipelineDataSetSerializer = serializer
         guard let compiler = try? device.makeCompiler(descriptor: descriptor) else {
             throw MetalShaderCompilerError.compilerUnavailable
         }
         self.compiler = compiler
+        self.serializer = serializer
+
+        let cacheDirectory = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask).first?
+            .appendingPathComponent("io.github.deestiz.sm64modern", isDirectory: true)
+            .appendingPathComponent("Metal4", isDirectory: true)
+        self.archiveURL = cacheDirectory?.appendingPathComponent(
+            "pipelines-v\(Self.rendererSchema)-s\(Self.archiveSchema)-device-\(device.registryID).metallib",
+            isDirectory: false
+        )
+        self.descriptorCacheURL = self.archiveURL?.deletingPathExtension().appendingPathExtension("mtl4-json")
+
+        var archives: [any MTL4Archive] = []
+        if let archiveURL, FileManager.default.fileExists(atPath: archiveURL.path) {
+            var error: NSError?
+            if let archive = SM64ModernLoadArchive(device, archiveURL, &error) {
+                archives.append(archive)
+                metalShaderLogger.notice("metal4_archive_loaded path=\(archiveURL.path, privacy: .public)")
+            } else if let error {
+                metalShaderLogger.info("metal4_archive_ignored path=\(archiveURL.path, privacy: .public) error=\(error.localizedDescription, privacy: .public)")
+            }
+        }
+        if let descriptorCacheURL, FileManager.default.fileExists(atPath: descriptorCacheURL.path) {
+            metalShaderLogger.notice("metal4_descriptor_cache_found path=\(descriptorCacheURL.path, privacy: .public)")
+        }
+        self.lookupArchives = archives
+        if serializer != nil {
+            if let cacheDirectory {
+                try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
+            }
+            metalShaderLogger.notice("metal4_pipeline_cache_ready schema=\(Self.rendererSchema) archive_schema=\(Self.archiveSchema) device=\(device.registryID)")
+        } else {
+            metalShaderLogger.info("metal4_pipeline_cache_unavailable reason=serializer_creation_failed")
+        }
     }
 
     func pipeline(for key: MetalShaderKey) throws -> CompiledPipeline {
+        lock.lock()
+        defer { lock.unlock() }
         if let cached = cache[key] { return cached }
+        if let failure = failures[key] { throw failure }
+        throw MetalShaderCompilerError.pipelineNotReady(shaderID: key.shaderID)
+    }
 
-        let source = Self.makeSource(for: key)
-        let libraryDescriptor = MTL4LibraryDescriptor()
-        libraryDescriptor.name = "SM64 Shader 0x\(String(key.shaderID, radix: 16))"
-        libraryDescriptor.source = source
-        let options = MTLCompileOptions()
-        options.languageVersion = .version4_0
-        libraryDescriptor.options = options
-        let library = try compiler.makeLibrary(descriptor: libraryDescriptor)
-
-        let vertexFunction = MTL4LibraryFunctionDescriptor()
-        vertexFunction.library = library
-        vertexFunction.name = "sm64_vertex"
-        let fragmentFunction = MTL4LibraryFunctionDescriptor()
-        fragmentFunction.library = library
-        fragmentFunction.name = "sm64_fragment"
-
-        let descriptor = MTL4RenderPipelineDescriptor()
-        descriptor.label = "SM64 Pipeline 0x\(String(key.shaderID, radix: 16)) alpha=\(key.alphaBlend)"
-        descriptor.vertexFunctionDescriptor = vertexFunction
-        descriptor.fragmentFunctionDescriptor = fragmentFunction
-        descriptor.inputPrimitiveTopology = .triangle
-        guard let color = descriptor.colorAttachments[0] else {
-            throw MetalShaderCompilerError.pipelineUnavailable(shaderID: key.shaderID)
+    func prepare(_ key: MetalShaderKey) {
+        lock.lock()
+        guard cache[key] == nil, failures[key] == nil, !pending.contains(key) else {
+            lock.unlock()
+            return
         }
-        color.pixelFormat = .bgra8Unorm
-        if key.alphaBlend {
-            color.blendingState = .enabled
-            color.sourceRGBBlendFactor = .sourceAlpha
-            color.destinationRGBBlendFactor = .oneMinusSourceAlpha
-            color.rgbBlendOperation = .add
-            color.sourceAlphaBlendFactor = .one
-            color.destinationAlphaBlendFactor = .oneMinusSourceAlpha
-            color.alphaBlendOperation = .add
+        pending.insert(key)
+        lock.unlock()
+        compileQueue.async { [self] in
+            compile(key)
         }
-
-        var error: NSError?
-        guard let state = SM64ModernMakeRenderPipelineState(compiler, descriptor, &error) else {
-            if let error { throw error }
-            throw MetalShaderCompilerError.pipelineUnavailable(shaderID: key.shaderID)
-        }
-        let result = CompiledPipeline(state: state, vertexStride: Self.vertexStride(for: key))
-        cache[key] = result
-        return result
     }
 
     func removeAll() {
+        flushArchive()
+        lock.lock()
         cache.removeAll()
+        failures.removeAll()
+        pending.removeAll()
+        lock.unlock()
+    }
+
+    private func compile(_ key: MetalShaderKey) {
+        do {
+            let source = Self.makeSource(for: key)
+            let libraryDescriptor = MTL4LibraryDescriptor()
+            libraryDescriptor.name = "SM64 Shader 0x\(String(key.shaderID, radix: 16))"
+            libraryDescriptor.source = source
+            let options = MTLCompileOptions()
+            options.languageVersion = .version4_0
+            libraryDescriptor.options = options
+            let library = try compiler.makeLibrary(descriptor: libraryDescriptor)
+
+            let vertexFunction = MTL4LibraryFunctionDescriptor()
+            vertexFunction.library = library
+            vertexFunction.name = "sm64_vertex"
+            let fragmentFunction = MTL4LibraryFunctionDescriptor()
+            fragmentFunction.library = library
+            fragmentFunction.name = "sm64_fragment"
+
+            let descriptor = MTL4RenderPipelineDescriptor()
+            descriptor.label = "SM64 Pipeline 0x\(String(key.shaderID, radix: 16)) alpha=\(key.alphaBlend)"
+            descriptor.vertexFunctionDescriptor = vertexFunction
+            descriptor.fragmentFunctionDescriptor = fragmentFunction
+            descriptor.inputPrimitiveTopology = .triangle
+            guard let color = descriptor.colorAttachments[0] else {
+                throw MetalShaderCompilerError.pipelineUnavailable(shaderID: key.shaderID)
+            }
+            color.pixelFormat = .bgra8Unorm
+            if key.alphaBlend {
+                color.blendingState = .enabled
+                color.sourceRGBBlendFactor = .sourceAlpha
+                color.destinationRGBBlendFactor = .oneMinusSourceAlpha
+                color.rgbBlendOperation = .add
+                color.sourceAlphaBlendFactor = .one
+                color.destinationAlphaBlendFactor = .oneMinusSourceAlpha
+                color.alphaBlendOperation = .add
+            }
+
+            let archives: [any MTL4Archive]? = lookupArchives.isEmpty ? nil : lookupArchives
+            SM64ModernMakeRenderPipelineStateAsync(compiler, descriptor, archives) { [self, library] state, error in
+                if let state {
+                    finish(key: key, result: CompiledPipeline(state: state, vertexStride: Self.vertexStride(for: key)), error: nil)
+                } else {
+                    finish(key: key, result: nil, error: error ?? MetalShaderCompilerError.pipelineUnavailable(shaderID: key.shaderID))
+                }
+                _ = library
+            }
+            metalShaderLogger.debug("metal4_pipeline_compile_started shader=0x\(String(key.shaderID, radix: 16), privacy: .public)")
+        } catch {
+            finish(key: key, result: nil, error: error)
+        }
+    }
+
+    private func finish(key: MetalShaderKey, result: CompiledPipeline?, error: Error?) {
+        lock.lock()
+        pending.remove(key)
+        if let result {
+            cache[key] = result
+        } else if let error {
+            failures[key] = error
+        }
+        lock.unlock()
+        if let result {
+            metalShaderLogger.notice("metal4_pipeline_ready shader=0x\(String(key.shaderID, radix: 16), privacy: .public) stride=\(result.vertexStride)")
+        } else {
+            metalShaderLogger.error("metal4_pipeline_failed shader=0x\(String(key.shaderID, radix: 16), privacy: .public) error=\(error?.localizedDescription ?? "unknown", privacy: .public)")
+        }
+    }
+
+    private func flushArchive() {
+        guard let serializer, let archiveURL else { return }
+        do {
+            SM64ModernWaitForRenderPipelineTasks()
+            try FileManager.default.createDirectory(at: archiveURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            var archiveError: NSError?
+            if SM64ModernFlushPipelineDataSetSerializer(serializer, archiveURL, &archiveError) {
+                metalShaderLogger.notice("metal4_archive_flushed path=\(archiveURL.path, privacy: .public)")
+                return
+            }
+            let archiveReason = archiveError?.localizedDescription ?? "runtime serializer returned false"
+            guard let descriptorCacheURL else {
+                metalShaderLogger.info("metal4_archive_deferred reason=\(archiveReason, privacy: .public)")
+                return
+            }
+            var scriptError: NSError?
+            guard let script = SM64ModernSerializePipelineDataSetScript(serializer, &scriptError) else {
+                throw scriptError ?? NSError(
+                    domain: "io.github.deestiz.sm64modern.metal4",
+                    code: 2,
+                    userInfo: [NSLocalizedDescriptionKey: "Metal 4 pipeline dataset script serialization returned nil"]
+                )
+            }
+            try script.write(to: descriptorCacheURL, options: .atomic)
+            metalShaderLogger.notice("metal4_descriptor_cache_flushed path=\(descriptorCacheURL.path, privacy: .public) bytes=\(script.count) archive_deferred=\(archiveReason, privacy: .public)")
+        } catch {
+            metalShaderLogger.error("metal4_pipeline_cache_flush_failed path=\(archiveURL.path, privacy: .public) error=\(error.localizedDescription, privacy: .public)")
+        }
     }
 
     private static func vertexStride(for key: MetalShaderKey) -> Int {

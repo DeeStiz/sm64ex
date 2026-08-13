@@ -11,6 +11,38 @@ id<MTLRenderPipelineState> _Nullable SM64ModernMakeRenderPipelineState(
     NSError **error
 ) API_AVAILABLE(macos(26.0));
 
+typedef void (^SM64ModernRenderPipelineCompletion)(
+    id<MTLRenderPipelineState> _Nullable state,
+    NSError * _Nullable error
+) API_AVAILABLE(macos(26.0));
+
+void SM64ModernMakeRenderPipelineStateAsync(
+    id<MTL4Compiler> compiler,
+    MTL4PipelineDescriptor *descriptor,
+    NSArray<id<MTL4Archive>> * _Nullable lookupArchives,
+    SM64ModernRenderPipelineCompletion completion
+) API_AVAILABLE(macos(26.0));
+
+void SM64ModernWaitForRenderPipelineTasks(void) API_AVAILABLE(macos(26.0));
+
+id<MTL4PipelineDataSetSerializer> _Nullable SM64ModernMakePipelineDataSetSerializer(
+    id<MTLDevice> device
+) API_AVAILABLE(macos(26.0));
+id<MTL4Archive> _Nullable SM64ModernLoadArchive(
+    id<MTLDevice> device,
+    NSURL *url,
+    NSError **error
+) API_AVAILABLE(macos(26.0));
+BOOL SM64ModernFlushPipelineDataSetSerializer(
+    id<MTL4PipelineDataSetSerializer> serializer,
+    NSURL *url,
+    NSError **error
+) API_AVAILABLE(macos(26.0));
+NSData * _Nullable SM64ModernSerializePipelineDataSetScript(
+    id<MTL4PipelineDataSetSerializer> serializer,
+    NSError **error
+) API_AVAILABLE(macos(26.0));
+
 void SM64ModernCopyBufferToTexture(
     id<MTL4ComputeCommandEncoder> encoder,
     id<MTLBuffer> source,

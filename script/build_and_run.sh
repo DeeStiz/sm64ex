@@ -160,7 +160,7 @@ case "$MODE" in
       'engine_thread_started' \
       'input_service_ready' \
       'input_bridge_installed abi=1' \
-      'gameplay_bridge_installed abi=1 slices=mario_buttons,bobomb_release' \
+      'gameplay_bridge_installed abi=1 slices=mario_buttons,mario_ground_speed,bobomb_release' \
       'input_snapshot_started owner_main=false' \
       'audio_service_started input_hz=32000 format=s16_interleaved_stereo' \
       'audio_enqueue_started blocks_per_native_step=1' \
@@ -174,7 +174,7 @@ case "$MODE" in
       grep -Fq "$expected" <<< "$runtime_log"
     done
     printf '%s\n' "$runtime_log" \
-      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|input_snapshot_started|audio_service_started|audio_enqueue_started|audio_render_started|timebase_configured|fixed_step_scheduler_(started|status)|lifecycle_running|presentation_cadence|lifecycle_step count=1'
+      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|gameplay_bridge_installed|input_snapshot_started|audio_service_started|audio_enqueue_started|audio_render_started|timebase_configured|fixed_step_scheduler_(started|status)|lifecycle_running|presentation_cadence|lifecycle_step count=1'
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do
       if ! kill -0 "$app_pid" >/dev/null 2>&1; then
@@ -239,6 +239,170 @@ case "$MODE" in
     fi
     printf '%s\n' "$record_log" "$replay_log" \
       | grep -E 'parity_session_started|bounded_parity_run_complete|parity_result subsystem=|parity_session_finished'
+    ;;
+  --m11-shadow-verify|m11-shadow-verify)
+    M11_TEMP="$(mktemp -d "${TMPDIR:-/tmp}/sm64-modern-m11-shadow.XXXXXX")"
+    trap '/bin/rm -rf -- "$M11_TEMP"' EXIT
+    M11_TRACE="$M11_TEMP/mario-ground-speed-v3.trace"
+    M11_RECORD_SAVE="$M11_TEMP/record-save"
+    M11_SHADOW_SAVE="$M11_TEMP/shadow-save"
+    M11_TICKS="${SM64_MODERN_M11_TICKS:-360}"
+    mkdir -p "$M11_RECORD_SAVE" "$M11_SHADOW_SAVE"
+
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=record \
+      --env SM64_MODERN_PARITY_TRACE="$M11_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M11_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M11_RECORD_SAVE" \
+      --env SM64_MODERN_AUTOMATED_GAMEPLAY=1
+    m11_record_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$m11_record_pid"
+    test -s "$M11_TRACE"
+    m11_record_log="$(/usr/bin/log show --last 5m --style compact \
+      --predicate "processIdentifier == $m11_record_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=1 schema=3' <<< "$m11_record_log"
+    grep -Fq "bounded_parity_run_complete steps=$M11_TICKS" <<< "$m11_record_log"
+    grep -Fq 'parity_result subsystem=1 status=0' <<< "$m11_record_log"
+    grep -Fq 'parity_session_finished status=0' <<< "$m11_record_log"
+
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=shadow \
+      --env SM64_MODERN_PARITY_TRACE="$M11_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M11_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M11_SHADOW_SAVE" \
+      --env SM64_MODERN_SWIFT_SLICES=mario-buttons \
+      --env SM64_MODERN_SWIFT_PROMOTE=0 \
+      --env SM64_MODERN_AUTOMATED_GAMEPLAY=1
+    m11_shadow_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$m11_shadow_pid"
+    m11_shadow_log="$(/usr/bin/log show --last 5m --style compact \
+      --predicate "processIdentifier == $m11_shadow_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=3 schema=3' <<< "$m11_shadow_log"
+    grep -Fq 'swift_shadow_started subsystems=1 promote=false' <<< "$m11_shadow_log"
+    grep -Fq 'parity_result subsystem=1 status=0' <<< "$m11_shadow_log"
+    grep -Eq 'swift_gameplay_evidence mario_buttons=[1-9][0-9]* mario_ground_speed=[1-9][0-9]*' <<< "$m11_shadow_log"
+    grep -Fq "bounded_parity_run_complete steps=$M11_TICKS" <<< "$m11_shadow_log"
+    grep -Fq 'parity_session_finished status=0' <<< "$m11_shadow_log"
+    grep -Fq 'engine_thread_finished status=0' <<< "$m11_shadow_log"
+    printf '%s\n' "$m11_record_log" "$m11_shadow_log" \
+      | grep -E 'parity_session_started|swift_shadow_started|swift_gameplay_evidence|bounded_parity_run_complete|parity_result subsystem=1|parity_session_finished|engine_thread_finished status=0'
+    ;;
+  --m13-shadow-verify|m13-shadow-verify)
+    M13_TEMP="$(mktemp -d "${TMPDIR:-/tmp}/sm64-modern-m13-shadow.XXXXXX")"
+    trap '/bin/rm -rf -- "$M13_TEMP"' EXIT
+    M13_TRACE="$M13_TEMP/bobomb-release-v3.trace"
+    M13_RECORD_SAVE="$M13_TEMP/record-save"
+    M13_SHADOW_SAVE="$M13_TEMP/shadow-save"
+    M13_TICKS="${SM64_MODERN_M13_TICKS:-360}"
+    mkdir -p "$M13_RECORD_SAVE" "$M13_SHADOW_SAVE"
+
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=record \
+      --env SM64_MODERN_PARITY_TRACE="$M13_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M13_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M13_RECORD_SAVE" \
+      --env SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
+      --env SM64_MODERN_AUTOMATED_BOBOMB=1
+    m13_record_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$m13_record_pid"
+    test -s "$M13_TRACE"
+    m13_record_log="$(/usr/bin/log show --last 5m --style compact \
+      --predicate "processIdentifier == $m13_record_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=1 schema=3' <<< "$m13_record_log"
+    grep -Fq "bounded_parity_run_complete steps=$M13_TICKS" <<< "$m13_record_log"
+    grep -Fq 'parity_result subsystem=4 status=0' <<< "$m13_record_log"
+    grep -Fq 'parity_session_finished status=0' <<< "$m13_record_log"
+
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=shadow \
+      --env SM64_MODERN_PARITY_TRACE="$M13_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M13_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M13_SHADOW_SAVE" \
+      --env SM64_MODERN_SWIFT_SLICES=bobomb-release \
+      --env SM64_MODERN_SWIFT_PROMOTE=0 \
+      --env SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
+      --env SM64_MODERN_AUTOMATED_BOBOMB=1
+    m13_shadow_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$m13_shadow_pid"
+    m13_shadow_log="$(/usr/bin/log show --last 5m --style compact \
+      --predicate "processIdentifier == $m13_shadow_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=3 schema=3' <<< "$m13_shadow_log"
+    grep -Fq 'swift_shadow_started subsystems=4 promote=false' <<< "$m13_shadow_log"
+    grep -Fq 'parity_result subsystem=4 status=0' <<< "$m13_shadow_log"
+    grep -Eq 'swift_gameplay_evidence .*bobomb_release=[1-9][0-9]*' <<< "$m13_shadow_log"
+    grep -Fq "bounded_parity_run_complete steps=$M13_TICKS" <<< "$m13_shadow_log"
+    grep -Fq 'parity_session_finished status=0' <<< "$m13_shadow_log"
+    grep -Fq 'engine_thread_finished status=0' <<< "$m13_shadow_log"
+    printf '%s\n' "$m13_record_log" "$m13_shadow_log" \
+      | grep -E 'parity_session_started|swift_shadow_started|swift_gameplay_evidence|bounded_parity_run_complete|parity_result subsystem=4|parity_session_finished|engine_thread_finished status=0'
+    ;;
+  --m14-native-verify|m14-native-verify)
+    M14_TEMP="$(mktemp -d "${TMPDIR:-/tmp}/sm64-modern-m14-native.XXXXXX")"
+    trap '/bin/rm -rf -- "$M14_TEMP"' EXIT
+    M14_TRACE="$M14_TEMP/bobomb-native-default-v1.trace"
+    M14_RECORD_SAVE="$M14_TEMP/record-save"
+    M14_SHADOW_SAVE="$M14_TEMP/shadow-save"
+    M14_TICKS="${SM64_MODERN_M14_TICKS:-8}"
+    M14_SWIFT_TICKS="${SM64_MODERN_M14_SWIFT_TICKS:-8}"
+    M14_TOTAL_TICKS=$((M14_TICKS + M14_SWIFT_TICKS))
+    mkdir -p "$M14_RECORD_SAVE" "$M14_SHADOW_SAVE"
+
+    # Explicit C fallback records the deterministic Battlefield trace. The
+    # authority telemetry makes the default safe path observable.
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=record \
+      --env SM64_MODERN_PARITY_TRACE="$M14_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M14_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M14_RECORD_SAVE" \
+      --env SM64_MODERN_SWIFT_AUTHORITY=c \
+      --env SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
+      --env SM64_MODERN_AUTOMATED_BOBOMB=1
+    m14_record_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$m14_record_pid"
+    test -s "$M14_TRACE"
+    m14_record_log="$(/usr/bin/log show --last 5m --style compact \
+      --predicate "processIdentifier == $m14_record_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=1 schema=3' <<< "$m14_record_log"
+    grep -Fq 'swift_authority_fallback=c' <<< "$m14_record_log"
+    grep -Fq "bounded_parity_run_complete steps=$M14_TICKS" <<< "$m14_record_log"
+    grep -Fq 'parity_result subsystem=4 status=0' <<< "$m14_record_log"
+    grep -Eq 'swift_gameplay_evidence .*bobomb_release=0' <<< "$m14_record_log"
+    grep -Fq 'engine_thread_finished status=0' <<< "$m14_record_log"
+
+    # Native Swift authority is never enabled directly. This pass requires a
+    # bounded shadow comparison, promotes only after eligibility/evidence, and
+    # then proves post-promotion callback execution for a second bounded slice.
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=shadow \
+      --env SM64_MODERN_PARITY_TRACE="$M14_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M14_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M14_SHADOW_SAVE" \
+      --env SM64_MODERN_SWIFT_AUTHORITY=swift \
+      --env SM64_MODERN_SWIFT_SLICES=bobomb-release \
+      --env SM64_MODERN_SWIFT_PROMOTE=1 \
+      --env SM64_MODERN_SWIFT_AUTHORITY_TICKS="$M14_SWIFT_TICKS" \
+      --env SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
+      --env SM64_MODERN_AUTOMATED_BOBOMB=1
+    m14_shadow_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$m14_shadow_pid"
+    m14_shadow_log="$(/usr/bin/log show --last 5m --style compact \
+      --predicate "processIdentifier == $m14_shadow_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=3 schema=3' <<< "$m14_shadow_log"
+    grep -Fq 'swift_authority_requested mode=native' <<< "$m14_shadow_log"
+    grep -Fq 'swift_shadow_started subsystems=4 promote=true' <<< "$m14_shadow_log"
+    grep -Eq 'swift_gameplay_evidence .*bobomb_release=[1-9][0-9]*' <<< "$m14_shadow_log"
+    grep -Fq 'parity_result subsystem=4 status=0' <<< "$m14_shadow_log"
+    grep -Fq 'swift_authority_promoted subsystems=4' <<< "$m14_shadow_log"
+    grep -Fq "bounded_swift_authority_run_complete steps=$M14_TOTAL_TICKS authority_steps=$M14_SWIFT_TICKS" <<< "$m14_shadow_log"
+    grep -Fq 'engine_thread_finished status=0' <<< "$m14_shadow_log"
+    printf '%s\n' "$m14_record_log" "$m14_shadow_log" \
+      | grep -E 'swift_authority_(fallback=c|requested mode=native|promoted)|swift_shadow_started|swift_gameplay_evidence|bounded_(parity_run_complete|swift_authority_run_complete)|parity_result subsystem=4|engine_thread_finished status=0'
     ;;
   --m7-record-live|m7-record-live)
     M7_DIR="${SM64_MODERN_M7_DIR:-$PROJECT_ROOT/build/sm64-modern-m7-live}"
@@ -315,7 +479,7 @@ case "$MODE" in
       | grep -E 'swift_shadow_started|swift_gameplay_slice_exercised|parity_result subsystem=(1|4)|swift_authority_promoted|bounded_swift_authority_run_complete|engine_thread_finished status=0'
     ;;
   *)
-    echo "usage: $0 [run|--debug|--logs|--telemetry|--metal-validation|--metal-hud|--metal-capture|--verify|--parity-verify|--m7-record-live|--m7-shadow-live]" >&2
+    echo "usage: $0 [run|--debug|--logs|--telemetry|--metal-validation|--metal-hud|--metal-capture|--verify|--parity-verify|--m11-shadow-verify|--m13-shadow-verify|--m14-native-verify|--m7-record-live|--m7-shadow-live]" >&2
     exit 2
     ;;
 esac

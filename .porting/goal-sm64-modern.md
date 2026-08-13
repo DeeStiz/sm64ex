@@ -30,6 +30,11 @@ Create a parallel Apple-silicon macOS 27 application using Swift 6.4, AppKit, Me
 | M8c: World dynamics | Mario, actors, platforms, collisions, camera, particles, and environmental motion integrate coherently at 60 Hz. | Complete |
 | M8d: Full-world 60 Hz | Native input/audio/presentation integration and full-world deterministic/time-based gates pass with the 60 Hz clock active. | Complete |
 | M9: Release | Performance, validation, leaks, signing, notarization, and clean-machine checks pass. | Complete |
+| M10: Metal 4 frame packets | Batch scene submission into reusable frame storage and a versioned C/Swift rendering bridge without changing the owner-thread presentation contract. | Complete |
+| M11: Swift Mario movement | Run the ground-speed kernel through a fixed-width POD callback with exact C/shadow parity evidence. | Complete |
+| M12: Metal 4 pipeline readiness | Move shader/pipeline compilation off the display-link owner and persist a device/schema-keyed pipeline descriptor cache. | Complete |
+| M13: Swift Bob-omb actor | Migrate the typed Bob-omb release transition through C reference, shadow Swift, and exact bounded authority gates. | Complete |
+| M14: Swift authority default | Make Swift authority an explicit, fail-closed mode with C fallback and current-product bounded promotion evidence. | Complete |
 
 ## Completed Milestone: M0
 

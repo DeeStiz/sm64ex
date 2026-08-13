@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <math.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -13,6 +14,9 @@
 static SM64ModernGameplayMigrationApiV1 sMigration;
 static SM64ModernStatus sMigrationStatus = SM64_MODERN_STATUS_OK;
 static bool sMigrationInstalled;
+static SM64ModernMarioGroundSpeedApiV1 sGroundSpeed;
+static SM64ModernStatus sGroundSpeedStatus = SM64_MODERN_STATUS_OK;
+static bool sGroundSpeedInstalled;
 
 static bool valid_header(const SM64ModernAbiHeader *header, uint32_t size) {
     return header && header->abi_version == SM64_MODERN_ABI_VERSION_1
@@ -38,6 +42,12 @@ static void initialize_mario_output(SM64ModernMarioButtonOutputV1 *output) {
 }
 
 static void initialize_bobomb_output(SM64ModernBobombReleaseOutputV1 *output) {
+    memset(output, 0, sizeof(*output));
+    output->header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    output->header.struct_size = sizeof(*output);
+}
+
+static void initialize_ground_speed_output(SM64ModernMarioGroundSpeedOutputV1 *output) {
     memset(output, 0, sizeof(*output));
     output->header.abi_version = SM64_MODERN_ABI_VERSION_1;
     output->header.struct_size = sizeof(*output);
@@ -75,6 +85,7 @@ SM64ModernStatus sm64_modern_install_gameplay_migration_api(
 }
 
 void sm64_modern_uninstall_gameplay_migration_api(void) {
+    sm64_modern_uninstall_mario_ground_speed_api();
     memset(&sMigration, 0, sizeof(sMigration));
     sMigrationInstalled = false;
     sMigrationStatus = SM64_MODERN_STATUS_OK;
@@ -86,6 +97,45 @@ SM64ModernStatus sm64_modern_gameplay_migration_status(void) {
 
 SM64ModernStatus sm64_modern_gameplay_migration_active_status(void) {
     return sMigrationInstalled ? sMigrationStatus : SM64_MODERN_STATUS_OK;
+}
+
+SM64ModernStatus sm64_modern_validate_mario_ground_speed_api(
+    const SM64ModernMarioGroundSpeedApiV1 *api) {
+    if (!api) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (api->header.abi_version != SM64_MODERN_ABI_VERSION_1) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_VERSION;
+    }
+    if (api->header.struct_size < sizeof(*api)) {
+        return SM64_MODERN_STATUS_BUFFER_TOO_SMALL;
+    }
+    return api->update ? SM64_MODERN_STATUS_OK : SM64_MODERN_STATUS_INVALID_ARGUMENT;
+}
+
+SM64ModernStatus sm64_modern_install_mario_ground_speed_api(
+    const SM64ModernMarioGroundSpeedApiV1 *api) {
+    const SM64ModernStatus status = sm64_modern_validate_mario_ground_speed_api(api);
+    if (status != SM64_MODERN_STATUS_OK) {
+        return status;
+    }
+    if (!sMigrationInstalled || sGroundSpeedInstalled) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+    memcpy(&sGroundSpeed, api, sizeof(sGroundSpeed));
+    sGroundSpeedInstalled = true;
+    sGroundSpeedStatus = SM64_MODERN_STATUS_OK;
+    return SM64_MODERN_STATUS_OK;
+}
+
+void sm64_modern_uninstall_mario_ground_speed_api(void) {
+    memset(&sGroundSpeed, 0, sizeof(sGroundSpeed));
+    sGroundSpeedInstalled = false;
+    sGroundSpeedStatus = SM64_MODERN_STATUS_OK;
+}
+
+SM64ModernStatus sm64_modern_mario_ground_speed_status(void) {
+    return sGroundSpeedInstalled ? sGroundSpeedStatus : SM64_MODERN_STATUS_INVALID_STATE;
 }
 
 SM64ModernStatus sm64_modern_gameplay_reference_mario_buttons(
@@ -129,6 +179,80 @@ SM64ModernStatus sm64_modern_gameplay_reference_mario_buttons(
     } else if (out_output->frames_since_b < UINT8_MAX) {
         out_output->frames_since_b++;
     }
+    return SM64_MODERN_STATUS_OK;
+}
+
+static int32_t approach_s32_reference(int32_t current, int32_t target,
+                                      int32_t increment, int32_t decrement) {
+    if (current < target) {
+        current += increment;
+        if (current > target) {
+            current = target;
+        }
+    } else {
+        current -= decrement;
+        if (current < target) {
+            current = target;
+        }
+    }
+    return current;
+}
+
+SM64ModernStatus sm64_modern_gameplay_reference_mario_ground_speed(
+    const SM64ModernMarioGroundSpeedInputV1 *input,
+    SM64ModernMarioGroundSpeedOutputV1 *out_output) {
+    if (!input || !out_output
+        || !valid_header(&input->header, sizeof(*input)) || input->reserved != 0
+        || input->floor_is_slow > 1u || input->responsive_cheat > 1u
+        || input->cheats_enabled > 1u) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+
+    const float intended_magnitude = sm64_modern_gameplay_float_from_bits(
+        input->intended_magnitude_bits);
+    const float quicksand_depth = sm64_modern_gameplay_float_from_bits(
+        input->quicksand_depth_bits);
+    const float floor_normal_y = sm64_modern_gameplay_float_from_bits(
+        input->floor_normal_y_bits);
+    float forward_velocity = sm64_modern_gameplay_float_from_bits(
+        input->forward_velocity_bits);
+    if (!isfinite(intended_magnitude) || !isfinite(quicksand_depth)
+        || !isfinite(floor_normal_y) || !isfinite(forward_velocity)) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+
+    float max_target_speed = input->floor_is_slow != 0u ? 24.0f : 32.0f;
+    float target_speed = intended_magnitude < max_target_speed
+        ? intended_magnitude : max_target_speed;
+    if (quicksand_depth > 10.0f) {
+        target_speed = (float)((double) target_speed
+                               * (6.25 / (double) quicksand_depth));
+    }
+
+    if (forward_velocity <= 0.0f) {
+        forward_velocity += 1.1f;
+    } else if (forward_velocity <= target_speed) {
+        forward_velocity += 1.1f - forward_velocity / 43.0f;
+    } else if (floor_normal_y >= 0.95f) {
+        forward_velocity -= 1.0f;
+    }
+    if (forward_velocity > 48.0f) {
+        forward_velocity = 48.0f;
+    }
+
+    const int32_t intended_yaw = (int32_t)(int16_t) input->intended_yaw;
+    const int32_t face_yaw = (int32_t)(int16_t) input->face_yaw;
+    int32_t next_face_yaw;
+    if (input->responsive_cheat != 0u && input->cheats_enabled != 0u) {
+        next_face_yaw = intended_yaw;
+    } else {
+        const int32_t delta = (int32_t)(int16_t)(intended_yaw - face_yaw);
+        next_face_yaw = intended_yaw - approach_s32_reference(delta, 0, 0x800, 0x800);
+    }
+
+    initialize_ground_speed_output(out_output);
+    out_output->forward_velocity_bits = sm64_modern_gameplay_float_bits(forward_velocity);
+    out_output->face_yaw = (int32_t)(int16_t) next_face_yaw;
     return SM64_MODERN_STATUS_OK;
 }
 
@@ -180,6 +304,23 @@ static SM64ModernStatus invoke_mario_callback(
         ? SM64_MODERN_STATUS_OK : SM64_MODERN_STATUS_INVALID_ARGUMENT;
 }
 
+static SM64ModernStatus invoke_ground_speed_callback(
+    const SM64ModernMarioGroundSpeedInputV1 *input,
+    SM64ModernMarioGroundSpeedOutputV1 *out_output) {
+    if (!sGroundSpeedInstalled) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+    initialize_ground_speed_output(out_output);
+    const SM64ModernStatus status = sGroundSpeed.update(
+        sGroundSpeed.context, input, out_output);
+    if (status != SM64_MODERN_STATUS_OK) {
+        return status;
+    }
+    return valid_header(&out_output->header, sizeof(*out_output))
+            && out_output->reserved == 0
+        ? SM64_MODERN_STATUS_OK : SM64_MODERN_STATUS_INVALID_ARGUMENT;
+}
+
 static SM64ModernStatus invoke_bobomb_callback(
     const SM64ModernBobombReleaseInputV1 *input,
     SM64ModernBobombReleaseOutputV1 *out_output) {
@@ -226,6 +367,35 @@ SM64ModernStatus sm64_modern_gameplay_update_mario_buttons(
     }
     if (authority == SM64_MODERN_AUTHORITY_SHADOW_SWIFT) {
         return sm64_modern_gameplay_reference_mario_buttons(input, out_output);
+    }
+    *out_output = swift_output;
+    return SM64_MODERN_STATUS_OK;
+}
+
+SM64ModernStatus sm64_modern_gameplay_update_mario_ground_speed(
+    const SM64ModernMarioGroundSpeedInputV1 *input,
+    SM64ModernMarioGroundSpeedOutputV1 *out_output) {
+    if (!input || !out_output) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    SM64ModernAuthority authority;
+    SM64ModernStatus status = sm64_modern_gameplay_get_authority(
+        SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO, &authority);
+    if (status != SM64_MODERN_STATUS_OK) {
+        return status;
+    }
+    if (authority == SM64_MODERN_AUTHORITY_C) {
+        return sm64_modern_gameplay_reference_mario_ground_speed(input, out_output);
+    }
+
+    SM64ModernMarioGroundSpeedOutputV1 swift_output;
+    status = invoke_ground_speed_callback(input, &swift_output);
+    if (status != SM64_MODERN_STATUS_OK) {
+        sGroundSpeedStatus = status;
+        return status;
+    }
+    if (authority == SM64_MODERN_AUTHORITY_SHADOW_SWIFT) {
+        return sm64_modern_gameplay_reference_mario_ground_speed(input, out_output);
     }
     *out_output = swift_output;
     return SM64_MODERN_STATUS_OK;

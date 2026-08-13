@@ -12,6 +12,11 @@ static struct ObjectHitbox sBobombHitbox = {
     /* hurtboxHeight:     */ 0,
 };
 
+// M13's live gate uses one deterministic release to prove the typed actor
+// contract against a real level object. It is intentionally process-local and
+// opt-in; normal Bob-omb behavior never consults this flag.
+static u8 sAutomatedBobombReleaseIssued;
+
 void bhv_bobomb_init(void) {
     o->oGravity = 2.5;
     o->oFriction = 0.8;
@@ -189,11 +194,19 @@ void bobomb_held_loop(void) {
 }
 
 static void bobomb_apply_release_transition(u32 heldState) {
+    // The release slice is owned by the Battlefield actor subsystem.  Object
+    // callbacks can run while another legacy subsystem is still on the
+    // parity stack (for example after level-script work), so do not inherit a
+    // stale stack owner for this typed actor transition.
+    const SM64ModernGameplaySubsystem subsystem =
+        gCurrLevelNum == LEVEL_BOB
+            ? SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_BOBOMB_BATTLEFIELD
+            : sm64_modern_parity_current_subsystem();
     const SM64ModernBobombReleaseInputV1 input = {
         { SM64_MODERN_ABI_VERSION_1, sizeof(SM64ModernBobombReleaseInputV1) },
         sm64_modern_parity_simulation_tick(),
         sm64_modern_parity_object_slot(o),
-        sm64_modern_parity_current_subsystem(),
+        subsystem,
         heldState,
         o->oFlags,
         (u16) o->header.gfx.node.flags,
@@ -249,6 +262,13 @@ void curr_obj_random_blink(s32 *blinkTimer) {
 
 void bhv_bobomb_loop(void) {
     s8 dustPeriodMinus1;
+    if (sAutomatedBobombReleaseIssued == 0
+        && getenv("SM64_MODERN_AUTOMATED_BOBOMB") != NULL
+        && gCurrLevelNum == LEVEL_BOB) {
+        sAutomatedBobombReleaseIssued = 1;
+        o->oHeldState = HELD_THROWN;
+        bobomb_thrown_loop();
+    }
     if (is_point_within_radius_of_mario(o->oPosX, o->oPosY, o->oPosZ, 4000) != 0) {
         switch (o->oHeldState) {
             case HELD_FREE:

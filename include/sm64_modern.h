@@ -312,6 +312,32 @@ typedef struct SM64ModernMarioButtonOutputV1 {
     uint32_t reserved;
 } SM64ModernMarioButtonOutputV1;
 
+// Bounded Mario ground-speed slice. Only scalar state crosses the boundary;
+// slope acceleration, sand, wind, collision, and action transitions remain in
+// C. Float fields use IEEE-754 bit patterns and angles are sign-extended N64
+// s16 values carried in int32 slots.
+typedef struct SM64ModernMarioGroundSpeedInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t intended_magnitude_bits;
+    uint32_t forward_velocity_bits;
+    uint32_t quicksand_depth_bits;
+    uint32_t floor_normal_y_bits;
+    int32_t intended_yaw;
+    int32_t face_yaw;
+    uint32_t floor_is_slow;
+    uint32_t responsive_cheat;
+    uint32_t cheats_enabled;
+    uint32_t reserved;
+} SM64ModernMarioGroundSpeedInputV1;
+
+typedef struct SM64ModernMarioGroundSpeedOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t forward_velocity_bits;
+    int32_t face_yaw;
+    uint32_t reserved;
+} SM64ModernMarioGroundSpeedOutputV1;
+
 typedef struct SM64ModernBobombReleaseInputV1 {
     SM64ModernAbiHeader header;
     uint64_t simulation_tick;
@@ -338,6 +364,10 @@ typedef SM64ModernStatus (*SM64ModernMarioButtonUpdateFn)(
     void *context,
     const SM64ModernMarioButtonInputV1 *input,
     SM64ModernMarioButtonOutputV1 *out_output);
+typedef SM64ModernStatus (*SM64ModernMarioGroundSpeedUpdateFn)(
+    void *context,
+    const SM64ModernMarioGroundSpeedInputV1 *input,
+    SM64ModernMarioGroundSpeedOutputV1 *out_output);
 typedef SM64ModernStatus (*SM64ModernBobombReleaseUpdateFn)(
     void *context,
     const SM64ModernBobombReleaseInputV1 *input,
@@ -355,6 +385,14 @@ typedef struct SM64ModernGameplayMigrationApiV1 {
     SM64ModernBobombReleaseUpdateFn update_bobomb_release;
     SM64ModernGameplayCandidateTransformFn transform_candidate;
 } SM64ModernGameplayMigrationApiV1;
+
+// Optional gameplay-kernel extension. It is installed separately so the
+// original migration table remains ABI-stable for existing hosts.
+typedef struct SM64ModernMarioGroundSpeedApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioGroundSpeedUpdateFn update;
+} SM64ModernMarioGroundSpeedApiV1;
 
 // The native renderer is installed from the platform initialize callback, on
 // the lifecycle owner thread. Every pointer passed to a callback is borrowed
@@ -423,6 +461,19 @@ typedef struct SM64ModernRenderingApiV1 {
     SM64ModernRenderFrameFn finish_render;
     SM64ModernRenderGetDimensionsFn get_dimensions;
 } SM64ModernRenderingApiV1;
+
+// Optional frame-batch extension for native renderers. The legacy rendering
+// callbacks remain the compatibility path; when this extension is installed,
+// frame lifecycle and triangle submission are routed through the batch owner.
+// Vertex memory is borrowed for the duration of append_triangles only.
+typedef struct SM64ModernRenderingBatchApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernRenderFrameFn start_frame;
+    SM64ModernRenderDrawTrianglesFn append_triangles;
+    SM64ModernRenderFrameFn end_frame;
+    SM64ModernRenderFrameFn finish_render;
+} SM64ModernRenderingBatchApiV1;
 
 typedef struct SM64ModernGameplayRecordEnvelopeV1 {
     SM64ModernAbiHeader header;
@@ -567,10 +618,20 @@ SM64ModernStatus sm64_modern_install_gameplay_migration_api(
     const SM64ModernGameplayMigrationApiV1 *migration);
 void sm64_modern_uninstall_gameplay_migration_api(void);
 SM64ModernStatus sm64_modern_gameplay_migration_status(void);
+SM64ModernStatus sm64_modern_validate_mario_ground_speed_api(
+    const SM64ModernMarioGroundSpeedApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_ground_speed_api(
+    const SM64ModernMarioGroundSpeedApiV1 *api);
+void sm64_modern_uninstall_mario_ground_speed_api(void);
+SM64ModernStatus sm64_modern_mario_ground_speed_status(void);
 SM64ModernStatus sm64_modern_validate_rendering_api(const SM64ModernRenderingApiV1 *rendering);
 SM64ModernStatus sm64_modern_install_rendering_api(const SM64ModernRenderingApiV1 *rendering);
 void sm64_modern_uninstall_rendering_api(void);
 SM64ModernStatus sm64_modern_rendering_status(void);
+SM64ModernStatus sm64_modern_validate_rendering_batch_api(const SM64ModernRenderingBatchApiV1 *batch);
+SM64ModernStatus sm64_modern_install_rendering_batch_api(const SM64ModernRenderingBatchApiV1 *batch);
+void sm64_modern_uninstall_rendering_batch_api(void);
+SM64ModernStatus sm64_modern_rendering_batch_status(void);
 SM64ModernStatus sm64_modern_get_gameplay_api(uint32_t requested_version,
                                               uint32_t output_size,
                                               SM64ModernGameplayApiV1 *out_api);

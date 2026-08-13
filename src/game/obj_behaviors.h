@@ -37,6 +37,8 @@ void bobomb_dropped_loop(void);
 void bobomb_thrown_loop(void);
 void curr_obj_random_blink(s32 *blinkTimer);
 void bhv_bobomb_loop(void);
+// Test-only M13 gate: run one typed Bob-omb release against a loaded object.
+void sm64_modern_bobomb_release_test_step(void);
 void bhv_bobomb_fuse_smoke_init(void);
 void bhv_bobomb_buddy_init(void);
 void bobomb_buddy_act_idle(void);

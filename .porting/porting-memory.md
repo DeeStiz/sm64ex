@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- M9 Release is handed off in commit `6e7c561`: local optimized Release/package, runtime, performance, Metal, GPU, leak, ASan, and regression evidence passed.
+- M10-M14 are implemented in the current uncommitted worktree: reusable Metal 4 frame packets, Swift Mario ground speed, asynchronous pipeline/cache preparation, typed Swift Bob-omb release, and explicit native Swift authority all pass their bounded gates; no commit/push was authorized.
 - The 3,600-step Release profile recorded zero scheduler drops, zero audio drops, zero underruns, and +3.49 MiB RSS; two leak snapshots reported zero app leaks. Metal HUD and validation also exited cleanly.
 - The fetched CAMetalLayer title drawable was intact; full-screen capture was limited by the app window being on a negative-coordinate secondary display, so human visual confirmation remains open.
 - Developer ID/notarization, clean-machine, unavailable Linux/Windows/web, physical controller/audio, and normal BOB entrance/subsystem-4 acceptance remain external or human gates.
@@ -122,10 +122,10 @@
 - A sanitizer build reuses `build/sm64-modern-debug`; force a normal native-core rebuild afterward because Make does not encode sanitizer flags into dependency identity.
 - M9 long-run leaks were zero app-owned bytes; keep framework-only macOS audio listener variance separate from product leak claims.
 - Preserve per-texture sampler state, clamp precedence, exact texture-generation retention, and the display-link owner-thread guard; weakening any of these reopens the M6 texture-corruption or screenshot/Spaces crash regressions.
-- Repeat current-product live BOB record/shadow and verify an unmodified Bob-omb Battlefield entrance has BOB music and motions; the M9 default save stayed outside BOB and emitted no subsystem-4 result.
+- Current-product M13/M14 bounded Bob-omb record/shadow/authority runs pass for 360/8 ticks; the opt-in reserved-subject helper is test-only, so an unmodified human Bob-omb Battlefield entrance, music, motion, and physical acceptance remain open.
 - M7 live traces fingerprint the signed app directory. Record first, then shadow the exact same product; do not rebuild, relink, or re-sign between those phases.
 - M8d native 60/30 product integration and parity passed; the private world smoke is still bounded-model evidence rather than independent full-world cross-rate proof, and physical controller/haptic acceptance remains untested.
-- The M8d layer-boundary trace and live window agree; discovery still has no external GPU ground truth, so local draw/pass counts are regression evidence only.
+- The current automated layer capture has a valid 34-draw/29-blit Metal 4 pass and populated transient geometry, but the fetched drawable and foreground window are black after the display link stops at three presents; treat visual/human acceptance as open until a visible-window capture is repeated.
 - M9 profile audio was clean in-window; teardown-only underruns from instrumented/short runs are not release-bar evidence.
 
 ## Feature Status
@@ -136,11 +136,11 @@
 | Callable C core | Implemented — versioned lifecycle/platform/gameplay POD ABI, static archive, legacy adapter, and C/C++ smoke consumer |
 | AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 60/30 C-core owner thread with clean shutdown |
 | Metal 4 device/presentation | Implemented — validated raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
-| Metal 4 rendering | Implemented — complete-scene POD bridge/replay with dynamic MSL, private textures, memoryless depth, samplers, state, display lists, explicit residency/barriers, trace inspection, and clean Metal validation |
+| Metal 4 rendering | Implemented — complete-scene POD bridge/replay with reusable batched frame storage, async Metal 4 MSL/pipeline preparation, device/schema-keyed descriptor fallback cache, private textures, memoryless depth, samplers, state, residency/barriers, trace inspection, and clean Metal validation |
 | Native input | Implemented — native-tick snapshots, retained edges, keyboard/mouse bridge, and haptic bridge passed; no physical controller was connected in M8d |
 | Native audio | Implemented — 32 kHz interleaved s16 stereo through a lock-free SPSC ring, one block per native tick, and owner-thread AVAudioEngine/source-node lifecycle with route recovery |
 | Gameplay parity | Implemented — fixed-width deterministic input/snapshot/effect traces, compatibility fingerprints, first-divergence diagnostics, bounded host streams, and independent per-subsystem Swift authority gates |
-| Swift gameplay | Implemented — copied POD callbacks and exact per-subsystem gates for Mario A/B/Z edges and Bob-omb thrown/dropped release transitions; fresh current-product long validation remains on the watch list |
+| Swift gameplay | Implemented — copied POD callbacks and exact per-subsystem gates for Mario A/B/Z edges and Bob-omb thrown/dropped release transitions; current-product bounded M11/M13/M14 evidence passes while normal-gameplay visual/audio and long unmodified BOB acceptance remain open |
 | Native timebase | Implemented — rational paired-rate ABI, lifecycle-frozen configuration, monotonic fixed-step host scheduler, 60/30 telemetry, trace fingerprinting, and timing-inventory seams |
 | World cadence | Implemented — paired-boundary scripts/timers/events remain intact while native dynamics and product 60/30 activation pass the audited gates |
 | Full-world 60 Hz | Partial — native product input/audio/presentation/parity integration passes, but independent full-world cross-rate, external-ground-truth, and hardware acceptance remain open |
@@ -185,7 +185,7 @@
 - Trace headers fingerprint schema, build, initial save state, and subsystem mask. A mismatch is an intentional hard failure rather than a best-effort replay fallback.
 - Sound, rumble, object lifecycle, and PCM checksums are deterministic effects. PCM is hashed before device delivery; parity code must never enter or instrument the real-time AVAudioEngine callback.
 - Renderer texture records own sampler intent per texture generation. Clamp beats mirror/repeat when both legacy flags appear, and retired generations remain alive/resident until shared-event completion.
-- M7 Swift kernels own only declared scalar outputs. C retains animation, floor resolution, render helpers, the object graph, and every non-migrated behavior branch through narrow adapters.
+- M7-M14 Swift kernels own only declared scalar outputs through fixed-width POD adapters. C retains animation, floor resolution, render helpers, the object graph, and every non-migrated behavior branch; M10/M12 keep Metal packet ownership and pipeline compilation off the display-link callback.
 - Candidate transformation substitutes only Swift-owned fields in the complete C reference stream; callback absence/failure, incomplete candidates, or any value mismatch are hard failures rather than silent C fallback.
 - A parity trace fingerprints the signed app directory. Rebuilding or re-signing between record and shadow invalidates the trace at tick zero, so the shadow harness deliberately verifies and reuses the record product.
 - M8a is committed as `a6606b5`. `sm64_modern_timebase` owns exact rational simulation/legacy rates and the compatibility fingerprint; `FixedStepScheduler` owns monotonic deadlines and bounded catch-up on the existing engine thread. Shipping configuration remains 30/1 until later M8 gates deliberately activate 60 Hz.

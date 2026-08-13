@@ -56,6 +56,18 @@ static SM64ModernBobombReleaseInputV1 bobomb_input(uint32_t held_state) {
     return input;
 }
 
+static SM64ModernMarioGroundSpeedInputV1 ground_speed_input(void) {
+    SM64ModernMarioGroundSpeedInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.intended_magnitude_bits = sm64_modern_gameplay_float_bits(32.0f);
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(0.0f);
+    input.quicksand_depth_bits = sm64_modern_gameplay_float_bits(0.0f);
+    input.floor_normal_y_bits = sm64_modern_gameplay_float_bits(1.0f);
+    return input;
+}
+
 static SM64ModernStatus smoke_mario(void *context,
                                     const SM64ModernMarioButtonInputV1 *input,
                                     SM64ModernMarioButtonOutputV1 *out_output) {
@@ -68,6 +80,14 @@ static SM64ModernStatus smoke_bobomb(void *context,
                                      SM64ModernBobombReleaseOutputV1 *out_output) {
     (*(uint32_t *) context)++;
     return sm64_modern_gameplay_reference_bobomb_release(input, out_output);
+}
+
+static SM64ModernStatus smoke_ground_speed(
+    void *context,
+    const SM64ModernMarioGroundSpeedInputV1 *input,
+    SM64ModernMarioGroundSpeedOutputV1 *out_output) {
+    (*(uint32_t *) context)++;
+    return sm64_modern_gameplay_reference_mario_ground_speed(input, out_output);
 }
 
 static SM64ModernStatus smoke_transform(void *context,
@@ -213,6 +233,42 @@ static void verify_bobomb_reference(void) {
                   SM64_MODERN_STATUS_INVALID_ARGUMENT);
 }
 
+static void verify_ground_speed_reference(void) {
+    SM64ModernMarioGroundSpeedInputV1 input = ground_speed_input();
+    SM64ModernMarioGroundSpeedOutputV1 output;
+    expect_status("Ground-speed null input dispatch",
+                  sm64_modern_gameplay_update_mario_ground_speed(NULL, &output),
+                  SM64_MODERN_STATUS_INVALID_ARGUMENT);
+    expect_status("Ground-speed null output dispatch",
+                  sm64_modern_gameplay_update_mario_ground_speed(&input, NULL),
+                  SM64_MODERN_STATUS_INVALID_ARGUMENT);
+    expect_status("Ground-speed initial reference",
+                  sm64_modern_gameplay_reference_mario_ground_speed(&input, &output),
+                  SM64_MODERN_STATUS_OK);
+    expect_u32("Ground-speed initial velocity", output.forward_velocity_bits,
+               sm64_modern_gameplay_float_bits(1.1f));
+    expect_u32("Ground-speed initial yaw", (uint32_t) output.face_yaw, 0);
+
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(20.0f);
+    input.face_yaw = -0x1000;
+    expect_status("Ground-speed turn reference",
+                  sm64_modern_gameplay_reference_mario_ground_speed(&input, &output),
+                  SM64_MODERN_STATUS_OK);
+    expect_u32("Ground-speed turn velocity", output.forward_velocity_bits,
+               sm64_modern_gameplay_float_bits(20.0f + 1.1f - 20.0f / 43.0f));
+    expect_u32("Ground-speed turn yaw", (uint32_t) output.face_yaw, (uint32_t) -0x800);
+
+    input.floor_is_slow = 1;
+    input.quicksand_depth_bits = sm64_modern_gameplay_float_bits(25.0f);
+    input.responsive_cheat = 1;
+    input.cheats_enabled = 1;
+    input.intended_yaw = 0x2345;
+    expect_status("Ground-speed cheat reference",
+                  sm64_modern_gameplay_reference_mario_ground_speed(&input, &output),
+                  SM64_MODERN_STATUS_OK);
+    expect_u32("Ground-speed responsive yaw", (uint32_t) output.face_yaw, 0x2345);
+}
+
 static void verify_callback_contract(void) {
     uint32_t callback_count = 0;
     SM64ModernGameplayMigrationApiV1 api;
@@ -237,6 +293,26 @@ static void verify_callback_contract(void) {
     api.header.struct_size = sizeof(api);
     expect_status("Migration install", sm64_modern_install_gameplay_migration_api(&api),
                   SM64_MODERN_STATUS_OK);
+    SM64ModernMarioGroundSpeedApiV1 ground_api;
+    memset(&ground_api, 0, sizeof(ground_api));
+    ground_api.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    ground_api.header.struct_size = sizeof(ground_api);
+    ground_api.context = &callback_count;
+    expect_status("Ground-speed missing callback",
+                  sm64_modern_validate_mario_ground_speed_api(&ground_api),
+                  SM64_MODERN_STATUS_INVALID_ARGUMENT);
+    ground_api.update = smoke_ground_speed;
+    expect_status("Ground-speed API valid",
+                  sm64_modern_validate_mario_ground_speed_api(&ground_api),
+                  SM64_MODERN_STATUS_OK);
+    expect_status("Ground-speed install",
+                  sm64_modern_install_mario_ground_speed_api(&ground_api),
+                  SM64_MODERN_STATUS_OK);
+    expect_status("Ground-speed status", sm64_modern_mario_ground_speed_status(),
+                  SM64_MODERN_STATUS_OK);
+    expect_status("Ground-speed double install",
+                  sm64_modern_install_mario_ground_speed_api(&ground_api),
+                  SM64_MODERN_STATUS_INVALID_STATE);
     expect_status("Migration status", sm64_modern_gameplay_migration_status(),
                   SM64_MODERN_STATUS_OK);
     expect_status("Migration double install", sm64_modern_install_gameplay_migration_api(&api),
@@ -291,6 +367,15 @@ static void verify_authority_dispatch_and_failure(void) {
     migration.transform_candidate = smoke_transform;
     expect_status("Migration gate install", sm64_modern_install_gameplay_migration_api(&migration),
                   SM64_MODERN_STATUS_OK);
+    SM64ModernMarioGroundSpeedApiV1 ground_api;
+    memset(&ground_api, 0, sizeof(ground_api));
+    ground_api.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    ground_api.header.struct_size = sizeof(ground_api);
+    ground_api.context = &callback_count;
+    ground_api.update = smoke_ground_speed;
+    expect_status("Ground-speed gate install",
+                  sm64_modern_install_mario_ground_speed_api(&ground_api),
+                  SM64_MODERN_STATUS_OK);
 
     trace.cursor = 0;
     config.mode = SM64_MODERN_GAMEPLAY_PARITY_SHADOW;
@@ -324,6 +409,13 @@ static void verify_authority_dispatch_and_failure(void) {
                   SM64_MODERN_STATUS_OK);
     expect_u32("Migration Swift output", output.input,
                SM64_MODERN_MARIO_INPUT_A_PRESSED);
+    SM64ModernMarioGroundSpeedInputV1 ground_input = ground_speed_input();
+    SM64ModernMarioGroundSpeedOutputV1 ground_output;
+    expect_status("Ground-speed Swift dispatch",
+                  sm64_modern_gameplay_update_mario_ground_speed(&ground_input, &ground_output),
+                  SM64_MODERN_STATUS_OK);
+    expect_u32("Ground-speed Swift output", ground_output.forward_velocity_bits,
+               sm64_modern_gameplay_float_bits(1.1f));
     if (callback_count < 2) {
         fprintf(stderr, "Migration callbacks were not exercised by shadow and Swift authority\n");
         failures++;
@@ -358,6 +450,7 @@ static void verify_authority_dispatch_and_failure(void) {
 int main(void) {
     verify_mario_reference();
     verify_bobomb_reference();
+    verify_ground_speed_reference();
     verify_callback_contract();
     verify_authority_dispatch_and_failure();
     if (failures != 0) {

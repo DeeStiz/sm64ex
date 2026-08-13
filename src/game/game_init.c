@@ -1,5 +1,6 @@
 #include <ultra64.h>
 #include <stdbool.h>
+#include <stdlib.h>
 
 #include "sm64.h"
 #include "gfx_dimensions.h"
@@ -9,10 +10,12 @@
 #include "buffers/gfx_output_buffer.h"
 #include "buffers/framebuffers.h"
 #include "buffers/zbuffer.h"
+#include "game/area.h"
 #include "engine/level_script.h"
 #include "game_init.h"
 #include "main.h"
 #include "memory.h"
+#include "obj_behaviors.h"
 #include "profiler.h"
 #include "save_file.h"
 #include "seq_ids.h"
@@ -21,6 +24,8 @@
 #include "segment2.h"
 #include "segment_symbols.h"
 #include "thread6.h"
+#include "levels/scripts.h"
+#include "level_table.h"
 #include "pc/sm64_modern_gameplay_parity.h"
 #include "pc/sm64_modern_timebase.h"
 #include <prevent_bss_reordering.h>
@@ -614,6 +619,22 @@ void thread5_game_loop(UNUSED void *arg) {
     // point levelCommandAddr to the entry point into the level script data.
     levelCommandAddr = segmented_to_virtual(level_script_entry);
 
+    // The bounded gameplay gates run headlessly and must exercise real game
+    // objects instead of depending on a window receiving title-screen input.
+    // Keep this strictly opt-in: normal launches retain the stock intro and
+    // file-select path. The Bob-omb gate selects Battlefield while the Mario
+    // gate keeps the existing castle-grounds bootstrap.
+    const bool automatedGameplay = getenv("SM64_MODERN_AUTOMATED_GAMEPLAY") != NULL;
+    const bool automatedBobomb = getenv("SM64_MODERN_AUTOMATED_BOBOMB") != NULL;
+    if (automatedGameplay || automatedBobomb) {
+        gCurrDemoInput = NULL;
+        gCurrSaveFileNum = 1;
+        gCurrActNum = 1;
+        sm64_modern_level_script_set_register(
+            automatedBobomb ? LEVEL_BOB : LEVEL_CASTLE_GROUNDS);
+        levelCommandAddr = (struct LevelCommand *) level_main_scripts_entry;
+    }
+
     play_music(SEQ_PLAYER_SFX, SEQUENCE_ARGS(0, SEQ_SOUND_PLAYER), 0);
     set_sound_mode(save_file_get_sound_mode());
 
@@ -639,6 +660,7 @@ void game_loop_one_iteration(void) {
     config_gfx_pool();
     read_controller_inputs();
     levelCommandAddr = level_script_execute(levelCommandAddr);
+    sm64_modern_bobomb_release_test_step();
     sm64_modern_parity_capture_snapshots();
     display_and_vsync();
 

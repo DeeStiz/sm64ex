@@ -179,6 +179,7 @@ int main(void) {
     SM64ModernPlatformApiV1 platform;
     SM64ModernInputApiV1 input;
     SM64ModernRenderingApiV1 rendering;
+    SM64ModernRenderingBatchApiV1 rendering_batch;
     SM64ModernLifecycleState state = UINT32_MAX;
     SM64ModernAuthority authority = UINT32_MAX;
     int failures = 0;
@@ -190,6 +191,7 @@ int main(void) {
     memset(&platform, 0, sizeof(platform));
     memset(&input, 0, sizeof(input));
     memset(&rendering, 0, sizeof(rendering));
+    memset(&rendering_batch, 0, sizeof(rendering_batch));
 
     platform.header.abi_version = SM64_MODERN_ABI_VERSION_1;
     platform.header.struct_size = sizeof(platform);
@@ -245,6 +247,26 @@ int main(void) {
 
     rendering.header.abi_version = SM64_MODERN_ABI_VERSION_1;
     rendering.header.struct_size = sizeof(rendering);
+
+    rendering_batch.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    rendering_batch.header.struct_size = sizeof(rendering_batch);
+    rendering_batch.start_frame = smoke_render_frame;
+    rendering_batch.append_triangles = smoke_render_draw;
+    rendering_batch.end_frame = smoke_render_frame;
+    rendering_batch.finish_render = smoke_render_frame;
+    failures += expect_status("rendering batch v1",
+                              sm64_modern_validate_rendering_batch_api(&rendering_batch),
+                              SM64_MODERN_STATUS_OK);
+    rendering_batch.finish_render = NULL;
+    failures += expect_status("rendering batch missing callback",
+                              sm64_modern_validate_rendering_batch_api(&rendering_batch),
+                              SM64_MODERN_STATUS_INVALID_ARGUMENT);
+    rendering_batch.finish_render = smoke_render_frame;
+    rendering_batch.header.struct_size--;
+    failures += expect_status("small rendering batch table",
+                              sm64_modern_validate_rendering_batch_api(&rendering_batch),
+                              SM64_MODERN_STATUS_BUFFER_TOO_SMALL);
+    rendering_batch.header.struct_size = sizeof(rendering_batch);
 
     rendering.initialize = smoke_render_initialize;
     rendering.shutdown = smoke_render_shutdown;
@@ -379,10 +401,13 @@ int main(void) {
         || offsetof(SM64ModernInputApiV1, header) != 0
         || offsetof(SM64ModernMarioButtonInputV1, header) != 0
         || offsetof(SM64ModernMarioButtonOutputV1, header) != 0
+        || offsetof(SM64ModernMarioGroundSpeedInputV1, header) != 0
+        || offsetof(SM64ModernMarioGroundSpeedOutputV1, header) != 0
         || offsetof(SM64ModernBobombReleaseInputV1, header) != 0
         || offsetof(SM64ModernBobombReleaseOutputV1, header) != 0
         || offsetof(SM64ModernGameplayMigrationApiV1, header) != 0
         || offsetof(SM64ModernRenderingApiV1, header) != 0
+        || offsetof(SM64ModernRenderingBatchApiV1, header) != 0
         || offsetof(SM64ModernGameplayRecordEnvelopeV1, header) != 0
         || offsetof(SM64ModernGameplayTraceRecordV1, envelope) != 0
         || offsetof(SM64ModernGameplayParityConfigV1, header) != 0
@@ -398,9 +423,13 @@ int main(void) {
         || sizeof(SM64ModernTimebaseApiV1) != 24
         || sizeof(SM64ModernMarioButtonInputV1) != 48
         || sizeof(SM64ModernMarioButtonOutputV1) != 24
+        || sizeof(SM64ModernMarioGroundSpeedInputV1) != 56
+        || sizeof(SM64ModernMarioGroundSpeedOutputV1) != 20
+        || sizeof(SM64ModernMarioGroundSpeedApiV1) != 24
         || sizeof(SM64ModernBobombReleaseInputV1) != 40
         || sizeof(SM64ModernBobombReleaseOutputV1) != 36
         || sizeof(SM64ModernGameplayMigrationApiV1) != 40
+        || sizeof(SM64ModernRenderingBatchApiV1) != 48
         || sizeof(SM64ModernGameplayRecordEnvelopeV1) != 32
         || sizeof(SM64ModernGameplayTraceRecordV1) != 88
         || sizeof(SM64ModernGameplayParityConfigV1) != 32

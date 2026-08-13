@@ -887,3 +887,7 @@ struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {
 
     return sCurrentCmd;
 }
+
+void sm64_modern_level_script_set_register(s32 value) {
+    sRegister = value;
+}

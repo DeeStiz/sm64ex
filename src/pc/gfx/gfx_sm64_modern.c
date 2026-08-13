@@ -25,8 +25,11 @@ struct ShaderProgram {
 };
 
 static SM64ModernRenderingApiV1 sRendering;
+static SM64ModernRenderingBatchApiV1 sRenderingBatch;
 static SM64ModernStatus sRenderingStatus = SM64_MODERN_STATUS_OK;
+static SM64ModernStatus sRenderingBatchStatus = SM64_MODERN_STATUS_OK;
 static bool sRenderingInstalled;
+static bool sRenderingBatchInstalled;
 static struct ShaderProgram sShaderPrograms[SM64_MODERN_SHADER_CAPACITY];
 static uint32_t sShaderProgramCount;
 static uint32_t sNextTextureId;
@@ -41,6 +44,15 @@ static void rendering_record_status(SM64ModernStatus status) {
     if (sRenderingStatus == SM64_MODERN_STATUS_OK && status != SM64_MODERN_STATUS_OK) {
         sRenderingStatus = status;
     }
+}
+
+static void rendering_batch_record_status(SM64ModernStatus status) {
+    if (sRenderingBatchStatus == SM64_MODERN_STATUS_OK && status != SM64_MODERN_STATUS_OK) {
+        sRenderingBatchStatus = status;
+    }
+    // A batch failure also makes the compatibility rendering table unusable;
+    // the legacy status remains the single dispatch gate used by gfx.
+    rendering_record_status(status);
 }
 
 static void modern_window_init(const char *window_title) {
@@ -251,10 +263,18 @@ static void modern_renderer_draw_triangles(float vertices[], size_t float_count,
         return;
     }
     if (rendering_can_dispatch()) {
-        rendering_record_status(sRendering.draw_triangles(sRendering.context,
-                                                          vertices,
-                                                          (uint32_t) float_count,
-                                                          (uint32_t) triangle_count));
+        if (sRenderingBatchInstalled) {
+            rendering_batch_record_status(sRenderingBatch.append_triangles(
+                sRenderingBatch.context,
+                vertices,
+                (uint32_t) float_count,
+                (uint32_t) triangle_count));
+        } else {
+            rendering_record_status(sRendering.draw_triangles(sRendering.context,
+                                                              vertices,
+                                                              (uint32_t) float_count,
+                                                              (uint32_t) triangle_count));
+        }
     }
 }
 
@@ -269,19 +289,31 @@ static void modern_renderer_on_resize(void) {
 
 static void modern_renderer_start_frame(void) {
     if (rendering_can_dispatch()) {
-        rendering_record_status(sRendering.start_frame(sRendering.context));
+        if (sRenderingBatchInstalled) {
+            rendering_batch_record_status(sRenderingBatch.start_frame(sRenderingBatch.context));
+        } else {
+            rendering_record_status(sRendering.start_frame(sRendering.context));
+        }
     }
 }
 
 static void modern_renderer_end_frame(void) {
     if (rendering_can_dispatch()) {
-        rendering_record_status(sRendering.end_frame(sRendering.context));
+        if (sRenderingBatchInstalled) {
+            rendering_batch_record_status(sRenderingBatch.end_frame(sRenderingBatch.context));
+        } else {
+            rendering_record_status(sRendering.end_frame(sRendering.context));
+        }
     }
 }
 
 static void modern_renderer_finish_render(void) {
     if (rendering_can_dispatch()) {
-        rendering_record_status(sRendering.finish_render(sRendering.context));
+        if (sRenderingBatchInstalled) {
+            rendering_batch_record_status(sRenderingBatch.finish_render(sRenderingBatch.context));
+        } else {
+            rendering_record_status(sRendering.finish_render(sRendering.context));
+        }
     }
 }
 
@@ -383,10 +415,54 @@ void sm64_modern_uninstall_rendering_api(void) {
         return;
     }
     gfx_shutdown();
+    sm64_modern_uninstall_rendering_batch_api();
     memset(&sRendering, 0, sizeof(sRendering));
     sRenderingInstalled = false;
 }
 
 SM64ModernStatus sm64_modern_rendering_status(void) {
     return sRenderingInstalled ? sRenderingStatus : SM64_MODERN_STATUS_OK;
+}
+
+SM64ModernStatus sm64_modern_validate_rendering_batch_api(
+    const SM64ModernRenderingBatchApiV1 *batch) {
+    if (!batch) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (batch->header.abi_version != SM64_MODERN_ABI_VERSION_1) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_VERSION;
+    }
+    if (batch->header.struct_size < sizeof(*batch)) {
+        return SM64_MODERN_STATUS_BUFFER_TOO_SMALL;
+    }
+    if (!batch->start_frame || !batch->append_triangles || !batch->end_frame
+        || !batch->finish_render) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    return SM64_MODERN_STATUS_OK;
+}
+
+SM64ModernStatus sm64_modern_install_rendering_batch_api(
+    const SM64ModernRenderingBatchApiV1 *batch) {
+    const SM64ModernStatus status = sm64_modern_validate_rendering_batch_api(batch);
+    if (status != SM64_MODERN_STATUS_OK) {
+        return status;
+    }
+    if (!sRenderingInstalled || sRenderingBatchInstalled) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+    memcpy(&sRenderingBatch, batch, sizeof(sRenderingBatch));
+    sRenderingBatchStatus = SM64_MODERN_STATUS_OK;
+    sRenderingBatchInstalled = true;
+    return SM64_MODERN_STATUS_OK;
+}
+
+void sm64_modern_uninstall_rendering_batch_api(void) {
+    memset(&sRenderingBatch, 0, sizeof(sRenderingBatch));
+    sRenderingBatchInstalled = false;
+    sRenderingBatchStatus = SM64_MODERN_STATUS_OK;
+}
+
+SM64ModernStatus sm64_modern_rendering_batch_status(void) {
+    return sRenderingBatchInstalled ? sRenderingBatchStatus : SM64_MODERN_STATUS_OK;
 }

@@ -1,4 +1,5 @@
 #include <PR/ultratypes.h>
+#include <string.h>
 
 #include "sm64.h"
 #include "mario.h"
@@ -14,6 +15,8 @@
 #include "thread6.h"
 #include "pc/configfile.h"
 #include "pc/cheats.h"
+#include "pc/sm64_modern_gameplay_migration.h"
+#include "pc/sm64_modern_timebase.h"
 
 struct LandingAction {
     s16 numFrames;
@@ -436,41 +439,28 @@ s32 update_decelerating_speed(struct MarioState *m) {
 }
 
 void update_walking_speed(struct MarioState *m) {
-    f32 maxTargetSpeed;
-    f32 targetSpeed;
+    SM64ModernMarioGroundSpeedInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_timebase_simulation_tick();
+    input.intended_magnitude_bits = sm64_modern_gameplay_float_bits(m->intendedMag);
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.quicksand_depth_bits = sm64_modern_gameplay_float_bits(m->quicksandDepth);
+    input.floor_normal_y_bits = sm64_modern_gameplay_float_bits(
+        m->floor ? m->floor->normal.y : 1.0f);
+    input.intended_yaw = m->intendedYaw;
+    input.face_yaw = m->faceAngle[1];
+    input.floor_is_slow = m->floor && m->floor->type == SURFACE_SLOW;
+    input.responsive_cheat = Cheats.Responsive;
+    input.cheats_enabled = Cheats.EnableCheats;
 
-    if (m->floor != NULL && m->floor->type == SURFACE_SLOW) {
-        maxTargetSpeed = 24.0f;
-    } else {
-        maxTargetSpeed = 32.0f;
+    SM64ModernMarioGroundSpeedOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_ground_speed(&input, &output)
+        == SM64_MODERN_STATUS_OK) {
+        m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+        m->faceAngle[1] = (s16) output.face_yaw;
     }
-
-    targetSpeed = m->intendedMag < maxTargetSpeed ? m->intendedMag : maxTargetSpeed;
-
-    if (m->quicksandDepth > 10.0f) {
-        targetSpeed *= 6.25 / m->quicksandDepth;
-    }
-
-    if (m->forwardVel <= 0.0f) {
-        m->forwardVel += 1.1f;
-    } else if (m->forwardVel <= targetSpeed) {
-        m->forwardVel += 1.1f - m->forwardVel / 43.0f;
-    } else if (m->floor->normal.y >= 0.95f) {
-        m->forwardVel -= 1.0f;
-    }
-
-    if (m->forwardVel > 48.0f) {
-        m->forwardVel = 48.0f;
-    }
-
-    /* Handles the "Super responsive controls" cheat. The content of the "else" is Mario's original code for turning around.*/
-
-    if (Cheats.Responsive == true && Cheats.EnableCheats == true ) {
-        m->faceAngle[1] = m->intendedYaw;
-    }
-    else {
-         m->faceAngle[1] = m->intendedYaw - approach_s32((s16)(m->intendedYaw - m->faceAngle[1]), 0, 0x800, 0x800);
-    }        
     apply_slope_accel(m);
 }
 

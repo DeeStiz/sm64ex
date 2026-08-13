@@ -32,6 +32,18 @@ func makeMetalRenderingAPI(host: EngineHost) -> SM64ModernRenderingApiV1 {
     return api
 }
 
+func makeMetalRenderingBatchAPI(host: EngineHost) -> SM64ModernRenderingBatchApiV1 {
+    var api = SM64ModernRenderingBatchApiV1()
+    api.header.abi_version = SM64_MODERN_ABI_VERSION_1
+    api.header.struct_size = UInt32(MemoryLayout<SM64ModernRenderingBatchApiV1>.size)
+    api.context = Unmanaged.passUnretained(host).toOpaque()
+    api.start_frame = renderingStartFrame
+    api.append_triangles = renderingDraw
+    api.end_frame = renderingEndFrame
+    api.finish_render = renderingFinish
+    return api
+}
+
 private func renderingInitialize(_ context: UnsafeMutableRawPointer?, _ filteringMode: UInt32) -> SM64ModernStatus {
     renderingHost(from: context)?.renderingInitialize(filteringMode: filteringMode) ?? SM64_MODERN_STATUS_INVALID_STATE
 }

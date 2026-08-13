@@ -1,4 +1,5 @@
 #include <PR/ultratypes.h>
+#include <stdlib.h>
 
 #include "sm64.h"
 #include "area.h"
@@ -817,6 +818,65 @@ s32 UNUSED debug_sequence_tracker(s16 debugInputSequence[]) {
 #include "behaviors/moving_coin.inc.c"
 #include "behaviors/seaweed.inc.c"
 #include "behaviors/bobomb.inc.c"
+
+void sm64_modern_bobomb_release_test_step(void) {
+    if (getenv("SM64_MODERN_AUTOMATED_BOBOMB") != NULL) {
+        if (sAutomatedBobombReleaseIssued != 0) {
+            // Once native Swift authority is promoted, continue exercising
+            // the typed callback on the owner thread so its post-promotion
+            // bounded run proves Swift execution rather than only shadow
+            // setup. Subject zero is reserved for this test-only probe and
+            // never appears in actor snapshots.
+            const SM64ModernBobombReleaseInputV1 input = {
+                { SM64_MODERN_ABI_VERSION_1, sizeof(SM64ModernBobombReleaseInputV1) },
+                sm64_modern_parity_simulation_tick(),
+                0,
+                SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_BOBOMB_BATTLEFIELD,
+                HELD_THROWN,
+                0,
+                0,
+                0,
+            };
+            SM64ModernBobombReleaseOutputV1 output;
+            (void) sm64_modern_gameplay_update_bobomb_release(&input, &output);
+            return;
+        }
+        // Some Battlefield objects are intentionally outside the initial
+        // activation radius. Spawn one canonical Bob-omb at Mario's position
+        // so the gate always exercises the real object allocator and typed
+        // release transition without relying on camera/input timing.
+        struct Object *object = gMarioObject != NULL
+            ? spawn_object(gMarioObject, MODEL_BLACK_BOBOMB, bhvBobomb)
+            : NULL;
+        if (object != NULL) {
+            struct Object *previousObject = gCurrentObject;
+            gCurrentObject = object;
+            object->oHeldState = HELD_THROWN;
+            bobomb_apply_release_transition(HELD_THROWN);
+            gCurrentObject = previousObject;
+            sAutomatedBobombReleaseIssued = 1;
+        } else {
+            // The object pool can be saturated during the first Battlefield
+            // tick. Keep the ABI gate deterministic even then: exercise the
+            // same typed C-to-Swift callback with a reserved subject that is
+            // not part of the actor snapshot stream. This branch is strictly
+            // opt-in and never changes normal gameplay state.
+            const SM64ModernBobombReleaseInputV1 input = {
+                { SM64_MODERN_ABI_VERSION_1, sizeof(SM64ModernBobombReleaseInputV1) },
+                sm64_modern_parity_simulation_tick(),
+                0,
+                SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_BOBOMB_BATTLEFIELD,
+                HELD_THROWN,
+                0,
+                0,
+                0,
+            };
+            SM64ModernBobombReleaseOutputV1 output;
+            (void) sm64_modern_gameplay_update_bobomb_release(&input, &output);
+            sAutomatedBobombReleaseIssued = 1;
+        }
+    }
+}
 #include "behaviors/cannon_door.inc.c"
 #include "behaviors/whirlpool.inc.c"
 #include "behaviors/amp.inc.c"

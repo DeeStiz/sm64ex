@@ -66,6 +66,9 @@ final class AppleInputService: @unchecked Sendable {
     }
 
     private let lock = NSLock()
+    private let automatedMenuInput = ProcessInfo.processInfo.environment["SM64_MODERN_AUTOMATED_MENU"] != nil
+    private let automatedGameplayInput = ProcessInfo.processInfo.environment["SM64_MODERN_AUTOMATED_GAMEPLAY"] != nil
+    private var automatedMenuReadCount: UInt32 = 0
     private let hapticLock = NSLock()
     private var keyboardWords = [UInt32](repeating: 0, count: Int(SM64_MODERN_INPUT_KEYBOARD_WORD_COUNT))
     private var pendingKeyboardPressWords = [UInt32](
@@ -116,6 +119,12 @@ final class AppleInputService: @unchecked Sendable {
             inputLogger.notice("controller_current name=\(name, privacy: .public)")
         })
         inputLogger.notice("input_service_ready controllers=\(GCController.controllers().count)")
+        if automatedMenuInput {
+            inputLogger.notice("automated_menu_input_enabled")
+        }
+        if automatedGameplayInput {
+            inputLogger.notice("automated_gameplay_input_enabled")
+        }
     }
 
     deinit {
@@ -226,11 +235,12 @@ final class AppleInputService: @unchecked Sendable {
 
         lock.lock()
         let isFocused = focused
-        let keys = isFocused
+        var keys = isFocused
             ? zip(keyboardWords, pendingKeyboardPressWords).map { $0 | $1 }
             : [UInt32](repeating: 0, count: keyboardWords.count)
         let mouse = isFocused ? mouseButtons | pendingMousePresses : 0
         let gamepad = isFocused ? controllerState : ControllerState()
+        var automatedGamepadButtons = gamepad.buttons
         pendingKeyboardPressWords = [UInt32](repeating: 0, count: pendingKeyboardPressWords.count)
         pendingMousePresses = 0
         let risingButtons = gamepad.buttons & ~lastControllerButtons
@@ -240,6 +250,43 @@ final class AppleInputService: @unchecked Sendable {
         if rawKey == SM64_MODERN_INPUT_NO_KEY, risingButtons != 0 {
             rawKey = gamepadVirtualKeyBase + UInt32(risingButtons.trailingZeroBitCount)
         }
+        if automatedMenuInput {
+            // The milestone harness is intentionally opt-in and emits a
+            // bounded Start/A sequence using the persisted default keyboard
+            // scan codes. It lets a headless run reach Mario actions without
+            // posting GUI events or changing normal input behavior.
+            let read = automatedMenuReadCount
+            automatedMenuReadCount &+= 1
+            let virtualKey: UInt32?
+            let isAutomatedStartPulse = (read >= 8 && read < 16)
+                || (read >= 40 && read < 48)
+                || (read >= 88 && read < 96)
+                || (read >= 136 && read < 144)
+                || (read >= 184 && read < 192)
+                || (read >= 232 && read < 240)
+                || (read >= 280 && read < 288)
+                || (read >= 328 && read < 336)
+            if isAutomatedStartPulse {
+                virtualKey = 0x39 // Space / Start
+                automatedGamepadButtons |= UInt32(1) << 6 // SDL menu / Start
+            } else if (read >= 72 && read < 80)
+                        || (read >= 144 && read < 152)
+                        || (read >= 216 && read < 224)
+                        || (read >= 288 && read < 296) {
+                virtualKey = 0x26 // A in the native default keyboard map
+                automatedGamepadButtons |= UInt32(1) // SDL A
+            } else {
+                virtualKey = nil
+            }
+            if let virtualKey {
+                let word = Int(virtualKey / 32)
+                if word < keys.count {
+                    keys[word] |= UInt32(1) << (virtualKey % 32)
+                }
+            }
+        }
+        let automatedLeftStickX: Int16 = automatedGameplayInput ? 16_000 : gamepad.leftX
+        let automatedLeftStickY: Int16 = automatedGameplayInput ? 0 : gamepad.leftY
         let shouldLogController = gamepad.isActive && !loggedControllerActivity
         if shouldLogController { loggedControllerActivity = true }
         let shouldLogBufferedController = isFocused
@@ -268,10 +315,10 @@ final class AppleInputService: @unchecked Sendable {
         withUnsafeMutableBytes(of: &snapshot.keyboard_keys) { destination in
             keys.withUnsafeBytes { source in destination.copyBytes(from: source) }
         }
-        snapshot.gamepad_buttons = gamepad.buttons
+        snapshot.gamepad_buttons = automatedGamepadButtons
         snapshot.mouse_buttons = mouse
-        snapshot.left_stick_x = gamepad.leftX
-        snapshot.left_stick_y = gamepad.leftY
+        snapshot.left_stick_x = automatedLeftStickX
+        snapshot.left_stick_y = automatedLeftStickY
         snapshot.right_stick_x = gamepad.rightX
         snapshot.right_stick_y = gamepad.rightY
         snapshot.last_virtual_key = rawKey

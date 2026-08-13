@@ -55,7 +55,19 @@ private func platformInitialize(
         }
         return renderingStatus
     }
+    var renderingBatch = makeMetalRenderingBatchAPI(host: host)
+    let renderingBatchStatus = sm64_modern_install_rendering_batch_api(&renderingBatch)
+    guard renderingBatchStatus == SM64_MODERN_STATUS_OK else {
+        engineLogger.error("rendering_batch_bridge_install_failed status=\(renderingBatchStatus)")
+        sm64_modern_uninstall_rendering_api()
+        do { try host.shutdownMetalOnEngineThread() } catch {
+            engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
+        }
+        return renderingBatchStatus
+    }
+    engineLogger.notice("rendering_batch_bridge_installed abi=1")
     guard let inputService = host.inputServiceOnEngineThread else {
+        sm64_modern_uninstall_rendering_batch_api()
         sm64_modern_uninstall_rendering_api()
         do { try host.shutdownMetalOnEngineThread() } catch {
             engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
@@ -85,7 +97,19 @@ private func platformInitialize(
         }
         return gameplayStatus
     }
-    engineLogger.notice("gameplay_bridge_installed abi=1 slices=mario_buttons,bobomb_release")
+    var marioGroundSpeed = makeSwiftMarioGroundSpeedAPI(service: gameplayService)
+    let marioGroundSpeedStatus = sm64_modern_install_mario_ground_speed_api(&marioGroundSpeed)
+    guard marioGroundSpeedStatus == SM64_MODERN_STATUS_OK else {
+        engineLogger.error("mario_ground_speed_bridge_install_failed status=\(marioGroundSpeedStatus)")
+        sm64_modern_uninstall_gameplay_migration_api()
+        sm64_modern_uninstall_input_api()
+        sm64_modern_uninstall_rendering_api()
+        do { try host.shutdownMetalOnEngineThread() } catch {
+            engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
+        }
+        return marioGroundSpeedStatus
+    }
+    engineLogger.notice("gameplay_bridge_installed abi=1 slices=mario_buttons,mario_ground_speed,bobomb_release")
     do {
         try host.initializeAudioOnEngineThread()
     } catch {
@@ -582,7 +606,12 @@ final class EngineHost: @unchecked Sendable {
         config.header.struct_size = UInt32(MemoryLayout<SM64ModernLifecycleConfigV1>.size)
         config.main_pool_size = 0
         config.fullscreen_mode = SM64_MODERN_FULLSCREEN_FORCE_OFF
-        config.skip_intro = 0
+        // Headless migration gates opt into the same level script with a
+        // deterministic save-backed spawn, so the Peach intro cutscene cannot
+        // consume the entire bounded callback window.
+        let environment = ProcessInfo.processInfo.environment
+        config.skip_intro = environment["SM64_MODERN_AUTOMATED_GAMEPLAY"] != nil
+            || environment["SM64_MODERN_AUTOMATED_BOBOMB"] != nil ? 1 : 0
 
         let paths: HostPaths
         do {

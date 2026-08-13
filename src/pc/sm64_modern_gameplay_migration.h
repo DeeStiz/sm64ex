@@ -6,6 +6,9 @@
 SM64ModernStatus sm64_modern_gameplay_update_mario_buttons(
     const SM64ModernMarioButtonInputV1 *input,
     SM64ModernMarioButtonOutputV1 *out_output);
+SM64ModernStatus sm64_modern_gameplay_update_mario_ground_speed(
+    const SM64ModernMarioGroundSpeedInputV1 *input,
+    SM64ModernMarioGroundSpeedOutputV1 *out_output);
 SM64ModernStatus sm64_modern_gameplay_update_bobomb_release(
     const SM64ModernBobombReleaseInputV1 *input,
     SM64ModernBobombReleaseOutputV1 *out_output);
@@ -20,6 +23,9 @@ float sm64_modern_gameplay_float_from_bits(uint32_t bits);
 SM64ModernStatus sm64_modern_gameplay_reference_mario_buttons(
     const SM64ModernMarioButtonInputV1 *input,
     SM64ModernMarioButtonOutputV1 *out_output);
+SM64ModernStatus sm64_modern_gameplay_reference_mario_ground_speed(
+    const SM64ModernMarioGroundSpeedInputV1 *input,
+    SM64ModernMarioGroundSpeedOutputV1 *out_output);
 SM64ModernStatus sm64_modern_gameplay_reference_bobomb_release(
     const SM64ModernBobombReleaseInputV1 *input,
     SM64ModernBobombReleaseOutputV1 *out_output);

@@ -24,21 +24,51 @@ struct MetalRect: Hashable, Sendable {
 
 struct MetalSceneDraw: Sendable {
     let shader: MetalShaderKey
-    let textureIDs: [UInt32]
-    let textureBindings: [MetalTextureBinding?]
-    let samplers: [MetalSamplerKey]
+    let textureID0: UInt32
+    let textureID1: UInt32
+    let textureBinding0: MetalTextureBinding?
+    let textureBinding1: MetalTextureBinding?
+    let sampler0: MetalSamplerKey
+    let sampler1: MetalSamplerKey
     let depthTest: Bool
     let depthWrite: Bool
     let decal: Bool
     let viewport: MetalRect
     let scissor: MetalRect
-    let vertices: [Float]
+    let vertexOffset: Int
+    let floatCount: Int
     let triangleCount: UInt32
+}
+
+final class MetalSceneFrameStorage: @unchecked Sendable {
+    // Display lists are bounded by the legacy renderer's frame budget. Reserve
+    // once per reusable storage so appending a draw does not allocate a new
+    // per-draw vertex array or descriptor backing store during steady state.
+    private static let initialVertexCapacity = 256 * 1024
+    private static let initialDrawCapacity = 512
+
+    var vertices: [Float]
+    var draws: [MetalSceneDraw]
+
+    init() {
+        vertices = []
+        vertices.reserveCapacity(Self.initialVertexCapacity)
+        draws = []
+        draws.reserveCapacity(Self.initialDrawCapacity)
+    }
+
+    func reset() {
+        vertices.removeAll(keepingCapacity: true)
+        draws.removeAll(keepingCapacity: true)
+    }
 }
 
 struct MetalScenePacket: Sendable {
     let sequence: UInt64
-    let draws: [MetalSceneDraw]
+    let storage: MetalSceneFrameStorage
+
+    var draws: [MetalSceneDraw] { storage.draws }
+    var vertices: [Float] { storage.vertices }
 }
 
 final class MetalSceneRecorder {
@@ -55,11 +85,15 @@ final class MetalSceneRecorder {
     private var alphaBlend = false
     private var viewport = MetalRect(x: 0, y: 0, width: 1, height: 1)
     private var scissor = MetalRect(x: 0, y: 0, width: 1, height: 1)
-    private var draws: [MetalSceneDraw] = []
+    private var activeStorage = MetalSceneFrameStorage()
+    private var reusableStorage = MetalSceneFrameStorage()
     private var nextSequence: UInt64 = 1
     private(set) var latestPacket: MetalScenePacket?
 
-    var currentTextureIDs: [UInt32] { selectedTextureIDs }
+    func currentTextureID(tile: UInt32) -> UInt32 {
+        guard tile < 2 else { return 0 }
+        return selectedTextureIDs[Int(tile)]
+    }
 
     func registerShader(
         id: UInt32,
@@ -98,7 +132,7 @@ final class MetalSceneRecorder {
     func setScissor(_ rect: MetalRect) { scissor = rect }
 
     func startFrame(width: Int, height: Int) {
-        draws.removeAll(keepingCapacity: true)
+        activeStorage.reset()
         let full = MetalRect(x: 0, y: 0, width: Int32(max(width, 1)), height: Int32(max(height, 1)))
         viewport = full
         scissor = full
@@ -108,12 +142,12 @@ final class MetalSceneRecorder {
         vertices: UnsafePointer<Float>,
         floatCount: UInt32,
         triangleCount: UInt32,
-        textureBindings: [MetalTextureBinding?]
+        textureBinding0: MetalTextureBinding?,
+        textureBinding1: MetalTextureBinding?
     ) -> Bool {
         guard let selectedShaderID, let registered = shaders[selectedShaderID], floatCount > 0 else {
             return false
         }
-        guard textureBindings.count == selectedTextureIDs.count else { return false }
         var shader = registered
         shader = MetalShaderKey(
             shaderID: shader.shaderID,
@@ -122,31 +156,41 @@ final class MetalSceneRecorder {
             textureMask: shader.textureMask,
             alphaBlend: alphaBlend
         )
-        let draw = MetalSceneDraw(
+        let vertexOffset = activeStorage.vertices.count
+        let floatCount = Int(floatCount)
+        activeStorage.vertices.append(contentsOf: UnsafeBufferPointer(start: vertices, count: floatCount))
+        activeStorage.draws.append(MetalSceneDraw(
             shader: shader,
-            textureIDs: selectedTextureIDs,
-            textureBindings: textureBindings,
-            samplers: samplerKeys,
+            textureID0: selectedTextureIDs[0],
+            textureID1: selectedTextureIDs[1],
+            textureBinding0: textureBinding0,
+            textureBinding1: textureBinding1,
+            sampler0: samplerKeys[0],
+            sampler1: samplerKeys[1],
             depthTest: depthTest,
             depthWrite: depthWrite,
             decal: decal,
             viewport: viewport,
             scissor: scissor,
-            vertices: Array(UnsafeBufferPointer(start: vertices, count: Int(floatCount))),
+            vertexOffset: vertexOffset,
+            floatCount: floatCount,
             triangleCount: triangleCount
-        )
-        draws.append(draw)
+        ))
         return true
     }
 
     func endFrame() {
-        latestPacket = MetalScenePacket(sequence: nextSequence, draws: draws)
+        let finishedStorage = activeStorage
+        activeStorage = reusableStorage
+        reusableStorage = finishedStorage
+        latestPacket = MetalScenePacket(sequence: nextSequence, storage: finishedStorage)
         nextSequence += 1
     }
 
     func reset() {
         shaders.removeAll()
-        draws.removeAll()
+        activeStorage.reset()
+        reusableStorage.reset()
         latestPacket = nil
         selectedShaderID = nil
     }
