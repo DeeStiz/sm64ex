@@ -2,11 +2,11 @@
 
 ## Current Milestone
 
-- M9 Release preparation is approved: produce local optimized Release, packaging, validation, performance, and leak evidence; report external gates explicitly as pending.
-- M9 success criterion remains performance, validation, leaks, signing, notarization, and clean-machine checks, with the 60/30 product contract preserved.
-- Approved work items: Release build/package path, bundle/signing inspection, long-run scheduler/audio/RSS/leak profiling, Metal validation plus CAMetalLayer GPU capture, current-product BOB parity/entrance checks, and available legacy regression gates. Audio/fixed-step/timebase smokes pass; a direct C ABI/parity/migration relink was blocked by stale ASan objects and standalone weak haptic bridge symbols. The current default save stayed outside BOB, so no subsystem-4 result was emitted; normal entrance remains pending.
-- Release performance bar: require zero scheduler drops, zero audio drops, bounded underruns, stable RSS, and no app-owned leak growth over the selected run; framework-only macOS listener allocations remain separately reported.
-- Developer ID, notarization, clean-machine, and unavailable Linux/Windows/web environments are external prerequisites and cannot be claimed locally.
+- M9 Release is handed off in commit `6e7c561`: local optimized Release/package, runtime, performance, Metal, GPU, leak, ASan, and regression evidence passed.
+- The 3,600-step Release profile recorded zero scheduler drops, zero audio drops, zero underruns, and +3.49 MiB RSS; two leak snapshots reported zero app leaks. Metal HUD and validation also exited cleanly.
+- The fetched CAMetalLayer title drawable was intact; full-screen capture was limited by the app window being on a negative-coordinate secondary display, so human visual confirmation remains open.
+- Developer ID/notarization, clean-machine, unavailable Linux/Windows/web, physical controller/audio, and normal BOB entrance/subsystem-4 acceptance remain external or human gates.
+- Standalone C ABI/parity/migration smokes pass with the intended macOS dynamic-lookup link; the default linker still rejects the optional weak Swift haptic symbols.
 - Keep demo/Goddard rows deferred and retain the current `0.1` marketing version / build `1` metadata.
 - M8d full-world 60 Hz integration is complete in commit `f483cc0`; the native product now runs a 60/30 paired clock with input, audio, presentation, and parity gates active.
 - M8b added a private, lifecycle-reset cadence context with simulation tick, legacy tick, pair phase, boundary/final-step predicates, and a fingerprinted policy. Public ABI v1 and schema-3 record layouts remain unchanged.
@@ -110,7 +110,7 @@
 - The legal US ROM and extracted assets remain local/ignored; future clean builds must receive `BASEROM` or the matching `SM64_BASEROM_*` environment variable.
 - macOS still needs `i686-w64-mingw32-as` and `objcopy` for the one source-authored N64 sequence even though all game C/C++ uses Apple Clang.
 - The existing `60fps_ex.patch` renders interpolated frames but keeps gameplay at 30 Hz; it is not the target 60 Hz simulation.
-- Discovery has no checked-in GPU ground truth; local captures and screenshots are ignored evidence, not cross-implementation or sustained-performance acceptance.
+- Discovery has no checked-in GPU ground truth; local captures and screenshots are ignored evidence, not cross-implementation acceptance.
 - The native AppKit host resolves the raw SDL bundle-identity warning; the separate legacy SDL AudioQueue shutdown code `-66671` remains unresolved.
 - Apple AddressSanitizer leak detection is unavailable on this platform; later long-run leak acceptance needs another supported instrument.
 - Full Linux, Windows, and web legacy builds remain regression gates; M1's changed C paths passed MinGW C syntax checks, not full product builds.
@@ -120,14 +120,13 @@
 - M5b human evidence covers audible playback and route switching, but does not prove broad device compatibility, subjective latency, or long-duration audio quality.
 - Keep native service callbacks real-time safe and owner-explicit: do not expose the legacy object graph to Swift, block the audio render thread, or publish input/audio capabilities before installation succeeds.
 - A sanitizer build reuses `build/sm64-modern-debug`; force a normal native-core rebuild afterward because Make does not encode sanitizer flags into dependency identity.
-- Recheck the macOS 27 AVAudio listener-binding `leaks` variance during long-duration M9 profiling; M6 reported 134 allocations/8,544 bytes almost entirely in Apple audio bindings, bounded RSS stabilized near 116.8 MiB, and no M6-owned allocation was identified.
+- M9 long-run leaks were zero app-owned bytes; keep framework-only macOS audio listener variance separate from product leak claims.
 - Preserve per-texture sampler state, clamp precedence, exact texture-generation retention, and the display-link owner-thread guard; weakening any of these reopens the M6 texture-corruption or screenshot/Spaces crash regressions.
-- Repeat the full 3,000-tick live BOB record/shadow, Metal validation, and memory-safety pass against commit `5f0bb63`; the accepted long trace predates the bundle/logging rebrand and is not current-product proof.
-- Verify an unmodified normal entrance to Bob-omb Battlefield has BOB music and motions. Debugger-routed validation deliberately bypassed normal transition state and produced castle intro audio/motion over BOB geometry.
+- Repeat current-product live BOB record/shadow and verify an unmodified Bob-omb Battlefield entrance has BOB music and motions; the M9 default save stayed outside BOB and emitted no subsystem-4 result.
 - M7 live traces fingerprint the signed app directory. Record first, then shadow the exact same product; do not rebuild, relink, or re-sign between those phases.
 - M8d native 60/30 product integration and parity passed; the private world smoke is still bounded-model evidence rather than independent full-world cross-rate proof, and physical controller/haptic acceptance remains untested.
 - The M8d layer-boundary trace and live window agree; discovery still has no external GPU ground truth, so local draw/pass counts are regression evidence only.
-- Normal short verification records a bounded audio underrun count (492 frames, zero drops); investigate sustained audio underruns during M9 profiling rather than treating this short teardown sample as clean audio evidence.
+- M9 profile audio was clean in-window; teardown-only underruns from instrumented/short runs are not release-bar evidence.
 
 ## Feature Status
 
@@ -145,7 +144,7 @@
 | Native timebase | Implemented — rational paired-rate ABI, lifecycle-frozen configuration, monotonic fixed-step host scheduler, 60/30 telemetry, trace fingerprinting, and timing-inventory seams |
 | World cadence | Implemented — paired-boundary scripts/timers/events remain intact while native dynamics and product 60/30 activation pass the audited gates |
 | Full-world 60 Hz | Partial — native product input/audio/presentation/parity integration passes, but independent full-world cross-rate, external-ground-truth, and hardware acceptance remain open |
-| Signing/notarization | Partial — hardened Apple Development Debug signing works; sustained-execution Release provisioning and Developer ID/notarization remain external/future gates |
+| Signing/notarization | Partial — hardened Apple Development Release/local runtime signing and package inspection pass; Developer ID, sustained-execution provisioning, notarization, and clean-machine acceptance remain external |
 
 ## Curated Knowledge
 
@@ -196,4 +195,4 @@
 - Preserve held input edges until the next legacy boundary. Keep actual device sampling, PCM blocks, haptic delivery, display-link presentation, and schema-3 native-tick parity under M8d ownership.
 - M8c is committed as `9cc69a8`; `sm64_modern_timebase_native_step_scale()` feeds continuous spatial deltas while paired-boundary admission protects legacy script/event work; `paintings_update_dynamics()` owns painting floor/ripple state and render callbacks do not mutate it.
 - M8d is committed as `f483cc0`. The product uses a 60/30 pair (`paired_ticks=2`), samples input and presents at native cadence, emits one PCM block per native tick, and keeps legacy effects on paired boundaries.
-- For GPU validation, capture at the `CAMetalLayer` boundary and inspect more than one drawable attachment; the M8d live window and fetched color attachment agreed, but no external reference artifact exists.
+- M9 profiling is opt-in through `SM64_MODERN_M9_PROFILE_TICKS`; keep performance and `leaks` runs separate because `leaks` suspends the target and manufactures scheduler drops.
