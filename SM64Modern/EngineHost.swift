@@ -8,6 +8,25 @@ import os
 private let engineLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "EngineHost")
 private let audioLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "Audio")
 
+private func residentMemoryBytes() -> UInt64? {
+    var info = mach_task_basic_info()
+    var count = mach_msg_type_number_t(
+        MemoryLayout<mach_task_basic_info>.size / MemoryLayout<natural_t>.size
+    )
+    let result = withUnsafeMutablePointer(to: &info) { pointer in
+        pointer.withMemoryRebound(to: integer_t.self, capacity: Int(count)) {
+            task_info(
+                mach_task_self_,
+                task_flavor_t(MACH_TASK_BASIC_INFO),
+                $0,
+                &count
+            )
+        }
+    }
+    guard result == KERN_SUCCESS else { return nil }
+    return UInt64(info.resident_size)
+}
+
 private func engineHost(from context: UnsafeMutableRawPointer?) -> EngineHost? {
     guard let context else { return nil }
     return Unmanaged<EngineHost>.fromOpaque(context).takeUnretainedValue()
@@ -147,6 +166,27 @@ final class EngineHost: @unchecked Sendable {
         let drawableSize: CGSize
     }
 
+    private struct M9ProfileConfiguration {
+        let targetSteps: UInt64
+        let warmupSteps: UInt64
+
+        static func fromEnvironment() -> M9ProfileConfiguration? {
+            let environment = ProcessInfo.processInfo.environment
+            guard let rawTarget = environment["SM64_MODERN_M9_PROFILE_TICKS"],
+                  let targetSteps = UInt64(rawTarget),
+                  targetSteps > 0 else {
+                return nil
+            }
+            let defaultWarmup = min(UInt64(600), targetSteps > 1 ? targetSteps - 1 : 0)
+            let requestedWarmup = UInt64(environment["SM64_MODERN_M9_PROFILE_WARMUP_TICKS"] ?? "")
+                ?? defaultWarmup
+            return M9ProfileConfiguration(
+                targetSteps: targetSteps,
+                warmupSteps: min(requestedWarmup, targetSteps > 1 ? targetSteps - 1 : 0)
+            )
+        }
+    }
+
     private enum State {
         case idle
         case starting
@@ -180,6 +220,14 @@ final class EngineHost: @unchecked Sendable {
     private var schedulerCatchUpSteps: UInt64 = 0
     private var schedulerDroppedSteps: UInt64 = 0
     private var schedulerMaximumLatenessNanoseconds: UInt64 = 0
+    private let m9ProfileConfiguration = M9ProfileConfiguration.fromEnvironment()
+    private var m9ProfileBaselineStep: UInt64?
+    private var m9ProfileStartNanoseconds: UInt64?
+    private var m9ProfileStartRSSBytes: UInt64?
+    private var m9ProfileStartAudioRendered: UInt64 = 0
+    private var m9ProfileStartAudioUnderrun: UInt64 = 0
+    private var m9ProfileStartAudioDropped: UInt64 = 0
+    private var m9ProfileComplete = false
 
     var isCurrentEngineThread: Bool {
         condition.withLock {
@@ -324,6 +372,11 @@ final class EngineHost: @unchecked Sendable {
         engineLogger.notice(
             "fixed_step_scheduler_started clock=monotonic_raw max_catch_up=\(self.timebaseSnapshot.max_catch_up_steps)"
         )
+        if let m9ProfileConfiguration {
+            engineLogger.notice(
+                "m9_profile_armed target_steps=\(m9ProfileConfiguration.targetSteps, privacy: .public) warmup_steps=\(m9ProfileConfiguration.warmupSteps, privacy: .public)"
+            )
+        }
 
         while engineRunStatus == SM64_MODERN_STATUS_OK,
               !condition.withLock({ stopRequested }) {
@@ -399,6 +452,7 @@ final class EngineHost: @unchecked Sendable {
 
         stepCount += 1
         logAudioRenderIfNeeded()
+        sampleM9ProfileIfNeeded()
         if stepCount == 1 || stepCount.isMultiple(of: 300) {
             engineLogger.notice("lifecycle_step count=\(self.stepCount)")
             metalRenderer?.logSceneStatus(step: stepCount)
@@ -421,6 +475,68 @@ final class EngineHost: @unchecked Sendable {
                 CFRunLoopStop(CFRunLoopGetCurrent())
             }
         }
+    }
+
+    private func sampleM9ProfileIfNeeded() {
+        precondition(isCurrentEngineThread)
+        guard let configuration = m9ProfileConfiguration else { return }
+
+        if m9ProfileBaselineStep == nil, stepCount >= configuration.warmupSteps {
+            let audio = audioService?.audioStatus().ring
+            m9ProfileBaselineStep = stepCount
+            m9ProfileStartNanoseconds = MonotonicClock.nowNanoseconds()
+            m9ProfileStartRSSBytes = residentMemoryBytes()
+            m9ProfileStartAudioRendered = audio?.rendered_frames ?? 0
+            m9ProfileStartAudioUnderrun = audio?.underrun_frames ?? 0
+            m9ProfileStartAudioDropped = audio?.dropped_frames ?? 0
+            engineLogger.notice(
+                "m9_profile_warmup_complete step=\(self.stepCount, privacy: .public) rss_bytes=\((self.m9ProfileStartRSSBytes ?? 0), privacy: .public) audio_rendered=\(self.m9ProfileStartAudioRendered, privacy: .public)"
+            )
+        }
+
+        guard !m9ProfileComplete,
+              m9ProfileBaselineStep != nil,
+              stepCount >= configuration.targetSteps else {
+            return
+        }
+
+        m9ProfileComplete = true
+        let endNanoseconds = MonotonicClock.nowNanoseconds()
+        let startNanoseconds = m9ProfileStartNanoseconds ?? endNanoseconds
+        let elapsedNanoseconds = endNanoseconds >= startNanoseconds
+            ? endNanoseconds - startNanoseconds
+            : 0
+        let endRSSBytes = residentMemoryBytes()
+        let startRSSBytes = m9ProfileStartRSSBytes ?? endRSSBytes ?? 0
+        let endRSS = endRSSBytes ?? startRSSBytes
+        let rssDeltaBytes: Int64 = endRSS >= startRSSBytes
+            ? Int64(endRSS - startRSSBytes)
+            : -Int64(startRSSBytes - endRSS)
+        let audio = audioService?.audioStatus().ring
+        let rendered = audio?.rendered_frames ?? m9ProfileStartAudioRendered
+        let underrun = audio?.underrun_frames ?? m9ProfileStartAudioUnderrun
+        let dropped = audio?.dropped_frames ?? m9ProfileStartAudioDropped
+        let renderedDelta = rendered >= m9ProfileStartAudioRendered
+            ? rendered - m9ProfileStartAudioRendered
+            : 0
+        let underrunDelta = underrun >= m9ProfileStartAudioUnderrun
+            ? underrun - m9ProfileStartAudioUnderrun
+            : 0
+        let droppedDelta = dropped >= m9ProfileStartAudioDropped
+            ? dropped - m9ProfileStartAudioDropped
+            : 0
+        let underrunRateBPS = renderedDelta == 0
+            ? 0
+            : (underrunDelta * 10_000) / renderedDelta
+        engineLogger.notice(
+            "m9_profile_complete steps=\(self.stepCount, privacy: .public) elapsed_ns=\(elapsedNanoseconds, privacy: .public) scheduler_dropped_steps=\(self.schedulerDroppedSteps, privacy: .public) scheduler_catch_up_steps=\(self.schedulerCatchUpSteps, privacy: .public) audio_rendered_delta=\(renderedDelta, privacy: .public) audio_underrun_delta=\(underrunDelta, privacy: .public) audio_underrun_rate_bps=\(underrunRateBPS, privacy: .public) audio_dropped_delta=\(droppedDelta, privacy: .public) rss_start_bytes=\(startRSSBytes, privacy: .public) rss_end_bytes=\(endRSS, privacy: .public) rss_delta_bytes=\(rssDeltaBytes, privacy: .public)"
+        )
+        condition.withLock {
+            stopRequested = true
+            requestedExitReason = SM64_MODERN_EXIT_PLATFORM_REQUESTED
+            automaticTerminationRequested = true
+        }
+        CFRunLoopStop(CFRunLoopGetCurrent())
     }
 
     private func initializeCore() -> SM64ModernStatus {
@@ -588,9 +704,29 @@ final class EngineHost: @unchecked Sendable {
         guard let audioService else { return }
         audioService.stop()
         let status = audioService.audioStatus()
+        logM9ProfileAudioFinal(status.ring)
         self.audioService = nil
         audioLogger.notice(
             "audio_service_stopped enqueued=\(status.ring.enqueued_frames) rendered=\(status.ring.rendered_frames) underrun=\(status.ring.underrun_frames) dropped=\(status.ring.dropped_frames) render_calls=\(status.ring.render_calls)"
+        )
+    }
+
+    private func logM9ProfileAudioFinal(_ ring: SM64ModernAudioRingStats) {
+        guard m9ProfileConfiguration != nil, m9ProfileBaselineStep != nil else { return }
+        let renderedDelta = ring.rendered_frames >= m9ProfileStartAudioRendered
+            ? ring.rendered_frames - m9ProfileStartAudioRendered
+            : 0
+        let underrunDelta = ring.underrun_frames >= m9ProfileStartAudioUnderrun
+            ? ring.underrun_frames - m9ProfileStartAudioUnderrun
+            : 0
+        let droppedDelta = ring.dropped_frames >= m9ProfileStartAudioDropped
+            ? ring.dropped_frames - m9ProfileStartAudioDropped
+            : 0
+        let underrunRateBPS = renderedDelta == 0
+            ? 0
+            : (underrunDelta * 10_000) / renderedDelta
+        audioLogger.notice(
+            "m9_profile_audio_final audio_rendered_delta=\(renderedDelta, privacy: .public) audio_underrun_delta=\(underrunDelta, privacy: .public) audio_underrun_rate_bps=\(underrunRateBPS, privacy: .public) audio_dropped_delta=\(droppedDelta, privacy: .public)"
         )
     }
 

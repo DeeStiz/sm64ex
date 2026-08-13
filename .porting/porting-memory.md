@@ -2,6 +2,12 @@
 
 ## Current Milestone
 
+- M9 Release preparation is approved: produce local optimized Release, packaging, validation, performance, and leak evidence; report external gates explicitly as pending.
+- M9 success criterion remains performance, validation, leaks, signing, notarization, and clean-machine checks, with the 60/30 product contract preserved.
+- Approved work items: Release build/package path, bundle/signing inspection, long-run scheduler/audio/RSS/leak profiling, Metal validation plus CAMetalLayer GPU capture, current-product BOB parity/entrance checks, and available legacy regression gates. Audio/fixed-step/timebase smokes pass; a direct C ABI/parity/migration relink was blocked by stale ASan objects and standalone weak haptic bridge symbols. The current default save stayed outside BOB, so no subsystem-4 result was emitted; normal entrance remains pending.
+- Release performance bar: require zero scheduler drops, zero audio drops, bounded underruns, stable RSS, and no app-owned leak growth over the selected run; framework-only macOS listener allocations remain separately reported.
+- Developer ID, notarization, clean-machine, and unavailable Linux/Windows/web environments are external prerequisites and cannot be claimed locally.
+- Keep demo/Goddard rows deferred and retain the current `0.1` marketing version / build `1` metadata.
 - M8d full-world 60 Hz integration is complete in commit `f483cc0`; the native product now runs a 60/30 paired clock with input, audio, presentation, and parity gates active.
 - M8b added a private, lifecycle-reset cadence context with simulation tick, legacy tick, pair phase, boundary/final-step predicates, and a fingerprinted policy. Public ABI v1 and schema-3 record layouts remain unchanged.
 - Exact cadence state advances once on the first native step of each synthetic 60/30 pair and remains held on the second redraw. Integer/16.16 animation steps, RNG draws, thresholds, events, transitions, HUD/dialog/menu/demo/save state, and input edges retain legacy elapsed-time ordering.
