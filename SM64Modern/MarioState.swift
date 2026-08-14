@@ -195,9 +195,17 @@ struct SM64MarioTerrainMutation: Equatable, Sendable {
 
 enum SM64MarioActionBits {
     static let groupMask: UInt32 = 0x000001C0
+    static let movingGroup: UInt32 = 0x00000040
+    static let airborneGroup: UInt32 = 0x00000080
     static let submergedGroup: UInt32 = 0x000000C0
+    static let cutsceneGroup: UInt32 = 0x00000100
+    static let air: UInt32 = 0x00000800
     static let intangible: UInt32 = 0x00001000
     static let swimming: UInt32 = 0x00002000
+    static let actionSoundPlayed: UInt32 = 0x00010000
+    static let marioSoundPlayed: UInt32 = 0x00020000
+    static let unknown18: UInt32 = 0x00040000
+    static let unknown08: UInt32 = 0x00000100
 }
 
 struct SM64MarioHealthContext: Equatable, Sendable {
