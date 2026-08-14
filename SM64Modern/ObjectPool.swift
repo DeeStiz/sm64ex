@@ -65,28 +65,81 @@ struct SM64ObjectVector3: Equatable, Sendable {
     static let hiddenGfxOrigin = SM64ObjectVector3(x: -10_000, y: -10_000, z: -10_000)
 }
 
+struct SM64ObjectAngles: Equatable, Sendable {
+    var pitch: Int32
+    var yaw: Int32
+    var roll: Int32
+
+    static let zero = SM64ObjectAngles(pitch: 0, yaw: 0, roll: 0)
+}
+
 struct SM64ObjectRecord: Equatable, Sendable {
     let id: SM64ObjectID
     var objectList: SM64ObjectList
     var activeFlags: UInt16
     var parent: SM64ObjectID
     var previousObject: SM64ObjectID?
+    var collidedObjects: [SM64ObjectID?]
+    var platform: SM64ObjectID?
     var model: UInt32
     var behaviorIdentity: UInt64
+    var currentBehaviorCommandIdentity: UInt64
+    var behaviorStack: [UInt64]
+    var objectFlags: UInt32
+    var dialogResponse: Int16
+    var dialogState: Int16
+    var intangibleTimer: Int32
     var position: SM64ObjectVector3
+    var velocity: SM64ObjectVector3
+    var forwardVelocity: Float
+    var moveAngles: SM64ObjectAngles
+    var faceAngles: SM64ObjectAngles
+    var angleVelocity: SM64ObjectAngles
     var gfxPosition: SM64ObjectVector3
+    var graphFlags: UInt16
+    var graphYOffset: Float
+    var activeParticleFlags: UInt32
+    var gravity: Float
+    var floorHeight: Float
+    var moveFlags: UInt32
+    var animationState: Int32
+    var heldState: UInt32
     var hitboxRadius: Float
     var hitboxHeight: Float
     var hurtboxRadius: Float
     var hurtboxHeight: Float
     var hitboxDownOffset: Float
-    var intangibleTimer: Int16
-    var damageOrCoinValue: Int16
-    var health: Int16
+    var wallHitboxRadius: Float
+    var dragStrength: Float
+    var interactionType: UInt32
+    var interactionStatus: Int32
+    var interactionSubtype: UInt32
+    var parentRelativePosition: SM64ObjectVector3
+    var behaviorParams: Int32
+    var behaviorParams2ndByte: Int32
+    var action: Int32
+    var subAction: Int32
+    var timer: Int32
+    var previousAction: Int32
     var collisionDistance: Float
+    var angleToMario: Int32
     var drawingDistance: Float
     var distanceToMario: Float
-    var room: Int16
+    var homePosition: SM64ObjectVector3
+    var friction: Float
+    var buoyancy: Float
+    var soundStateID: Int32
+    var opacity: Int32
+    var damageOrCoinValue: Int32
+    var health: Int32
+    var numLootCoins: Int32
+    var room: Int32
+    var floorType: Int16
+    var floorRoom: Int16
+    var angleToHome: Int32
+    var collisionDataIdentity: UInt64
+    var respawnInfoType: UInt8
+    var respawnInfoIdentity: UInt64
     var transform: [Float]
     var behaviorStackIndex: UInt32
     var behaviorDelayTimer: Int16
@@ -105,22 +158,67 @@ struct SM64ObjectRecord: Equatable, Sendable {
             | (objectList == .unimportant ? SM64ObjectPool.activeFlagUnimportant : 0)
         self.parent = parent
         self.previousObject = nil
+        self.collidedObjects = Array(repeating: nil, count: 4)
+        self.platform = nil
         self.model = model
         self.behaviorIdentity = behaviorIdentity
+        self.currentBehaviorCommandIdentity = behaviorIdentity
+        self.behaviorStack = Array(repeating: 0, count: 8)
+        self.objectFlags = 0
+        self.dialogResponse = 0
+        self.dialogState = 0
+        self.intangibleTimer = -1
         self.position = .zero
+        self.velocity = .zero
+        self.forwardVelocity = 0
+        self.moveAngles = .zero
+        self.faceAngles = .zero
+        self.angleVelocity = .zero
         self.gfxPosition = .hiddenGfxOrigin
+        self.graphFlags = 0
+        self.graphYOffset = 0
+        self.activeParticleFlags = 0
+        self.gravity = 0
+        self.floorHeight = 0
+        self.moveFlags = 0
+        self.animationState = 0
+        self.heldState = 0
         self.hitboxRadius = 50
         self.hitboxHeight = 100
         self.hurtboxRadius = 0
         self.hurtboxHeight = 0
         self.hitboxDownOffset = 0
-        self.intangibleTimer = -1
+        self.wallHitboxRadius = 0
+        self.dragStrength = 0
+        self.interactionType = 0
+        self.interactionStatus = 0
+        self.interactionSubtype = 0
+        self.parentRelativePosition = .zero
+        self.behaviorParams = 0
+        self.behaviorParams2ndByte = 0
+        self.action = 0
+        self.subAction = 0
+        self.timer = 0
+        self.previousAction = 0
+        self.angleToMario = 0
         self.damageOrCoinValue = 0
         self.health = 2048
         self.collisionDistance = 1000
         self.drawingDistance = drawingDistance
         self.distanceToMario = 19_000
+        self.homePosition = .zero
+        self.friction = 0
+        self.buoyancy = 0
+        self.soundStateID = 0
+        self.opacity = 0
+        self.numLootCoins = 0
         self.room = -1
+        self.floorType = 0
+        self.floorRoom = 0
+        self.angleToHome = 0
+        self.collisionDataIdentity = 0
+        self.respawnInfoType = 0
+        self.respawnInfoIdentity = 0
         self.transform = [
             1, 0, 0, 0,
             0, 1, 0, 0,
@@ -252,6 +350,35 @@ final class SM64ObjectPool {
         mutation(&record)
         slots[Int(id.slot)].record = record
         return true
+    }
+
+    @discardableResult
+    func setParent(_ child: SM64ObjectID, parent: SM64ObjectID) -> Bool {
+        guard isValid(parent) else { return false }
+        return mutate(child) { $0.parent = parent }
+    }
+
+    @discardableResult
+    func setPreviousObject(_ object: SM64ObjectID, previous: SM64ObjectID?) -> Bool {
+        if let previous, !isValid(previous) { return false }
+        return mutate(object) { $0.previousObject = previous }
+    }
+
+    @discardableResult
+    func setPlatform(_ object: SM64ObjectID, platform: SM64ObjectID?) -> Bool {
+        if let platform, !isValid(platform) { return false }
+        return mutate(object) { $0.platform = platform }
+    }
+
+    @discardableResult
+    func setCollidedObject(
+        _ object: SM64ObjectID,
+        slot: Int,
+        collidedObject: SM64ObjectID?
+    ) -> Bool {
+        guard (0..<4).contains(slot) else { return false }
+        if let collidedObject, !isValid(collidedObject) { return false }
+        return mutate(object) { $0.collidedObjects[slot] = collidedObject }
     }
 
     /// Matches `mark_obj_for_deletion`: the node stays in its list until the
