@@ -45,6 +45,7 @@ else
   "$PROJECT_ROOT/script/test_oracle_trace.sh"
   "$PROJECT_ROOT/script/test_oracle_trace_swift.sh"
   "$PROJECT_ROOT/script/test_oracle_bridge.sh"
+  "$PROJECT_ROOT/script/test_oracle_reachability.sh"
   xcodegen generate --spec project.yml
   xcodebuild \
     -project SM64Modern.xcodeproj \
