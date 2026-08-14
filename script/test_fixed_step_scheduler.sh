@@ -7,6 +7,7 @@ mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
   -parse-as-library \
+  -module-cache-path "$BUILD_ROOT/module-cache" \
   "$PROJECT_ROOT/SM64Modern/FixedStepScheduler.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_fixed_step_scheduler_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-fixed-step-scheduler-smoke"

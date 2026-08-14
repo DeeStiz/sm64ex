@@ -2,8 +2,11 @@
 
 ## Current Milestone
 
-- No active milestone. The SM64 Modern porting goal is complete through M14; remaining Developer ID/notarization, clean-machine, physical-device, normal-gameplay, and external-ground-truth checks are release or human acceptance gates, not unfinished porting milestones.
-- M10-M14 are implemented in the current uncommitted worktree: reusable Metal 4 frame packets, Swift Mario ground speed, asynchronous pipeline/cache preparation, typed Swift Bob-omb release, and explicit native Swift authority all pass their bounded gates; no commit/push was authorized.
+- Active goal: `full-swift-twin`, M0 baseline complete and M1 dual-engine lifecycle in progress. The prior SM64 Modern M0-M14 goal remains complete and unchanged.
+- The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
+- M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
+- M1 scope: add the engine runtime protocol/adapter boundary, a Swift lifecycle shell, launch-time authority selection, persisted Advanced setting, restart-only switching, and fail-closed invalid configuration without changing C-authority behavior.
+- M2-M35 remain planned in `.porting/goal-full-swift-twin.md`; the execution contract is autonomous except for credentials, human/device gates, parity exceptions, destructive recovery, or scope changes.
 - The 3,600-step Release profile recorded zero scheduler drops, zero audio drops, zero underruns, and +3.49 MiB RSS; two leak snapshots reported zero app leaks. Metal HUD and validation also exited cleanly.
 - The fetched CAMetalLayer title drawable was intact; full-screen capture was limited by the app window being on a negative-coordinate secondary display, so human visual confirmation remains open.
 - Developer ID/notarization, clean-machine, unavailable Linux/Windows/web, physical controller/audio, and normal BOB entrance/subsystem-4 acceptance remain external or human gates.
@@ -136,6 +139,7 @@
 | macOS legacy build | Implemented — Apple Clang arm64 build, external ROM extraction, OpenGL launch, LLDB/visual evidence, and ASan route pass |
 | Callable C core | Implemented — versioned lifecycle/platform/gameplay POD ABI, static archive, legacy adapter, and C/C++ smoke consumer |
 | AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 60/30 C-core owner thread with clean shutdown |
+| Full Swift twin runtime | Partial — new goal M0 baseline passes; M1 will introduce the whole-engine Swift/C runtime boundary and launch-time authority selector while existing bounded slices remain unchanged |
 | Metal 4 device/presentation | Implemented — validated raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
 | Metal 4 rendering | Implemented — complete-scene POD bridge/replay with reusable batched frame storage, async Metal 4 MSL/pipeline preparation, device/schema-keyed descriptor fallback cache, private textures, memoryless depth, samplers, state, residency/barriers, trace inspection, and clean Metal validation |
 | Native input | Implemented — native-tick snapshots, retained edges, keyboard/mouse bridge, and haptic bridge passed; no physical controller was connected in M8d |
