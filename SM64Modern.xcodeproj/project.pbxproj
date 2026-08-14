@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		01E615EBF7207413282AF29D /* LevelScriptVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129A98B13AFB161495B1C646 /* LevelScriptVM.swift */; };
+		0251DEA438C860732FDBE0C1 /* BehaviorScriptVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */; };
 		02E322DA71DC6695775C5D60 /* SwiftGameplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */; };
 		09C260568C8A5ECD27002AC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */; };
 		0C110C47F377370F18974E8D /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */; };
@@ -16,6 +17,7 @@
 		139E7960DE4C5B3DA9CE17B8 /* AppleAudioRing.c in Sources */ = {isa = PBXBuildFile; fileRef = A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */; };
 		15156FB40A2F0FB896A7D6EC /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C22E70845A716BECE93CE0 /* GameView.swift */; };
 		1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 399C03F347FC9A4D23DFECFD /* OracleTrace.swift */; };
+		161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */; };
 		1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */; };
 		1F4EB6331042EECC1AFF0F44 /* ObjectPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E29EEED44FF3034BE40C4C /* ObjectPool.swift */; };
 		335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26195252708283AFB936E392 /* GameplayParity.swift */; };
@@ -39,6 +41,7 @@
 		D65F07ACB7B0E4429D8D1086 /* ObjectSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */; };
 		E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */; };
 		ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */; };
+		FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6B1983ADD652967A0372D10 /* BehaviorScript.swift */; };
 		FDFB158F79EC6A450D735577 /* LevelScriptContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */; };
 /* End PBXBuildFile section */
 
@@ -47,6 +50,7 @@
 		1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalCompilerBridge.m; sourceTree = "<group>"; };
 		1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderingBridge.swift; sourceTree = "<group>"; };
 		1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTraceSession.swift; sourceTree = "<group>"; };
+		2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptContentRuntime.swift; sourceTree = "<group>"; };
 		2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScriptContentRuntime.swift; sourceTree = "<group>"; };
 		26195252708283AFB936E392 /* GameplayParity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameplayParity.swift; sourceTree = "<group>"; };
 		29E29EEED44FF3034BE40C4C /* ObjectPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectPool.swift; sourceTree = "<group>"; };
@@ -70,12 +74,14 @@
 		A25BB84567898B7DD0F01721 /* MemoryArena.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryArena.swift; sourceTree = "<group>"; };
 		A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = AppleAudioRing.c; sourceTree = "<group>"; };
 		AC89F10EF988BEB5D9624D69 /* LevelScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScript.swift; sourceTree = "<group>"; };
+		B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptVM.swift; sourceTree = "<group>"; };
 		B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectSnapshot.swift; sourceTree = "<group>"; };
 		B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftGameplay.swift; sourceTree = "<group>"; };
 		BB40062F0B74B53B43A517BA /* EngineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineState.swift; sourceTree = "<group>"; };
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
 		CB4ABB8191E695DB49D9CF9E /* AppleAudioService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioService.h; sourceTree = "<group>"; };
 		D5723E1972C2FF3BB21E3A5B /* AppMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMain.swift; sourceTree = "<group>"; };
+		D6B1983ADD652967A0372D10 /* BehaviorScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScript.swift; sourceTree = "<group>"; };
 		D8F9722E9A2207BC558A3023 /* SM64Modern.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SM64Modern.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayoutContentRuntime.swift; sourceTree = "<group>"; };
 		EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedTrigTables.swift; sourceTree = "<group>"; };
@@ -94,6 +100,9 @@
 				328470043E0C3F9278C1A80E /* AppleAudioService.m */,
 				C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */,
 				D5723E1972C2FF3BB21E3A5B /* AppMain.swift */,
+				D6B1983ADD652967A0372D10 /* BehaviorScript.swift */,
+				2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */,
+				B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */,
 				F3F0AEF5342F3B329237DD66 /* ContentPack.swift */,
 				8A6630058727A186889977A1 /* ContentPackRuntime.swift */,
 				3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */,
@@ -230,6 +239,9 @@
 				139E7960DE4C5B3DA9CE17B8 /* AppleAudioRing.c in Sources */,
 				AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */,
 				45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */,
+				FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */,
+				161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */,
+				0251DEA438C860732FDBE0C1 /* BehaviorScriptVM.swift in Sources */,
 				B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */,
 				90B7F9D7BD419562B6E7A2F8 /* ContentPackRuntime.swift in Sources */,
 				11833E1637F8649E7554B9F6 /* DeterministicPrimitives.swift in Sources */,
