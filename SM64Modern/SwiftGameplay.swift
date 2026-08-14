@@ -181,46 +181,31 @@ final class SwiftGameplayService: @unchecked Sendable {
         precondition(!Thread.isMainThread, "Swift gameplay callbacks require the engine owner thread")
         advanceCandidateTick(to: input.simulation_tick)
 
-        let intendedMagnitude = Float(bitPattern: input.intended_magnitude_bits)
-        let quicksandDepth = Float(bitPattern: input.quicksand_depth_bits)
-        let floorNormalY = Float(bitPattern: input.floor_normal_y_bits)
-        var forwardVelocity = Float(bitPattern: input.forward_velocity_bits)
-        guard intendedMagnitude.isFinite, quicksandDepth.isFinite,
-              floorNormalY.isFinite, forwardVelocity.isFinite,
-              input.floor_is_slow <= 1, input.responsive_cheat <= 1,
+        guard input.floor_is_slow <= 1, input.responsive_cheat <= 1,
               input.cheats_enabled <= 1 else {
             return SM64_MODERN_STATUS_INVALID_ARGUMENT
         }
-
-        let maxTargetSpeed: Float = input.floor_is_slow != 0 ? 24 : 32
-        var targetSpeed = intendedMagnitude < maxTargetSpeed ? intendedMagnitude : maxTargetSpeed
-        if quicksandDepth > 10 {
-            targetSpeed = Float(Double(targetSpeed) * (6.25 / Double(quicksandDepth)))
-        }
-        if forwardVelocity <= 0 {
-            forwardVelocity += 1.1
-        } else if forwardVelocity <= targetSpeed {
-            forwardVelocity += 1.1 - forwardVelocity / 43
-        } else if floorNormalY >= 0.95 {
-            forwardVelocity -= 1
-        }
-        if forwardVelocity > 48 { forwardVelocity = 48 }
-
-        let intendedYaw = Int32(Int16(truncatingIfNeeded: input.intended_yaw))
-        let faceYaw = Int32(Int16(truncatingIfNeeded: input.face_yaw))
-        let nextFaceYaw: Int32
-        if input.responsive_cheat != 0 && input.cheats_enabled != 0 {
-            nextFaceYaw = intendedYaw
-        } else {
-            let delta = Int32(Int16(truncatingIfNeeded: intendedYaw - faceYaw))
-            nextFaceYaw = intendedYaw - approachS32(delta, target: 0, increment: 0x800, decrement: 0x800)
+        guard let speed = SM64MarioGroundSpeed.update(
+            SM64MarioGroundSpeedInput(
+                intendedMagnitude: Float(bitPattern: input.intended_magnitude_bits),
+                forwardVelocity: Float(bitPattern: input.forward_velocity_bits),
+                quicksandDepth: Float(bitPattern: input.quicksand_depth_bits),
+                floorNormalY: Float(bitPattern: input.floor_normal_y_bits),
+                intendedYaw: input.intended_yaw,
+                faceYaw: input.face_yaw,
+                floorIsSlow: input.floor_is_slow != 0,
+                responsiveCheat: input.responsive_cheat != 0,
+                cheatsEnabled: input.cheats_enabled != 0
+            )
+        ) else {
+            return SM64_MODERN_STATUS_INVALID_ARGUMENT
         }
 
         var result = SM64ModernMarioGroundSpeedOutputV1()
         result.header.abi_version = SM64_MODERN_ABI_VERSION_1
         result.header.struct_size = UInt32(MemoryLayout<SM64ModernMarioGroundSpeedOutputV1>.size)
-        result.forward_velocity_bits = forwardVelocity.bitPattern
-        result.face_yaw = Int32(Int16(truncatingIfNeeded: nextFaceYaw))
+        result.forward_velocity_bits = speed.forwardVelocity.bitPattern
+        result.face_yaw = Int32(speed.faceYaw)
         output.pointee = result
         marioGroundSpeedCandidate = MarioGroundSpeedCandidate(
             tick: input.simulation_tick,
@@ -352,19 +337,6 @@ final class SwiftGameplayService: @unchecked Sendable {
         bobombCandidates.removeAll(keepingCapacity: true)
     }
 
-    private func approachS32(
-        _ current: Int32,
-        target: Int32,
-        increment: Int32,
-        decrement: Int32
-    ) -> Int32 {
-        if current < target {
-            let next = current + increment
-            return next > target ? target : next
-        }
-        let next = current - decrement
-        return next < target ? target : next
-    }
 }
 
 func makeSwiftMarioGroundSpeedAPI(
