@@ -137,6 +137,62 @@ struct SM64MarioCapFlags: OptionSet, Equatable, Sendable {
     static let inHand = Self(rawValue: 0x00000020)
 }
 
+enum SM64MarioCapPowerup: Equatable, Sendable {
+    case vanish
+    case metal
+    case wing
+
+    var capFlag: SM64MarioCapFlags {
+        switch self {
+        case .vanish: return .vanish
+        case .metal: return .metal
+        case .wing: return .wing
+        }
+    }
+
+    /// Timers used by `set_mario_initial_cap_powerup` in the three cap
+    /// courses. Pickups use a separate timer because the C interaction path
+    /// gives the wing cap 1800 frames instead of the initial 1200.
+    var initialTimer: UInt16 {
+        switch self {
+        case .vanish, .metal: return 600
+        case .wing: return 1200
+        }
+    }
+
+    var pickupTimer: UInt16 {
+        switch self {
+        case .vanish, .metal: return 600
+        case .wing: return 1800
+        }
+    }
+}
+
+struct SM64MarioCapMutation: Equatable, Sendable {
+    let capTimer: UInt16
+    let flags: UInt32
+    let renderFlags: UInt32
+    let didExpire: Bool
+    let shouldFadeOutMusic: Bool
+    let didFlicker: Bool
+}
+
+struct SM64MarioTerrainMutation: Equatable, Sendable {
+    let position: SM64ObjectVector3
+    let floorSurfaceID: UInt32?
+    let ceilingSurfaceID: UInt32?
+    let wallSurfaceID: UInt32?
+    let floorHeight: Float
+    let ceilingHeight: Float
+    let floorAngle: Int16
+    let waterLevel: Float
+    let terrainSoundAddend: UInt32
+    let input: SM64MarioInputFlags
+    let floorChanged: Bool
+    let ceilingChanged: Bool
+    let waterLevelChanged: Bool
+}
+
 enum SM64MarioActionBits {
     static let groupMask: UInt32 = 0x000001C0
     static let submergedGroup: UInt32 = 0x000000C0
@@ -157,6 +213,151 @@ struct SM64MarioHealthMutation: Equatable, Sendable {
 }
 
 extension SM64MarioState {
+    private static let temporaryCapMask =
+        SM64MarioCapFlags.vanish.rawValue
+        | SM64MarioCapFlags.metal.rawValue
+        | SM64MarioCapFlags.wing.rawValue
+    private static let persistentCapMask =
+        SM64MarioCapFlags.normal.rawValue
+        | SM64MarioCapFlags.vanish.rawValue
+        | SM64MarioCapFlags.metal.rawValue
+        | SM64MarioCapFlags.wing.rawValue
+    private static let capFlickerFrames: UInt64 = 0x4444_4492_4925_5555
+
+    /// Applies the cap course powerup selected by `gCurrCourseNum` in
+    /// `set_mario_initial_cap_powerup`. Course numbers 20, 21, and 22 are
+    /// `COURSE_COTMC`, `COURSE_TOTWC`, and `COURSE_VCUTM` in the US table.
+    @discardableResult
+    mutating func applyInitialCapPowerup(courseIndex: Int) -> SM64MarioCapMutation? {
+        let powerup: SM64MarioCapPowerup?
+        switch courseIndex {
+        case 20: powerup = .metal
+        case 21: powerup = .wing
+        case 22: powerup = .vanish
+        default: powerup = nil
+        }
+        guard let powerup else { return nil }
+        flags |= powerup.capFlag.rawValue | SM64MarioCapFlags.onHead.rawValue
+        capTimer = powerup.initialTimer
+        return SM64MarioCapMutation(
+            capTimer: capTimer,
+            flags: flags,
+            renderFlags: flags,
+            didExpire: false,
+            shouldFadeOutMusic: false,
+            didFlicker: false
+        )
+    }
+
+    /// Applies the value portion of `interact_cap`. Action selection,
+    /// sequence playback, and object ownership remain owner-thread effects;
+    /// this method only performs the C-compatible flag and timer mutation.
+    @discardableResult
+    mutating func applyCapPowerup(_ powerup: SM64MarioCapPowerup) -> SM64MarioCapMutation {
+        flags &= ~(SM64MarioCapFlags.onHead.rawValue | SM64MarioCapFlags.inHand.rawValue)
+        flags |= powerup.capFlag.rawValue
+        capTimer = max(capTimer, powerup.pickupTimer)
+        return SM64MarioCapMutation(
+            capTimer: capTimer,
+            flags: flags,
+            renderFlags: flags,
+            didExpire: false,
+            shouldFadeOutMusic: false,
+            didFlicker: false
+        )
+    }
+
+    /// Mirrors `update_and_return_cap_flags`. The returned render flags may
+    /// flicker while the state flags remain stable; expiration mutates the
+    /// state and reports the music transition as an intent.
+    @discardableResult
+    mutating func tickCapTimer() -> SM64MarioCapMutation {
+        var renderFlags = flags
+        var didExpire = false
+        var shouldFadeOutMusic = false
+        var didFlicker = false
+
+        if capTimer > 0 {
+            let pausesWhileReading = action == 0x20001305 // ACT_READING_AUTOMATIC_DIALOG
+                || action == 0x20001306 // ACT_READING_NPC_DIALOG
+                || action == 0x00001308 // ACT_READING_SIGN
+                || action == 0x00001371 // ACT_IN_CANNON
+            if capTimer <= 60 || !pausesWhileReading {
+                capTimer &-= 1
+            }
+
+            if capTimer == 0 {
+                didExpire = true
+                flags &= ~Self.temporaryCapMask
+                if flags & Self.persistentCapMask == 0 {
+                    flags &= ~SM64MarioCapFlags.onHead.rawValue
+                }
+            }
+
+            shouldFadeOutMusic = capTimer == 0x3C
+            if capTimer < 0x40
+                && ((Self.capFlickerFrames & (UInt64(1) << UInt64(capTimer))) != 0) {
+                renderFlags &= ~Self.temporaryCapMask
+                if renderFlags & Self.persistentCapMask == 0 {
+                    renderFlags &= ~SM64MarioCapFlags.onHead.rawValue
+                }
+                didFlicker = true
+            }
+        }
+
+        return SM64MarioCapMutation(
+            capTimer: capTimer,
+            flags: flags,
+            renderFlags: renderFlags,
+            didExpire: didExpire,
+            shouldFadeOutMusic: shouldFadeOutMusic,
+            didFlicker: didFlicker
+        )
+    }
+
+    /// Applies the collision-derived portion of `update_mario_geometry_inputs`
+    /// after wall resolution and the graphics-position fallback have already
+    /// been performed by `SM64MarioGeometryInput.update`.
+    @discardableResult
+    mutating func applyTerrainSnapshot(
+        _ geometry: SM64MarioGeometryInputResult
+    ) -> SM64MarioTerrainMutation {
+        let oldFloor = floorSurfaceID
+        let oldCeiling = ceilingSurfaceID
+        let oldWaterLevel = waterLevel
+
+        position = geometry.position
+        input.formUnion(geometry.flags)
+        floorSurfaceID = geometry.floor.surfaceID
+        ceilingSurfaceID = geometry.ceiling.surfaceID
+        // C stores only the resolved wall pointer outside the collision
+        // routine. The lower probe is the last C wall pass, so its newest
+        // surface is the stable ID used by the Swift state boundary.
+        wallSurfaceID = geometry.lowerWall.surfaceIDs.last
+            ?? geometry.upperWall.surfaceIDs.last
+        floorHeight = geometry.floor.height
+        ceilingHeight = geometry.ceiling.height
+        floorAngle = geometry.floorAngle
+        waterLevel = geometry.waterLevel
+        terrainSoundAddend = geometry.terrainSoundAddend
+
+        return SM64MarioTerrainMutation(
+            position: position,
+            floorSurfaceID: floorSurfaceID,
+            ceilingSurfaceID: ceilingSurfaceID,
+            wallSurfaceID: wallSurfaceID,
+            floorHeight: floorHeight,
+            ceilingHeight: ceilingHeight,
+            floorAngle: floorAngle,
+            waterLevel: waterLevel,
+            terrainSoundAddend: terrainSoundAddend,
+            input: input,
+            floorChanged: oldFloor != floorSurfaceID,
+            ceilingChanged: oldCeiling != ceilingSurfaceID,
+            waterLevelChanged: oldWaterLevel != waterLevel
+        )
+    }
+
     /// Value counterpart of `update_mario_health`. It returns the observable
     /// rumble intent instead of calling a platform API; the owner-thread tick
     /// can enqueue it after the state transition is accepted.
