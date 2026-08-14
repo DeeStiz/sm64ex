@@ -30,6 +30,8 @@ private func hashFrame(_ initial: UInt64, _ frame: SM64MarioInputFrame) -> UInt6
     hash = hashU16(hash, frame.controller.buttonPressed)
     hash = hashU16(hash, UInt16(bitPattern: frame.controller.rawStickX))
     hash = hashU16(hash, UInt16(bitPattern: frame.controller.rawStickY))
+    hash = hashU16(hash, frame.camera.buttonDown)
+    hash = hashU16(hash, frame.camera.buttonPressed)
     hash = hashU16(hash, frame.mario.input.rawValue)
     hash = hashU32(hash, frame.mario.intendedMagnitude.bitPattern)
     hash = hashU16(hash, UInt16(bitPattern: frame.mario.intendedYaw))
@@ -54,10 +56,12 @@ enum SM64ModernMarioInputFrameSmoke {
     static func main() throws {
         let world = try SM64SurfaceCollisionWorld(staticSurfaces: [floor()])
         var normalizer = SM64ControllerInputNormalizer()
+        var cameraNormalizer = SM64CameraInputNormalizer()
         let first = SM64MarioInputFrameComposer.update(
             normalizer: &normalizer,
+            cameraNormalizer: &cameraNormalizer,
             simulationTick: 11,
-            sample: SM64ControllerRawSample(buttons: 0x8000, rawStickX: 38),
+            sample: SM64ControllerRawSample(buttons: 0x8000, rawStickX: 38, extStickX: 20_000, extStickY: -20_000),
             focused: true,
             advanceLegacyDomain: true,
             rumbleRequest: SM64RumbleRequest(strength: 0.5, duration: 0.25),
@@ -76,6 +80,7 @@ enum SM64ModernMarioInputFrameSmoke {
 
         let second = SM64MarioInputFrameComposer.update(
             normalizer: &normalizer,
+            cameraNormalizer: &cameraNormalizer,
             simulationTick: 12,
             sample: SM64ControllerRawSample(buttons: 0x8000, rawStickX: 38),
             focused: false,
@@ -96,6 +101,7 @@ enum SM64ModernMarioInputFrameSmoke {
         let demo = SM64DemoInputState(timer: 2, buttonMask: 0x90, rawStickX: 24, rawStickY: -12)
         let third = SM64MarioInputFrameComposer.update(
             normalizer: &normalizer,
+            cameraNormalizer: &cameraNormalizer,
             simulationTick: 13,
             sample: SM64ControllerRawSample(buttons: 0x1000),
             focused: true,
@@ -116,6 +122,7 @@ enum SM64ModernMarioInputFrameSmoke {
 
         let fourth = SM64MarioInputFrameComposer.update(
             normalizer: &normalizer,
+            cameraNormalizer: &cameraNormalizer,
             simulationTick: 14,
             sample: SM64ControllerRawSample(buttons: 0x1000),
             focused: true,
@@ -134,6 +141,7 @@ enum SM64ModernMarioInputFrameSmoke {
 
         let end = SM64MarioInputFrameComposer.update(
             normalizer: &normalizer,
+            cameraNormalizer: &cameraNormalizer,
             simulationTick: 15,
             sample: SM64ControllerRawSample(buttons: 0x1000),
             focused: true,

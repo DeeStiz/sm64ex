@@ -13,6 +13,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/GeneratedTrigTables.swift" \
   "$PROJECT_ROOT/SM64Modern/DeterministicPrimitives.swift" \
   "$PROJECT_ROOT/SM64Modern/InputCore.swift" \
+  "$PROJECT_ROOT/SM64Modern/CameraInput.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioInputCore.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectPool.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \

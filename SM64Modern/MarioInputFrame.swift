@@ -87,6 +87,7 @@ struct SM64MarioInputFrame: Equatable, Sendable {
     let demoEnded: Bool
     let demoTimer: UInt8?
     let controller: SM64ControllerState
+    let camera: SM64CameraInputState
     let mario: SM64MarioInputState
     let geometry: SM64MarioGeometryInputResult
     let rumbleRequest: SM64RumbleRequest?
@@ -104,6 +105,7 @@ struct SM64MarioInputFrameResult: Equatable, Sendable {
 enum SM64MarioInputFrameComposer {
     static func update(
         normalizer: inout SM64ControllerInputNormalizer,
+        cameraNormalizer: inout SM64CameraInputNormalizer,
         simulationTick: UInt64,
         sample: SM64ControllerRawSample,
         focused: Bool,
@@ -160,6 +162,10 @@ enum SM64MarioInputFrameComposer {
             isLavaLevel: isLavaLevel,
             isCrawling: isCrawling
         )
+        let camera = cameraNormalizer.update(
+            controller: controller,
+            advanceLegacyDomain: advanceLegacyDomain
+        )
         let mario = SM64MarioInputCore.update(
             controller: controller,
             squishTimer: squishTimer,
@@ -177,6 +183,7 @@ enum SM64MarioInputFrameComposer {
             demoEnded: overlay?.didEnd ?? false,
             demoTimer: overlay?.nextState.timer,
             controller: controller,
+            camera: camera,
             mario: mario,
             geometry: geometry,
             rumbleRequest: SM64RumbleBoundary.admitted(
