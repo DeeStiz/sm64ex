@@ -2,11 +2,12 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`, M0 baseline, M1 dual-engine lifecycle, and M2 content-pack compiler complete for local code/test scope; M3 oracle trace is next. The prior SM64 Modern M0-M14 goal remains complete and unchanged.
+- Active goal: `full-swift-twin`, M0 baseline, M1 dual-engine lifecycle, and M2 content-pack compiler complete for local code/test scope; M3 schema-4 oracle foundation is in progress. The prior SM64 Modern M0-M14 goal remains complete and unchanged.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
 - M2 evidence: `SM64CPK` is a little-endian versioned pack with section/file SHA-256 hashes, source fingerprint, US SHA-1 legal-ROM gate, safe-path loader validation, and deterministic rebuilds. Fixture source-only and legal-ROM packs pass; the full repository source-only pack contains 3,324 files and is byte-identical across rebuilds. No production ROM was available, and runtime content consumption remains M6 work.
+- M3 foundation evidence: schema-4 C records are fixed at 128 bytes with 72-byte configuration, carry build/content/timebase/config/save/coverage fingerprints, and reject malformed hashes, value mismatches, missing/extra records, and incomplete coverage. The C smoke emits a raw trace that the Swift codec reads; C-vs-C rebuilds are byte-identical. Live engine capture still needs wiring through the existing owner-thread parity seams.
 - M2-M35 remain planned in `.porting/goal-full-swift-twin.md`; the execution contract is autonomous except for credentials, human/device gates, parity exceptions, destructive recovery, or scope changes.
 - The 3,600-step Release profile recorded zero scheduler drops, zero audio drops, zero underruns, and +3.49 MiB RSS; two leak snapshots reported zero app leaks. Metal HUD and validation also exited cleanly.
 - The fetched CAMetalLayer title drawable was intact; full-screen capture was limited by the app window being on a negative-coordinate secondary display, so human visual confirmation remains open.
@@ -132,6 +133,7 @@
 - M8d native 60/30 product integration and parity passed; the private world smoke is still bounded-model evidence rather than independent full-world cross-rate proof, and physical controller/haptic acceptance remains untested.
 - The current automated layer capture has a valid 34-draw/29-blit Metal 4 pass and populated transient geometry, but the fetched drawable and foreground window are black after the display link stops at three presents; treat visual/human acceptance as open until a visible-window capture is repeated.
 - M9 profile audio was clean in-window; teardown-only underruns from instrumented/short runs are not release-bar evidence.
+- M3 schema-4 codec work is not live whole-engine evidence yet. Do not call a title/gameplay/save/audio/render qualification pass until the C owner-thread hooks emit all domains and the Swift runtime consumes the same trace with an identical content/save/config fingerprint.
 
 ## Feature Status
 
@@ -203,3 +205,4 @@
 - M8d is committed as `f483cc0`. The product uses a 60/30 pair (`paired_ticks=2`), samples input and presents at native cadence, emits one PCM block per native tick, and keeps legacy effects on paired boundaries.
 - M9 profiling is opt-in through `SM64_MODERN_M9_PROFILE_TICKS`; keep performance and `leaks` runs separate because `leaks` suspends the target and manufactures scheduler drops.
 - M2 full-Swift-twin evidence: `script/test_content_pack.sh`, all baseline smoke scripts, deterministic full source-only pack verification, and an isolated Swift 6/macOS 27 Debug app build pass. The pack tool is `script/build_content_pack.sh`; generated packs remain ignored build artifacts. A legal US ROM is required for a shippable ROM-derived pack; source-only mode is development-only.
+- M3 full-Swift-twin foundation evidence: `script/test_oracle_trace.sh` and `script/test_oracle_trace_swift.sh` pass, including C-produced raw-file to Swift decode. `make ... oracle-trace-smoke` and the strict Swift 6/macOS 27 app build pass. The schema-4 inventory is deliberately additive; schema-3 replay compatibility is unchanged.

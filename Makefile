@@ -317,6 +317,7 @@ SM64_MODERN_MIGRATION_SMOKE := $(BUILD_DIR)/sm64-modern-migration-smoke
 SM64_MODERN_TIMEBASE_SMOKE := $(BUILD_DIR)/sm64-modern-timebase-smoke
 SM64_MODERN_TIMEBASE_CADENCE_SMOKE := $(BUILD_DIR)/sm64-modern-timebase-cadence-smoke
 SM64_MODERN_WORLD_CADENCE_SMOKE := $(BUILD_DIR)/sm64-modern-world-cadence-smoke
+SM64_MODERN_ORACLE_TRACE_SMOKE := $(BUILD_DIR)/sm64-modern-oracle-trace-smoke
 
 ifeq ($(TARGET_WEB),1)
 EXE := $(BUILD_DIR)/$(TARGET).html
@@ -498,6 +499,7 @@ SM64_MODERN_MIGRATION_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_gameplay_migra
 SM64_MODERN_TIMEBASE_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_timebase_smoke.o
 SM64_MODERN_TIMEBASE_CADENCE_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_timebase_cadence_smoke.o
 SM64_MODERN_WORLD_CADENCE_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_world_cadence_smoke.o
+SM64_MODERN_ORACLE_TRACE_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_oracle_trace_smoke.o
 
 RPC_LIBS :=
 ifeq ($(DISCORDRPC),1)
@@ -835,6 +837,9 @@ cadence-smoke: $(SM64_MODERN_TIMEBASE_CADENCE_SMOKE) $(SM64_MODERN_WORLD_CADENCE
 	$(SM64_MODERN_TIMEBASE_CADENCE_SMOKE)
 	$(SM64_MODERN_WORLD_CADENCE_SMOKE)
 
+oracle-trace-smoke: $(SM64_MODERN_ORACLE_TRACE_SMOKE)
+	$(SM64_MODERN_ORACLE_TRACE_SMOKE)
+
 # thank you apple very cool
 ifeq ($(HOST_OS),Darwin)
   CP := gcp
@@ -1166,6 +1171,8 @@ $(SM64_MODERN_TIMEBASE_CADENCE_SMOKE_OBJ): include/sm64_modern.h src/pc/sm64_mod
 
 $(SM64_MODERN_WORLD_CADENCE_SMOKE_OBJ): include/sm64_modern.h src/pc/sm64_modern_timebase.h
 
+$(SM64_MODERN_ORACLE_TRACE_SMOKE_OBJ): include/sm64_modern.h
+
 $(SM64_MODERN_CORE): Makefile $(SM64_MODERN_CORE_O_FILES)
 	$(RM) $@
 	$(AR) rcs $@ $(SM64_MODERN_CORE_O_FILES)
@@ -1188,10 +1195,13 @@ $(SM64_MODERN_TIMEBASE_CADENCE_SMOKE): $(SM64_MODERN_TIMEBASE_CADENCE_SMOKE_OBJ)
 $(SM64_MODERN_WORLD_CADENCE_SMOKE): $(SM64_MODERN_WORLD_CADENCE_SMOKE_OBJ) $(SM64_MODERN_CORE)
 	$(LD) -L $(BUILD_DIR) -o $@ $(SM64_MODERN_WORLD_CADENCE_SMOKE_OBJ) $(SM64_MODERN_CORE) $(LDFLAGS)
 
+$(SM64_MODERN_ORACLE_TRACE_SMOKE): $(SM64_MODERN_ORACLE_TRACE_SMOKE_OBJ) $(SM64_MODERN_CORE)
+	$(LD) -L $(BUILD_DIR) -o $@ $(SM64_MODERN_ORACLE_TRACE_SMOKE_OBJ) $(SM64_MODERN_CORE) $(LDFLAGS)
+
 $(EXE): $(SM64_MODERN_ENTRY_OBJ) $(SM64_MODERN_CORE) $(MIO0_FILES:.mio0=.o) $(if $(RPC_LIBS),$(BUILD_DIR)/$(RPC_LIBS),)
 	$(LD) -L $(BUILD_DIR) -o $@ $(SM64_MODERN_ENTRY_OBJ) $(SM64_MODERN_CORE) $(LDFLAGS)
 
-.PHONY: all core native-core abi-smoke parity-smoke migration-smoke timebase-smoke cadence-smoke clean distclean default diff test load libultra res
+.PHONY: all core native-core abi-smoke parity-smoke migration-smoke timebase-smoke cadence-smoke oracle-trace-smoke clean distclean default diff test load libultra res
 .PRECIOUS: $(BUILD_DIR)/bin/%.elf $(SOUND_BIN_DIR)/%.ctl $(SOUND_BIN_DIR)/%.tbl $(SOUND_SAMPLE_TABLES) $(SOUND_BIN_DIR)/%.s $(BUILD_DIR)/%
 .DELETE_ON_ERROR:
 

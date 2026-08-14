@@ -93,6 +93,47 @@ typedef uint32_t SM64ModernGameplayParityMode;
 
 #define SM64_MODERN_GAMEPLAY_PARITY_SCHEMA_VERSION 3u
 
+// Schema 4 is the additive whole-engine oracle contract. Schema 3 remains
+// readable by the existing bounded gameplay parity harness above; schema 4
+// deliberately has its own records so new domains can be added without
+// changing the v1 ABI or invalidating existing evidence.
+#define SM64_MODERN_ORACLE_TRACE_SCHEMA_VERSION 4u
+#define SM64_MODERN_ORACLE_TRACE_VALUE_CAPACITY 8u
+
+typedef uint32_t SM64ModernOracleTraceMode;
+
+#define SM64_MODERN_ORACLE_TRACE_RECORD 1u
+#define SM64_MODERN_ORACLE_TRACE_REPLAY 2u
+
+typedef uint32_t SM64ModernOracleTraceDomain;
+
+#define SM64_MODERN_ORACLE_DOMAIN_GLOBAL 0u
+#define SM64_MODERN_ORACLE_DOMAIN_INPUT 1u
+#define SM64_MODERN_ORACLE_DOMAIN_MARIO 2u
+#define SM64_MODERN_ORACLE_DOMAIN_OBJECT 3u
+#define SM64_MODERN_ORACLE_DOMAIN_INTERACTION 4u
+#define SM64_MODERN_ORACLE_DOMAIN_CAMERA 5u
+#define SM64_MODERN_ORACLE_DOMAIN_SCRIPT 6u
+#define SM64_MODERN_ORACLE_DOMAIN_COLLISION 7u
+#define SM64_MODERN_ORACLE_DOMAIN_RNG 8u
+#define SM64_MODERN_ORACLE_DOMAIN_AUDIO 9u
+#define SM64_MODERN_ORACLE_DOMAIN_SAVE 10u
+#define SM64_MODERN_ORACLE_DOMAIN_RENDER 11u
+#define SM64_MODERN_ORACLE_DOMAIN_EFFECT 12u
+#define SM64_MODERN_ORACLE_DOMAIN_COVERAGE 13u
+#define SM64_MODERN_ORACLE_TRACE_DOMAIN_COUNT 14u
+
+typedef uint32_t SM64ModernOracleTraceRecordKind;
+
+#define SM64_MODERN_ORACLE_RECORD_STATE 1u
+#define SM64_MODERN_ORACLE_RECORD_INPUT 2u
+#define SM64_MODERN_ORACLE_RECORD_EVENT 3u
+#define SM64_MODERN_ORACLE_RECORD_EFFECT 4u
+#define SM64_MODERN_ORACLE_RECORD_AUDIO_PCM 5u
+#define SM64_MODERN_ORACLE_RECORD_SAVE_BYTES 6u
+#define SM64_MODERN_ORACLE_RECORD_RENDER_PACKET 7u
+#define SM64_MODERN_ORACLE_RECORD_COVERAGE 8u
+
 #define SM64_MODERN_TIMEBASE_RATE_LIMIT 1000u
 #define SM64_MODERN_TIMEBASE_MAX_CATCH_UP_LIMIT 8u
 
@@ -503,6 +544,82 @@ typedef SM64ModernGameplayTraceRecordV1 SM64ModernGameplayInputRecordV1;
 typedef SM64ModernGameplayTraceRecordV1 SM64ModernGameplaySnapshotRecordV1;
 typedef SM64ModernGameplayTraceRecordV1 SM64ModernGameplayEffectRecordV1;
 
+// Whole-engine oracle schema 4. These records are fixed-width, pointer-free,
+// and canonical across C and Swift. Floating-point values are supplied as
+// IEEE-754 bits, save/PCM payloads are represented by deterministic hashes,
+// and object/resource identities are stable content or pool IDs.
+typedef struct SM64ModernOracleTraceConfigV1 {
+    SM64ModernAbiHeader header;
+    uint32_t schema_version;
+    uint32_t region_code;
+    SM64ModernOracleTraceMode mode;
+    uint32_t reserved;
+    uint64_t build_fingerprint;
+    uint64_t content_fingerprint;
+    uint64_t timebase_fingerprint;
+    uint64_t configuration_fingerprint;
+    uint64_t initial_save_fingerprint;
+    uint64_t coverage_fingerprint;
+} SM64ModernOracleTraceConfigV1;
+
+typedef struct SM64ModernOracleTraceRecordV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    SM64ModernOracleTraceDomain domain;
+    SM64ModernOracleTraceRecordKind record_kind;
+    uint64_t subject_id;
+    uint64_t record_id;
+    uint32_t sequence;
+    uint32_t value_count;
+    uint32_t flags;
+    uint32_t reserved;
+    uint64_t values[SM64_MODERN_ORACLE_TRACE_VALUE_CAPACITY];
+    uint64_t canonical_hash;
+} SM64ModernOracleTraceRecordV1;
+
+typedef struct SM64ModernOracleCoverageEntryV1 {
+    SM64ModernAbiHeader header;
+    SM64ModernOracleTraceDomain domain;
+    uint32_t flags;
+    uint64_t record_id;
+} SM64ModernOracleCoverageEntryV1;
+
+typedef SM64ModernStatus (*SM64ModernOracleTraceWriteHeaderFn)(
+    void *context,
+    const SM64ModernOracleTraceConfigV1 *config);
+typedef SM64ModernStatus (*SM64ModernOracleTraceReadHeaderFn)(
+    void *context,
+    SM64ModernOracleTraceConfigV1 *out_config);
+typedef SM64ModernStatus (*SM64ModernOracleTraceWriteRecordFn)(
+    void *context,
+    const SM64ModernOracleTraceRecordV1 *record);
+typedef SM64ModernStatus (*SM64ModernOracleTraceReadRecordFn)(
+    void *context,
+    SM64ModernOracleTraceRecordV1 *out_record);
+
+typedef struct SM64ModernOracleTraceStreamApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernOracleTraceWriteHeaderFn write_header;
+    SM64ModernOracleTraceReadHeaderFn read_header;
+    SM64ModernOracleTraceWriteRecordFn write_record;
+    SM64ModernOracleTraceReadRecordFn read_record;
+} SM64ModernOracleTraceStreamApiV1;
+
+typedef struct SM64ModernOracleTraceResultV1 {
+    SM64ModernAbiHeader header;
+    SM64ModernOracleTraceMode mode;
+    SM64ModernStatus status;
+    uint32_t reserved;
+    uint64_t expected_records;
+    uint64_t actual_records;
+    uint64_t matched_records;
+    uint64_t expected_hash;
+    uint64_t actual_hash;
+    uint64_t coverage_fingerprint;
+    uint64_t coverage_entries;
+} SM64ModernOracleTraceResultV1;
+
 typedef struct SM64ModernGameplayParityConfigV1 {
     SM64ModernAbiHeader header;
     SM64ModernGameplayParityMode mode;
@@ -638,6 +755,38 @@ SM64ModernStatus sm64_modern_get_gameplay_api(uint32_t requested_version,
 SM64ModernStatus sm64_modern_get_gameplay_parity_api(uint32_t requested_version,
                                                      uint32_t output_size,
                                                      SM64ModernGameplayParityApiV1 *out_api);
+
+// Schema-4 whole-engine oracle trace. This API is owner-thread-only and is
+// intentionally separate from the schema-3 gameplay parity service.
+void sm64_modern_oracle_trace_reset(void);
+SM64ModernStatus sm64_modern_oracle_trace_begin(
+    const SM64ModernOracleTraceConfigV1 *config,
+    const SM64ModernOracleTraceStreamApiV1 *stream);
+SM64ModernStatus sm64_modern_oracle_trace_end(void);
+void sm64_modern_oracle_trace_begin_tick(void);
+void sm64_modern_oracle_trace_end_tick(void);
+SM64ModernStatus sm64_modern_oracle_trace_record(
+    SM64ModernOracleTraceDomain domain,
+    SM64ModernOracleTraceRecordKind record_kind,
+    uint64_t subject_id,
+    uint64_t record_id,
+    uint32_t flags,
+    const uint64_t *values,
+    uint32_t value_count);
+SM64ModernStatus sm64_modern_oracle_trace_mark_coverage(
+    SM64ModernOracleTraceDomain domain,
+    uint64_t record_id);
+SM64ModernStatus sm64_modern_oracle_trace_get_result(
+    SM64ModernOracleTraceResultV1 *out_result);
+SM64ModernStatus sm64_modern_oracle_trace_status(void);
+uint64_t sm64_modern_oracle_trace_simulation_tick(void);
+uint64_t sm64_modern_oracle_trace_hash_record(
+    const SM64ModernOracleTraceRecordV1 *record);
+uint32_t sm64_modern_oracle_inventory_count(void);
+SM64ModernStatus sm64_modern_oracle_inventory_entry(
+    uint32_t index,
+    SM64ModernOracleCoverageEntryV1 *out_entry);
+uint64_t sm64_modern_oracle_inventory_fingerprint(void);
 
 #ifdef __cplusplus
 }
