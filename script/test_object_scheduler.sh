@@ -13,6 +13,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ObjectPool.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineState.swift" \
   "$PROJECT_ROOT/SM64Modern/MemoryArena.swift" \
+  "$PROJECT_ROOT/SM64Modern/GeneratedTrigTables.swift" \
+  "$PROJECT_ROOT/SM64Modern/DeterministicPrimitives.swift" \
+  "$PROJECT_ROOT/SM64Modern/ObjectTransform.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectScheduler.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_object_scheduler_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-object-scheduler-smoke"

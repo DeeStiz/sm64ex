@@ -62,6 +62,7 @@ struct SM64ObjectVector3: Equatable, Sendable {
     var z: Float
 
     static let zero = SM64ObjectVector3(x: 0, y: 0, z: 0)
+    static let one = SM64ObjectVector3(x: 1, y: 1, z: 1)
     static let hiddenGfxOrigin = SM64ObjectVector3(x: -10_000, y: -10_000, z: -10_000)
 }
 
@@ -96,6 +97,7 @@ struct SM64ObjectRecord: Equatable, Sendable {
     var faceAngles: SM64ObjectAngles
     var angleVelocity: SM64ObjectAngles
     var gfxPosition: SM64ObjectVector3
+    var scale: SM64ObjectVector3
     var graphFlags: UInt16
     var graphYOffset: Float
     var activeParticleFlags: UInt32
@@ -175,6 +177,7 @@ struct SM64ObjectRecord: Equatable, Sendable {
         self.faceAngles = .zero
         self.angleVelocity = .zero
         self.gfxPosition = .hiddenGfxOrigin
+        self.scale = .one
         self.graphFlags = 0
         self.graphYOffset = 0
         self.activeParticleFlags = 0

@@ -18,8 +18,60 @@ struct SM64ObjectSchedulerTickResult: Equatable, Sendable {
 final class SM64ObjectScheduler {
     static let graphRenderHasAnimation: UInt16 = 1 << 5
     static let interactionDoorMask: UInt32 = (1 << 2) | (1 << 11)
+    static let objectFlagUpdateGfxPositionAndAngle: UInt32 = 1 << 0
+    static let objectFlagBuildTransform: UInt32 = 1 << 5
+    static let objectFlagTransformRelativeToParent: UInt32 = 1 << 9
 
     typealias UpdateHandler = (_ id: SM64ObjectID, _ pool: SM64ObjectPool) -> Void
+
+    /// Applies the transform portion of `cur_obj_update` after a behavior
+    /// callback has changed object fields. Parent transforms are read through
+    /// stable IDs, never through C pointers, and objects are visited in the
+    /// same live list order as the scheduler.
+    @discardableResult
+    func updateTransforms(state: SM64SwiftEngineState) -> [SM64ObjectID] {
+        var updated: [SM64ObjectID] = []
+        for id in state.objects.updateIDs() {
+            guard let record = state.objects.record(for: id) else { continue }
+            var next = record
+            var changed = false
+
+            if record.objectFlags & Self.objectFlagTransformRelativeToParent != 0,
+               let parent = state.objects.record(for: record.parent) {
+                next.transform = SM64ObjectTransform.relativeToParent(
+                    relativePosition: record.parentRelativePosition,
+                    faceAngles: record.faceAngles,
+                    scale: record.scale,
+                    parentTransform: parent.transform
+                )
+                next.position = SM64ObjectTransform.translation(of: next.transform)
+                changed = true
+            } else if record.objectFlags & Self.objectFlagBuildTransform != 0 {
+                next.transform = SM64ObjectTransform.applyingScale(
+                    SM64ObjectTransform.rotateZXYAndTranslate(
+                        translation: record.position,
+                        angles: record.faceAngles
+                    ),
+                    scale: record.scale
+                )
+                changed = true
+            }
+
+            if record.objectFlags & Self.objectFlagUpdateGfxPositionAndAngle != 0 {
+                next.gfxPosition = SM64ObjectTransform.gfxPosition(
+                    position: next.position,
+                    graphYOffset: next.graphYOffset
+                )
+                changed = true
+            }
+
+            if changed {
+                _ = state.objects.mutate(id) { $0 = next }
+                updated.append(id)
+            }
+        }
+        return updated
+    }
 
     @discardableResult
     func update(
