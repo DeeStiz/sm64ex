@@ -39,6 +39,11 @@ enum SM64MarioActionID {
     static let punching: UInt32 = 0x00800380
     static let movePunching: UInt32 = 0x00800457
     static let crouchSlide: UInt32 = 0x04808459
+    static let buttSlideStop: UInt32 = 0x0C00023E
+    static let buttSlideAir: UInt32 = 0x0300088E
+    static let stomachSlideStop: UInt32 = 0x00000386
+    static let forwardRollout: UInt32 = 0x010008A6
+    static let backwardRollout: UInt32 = 0x010008AD
     static let turningAround: UInt32 = 0x00000443
     static let startSleeping: UInt32 = 0x0C400202
     static let panting: UInt32 = 0x0C400205
