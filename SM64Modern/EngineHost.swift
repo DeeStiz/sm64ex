@@ -219,6 +219,7 @@ final class EngineHost: @unchecked Sendable {
         case failed
     }
 
+    private let engineAuthority: SM64ModernEngineAuthority
     private let condition = NSCondition()
     private var state: State = .idle
     private var stopRequested = false
@@ -252,6 +253,11 @@ final class EngineHost: @unchecked Sendable {
     private var m9ProfileStartAudioUnderrun: UInt64 = 0
     private var m9ProfileStartAudioDropped: UInt64 = 0
     private var m9ProfileComplete = false
+    private var engineRuntime: SM64ModernEngineRuntime?
+
+    init(authority: SM64ModernEngineAuthority = .swift) {
+        self.engineAuthority = authority
+    }
 
     var isCurrentEngineThread: Bool {
         condition.withLock {
@@ -337,7 +343,13 @@ final class EngineHost: @unchecked Sendable {
         }
         engineLogger.notice("engine_thread_started token=\(identifier) main=\(Thread.isMainThread)")
 
-        let initializeStatus = initializeCore()
+        let runtime = makeEngineRuntime()
+        engineRuntime = runtime
+        engineLogger.notice(
+            "engine_runtime_selected authority=\(runtime.authority.rawValue, privacy: .public) implementation=\(runtime.implementation, privacy: .public)"
+        )
+
+        let initializeStatus = runtime.initialize()
         guard initializeStatus == SM64_MODERN_STATUS_OK else {
             finish(state: .failed, status: initializeStatus)
             DispatchQueue.main.async {
@@ -359,7 +371,7 @@ final class EngineHost: @unchecked Sendable {
 
         if engineRunStatus == SM64_MODERN_STATUS_OK && condition.withLock({ stopRequested }) {
             let reason = condition.withLock { requestedExitReason }
-            engineRunStatus = lifecycle.request_stop(reason)
+            engineRunStatus = runtime.requestStop(reason: reason)
         }
 
         if engineRunStatus != SM64_MODERN_STATUS_OK && engineRunStatus != SM64_MODERN_STATUS_STOP_REQUESTED {
@@ -368,7 +380,8 @@ final class EngineHost: @unchecked Sendable {
 
         let parityStatus = parityCoordinator?.endAndReport() ?? SM64_MODERN_STATUS_OK
         parityCoordinator = nil
-        let shutdownStatus = lifecycle.shutdown()
+        let shutdownStatus = runtime.shutdown()
+        engineRuntime = nil
         let executionStatus = engineRunStatus != SM64_MODERN_STATUS_OK
             && engineRunStatus != SM64_MODERN_STATUS_STOP_REQUESTED
             ? engineRunStatus : SM64_MODERN_STATUS_OK
@@ -468,7 +481,7 @@ final class EngineHost: @unchecked Sendable {
 
         // Recover and discard stale route data before the core asks how much
         // PCM is buffered, so this tick immediately refills the restarted graph.
-        engineRunStatus = lifecycle.step()
+        engineRunStatus = engineRuntime?.step() ?? SM64_MODERN_STATUS_INVALID_STATE
         guard engineRunStatus == SM64_MODERN_STATUS_OK else {
             CFRunLoopStop(CFRunLoopGetCurrent())
             return
@@ -563,7 +576,24 @@ final class EngineHost: @unchecked Sendable {
         CFRunLoopStop(CFRunLoopGetCurrent())
     }
 
-    private func initializeCore() -> SM64ModernStatus {
+    private func makeEngineRuntime() -> SM64ModernEngineRuntime {
+        let cAdapter = SM64ModernCEngineRuntimeAdapter(
+            callbacks: SM64ModernEngineRuntimeCallbacks(
+                initialize: { [unowned self] in self.initializeCEngineOnEngineThread() },
+                step: { [unowned self] in self.stepCEngineOnEngineThread() },
+                requestStop: { [unowned self] reason in self.requestStopCEngineOnEngineThread(reason: reason) },
+                shutdown: { [unowned self] in self.shutdownCEngineOnEngineThread() }
+            )
+        )
+        switch engineAuthority {
+        case .swift:
+            return SM64ModernSwiftEngineRuntime(cFallback: cAdapter)
+        case .cCompatibility:
+            return cAdapter
+        }
+    }
+
+    private func initializeCEngineOnEngineThread() -> SM64ModernStatus {
         var lifecycle = SM64ModernLifecycleApiV1()
         var status = sm64_modern_get_lifecycle_api(
             SM64_MODERN_ABI_VERSION_1,
@@ -658,6 +688,21 @@ final class EngineHost: @unchecked Sendable {
         }
         parityCoordinator = parityStart.coordinator
         return SM64_MODERN_STATUS_OK
+    }
+
+    private func stepCEngineOnEngineThread() -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return lifecycle.step()
+    }
+
+    private func requestStopCEngineOnEngineThread(reason: SM64ModernExitReason) -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return lifecycle.request_stop(reason)
+    }
+
+    private func shutdownCEngineOnEngineThread() -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        return lifecycle.shutdown()
     }
 
     fileprivate var gameplayServiceOnEngineThread: SwiftGameplayService {

@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress — M0 is complete locally; M1 dual-engine lifecycle is implemented and remains open only for a real GUI launch verification unavailable in this managed session.
+In progress — M0 and M1 are complete for their local code/test scopes; M2 content-pack compiler is next. GUI, physical, distribution, and human gates remain explicitly tracked as external acceptance.
 
 ## Target
 
@@ -56,7 +56,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | Milestone | Success criterion | Status |
 |---|---|---|
 | M0: Reproducible baseline | Current native, C, ABI/parity, scheduler, audio, timebase, and legacy baselines pass from isolated build/cache paths. | Complete |
-| M1: Dual-engine lifecycle | Swift runtime shell, C adapter, selector, persisted setting, restart semantics, and fail-closed handling work without changing C behavior. | In progress — compile/smoke pass; GUI launch verification is environment-blocked |
+| M1: Dual-engine lifecycle | Swift runtime shell, C adapter, selector, persisted setting, restart semantics, and fail-closed handling work without changing C behavior. | Complete locally — compile/smoke pass; GUI launch is environment-blocked |
 | M2: Content-pack compiler | Deterministic US content pack and legal-ROM importer validate hashes and reject invalid input. | Not started |
 | M3: Full oracle trace v4 | C record/replay and C-vs-C traces match across title, gameplay, transitions, audio, saves, and rendering; reachable IDs are inventoried. | Not started |
 | M4: Deterministic primitives | Swift math, fixed-point, trig, RNG, cadence, animation, and timebase operations match C exactly. | Not started |

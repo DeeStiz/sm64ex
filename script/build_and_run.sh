@@ -12,6 +12,20 @@ SIGNING_IDENTITY="${SM64_MODERN_CODE_SIGN_IDENTITY:-Apple Development}"
 DEBUG_ENTITLEMENTS="$PROJECT_ROOT/SM64Modern/SM64ModernDebug.entitlements"
 DEFAULT_SAVE_ROOT="$PROJECT_ROOT/build/sm64-modern-state"
 
+if [[ -z "${SM64_MODERN_CODE_SIGN_IDENTITY:-}" ]]; then
+  if ! security find-identity -v -p codesigning 2>/dev/null | grep -Fq 'Apple Development:'; then
+    # Local CI/managed shells often have no development certificate. Ad hoc
+    # signing keeps the build artifact runnable without pretending it is a
+    # distributable Developer ID product.
+    SIGNING_IDENTITY="-"
+  fi
+fi
+
+CODE_SIGN_RUNTIME_ARGS=()
+if [[ "$SIGNING_IDENTITY" != "-" ]]; then
+  CODE_SIGN_RUNTIME_ARGS=(--options runtime)
+fi
+
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
 cd "$PROJECT_ROOT"
@@ -25,6 +39,8 @@ else
   "$PROJECT_ROOT/script/test_audio_ring.sh"
   "$PROJECT_ROOT/script/test_fixed_step_scheduler.sh"
   "$PROJECT_ROOT/script/test_timebase_audit.sh"
+  "$PROJECT_ROOT/script/test_engine_authority.sh"
+  "$PROJECT_ROOT/script/test_engine_runtime.sh"
   xcodegen generate --spec project.yml
   xcodebuild \
     -project SM64Modern.xcodeproj \
@@ -39,7 +55,7 @@ else
   while IFS= read -r nested_code; do
     codesign \
       --force \
-      --options runtime \
+      "${CODE_SIGN_RUNTIME_ARGS[@]}" \
       --timestamp=none \
       --sign "$SIGNING_IDENTITY" \
       "$nested_code"
@@ -47,7 +63,7 @@ else
 
   codesign \
     --force \
-    --options runtime \
+    "${CODE_SIGN_RUNTIME_ARGS[@]}" \
     --timestamp=none \
     --entitlements "$DEBUG_ENTITLEMENTS" \
     --sign "$SIGNING_IDENTITY" \

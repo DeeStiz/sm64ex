@@ -245,7 +245,7 @@ validate_cadence_manifest() {
     'src/pc/gfx/gfx_pc.c|gfx_start_frame'
     'src/pc/gfx/gfx_pc.c|gfx_end_frame'
     'src/game/game_init.c|display_and_vsync'
-    'SM64Modern/EngineHost.swift|initializeCore'
+    'SM64Modern/EngineHost.swift|initializeCEngineOnEngineThread'
     'SM64Modern/EngineHost.swift|runFixedStepLoop'
   )
   for required_anchor in "${required_anchors[@]}"; do
@@ -291,7 +291,7 @@ validate_cadence_manifest() {
     $'presentation\tM8d\tsrc/game/game_init.c\tdisplay_and_vsync\taudited'
     $'audio\tM8d\tsrc/pc/pc_main.c\tcreate_next_audio_buffer\taudited'
     $'presentation\tM8d\tsrc/pc/sm64_modern_gameplay_parity.c\tsm64_modern_parity_begin_tick\taudited'
-    $'presentation\tM8d\tSM64Modern/EngineHost.swift\tinitializeCore\taudited'
+    $'presentation\tM8d\tSM64Modern/EngineHost.swift\tinitializeCEngineOnEngineThread\taudited'
     $'presentation\tM8d\tSM64Modern/EngineHost.swift\trunFixedStepLoop\taudited'
   )
   for required_scoped_anchor in "${required_scoped_anchors[@]}"; do

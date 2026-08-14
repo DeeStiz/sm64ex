@@ -66,6 +66,8 @@ build_release() {
   "$PROJECT_ROOT/script/test_audio_ring.sh"
   "$PROJECT_ROOT/script/test_fixed_step_scheduler.sh"
   "$PROJECT_ROOT/script/test_timebase_audit.sh"
+  "$PROJECT_ROOT/script/test_engine_authority.sh"
+  "$PROJECT_ROOT/script/test_engine_runtime.sh"
   xcodegen generate --spec project.yml
   xcodebuild \
     -project SM64Modern.xcodeproj \

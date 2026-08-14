@@ -2,10 +2,10 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`, M0 baseline complete and M1 dual-engine lifecycle in progress. The prior SM64 Modern M0-M14 goal remains complete and unchanged.
+- Active goal: `full-swift-twin`, M0 baseline and M1 dual-engine lifecycle complete for local code/test scope; M2 content-pack compiler is next. The prior SM64 Modern M0-M14 goal remains complete and unchanged.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
-- M1 scope: add the engine runtime protocol/adapter boundary, a Swift lifecycle shell, launch-time authority selection, persisted Advanced setting, restart-only switching, and fail-closed invalid configuration without changing C-authority behavior.
+- M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
 - M2-M35 remain planned in `.porting/goal-full-swift-twin.md`; the execution contract is autonomous except for credentials, human/device gates, parity exceptions, destructive recovery, or scope changes.
 - The 3,600-step Release profile recorded zero scheduler drops, zero audio drops, zero underruns, and +3.49 MiB RSS; two leak snapshots reported zero app leaks. Metal HUD and validation also exited cleanly.
 - The fetched CAMetalLayer title drawable was intact; full-screen capture was limited by the app window being on a negative-coordinate secondary display, so human visual confirmation remains open.
