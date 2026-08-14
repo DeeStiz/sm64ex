@@ -78,6 +78,27 @@ struct SM64GeoLayoutCommand: Equatable, Sendable {
 
     var byteLength: Int { bytes.count }
 
+    var pointerLogicalOffsets: [Int] {
+        switch opcode {
+        case .branchAndLink, .branch: return [4]
+        case .nodePerspective: return parameter == 0 ? [] : [8]
+        case .nodeSwitchCase: return [4]
+        case .nodeCamera: return [16]
+        case .nodeTranslationRotation:
+            guard parameter & 0x80 != 0 else { return [] }
+            let layout = (parameter & 0x70) >> 4
+            return [layout == 0 ? 16 : (layout == 3 ? 4 : 8)]
+        case .nodeTranslation, .nodeRotation, .nodeBillboard:
+            return parameter & 0x80 == 0 ? [] : [8]
+        case .nodeAnimatedPart: return [8]
+        case .nodeDisplayList: return [4]
+        case .nodeGenerated, .nodeBackground: return [4]
+        case .nodeHeldObject: return [8]
+        case .nodeScale: return parameter & 0x80 == 0 ? [] : [8]
+        default: return []
+        }
+    }
+
     func readUInt8(logicalOffset: Int) throws -> UInt8 {
         let index = try physicalIndex(logicalOffset, width: 1)
         return bytes[index]

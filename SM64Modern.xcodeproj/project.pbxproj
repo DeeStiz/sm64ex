@@ -19,6 +19,7 @@
 		1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */; };
 		1F4EB6331042EECC1AFF0F44 /* ObjectPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E29EEED44FF3034BE40C4C /* ObjectPool.swift */; };
 		335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26195252708283AFB936E392 /* GameplayParity.swift */; };
+		3A185680189903BB0AA43307 /* GeoLayoutContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */; };
 		4542710AB513728A46A876F6 /* MetalCompilerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */; };
 		45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */; };
 		59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC89F10EF988BEB5D9624D69 /* LevelScript.swift */; };
@@ -76,6 +77,7 @@
 		CB4ABB8191E695DB49D9CF9E /* AppleAudioService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioService.h; sourceTree = "<group>"; };
 		D5723E1972C2FF3BB21E3A5B /* AppMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMain.swift; sourceTree = "<group>"; };
 		D8F9722E9A2207BC558A3023 /* SM64Modern.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SM64Modern.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayoutContentRuntime.swift; sourceTree = "<group>"; };
 		EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedTrigTables.swift; sourceTree = "<group>"; };
 		EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineRuntime.swift; sourceTree = "<group>"; };
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
@@ -105,6 +107,7 @@
 				3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */,
 				EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */,
 				34836A16DABAFE021C624BDF /* GeoLayout.swift */,
+				E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */,
 				AC89F10EF988BEB5D9624D69 /* LevelScript.swift */,
 				2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */,
 				129A98B13AFB161495B1C646 /* LevelScriptVM.swift */,
@@ -240,6 +243,7 @@
 				335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */,
 				1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */,
 				86873A7F75CAAF78C48A991F /* GeoLayout.swift in Sources */,
+				3A185680189903BB0AA43307 /* GeoLayoutContentRuntime.swift in Sources */,
 				59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */,
 				FDFB158F79EC6A450D735577 /* LevelScriptContentRuntime.swift in Sources */,
 				01E615EBF7207413282AF29D /* LevelScriptVM.swift in Sources */,
