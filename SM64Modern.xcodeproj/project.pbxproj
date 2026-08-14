@@ -22,10 +22,12 @@
 		45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */; };
 		5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */; };
 		862583ABDC99F7D05524622B /* MetalRenderingBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */; };
+		8F2434A3E57287185819D685 /* EngineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB40062F0B74B53B43A517BA /* EngineState.swift */; };
 		946B96572AA7C94347AF500E /* EngineHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C737B1A16857D51F7C7FE7A /* EngineHost.swift */; };
 		995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD8678B319AD274378179C /* MetalShaderCompiler.swift */; };
 		A03388793B2976FA562FE712 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5723E1972C2FF3BB21E3A5B /* AppMain.swift */; };
 		AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */ = {isa = PBXBuildFile; fileRef = 328470043E0C3F9278C1A80E /* AppleAudioService.m */; };
+		B188BC254D2FE77844ADEE0F /* MemoryArena.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25BB84567898B7DD0F01721 /* MemoryArena.swift */; };
 		B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F0AEF5342F3B329237DD66 /* ContentPack.swift */; };
 		CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386378DD6ECB9F78AC003073 /* MetalRenderer.swift */; };
 		CFF98EAAB1C2B379F37CB33B /* EngineAuthority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6291FCF691572C0089D6194D /* EngineAuthority.swift */; };
@@ -54,8 +56,10 @@
 		92C22E70845A716BECE93CE0 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		97BD8678B319AD274378179C /* MetalShaderCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalShaderCompiler.swift; sourceTree = "<group>"; };
 		A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedStepScheduler.swift; sourceTree = "<group>"; };
+		A25BB84567898B7DD0F01721 /* MemoryArena.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryArena.swift; sourceTree = "<group>"; };
 		A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = AppleAudioRing.c; sourceTree = "<group>"; };
 		B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftGameplay.swift; sourceTree = "<group>"; };
+		BB40062F0B74B53B43A517BA /* EngineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineState.swift; sourceTree = "<group>"; };
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
 		CB4ABB8191E695DB49D9CF9E /* AppleAudioService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioService.h; sourceTree = "<group>"; };
 		D5723E1972C2FF3BB21E3A5B /* AppMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMain.swift; sourceTree = "<group>"; };
@@ -81,11 +85,13 @@
 				6291FCF691572C0089D6194D /* EngineAuthority.swift */,
 				5C737B1A16857D51F7C7FE7A /* EngineHost.swift */,
 				EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */,
+				BB40062F0B74B53B43A517BA /* EngineState.swift */,
 				A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */,
 				26195252708283AFB936E392 /* GameplayParity.swift */,
 				92C22E70845A716BECE93CE0 /* GameView.swift */,
 				3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */,
 				EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */,
+				A25BB84567898B7DD0F01721 /* MemoryArena.swift */,
 				2CA0E28C4E523ADAE015243F /* MetalCompilerBridge.h */,
 				1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */,
 				386378DD6ECB9F78AC003073 /* MetalRenderer.swift */,
@@ -208,11 +214,13 @@
 				CFF98EAAB1C2B379F37CB33B /* EngineAuthority.swift in Sources */,
 				946B96572AA7C94347AF500E /* EngineHost.swift in Sources */,
 				1000A98A2958DA1238E20A6D /* EngineRuntime.swift in Sources */,
+				8F2434A3E57287185819D685 /* EngineState.swift in Sources */,
 				ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */,
 				15156FB40A2F0FB896A7D6EC /* GameView.swift in Sources */,
 				0C110C47F377370F18974E8D /* GameViewController.swift in Sources */,
 				335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */,
 				1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */,
+				B188BC254D2FE77844ADEE0F /* MemoryArena.swift in Sources */,
 				4542710AB513728A46A876F6 /* MetalCompilerBridge.m in Sources */,
 				CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */,
 				862583ABDC99F7D05524622B /* MetalRenderingBridge.swift in Sources */,
