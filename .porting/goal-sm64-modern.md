@@ -1,5 +1,9 @@
 # Porting Goal: SM64 Modern
 
+## Status
+
+Complete — all planned milestones M0–M14 are complete. External and human acceptance gates that remain open are documented in `.porting/porting-memory.md` and the M14 handoff.
+
 ## Target
 
 Create a parallel Apple-silicon macOS 27 application using Swift 6.4, AppKit, Metal 4, native Apple input/audio services, and a deterministic full-world 60 Hz simulation while preserving the legacy portable build and save compatibility.

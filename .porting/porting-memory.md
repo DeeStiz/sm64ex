@@ -2,6 +2,7 @@
 
 ## Current Milestone
 
+- No active milestone. The SM64 Modern porting goal is complete through M14; remaining Developer ID/notarization, clean-machine, physical-device, normal-gameplay, and external-ground-truth checks are release or human acceptance gates, not unfinished porting milestones.
 - M10-M14 are implemented in the current uncommitted worktree: reusable Metal 4 frame packets, Swift Mario ground speed, asynchronous pipeline/cache preparation, typed Swift Bob-omb release, and explicit native Swift authority all pass their bounded gates; no commit/push was authorized.
 - The 3,600-step Release profile recorded zero scheduler drops, zero audio drops, zero underruns, and +3.49 MiB RSS; two leak snapshots reported zero app leaks. Metal HUD and validation also exited cleanly.
 - The fetched CAMetalLayer title drawable was intact; full-screen capture was limited by the app window being on a negative-coordinate secondary display, so human visual confirmation remains open.
