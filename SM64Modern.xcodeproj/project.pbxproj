@@ -36,6 +36,7 @@
 		995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD8678B319AD274378179C /* MetalShaderCompiler.swift */; };
 		A03388793B2976FA562FE712 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5723E1972C2FF3BB21E3A5B /* AppMain.swift */; };
 		AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */ = {isa = PBXBuildFile; fileRef = 328470043E0C3F9278C1A80E /* AppleAudioService.m */; };
+		AF40398B5A629439B358BCB6 /* SurfacePartition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */; };
 		B188BC254D2FE77844ADEE0F /* MemoryArena.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25BB84567898B7DD0F01721 /* MemoryArena.swift */; };
 		B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F0AEF5342F3B329237DD66 /* ContentPack.swift */; };
 		CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386378DD6ECB9F78AC003073 /* MetalRenderer.swift */; };
@@ -90,6 +91,7 @@
 		E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayoutContentRuntime.swift; sourceTree = "<group>"; };
 		EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedTrigTables.swift; sourceTree = "<group>"; };
 		EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineRuntime.swift; sourceTree = "<group>"; };
+		F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfacePartition.swift; sourceTree = "<group>"; };
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -138,6 +140,7 @@
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
 				135C103AE0705B71EBE54DC5 /* SurfaceCollision.swift */,
 				2E23B1C6254504EAE6CE5C01 /* SurfaceCollisionData.swift */,
+				F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */,
 				B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */,
 			);
 			path = SM64Modern;
@@ -277,6 +280,7 @@
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
 				12FFA6069B5EABBA754D6DFF /* SurfaceCollision.swift in Sources */,
 				213C0A6E5D88CC7C1405FED4 /* SurfaceCollisionData.swift in Sources */,
+				AF40398B5A629439B358BCB6 /* SurfacePartition.swift in Sources */,
 				02E322DA71DC6695775C5D60 /* SwiftGameplay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
