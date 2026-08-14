@@ -15,6 +15,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/InputCore.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioInputCore.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectPool.swift" \
+  "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioGeometryInput.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_mario_geometry_input_smoke.swift" \

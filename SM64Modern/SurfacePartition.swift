@@ -6,6 +6,12 @@ struct SM64SurfacePartitionCell: Equatable, Sendable {
     var walls: [UInt32] = []
 }
 
+enum SM64SurfacePartitionKind: Sendable {
+    case floor
+    case ceiling
+    case wall
+}
+
 /// The 16x16 spatial partition contract used by the C loader. Cells retain
 /// duplicate surface references when a triangle crosses cell boundaries; IDs
 /// are stable and the per-list insertion ordering is deterministic.
@@ -38,6 +44,29 @@ struct SM64SurfacePartitionGrid: Equatable, Sendable {
         let clampedX = max(0, min(Self.dimension - 1, x))
         let clampedZ = max(0, min(Self.dimension - 1, z))
         return (dynamic ? dynamicCells : staticCells)[clampedZ * Self.dimension + clampedX]
+    }
+
+    static func queryCellIndex(_ coordinate: Float) -> Int {
+        let bounded = max(-Self.boundary, min(Self.boundary - 1, Int32(coordinate)))
+        return max(0, min(Self.dimension - 1, Int((bounded + Self.boundary) / Self.cellSize)))
+    }
+
+    func candidateIDs(
+        x: Float,
+        z: Float,
+        dynamic: Bool,
+        kind: SM64SurfacePartitionKind
+    ) -> [UInt32] {
+        let cell = cell(
+            x: Self.queryCellIndex(x),
+            z: Self.queryCellIndex(z),
+            dynamic: dynamic
+        )
+        switch kind {
+        case .floor: return cell.floors
+        case .ceiling: return cell.ceilings
+        case .wall: return cell.walls
+        }
     }
 
     static func lowerCellIndex(_ coordinate: Int16) -> Int {

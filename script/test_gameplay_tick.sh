@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-mario-input-frame-smoke"
+BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-gameplay-tick-smoke"
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
@@ -20,21 +20,23 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioGeometryInput.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioInputFrame.swift" \
-  "$PROJECT_ROOT/tests/sm64_modern_mario_input_frame_smoke.swift" \
-  -o "$BUILD_ROOT/sm64-modern-mario-input-frame-smoke"
-SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-mario-input-frame-smoke)"
+  "$PROJECT_ROOT/SM64Modern/RumbleCore.swift" \
+  "$PROJECT_ROOT/SM64Modern/GameplayTick.swift" \
+  "$PROJECT_ROOT/tests/sm64_modern_gameplay_tick_smoke.swift" \
+  -o "$BUILD_ROOT/sm64-modern-gameplay-tick-smoke"
+SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-gameplay-tick-smoke)"
 printf '%s\n' "$SWIFT_OUTPUT"
 
 xcrun clang -std=c11 \
-  "$PROJECT_ROOT/tests/sm64_modern_mario_input_frame_contract.c" \
-  -o "$BUILD_ROOT/sm64-modern-mario-input-frame-contract"
-C_OUTPUT="$($BUILD_ROOT/sm64-modern-mario-input-frame-contract)"
+  "$PROJECT_ROOT/tests/sm64_modern_gameplay_tick_contract.c" \
+  -o "$BUILD_ROOT/sm64-modern-gameplay-tick-contract"
+C_OUTPUT="$($BUILD_ROOT/sm64-modern-gameplay-tick-contract)"
 printf '%s\n' "$C_OUTPUT"
 
-SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^marioInputFrameFingerprint=//p')"
-C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^marioInputFrameFingerprint=//p')"
+SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^gameplayTickFingerprint=//p')"
+C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^gameplayTickFingerprint=//p')"
 [[ -n "$SWIFT_FINGERPRINT" && "$SWIFT_FINGERPRINT" == "$C_FINGERPRINT" ]] || {
-  echo "Swift/C Mario input-frame fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
+  echo "Swift/C gameplay-tick fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
   exit 1
 }
-printf '%s\n' "SM64 Modern Mario input frame C contract matched"
+printf '%s\n' "SM64 Modern gameplay tick C contract matched"

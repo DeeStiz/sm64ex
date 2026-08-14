@@ -103,6 +103,16 @@ enum SM64ModernSurfaceCollisionSmoke {
         )
         require(rayHit?.surfaceID == 2 && rayHit?.position.y == 50 && rayHit?.distance == 50, "ray surface hit")
 
+        var reloadedWorld = world
+        try reloadedWorld.replaceDynamicSurfaces([triangle(id: 6, y: 120)])
+        require(reloadedWorld.findFloor(x: 0, y: 200, z: 0).surfaceID == 6, "dynamic partition reload")
+        do {
+            try reloadedWorld.replaceDynamicSurfaces([floor])
+            require(false, "duplicate surface identity rejected")
+        } catch SM64SurfaceCollisionError.invalidSurface {
+            // Expected: static and dynamic surfaces share one identity domain.
+        }
+
         var fingerprint = fnvOffset
         fingerprint = appendResult(fingerprint, world.findFloor(x: 0, y: 100, z: 0))
         fingerprint = appendResult(fingerprint, world.findFloor(x: 0, y: -100, z: 0))

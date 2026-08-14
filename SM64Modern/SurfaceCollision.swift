@@ -114,8 +114,8 @@ enum SM64SurfaceCollisionError: Error, Equatable, Sendable {
 }
 
 /// Value-type collision world matching the legacy surface query contract.
-/// Spatial partitioning is intentionally a later optimization; insertion
-/// order and dynamic-over-static selection are preserved here first.
+/// Queries use the C-ordered static/dynamic partition candidates while the
+/// source surface arrays remain the authoritative storage for exact tests.
 struct SM64SurfaceCollisionWorld: Equatable, Sendable {
     static let levelBoundaryMax: Int32 = 0x2000
     static let missHeight: Float = -11_000
@@ -125,12 +125,15 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
     static let cameraBoundaryType: Int16 = 0x72
     static let vanishCapWallsType: Int16 = 0x7B
 
-    var staticSurfaces: [SM64Surface]
-    var dynamicSurfaces: [SM64Surface]
+    private(set) var staticSurfaces: [SM64Surface]
+    private(set) var dynamicSurfaces: [SM64Surface]
+    private var staticSurfaceIndices: [UInt32: Int]
+    private var dynamicSurfaceIndices: [UInt32: Int]
     var waterRegions: [SM64WaterRegion]
     var checkingForCamera: Bool
     var includeIntangibleOnce: Bool
     var passThroughVanishCapWalls: Bool
+    private(set) var partition: SM64SurfacePartitionGrid
 
     init(
         staticSurfaces: [SM64Surface] = [],
@@ -151,10 +154,29 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         }
         self.staticSurfaces = staticSurfaces
         self.dynamicSurfaces = dynamicSurfaces
+        self.staticSurfaceIndices = Self.indexSurfaces(staticSurfaces)
+        self.dynamicSurfaceIndices = Self.indexSurfaces(dynamicSurfaces)
         self.waterRegions = waterRegions
         self.checkingForCamera = checkingForCamera
         self.includeIntangibleOnce = includeIntangibleOnce
         self.passThroughVanishCapWalls = passThroughVanishCapWalls
+        self.partition = SM64SurfacePartitionGrid(
+            staticSurfaces: staticSurfaces,
+            dynamicSurfaces: dynamicSurfaces
+        )
+    }
+
+    mutating func replaceDynamicSurfaces(_ surfaces: [SM64Surface]) throws {
+        let combined = staticSurfaces + surfaces
+        guard Set(combined.map { $0.id }).count == combined.count else {
+            throw SM64SurfaceCollisionError.invalidSurface(0)
+        }
+        dynamicSurfaces = surfaces
+        dynamicSurfaceIndices = Self.indexSurfaces(surfaces)
+        partition = SM64SurfacePartitionGrid(
+            staticSurfaces: staticSurfaces,
+            dynamicSurfaces: dynamicSurfaces
+        )
     }
 
     func findFloor(x: Float, y: Float, z: Float) -> SM64SurfaceQueryResult {
@@ -162,11 +184,32 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         let ix = Int32(x)
         let iy = Int32(y)
         let iz = Int32(z)
-        var staticResult = findFloor(in: staticSurfaces, x: ix, y: iy, z: iz)
+        var staticResult = findFloor(
+            in: staticSurfaces,
+            indices: staticSurfaceIndices,
+            ids: partition.candidateIDs(x: x, z: z, dynamic: false, kind: .floor),
+            x: ix,
+            y: iy,
+            z: iz
+        )
         if includeIntangibleOnce, staticResult.type == Self.intangibleType {
-            staticResult = findFloor(in: staticSurfaces, x: ix, y: Int32(staticResult.height - 200), z: iz)
+            staticResult = findFloor(
+                in: staticSurfaces,
+                indices: staticSurfaceIndices,
+                ids: partition.candidateIDs(x: x, z: z, dynamic: false, kind: .floor),
+                x: ix,
+                y: Int32(staticResult.height - 200),
+                z: iz
+            )
         }
-        let dynamicResult = findFloor(in: dynamicSurfaces, x: ix, y: iy, z: iz)
+        let dynamicResult = findFloor(
+            in: dynamicSurfaces,
+            indices: dynamicSurfaceIndices,
+            ids: partition.candidateIDs(x: x, z: z, dynamic: true, kind: .floor),
+            x: ix,
+            y: iy,
+            z: iz
+        )
         return dynamicResult.surfaceID != nil && dynamicResult.height > staticResult.height
             ? dynamicResult
             : staticResult
@@ -174,8 +217,22 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
 
     func findCeil(x: Float, y: Float, z: Float) -> SM64SurfaceQueryResult {
         guard inBounds(x: x, z: z) else { return .miss }
-        let staticResult = findCeil(in: staticSurfaces, x: Int32(x), y: Int32(y), z: Int32(z))
-        let dynamicResult = findCeil(in: dynamicSurfaces, x: Int32(x), y: Int32(y), z: Int32(z))
+        let staticResult = findCeil(
+            in: staticSurfaces,
+            indices: staticSurfaceIndices,
+            ids: partition.candidateIDs(x: x, z: z, dynamic: false, kind: .ceiling),
+            x: Int32(x),
+            y: Int32(y),
+            z: Int32(z)
+        )
+        let dynamicResult = findCeil(
+            in: dynamicSurfaces,
+            indices: dynamicSurfaceIndices,
+            ids: partition.candidateIDs(x: x, z: z, dynamic: true, kind: .ceiling),
+            x: Int32(x),
+            y: Int32(y),
+            z: Int32(z)
+        )
         return dynamicResult.surfaceID != nil && dynamicResult.height < staticResult.height
             ? dynamicResult
             : staticResult
@@ -207,8 +264,32 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         let radius = min(input.radius, 200)
         var total = 0
         var ids: [UInt32] = []
-        collideWallList(dynamicSurfaces, baseX: x, baseZ: z, y: y, radius: radius, x: &x, z: &z, total: &total, ids: &ids)
-        collideWallList(staticSurfaces, baseX: x, baseZ: z, y: y, radius: radius, x: &x, z: &z, total: &total, ids: &ids)
+        collideWallList(
+            dynamicSurfaces,
+            indices: dynamicSurfaceIndices,
+            candidateIDs: partition.candidateIDs(x: x, z: z, dynamic: true, kind: .wall),
+            baseX: x,
+            baseZ: z,
+            y: y,
+            radius: radius,
+            x: &x,
+            z: &z,
+            total: &total,
+            ids: &ids
+        )
+        collideWallList(
+            staticSurfaces,
+            indices: staticSurfaceIndices,
+            candidateIDs: partition.candidateIDs(x: x, z: z, dynamic: false, kind: .wall),
+            baseX: x,
+            baseZ: z,
+            y: y,
+            radius: radius,
+            x: &x,
+            z: &z,
+            total: &total,
+            ids: &ids
+        )
         return SM64WallCollisionResult(x: x, y: input.y, z: z, totalCollisions: total, surfaceIDs: ids)
     }
 
@@ -253,6 +334,8 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
 
     private func collideWallList(
         _ surfaces: [SM64Surface],
+        indices: [UInt32: Int],
+        candidateIDs: [UInt32],
         baseX: Float,
         baseZ: Float,
         y: Float,
@@ -262,7 +345,11 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         total: inout Int,
         ids: inout [UInt32]
     ) {
-        for surface in surfaces {
+        let candidates: [SM64Surface] = candidateIDs.compactMap { id -> SM64Surface? in
+            guard let index = indices[id], surfaces.indices.contains(index) else { return nil }
+            return surfaces[index]
+        }
+        for surface in candidates {
             guard y >= Float(surface.lowerY), y <= Float(surface.upperY) else { continue }
             let offset = surface.normal.x * baseX + surface.normal.y * y + surface.normal.z * baseZ + surface.originOffset
             guard offset >= -radius, offset <= radius else { continue }
@@ -347,8 +434,18 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         return true
     }
 
-    private func findFloor(in surfaces: [SM64Surface], x: Int32, y: Int32, z: Int32) -> SM64SurfaceQueryResult {
-        for surface in surfaces {
+    private func findFloor(
+        in surfaces: [SM64Surface],
+        indices: [UInt32: Int],
+        ids: [UInt32],
+        x: Int32,
+        y: Int32,
+        z: Int32
+    ) -> SM64SurfaceQueryResult {
+        for surface in ids.compactMap({ id -> SM64Surface? in
+            guard let index = indices[id], surfaces.indices.contains(index) else { return nil }
+            return surfaces[index]
+        }) {
             guard contains(surface, x: x, z: z), accepts(surface) else { continue }
             let ny = surface.normal.y
             guard ny > 0 else { continue }
@@ -359,8 +456,18 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         return .miss
     }
 
-    private func findCeil(in surfaces: [SM64Surface], x: Int32, y: Int32, z: Int32) -> SM64SurfaceQueryResult {
-        for surface in surfaces {
+    private func findCeil(
+        in surfaces: [SM64Surface],
+        indices: [UInt32: Int],
+        ids: [UInt32],
+        x: Int32,
+        y: Int32,
+        z: Int32
+    ) -> SM64SurfaceQueryResult {
+        for surface in ids.compactMap({ id -> SM64Surface? in
+            guard let index = indices[id], surfaces.indices.contains(index) else { return nil }
+            return surfaces[index]
+        }) {
             guard contains(surface, x: x, z: z), accepts(surface) else { continue }
             let ny = surface.normal.y
             guard ny < 0 else { continue }
@@ -369,5 +476,9 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
             return SM64SurfaceQueryResult(height: height, surface: surface)
         }
         return .miss
+    }
+
+    private static func indexSurfaces(_ surfaces: [SM64Surface]) -> [UInt32: Int] {
+        Dictionary(uniqueKeysWithValues: surfaces.enumerated().map { ($0.element.id, $0.offset) })
     }
 }

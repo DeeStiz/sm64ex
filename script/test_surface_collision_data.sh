@@ -5,7 +5,7 @@ PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-surface-collision-data-smoke"
 mkdir -p "$BUILD_ROOT"
 
-xcrun swiftc -parse-as-library -swift-version 6 -Xfrontend -strict-concurrency=complete -module-cache-path "$BUILD_ROOT/module-cache" "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" "$PROJECT_ROOT/SM64Modern/SurfaceCollisionData.swift" "$PROJECT_ROOT/tests/sm64_modern_surface_collision_data_smoke.swift" -o "$BUILD_ROOT/sm64-modern-surface-collision-data-smoke"
+xcrun swiftc -parse-as-library -swift-version 6 -Xfrontend -strict-concurrency=complete -module-cache-path "$BUILD_ROOT/module-cache" "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" "$PROJECT_ROOT/SM64Modern/SurfaceCollisionData.swift" "$PROJECT_ROOT/tests/sm64_modern_surface_collision_data_smoke.swift" -o "$BUILD_ROOT/sm64-modern-surface-collision-data-smoke"
 SWIFT_OUTPUT="$("$BUILD_ROOT/sm64-modern-surface-collision-data-smoke")"
 printf '%s\n' "$SWIFT_OUTPUT"
 
