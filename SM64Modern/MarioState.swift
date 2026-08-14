@@ -206,6 +206,7 @@ enum SM64MarioActionBits {
     static let marioSoundPlayed: UInt32 = 0x00020000
     static let unknown18: UInt32 = 0x00040000
     static let unknown08: UInt32 = 0x00000100
+    static let unknown31: UInt32 = 0x80000000
 }
 
 struct SM64MarioHealthContext: Equatable, Sendable {
