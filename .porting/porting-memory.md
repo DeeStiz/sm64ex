@@ -2,10 +2,11 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`, M0 baseline and M1 dual-engine lifecycle complete for local code/test scope; M2 content-pack compiler is next. The prior SM64 Modern M0-M14 goal remains complete and unchanged.
+- Active goal: `full-swift-twin`, M0 baseline, M1 dual-engine lifecycle, and M2 content-pack compiler complete for local code/test scope; M3 oracle trace is next. The prior SM64 Modern M0-M14 goal remains complete and unchanged.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
+- M2 evidence: `SM64CPK` is a little-endian versioned pack with section/file SHA-256 hashes, source fingerprint, US SHA-1 legal-ROM gate, safe-path loader validation, and deterministic rebuilds. Fixture source-only and legal-ROM packs pass; the full repository source-only pack contains 3,324 files and is byte-identical across rebuilds. No production ROM was available, and runtime content consumption remains M6 work.
 - M2-M35 remain planned in `.porting/goal-full-swift-twin.md`; the execution contract is autonomous except for credentials, human/device gates, parity exceptions, destructive recovery, or scope changes.
 - The 3,600-step Release profile recorded zero scheduler drops, zero audio drops, zero underruns, and +3.49 MiB RSS; two leak snapshots reported zero app leaks. Metal HUD and validation also exited cleanly.
 - The fetched CAMetalLayer title drawable was intact; full-screen capture was limited by the app window being on a negative-coordinate secondary display, so human visual confirmation remains open.
@@ -139,7 +140,7 @@
 | macOS legacy build | Implemented — Apple Clang arm64 build, external ROM extraction, OpenGL launch, LLDB/visual evidence, and ASan route pass |
 | Callable C core | Implemented — versioned lifecycle/platform/gameplay POD ABI, static archive, legacy adapter, and C/C++ smoke consumer |
 | AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 60/30 C-core owner thread with clean shutdown |
-| Full Swift twin runtime | Partial — new goal M0 baseline passes; M1 will introduce the whole-engine Swift/C runtime boundary and launch-time authority selector while existing bounded slices remain unchanged |
+| Full Swift twin runtime | Partial — M0 baseline, M1 lifecycle/selector, and M2 content-pack compiler are complete locally; M3 oracle trace and M4-M31 engine migration remain |
 | Metal 4 device/presentation | Implemented — validated raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
 | Metal 4 rendering | Implemented — complete-scene POD bridge/replay with reusable batched frame storage, async Metal 4 MSL/pipeline preparation, device/schema-keyed descriptor fallback cache, private textures, memoryless depth, samplers, state, residency/barriers, trace inspection, and clean Metal validation |
 | Native input | Implemented — native-tick snapshots, retained edges, keyboard/mouse bridge, and haptic bridge passed; no physical controller was connected in M8d |
@@ -201,3 +202,4 @@
 - M8c is committed as `9cc69a8`; `sm64_modern_timebase_native_step_scale()` feeds continuous spatial deltas while paired-boundary admission protects legacy script/event work; `paintings_update_dynamics()` owns painting floor/ripple state and render callbacks do not mutate it.
 - M8d is committed as `f483cc0`. The product uses a 60/30 pair (`paired_ticks=2`), samples input and presents at native cadence, emits one PCM block per native tick, and keeps legacy effects on paired boundaries.
 - M9 profiling is opt-in through `SM64_MODERN_M9_PROFILE_TICKS`; keep performance and `leaks` runs separate because `leaks` suspends the target and manufactures scheduler drops.
+- M2 full-Swift-twin evidence: `script/test_content_pack.sh`, all baseline smoke scripts, deterministic full source-only pack verification, and an isolated Swift 6/macOS 27 Debug app build pass. The pack tool is `script/build_content_pack.sh`; generated packs remain ignored build artifacts. A legal US ROM is required for a shippable ROM-derived pack; source-only mode is development-only.

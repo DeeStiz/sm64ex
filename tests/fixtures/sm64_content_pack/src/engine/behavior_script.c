@@ -1,0 +1,1 @@
+fixture-behavior-bytecode
