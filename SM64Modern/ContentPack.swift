@@ -10,6 +10,11 @@ enum SM64ContentPackError: Error, CustomStringConvertible {
     case invalidROMHash(expected: String, actual: String)
     case invalidPath(String)
     case hashMismatch(String)
+    case missingSection(String)
+    case duplicateResource(String)
+    case unknownSegment(UInt8)
+    case segmentedRangeOutOfBounds(String)
+    case resourceNotFound(String)
 
     var description: String {
         switch self {
@@ -21,6 +26,11 @@ enum SM64ContentPackError: Error, CustomStringConvertible {
         case .invalidROMHash(let expected, let actual): "US ROM SHA-1 mismatch: expected \(expected), found \(actual)"
         case .invalidPath(let path): "unsafe content path: \(path)"
         case .hashMismatch(let path): "content hash mismatch: \(path)"
+        case .missingSection(let kind): "content pack section is missing: \(kind)"
+        case .duplicateResource(let path): "duplicate content resource: \(path)"
+        case .unknownSegment(let segment): "unknown segmented resource \(String(format: "0x%02x", segment))"
+        case .segmentedRangeOutOfBounds(let detail): "segmented resource range is out of bounds: \(detail)"
+        case .resourceNotFound(let path): "content resource not found: \(path)"
         }
     }
 }

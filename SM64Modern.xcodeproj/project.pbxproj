@@ -23,6 +23,7 @@
 		5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */; };
 		862583ABDC99F7D05524622B /* MetalRenderingBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */; };
 		8F2434A3E57287185819D685 /* EngineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB40062F0B74B53B43A517BA /* EngineState.swift */; };
+		90B7F9D7BD419562B6E7A2F8 /* ContentPackRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6630058727A186889977A1 /* ContentPackRuntime.swift */; };
 		946B96572AA7C94347AF500E /* EngineHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C737B1A16857D51F7C7FE7A /* EngineHost.swift */; };
 		995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD8678B319AD274378179C /* MetalShaderCompiler.swift */; };
 		A03388793B2976FA562FE712 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5723E1972C2FF3BB21E3A5B /* AppMain.swift */; };
@@ -54,6 +55,7 @@
 		6291FCF691572C0089D6194D /* EngineAuthority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineAuthority.swift; sourceTree = "<group>"; };
 		667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SM64ModernDebug.entitlements; sourceTree = "<group>"; };
 		7316D473A3C5C7E718C32B2E /* AppleAudioRing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioRing.h; sourceTree = "<group>"; };
+		8A6630058727A186889977A1 /* ContentPackRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPackRuntime.swift; sourceTree = "<group>"; };
 		92C22E70845A716BECE93CE0 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		97BD8678B319AD274378179C /* MetalShaderCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalShaderCompiler.swift; sourceTree = "<group>"; };
 		A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedStepScheduler.swift; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 				C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */,
 				D5723E1972C2FF3BB21E3A5B /* AppMain.swift */,
 				F3F0AEF5342F3B329237DD66 /* ContentPack.swift */,
+				8A6630058727A186889977A1 /* ContentPackRuntime.swift */,
 				3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */,
 				6291FCF691572C0089D6194D /* EngineAuthority.swift */,
 				5C737B1A16857D51F7C7FE7A /* EngineHost.swift */,
@@ -213,6 +216,7 @@
 				AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */,
 				45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */,
 				B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */,
+				90B7F9D7BD419562B6E7A2F8 /* ContentPackRuntime.swift in Sources */,
 				11833E1637F8649E7554B9F6 /* DeterministicPrimitives.swift in Sources */,
 				CFF98EAAB1C2B379F37CB33B /* EngineAuthority.swift in Sources */,
 				946B96572AA7C94347AF500E /* EngineHost.swift in Sources */,
