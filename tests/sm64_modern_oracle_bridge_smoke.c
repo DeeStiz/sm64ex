@@ -235,6 +235,9 @@ int main(void) {
         expect_u64("bridge RNG event", trace.records[record_index].record_id,
                    expected_rng_events[index]);
     }
+    expect_u64("bridge RNG first value", trace.records[2].values[0], UINT64_C(0xfa53));
+    expect_u64("bridge RNG float bits", trace.records[4].values[0], UINT64_C(0x3eaf0e00));
+    expect_u64("bridge RNG sign", trace.records[6].values[0], UINT64_C(1));
     const uint32_t expected_collision_events[5] = {
         SM64_MODERN_ORACLE_COLLISION_EVENT_FLOOR,
         SM64_MODERN_ORACLE_COLLISION_EVENT_CEIL,
