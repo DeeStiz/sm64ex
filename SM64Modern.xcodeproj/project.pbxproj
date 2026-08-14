@@ -27,6 +27,7 @@
 		3A185680189903BB0AA43307 /* GeoLayoutContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */; };
 		3D45F4E1ED09C5B5EC150CC5 /* ObjectTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */; };
 		4542710AB513728A46A876F6 /* MetalCompilerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */; };
+		456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */; };
 		45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */; };
 		53B872CB3B81DFEBF260C4C7 /* MarioGeometryInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93DAAFB0FF6CAB909448BA5 /* MarioGeometryInput.swift */; };
 		59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC89F10EF988BEB5D9624D69 /* LevelScript.swift */; };
@@ -81,6 +82,7 @@
 		5C737B1A16857D51F7C7FE7A /* EngineHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineHost.swift; sourceTree = "<group>"; };
 		6291FCF691572C0089D6194D /* EngineAuthority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineAuthority.swift; sourceTree = "<group>"; };
 		667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SM64ModernDebug.entitlements; sourceTree = "<group>"; };
+		6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RumbleCore.swift; sourceTree = "<group>"; };
 		724F73EC282345F4551FC1BF /* CameraInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraInput.swift; sourceTree = "<group>"; };
 		7316D473A3C5C7E718C32B2E /* AppleAudioRing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioRing.h; sourceTree = "<group>"; };
 		8A6630058727A186889977A1 /* ContentPackRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPackRuntime.swift; sourceTree = "<group>"; };
@@ -158,6 +160,7 @@
 				D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */,
 				399C03F347FC9A4D23DFECFD /* OracleTrace.swift */,
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
+				6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */,
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
 				135C103AE0705B71EBE54DC5 /* SurfaceCollision.swift */,
 				2E23B1C6254504EAE6CE5C01 /* SurfaceCollisionData.swift */,
@@ -306,6 +309,7 @@
 				3D45F4E1ED09C5B5EC150CC5 /* ObjectTransform.swift in Sources */,
 				1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */,
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
+				456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */,
 				12FFA6069B5EABBA754D6DFF /* SurfaceCollision.swift in Sources */,
 				213C0A6E5D88CC7C1405FED4 /* SurfaceCollisionData.swift in Sources */,
 				AF40398B5A629439B358BCB6 /* SurfacePartition.swift in Sources */,
