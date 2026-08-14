@@ -1177,6 +1177,15 @@ static void noop_8031EEC8(void) {
 
 void audio_signal_game_loop_tick(void) {
     sGameLoopTicked = 1;
+    const uint64_t values[3] = {
+        (uint32_t) gAudioFrameCount,
+        gAudioRandom,
+        get_current_background_music(),
+    };
+    sm64_modern_parity_record_audio_sequence(
+        SM64_MODERN_ORACLE_AUDIO_EVENT_TICK,
+        values,
+        3);
 #ifdef VERSION_EU
     maybe_tick_game_sound();
 #endif
@@ -1524,6 +1533,17 @@ void update_game_sound(void) {
 #undef ARG2_VAL2
 
 void play_sequence(u8 player, u8 seqId, u16 fadeTimer) {
+    const uint64_t values[5] = {
+        player,
+        seqId,
+        fadeTimer,
+        (uint32_t) gSequencePlayers[player].state,
+        (uint32_t) gSequencePlayers[player].enabled,
+    };
+    sm64_modern_parity_record_audio_sequence(
+        SM64_MODERN_ORACLE_AUDIO_EVENT_SEQUENCE,
+        values,
+        5);
     u8 temp_ret;
     u8 i;
 
@@ -2070,6 +2090,17 @@ void set_sequence_player_volume(s32 player, f32 volume) {
 }
 
 void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
+    const uint64_t values[5] = {
+        player,
+        seqArgs,
+        fadeTimer,
+        sBackgroundMusicQueueSize,
+        get_current_background_music(),
+    };
+    sm64_modern_parity_record_audio_sequence(
+        SM64_MODERN_ORACLE_AUDIO_EVENT_QUEUE,
+        values,
+        5);
     u8 seqId = seqArgs & 0xff;
     u8 priority = seqArgs >> 8;
     u8 i;
@@ -2130,6 +2161,15 @@ void play_music(u8 player, u16 seqArgs, u16 fadeTimer) {
 }
 
 void stop_background_music(u16 seqId) {
+    const uint64_t values[3] = {
+        seqId,
+        sBackgroundMusicQueueSize,
+        get_current_background_music(),
+    };
+    sm64_modern_parity_record_audio_sequence(
+        SM64_MODERN_ORACLE_AUDIO_EVENT_QUEUE,
+        values,
+        3);
     u8 foundIndex;
     u8 i;
 
@@ -2171,6 +2211,15 @@ void stop_background_music(u16 seqId) {
 }
 
 void fadeout_background_music(u16 seqId, u16 fadeOut) {
+    const uint64_t values[3] = {
+        seqId,
+        fadeOut,
+        sBackgroundMusicQueueSize,
+    };
+    sm64_modern_parity_record_audio_sequence(
+        SM64_MODERN_ORACLE_AUDIO_EVENT_QUEUE,
+        values,
+        3);
     if (sBackgroundMusicQueueSize != 0 && sBackgroundMusicQueue[0].seqId == (u8)(seqId & 0xff)) {
         sequence_player_fade_out(SEQ_PLAYER_LEVEL, fadeOut);
     }
@@ -2216,6 +2265,12 @@ void func_80320ED8(void) {
 
 void play_secondary_music(u8 seqId, u8 bgMusicVolume, u8 volume, u16 fadeTimer) {
     UNUSED u32 dummy;
+
+    const uint64_t values[4] = { seqId, bgMusicVolume, volume, fadeTimer };
+    sm64_modern_parity_record_audio_sequence(
+        SM64_MODERN_ORACLE_AUDIO_EVENT_SECONDARY,
+        values,
+        4);
 
     sUnused80332118 = 0;
     if (sPlayer0CurSeqId == 0xff || sPlayer0CurSeqId == SEQ_MENU_TITLE_SCREEN) {

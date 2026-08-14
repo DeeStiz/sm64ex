@@ -32,6 +32,42 @@ void sm64_modern_parity_record_save_state(uint32_t event_id,
                                           const void *bytes,
                                           uint32_t byte_count,
                                           uint32_t modified_flags);
+#define SM64_MODERN_ORACLE_RNG_EVENT_U16 1u
+#define SM64_MODERN_ORACLE_RNG_EVENT_FLOAT 2u
+#define SM64_MODERN_ORACLE_RNG_EVENT_SIGN 3u
+void sm64_modern_parity_record_rng_draw(uint32_t event_id,
+                                        uint64_t value,
+                                        uint64_t seed);
+#define SM64_MODERN_ORACLE_COLLISION_EVENT_FLOOR 1u
+#define SM64_MODERN_ORACLE_COLLISION_EVENT_CEIL 2u
+#define SM64_MODERN_ORACLE_COLLISION_EVENT_WALL 3u
+#define SM64_MODERN_ORACLE_COLLISION_EVENT_ENVIRONMENT 4u
+void sm64_modern_parity_record_collision_query(uint32_t event_id,
+                                               const uint64_t *values,
+                                               uint32_t value_count);
+#define SM64_MODERN_ORACLE_SCRIPT_EVENT_LEVEL_COMMAND 1u
+#define SM64_MODERN_ORACLE_SCRIPT_EVENT_BEHAVIOR_COMMAND 2u
+#define SM64_MODERN_ORACLE_SCRIPT_EVENT_LEVEL_TRANSITION 3u
+#define SM64_MODERN_ORACLE_SCRIPT_EVENT_NATIVE_BEHAVIOR 4u
+#define SM64_MODERN_ORACLE_SCRIPT_EVENT_LIFECYCLE 5u
+void sm64_modern_parity_record_script_event(uint32_t event_id,
+                                            uint64_t subject_id,
+                                            const uint64_t *values,
+                                            uint32_t value_count);
+#define SM64_MODERN_ORACLE_AUDIO_EVENT_TICK 1u
+#define SM64_MODERN_ORACLE_AUDIO_EVENT_SEQUENCE 2u
+#define SM64_MODERN_ORACLE_AUDIO_EVENT_QUEUE 3u
+#define SM64_MODERN_ORACLE_AUDIO_EVENT_SECONDARY 4u
+void sm64_modern_parity_record_audio_sequence(uint32_t event_id,
+                                              const uint64_t *values,
+                                              uint32_t value_count);
+#define SM64_MODERN_ORACLE_RENDER_EVENT_DRAW 1u
+#define SM64_MODERN_ORACLE_RENDER_EVENT_FRAME_BEGIN 2u
+#define SM64_MODERN_ORACLE_RENDER_EVENT_FRAME_END 3u
+#define SM64_MODERN_ORACLE_RENDER_EVENT_FINISH 4u
+void sm64_modern_parity_record_render_packet(uint32_t event_id,
+                                             const uint64_t *values,
+                                             uint32_t value_count);
 u32 sm64_modern_parity_audio_frame_count(u32 high_count, u32 default_count);
 void sm64_modern_parity_enter_subsystem(SM64ModernGameplaySubsystem subsystem);
 void sm64_modern_parity_enter_object_update(const struct Object *object);

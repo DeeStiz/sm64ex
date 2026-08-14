@@ -2,7 +2,7 @@
 
 ## Status
 
-In progress — M0, M1, and M2 are complete for their local code/test scopes; M3 has a schema-4 codec/inventory foundation and live C tick-boundary bridge checkpoint, while full title/gameplay/save/render reachability closure remains. GUI, physical, distribution, and human gates remain explicitly tracked as external acceptance.
+In progress — M0, M1, and M2 are complete for their local code/test scopes; M3 now has schema-4 codecs, a live C tick-boundary bridge, a deterministic source inventory, and native hooks for save bytes, RNG, collision, script/behavior, audio sequencing, and render packets. File-backed GUI capture, full-save boot/recovery qualification, and whole-inventory execution closure remain. GUI, physical, distribution, and human gates remain explicitly tracked as external acceptance.
 
 ## Target
 
@@ -58,7 +58,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M0: Reproducible baseline | Current native, C, ABI/parity, scheduler, audio, timebase, and legacy baselines pass from isolated build/cache paths. | Complete |
 | M1: Dual-engine lifecycle | Swift runtime shell, C adapter, selector, persisted setting, restart semantics, and fail-closed handling work without changing C behavior. | Complete locally — compile/smoke pass; GUI launch is environment-blocked |
 | M2: Content-pack compiler | Deterministic US content pack and legal-ROM importer validate hashes and reject invalid input. | Complete locally — fixture/full-source pack, ROM gate, loader, deterministic rebuild, and app build pass; production ROM unavailable in this session |
-| M3: Full oracle trace v4 | C record/replay and C-vs-C traces match across title, gameplay, transitions, audio, saves, and rendering; reachable IDs are inventoried. | In progress — schema-4 fixed-width C/Swift codecs, deterministic C-vs-C smoke, live C tick/input/state/effect/PCM bridge, deterministic reachability inventory, and save mutation/persist/load/reload byte hook pass; file-backed app capture plus full save, render, script, collision, RNG, and audio-sequence closure remain |
+| M3: Full oracle trace v4 | C record/replay and C-vs-C traces match across title, gameplay, transitions, audio, saves, and rendering; reachable IDs are inventoried. | In progress — schema-4 fixed-width C/Swift codecs, deterministic C-vs-C smoke, live C tick/input/state/effect/PCM bridge, deterministic reachability inventory, and native save/RNG/collision/script/audio-sequence/render boundary hooks pass; file-backed app capture, full-save boot/recovery qualification, and whole-inventory execution closure remain |
 | M4: Deterministic primitives | Swift math, fixed-point, trig, RNG, cadence, animation, and timebase operations match C exactly. | Not started |
 | M5: Engine state and identity | Swift pools, arenas, stable IDs, references, reset behavior, and object initialization match C. | Not started |
 | M6: Content loading | Swift loads and validates every content-pack section and segmented/resource reference. | Not started |

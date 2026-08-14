@@ -229,11 +229,11 @@ struct SM64OracleReachabilityTool {
             ("effects", "hooked", "sound rumble spawn/despawn effects"),
             ("audio_pcm", "hooked", "pre-device PCM checksum boundary"),
             ("save_bytes", "hooked", "mutation/persist/load/reload byte boundary; full save closure remains"),
-            ("render_packet", "deferred", "STUB(M3): immutable render packet boundary"),
-            ("script_events", "deferred", "STUB(M3): level/behavior script event boundary"),
-            ("collision_queries", "deferred", "STUB(M3): collision query boundary"),
-            ("rng_draws", "deferred", "STUB(M3): random draw boundary"),
-            ("audio_sequence", "deferred", "STUB(M3): sequence/channel boundary"),
+            ("render_packet", "hooked", "draw packet hash plus frame begin/end/finish boundaries"),
+            ("script_events", "hooked", "level/behavior command and lifecycle boundaries"),
+            ("collision_queries", "hooked", "floor/ceil/wall/environment query boundary"),
+            ("rng_draws", "hooked", "u16/float/sign draw boundary"),
+            ("audio_sequence", "hooked", "owner-thread tick, sequence, queue, and secondary boundaries"),
         ].map { domain, status, notes in
             ReachabilityRow(domain: "oracle_hook", identity: domain, source: source, status: status, notes: notes)
         }

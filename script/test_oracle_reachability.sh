@@ -54,11 +54,11 @@ for required in \
   'oracle_hook|object_state|.*|hooked|' \
   'oracle_hook|audio_pcm|.*|hooked|' \
   'oracle_hook|save_bytes|.*|hooked|' \
-  'oracle_hook|render_packet|.*|deferred|' \
-  'oracle_hook|script_events|.*|deferred|' \
-  'oracle_hook|collision_queries|.*|deferred|' \
-  'oracle_hook|rng_draws|.*|deferred|' \
-  'oracle_hook|audio_sequence|.*|deferred|'; do
+  'oracle_hook|render_packet|.*|hooked|' \
+  'oracle_hook|script_events|.*|hooked|' \
+  'oracle_hook|collision_queries|.*|hooked|' \
+  'oracle_hook|rng_draws|.*|hooked|' \
+  'oracle_hook|audio_sequence|.*|hooked|'; do
   if ! rg -q "^${required}" "$FIRST"; then
     echo "missing oracle hook contract row: $required" >&2
     exit 1

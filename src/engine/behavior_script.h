@@ -21,6 +21,7 @@
 
 u16 random_u16(void);
 u16 random_seed_get(void);
+void random_seed_set(u16 seed);
 float random_float(void);
 s32 random_sign(void);
 

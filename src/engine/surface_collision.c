@@ -1,4 +1,5 @@
 #include <PR/ultratypes.h>
+#include <string.h>
 
 #include "sm64.h"
 #include "game/debug.h"
@@ -8,6 +9,72 @@
 #include "surface_collision.h"
 #include "surface_load.h"
 #include "math_util.h"
+#include "pc/sm64_modern_gameplay_parity.h"
+
+static uint64_t collision_float_bits(f32 value) {
+    uint32_t bits;
+    memcpy(&bits, &value, sizeof(bits));
+    return bits;
+}
+
+static uint64_t collision_surface_type(const struct Surface *surface) {
+    return surface ? surface->type : UINT64_MAX;
+}
+
+static uint64_t collision_surface_flags(const struct Surface *surface) {
+    return surface ? surface->flags : UINT64_MAX;
+}
+
+static void record_height_query(uint32_t event_id,
+                                f32 x,
+                                f32 y,
+                                f32 z,
+                                f32 height,
+                                const struct Surface *surface) {
+    const uint64_t values[7] = {
+        collision_float_bits(x),
+        collision_float_bits(y),
+        collision_float_bits(z),
+        collision_float_bits(height),
+        collision_surface_type(surface),
+        collision_surface_flags(surface),
+        surface ? collision_float_bits(surface->normal.y) : UINT64_MAX,
+    };
+    sm64_modern_parity_record_collision_query(event_id, values, 7);
+}
+
+static void record_wall_query(const struct WallCollisionData *input,
+                              const struct WallCollisionData *output,
+                              s32 collision_count) {
+    const uint64_t values[8] = {
+        collision_float_bits(input->x),
+        collision_float_bits(input->y),
+        collision_float_bits(input->z),
+        collision_float_bits(input->offsetY),
+        collision_float_bits(input->radius),
+        collision_float_bits(output->x),
+        collision_float_bits(output->z),
+        ((uint64_t) (uint32_t) output->numWalls << 32u)
+            | (uint32_t) collision_count,
+    };
+    sm64_modern_parity_record_collision_query(
+        SM64_MODERN_ORACLE_COLLISION_EVENT_WALL,
+        values,
+        8);
+}
+
+static void record_environment_query(uint32_t kind, f32 x, f32 z, f32 height) {
+    const uint64_t values[4] = {
+        collision_float_bits(x),
+        collision_float_bits(z),
+        collision_float_bits(height),
+        kind,
+    };
+    sm64_modern_parity_record_collision_query(
+        SM64_MODERN_ORACLE_COLLISION_EVENT_ENVIRONMENT,
+        values,
+        4);
+}
 
 /**************************************************
  *                      WALLS                     *
@@ -186,15 +253,18 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
     struct SurfaceNode *node;
     s16 cellX, cellZ;
     s32 numCollisions = 0;
+    struct WallCollisionData input = *colData;
     s16 x = colData->x;
     s16 z = colData->z;
 
     colData->numWalls = 0;
 
     if (x <= -LEVEL_BOUNDARY_MAX || x >= LEVEL_BOUNDARY_MAX) {
+        record_wall_query(&input, colData, numCollisions);
         return numCollisions;
     }
     if (z <= -LEVEL_BOUNDARY_MAX || z >= LEVEL_BOUNDARY_MAX) {
+        record_wall_query(&input, colData, numCollisions);
         return numCollisions;
     }
 
@@ -213,6 +283,8 @@ s32 find_wall_collisions(struct WallCollisionData *colData) {
 
     // Increment the debug tracker.
     gNumCalls.wall += 1;
+
+    record_wall_query(&input, colData, numCollisions);
 
     return numCollisions;
 }
@@ -321,9 +393,13 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
     *pceil = NULL;
 
     if (x <= -LEVEL_BOUNDARY_MAX || x >= LEVEL_BOUNDARY_MAX) {
+        record_height_query(SM64_MODERN_ORACLE_COLLISION_EVENT_CEIL,
+                            posX, posY, posZ, height, *pceil);
         return height;
     }
     if (z <= -LEVEL_BOUNDARY_MAX || z >= LEVEL_BOUNDARY_MAX) {
+        record_height_query(SM64_MODERN_ORACLE_COLLISION_EVENT_CEIL,
+                            posX, posY, posZ, height, *pceil);
         return height;
     }
 
@@ -348,6 +424,9 @@ f32 find_ceil(f32 posX, f32 posY, f32 posZ, struct Surface **pceil) {
 
     // Increment the debug tracker.
     gNumCalls.ceil += 1;
+
+    record_height_query(SM64_MODERN_ORACLE_COLLISION_EVENT_CEIL,
+                        posX, posY, posZ, height, *pceil);
 
     return height;
 }
@@ -528,9 +607,13 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     *pfloor = NULL;
 
     if (x <= -LEVEL_BOUNDARY_MAX || x >= LEVEL_BOUNDARY_MAX) {
+        record_height_query(SM64_MODERN_ORACLE_COLLISION_EVENT_FLOOR,
+                            xPos, yPos, zPos, height, *pfloor);
         return height;
     }
     if (z <= -LEVEL_BOUNDARY_MAX || z >= LEVEL_BOUNDARY_MAX) {
+        record_height_query(SM64_MODERN_ORACLE_COLLISION_EVENT_FLOOR,
+                            xPos, yPos, zPos, height, *pfloor);
         return height;
     }
 
@@ -577,6 +660,9 @@ f32 find_floor(f32 xPos, f32 yPos, f32 zPos, struct Surface **pfloor) {
     // Increment the debug tracker.
     gNumCalls.floor += 1;
 
+    record_height_query(SM64_MODERN_ORACLE_COLLISION_EVENT_FLOOR,
+                        xPos, yPos, zPos, height, *pfloor);
+
     return height;
 }
 
@@ -616,6 +702,7 @@ f32 find_water_level(f32 x, f32 z) {
         }
     }
 
+    record_environment_query(0, x, z, waterLevel);
     return waterLevel;
 }
 
@@ -656,6 +743,7 @@ f32 find_poison_gas_level(f32 x, f32 z) {
         }
     }
 
+    record_environment_query(1, x, z, gasLevel);
     return gasLevel;
 }
 

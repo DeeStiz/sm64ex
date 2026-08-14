@@ -385,9 +385,10 @@ static void record_oracle_values(SM64ModernGameplaySubsystem subsystem,
         return;
     }
 
-    // Save byte mutation/persistence boundaries are routed separately. Render
-    // packets, script/behavior events, collision queries, RNG draws, and audio
-    // sequencing still need dedicated seams.
+    // Save byte mutation/persistence, render packets, script/behavior events,
+    // collision queries, RNG draws, and audio sequencing route through the
+    // dedicated schema-4 seams below. Inventory execution closure remains a
+    // separate qualification gate.
 
     SM64ModernOracleTraceDomain domain = oracle_domain_for_subsystem(subsystem);
     SM64ModernOracleTraceRecordKind oracle_kind = SM64_MODERN_ORACLE_RECORD_STATE;
@@ -1178,6 +1179,181 @@ void sm64_modern_parity_record_save_state(uint32_t event_id,
         0,
         values,
         3);
+    if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = status;
+    }
+}
+
+void sm64_modern_parity_record_rng_draw(uint32_t event_id,
+                                        uint64_t value,
+                                        uint64_t seed) {
+    if (!sm64_modern_oracle_trace_is_active()) {
+        return;
+    }
+    if (event_id < SM64_MODERN_ORACLE_RNG_EVENT_U16
+        || event_id > SM64_MODERN_ORACLE_RNG_EVENT_SIGN) {
+        if (sStatus == SM64_MODERN_STATUS_OK) {
+            sStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return;
+    }
+    const uint64_t values[2] = { value, seed };
+    const SM64ModernStatus coverage_status = sm64_modern_oracle_trace_mark_coverage(
+        SM64_MODERN_ORACLE_DOMAIN_RNG,
+        event_id);
+    if (coverage_status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = coverage_status;
+        return;
+    }
+    const SM64ModernStatus status = sm64_modern_oracle_trace_record(
+        SM64_MODERN_ORACLE_DOMAIN_RNG,
+        SM64_MODERN_ORACLE_RECORD_EVENT,
+        0,
+        event_id,
+        0,
+        values,
+        2);
+    if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = status;
+    }
+}
+
+void sm64_modern_parity_record_collision_query(uint32_t event_id,
+                                               const uint64_t *values,
+                                               uint32_t value_count) {
+    if (!sm64_modern_oracle_trace_is_active()) {
+        return;
+    }
+    if (event_id < SM64_MODERN_ORACLE_COLLISION_EVENT_FLOOR
+        || event_id > SM64_MODERN_ORACLE_COLLISION_EVENT_ENVIRONMENT
+        || value_count > SM64_MODERN_ORACLE_TRACE_VALUE_CAPACITY
+        || (value_count > 0u && !values)) {
+        if (sStatus == SM64_MODERN_STATUS_OK) {
+            sStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return;
+    }
+    const SM64ModernStatus coverage_status = sm64_modern_oracle_trace_mark_coverage(
+        SM64_MODERN_ORACLE_DOMAIN_COLLISION,
+        event_id);
+    if (coverage_status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = coverage_status;
+        return;
+    }
+    const SM64ModernStatus status = sm64_modern_oracle_trace_record(
+        SM64_MODERN_ORACLE_DOMAIN_COLLISION,
+        SM64_MODERN_ORACLE_RECORD_EVENT,
+        0,
+        event_id,
+        0,
+        values,
+        value_count);
+    if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = status;
+    }
+}
+
+void sm64_modern_parity_record_script_event(uint32_t event_id,
+                                            uint64_t subject_id,
+                                            const uint64_t *values,
+                                            uint32_t value_count) {
+    if (!sm64_modern_oracle_trace_is_active()) {
+        return;
+    }
+    if (event_id < SM64_MODERN_ORACLE_SCRIPT_EVENT_LEVEL_COMMAND
+        || event_id > SM64_MODERN_ORACLE_SCRIPT_EVENT_LIFECYCLE
+        || value_count > SM64_MODERN_ORACLE_TRACE_VALUE_CAPACITY
+        || (value_count > 0u && !values)) {
+        if (sStatus == SM64_MODERN_STATUS_OK) {
+            sStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return;
+    }
+    const SM64ModernStatus coverage_status = sm64_modern_oracle_trace_mark_coverage(
+        SM64_MODERN_ORACLE_DOMAIN_SCRIPT,
+        event_id);
+    if (coverage_status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = coverage_status;
+        return;
+    }
+    const SM64ModernStatus status = sm64_modern_oracle_trace_record(
+        SM64_MODERN_ORACLE_DOMAIN_SCRIPT,
+        SM64_MODERN_ORACLE_RECORD_EVENT,
+        subject_id,
+        event_id,
+        0,
+        values,
+        value_count);
+    if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = status;
+    }
+}
+
+void sm64_modern_parity_record_audio_sequence(uint32_t event_id,
+                                              const uint64_t *values,
+                                              uint32_t value_count) {
+    if (!sm64_modern_oracle_trace_is_active()) {
+        return;
+    }
+    if (event_id < SM64_MODERN_ORACLE_AUDIO_EVENT_TICK
+        || event_id > SM64_MODERN_ORACLE_AUDIO_EVENT_SECONDARY
+        || value_count > SM64_MODERN_ORACLE_TRACE_VALUE_CAPACITY
+        || (value_count > 0u && !values)) {
+        if (sStatus == SM64_MODERN_STATUS_OK) {
+            sStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return;
+    }
+    const SM64ModernStatus coverage_status = sm64_modern_oracle_trace_mark_coverage(
+        SM64_MODERN_ORACLE_DOMAIN_AUDIO,
+        event_id);
+    if (coverage_status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = coverage_status;
+        return;
+    }
+    const SM64ModernStatus status = sm64_modern_oracle_trace_record(
+        SM64_MODERN_ORACLE_DOMAIN_AUDIO,
+        SM64_MODERN_ORACLE_RECORD_EVENT,
+        0,
+        event_id,
+        0,
+        values,
+        value_count);
+    if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = status;
+    }
+}
+
+void sm64_modern_parity_record_render_packet(uint32_t event_id,
+                                             const uint64_t *values,
+                                             uint32_t value_count) {
+    if (!sm64_modern_oracle_trace_is_active()) {
+        return;
+    }
+    if (event_id < SM64_MODERN_ORACLE_RENDER_EVENT_DRAW
+        || event_id > SM64_MODERN_ORACLE_RENDER_EVENT_FINISH
+        || value_count > SM64_MODERN_ORACLE_TRACE_VALUE_CAPACITY
+        || (value_count > 0u && !values)) {
+        if (sStatus == SM64_MODERN_STATUS_OK) {
+            sStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return;
+    }
+    const SM64ModernStatus coverage_status = sm64_modern_oracle_trace_mark_coverage(
+        SM64_MODERN_ORACLE_DOMAIN_RENDER,
+        event_id);
+    if (coverage_status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = coverage_status;
+        return;
+    }
+    const SM64ModernStatus status = sm64_modern_oracle_trace_record(
+        SM64_MODERN_ORACLE_DOMAIN_RENDER,
+        SM64_MODERN_ORACLE_RECORD_RENDER_PACKET,
+        0,
+        event_id,
+        0,
+        values,
+        value_count);
     if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
         sStatus = status;
     }

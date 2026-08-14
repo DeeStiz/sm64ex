@@ -1,4 +1,5 @@
 #include <ultra64.h>
+#include <string.h>
 
 #include "sm64.h"
 #include "behavior_data.h"
@@ -13,6 +14,7 @@
 #include "game/object_helpers.h"
 #include "game/object_list_processor.h"
 #include "pc/sm64_modern_timebase.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 #include "graph_node.h"
 #include "surface_collision.h"
 
@@ -36,6 +38,10 @@ u16 random_seed_get(void) {
     return gRandomSeed16;
 }
 
+void random_seed_set(u16 seed) {
+    gRandomSeed16 = seed;
+}
+
 // Unused function that directly jumps to a behavior command and resets the object's stack index.
 static void goto_behavior_unused(const BehaviorScript *bhvAddr) {
     gCurBhvCommand = segmented_to_virtual(bhvAddr);
@@ -50,6 +56,10 @@ u16 random_u16(void) {
     // still run continuous behavior code, but must not consume a second RNG
     // draw for the same logical interval.
     if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        sm64_modern_parity_record_rng_draw(
+            SM64_MODERN_ORACLE_RNG_EVENT_U16,
+            gRandomSeed16,
+            gRandomSeed16);
         return gRandomSeed16;
     }
 
@@ -75,22 +85,35 @@ u16 random_u16(void) {
         gRandomSeed16 = temp2 ^ 0x8180;
     }
 
+    sm64_modern_parity_record_rng_draw(
+        SM64_MODERN_ORACLE_RNG_EVENT_U16,
+        gRandomSeed16,
+        gRandomSeed16);
     return gRandomSeed16;
 }
 
 // Generate a pseudorandom float in the range [0, 1).
 f32 random_float(void) {
-    f32 rnd = random_u16();
-    return rnd / (double) 0x10000;
+    const u16 raw = random_u16();
+    const f32 result = raw / (double) 0x10000;
+    uint32_t result_bits;
+    memcpy(&result_bits, &result, sizeof(result_bits));
+    sm64_modern_parity_record_rng_draw(
+        SM64_MODERN_ORACLE_RNG_EVENT_FLOAT,
+        result_bits,
+        raw);
+    return result;
 }
 
 // Return either -1 or 1 with a 50:50 chance.
 s32 random_sign(void) {
-    if (random_u16() >= 0x7FFF) {
-        return 1;
-    } else {
-        return -1;
-    }
+    const u16 raw = random_u16();
+    const s32 result = raw >= 0x7FFF ? 1 : -1;
+    sm64_modern_parity_record_rng_draw(
+        SM64_MODERN_ORACLE_RNG_EVENT_SIGN,
+        (uint64_t) (int64_t) result,
+        raw);
+    return result;
 }
 
 // Update an object's graphical position and rotation to match its real position and rotation.
@@ -406,6 +429,7 @@ static void cur_obj_update_native_behavior(void) {
     // loop, for example, has debug, action, and spawn bodies).  Walk only the
     // contiguous CALL_NATIVE run; stop before END_LOOP or any script command
     // so the legacy program counter and stack remain untouched.
+    uint32_t native_index = 0;
     do {
         gCurBhvCommand = command;
         const NativeBhvFunc behaviorFunc = (NativeBhvFunc) BHV_CMD_GET_VPTR(1);
@@ -417,6 +441,18 @@ static void cur_obj_update_native_behavior(void) {
             && behaviorFunc != try_do_mario_debug_object_spawn) {
             behaviorFunc();
         }
+        const uint64_t values[5] = {
+            (*command >> 24) & 0xFFu,
+            native_index++,
+            (uint32_t) gCurrentObject->oAction,
+            (uint32_t) gCurrentObject->oTimer,
+            (uint32_t) gCurrentObject->activeFlags,
+        };
+        sm64_modern_parity_record_script_event(
+            SM64_MODERN_ORACLE_SCRIPT_EVENT_NATIVE_BEHAVIOR,
+            sm64_modern_parity_object_slot(gCurrentObject),
+            values,
+            5);
         command += 2;
     } while (((*command >> 24) & 0xFFu) == 0x0Cu);
 }
@@ -968,6 +1004,17 @@ void cur_obj_update(void) {
         return;
     }
 
+    const uint64_t lifecycle_values[3] = {
+        (uint32_t) gCurrentObject->oAction,
+        (uint32_t) gCurrentObject->oTimer,
+        (uint32_t) gCurrentObject->activeFlags,
+    };
+    sm64_modern_parity_record_script_event(
+        SM64_MODERN_ORACLE_SCRIPT_EVENT_LIFECYCLE,
+        sm64_modern_parity_object_slot(gCurrentObject),
+        lifecycle_values,
+        3);
+
     s16 objFlags = gCurrentObject->oFlags;
     f32 distanceFromMario;
     BhvCommandProc bhvCmdProc;
@@ -1001,8 +1048,22 @@ void cur_obj_update(void) {
         gCurBhvCommand = gCurrentObject->curBhvCommand;
 
         do {
+            const uint32_t command_opcode = (*gCurBhvCommand >> 24) & 0xFFu;
             bhvCmdProc = BehaviorCmdTable[*gCurBhvCommand >> 24];
             bhvProcResult = bhvCmdProc();
+            const uint64_t values[6] = {
+                command_opcode,
+                (uint32_t) bhvProcResult,
+                (uint32_t) gCurrentObject->oAction,
+                (uint32_t) gCurrentObject->oTimer,
+                gCurBhvCommand ? ((*gCurBhvCommand >> 24) & 0xFFu) : UINT64_MAX,
+                (uint32_t) advanceLegacyDomain,
+            };
+            sm64_modern_parity_record_script_event(
+                SM64_MODERN_ORACLE_SCRIPT_EVENT_BEHAVIOR_COMMAND,
+                sm64_modern_parity_object_slot(gCurrentObject),
+                values,
+                6);
         } while (bhvProcResult == BHV_PROC_CONTINUE);
 
         gCurrentObject->curBhvCommand = gCurBhvCommand;

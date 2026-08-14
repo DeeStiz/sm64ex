@@ -23,6 +23,7 @@
 #include "surface_collision.h"
 #include "surface_load.h"
 #include "level_table.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 #include "pc/sm64_modern_timebase.h"
 
 #define CMD_GET(type, offset) (*(type *) (CMD_PROCESS_OFFSET(offset) + (u8 *) sCurrentCmd))
@@ -54,6 +55,23 @@ static uintptr_t *sStackBase = NULL;
 static s16 sScriptStatus;
 static s32 sRegister;
 static struct LevelCommand *sCurrentCmd;
+
+static void record_level_script_command(uint8_t command_type, uint8_t command_size) {
+    const uint64_t values[7] = {
+        command_type,
+        command_size,
+        (uint32_t) sRegister,
+        (uint16_t) gCurrLevelNum,
+        (uint16_t) gCurrAreaIndex,
+        (uint32_t) sScriptStatus,
+        sCurrentCmd ? sCurrentCmd->type : UINT64_MAX,
+    };
+    sm64_modern_parity_record_script_event(
+        SM64_MODERN_ORACLE_SCRIPT_EVENT_LEVEL_COMMAND,
+        (uint64_t) (uint16_t) gCurrLevelNum,
+        values,
+        7);
+}
 
 static s32 eval_script_op(s8 op, s32 arg) {
     s32 result = 0;
@@ -678,6 +696,14 @@ static void level_cmd_set_transition(void) {
     if (gCurrentArea != NULL) {
         play_transition(CMD_GET(u8, 2), CMD_GET(u8, 3), CMD_GET(u8, 4), CMD_GET(u8, 5), CMD_GET(u8, 6));
     }
+    const uint64_t values[5] = {
+        CMD_GET(u8, 2), CMD_GET(u8, 3), CMD_GET(u8, 4), CMD_GET(u8, 5), CMD_GET(u8, 6),
+    };
+    sm64_modern_parity_record_script_event(
+        SM64_MODERN_ORACLE_SCRIPT_EVENT_LEVEL_TRANSITION,
+        (uint64_t) (uint16_t) gCurrLevelNum,
+        values,
+        5);
     sCurrentCmd = CMD_NEXT;
 }
 
@@ -864,6 +890,17 @@ static void (*LevelScriptJumpTable[])(void) = {
 struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {
     sCurrentCmd = cmd;
 
+    const uint64_t lifecycle_values[3] = {
+        (uint16_t) gCurrLevelNum,
+        (uint16_t) gCurrAreaIndex,
+        (uint32_t) sRegister,
+    };
+    sm64_modern_parity_record_script_event(
+        SM64_MODERN_ORACLE_SCRIPT_EVENT_LIFECYCLE,
+        (uint64_t) (uint16_t) gCurrLevelNum,
+        lifecycle_values,
+        3);
+
     /*
      * The native host may present a second tick for the same legacy frame.
      * Keep the command pointer stable on that held tick, but do not invoke
@@ -875,7 +912,10 @@ struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {
     if (sm64_modern_timebase_should_advance_legacy_domain()) {
         sScriptStatus = SCRIPT_RUNNING;
         while (sScriptStatus == SCRIPT_RUNNING) {
+            const uint8_t executed_type = sCurrentCmd->type;
+            const uint8_t executed_size = sCurrentCmd->size;
             LevelScriptJumpTable[sCurrentCmd->type]();
+            record_level_script_command(executed_type, executed_size);
         }
     }
 

@@ -3,6 +3,8 @@
 #include <string.h>
 
 #include "sm64_modern.h"
+#include "engine/behavior_script.h"
+#include "engine/surface_collision.h"
 #include "pc/sm64_modern_gameplay_parity.h"
 
 #define TRACE_CAPACITY 64u
@@ -128,6 +130,45 @@ static void emit_snapshot(uint64_t value, uint8_t save_marker) {
         save_bytes,
         sizeof(save_bytes),
         1);
+    random_seed_set(UINT16_C(0x1234));
+    (void) random_u16();
+    (void) random_float();
+    (void) random_sign();
+    struct Surface *floor = NULL;
+    struct Surface *ceil = NULL;
+    (void) find_floor(32.0f, 100.0f, -48.0f, &floor);
+    (void) find_ceil(32.0f, 100.0f, -48.0f, &ceil);
+    struct WallCollisionData wall = {
+        .x = 32.0f,
+        .y = 100.0f,
+        .z = -48.0f,
+        .offsetY = 0.0f,
+        .radius = 50.0f,
+        .unk14 = 0,
+        .numWalls = 0,
+        .walls = { NULL, NULL, NULL, NULL },
+    };
+    (void) find_wall_collisions(&wall);
+    (void) find_water_level(32.0f, -48.0f);
+    (void) find_poison_gas_level(32.0f, -48.0f);
+    for (uint32_t event = SM64_MODERN_ORACLE_SCRIPT_EVENT_LEVEL_COMMAND;
+         event <= SM64_MODERN_ORACLE_SCRIPT_EVENT_LIFECYCLE;
+         ++event) {
+        const uint64_t script_values[3] = { event, 0x100u + event, value };
+        sm64_modern_parity_record_script_event(event, 7, script_values, 3);
+    }
+    for (uint32_t event = SM64_MODERN_ORACLE_AUDIO_EVENT_TICK;
+         event <= SM64_MODERN_ORACLE_AUDIO_EVENT_SECONDARY;
+         ++event) {
+        const uint64_t audio_values[2] = { event, value };
+        sm64_modern_parity_record_audio_sequence(event, audio_values, 2);
+    }
+    for (uint32_t event = SM64_MODERN_ORACLE_RENDER_EVENT_DRAW;
+         event <= SM64_MODERN_ORACLE_RENDER_EVENT_FINISH;
+         ++event) {
+        const uint64_t render_values[2] = { event, value };
+        sm64_modern_parity_record_render_packet(event, render_values, 2);
+    }
     sm64_modern_parity_end_tick();
 }
 
@@ -168,7 +209,7 @@ static SM64ModernStatus replay_trace(struct MemoryTrace *trace,
 int main(void) {
     struct MemoryTrace trace;
     record_trace(&trace);
-    expect_u64("bridge record count", trace.count, 2);
+    expect_u64("bridge record count", trace.count, 25);
     expect_u64("bridge domain", trace.records[0].domain, SM64_MODERN_ORACLE_DOMAIN_MARIO);
     expect_u64("bridge tick", trace.records[0].simulation_tick, 1);
     expect_u64("bridge record id", trace.records[0].record_id, SM64_MODERN_FIELD_MARIO_ACTION);
@@ -180,6 +221,56 @@ int main(void) {
                SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION);
     expect_u64("bridge save byte count", trace.records[1].values[0], 4);
     expect_u64("bridge save modified flags", trace.records[1].values[2], 1);
+    const uint32_t expected_rng_events[5] = {
+        SM64_MODERN_ORACLE_RNG_EVENT_U16,
+        SM64_MODERN_ORACLE_RNG_EVENT_U16,
+        SM64_MODERN_ORACLE_RNG_EVENT_FLOAT,
+        SM64_MODERN_ORACLE_RNG_EVENT_U16,
+        SM64_MODERN_ORACLE_RNG_EVENT_SIGN,
+    };
+    for (uint32_t index = 0; index < 5; ++index) {
+        const uint32_t record_index = index + 2u;
+        expect_u64("bridge RNG domain", trace.records[record_index].domain,
+                   SM64_MODERN_ORACLE_DOMAIN_RNG);
+        expect_u64("bridge RNG event", trace.records[record_index].record_id,
+                   expected_rng_events[index]);
+    }
+    const uint32_t expected_collision_events[5] = {
+        SM64_MODERN_ORACLE_COLLISION_EVENT_FLOOR,
+        SM64_MODERN_ORACLE_COLLISION_EVENT_CEIL,
+        SM64_MODERN_ORACLE_COLLISION_EVENT_WALL,
+        SM64_MODERN_ORACLE_COLLISION_EVENT_ENVIRONMENT,
+        SM64_MODERN_ORACLE_COLLISION_EVENT_ENVIRONMENT,
+    };
+    for (uint32_t index = 0; index < 5; ++index) {
+        const uint32_t record_index = index + 7u;
+        expect_u64("bridge collision domain", trace.records[record_index].domain,
+                   SM64_MODERN_ORACLE_DOMAIN_COLLISION);
+        expect_u64("bridge collision event", trace.records[record_index].record_id,
+                   expected_collision_events[index]);
+    }
+    for (uint32_t index = 0; index < 5; ++index) {
+        const uint32_t record_index = index + 12u;
+        expect_u64("bridge script domain", trace.records[record_index].domain,
+                   SM64_MODERN_ORACLE_DOMAIN_SCRIPT);
+        expect_u64("bridge script event", trace.records[record_index].record_id,
+                   index + 1u);
+        expect_u64("bridge script subject", trace.records[record_index].subject_id, 7);
+    }
+    for (uint32_t index = 0; index < 4; ++index) {
+        const uint32_t record_index = index + 17u;
+        expect_u64("bridge audio domain", trace.records[record_index].domain,
+                   SM64_MODERN_ORACLE_DOMAIN_AUDIO);
+        expect_u64("bridge audio event", trace.records[record_index].record_id,
+                   index + 1u);
+    }
+    for (uint32_t index = 0; index < 4; ++index) {
+        const uint32_t record_index = index + 21u;
+        expect_u64("bridge render domain", trace.records[record_index].domain,
+                   SM64_MODERN_ORACLE_DOMAIN_RENDER);
+        expect_u64("bridge render event", trace.records[record_index].record_id,
+                   index + 1u);
+    }
 
     expect_status("bridge replay",
                   replay_trace(&trace, UINT64_C(0x1234), UINT8_C(0x01)),

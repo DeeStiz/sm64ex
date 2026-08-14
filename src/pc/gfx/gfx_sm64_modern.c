@@ -15,8 +15,11 @@
 #include "gfx_pc.h"
 #include "gfx_rendering_api.h"
 #include "gfx_window_manager_api.h"
+#include "../sm64_modern_gameplay_parity.h"
 
 #define SM64_MODERN_SHADER_CAPACITY 64u
+#define SM64_MODERN_RENDER_FNV_OFFSET UINT64_C(1469598103934665603)
+#define SM64_MODERN_RENDER_FNV_PRIME UINT64_C(1099511628211)
 
 struct ShaderProgram {
     uint32_t shader_id;
@@ -35,6 +38,44 @@ static uint32_t sShaderProgramCount;
 static uint32_t sNextTextureId;
 static uint32_t sSelectedTextureIds[2];
 static uint32_t sCurrentTextureTile;
+static uint32_t sSelectedShaderId = UINT32_MAX;
+static int32_t sViewportX;
+static int32_t sViewportY;
+static int32_t sViewportWidth = 1;
+static int32_t sViewportHeight = 1;
+static int32_t sScissorX;
+static int32_t sScissorY;
+static int32_t sScissorWidth = 1;
+static int32_t sScissorHeight = 1;
+
+static uint64_t render_hash_u32(uint64_t hash, uint32_t value) {
+    for (uint32_t byte = 0; byte < 4u; ++byte) {
+        hash ^= (value >> (byte * 8u)) & UINT64_C(0xff);
+        hash *= SM64_MODERN_RENDER_FNV_PRIME;
+    }
+    return hash;
+}
+
+static uint64_t render_hash_vertices(const float *vertices, uint32_t float_count) {
+    uint64_t hash = SM64_MODERN_RENDER_FNV_OFFSET;
+    if (!vertices) {
+        return render_hash_u32(hash, 0);
+    }
+    for (uint32_t index = 0; index < float_count; ++index) {
+        uint32_t bits;
+        memcpy(&bits, &vertices[index], sizeof(bits));
+        hash = render_hash_u32(hash, bits);
+    }
+    return hash;
+}
+
+static uint64_t render_hash_rect(int x, int y, int width, int height) {
+    uint64_t hash = SM64_MODERN_RENDER_FNV_OFFSET;
+    hash = render_hash_u32(hash, (uint32_t) x);
+    hash = render_hash_u32(hash, (uint32_t) y);
+    hash = render_hash_u32(hash, (uint32_t) width);
+    return render_hash_u32(hash, (uint32_t) height);
+}
 
 static bool rendering_can_dispatch(void) {
     return sRenderingInstalled && sRenderingStatus == SM64_MODERN_STATUS_OK;
@@ -118,6 +159,9 @@ static void modern_renderer_unload_shader(struct ShaderProgram *old_program) {
 }
 
 static void modern_renderer_load_shader(struct ShaderProgram *program) {
+    if (program) {
+        sSelectedShaderId = program->shader_id;
+    }
     if (rendering_can_dispatch() && program) {
         sRendering.select_shader(sRendering.context, program->shader_id);
     }
@@ -239,12 +283,20 @@ static void modern_renderer_set_zmode_decal(bool enabled) {
 }
 
 static void modern_renderer_set_viewport(int x, int y, int width, int height) {
+    sViewportX = x;
+    sViewportY = y;
+    sViewportWidth = width;
+    sViewportHeight = height;
     if (rendering_can_dispatch()) {
         sRendering.set_viewport(sRendering.context, x, y, width, height);
     }
 }
 
 static void modern_renderer_set_scissor(int x, int y, int width, int height) {
+    sScissorX = x;
+    sScissorY = y;
+    sScissorWidth = width;
+    sScissorHeight = height;
     if (rendering_can_dispatch()) {
         sRendering.set_scissor(sRendering.context, x, y, width, height);
     }
@@ -262,6 +314,25 @@ static void modern_renderer_draw_triangles(float vertices[], size_t float_count,
         rendering_record_status(SM64_MODERN_STATUS_INVALID_ARGUMENT);
         return;
     }
+    const uint32_t shader_id = sSelectedShaderId;
+    const uint32_t state_bits = (sCurrentTextureTile & 0x3u)
+        | ((sSelectedTextureIds[0] << 2u)
+           ^ (sSelectedTextureIds[1] << 5u));
+    const uint64_t values[8] = {
+        shader_id,
+        (uint32_t) float_count,
+        (uint32_t) triangle_count,
+        render_hash_vertices(vertices, (uint32_t) float_count),
+        sSelectedTextureIds[0],
+        sSelectedTextureIds[1],
+        state_bits | (sRenderingBatchInstalled ? UINT32_C(0x80000000) : 0u),
+        render_hash_rect(sViewportX, sViewportY, sViewportWidth, sViewportHeight)
+            ^ render_hash_rect(sScissorX, sScissorY, sScissorWidth, sScissorHeight),
+    };
+    sm64_modern_parity_record_render_packet(
+        SM64_MODERN_ORACLE_RENDER_EVENT_DRAW,
+        values,
+        8);
     if (rendering_can_dispatch()) {
         if (sRenderingBatchInstalled) {
             rendering_batch_record_status(sRenderingBatch.append_triangles(
@@ -288,6 +359,17 @@ static void modern_renderer_on_resize(void) {
 }
 
 static void modern_renderer_start_frame(void) {
+    const uint64_t values[5] = {
+        sShaderProgramCount,
+        sNextTextureId,
+        sSelectedTextureIds[0],
+        sSelectedTextureIds[1],
+        sCurrentTextureTile,
+    };
+    sm64_modern_parity_record_render_packet(
+        SM64_MODERN_ORACLE_RENDER_EVENT_FRAME_BEGIN,
+        values,
+        5);
     if (rendering_can_dispatch()) {
         if (sRenderingBatchInstalled) {
             rendering_batch_record_status(sRenderingBatch.start_frame(sRenderingBatch.context));
@@ -298,6 +380,17 @@ static void modern_renderer_start_frame(void) {
 }
 
 static void modern_renderer_end_frame(void) {
+    const uint64_t values[5] = {
+        sShaderProgramCount,
+        sNextTextureId,
+        sSelectedTextureIds[0],
+        sSelectedTextureIds[1],
+        sCurrentTextureTile,
+    };
+    sm64_modern_parity_record_render_packet(
+        SM64_MODERN_ORACLE_RENDER_EVENT_FRAME_END,
+        values,
+        5);
     if (rendering_can_dispatch()) {
         if (sRenderingBatchInstalled) {
             rendering_batch_record_status(sRenderingBatch.end_frame(sRenderingBatch.context));
@@ -308,6 +401,16 @@ static void modern_renderer_end_frame(void) {
 }
 
 static void modern_renderer_finish_render(void) {
+    const uint64_t values[4] = {
+        sRenderingStatus,
+        sRenderingBatchStatus,
+        sShaderProgramCount,
+        sNextTextureId,
+    };
+    sm64_modern_parity_record_render_packet(
+        SM64_MODERN_ORACLE_RENDER_EVENT_FINISH,
+        values,
+        4);
     if (rendering_can_dispatch()) {
         if (sRenderingBatchInstalled) {
             rendering_batch_record_status(sRenderingBatch.finish_render(sRenderingBatch.context));
@@ -399,6 +502,15 @@ SM64ModernStatus sm64_modern_install_rendering_api(const SM64ModernRenderingApiV
     sShaderProgramCount = 0;
     sNextTextureId = 0;
     sCurrentTextureTile = 0;
+    sSelectedShaderId = UINT32_MAX;
+    sViewportX = 0;
+    sViewportY = 0;
+    sViewportWidth = 1;
+    sViewportHeight = 1;
+    sScissorX = 0;
+    sScissorY = 0;
+    sScissorWidth = 1;
+    sScissorHeight = 1;
     sRenderingStatus = SM64_MODERN_STATUS_OK;
     sRenderingInstalled = true;
     gfx_init(&sModernWindowApi, &sModernRenderingApi, "SM64 Modern");
