@@ -161,6 +161,7 @@ struct SM64LevelScriptVM: Sendable {
     private static let stackCapacity = 32
 
     let program: SM64LevelScriptProgram
+    let targetResolver: SM64LevelScriptTargetResolver
     let strictUnsupportedCommands: Bool
     let callHandler: (@Sendable (Int16, Int32) -> Int32)?
 
@@ -197,6 +198,7 @@ struct SM64LevelScriptVM: Sendable {
     init(
         program: SM64LevelScriptProgram,
         startOffset: Int = 0,
+        targetResolver: SM64LevelScriptTargetResolver = SM64LevelScriptTargetResolver(),
         strictUnsupportedCommands: Bool = false,
         callHandler: (@Sendable (Int16, Int32) -> Int32)? = nil,
         demoLevels: [Int32] = SM64LevelScriptVM.defaultDemoLevels
@@ -205,6 +207,7 @@ struct SM64LevelScriptVM: Sendable {
             throw SM64LevelScriptVMError.invalidStart(startOffset)
         }
         self.program = program
+        self.targetResolver = targetResolver
         self.currentOffset = startOffset
         self.strictUnsupportedCommands = strictUnsupportedCommands
         self.callHandler = callHandler
@@ -270,7 +273,6 @@ struct SM64LevelScriptVM: Sendable {
             let command = try program.command(at: offset)
             try execute(command)
             commandCount &+= 1
-            let nextOpcode = currentOffset.flatMap { try? program.command(at: $0).opcode.rawValue }
             traces.append(SM64LevelScriptCommandTrace(
                 tick: tickCount,
                 executedOffset: command.offset,
@@ -282,7 +284,6 @@ struct SM64LevelScriptVM: Sendable {
                 status: status,
                 nextOffset: currentOffset
             ))
-            _ = nextOpcode
         }
     }
 
@@ -556,7 +557,11 @@ struct SM64LevelScriptVM: Sendable {
     }
 
     private mutating func jump(to command: SM64LevelScriptCommand, logicalOffset: Int) throws {
-        currentOffset = try program.targetOffset(from: command, logicalOffset: logicalOffset)
+        currentOffset = try targetResolver.targetOffset(
+            from: command,
+            logicalOffset: logicalOffset,
+            in: program
+        )
     }
 
     private mutating func push(_ value: Int64) throws {

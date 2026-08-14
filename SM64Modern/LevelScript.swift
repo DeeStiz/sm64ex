@@ -102,6 +102,26 @@ struct SM64LevelScriptCommand: Equatable, Sendable {
         Int(sizeUnits) << 1
     }
 
+    /// Logical command fields that contain a script/content target rather than
+    /// an inline scalar. The offsets are the C `CMD_GET(void *, offset)`
+    /// offsets; callers still decide whether a target is code, geometry, or
+    /// another content resource.
+    var pointerLogicalOffsets: [Int] {
+        switch opcode {
+        case .execute: return [4, 8, 12]
+        case .exitAndExecute: return [4, 8, 12]
+        case .jump, .jumpAndLink: return [4]
+        case .jumpIf, .jumpAndLinkIf: return [8]
+        case .beginArea: return [4]
+        case .loadModelFromDisplayList, .loadModelFromGeo: return [4]
+        case .scaleModel: return [4]
+        case .placeObject: return [20]
+        case .initMario: return [8]
+        case .setTerrainData, .setRooms, .setMacroObjects: return [4]
+        default: return []
+        }
+    }
+
     func readUInt8(logicalOffset: Int) throws -> UInt8 {
         let index = try physicalIndex(logicalOffset, width: 1)
         return bytes[index]
@@ -168,6 +188,30 @@ struct SM64LevelScriptCommand: Equatable, Sendable {
             )
         }
         return physical
+    }
+}
+
+/// Resolves the retained 64-bit command-word value to a validated command
+/// offset. The default mode accepts the synthetic offset representation used
+/// by source-only fixtures; production content supplies explicit segmented
+/// mappings from `SM64ContentPackRuntime`.
+struct SM64LevelScriptTargetResolver: Sendable {
+    let mappedTargets: [UInt64: Int]
+
+    init(mappedTargets: [UInt64: Int] = [:]) {
+        self.mappedTargets = mappedTargets
+    }
+
+    func targetOffset(
+        from command: SM64LevelScriptCommand,
+        logicalOffset: Int,
+        in program: SM64LevelScriptProgram
+    ) throws -> Int {
+        let rawTarget = try command.readUInt64(logicalOffset: logicalOffset)
+        if let mapped = mappedTargets[rawTarget] {
+            return mapped
+        }
+        return try program.targetOffset(from: command, logicalOffset: logicalOffset)
     }
 }
 
