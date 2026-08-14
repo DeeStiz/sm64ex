@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		01E615EBF7207413282AF29D /* LevelScriptVM.swift in Sources */ = {isa = PBXBuildFile; fileRef = 129A98B13AFB161495B1C646 /* LevelScriptVM.swift */; };
 		02E322DA71DC6695775C5D60 /* SwiftGameplay.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */; };
 		09C260568C8A5ECD27002AC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */; };
 		0C110C47F377370F18974E8D /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */; };
@@ -20,6 +21,7 @@
 		335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26195252708283AFB936E392 /* GameplayParity.swift */; };
 		4542710AB513728A46A876F6 /* MetalCompilerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */; };
 		45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */; };
+		59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC89F10EF988BEB5D9624D69 /* LevelScript.swift */; };
 		5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */; };
 		862583ABDC99F7D05524622B /* MetalRenderingBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */; };
 		8F2434A3E57287185819D685 /* EngineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB40062F0B74B53B43A517BA /* EngineState.swift */; };
@@ -38,6 +40,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		129A98B13AFB161495B1C646 /* LevelScriptVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScriptVM.swift; sourceTree = "<group>"; };
 		1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalCompilerBridge.m; sourceTree = "<group>"; };
 		1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderingBridge.swift; sourceTree = "<group>"; };
 		1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTraceSession.swift; sourceTree = "<group>"; };
@@ -61,6 +64,7 @@
 		A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedStepScheduler.swift; sourceTree = "<group>"; };
 		A25BB84567898B7DD0F01721 /* MemoryArena.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryArena.swift; sourceTree = "<group>"; };
 		A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = AppleAudioRing.c; sourceTree = "<group>"; };
+		AC89F10EF988BEB5D9624D69 /* LevelScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScript.swift; sourceTree = "<group>"; };
 		B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectSnapshot.swift; sourceTree = "<group>"; };
 		B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftGameplay.swift; sourceTree = "<group>"; };
 		BB40062F0B74B53B43A517BA /* EngineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineState.swift; sourceTree = "<group>"; };
@@ -96,6 +100,8 @@
 				92C22E70845A716BECE93CE0 /* GameView.swift */,
 				3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */,
 				EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */,
+				AC89F10EF988BEB5D9624D69 /* LevelScript.swift */,
+				129A98B13AFB161495B1C646 /* LevelScriptVM.swift */,
 				A25BB84567898B7DD0F01721 /* MemoryArena.swift */,
 				2CA0E28C4E523ADAE015243F /* MetalCompilerBridge.h */,
 				1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */,
@@ -227,6 +233,8 @@
 				0C110C47F377370F18974E8D /* GameViewController.swift in Sources */,
 				335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */,
 				1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */,
+				59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */,
+				01E615EBF7207413282AF29D /* LevelScriptVM.swift in Sources */,
 				B188BC254D2FE77844ADEE0F /* MemoryArena.swift in Sources */,
 				4542710AB513728A46A876F6 /* MetalCompilerBridge.m in Sources */,
 				CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */,
