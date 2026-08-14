@@ -24,6 +24,7 @@
 		59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC89F10EF988BEB5D9624D69 /* LevelScript.swift */; };
 		5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */; };
 		862583ABDC99F7D05524622B /* MetalRenderingBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */; };
+		86873A7F75CAAF78C48A991F /* GeoLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34836A16DABAFE021C624BDF /* GeoLayout.swift */; };
 		8F2434A3E57287185819D685 /* EngineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB40062F0B74B53B43A517BA /* EngineState.swift */; };
 		90B7F9D7BD419562B6E7A2F8 /* ContentPackRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6630058727A186889977A1 /* ContentPackRuntime.swift */; };
 		946B96572AA7C94347AF500E /* EngineHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C737B1A16857D51F7C7FE7A /* EngineHost.swift */; };
@@ -51,6 +52,7 @@
 		2CA0E28C4E523ADAE015243F /* MetalCompilerBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalCompilerBridge.h; sourceTree = "<group>"; };
 		2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalScene.swift; sourceTree = "<group>"; };
 		328470043E0C3F9278C1A80E /* AppleAudioService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleAudioService.m; sourceTree = "<group>"; };
+		34836A16DABAFE021C624BDF /* GeoLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayout.swift; sourceTree = "<group>"; };
 		386378DD6ECB9F78AC003073 /* MetalRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderer.swift; sourceTree = "<group>"; };
 		399C03F347FC9A4D23DFECFD /* OracleTrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTrace.swift; sourceTree = "<group>"; };
 		3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeterministicPrimitives.swift; sourceTree = "<group>"; };
@@ -102,6 +104,7 @@
 				92C22E70845A716BECE93CE0 /* GameView.swift */,
 				3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */,
 				EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */,
+				34836A16DABAFE021C624BDF /* GeoLayout.swift */,
 				AC89F10EF988BEB5D9624D69 /* LevelScript.swift */,
 				2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */,
 				129A98B13AFB161495B1C646 /* LevelScriptVM.swift */,
@@ -236,6 +239,7 @@
 				0C110C47F377370F18974E8D /* GameViewController.swift in Sources */,
 				335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */,
 				1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */,
+				86873A7F75CAAF78C48A991F /* GeoLayout.swift in Sources */,
 				59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */,
 				FDFB158F79EC6A450D735577 /* LevelScriptContentRuntime.swift in Sources */,
 				01E615EBF7207413282AF29D /* LevelScriptVM.swift in Sources */,
