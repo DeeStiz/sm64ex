@@ -170,11 +170,25 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
 
     func findCeil(x: Float, y: Float, z: Float) -> SM64SurfaceQueryResult {
         guard inBounds(x: x, z: z) else { return .miss }
-        return findCeil(in: staticSurfaces, x: Int32(x), y: Int32(y), z: Int32(z))
+        let staticResult = findCeil(in: staticSurfaces, x: Int32(x), y: Int32(y), z: Int32(z))
+        let dynamicResult = findCeil(in: dynamicSurfaces, x: Int32(x), y: Int32(y), z: Int32(z))
+        return dynamicResult.surfaceID != nil && dynamicResult.height < staticResult.height
+            ? dynamicResult
+            : staticResult
     }
 
     func findWaterLevel(x: Float, z: Float) -> Float {
         for region in waterRegions where region.value < 50
+            && region.lowX < x && x < region.highX
+            && region.lowZ < z && z < region.highZ {
+            return region.level
+        }
+        return Self.missHeight
+    }
+
+    func findPoisonGasLevel(x: Float, z: Float) -> Float {
+        for region in waterRegions where region.value >= 50
+            && region.value % 10 == 0
             && region.lowX < x && x < region.highX
             && region.lowZ < z && z < region.highZ {
             return region.level
@@ -333,7 +347,7 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         for surface in surfaces {
             guard contains(surface, x: x, z: z), accepts(surface) else { continue }
             let ny = surface.normal.y
-            guard ny != 0 else { continue }
+            guard ny > 0 else { continue }
             let height = -(Float(x) * surface.normal.x + Float(z) * surface.normal.z + surface.originOffset) / ny
             guard Float(y) - (height - 78) >= 0 else { continue }
             return SM64SurfaceQueryResult(height: height, surface: surface)
@@ -345,7 +359,7 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         for surface in surfaces {
             guard contains(surface, x: x, z: z), accepts(surface) else { continue }
             let ny = surface.normal.y
-            guard ny != 0 else { continue }
+            guard ny < 0 else { continue }
             let height = -(Float(x) * surface.normal.x + Float(z) * surface.normal.z + surface.originOffset) / ny
             guard Float(y) - (height + 78) <= 0 else { continue }
             return SM64SurfaceQueryResult(height: height, surface: surface)
