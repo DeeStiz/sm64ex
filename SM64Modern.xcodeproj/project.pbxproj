@@ -38,6 +38,7 @@
 		995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD8678B319AD274378179C /* MetalShaderCompiler.swift */; };
 		A03388793B2976FA562FE712 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5723E1972C2FF3BB21E3A5B /* AppMain.swift */; };
 		AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */ = {isa = PBXBuildFile; fileRef = 328470043E0C3F9278C1A80E /* AppleAudioService.m */; };
+		ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */; };
 		AF40398B5A629439B358BCB6 /* SurfacePartition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */; };
 		B188BC254D2FE77844ADEE0F /* MemoryArena.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25BB84567898B7DD0F01721 /* MemoryArena.swift */; };
 		B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F0AEF5342F3B329237DD66 /* ContentPack.swift */; };
@@ -65,6 +66,7 @@
 		2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalScene.swift; sourceTree = "<group>"; };
 		328470043E0C3F9278C1A80E /* AppleAudioService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleAudioService.m; sourceTree = "<group>"; };
 		34836A16DABAFE021C624BDF /* GeoLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayout.swift; sourceTree = "<group>"; };
+		34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputCore.swift; sourceTree = "<group>"; };
 		386378DD6ECB9F78AC003073 /* MetalRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderer.swift; sourceTree = "<group>"; };
 		399C03F347FC9A4D23DFECFD /* OracleTrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTrace.swift; sourceTree = "<group>"; };
 		3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeterministicPrimitives.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */,
 				34836A16DABAFE021C624BDF /* GeoLayout.swift */,
 				E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */,
+				34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */,
 				AC89F10EF988BEB5D9624D69 /* LevelScript.swift */,
 				2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */,
 				129A98B13AFB161495B1C646 /* LevelScriptVM.swift */,
@@ -271,6 +274,7 @@
 				1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */,
 				86873A7F75CAAF78C48A991F /* GeoLayout.swift in Sources */,
 				3A185680189903BB0AA43307 /* GeoLayoutContentRuntime.swift in Sources */,
+				ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */,
 				59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */,
 				FDFB158F79EC6A450D735577 /* LevelScriptContentRuntime.swift in Sources */,
 				01E615EBF7207413282AF29D /* LevelScriptVM.swift in Sources */,
