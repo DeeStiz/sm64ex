@@ -43,6 +43,22 @@ enum DeterministicPrimitivesSmoke {
         expect(SM64DeterministicPrimitives.roundFloatToS16(2.49) == 2, "positive round")
         expect(SM64DeterministicPrimitives.roundFloatToS16(-2.49) == -2, "negative round")
 
+        expect(SM64CanonicalTrigTables.sinePrefix.count == 0x400, "sine prefix table size")
+        expect(SM64CanonicalTrigTables.cosine.count == 0x1000, "cosine table size")
+        expect(SM64CanonicalTrigTables.arctangent.count == 0x401, "arctangent table size")
+        expect(SM64CanonicalTrig.sins(0) == 0, "sine zero")
+        expect(SM64CanonicalTrig.sins(0x4000) == 1, "sine quarter turn")
+        expect(SM64CanonicalTrig.sins(Int16(bitPattern: 0x8000)) == 0, "sine half turn")
+        expect(SM64CanonicalTrig.sins(Int16(bitPattern: 0xC000)) == -1, "sine three-quarter turn")
+        expect(SM64CanonicalTrig.coss(0) == 1, "cosine zero")
+        expect(SM64CanonicalTrig.coss(0x4000) == 0, "cosine quarter turn")
+        expect(SM64CanonicalTrig.coss(Int16(bitPattern: 0x8000)) == -1, "cosine half turn")
+        expect(SM64CanonicalTrig.atan2s(y: 0, x: 1) == 0x4000, "atan2 positive x axis")
+        expect(SM64CanonicalTrig.atan2s(y: 1, x: 0) == 0, "atan2 positive y axis")
+        expect(SM64CanonicalTrig.atan2s(y: 0, x: -1) == Int16(bitPattern: 0xC000), "atan2 negative x axis")
+        expect(SM64CanonicalTrig.atan2s(y: -1, x: 0) == Int16(bitPattern: 0x8000), "atan2 negative y axis")
+        expect(SM64CanonicalTrig.atan2s(y: 1, x: 1) == 0x2000, "atan2 diagonal")
+
         let oneAndHalf = SM64Fixed16_16(float: 1.5)
         let two = SM64Fixed16_16(integer: 2)
         expect(oneAndHalf.rawValue == 0x18000, "fixed conversion")
@@ -91,6 +107,9 @@ enum DeterministicPrimitivesSmoke {
         if failures != 0 {
             exit(1)
         }
-        print("SM64 Modern deterministic primitives smoke passed")
+        print(
+            "SM64 Modern deterministic primitives smoke passed "
+                + "trigFingerprint=0x\(String(SM64CanonicalTrig.tableFingerprint(), radix: 16))"
+        )
     }
 }

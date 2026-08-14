@@ -47,6 +47,96 @@ enum SM64DeterministicPrimitives {
     }
 }
 
+/// Table-backed trigonometry from the US C engine. Angles are the legacy
+/// 16-bit circle (`0x10000 == 2π`); using the generated table is mandatory for
+/// parity because platform libm implementations are not bit-identical.
+enum SM64CanonicalTrig {
+    static func sins(_ angle: Int16) -> Float {
+        let index = Int(UInt16(bitPattern: angle) >> 4)
+        return SM64CanonicalTrigTables.sine[index]
+    }
+
+    static func coss(_ angle: Int16) -> Float {
+        let index = Int(UInt16(bitPattern: angle) >> 4)
+        return SM64CanonicalTrigTables.cosine[index]
+    }
+
+    static func atan2s(y: Float, x: Float) -> Int16 {
+        var y = y
+        var x = x
+        let result: UInt16
+
+        if x >= 0 {
+            if y >= 0 {
+                if y >= x {
+                    result = atan2Lookup(y: x, x: y)
+                } else {
+                    result = 0x4000 &- atan2Lookup(y: y, x: x)
+                }
+            } else {
+                y = -y
+                if y < x {
+                    result = 0x4000 &+ atan2Lookup(y: y, x: x)
+                } else {
+                    result = 0x8000 &- atan2Lookup(y: x, x: y)
+                }
+            }
+        } else {
+            x = -x
+            if y < 0 {
+                y = -y
+                if y >= x {
+                    result = 0x8000 &+ atan2Lookup(y: x, x: y)
+                } else {
+                    result = 0xC000 &- atan2Lookup(y: y, x: x)
+                }
+            } else if y < x {
+                result = 0xC000 &+ atan2Lookup(y: y, x: x)
+            } else {
+                result = 0 &- atan2Lookup(y: x, x: y)
+            }
+        }
+        return Int16(bitPattern: result)
+    }
+
+    static func atan2f(y: Float, x: Float) -> Float {
+        let angle = Int16(atan2s(y: y, x: x))
+        return Float(Double(angle) * Double.pi / 32_768.0)
+    }
+
+    static func tableFingerprint() -> UInt64 {
+        var hash = UInt64(1_469_598_103_934_665_603)
+        for value in SM64CanonicalTrigTables.sine {
+            hash = hashU32(hash, value.bitPattern)
+        }
+        for value in SM64CanonicalTrigTables.cosine {
+            hash = hashU32(hash, value.bitPattern)
+        }
+        for value in SM64CanonicalTrigTables.arctangent {
+            hash = hashU32(hash, UInt32(UInt16(bitPattern: value)))
+        }
+        return hash
+    }
+
+    private static func atan2Lookup(y: Float, x: Float) -> UInt16 {
+        guard x != 0 else {
+            return UInt16(bitPattern: SM64CanonicalTrigTables.arctangent[0])
+        }
+        let index = Int(y / x * 1_024.0 + 0.5)
+        precondition(index >= 0 && index < SM64CanonicalTrigTables.arctangent.count)
+        return UInt16(bitPattern: SM64CanonicalTrigTables.arctangent[index])
+    }
+
+    private static func hashU32(_ hash: UInt64, _ value: UInt32) -> UInt64 {
+        var hash = hash
+        for byte in 0..<4 {
+            hash ^= UInt64((value >> UInt32(byte * 8)) & 0xff)
+            hash &*= 1_099_511_628_211
+        }
+        return hash
+    }
+}
+
 struct SM64Fixed16_16: Equatable, Sendable {
     let rawValue: Int32
 
