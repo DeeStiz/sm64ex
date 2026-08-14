@@ -136,3 +136,72 @@ struct SM64MarioCapFlags: OptionSet, Equatable, Sendable {
     static let onHead = Self(rawValue: 0x00000010)
     static let inHand = Self(rawValue: 0x00000020)
 }
+
+enum SM64MarioActionBits {
+    static let groupMask: UInt32 = 0x000001C0
+    static let submergedGroup: UInt32 = 0x000000C0
+    static let intangible: UInt32 = 0x00001000
+    static let swimming: UInt32 = 0x00002000
+}
+
+struct SM64MarioHealthContext: Equatable, Sendable {
+    var terrainType: UInt16
+    var debugLevelSelect: Bool
+}
+
+struct SM64MarioHealthMutation: Equatable, Sendable {
+    let health: Int16
+    let healCounter: UInt8
+    let hurtCounter: UInt8
+    let nearDrowningRumble: Bool
+}
+
+extension SM64MarioState {
+    /// Value counterpart of `update_mario_health`. It returns the observable
+    /// rumble intent instead of calling a platform API; the owner-thread tick
+    /// can enqueue it after the state transition is accepted.
+    mutating func updateHealth(context: SM64MarioHealthContext) -> SM64MarioHealthMutation {
+        var didRunHealthDomain = false
+        if health >= 0x100 {
+            didRunHealthDomain = true
+            if healCounter == 0 && hurtCounter == 0 {
+                let isIntangible = action & SM64MarioActionBits.intangible != 0
+                let isSwimming = action & SM64MarioActionBits.swimming != 0
+                if input.contains(.inPoisonGas) && !isIntangible
+                    && flags & SM64MarioCapFlags.metal.rawValue == 0
+                    && !context.debugLevelSelect {
+                    health -= 4
+                } else if isSwimming && !isIntangible {
+                    let terrainIsSnow = context.terrainType & 0x0007 == 0x0002
+                    if position.y >= waterLevel - 140 && !terrainIsSnow {
+                        health += 0x1A
+                    } else if !context.debugLevelSelect {
+                        health -= terrainIsSnow ? 3 : 1
+                    }
+                }
+            }
+
+            if healCounter > 0 {
+                health += 0x40
+                healCounter -= 1
+            }
+            if hurtCounter > 0 {
+                health -= 0x40
+                hurtCounter -= 1
+            }
+
+            if health >= 0x881 { health = 0x880 }
+            if health < 0x100 { health = 0xFF }
+        }
+
+        let nearDrowning = didRunHealthDomain
+            && action & SM64MarioActionBits.groupMask == SM64MarioActionBits.submergedGroup
+            && health < 0x300
+        return SM64MarioHealthMutation(
+            health: health,
+            healCounter: healCounter,
+            hurtCounter: hurtCounter,
+            nearDrowningRumble: nearDrowning
+        )
+    }
+}
