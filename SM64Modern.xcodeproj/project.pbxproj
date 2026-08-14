@@ -43,6 +43,7 @@
 		8F2434A3E57287185819D685 /* EngineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB40062F0B74B53B43A517BA /* EngineState.swift */; };
 		90B7F9D7BD419562B6E7A2F8 /* ContentPackRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6630058727A186889977A1 /* ContentPackRuntime.swift */; };
 		946B96572AA7C94347AF500E /* EngineHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C737B1A16857D51F7C7FE7A /* EngineHost.swift */; };
+		956281711CE88DA51EC7508B /* MarioSlope.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C9C1CEC9C0000598706A91 /* MarioSlope.swift */; };
 		995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD8678B319AD274378179C /* MetalShaderCompiler.swift */; };
 		A03388793B2976FA562FE712 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5723E1972C2FF3BB21E3A5B /* AppMain.swift */; };
 		A87A6ECEEE1590A786D5241E /* MarioGroundStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7BD1F16923ABC44B644C96 /* MarioGroundStep.swift */; };
@@ -126,6 +127,7 @@
 		D8F9722E9A2207BC558A3023 /* SM64Modern.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SM64Modern.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DA7BD1F16923ABC44B644C96 /* MarioGroundStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGroundStep.swift; sourceTree = "<group>"; };
 		E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayoutContentRuntime.swift; sourceTree = "<group>"; };
+		E2C9C1CEC9C0000598706A91 /* MarioSlope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSlope.swift; sourceTree = "<group>"; };
 		EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedTrigTables.swift; sourceTree = "<group>"; };
 		EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineRuntime.swift; sourceTree = "<group>"; };
 		F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfacePartition.swift; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				0C50416E3A3BDC9F17816FA9 /* MarioInputCore.swift */,
 				4C0CFFDA8636E0474D01D970 /* MarioInputFrame.swift */,
 				F0B9175C21F74A9AA2E6085B /* MarioLandingJump.swift */,
+				E2C9C1CEC9C0000598706A91 /* MarioSlope.swift */,
 				96143C0812CD3AA2EE120132 /* MarioState.swift */,
 				1D4FC5292003781121076585 /* MarioStationaryAction.swift */,
 				9DEC5D253D4E679DB5AB13D6 /* MarioWalkAnimation.swift */,
@@ -336,6 +339,7 @@
 				E00BF690CC0240E3397ECB1A /* MarioInputCore.swift in Sources */,
 				B34928D4906D68E5F50AD5E0 /* MarioInputFrame.swift in Sources */,
 				A933BF2B0DAD6982556E9A0E /* MarioLandingJump.swift in Sources */,
+				956281711CE88DA51EC7508B /* MarioSlope.swift in Sources */,
 				6C8640CA9C5EE9B633AEB081 /* MarioState.swift in Sources */,
 				0FF51E99A1537E8C64BD9839 /* MarioStationaryAction.swift in Sources */,
 				7FFA3B76B0386131EC825C39 /* MarioWalkAnimation.swift in Sources */,
