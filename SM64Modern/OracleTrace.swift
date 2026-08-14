@@ -229,7 +229,7 @@ enum SM64OracleTraceFile {
     }
 }
 
-private enum SM64OracleTraceHash {
+enum SM64OracleTraceHash {
     static let offset: UInt64 = 1_469_598_103_934_665_603
     static let prime: UInt64 = 1_099_511_628_211
 }

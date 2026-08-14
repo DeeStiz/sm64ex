@@ -230,6 +230,7 @@ final class EngineHost: @unchecked Sendable {
     private var lifecycle = SM64ModernLifecycleApiV1()
     private var timebaseSnapshot = SM64ModernTimebaseSnapshotV1()
     private var parityCoordinator: GameplayParityCoordinator?
+    private var oracleTraceSession: SM64ModernOracleTraceSession?
     private let gameplayService = SwiftGameplayService()
     private var automaticTerminationRequested = false
     private var inputService: AppleInputService?
@@ -380,6 +381,8 @@ final class EngineHost: @unchecked Sendable {
 
         let parityStatus = parityCoordinator?.endAndReport() ?? SM64_MODERN_STATUS_OK
         parityCoordinator = nil
+        let oracleTraceStatus = oracleTraceSession?.end() ?? SM64_MODERN_STATUS_OK
+        oracleTraceSession = nil
         let shutdownStatus = runtime.shutdown()
         engineRuntime = nil
         let executionStatus = engineRunStatus != SM64_MODERN_STATUS_OK
@@ -387,7 +390,9 @@ final class EngineHost: @unchecked Sendable {
             ? engineRunStatus : SM64_MODERN_STATUS_OK
         let finalStatus = shutdownStatus != SM64_MODERN_STATUS_OK
             ? shutdownStatus
-            : (executionStatus != SM64_MODERN_STATUS_OK ? executionStatus : parityStatus)
+            : (executionStatus != SM64_MODERN_STATUS_OK
+                ? executionStatus
+                : (parityStatus != SM64_MODERN_STATUS_OK ? parityStatus : oracleTraceStatus))
         let finalState: State = finalStatus == SM64_MODERN_STATUS_OK ? .stopped : .failed
         finish(state: finalState, status: finalStatus)
 
@@ -511,6 +516,15 @@ final class EngineHost: @unchecked Sendable {
                 engineLogger.notice("bounded_parity_run_complete steps=\(self.stepCount)")
                 CFRunLoopStop(CFRunLoopGetCurrent())
             }
+        }
+        if let oracleTraceSession, oracleTraceSession.shouldStop(after: stepCount) {
+            condition.withLock {
+                stopRequested = true
+                requestedExitReason = SM64_MODERN_EXIT_PLATFORM_REQUESTED
+                automaticTerminationRequested = true
+            }
+            engineLogger.notice("bounded_oracle_trace_run_complete steps=\(self.stepCount)")
+            CFRunLoopStop(CFRunLoopGetCurrent())
         }
     }
 
@@ -678,11 +692,22 @@ final class EngineHost: @unchecked Sendable {
         status = self.lifecycle.initialize(&config, &platform)
         guard status == SM64_MODERN_STATUS_OK else { return status }
 
+        let oracleStart = SM64ModernOracleTraceSession.beginFromEnvironment(
+            saveDirectory: paths.saveDirectory
+        )
+        guard oracleStart.status == SM64_MODERN_STATUS_OK else {
+            _ = self.lifecycle.shutdown()
+            return oracleStart.status
+        }
+        oracleTraceSession = oracleStart.session
+
         let parityStart = GameplayParityCoordinator.beginFromEnvironment(
             saveDirectory: paths.saveDirectory,
             gameplayService: gameplayService
         )
         guard parityStart.status == SM64_MODERN_STATUS_OK else {
+            _ = oracleTraceSession?.end()
+            oracleTraceSession = nil
             _ = self.lifecycle.shutdown()
             return parityStart.status
         }

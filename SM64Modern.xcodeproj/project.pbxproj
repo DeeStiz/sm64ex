@@ -26,12 +26,14 @@
 		B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F0AEF5342F3B329237DD66 /* ContentPack.swift */; };
 		CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386378DD6ECB9F78AC003073 /* MetalRenderer.swift */; };
 		CFF98EAAB1C2B379F37CB33B /* EngineAuthority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6291FCF691572C0089D6194D /* EngineAuthority.swift */; };
+		E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */; };
 		ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalCompilerBridge.m; sourceTree = "<group>"; };
 		1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderingBridge.swift; sourceTree = "<group>"; };
+		1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTraceSession.swift; sourceTree = "<group>"; };
 		26195252708283AFB936E392 /* GameplayParity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameplayParity.swift; sourceTree = "<group>"; };
 		2CA0E28C4E523ADAE015243F /* MetalCompilerBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalCompilerBridge.h; sourceTree = "<group>"; };
 		2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalScene.swift; sourceTree = "<group>"; };
@@ -83,6 +85,7 @@
 				2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */,
 				97BD8678B319AD274378179C /* MetalShaderCompiler.swift */,
 				399C03F347FC9A4D23DFECFD /* OracleTrace.swift */,
+				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
 				B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */,
 			);
@@ -205,6 +208,7 @@
 				5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */,
 				995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */,
 				1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */,
+				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
 				02E322DA71DC6695775C5D60 /* SwiftGameplay.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -223,6 +227,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/include",
+					"$(SRCROOT)/src",
 				);
 				INFOPLIST_FILE = SM64Modern/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -316,6 +321,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/include",
+					"$(SRCROOT)/src",
 				);
 				INFOPLIST_FILE = SM64Modern/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

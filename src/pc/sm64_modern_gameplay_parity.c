@@ -356,13 +356,82 @@ static void process_actual_record(SM64ModernGameplayTraceRecordV1 *actual) {
     }
 }
 
+static SM64ModernOracleTraceDomain oracle_domain_for_subsystem(
+    SM64ModernGameplaySubsystem subsystem) {
+    switch (subsystem) {
+        case SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO:
+            return SM64_MODERN_ORACLE_DOMAIN_MARIO;
+        case SM64_MODERN_GAMEPLAY_SUBSYSTEM_INTERACTION:
+            return SM64_MODERN_ORACLE_DOMAIN_INTERACTION;
+        case SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA:
+            return SM64_MODERN_ORACLE_DOMAIN_CAMERA;
+        case SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_BOBOMB_BATTLEFIELD:
+        case SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_JOLLY_ROGER_BAY:
+        case SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_BOWSER_ONE:
+            return SM64_MODERN_ORACLE_DOMAIN_OBJECT;
+        case SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL:
+        default:
+            return SM64_MODERN_ORACLE_DOMAIN_GLOBAL;
+    }
+}
+
+static void record_oracle_values(SM64ModernGameplaySubsystem subsystem,
+                                 SM64ModernGameplayRecordKind kind,
+                                 uint32_t record_id,
+                                 uint32_t subject_id,
+                                 const uint64_t *values,
+                                 uint32_t value_count) {
+    if (!sm64_modern_oracle_trace_is_active()) {
+        return;
+    }
+
+    // STUB(M3): save bytes, render packets, script/behavior events, collision
+    // queries, RNG draws, and audio sequencing still need dedicated seams.
+
+    SM64ModernOracleTraceDomain domain = oracle_domain_for_subsystem(subsystem);
+    SM64ModernOracleTraceRecordKind oracle_kind = SM64_MODERN_ORACLE_RECORD_STATE;
+    uint64_t oracle_record_id = record_id;
+    if (kind == SM64_MODERN_GAMEPLAY_RECORD_INPUT) {
+        domain = SM64_MODERN_ORACLE_DOMAIN_INPUT;
+        oracle_kind = SM64_MODERN_ORACLE_RECORD_INPUT;
+        // Schema 3 uses record ID zero for the controller sample; schema 4's
+        // inventory reserves input ID one so zero remains an invalid sentinel.
+        oracle_record_id++;
+    } else if (kind == SM64_MODERN_GAMEPLAY_RECORD_EFFECT) {
+        domain = SM64_MODERN_ORACLE_DOMAIN_EFFECT;
+        oracle_kind = SM64_MODERN_ORACLE_RECORD_EFFECT;
+    }
+
+    const SM64ModernStatus coverage_status = sm64_modern_oracle_trace_mark_coverage(
+        domain,
+        oracle_record_id);
+    if (coverage_status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = coverage_status;
+        return;
+    }
+
+    const SM64ModernStatus status = sm64_modern_oracle_trace_record(
+        domain,
+        oracle_kind,
+        subject_id,
+        oracle_record_id,
+        0,
+        values,
+        value_count);
+    if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = status;
+    }
+}
+
 static void record_values(SM64ModernGameplaySubsystem subsystem,
                           SM64ModernGameplayRecordKind kind,
                           uint32_t record_id,
                           uint32_t subject_id,
                           const uint64_t *values,
                           uint32_t value_count) {
-    if (!subsystem_enabled(subsystem) || sStatus != SM64_MODERN_STATUS_OK) {
+    const bool parity_enabled = subsystem_enabled(subsystem);
+    const bool oracle_enabled = sm64_modern_oracle_trace_is_active() != 0;
+    if ((!parity_enabled && !oracle_enabled) || sStatus != SM64_MODERN_STATUS_OK) {
         return;
     }
     if (value_count > SM64_MODERN_GAMEPLAY_RECORD_VALUE_CAPACITY
@@ -370,13 +439,16 @@ static void record_values(SM64ModernGameplaySubsystem subsystem,
         sStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
         return;
     }
-    SM64ModernGameplayTraceRecordV1 record = make_record(subsystem,
-                                                         kind,
-                                                         record_id,
-                                                         subject_id,
-                                                         values,
-                                                         value_count);
-    process_actual_record(&record);
+    if (parity_enabled) {
+        SM64ModernGameplayTraceRecordV1 record = make_record(subsystem,
+                                                             kind,
+                                                             record_id,
+                                                             subject_id,
+                                                             values,
+                                                             value_count);
+        process_actual_record(&record);
+    }
+    record_oracle_values(subsystem, kind, record_id, subject_id, values, value_count);
 }
 
 static void record_scalar(SM64ModernGameplaySubsystem subsystem,
@@ -649,40 +721,70 @@ SM64ModernStatus sm64_modern_gameplay_set_authority(SM64ModernGameplaySubsystem 
 }
 
 void sm64_modern_parity_begin_tick(void) {
-    if (!sSessionActive || sStatus != SM64_MODERN_STATUS_OK) {
+    const bool oracle_enabled = sm64_modern_oracle_trace_is_active() != 0;
+    if ((!sSessionActive && !oracle_enabled) || sStatus != SM64_MODERN_STATUS_OK) {
         return;
     }
-    finalize_candidate_tick();
-    sSimulationTick++;
-    memset(sSequence, 0, sizeof(sSequence));
-    memset(sCandidateRecords, 0, sizeof(sCandidateRecords));
-    sTickOpen = true;
+    if (sSessionActive) {
+        finalize_candidate_tick();
+        sSimulationTick++;
+        memset(sSequence, 0, sizeof(sSequence));
+        memset(sCandidateRecords, 0, sizeof(sCandidateRecords));
+        sTickOpen = true;
+    }
+    if (oracle_enabled) {
+        sm64_modern_oracle_trace_begin_tick();
+        if (sm64_modern_oracle_trace_status() != SM64_MODERN_STATUS_OK) {
+            sStatus = sm64_modern_oracle_trace_status();
+        }
+    }
 }
 
 void sm64_modern_parity_end_tick(void) {
-    finalize_candidate_tick();
-    sTickOpen = false;
+    if (sSessionActive) {
+        finalize_candidate_tick();
+        sTickOpen = false;
+    }
+    if (sm64_modern_oracle_trace_is_active()) {
+        sm64_modern_oracle_trace_end_tick();
+        if (sm64_modern_oracle_trace_status() != SM64_MODERN_STATUS_OK
+            && sStatus == SM64_MODERN_STATUS_OK) {
+            sStatus = sm64_modern_oracle_trace_status();
+        }
+    }
 }
 
 void sm64_modern_parity_filter_input(OSContPad *pad) {
-    if (!pad || !subsystem_enabled(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL)
+    const bool oracle_enabled = sm64_modern_oracle_trace_is_active() != 0;
+    if (!pad || (!subsystem_enabled(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL) && !oracle_enabled)
         || sStatus != SM64_MODERN_STATUS_OK) {
         return;
     }
 
+    const uint64_t oracle_values[2] = {
+        pad->button,
+        (uint64_t) (uint8_t) pad->stick_x
+            | ((uint64_t) (uint8_t) pad->stick_y << 8u)
+            | ((uint64_t) (uint8_t) pad->ext_stick_x << 16u)
+            | ((uint64_t) (uint8_t) pad->ext_stick_y << 24u),
+    };
+
+    if (!sSessionActive) {
+        record_oracle_values(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL,
+                             SM64_MODERN_GAMEPLAY_RECORD_INPUT,
+                             0,
+                             0,
+                             oracle_values,
+                             2);
+        return;
+    }
+
     if (sConfig.mode == SM64_MODERN_GAMEPLAY_PARITY_RECORD) {
-        const uint64_t values[2] = {
-            pad->button,
-            (uint64_t) (uint8_t) pad->stick_x
-                | ((uint64_t) (uint8_t) pad->stick_y << 8u)
-                | ((uint64_t) (uint8_t) pad->ext_stick_x << 16u)
-                | ((uint64_t) (uint8_t) pad->ext_stick_y << 24u),
-        };
         record_values(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL,
                       SM64_MODERN_GAMEPLAY_RECORD_INPUT,
                       0,
                       0,
-                      values,
+                      oracle_values,
                       2);
         return;
     }
@@ -749,6 +851,19 @@ void sm64_modern_parity_filter_input(OSContPad *pad) {
                        value_index,
                        true);
     }
+    const uint64_t replay_oracle_values[2] = {
+        pad->button,
+        (uint64_t) (uint8_t) pad->stick_x
+            | ((uint64_t) (uint8_t) pad->stick_y << 8u)
+            | ((uint64_t) (uint8_t) pad->ext_stick_x << 16u)
+            | ((uint64_t) (uint8_t) pad->ext_stick_y << 24u),
+    };
+    record_oracle_values(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL,
+                         SM64_MODERN_GAMEPLAY_RECORD_INPUT,
+                         0,
+                         0,
+                         replay_oracle_values,
+                         2);
 }
 
 void sm64_modern_parity_record_test_snapshot(SM64ModernGameplaySubsystem subsystem,
@@ -767,7 +882,8 @@ void sm64_modern_parity_record_test_snapshot(SM64ModernGameplaySubsystem subsyst
 u32 sm64_modern_parity_audio_frame_count(u32 high_count, u32 default_count) {
     // Device drain timing is intentionally outside deterministic gameplay.
     // A parity session therefore requests a fixed pre-device PCM quantum.
-    return sSessionActive ? high_count : default_count;
+    return (sSessionActive || sm64_modern_oracle_trace_is_active())
+        ? high_count : default_count;
 }
 
 static void capture_global_snapshot(void) {
@@ -895,7 +1011,9 @@ static void capture_camera_snapshot(void) {
 
 static void capture_actor_snapshot(void) {
     const SM64ModernGameplaySubsystem subsystem = actor_subsystem_for_level();
-    if (subsystem == SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL || !subsystem_enabled(subsystem)) {
+    const bool oracle_enabled = sm64_modern_oracle_trace_is_active() != 0;
+    if (subsystem == SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL
+        || (!subsystem_enabled(subsystem) && !oracle_enabled)) {
         return;
     }
     for (uint32_t index = 0; index < OBJECT_POOL_CAPACITY; ++index) {
@@ -947,7 +1065,8 @@ static void capture_actor_snapshot(void) {
 }
 
 void sm64_modern_parity_capture_snapshots(void) {
-    if (!sSessionActive || sStatus != SM64_MODERN_STATUS_OK) {
+    if ((!sSessionActive && !sm64_modern_oracle_trace_is_active())
+        || sStatus != SM64_MODERN_STATUS_OK) {
         return;
     }
     capture_global_snapshot();

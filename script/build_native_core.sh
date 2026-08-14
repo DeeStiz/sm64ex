@@ -23,4 +23,4 @@ exec make -C "$PROJECT_ROOT" \
   SM64_MODERN_NATIVE=1 \
   DEBUG="$DEBUG_VALUE" \
   BUILD_DIR_BASE="$BUILD_DIR_BASE" \
-  native-core timebase-smoke cadence-smoke oracle-trace-smoke
+  native-core timebase-smoke cadence-smoke oracle-trace-smoke oracle-bridge-smoke

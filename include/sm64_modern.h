@@ -779,6 +779,7 @@ SM64ModernStatus sm64_modern_oracle_trace_mark_coverage(
 SM64ModernStatus sm64_modern_oracle_trace_get_result(
     SM64ModernOracleTraceResultV1 *out_result);
 SM64ModernStatus sm64_modern_oracle_trace_status(void);
+uint32_t sm64_modern_oracle_trace_is_active(void);
 uint64_t sm64_modern_oracle_trace_simulation_tick(void);
 uint64_t sm64_modern_oracle_trace_hash_record(
     const SM64ModernOracleTraceRecordV1 *record);

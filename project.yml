@@ -38,6 +38,7 @@ targets:
         HEADER_SEARCH_PATHS:
           - "$(inherited)"
           - "$(SRCROOT)/include"
+          - "$(SRCROOT)/src"
         INFOPLIST_FILE: SM64Modern/Info.plist
         PRODUCT_BUNDLE_IDENTIFIER: io.github.deestiz.sm64modern
         PRODUCT_NAME: SM64 Modern

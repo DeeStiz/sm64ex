@@ -107,6 +107,12 @@ static SM64ModernOracleTraceConfigV1 make_config(SM64ModernOracleTraceMode mode)
     return config;
 }
 
+static SM64ModernOracleTraceConfigV1 make_deferred_config(SM64ModernOracleTraceMode mode) {
+    SM64ModernOracleTraceConfigV1 config = make_config(mode);
+    config.coverage_fingerprint = 0;
+    return config;
+}
+
 static void mark_complete_inventory(void) {
     for (uint32_t index = 0; index < sm64_modern_oracle_inventory_count(); ++index) {
         SM64ModernOracleCoverageEntryV1 entry;
@@ -204,6 +210,62 @@ static SM64ModernStatus replay_trace(struct MemoryTrace *trace,
     return sm64_modern_oracle_trace_end();
 }
 
+static void exercise_deferred_coverage(void) {
+    struct MemoryTrace trace;
+    memset(&trace, 0, sizeof(trace));
+    const SM64ModernOracleTraceConfigV1 record_config =
+        make_deferred_config(SM64_MODERN_ORACLE_TRACE_RECORD);
+    const SM64ModernOracleTraceStreamApiV1 record_stream = make_stream(&trace);
+    const uint64_t value = UINT64_C(0xfeedface);
+    expect_status("deferred coverage begin",
+                  sm64_modern_oracle_trace_begin(&record_config, &record_stream),
+                  SM64_MODERN_STATUS_OK);
+    sm64_modern_oracle_trace_begin_tick();
+    expect_status("deferred coverage record",
+                  sm64_modern_oracle_trace_record(
+                      SM64_MODERN_ORACLE_DOMAIN_GLOBAL,
+                      SM64_MODERN_ORACLE_RECORD_STATE,
+                      0,
+                      SM64_MODERN_FIELD_GLOBAL_TIMER,
+                      0,
+                      &value,
+                      1),
+                  SM64_MODERN_STATUS_OK);
+    sm64_modern_oracle_trace_end_tick();
+    expect_status("deferred coverage record end",
+                  sm64_modern_oracle_trace_end(),
+                  SM64_MODERN_STATUS_OK);
+
+    trace.cursor = 0;
+    const SM64ModernOracleTraceConfigV1 replay_config =
+        make_deferred_config(SM64_MODERN_ORACLE_TRACE_REPLAY);
+    const SM64ModernOracleTraceStreamApiV1 replay_stream = make_stream(&trace);
+    expect_status("deferred coverage replay begin",
+                  sm64_modern_oracle_trace_begin(&replay_config, &replay_stream),
+                  SM64_MODERN_STATUS_OK);
+    sm64_modern_oracle_trace_begin_tick();
+    expect_status("deferred coverage replay record",
+                  sm64_modern_oracle_trace_record(
+                      SM64_MODERN_ORACLE_DOMAIN_GLOBAL,
+                      SM64_MODERN_ORACLE_RECORD_STATE,
+                      0,
+                      SM64_MODERN_FIELD_GLOBAL_TIMER,
+                      0,
+                      &value,
+                      1),
+                  SM64_MODERN_STATUS_OK);
+    sm64_modern_oracle_trace_end_tick();
+    expect_status("deferred coverage replay end",
+                  sm64_modern_oracle_trace_end(),
+                  SM64_MODERN_STATUS_OK);
+    SM64ModernOracleTraceResultV1 result;
+    memset(&result, 0, sizeof(result));
+    expect_status("deferred coverage result",
+                  sm64_modern_oracle_trace_get_result(&result),
+                  SM64_MODERN_STATUS_OK);
+    expect_u64("deferred coverage entries", result.coverage_entries, 0);
+}
+
 int main(int argc, char **argv) {
     _Static_assert(sizeof(SM64ModernOracleTraceRecordV1) == 128,
                    "schema-4 records must remain 128 bytes");
@@ -212,6 +274,7 @@ int main(int argc, char **argv) {
 
     struct MemoryTrace first;
     struct MemoryTrace second;
+    exercise_deferred_coverage();
     record_trace(&first);
     record_trace(&second);
 

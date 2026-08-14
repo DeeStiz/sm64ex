@@ -348,7 +348,12 @@ SM64ModernStatus sm64_modern_oracle_trace_end(void) {
 
     sResult.coverage_fingerprint = coverage_fingerprint_from(sCoverage);
     sResult.coverage_entries = sCoverageCount;
-    if (sResult.coverage_fingerprint != sConfig.coverage_fingerprint) {
+    // A zero expected fingerprint explicitly defers whole-inventory
+    // reachability closure. This is used by the live bounded capture path;
+    // qualification/replay fixtures provide a non-zero fingerprint and keep
+    // the fail-closed exact-coverage check.
+    if (sConfig.coverage_fingerprint != 0
+        && sResult.coverage_fingerprint != sConfig.coverage_fingerprint) {
         set_status(SM64_MODERN_STATUS_PARITY_DIVERGED);
     }
 
@@ -470,6 +475,10 @@ SM64ModernStatus sm64_modern_oracle_trace_get_result(
 
 SM64ModernStatus sm64_modern_oracle_trace_status(void) {
     return sStatus;
+}
+
+uint32_t sm64_modern_oracle_trace_is_active(void) {
+    return sSessionActive ? 1u : 0u;
 }
 
 uint64_t sm64_modern_oracle_trace_simulation_tick(void) {
