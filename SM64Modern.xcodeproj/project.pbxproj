@@ -45,6 +45,7 @@
 		CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386378DD6ECB9F78AC003073 /* MetalRenderer.swift */; };
 		CFF98EAAB1C2B379F37CB33B /* EngineAuthority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6291FCF691572C0089D6194D /* EngineAuthority.swift */; };
 		D65F07ACB7B0E4429D8D1086 /* ObjectSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */; };
+		E00BF690CC0240E3397ECB1A /* MarioInputCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C50416E3A3BDC9F17816FA9 /* MarioInputCore.swift */; };
 		E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */; };
 		ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */; };
 		FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6B1983ADD652967A0372D10 /* BehaviorScript.swift */; };
@@ -52,6 +53,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0C50416E3A3BDC9F17816FA9 /* MarioInputCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioInputCore.swift; sourceTree = "<group>"; };
 		129A98B13AFB161495B1C646 /* LevelScriptVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScriptVM.swift; sourceTree = "<group>"; };
 		135C103AE0705B71EBE54DC5 /* SurfaceCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfaceCollision.swift; sourceTree = "<group>"; };
 		1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalCompilerBridge.m; sourceTree = "<group>"; };
@@ -133,6 +135,7 @@
 				AC89F10EF988BEB5D9624D69 /* LevelScript.swift */,
 				2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */,
 				129A98B13AFB161495B1C646 /* LevelScriptVM.swift */,
+				0C50416E3A3BDC9F17816FA9 /* MarioInputCore.swift */,
 				A25BB84567898B7DD0F01721 /* MemoryArena.swift */,
 				2CA0E28C4E523ADAE015243F /* MetalCompilerBridge.h */,
 				1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */,
@@ -278,6 +281,7 @@
 				59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */,
 				FDFB158F79EC6A450D735577 /* LevelScriptContentRuntime.swift in Sources */,
 				01E615EBF7207413282AF29D /* LevelScriptVM.swift in Sources */,
+				E00BF690CC0240E3397ECB1A /* MarioInputCore.swift in Sources */,
 				B188BC254D2FE77844ADEE0F /* MemoryArena.swift in Sources */,
 				4542710AB513728A46A876F6 /* MetalCompilerBridge.m in Sources */,
 				CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */,
