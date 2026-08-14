@@ -21,6 +21,7 @@
 		161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */; };
 		1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */; };
 		1F4EB6331042EECC1AFF0F44 /* ObjectPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E29EEED44FF3034BE40C4C /* ObjectPool.swift */; };
+		1FD4FE652AA364FC5084A439 /* ObjectScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CC8538BA0A2A1F3C291572 /* ObjectScheduler.swift */; };
 		213C0A6E5D88CC7C1405FED4 /* SurfaceCollisionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E23B1C6254504EAE6CE5C01 /* SurfaceCollisionData.swift */; };
 		335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26195252708283AFB936E392 /* GameplayParity.swift */; };
 		3A185680189903BB0AA43307 /* GeoLayoutContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */; };
@@ -85,6 +86,7 @@
 		BB40062F0B74B53B43A517BA /* EngineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineState.swift; sourceTree = "<group>"; };
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
 		CB4ABB8191E695DB49D9CF9E /* AppleAudioService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioService.h; sourceTree = "<group>"; };
+		D3CC8538BA0A2A1F3C291572 /* ObjectScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectScheduler.swift; sourceTree = "<group>"; };
 		D5723E1972C2FF3BB21E3A5B /* AppMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMain.swift; sourceTree = "<group>"; };
 		D6B1983ADD652967A0372D10 /* BehaviorScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScript.swift; sourceTree = "<group>"; };
 		D8F9722E9A2207BC558A3023 /* SM64Modern.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SM64Modern.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -134,6 +136,7 @@
 				2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */,
 				97BD8678B319AD274378179C /* MetalShaderCompiler.swift */,
 				29E29EEED44FF3034BE40C4C /* ObjectPool.swift */,
+				D3CC8538BA0A2A1F3C291572 /* ObjectScheduler.swift */,
 				B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */,
 				399C03F347FC9A4D23DFECFD /* OracleTrace.swift */,
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
@@ -275,6 +278,7 @@
 				5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */,
 				995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */,
 				1F4EB6331042EECC1AFF0F44 /* ObjectPool.swift in Sources */,
+				1FD4FE652AA364FC5084A439 /* ObjectScheduler.swift in Sources */,
 				D65F07ACB7B0E4429D8D1086 /* ObjectSnapshot.swift in Sources */,
 				1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */,
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,

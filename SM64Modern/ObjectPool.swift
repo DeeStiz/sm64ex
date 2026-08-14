@@ -255,6 +255,7 @@ final class SM64ObjectPool {
     // platform-dependent signed representation.
     static let activeFlagActive: UInt16 = 1 << 0
     static let activeFlagUnimportant: UInt16 = 1 << 4
+    static let activeFlagInitiatedTimeStop: UInt16 = 1 << 5
     static let activeFlagUnknown8: UInt16 = 1 << 8
 
     private struct Slot {

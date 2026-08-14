@@ -115,6 +115,17 @@ final class SM64SwiftEngineState {
         globals.timeStopState.subtract(flags)
     }
 
+    /// Applies the C boundary latch after a logical frame. Native 60 Hz
+    /// simulation steps may be held between these logical updates, so the
+    /// scheduler calls this only when the legacy domain is allowed to advance.
+    func latchTimeStopAtLogicalBoundary() {
+        if globals.timeStopState.contains(.enabled) {
+            globals.timeStopState.insert(.active)
+        } else {
+            globals.timeStopState.remove(.active)
+        }
+    }
+
     func beginFrame() {
         globals.frame &+= 1
         globals.objectCounter = 0
