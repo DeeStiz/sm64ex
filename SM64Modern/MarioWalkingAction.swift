@@ -39,6 +39,7 @@ struct SM64MarioWalkingActionInput: Equatable, Sendable {
     let groundStep: SM64MarioGroundStepInput
     let walkAnimation: SM64MarioWalkAnimationInput
     let wallResponse: SM64MarioWallResponseInput
+    let slope: SM64MarioSlopeInput?
 }
 
 struct SM64MarioWalkingActionResult: Equatable, Sendable {
@@ -78,9 +79,17 @@ enum SM64MarioWalkingAction {
         }
 
         let drop = true // act_walking always starts with mario_drop_held_object.
+        let initialSlope: SM64MarioSlopeResult?
+        if let slopeInput = input.slope {
+            guard let slope = SM64MarioSlope.update(slopeInput) else { return nil }
+            initialSlope = slope
+        } else {
+            initialSlope = nil
+        }
+        let facingDownhill = initialSlope?.facingDownhill ?? input.facingDownhill
 
         if input.input.contains(.aboveSlide),
-           input.terrainIsSlide || input.forwardVelocity <= -1 || input.facingDownhill {
+           input.terrainIsSlide || input.forwardVelocity <= -1 || facingDownhill {
             return transition(
                 intent: .beginSliding,
                 action: SM64MarioActionID.beginSliding,
@@ -181,11 +190,33 @@ enum SM64MarioWalkingAction {
             return nil
         }
 
+        let appliedSlope: SM64MarioSlopeResult?
+        if let slopeInput = input.slope {
+            let updatedSlopeInput = SM64MarioSlopeInput(
+                floorClass: slopeInput.floorClass,
+                terrainIsSlide: slopeInput.terrainIsSlide,
+                floorNormalX: slopeInput.floorNormalX,
+                floorNormalY: slopeInput.floorNormalY,
+                floorNormalZ: slopeInput.floorNormalZ,
+                floorAngle: slopeInput.floorAngle,
+                faceYaw: speed.faceYaw,
+                forwardVelocity: speed.forwardVelocity,
+                action: slopeInput.action
+            )
+            guard let slope = SM64MarioSlope.update(updatedSlopeInput) else { return nil }
+            appliedSlope = slope
+        } else {
+            appliedSlope = nil
+        }
+        let finalForwardVelocity = appliedSlope?.forwardVelocity ?? speed.forwardVelocity
+        let finalFaceYaw = appliedSlope?.slideYaw ?? speed.faceYaw
+        let groundVelocity = appliedSlope?.velocity ?? input.groundStep.velocity
+
         let stepInput = SM64MarioGroundStepInput(
             position: input.groundStep.position,
-            velocity: input.groundStep.velocity,
+            velocity: groundVelocity,
             floor: input.groundStep.floor,
-            faceYaw: Int32(speed.faceYaw),
+            faceYaw: Int32(finalFaceYaw),
             nativeStepScale: input.groundStep.nativeStepScale,
             ridingShell: input.groundStep.ridingShell,
             terrainSoundAddend: input.groundStep.terrainSoundAddend,
@@ -199,8 +230,8 @@ enum SM64MarioWalkingAction {
                 intent: .freefall,
                 action: SM64MarioActionID.freefall,
                 actionArgument: 0,
-                faceYaw: speed.faceYaw,
-                forwardVelocity: speed.forwardVelocity,
+                faceYaw: finalFaceYaw,
+                forwardVelocity: finalForwardVelocity,
                 velocity: stepInput.velocity,
                 actionState: 0,
                 actionTimer: 0,
@@ -217,10 +248,9 @@ enum SM64MarioWalkingAction {
             )
 
         case .none:
-            var walkInput = input.walkAnimation
-            walkInput = SM64MarioWalkAnimationInput(
+            let walkInput = SM64MarioWalkAnimationInput(
                 intendedMagnitude: input.intendedMagnitude,
-                forwardVelocity: speed.forwardVelocity,
+                forwardVelocity: finalForwardVelocity,
                 quicksandDepth: input.quicksandDepth,
                 actionTimer: input.walkAnimation.actionTimer,
                 animationPastFrame23: input.walkAnimation.animationPastFrame23,
@@ -235,8 +265,8 @@ enum SM64MarioWalkingAction {
                 intent: .continueGround,
                 action: nil,
                 actionArgument: 0,
-                faceYaw: speed.faceYaw,
-                forwardVelocity: speed.forwardVelocity,
+                faceYaw: finalFaceYaw,
+                forwardVelocity: finalForwardVelocity,
                 velocity: stepInput.velocity,
                 actionState: 0,
                 actionTimer: walk.actionTimer,
@@ -246,7 +276,7 @@ enum SM64MarioWalkingAction {
                 wallSound: .none,
                 groundStep: groundStep,
                 wallResponse: nil,
-                particleDust: input.intendedMagnitude - speed.forwardVelocity > 16,
+                particleDust: input.intendedMagnitude - finalForwardVelocity > 16,
                 shouldDropHeldObject: drop,
                 shouldRunLedgeClimbCheck: true,
                 shouldTiltBodyWalking: true
@@ -257,8 +287,8 @@ enum SM64MarioWalkingAction {
                 startPosition: input.wallResponse.startPosition,
                 position: groundStep.position,
                 velocity: stepInput.velocity,
-                forwardVelocity: speed.forwardVelocity,
-                faceYaw: Int32(speed.faceYaw),
+                forwardVelocity: finalForwardVelocity,
+                faceYaw: Int32(finalFaceYaw),
                 animationFrame: input.wallResponse.animationFrame,
                 animationPastFrame1: input.wallResponse.animationPastFrame1,
                 animationPastFrame2: input.wallResponse.animationPastFrame2,
@@ -271,7 +301,7 @@ enum SM64MarioWalkingAction {
                 intent: .continueGround,
                 action: nil,
                 actionArgument: wall.actionArgument,
-                faceYaw: speed.faceYaw,
+                faceYaw: finalFaceYaw,
                 forwardVelocity: wall.forwardVelocity,
                 velocity: wall.velocity,
                 actionState: wall.actionState,

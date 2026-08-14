@@ -121,7 +121,8 @@ private func baseInput(
             terrainSoundAddend: 0x50000,
             floorSlopePitch: 0x1234,
             wall: wall
-        )
+        ),
+        slope: nil
     )
 }
 
@@ -244,7 +245,8 @@ private extension SM64MarioWalkingActionInput {
                 quarterProbes: probes
             ),
             walkAnimation: walkAnimation,
-            wallResponse: wallResponse
+            wallResponse: wallResponse,
+            slope: slope
         )
     }
 }
