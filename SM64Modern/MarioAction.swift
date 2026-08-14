@@ -20,6 +20,8 @@ enum SM64MarioActionID {
     static let startCrawling: UInt32 = 0x0C008223
     static let stopCrawling: UInt32 = 0x0C008224
     static let crawling: UInt32 = 0x04008448
+    static let holdIdle: UInt32 = 0x08000207
+    static let holdHeavyIdle: UInt32 = 0x08000208
     static let shockwaveBounce: UInt32 = 0x00020226
     static let firstPerson: UInt32 = 0x0C000227
     static let freefall: UInt32 = 0x0100088C
@@ -34,6 +36,7 @@ enum SM64MarioActionID {
     static let standingAgainstWall: UInt32 = 0x0C400209
     static let braking: UInt32 = 0x04000445
     static let decelerating: UInt32 = 0x0400044A
+    static let holdDecelerating: UInt32 = 0x0000044B
     static let finishTurningAround: UInt32 = 0x00000444
     static let brakingStop: UInt32 = 0x0C00023D
     static let backwardGroundKnockback: UInt32 = 0x00020462
@@ -72,6 +75,9 @@ enum SM64MarioActionID {
     static let lavaBoost: UInt32 = 0x010208B7
     static let slideKick: UInt32 = 0x018008AA
     static let jumpKick: UInt32 = 0x018008AC
+    static let crazyBoxBounce: UInt32 = 0x000008AE
+    static let throwing: UInt32 = 0x80000588
+    static let heavyThrow: UInt32 = 0x80000589
     static let twirling: UInt32 = 0x108008A4
     static let metalWaterJump: UInt32 = 0x000044F8
     static let fallAfterStarGrab: UInt32 = 0x00001904
