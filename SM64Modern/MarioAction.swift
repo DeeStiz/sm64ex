@@ -18,6 +18,8 @@ enum SM64MarioActionID {
     static let crouching: UInt32 = 0x0C008220
     static let stopCrouching: UInt32 = 0x0C008222
     static let startCrawling: UInt32 = 0x0C008223
+    static let stopCrawling: UInt32 = 0x0C008224
+    static let crawling: UInt32 = 0x04008448
     static let shockwaveBounce: UInt32 = 0x00020226
     static let firstPerson: UInt32 = 0x0C000227
     static let freefall: UInt32 = 0x0100088C
