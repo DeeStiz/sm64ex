@@ -46,6 +46,7 @@
 		995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD8678B319AD274378179C /* MetalShaderCompiler.swift */; };
 		A03388793B2976FA562FE712 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5723E1972C2FF3BB21E3A5B /* AppMain.swift */; };
 		A87A6ECEEE1590A786D5241E /* MarioGroundStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7BD1F16923ABC44B644C96 /* MarioGroundStep.swift */; };
+		A933BF2B0DAD6982556E9A0E /* MarioLandingJump.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0B9175C21F74A9AA2E6085B /* MarioLandingJump.swift */; };
 		AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */ = {isa = PBXBuildFile; fileRef = 328470043E0C3F9278C1A80E /* AppleAudioService.m */; };
 		ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */; };
 		AF40398B5A629439B358BCB6 /* SurfacePartition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */; };
@@ -128,6 +129,7 @@
 		EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedTrigTables.swift; sourceTree = "<group>"; };
 		EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineRuntime.swift; sourceTree = "<group>"; };
 		F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfacePartition.swift; sourceTree = "<group>"; };
+		F0B9175C21F74A9AA2E6085B /* MarioLandingJump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioLandingJump.swift; sourceTree = "<group>"; };
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -172,6 +174,7 @@
 				DA7BD1F16923ABC44B644C96 /* MarioGroundStep.swift */,
 				0C50416E3A3BDC9F17816FA9 /* MarioInputCore.swift */,
 				4C0CFFDA8636E0474D01D970 /* MarioInputFrame.swift */,
+				F0B9175C21F74A9AA2E6085B /* MarioLandingJump.swift */,
 				96143C0812CD3AA2EE120132 /* MarioState.swift */,
 				1D4FC5292003781121076585 /* MarioStationaryAction.swift */,
 				9DEC5D253D4E679DB5AB13D6 /* MarioWalkAnimation.swift */,
@@ -332,6 +335,7 @@
 				A87A6ECEEE1590A786D5241E /* MarioGroundStep.swift in Sources */,
 				E00BF690CC0240E3397ECB1A /* MarioInputCore.swift in Sources */,
 				B34928D4906D68E5F50AD5E0 /* MarioInputFrame.swift in Sources */,
+				A933BF2B0DAD6982556E9A0E /* MarioLandingJump.swift in Sources */,
 				6C8640CA9C5EE9B633AEB081 /* MarioState.swift in Sources */,
 				0FF51E99A1537E8C64BD9839 /* MarioStationaryAction.swift in Sources */,
 				7FFA3B76B0386131EC825C39 /* MarioWalkAnimation.swift in Sources */,
