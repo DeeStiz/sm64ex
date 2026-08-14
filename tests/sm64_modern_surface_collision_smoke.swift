@@ -40,6 +40,20 @@ private func ceiling(id: UInt32, y: Int16) -> SM64Surface {
     )
 }
 
+private func wall(id: UInt32, x: Int16 = 0) -> SM64Surface {
+    SM64Surface(
+        id: id,
+        flags: SM64SurfaceCollisionWorld.xProjectionFlag,
+        lowerY: -100,
+        upperY: 100,
+        vertex1: SM64SurfaceVec3s(x: x, y: -100, z: -100),
+        vertex2: SM64SurfaceVec3s(x: x, y: 100, z: -100),
+        vertex3: SM64SurfaceVec3s(x: x, y: 100, z: 100),
+        normal: SM64SurfaceVec3f(x: 1, y: 0, z: 0),
+        originOffset: -Float(x)
+    )
+}
+
 private func appendResult(_ hash: UInt64, _ result: SM64SurfaceQueryResult) -> UInt64 {
     var value = hash
     value = hashU64(value, UInt64(result.height.bitPattern))
@@ -79,6 +93,15 @@ enum SM64ModernSurfaceCollisionSmoke {
             checkingForCamera: true
         )
         require(cameraWorld.findFloor(x: 0, y: 100, z: 0).surfaceID == 1, "camera no-collision flag")
+        let wallWorld = try SM64SurfaceCollisionWorld(staticSurfaces: [wall(id: 10)])
+        let wallResult = wallWorld.findWallCollisions(SM64WallCollisionInput(x: -10, y: 0, z: 0, offsetY: 0, radius: 20))
+        require(wallResult.totalCollisions == 1 && wallResult.surfaceIDs == [10], "wall capture")
+        require(wallResult.x == 20 && wallResult.z == 0, "wall projection push")
+        let rayHit = world.findSurfaceOnRay(
+            origin: SM64SurfaceVec3f(x: 0, y: 100, z: 0),
+            direction: SM64SurfaceVec3f(x: 0, y: -200, z: 0)
+        )
+        require(rayHit?.surfaceID == 2 && rayHit?.position.y == 50 && rayHit?.distance == 50, "ray surface hit")
 
         var fingerprint = fnvOffset
         fingerprint = appendResult(fingerprint, world.findFloor(x: 0, y: 100, z: 0))
@@ -87,6 +110,17 @@ enum SM64ModernSurfaceCollisionSmoke {
         fingerprint = hashU64(fingerprint, UInt64(world.findWaterLevel(x: 0, z: 0).bitPattern))
         fingerprint = hashU64(fingerprint, UInt64(world.findWaterLevel(x: 60, z: 0).bitPattern))
         fingerprint = appendResult(fingerprint, cameraWorld.findFloor(x: 0, y: 100, z: 0))
+        fingerprint = hashU64(fingerprint, UInt64(wallResult.x.bitPattern))
+        fingerprint = hashU64(fingerprint, UInt64(wallResult.z.bitPattern))
+        fingerprint = hashU64(fingerprint, UInt64(wallResult.totalCollisions))
+        for id in wallResult.surfaceIDs { fingerprint = hashU64(fingerprint, UInt64(id)) }
+        fingerprint = hashU64(fingerprint, UInt64(rayHit?.surfaceID ?? UInt32.max))
+        if let rayHit {
+            fingerprint = hashU64(fingerprint, UInt64(rayHit.position.x.bitPattern))
+            fingerprint = hashU64(fingerprint, UInt64(rayHit.position.y.bitPattern))
+            fingerprint = hashU64(fingerprint, UInt64(rayHit.position.z.bitPattern))
+            fingerprint = hashU64(fingerprint, UInt64(rayHit.distance.bitPattern))
+        }
         print(String(format: "surfaceCollisionFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern surface collision smoke passed")
     }

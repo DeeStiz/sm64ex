@@ -73,6 +73,28 @@ struct SM64SurfaceQueryResult: Equatable, Sendable {
     }
 }
 
+struct SM64WallCollisionInput: Equatable, Sendable {
+    var x: Float
+    var y: Float
+    var z: Float
+    var offsetY: Float
+    var radius: Float
+}
+
+struct SM64WallCollisionResult: Equatable, Sendable {
+    let x: Float
+    let y: Float
+    let z: Float
+    let totalCollisions: Int
+    let surfaceIDs: [UInt32]
+}
+
+struct SM64SurfaceRayHit: Equatable, Sendable {
+    let surfaceID: UInt32
+    let position: SM64SurfaceVec3f
+    let distance: Float
+}
+
 struct SM64WaterRegion: Equatable, Sendable {
     let value: Int16
     let lowX: Float
@@ -94,21 +116,25 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
     static let levelBoundaryMax: Int32 = 0x2000
     static let missHeight: Float = -11_000
     static let noCameraCollisionFlag: Int8 = 1 << 1
+    static let xProjectionFlag: Int8 = 1 << 3
     static let intangibleType: Int16 = 0x12
     static let cameraBoundaryType: Int16 = 0x72
+    static let vanishCapWallsType: Int16 = 0x7B
 
     var staticSurfaces: [SM64Surface]
     var dynamicSurfaces: [SM64Surface]
     var waterRegions: [SM64WaterRegion]
     var checkingForCamera: Bool
     var includeIntangibleOnce: Bool
+    var passThroughVanishCapWalls: Bool
 
     init(
         staticSurfaces: [SM64Surface] = [],
         dynamicSurfaces: [SM64Surface] = [],
         waterRegions: [SM64WaterRegion] = [],
         checkingForCamera: Bool = false,
-        includeIntangibleOnce: Bool = false
+        includeIntangibleOnce: Bool = false,
+        passThroughVanishCapWalls: Bool = false
     ) throws {
         let surfaces = staticSurfaces + dynamicSurfaces
         guard Set(surfaces.map { $0.id }).count == surfaces.count else {
@@ -124,6 +150,7 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         self.waterRegions = waterRegions
         self.checkingForCamera = checkingForCamera
         self.includeIntangibleOnce = includeIntangibleOnce
+        self.passThroughVanishCapWalls = passThroughVanishCapWalls
     }
 
     func findFloor(x: Float, y: Float, z: Float) -> SM64SurfaceQueryResult {
@@ -155,6 +182,33 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         return Self.missHeight
     }
 
+    func findWallCollisions(_ input: SM64WallCollisionInput) -> SM64WallCollisionResult {
+        var x = input.x
+        var z = input.z
+        let y = input.y + input.offsetY
+        let radius = min(input.radius, 200)
+        var total = 0
+        var ids: [UInt32] = []
+        collideWallList(dynamicSurfaces, baseX: x, baseZ: z, y: y, radius: radius, x: &x, z: &z, total: &total, ids: &ids)
+        collideWallList(staticSurfaces, baseX: x, baseZ: z, y: y, radius: radius, x: &x, z: &z, total: &total, ids: &ids)
+        return SM64WallCollisionResult(x: x, y: input.y, z: z, totalCollisions: total, surfaceIDs: ids)
+    }
+
+    func findSurfaceOnRay(origin: SM64SurfaceVec3f, direction: SM64SurfaceVec3f) -> SM64SurfaceRayHit? {
+        let directionLength = sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z)
+        guard directionLength > 0 else { return nil }
+        let ray = SM64SurfaceVec3f(x: direction.x / directionLength, y: direction.y / directionLength, z: direction.z / directionLength)
+        let top = ray.y >= 0 ? origin.y + ray.y * directionLength : origin.y
+        let bottom = ray.y >= 0 ? origin.y : origin.y + ray.y * directionLength
+        var best: SM64SurfaceRayHit?
+        for surface in dynamicSurfaces + staticSurfaces {
+            guard Float(surface.lowerY) <= top, Float(surface.upperY) >= bottom, acceptsRay(surface) else { continue }
+            guard let hit = rayIntersection(origin: origin, direction: ray, length: directionLength, surface: surface) else { continue }
+            if best == nil || hit.distance <= best!.distance { best = hit }
+        }
+        return best
+    }
+
     private func inBounds(x: Float, z: Float) -> Bool {
         let ix = Int32(x)
         let iz = Int32(z)
@@ -167,6 +221,99 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
             return (surface.flags & Self.noCameraCollisionFlag) == 0
         }
         return surface.type != Self.cameraBoundaryType
+    }
+
+    private func acceptsWall(_ surface: SM64Surface) -> Bool {
+        guard accepts(surface) else { return false }
+        return !(passThroughVanishCapWalls && surface.type == Self.vanishCapWallsType)
+    }
+
+    private func acceptsRay(_ surface: SM64Surface) -> Bool {
+        if checkingForCamera { return (surface.flags & Self.noCameraCollisionFlag) == 0 }
+        return true
+    }
+
+    private func collideWallList(
+        _ surfaces: [SM64Surface],
+        baseX: Float,
+        baseZ: Float,
+        y: Float,
+        radius: Float,
+        x: inout Float,
+        z: inout Float,
+        total: inout Int,
+        ids: inout [UInt32]
+    ) {
+        for surface in surfaces {
+            guard y >= Float(surface.lowerY), y <= Float(surface.upperY) else { continue }
+            let offset = surface.normal.x * baseX + surface.normal.y * y + surface.normal.z * baseZ + surface.originOffset
+            guard offset >= -radius, offset <= radius else { continue }
+            guard wallPointInside(surface, x: baseX, y: y, z: baseZ), acceptsWall(surface) else { continue }
+            x += surface.normal.x * (radius - offset)
+            z += surface.normal.z * (radius - offset)
+            total += 1
+            if ids.count < 4 { ids.append(surface.id) }
+        }
+    }
+
+    private func rayIntersection(origin: SM64SurfaceVec3f, direction: SM64SurfaceVec3f, length: Float, surface: SM64Surface) -> SM64SurfaceRayHit? {
+        let v0 = SM64SurfaceVec3f(x: Float(surface.vertex1.x), y: Float(surface.vertex1.y), z: Float(surface.vertex1.z))
+        let v1 = SM64SurfaceVec3f(x: Float(surface.vertex2.x), y: Float(surface.vertex2.y), z: Float(surface.vertex2.z))
+        let v2 = SM64SurfaceVec3f(x: Float(surface.vertex3.x), y: Float(surface.vertex3.y), z: Float(surface.vertex3.z))
+        let e1 = SM64SurfaceVec3f(x: v1.x - v0.x, y: v1.y - v0.y, z: v1.z - v0.z)
+        let e2 = SM64SurfaceVec3f(x: v2.x - v0.x, y: v2.y - v0.y, z: v2.z - v0.z)
+        let h = SM64SurfaceVec3f(
+            x: direction.y * e2.z - direction.z * e2.y,
+            y: direction.z * e2.x - direction.x * e2.z,
+            z: direction.x * e2.y - direction.y * e2.x
+        )
+        let a = e1.x * h.x + e1.y * h.y + e1.z * h.z
+        guard a <= -0.00001 || a >= 0.00001 else { return nil }
+        let f = 1 / a
+        let s = SM64SurfaceVec3f(x: origin.x - v0.x, y: origin.y - v0.y, z: origin.z - v0.z)
+        let u = f * (s.x * h.x + s.y * h.y + s.z * h.z)
+        guard u >= 0, u <= 1 else { return nil }
+        let q = SM64SurfaceVec3f(
+            x: s.y * e1.z - s.z * e1.y,
+            y: s.z * e1.x - s.x * e1.z,
+            z: s.x * e1.y - s.y * e1.x
+        )
+        let v = f * (direction.x * q.x + direction.y * q.y + direction.z * q.z)
+        guard v >= 0, u + v <= 1 else { return nil }
+        let distance = f * (e2.x * q.x + e2.y * q.y + e2.z * q.z)
+        guard distance > 0.00001, distance <= length else { return nil }
+        return SM64SurfaceRayHit(
+            surfaceID: surface.id,
+            position: SM64SurfaceVec3f(x: origin.x + direction.x * distance, y: origin.y + direction.y * distance, z: origin.z + direction.z * distance),
+            distance: distance
+        )
+    }
+
+    private func wallPointInside(_ surface: SM64Surface, x: Float, y: Float, z: Float) -> Bool {
+        let w1: Float
+        let w2: Float
+        let w3: Float
+        let y1 = Float(surface.vertex1.y)
+        let y2 = Float(surface.vertex2.y)
+        let y3 = Float(surface.vertex3.y)
+        let point: Float
+        if (surface.flags & Self.xProjectionFlag) != 0 {
+            w1 = -Float(surface.vertex1.z); w2 = -Float(surface.vertex2.z); w3 = -Float(surface.vertex3.z)
+            point = -z
+        } else {
+            w1 = Float(surface.vertex1.x); w2 = Float(surface.vertex2.x); w3 = Float(surface.vertex3.x)
+            point = x
+        }
+        let first = (y1 - y) * (w2 - w1) - (w1 - point) * (y2 - y1)
+        let second = (y2 - y) * (w3 - w2) - (w2 - point) * (y3 - y2)
+        let third = (y3 - y) * (w1 - w3) - (w3 - point) * (y1 - y3)
+        if surface.normal.x > 0 && (surface.flags & Self.xProjectionFlag) != 0 {
+            return first <= 0 && second <= 0 && third <= 0
+        }
+        if surface.normal.z > 0 && (surface.flags & Self.xProjectionFlag) == 0 {
+            return first <= 0 && second <= 0 && third <= 0
+        }
+        return first >= 0 && second >= 0 && third >= 0
     }
 
     private func contains(_ surface: SM64Surface, x: Int32, z: Int32) -> Bool {

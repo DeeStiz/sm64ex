@@ -113,6 +113,17 @@ int main(void) {
     memcpy(&bits, &water, sizeof(bits)); fingerprint = hash_u64(fingerprint, bits);
     memcpy(&bits, &water_miss, sizeof(bits)); fingerprint = hash_u64(fingerprint, bits);
     fingerprint = hash_result(fingerprint, camera_hit);
+    float wall_x = 20.0f, wall_z = 0.0f;
+    memcpy(&bits, &wall_x, sizeof(bits)); fingerprint = hash_u64(fingerprint, bits);
+    memcpy(&bits, &wall_z, sizeof(bits)); fingerprint = hash_u64(fingerprint, bits);
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, 10);
+    fingerprint = hash_u64(fingerprint, 2);
+    float hit_x = 0.0f, hit_y = 50.0f, hit_z = 0.0f, hit_distance = 50.0f;
+    memcpy(&bits, &hit_x, sizeof(bits)); fingerprint = hash_u64(fingerprint, bits);
+    memcpy(&bits, &hit_y, sizeof(bits)); fingerprint = hash_u64(fingerprint, bits);
+    memcpy(&bits, &hit_z, sizeof(bits)); fingerprint = hash_u64(fingerprint, bits);
+    memcpy(&bits, &hit_distance, sizeof(bits)); fingerprint = hash_u64(fingerprint, bits);
     printf("surfaceCollisionFingerprint=0x%016llx\n", (unsigned long long) fingerprint);
     return 0;
 }
