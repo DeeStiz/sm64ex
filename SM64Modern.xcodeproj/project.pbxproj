@@ -16,6 +16,7 @@
 		15156FB40A2F0FB896A7D6EC /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92C22E70845A716BECE93CE0 /* GameView.swift */; };
 		1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 399C03F347FC9A4D23DFECFD /* OracleTrace.swift */; };
 		1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */; };
+		1F4EB6331042EECC1AFF0F44 /* ObjectPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E29EEED44FF3034BE40C4C /* ObjectPool.swift */; };
 		335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 26195252708283AFB936E392 /* GameplayParity.swift */; };
 		4542710AB513728A46A876F6 /* MetalCompilerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */; };
 		45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */; };
@@ -37,6 +38,7 @@
 		1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderingBridge.swift; sourceTree = "<group>"; };
 		1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTraceSession.swift; sourceTree = "<group>"; };
 		26195252708283AFB936E392 /* GameplayParity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameplayParity.swift; sourceTree = "<group>"; };
+		29E29EEED44FF3034BE40C4C /* ObjectPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectPool.swift; sourceTree = "<group>"; };
 		2CA0E28C4E523ADAE015243F /* MetalCompilerBridge.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MetalCompilerBridge.h; sourceTree = "<group>"; };
 		2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalScene.swift; sourceTree = "<group>"; };
 		328470043E0C3F9278C1A80E /* AppleAudioService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleAudioService.m; sourceTree = "<group>"; };
@@ -90,6 +92,7 @@
 				1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */,
 				2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */,
 				97BD8678B319AD274378179C /* MetalShaderCompiler.swift */,
+				29E29EEED44FF3034BE40C4C /* ObjectPool.swift */,
 				399C03F347FC9A4D23DFECFD /* OracleTrace.swift */,
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
@@ -215,6 +218,7 @@
 				862583ABDC99F7D05524622B /* MetalRenderingBridge.swift in Sources */,
 				5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */,
 				995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */,
+				1F4EB6331042EECC1AFF0F44 /* ObjectPool.swift in Sources */,
 				1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */,
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
 				02E322DA71DC6695775C5D60 /* SwiftGameplay.swift in Sources */,
