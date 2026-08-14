@@ -228,7 +228,7 @@ struct SM64OracleReachabilityTool {
             ("object_state", "hooked", "actor snapshot boundary"),
             ("effects", "hooked", "sound rumble spawn/despawn effects"),
             ("audio_pcm", "hooked", "pre-device PCM checksum boundary"),
-            ("save_bytes", "deferred", "STUB(M3): save mutation/byte boundary"),
+            ("save_bytes", "hooked", "mutation/persist/load/reload byte boundary; full save closure remains"),
             ("render_packet", "deferred", "STUB(M3): immutable render packet boundary"),
             ("script_events", "deferred", "STUB(M3): level/behavior script event boundary"),
             ("collision_queries", "deferred", "STUB(M3): collision query boundary"),

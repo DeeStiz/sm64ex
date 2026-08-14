@@ -112,8 +112,9 @@ static void mark_inventory(void) {
     }
 }
 
-static void emit_snapshot(uint64_t value) {
+static void emit_snapshot(uint64_t value, uint8_t save_marker) {
     const uint64_t values[2] = { value, UINT64_C(0x3f800000) };
+    const uint8_t save_bytes[4] = { UINT8_C(0x53), UINT8_C(0x56), save_marker, UINT8_C(0x04) };
     sm64_modern_parity_begin_tick();
     sm64_modern_parity_record_test_snapshot(
         SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO,
@@ -121,6 +122,12 @@ static void emit_snapshot(uint64_t value) {
         0,
         values,
         2);
+    sm64_modern_parity_record_save_state(
+        SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
+        2,
+        save_bytes,
+        sizeof(save_bytes),
+        1);
     sm64_modern_parity_end_tick();
 }
 
@@ -134,7 +141,7 @@ static void record_trace(struct MemoryTrace *trace) {
                   sm64_modern_oracle_trace_begin(&config, &stream),
                   SM64_MODERN_STATUS_OK);
     mark_inventory();
-    emit_snapshot(UINT64_C(0x1234));
+    emit_snapshot(UINT64_C(0x1234), UINT8_C(0x01));
     expect_status("bridge parity status",
                   sm64_modern_parity_status(),
                   SM64_MODERN_STATUS_OK);
@@ -143,7 +150,9 @@ static void record_trace(struct MemoryTrace *trace) {
                   SM64_MODERN_STATUS_OK);
 }
 
-static SM64ModernStatus replay_trace(struct MemoryTrace *trace, uint64_t value) {
+static SM64ModernStatus replay_trace(struct MemoryTrace *trace,
+                                     uint64_t value,
+                                     uint8_t save_marker) {
     trace->cursor = 0;
     const SM64ModernOracleTraceConfigV1 config =
         make_config(SM64_MODERN_ORACLE_TRACE_REPLAY);
@@ -152,23 +161,34 @@ static SM64ModernStatus replay_trace(struct MemoryTrace *trace, uint64_t value) 
     SM64ModernStatus status = sm64_modern_oracle_trace_begin(&config, &stream);
     if (status != SM64_MODERN_STATUS_OK) return status;
     mark_inventory();
-    emit_snapshot(value);
+    emit_snapshot(value, save_marker);
     return sm64_modern_oracle_trace_end();
 }
 
 int main(void) {
     struct MemoryTrace trace;
     record_trace(&trace);
-    expect_u64("bridge record count", trace.count, 1);
+    expect_u64("bridge record count", trace.count, 2);
     expect_u64("bridge domain", trace.records[0].domain, SM64_MODERN_ORACLE_DOMAIN_MARIO);
     expect_u64("bridge tick", trace.records[0].simulation_tick, 1);
     expect_u64("bridge record id", trace.records[0].record_id, SM64_MODERN_FIELD_MARIO_ACTION);
+    expect_u64("bridge save domain", trace.records[1].domain, SM64_MODERN_ORACLE_DOMAIN_SAVE);
+    expect_u64("bridge save kind", trace.records[1].record_kind,
+               SM64_MODERN_ORACLE_RECORD_SAVE_BYTES);
+    expect_u64("bridge save file", trace.records[1].subject_id, 2);
+    expect_u64("bridge save event", trace.records[1].record_id,
+               SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION);
+    expect_u64("bridge save byte count", trace.records[1].values[0], 4);
+    expect_u64("bridge save modified flags", trace.records[1].values[2], 1);
 
     expect_status("bridge replay",
-                  replay_trace(&trace, UINT64_C(0x1234)),
+                  replay_trace(&trace, UINT64_C(0x1234), UINT8_C(0x01)),
                   SM64_MODERN_STATUS_OK);
     expect_status("bridge value divergence",
-                  replay_trace(&trace, UINT64_C(0x1235)),
+                  replay_trace(&trace, UINT64_C(0x1235), UINT8_C(0x01)),
+                  SM64_MODERN_STATUS_PARITY_DIVERGED);
+    expect_status("bridge save divergence",
+                  replay_trace(&trace, UINT64_C(0x1234), UINT8_C(0x02)),
                   SM64_MODERN_STATUS_PARITY_DIVERGED);
 
     if (failures != 0) {

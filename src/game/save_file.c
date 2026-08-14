@@ -12,6 +12,7 @@
 #include "thread6.h"
 #include "macros.h"
 #include "pc/ini.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 #include "pc/sm64_modern_timebase.h"
 
 #define MENU_DATA_MAGIC 0x4849
@@ -33,6 +34,16 @@ u8 gGotFileCoinHiScore = 0;
 u8 gCurrCourseStarFlags = 0;
 
 u8 gSpecialTripleJump = 0;
+
+static void record_save_oracle_state(uint32_t event_id, uint32_t file_index) {
+    sm64_modern_parity_record_save_state(
+        event_id,
+        file_index,
+        &gSaveBuffer,
+        sizeof(gSaveBuffer),
+        ((uint32_t) (uint8_t) gSaveFileModified)
+            | ((uint32_t) (uint8_t) gMainMenuDataModified << 8u));
+}
 
 #define STUB_LEVEL(_0, _1, courseenum, _3, _4, _5, _6, _7, _8) courseenum,
 #define DEFINE_LEVEL(_0, _1, courseenum, _3, _4, _5, _6, _7, _8, _9, _10) courseenum,
@@ -374,6 +385,7 @@ void save_file_do_save(s32 fileIndex) {
     }
     save_main_menu_data();
 #endif
+    record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_PERSIST, (u32) fileIndex);
 }
 
 void save_file_erase(s32 fileIndex) {
@@ -387,6 +399,7 @@ void save_file_erase(s32 fileIndex) {
     bzero(&gSaveBuffer.files[fileIndex][0], sizeof(gSaveBuffer.files[fileIndex][0]));
 
     gSaveFileModified = TRUE;
+    record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) fileIndex);
     save_file_do_save(fileIndex);
 }
 
@@ -403,6 +416,7 @@ BAD_RETURN(s32) save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
           sizeof(gSaveBuffer.files[destFileIndex][0]));
 
     gSaveFileModified = TRUE;
+    record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) destFileIndex);
     save_file_do_save(destFileIndex);
 }
 
@@ -460,6 +474,7 @@ void save_file_load_all(void) {
     }
 #endif // TEXTSAVES
     stub_save_file_1();
+    record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_LOAD, 0);
 }
 
 /**
@@ -477,6 +492,9 @@ void save_file_reload(void) {
 
     gMainMenuDataModified = FALSE;
     gSaveFileModified = FALSE;
+    record_save_oracle_state(
+        SM64_MODERN_ORACLE_SAVE_EVENT_RELOAD,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
 }
 
 /**
@@ -537,6 +555,7 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
             }
             break;
     }
+    record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) fileIndex);
 }
 
 s32 save_file_exists(s32 fileIndex) {
@@ -601,6 +620,9 @@ void save_file_set_flags(u32 flags) {
     }
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= (flags | SAVE_FLAG_FILE_EXISTS);
     gSaveFileModified = TRUE;
+    record_save_oracle_state(
+        SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
 }
 
 void save_file_clear_flags(u32 flags) {
@@ -610,6 +632,9 @@ void save_file_clear_flags(u32 flags) {
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags &= ~flags;
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
+    record_save_oracle_state(
+        SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
 }
 
 u32 save_file_get_flags(void) {
@@ -657,6 +682,7 @@ void save_file_set_star_flags(s32 fileIndex, s32 courseIndex, u32 starFlags) {
 
     gSaveBuffer.files[fileIndex][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
+    record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) fileIndex);
 }
 
 s32 save_file_get_course_coin_score(s32 fileIndex, s32 courseIndex) {
@@ -680,6 +706,9 @@ void save_file_set_cannon_unlocked(void) {
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].courseStars[gCurrCourseNum] |= 0x80;
     gSaveBuffer.files[gCurrSaveFileNum - 1][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
+    record_save_oracle_state(
+        SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
 }
 
 void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
@@ -692,6 +721,9 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
     saveFile->capArea = gCurrAreaIndex;
     vec3s_set(saveFile->capPos, x, y, z);
     save_file_set_flags(SAVE_FLAG_CAP_ON_GROUND);
+    record_save_oracle_state(
+        SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
 }
 
 s32 save_file_get_cap_pos(Vec3s capPos) {
@@ -715,6 +747,9 @@ void save_file_set_sound_mode(u16 mode) {
 
     gMainMenuDataModified = TRUE;
     save_main_menu_data();
+    record_save_oracle_state(
+        SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
 }
 
 u16 save_file_get_sound_mode(void) {

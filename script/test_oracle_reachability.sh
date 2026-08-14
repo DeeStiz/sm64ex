@@ -53,7 +53,7 @@ for required in \
   'oracle_hook|global_state|.*|hooked|' \
   'oracle_hook|object_state|.*|hooked|' \
   'oracle_hook|audio_pcm|.*|hooked|' \
-  'oracle_hook|save_bytes|.*|deferred|' \
+  'oracle_hook|save_bytes|.*|hooked|' \
   'oracle_hook|render_packet|.*|deferred|' \
   'oracle_hook|script_events|.*|deferred|' \
   'oracle_hook|collision_queries|.*|deferred|' \

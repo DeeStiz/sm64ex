@@ -21,6 +21,17 @@ void sm64_modern_parity_record_object_spawn(struct Object *parent,
                                              const void *behavior);
 void sm64_modern_parity_record_object_despawn(struct Object *object);
 void sm64_modern_parity_record_pcm(const s16 *samples, u32 frame_count);
+// Schema-4 save-byte boundary. The payload is hashed before any platform
+// persistence and never exposes the mutable SaveBuffer to Swift.
+#define SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION 1u
+#define SM64_MODERN_ORACLE_SAVE_EVENT_PERSIST 2u
+#define SM64_MODERN_ORACLE_SAVE_EVENT_LOAD 3u
+#define SM64_MODERN_ORACLE_SAVE_EVENT_RELOAD 4u
+void sm64_modern_parity_record_save_state(uint32_t event_id,
+                                          uint32_t file_index,
+                                          const void *bytes,
+                                          uint32_t byte_count,
+                                          uint32_t modified_flags);
 u32 sm64_modern_parity_audio_frame_count(u32 high_count, u32 default_count);
 void sm64_modern_parity_enter_subsystem(SM64ModernGameplaySubsystem subsystem);
 void sm64_modern_parity_enter_object_update(const struct Object *object);

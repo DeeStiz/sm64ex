@@ -385,8 +385,9 @@ static void record_oracle_values(SM64ModernGameplaySubsystem subsystem,
         return;
     }
 
-    // STUB(M3): save bytes, render packets, script/behavior events, collision
-    // queries, RNG draws, and audio sequencing still need dedicated seams.
+    // Save byte mutation/persistence boundaries are routed separately. Render
+    // packets, script/behavior events, collision queries, RNG draws, and audio
+    // sequencing still need dedicated seams.
 
     SM64ModernOracleTraceDomain domain = oracle_domain_for_subsystem(subsystem);
     SM64ModernOracleTraceRecordKind oracle_kind = SM64_MODERN_ORACLE_RECORD_STATE;
@@ -1130,6 +1131,56 @@ void sm64_modern_parity_record_pcm(const s16 *samples, u32 frame_count) {
     record_values(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL,
                   SM64_MODERN_GAMEPLAY_RECORD_EFFECT,
                   SM64_MODERN_EFFECT_PCM_CHECKSUM, 0, values, 2);
+}
+
+static uint64_t hash_bytes(const uint8_t *bytes, uint32_t byte_count) {
+    uint64_t hash = PARITY_FNV_OFFSET;
+    for (uint32_t index = 0; index < byte_count; ++index) {
+        hash ^= bytes[index];
+        hash *= PARITY_FNV_PRIME;
+    }
+    return hash;
+}
+
+void sm64_modern_parity_record_save_state(uint32_t event_id,
+                                          uint32_t file_index,
+                                          const void *bytes,
+                                          uint32_t byte_count,
+                                          uint32_t modified_flags) {
+    if (!sm64_modern_oracle_trace_is_active()) {
+        return;
+    }
+    if (event_id < SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION
+        || event_id > SM64_MODERN_ORACLE_SAVE_EVENT_RELOAD
+        || (!bytes && byte_count > 0u)) {
+        if (sStatus == SM64_MODERN_STATUS_OK) {
+            sStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return;
+    }
+    const uint64_t values[3] = {
+        byte_count,
+        hash_bytes((const uint8_t *) bytes, byte_count),
+        modified_flags,
+    };
+    const SM64ModernStatus coverage_status = sm64_modern_oracle_trace_mark_coverage(
+        SM64_MODERN_ORACLE_DOMAIN_SAVE,
+        event_id);
+    if (coverage_status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = coverage_status;
+        return;
+    }
+    const SM64ModernStatus status = sm64_modern_oracle_trace_record(
+        SM64_MODERN_ORACLE_DOMAIN_SAVE,
+        SM64_MODERN_ORACLE_RECORD_SAVE_BYTES,
+        file_index,
+        event_id,
+        0,
+        values,
+        3);
+    if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = status;
+    }
 }
 
 void sm64_modern_parity_enter_subsystem(SM64ModernGameplaySubsystem subsystem) {
