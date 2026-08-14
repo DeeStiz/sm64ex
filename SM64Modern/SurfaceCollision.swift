@@ -60,7 +60,9 @@ struct SM64SurfaceQueryResult: Equatable, Sendable {
     let surfaceID: UInt32?
     let type: Int16?
     let flags: Int8?
+    let normalX: Float?
     let normalY: Float?
+    let normalZ: Float?
 
     static let miss = SM64SurfaceQueryResult(height: -11_000, surface: nil)
 
@@ -69,7 +71,9 @@ struct SM64SurfaceQueryResult: Equatable, Sendable {
         self.surfaceID = surface?.id
         self.type = surface?.type
         self.flags = surface?.flags
+        self.normalX = surface?.normal.x
         self.normalY = surface?.normal.y
+        self.normalZ = surface?.normal.z
     }
 }
 

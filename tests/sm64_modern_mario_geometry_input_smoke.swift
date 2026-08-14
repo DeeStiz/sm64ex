@@ -17,20 +17,30 @@ private func hashResult(_ initial: UInt64, _ result: SM64MarioGeometryInputResul
     hash = hashF(hash, result.position.y)
     hash = hashF(hash, result.floor.height)
     hash = hashF(hash, result.ceiling.height)
+    hash = hashU32(hash, UInt32(UInt16(bitPattern: result.floorAngle)))
+    hash = hashU32(hash, UInt32(UInt16(bitPattern: result.floorClass)))
+    hash = hashU32(hash, result.terrainSoundAddend)
     hash = hashF(hash, result.waterLevel)
     hash = hashF(hash, result.poisonGasLevel)
     hash = hashU32(hash, UInt32(result.upperWall.totalCollisions))
     return hashU32(hash, UInt32(result.lowerWall.totalCollisions))
 }
 
-private func floor(id: UInt32, y: Int16, flags: Int8 = 0) -> SM64Surface {
+private func floor(
+    id: UInt32,
+    y: Int16,
+    type: Int16 = 0,
+    flags: Int8 = 0,
+    normal: SM64SurfaceVec3f = SM64SurfaceVec3f(x: 0, y: 1, z: 0)
+) -> SM64Surface {
     SM64Surface(
         id: id,
+        type: type,
         flags: flags,
         vertex1: SM64SurfaceVec3s(x: -100, y: y, z: -100),
         vertex2: SM64SurfaceVec3s(x: -100, y: y, z: 100),
         vertex3: SM64SurfaceVec3s(x: 100, y: y, z: -100),
-        normal: SM64SurfaceVec3f(x: 0, y: 1, z: 0),
+        normal: normal,
         originOffset: -Float(y)
     )
 }
@@ -74,13 +84,33 @@ enum SM64ModernMarioGeometryInputSmoke {
             graphicsPosition: .hiddenGfxOrigin,
             world: dynamicWorld
         )
+        let dryWorld = try SM64SurfaceCollisionWorld(
+            staticSurfaces: [
+                floor(
+                    id: 5,
+                    y: 0,
+                    type: 0x14,
+                    normal: SM64SurfaceVec3f(x: 0.5, y: 0.8660254, z: 0)
+                )
+            ]
+        )
+        let third = SM64MarioGeometryInput.update(
+            position: SM64ObjectVector3(x: 0, y: 0, z: 0),
+            graphicsPosition: .hiddenGfxOrigin,
+            world: dryWorld
+        )
         precondition(first.flags == [.offFloor, .inPoisonGas], "floor/gas flags")
         precondition(first.floor.surfaceID == 1 && first.ceiling.surfaceID == 2, "static surfaces")
         precondition(second.flags.contains(.squished), "dynamic squish flag")
         precondition(second.ceiling.surfaceID == 4, "dynamic ceiling selection")
+        precondition(third.floorAngle == 0x4000, "canonical floor angle")
+        precondition(third.floorClass == 0x14, "slippery floor class")
+        precondition(third.terrainSoundAddend == 0x10000, "grass slippery terrain sound")
+        precondition(third.flags == [.aboveSlide], "above-slide flag")
         var fingerprint = fnvOffset
         fingerprint = hashResult(fingerprint, first)
         fingerprint = hashResult(fingerprint, second)
+        fingerprint = hashResult(fingerprint, third)
         print(String(format: "marioGeometryInputFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern Mario geometry input smoke passed")
     }

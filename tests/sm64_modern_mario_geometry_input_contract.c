@@ -11,7 +11,9 @@ static uint64_t hash_u32(uint64_t hash, uint32_t value) {
 }
 
 static uint64_t hash_result(uint64_t hash, uint32_t flags, float x, float y,
-                            float floor, float ceiling, float water, float gas,
+                            float floor, float ceiling, uint32_t floor_angle,
+                            uint32_t floor_class, uint32_t terrain_sound,
+                            float water, float gas,
                             uint32_t upperWalls, uint32_t lowerWalls) {
     uint32_t bits;
     hash = hash_u32(hash, flags);
@@ -19,6 +21,9 @@ static uint64_t hash_result(uint64_t hash, uint32_t flags, float x, float y,
     memcpy(&bits, &y, sizeof(bits)); hash = hash_u32(hash, bits);
     memcpy(&bits, &floor, sizeof(bits)); hash = hash_u32(hash, bits);
     memcpy(&bits, &ceiling, sizeof(bits)); hash = hash_u32(hash, bits);
+    hash = hash_u32(hash, floor_angle);
+    hash = hash_u32(hash, floor_class);
+    hash = hash_u32(hash, terrain_sound);
     memcpy(&bits, &water, sizeof(bits)); hash = hash_u32(hash, bits);
     memcpy(&bits, &gas, sizeof(bits)); hash = hash_u32(hash, bits);
     hash = hash_u32(hash, upperWalls);
@@ -27,8 +32,12 @@ static uint64_t hash_result(uint64_t hash, uint32_t flags, float x, float y,
 
 int main(void) {
     uint64_t fingerprint = FNV_OFFSET;
-    fingerprint = hash_result(fingerprint, 0x104, 0, 150, -0.0f, 1000, 50, 300, 0, 0);
-    fingerprint = hash_result(fingerprint, 0x140, 0, 50, 40, 100, 50, 300, 0, 0);
+    fingerprint = hash_result(fingerprint, 0x104, 0, 150, -0.0f, 1000,
+                              0, 0, UINT32_C(0x20000), 50, 300, 0, 0);
+    fingerprint = hash_result(fingerprint, 0x140, 0, 50, 40, 100,
+                              0, 0, 0, 50, 300, 0, 0);
+    fingerprint = hash_result(fingerprint, 0x008, 0, 0, -0.0f, -11000,
+                              0x4000, 0x14, UINT32_C(0x10000), -11000, -11000, 0, 0);
     printf("marioGeometryInputFingerprint=0x%016llx\n", (unsigned long long) fingerprint);
     return 0;
 }
