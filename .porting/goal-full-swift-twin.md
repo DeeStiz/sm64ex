@@ -890,7 +890,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M19f: Decorative pendulum behavior seam | Swift reproduces pendulum initialization/room intent, signed angular acceleration, roll accumulation, and the ±0x10 clock-sound edge. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xd9bba67deb7b6398`, 143-script matrix target, regenerated native Debug build, and `git diff --check` pass; remaining mechanisms and hazards remain open |
 | M19g: Arrow lift behavior seam | Swift reproduces arrow-lift idle/away/back gates, 384-unit displacement clamp, perpendicular yaw, and canonical X/Z movement. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xcff4edab50dbc7ed`, 144-script matrix target, regenerated native Debug build, and `git diff --check` pass; remaining mechanisms and hazards remain open |
 | M19h: TTC elevator behavior seam | Swift reproduces TTC elevator peak selection, speed settings, random pause/change ordering, gravity/position update, endpoint clamp, and direction flip. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xf5fec77dc56be959`, 145-script matrix target, regenerated native Debug build, and `git diff --check` pass; remaining mechanisms and hazards remain open |
-| M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | In progress — M19a–M19h value seams are complete locally; platform ownership, dynamic collision replacement, remaining mechanisms, hazards, and effect delivery remain |
+| M19i: TTC pendulum behavior seam | Swift reproduces TTC pendulum initialization, signed acceleration direction, delay/sound countdown, random zero-velocity acceleration selection, and face-roll truncation. | Complete locally — strict Swift 6/C contract, focused fingerprint `0x04a7d453b291ca30`, 146-script matrix target, regenerated native Debug build, and `git diff --check` pass; global RNG and remaining mechanisms/hazards remain open |
+| M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | In progress — M19a–M19i value seams are complete locally; platform ownership, dynamic collision replacement, remaining mechanisms, hazards, and effect delivery remain |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
@@ -1021,7 +1022,10 @@ replayable trace, and the platform evidence listed in its exit gate.
    platform ownership and collision replacement. Add M19h's TTC elevator peak
    selection, speed-setting table, random pause/change ordering, gravity-before-
    position update, endpoint clamp, and direction flip before binding TTC's
-   global speed setting and object surface ownership.
+   global speed setting and object surface ownership. Add M19i's TTC pendulum
+   initialization, signed acceleration direction, delay/sound countdown,
+   random zero-velocity acceleration selection, and face-roll truncation before
+   wiring the global RNG stream and clock presentation.
 4. **M20 NPC, races, and puzzles.** Port Toads, penguins, birds, rabbits,
    MIPS, Lakitu, race timers, slide timers, red-coin puzzles, secrets,
    switches, paintings, and course-specific puzzle controllers. Include

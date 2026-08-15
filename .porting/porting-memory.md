@@ -1342,6 +1342,24 @@
   remaining mechanisms and hazards, effect delivery, and M20–M35 are still
   open.
 
+### M19i Completion Evidence
+
+- `SM64Modern/TTCPendulumBehavior.swift` is the value counterpart of
+  `bhv_ttc_pendulum_init`/`bhv_ttc_pendulum_update`: speed-setting
+  initialization, signed acceleration direction, delay and sound countdown,
+  random zero-velocity acceleration/delay selection, angle accumulation, and
+  face-roll truncation are explicit and pointer-free.
+- The independent C contract matches Swift at
+  `ttcPendulumFingerprint=0x04a7d453b291ca30`; accelerating, delayed,
+  sound-edge, random-zero, and stopped paths are covered.
+- `script/test_ttc_pendulum.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`. The full matrix target is
+  `runs=146 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 mechanism seam; global RNG ownership, platform
+  ownership/collision, remaining mechanisms and hazards, effect delivery, and
+  M20–M35 are still open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
