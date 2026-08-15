@@ -14,6 +14,7 @@
 		04B42C7E626E4B4A86900489 /* CameraBehindKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB8AD4D4F0B6D98AEBEEA9D /* CameraBehindKernel.swift */; };
 		09C260568C8A5ECD27002AC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */; };
 		0C110C47F377370F18974E8D /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */; };
+		0FAB9AF89873C70EE4547AB5 /* ProgressionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 322C784FFE351A6135FA2ECE /* ProgressionRuntime.swift */; };
 		0FF51E99A1537E8C64BD9839 /* MarioStationaryAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4FC5292003781121076585 /* MarioStationaryAction.swift */; };
 		1000A98A2958DA1238E20A6D /* EngineRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */; };
 		11833E1637F8649E7554B9F6 /* DeterministicPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */; };
@@ -144,6 +145,7 @@
 		2E23B1C6254504EAE6CE5C01 /* SurfaceCollisionData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfaceCollisionData.swift; sourceTree = "<group>"; };
 		2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalScene.swift; sourceTree = "<group>"; };
 		30B4722F19AD87EAD27684AF /* MarioSlideAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSlideAction.swift; sourceTree = "<group>"; };
+		322C784FFE351A6135FA2ECE /* ProgressionRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionRuntime.swift; sourceTree = "<group>"; };
 		328470043E0C3F9278C1A80E /* AppleAudioService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleAudioService.m; sourceTree = "<group>"; };
 		34836A16DABAFE021C624BDF /* GeoLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayout.swift; sourceTree = "<group>"; };
 		34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputCore.swift; sourceTree = "<group>"; };
@@ -353,6 +355,7 @@
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
 				8C3F3E0A2388B47713DA5889 /* ProgressionActors.swift */,
 				1E51884DE493C98BC81B06D2 /* ProgressionPersistence.swift */,
+				322C784FFE351A6135FA2ECE /* ProgressionRuntime.swift */,
 				F201059126BC066BFF28F447 /* ProgressionState.swift */,
 				6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */,
 				3795DAA620146CD3735BB84B /* SaveFileCodec.swift */,
@@ -567,6 +570,7 @@
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
 				EF3F4EC4818F96BA083A23B6 /* ProgressionActors.swift in Sources */,
 				495557CCCBBCB01107A119F3 /* ProgressionPersistence.swift in Sources */,
+				0FAB9AF89873C70EE4547AB5 /* ProgressionRuntime.swift in Sources */,
 				7FC210D0F220C0F3EC53E6B3 /* ProgressionState.swift in Sources */,
 				456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */,
 				4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */,
