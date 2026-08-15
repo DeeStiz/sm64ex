@@ -27,15 +27,21 @@ final class SM64WaterBombObjectBridge {
     static let shadowModel: UInt32 = 0x55 // MODEL_WATER_BOMB_SHADOW
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var spawners: [SM64ObjectID: SM64WaterBombSpawnerState] = [:]
     private var bombs: [SM64ObjectID: SM64WaterBombState] = [:]
     private var shadows: [SM64ObjectID: SM64WaterBombShadowState] = [:]
     private var spawnerInputs: [SM64ObjectID: SM64WaterBombSpawnerTickInput] = [:]
     private var bombInputs: [SM64ObjectID: SM64WaterBombTickInput] = [:]
     private(set) var effectLog: [SM64WaterBombObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -206,6 +212,8 @@ final class SM64WaterBombObjectBridge {
         spawnerInputs = frameSpawnerInputs
         bombInputs = frameBombInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
@@ -330,7 +338,10 @@ final class SM64WaterBombObjectBridge {
         }
 
         synchronizeBomb(id: id, state: state, pool: pool, previousAction: previousAction)
-        if state.markedForDeletion { _ = pool.markForDeletion(id) }
+        if state.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64WaterBombObjectEffectRecord(
                 objectID: id,
@@ -350,15 +361,19 @@ final class SM64WaterBombObjectBridge {
     ) {
         guard let record = pool.record(for: id),
               let parent = bombs[record.parent] else {
-            _ = pool.markForDeletion(id)
             shadows[id]?.markedForDeletion = true
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
             return
         }
         var state = initialState
         let result = SM64WaterBombKernel.tickShadow(parent: parent, state: &state)
         shadows[id] = state
         synchronizeShadow(id: id, state: state, parentAction: parent.action, pool: pool)
-        if state.markedForDeletion { _ = pool.markForDeletion(id) }
+        if state.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64WaterBombObjectEffectRecord(
                 objectID: id,

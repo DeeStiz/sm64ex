@@ -16,6 +16,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ObjectTransform.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineState.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectScheduler.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompRelease.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
   "$PROJECT_ROOT/SM64Modern/WaterBomb.swift" \
   "$PROJECT_ROOT/SM64Modern/WaterBombObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_water_bomb_object_bridge_smoke.swift" \

@@ -229,6 +229,11 @@ int main(void) {
                               sizeof(effects3) / sizeof(effects3[0]),
                               records3, sizeof(records3) / sizeof(records3[0]));
 
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, 1);
+
     printf("waterBombObjectBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);
     return 0;

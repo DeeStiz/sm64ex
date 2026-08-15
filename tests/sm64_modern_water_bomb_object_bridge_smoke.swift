@@ -270,6 +270,10 @@ enum SM64ModernWaterBombObjectBridgeSmoke {
             bombInputs: [bombID: SM64WaterBombTickInput(interacted: true)]
         )
         require(impact.effects.contains { $0.kind == .shadow && $0.markedForDeletion }, "bridge shadow impact deletion")
+        require(
+            bridge.deliveryLog.contains { $0.deleted == [shadowID] },
+            "bridge shadow deletion routed through owner thread"
+        )
         require(impact.scheduler.unloaded.map(\.traceSubject) == [shadowID.traceSubject], "bridge shadow unload")
         fingerprint = hashBridge(
             fingerprint,
@@ -286,6 +290,10 @@ enum SM64ModernWaterBombObjectBridgeSmoke {
             bombInputs: [bombID: SM64WaterBombTickInput()]
         )
         require(cleanup.scheduler.unloaded.map(\.traceSubject) == [bombID.traceSubject], "bridge bomb unload")
+        require(
+            bridge.deliveryLog.contains { $0.deleted == [bombID] },
+            "bridge bomb deletion routed through owner thread"
+        )
         require(bridge.spawnerState(for: spawnerID)?.bombActive == false, "bridge spawner clear")
         require(bridge.registeredIDs == [spawnerID], "bridge child cleanup")
         fingerprint = hashBridge(
@@ -297,6 +305,10 @@ enum SM64ModernWaterBombObjectBridgeSmoke {
                 engineState.objects.record(for: shadowID)
             ]
         )
+        fingerprint = hashU64(fingerprint, 1)
+        fingerprint = hashU64(fingerprint, 1)
+        fingerprint = hashU64(fingerprint, 1)
+        fingerprint = hashU64(fingerprint, 1)
 
         print(String(format: "waterBombObjectBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern water-bomb object bridge smoke passed")

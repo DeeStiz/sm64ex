@@ -2,11 +2,11 @@
 
 ## Status
 
-M18af is the latest validated checkpoint: Snufit bowling-ball bullet deletion
-is delivered through the owner-thread effect router in the independent Swift/C
-fingerprint `0xf6221010ed5e3f78`, and the strict focused contract, full
-131-script matrix, and regenerated native Debug build pass. M18ae remains the
-preceding validated fireball router-adoption checkpoint. M0–M17 local scopes remain complete
+M18ag is the latest validated checkpoint: water-bomb shadow/bomb deletion is
+delivered through the owner-thread effect router in the independent Swift/C
+fingerprint `0x2c7546919aa992ae`, and the strict focused contract, full
+131-script matrix, and regenerated native Debug build pass. M18af remains the
+preceding validated Snufit bullet router-adoption checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
 platform, NPC, boss, save, frontend, audio, renderer, Swift-6-safety,
@@ -664,7 +664,17 @@ M18af adopts the same owner-thread deletion route for Snufit's bowling-ball
  script matrix (`runs=131 failures=0`), regenerated native Debug build, and
  `git diff --check` pass. Remaining bridges still contain direct effect
  mutations, and whole-engine collision/effect presentation plus physical/
- visual/audio/human acceptance remain open.
+visual/audio/human acceptance remain open.
+
+M18ag adopts the common owner-thread effect router for the water-bomb family.
+Spawner-created bomb and shadow cleanup, including missing-parent shadow
+cleanup, now deliver deletion intents before scheduler unload while preserving
+spawner state clearing and child ordering in the independent Swift/C
+fingerprint `0x2c7546919aa992ae`. Focused strict Swift 6/C validation passes;
+the full 131-script matrix (`runs=131 failures=0`), regenerated native Debug
+build, and `git diff --check` pass. Remaining bridges still contain direct
+effect mutations, and whole-engine collision/effect presentation plus
+physical/visual/audio/human acceptance remain open.
 
 M12h routes floor, ceiling, and wall candidates through the C-ordered partition with indexed Swift surface storage and dynamic replacement. M12i adds a value-type owner-thread gameplay tick that composes input/geometry, preserves paired simulation/legacy counters, carries demo state, and advances logical rumble with a matching Swift/C trace. Live runtime wiring, production content breadth, and physical haptic delivery remain open.
 
@@ -747,6 +757,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M18ad: Bouncing fireball bridge | Bouncing-fireball parent/flame actions, child allocation, scale/velocity state, and owner-thread deletion fencing match C. | Complete locally — `0x473a69850a182475`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; whole-engine effect routing and runtime collision/presentation remain open |
 | M18ae: Fireball router adoption | Bouncing-fireball parent/flame deletion intents use the common owner-thread effect router before scheduler unload. | Complete locally — `0x6ad7b0bf4304989e`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M18af: Snufit bullet router adoption | Snufit bowling-ball bullet wall/ground deletion uses the common owner-thread effect router and preserves child unload ordering. | Complete locally — `0xf6221010ed5e3f78`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
+| M18ag: Water-bomb router adoption | Water-bomb bomb/shadow deletion, missing-parent cleanup, and end-of-frame unload use the common owner-thread effect router. | Complete locally — `0x2c7546919aa992ae`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |

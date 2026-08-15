@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18af is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet owner-thread enemy slice, including fireball and Snufit deletion-router adoption. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18ag is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb owner-thread enemy slice, including fireball, Snufit, and water-bomb deletion-router adoption. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -617,6 +617,23 @@
   `runs=131 failures=0` (log `/tmp/sm64-modern-m18af-matrix.log`), the
   regenerated native Debug build succeeds (log
   `/tmp/sm64-modern-m18af-build.log`), and `git diff --check` passes. Router
+  adoption across the remaining bridges, whole-engine collision/effect
+  delivery, and physical/visual/audio/human acceptance remain open.
+
+### M18ag Completion Evidence
+
+- `WaterBombObjectBridge.swift` now owns an
+  `SM64OwnerThreadEffectRouter` for bomb and shadow deletion. Normal bomb
+  explosion cleanup and missing-parent shadow cleanup enqueue deletion intents
+  and deliver them before scheduler unload, while the spawner's bomb-active
+  state remains owner-thread data.
+- The focused Swift/C contract extends the water-bomb trace with the two
+  routed deletion/unload outcomes, emitting
+  `waterBombObjectBridgeFingerprint=0x2c7546919aa992ae`.
+- Strict Swift 6/C validation passes. The full matrix passes with
+  `runs=131 failures=0` (log `/tmp/sm64-modern-m18ag-matrix.log`), the
+  regenerated native Debug build succeeds (log
+  `/tmp/sm64-modern-m18ag-build.log`), and `git diff --check` passes. Router
   adoption across the remaining bridges, whole-engine collision/effect
   delivery, and physical/visual/audio/human acceptance remain open.
 
