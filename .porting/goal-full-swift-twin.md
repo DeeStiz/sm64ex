@@ -2,7 +2,15 @@
 
 ## Status
 
-M14g composes the C `act_walking` dispatch priority over the migrated speed, four-quarter ground-step, walk-animation, and wall-response kernels. The Swift/C walking-action fingerprint is `0xe351adc13483b7a2`; landing-jump selection, slope acceleration, ledge/tilt effects, and remaining moving bodies remain explicit follow-on seams.
+M18t is the latest validated checkpoint (`c7c62dfa`): the Scuttlebug ground
+enemy and proximity-spawner bridge emits the independent Swift/C fingerprint
+`0x7204b63131e2054b`, the strict focused contract passes, the full 121-script
+matrix passes, and the generated native Debug build succeeds. M0–M17 local
+scopes remain complete for their bounded contracts; M18 is still open for the
+remaining common-enemy/projectile families and complete collision/effect
+delivery. M19–M35 remain the ordered platform, NPC, boss, save, frontend,
+audio, renderer, Swift-6-safety, qualification, Metal-4-production, and
+distribution/human-acceptance phases below.
 
 M14h extracts `set_jump_from_landing` into a finite-checked Swift action-selection kernel covering quicksand, steep floors, double-jump timer/squish overrides, prior landing actions, wing-cap triple jumps, speed-gated triple jumps, and the timer/drop/steep-physics intents with a matching Swift/C fingerprint.
 
