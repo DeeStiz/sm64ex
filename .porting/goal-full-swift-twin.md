@@ -2,7 +2,7 @@
 
 ## Status
 
-M33b is the latest validated checkpoint layered on M18am: the Swift runtime
+M33c is the latest validated checkpoint layered on M18am: the Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
 object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
@@ -46,6 +46,11 @@ fixture replay runner. Fourteen oracle-hook shards now produce byte-identical
 C and Swift trace files (72-byte headers plus 128-byte records), and partial
 evidence or illegal terminal reruns fail closed. These are runner-contract
 fixtures only; live engine route execution remains an open M33 gate.
+M33c attaches one existing Swift owner-thread route to the real C schema-4
+oracle. The deterministic input, Mario action, progression, object spawn, and
+scheduler sequence emits seven sidecar-normalized records; C replay matches all
+seven and a deliberate value mutation reports first divergence at record 3.
+This closes one live route slice only; whole-engine parity remains open.
 The implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
@@ -882,6 +887,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M32: Swift 6 safety closure | Strict concurrency passes with mutable engine state no longer relying on `@unchecked Sendable`; remaining unsafe code is limited to audited leaf shims. | Complete locally — M32a–M32k owner, value, lock, and callback boundaries are closed; M33 parity qualification and M34/M35 production/human gates remain open |
 | M33a: Deterministic route-shard inventory | The reachability inventory is transformed into one canonical shard per reachable row with stable IDs/seeds and expected schema-4 trace domains; planned versus executed state is explicit. | Complete locally — strict Swift 6 manifest tool, 7,419-row inventory/shard count match, deterministic double generation, 133-script matrix, clean native Debug build, and `git diff --check` pass; all shards remain planned until replay execution |
 | M33b: Route-shard execution ledger | A strict Swift 6 ledger advances only `planned -> running -> passed|failed|blocked`, rejects partial pass evidence, and compares bounded C/Swift schema-4 fixture bytes before any shard is considered executed. | Complete locally — owner-thread/value-only ledger smoke, 14 oracle-hook fixture shards, C/Swift byte-identical trace files, terminal-transition fence, 134-script matrix (`runs=134 failures=0`), clean native Debug build, and `git diff --check` pass; live engine route execution remains open |
+| M33c: Live Swift route oracle replay | The existing Swift owner-thread input/Mario-action/progression/object/scheduler route emits sidecar-normalized schema-4 records that the real C oracle replays exactly, with first-divergence detection. | Complete locally — seven-record Swift route, C schema-4 replay `matched=7`, deliberate mutation reports `first_divergence=3`, strict Swift 6/C smoke, 135-script matrix (`runs=135 failures=0`), and `git diff --check` pass; whole-engine route closure remains open |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | In progress — M33a inventory contract is complete; shard execution, C-vs-Swift schema-4 byte comparison, zero-unexecuted closure, and sanitizer reruns remain |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |
 | M35: Distribution and human acceptance | Developer ID, notarized/stapled DMG and ZIP, clean-machine Gatekeeper launch, and fresh-save human 120-star acceptance pass. | Not started |
