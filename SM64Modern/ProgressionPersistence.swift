@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 
 enum SM64ProgressionRouteKind: UInt8, Equatable, Sendable {
@@ -105,20 +106,22 @@ struct SM64PersistenceLoadResult: Equatable, Sendable {
 /// The complete bundle is replaced with Data.write(.atomic), so save and menu
 /// slots share one durable commit boundary while the value codecs retain C's
 /// individual checksum/recovery semantics.
-final class SM64OwnerThreadPersistenceAdapter: @unchecked Sendable {
+/// Immutable, sendable descriptor for owner-thread persistence operations. The
+/// file system is external state; every operation still requires the adapter's
+/// engine token and construction-thread token before accessing it.
+final class SM64OwnerThreadPersistenceAdapter: Sendable {
     let bundleURL: URL
     private let ownerThreadToken: UInt64
-    private let fileManager: FileManager
+    private let ownerThreadIdentity: UInt64
 
     init(
         rootURL: URL,
-        ownerThreadToken: UInt64,
-        fileManager: FileManager = .default
+        ownerThreadToken: UInt64
     ) throws {
         self.bundleURL = rootURL.appendingPathComponent("save-bundle.bin")
         self.ownerThreadToken = ownerThreadToken
-        self.fileManager = fileManager
-        try fileManager.createDirectory(
+        self.ownerThreadIdentity = Self.currentThreadIdentity()
+        try FileManager.default.createDirectory(
             at: rootURL, withIntermediateDirectories: true
         )
     }
@@ -128,7 +131,7 @@ final class SM64OwnerThreadPersistenceAdapter: @unchecked Sendable {
         menu: SM64MenuDataSnapshot,
         ownerThreadToken: UInt64
     ) throws {
-        precondition(ownerThreadToken == self.ownerThreadToken)
+        assertOwnerThread(ownerThreadToken)
         let saveBytes = SM64SaveFileCodec.encode(save)
         let menuBytes = SM64MenuDataCodec.encode(menu)
         let bundle = SM64PersistenceBundle(
@@ -139,7 +142,7 @@ final class SM64OwnerThreadPersistenceAdapter: @unchecked Sendable {
     }
 
     func load(ownerThreadToken: UInt64) throws -> SM64PersistenceLoadResult {
-        precondition(ownerThreadToken == self.ownerThreadToken)
+        assertOwnerThread(ownerThreadToken)
         let bundle = try readBundle()
         let saveRecovery = SM64SaveFileCodec.recover(
             primary: bundle?.savePrimary ?? [], backup: bundle?.saveBackup ?? []
@@ -158,7 +161,7 @@ final class SM64OwnerThreadPersistenceAdapter: @unchecked Sendable {
     /// Game-over reload uses the durable backup copies without mutating the
     /// primary slots or emitting a persistence write.
     func reload(ownerThreadToken: UInt64) throws -> SM64PersistenceLoadResult {
-        precondition(ownerThreadToken == self.ownerThreadToken)
+        assertOwnerThread(ownerThreadToken)
         let bundle = try readBundle()
         let save = SM64SaveFileCodec.decode(bundle?.saveBackup ?? [])
             ?? SM64SaveFileSnapshot()
@@ -171,9 +174,26 @@ final class SM64OwnerThreadPersistenceAdapter: @unchecked Sendable {
     }
 
     private func readBundle() throws -> SM64PersistenceBundle? {
-        guard fileManager.fileExists(atPath: bundleURL.path) else { return nil }
+        guard FileManager.default.fileExists(atPath: bundleURL.path) else { return nil }
         let bytes = Array(try Data(contentsOf: bundleURL))
         return SM64PersistenceBundle.decode(bytes)
+    }
+
+    private func assertOwnerThread(_ token: UInt64) {
+        precondition(token == ownerThreadToken)
+        precondition(
+            Self.currentThreadIdentity() == ownerThreadIdentity,
+            "SM64OwnerThreadPersistenceAdapter is owner-thread-only"
+        )
+    }
+
+    private static func currentThreadIdentity() -> UInt64 {
+        var identifier: UInt64 = 0
+        precondition(
+            pthread_threadid_np(nil, &identifier) == 0,
+            "pthread_threadid_np must produce an owner token"
+        )
+        return identifier
     }
 }
 
@@ -260,22 +280,24 @@ struct SM64PersistenceImage: Equatable, Sendable {
 /// `reload` select one save file against the shared menu slots. A legacy
 /// 176-byte M17 bundle is accepted once as slot zero and is upgraded on the
 /// next commit, making the bridge migration-safe without weakening checksums.
-final class SM64OwnerThreadEEPROMAdapter: @unchecked Sendable {
+/// Immutable, sendable descriptor for the normalized EEPROM image. All file
+/// access remains owner-thread-only and is guarded by the engine token plus the
+/// construction pthread identity.
+final class SM64OwnerThreadEEPROMAdapter: Sendable {
     let imageURL: URL
     private let legacyBundleURL: URL
     private let ownerThreadToken: UInt64
-    private let fileManager: FileManager
+    private let ownerThreadIdentity: UInt64
 
     init(
         rootURL: URL,
-        ownerThreadToken: UInt64,
-        fileManager: FileManager = .default
+        ownerThreadToken: UInt64
     ) throws {
         self.imageURL = rootURL.appendingPathComponent("eeprom-image.bin")
         self.legacyBundleURL = rootURL.appendingPathComponent("save-bundle.bin")
         self.ownerThreadToken = ownerThreadToken
-        self.fileManager = fileManager
-        try fileManager.createDirectory(
+        self.ownerThreadIdentity = Self.currentThreadIdentity()
+        try FileManager.default.createDirectory(
             at: rootURL, withIntermediateDirectories: true
         )
     }
@@ -286,7 +308,7 @@ final class SM64OwnerThreadEEPROMAdapter: @unchecked Sendable {
         menu: SM64MenuDataSnapshot,
         ownerThreadToken: UInt64
     ) throws {
-        precondition(ownerThreadToken == self.ownerThreadToken)
+        assertOwnerThread(ownerThreadToken)
         guard (0..<SM64PersistenceImage.fileCount).contains(saveFileIndex) else {
             throw SM64PersistenceAdapterError.invalidSaveFileIndex
         }
@@ -304,7 +326,7 @@ final class SM64OwnerThreadEEPROMAdapter: @unchecked Sendable {
         saveFileIndex: Int,
         ownerThreadToken: UInt64
     ) throws -> SM64PersistenceLoadResult {
-        precondition(ownerThreadToken == self.ownerThreadToken)
+        assertOwnerThread(ownerThreadToken)
         guard (0..<SM64PersistenceImage.fileCount).contains(saveFileIndex) else {
             throw SM64PersistenceAdapterError.invalidSaveFileIndex
         }
@@ -318,7 +340,7 @@ final class SM64OwnerThreadEEPROMAdapter: @unchecked Sendable {
         saveFileIndex: Int,
         ownerThreadToken: UInt64
     ) throws -> SM64PersistenceLoadResult {
-        precondition(ownerThreadToken == self.ownerThreadToken)
+        assertOwnerThread(ownerThreadToken)
         guard (0..<SM64PersistenceImage.fileCount).contains(saveFileIndex) else {
             throw SM64PersistenceAdapterError.invalidSaveFileIndex
         }
@@ -355,9 +377,9 @@ final class SM64OwnerThreadEEPROMAdapter: @unchecked Sendable {
 
     private func readImage() throws -> SM64PersistenceImage? {
         let sourceURL: URL
-        if fileManager.fileExists(atPath: imageURL.path) {
+        if FileManager.default.fileExists(atPath: imageURL.path) {
             sourceURL = imageURL
-        } else if fileManager.fileExists(atPath: legacyBundleURL.path) {
+        } else if FileManager.default.fileExists(atPath: legacyBundleURL.path) {
             sourceURL = legacyBundleURL
         } else {
             return nil
@@ -378,6 +400,23 @@ final class SM64OwnerThreadEEPROMAdapter: @unchecked Sendable {
             savePrimary: primary, saveBackup: backup,
             menuPrimary: legacy.menuPrimary, menuBackup: legacy.menuBackup
         )
+    }
+
+    private func assertOwnerThread(_ token: UInt64) {
+        precondition(token == ownerThreadToken)
+        precondition(
+            Self.currentThreadIdentity() == ownerThreadIdentity,
+            "SM64OwnerThreadEEPROMAdapter is owner-thread-only"
+        )
+    }
+
+    private static func currentThreadIdentity() -> UInt64 {
+        var identifier: UInt64 = 0
+        precondition(
+            pthread_threadid_np(nil, &identifier) == 0,
+            "pthread_threadid_np must produce an owner token"
+        )
+        return identifier
     }
 }
 
