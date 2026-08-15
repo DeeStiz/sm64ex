@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18r is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18s is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -381,6 +381,23 @@
   validation passes. The full matrix passes with `runs=119 failures=0` (log
   `/tmp/sm64-modern-m18r-matrix.log`), the generated native Debug build
   succeeds (log `/tmp/sm64-modern-m18r-build.log`), and `git diff --check` is
+  clean. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
+### M18s Completion Evidence
+
+- `SnufitEnemy.swift` preserves the idle/shoot action table, 100-unit orbit,
+  400-period cadence, 600/167 body-scale targets, three-shot timer/recoil
+  sequence, 0x1000 yaw approach, 0x2000 pitch clamp, copied Snufit/projectile
+  hitboxes, and the metal-hit bounce/gravity and wall/ground death paths.
+- `SnufitObjectBridge.swift` owns the general-actor Snufit and bowling-ball
+  records, creates the three-shot projectile children in scheduler order, and
+  keeps relative child placement value-only with end-of-frame unload.
+- The independent Swift/C owner-thread contract emits
+  `snufitObjectBridgeFingerprint=0xa388cd46139be059`; focused strict Swift 6/C
+  validation passes. The full matrix passes with `runs=120 failures=0` (log
+  `/tmp/sm64-modern-m18s-matrix.log`), the generated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18s-build.log`), and `git diff --check` is
   clean. Complete collision/effect delivery, remaining enemy/projectile
   breadth, and physical/visual/human acceptance remain open.
 
