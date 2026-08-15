@@ -41,7 +41,19 @@ enum SM64MarioActionID {
     static let jumpLand: UInt32 = 0x04000470
     static let freefallLand: UInt32 = 0x04000471
     static let startHanging: UInt32 = 0x08200348
+    static let holdingPole: UInt32 = 0x08100340
+    static let grabPoleSlow: UInt32 = 0x00100341
+    static let grabPoleFast: UInt32 = 0x00100342
+    static let climbingPole: UInt32 = 0x00100343
+    static let topOfPoleTransition: UInt32 = 0x00100344
+    static let topOfPole: UInt32 = 0x00100345
+    static let hanging: UInt32 = 0x00200349
+    static let hangMoving: UInt32 = 0x0020054A
     static let ledgeGrab: UInt32 = 0x0800034B
+    static let ledgeClimbSlow1: UInt32 = 0x0000054C
+    static let ledgeClimbSlow2: UInt32 = 0x0000054D
+    static let ledgeClimbDown: UInt32 = 0x0000054E
+    static let ledgeClimbFast: UInt32 = 0x0000054F
     static let doubleJumpLand: UInt32 = 0x04000472
     static let sideFlipLand: UInt32 = 0x04000473
     static let holdJumpLand: UInt32 = 0x00000474
@@ -113,10 +125,12 @@ enum SM64MarioActionID {
     static let dive: UInt32 = 0x0188088A
     static let longJump: UInt32 = 0x03000888
     static let flyingTripleJump: UInt32 = 0x03000894
+    static let topOfPoleJump: UInt32 = 0x0300088D
     static let holdJump: UInt32 = 0x030008A0
     static let holdFreefall: UInt32 = 0x010008A1
     static let holdWaterJump: UInt32 = 0x010008A3
     static let lavaBoost: UInt32 = 0x010208B7
+    static let shotFromCannon: UInt32 = 0x00880898
     static let waterIdle: UInt32 = 0x380022C0
     static let holdWaterIdle: UInt32 = 0x380022C1
     static let waterActionEnd: UInt32 = 0x300022C2
@@ -160,6 +174,7 @@ enum SM64MarioActionID {
     static let spawnSpinAirborne: UInt32 = 0x00001924
     static let specialExitAirborne: UInt32 = 0x0000192B
     static let specialDeathExit: UInt32 = 0x0000192C
+    static let inCannon: UInt32 = 0x00001371
 }
 
 struct SM64MarioActionMutation: Equatable, Sendable {
