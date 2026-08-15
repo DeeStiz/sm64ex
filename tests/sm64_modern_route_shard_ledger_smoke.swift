@@ -12,6 +12,10 @@ struct SM64ModernRouteShardLedgerSmoke {
         precondition(ledger.count == 1)
         precondition(ledger.plannedCount == 1)
         precondition(!ledger.allTerminal)
+        let shard = try ledger.shard(id: 1)
+        let missingCoverage = SM64RouteShardFixture.coverage(for: shard, records: [])
+        precondition(!missingCoverage.isComplete)
+        precondition(missingCoverage.missingDomains == ["input"])
         try ledger.begin(id: 1)
         let runningState = try ledger.state(for: 1)
         precondition(runningState == .running)
@@ -60,6 +64,6 @@ struct SM64ModernRouteShardLedgerSmoke {
         } catch let error as SM64RouteShardExecutionError {
             guard case .invalidTransition = error else { preconditionFailure("wrong terminal failure: \(error)") }
         }
-        print("SM64 Modern route-shard ledger smoke passed transition_fence=1 partial_pass_rejected=1 persistent_report_fence=1")
+        print("SM64 Modern route-shard ledger smoke passed transition_fence=1 partial_pass_rejected=1 persistent_report_fence=1 coverage_missing_rejected=1")
     }
 }

@@ -190,6 +190,18 @@ struct SM64RouteShardExecutionEvidence: Sendable, Equatable {
     }
 }
 
+struct SM64RouteShardCoverage: Sendable, Equatable {
+    let expectedKeys: Set<String>
+    let observedKeys: Set<String>
+    let missingDomains: Set<String>
+    let unexpectedKeys: Set<String>
+    let recordCountMatches: Bool
+
+    var isComplete: Bool {
+        recordCountMatches && missingDomains.isEmpty && unexpectedKeys.isEmpty
+    }
+}
+
 private struct RouteShardLedgerEntry: Sendable, Equatable {
     let shard: SM64RouteShard
     var state: SM64RouteShardExecutionState
@@ -425,6 +437,30 @@ enum SM64RouteShardFixture {
                 values: [shard.inputSeed, shard.saveSeed, shard.id, UInt64(index)]
             )
         }
+    }
+
+    static func coverage(
+        for shard: SM64RouteShard,
+        records: [SM64OracleTraceRecord]
+    ) -> SM64RouteShardCoverage {
+        let expectedKeys = Set(shard.expectedDomains.map { key(for: $0) })
+        let observedKeys = Set(records.map { "\($0.domain):\($0.recordKind)" })
+        let missingDomains = Set(
+            shard.expectedDomains.filter { !observedKeys.contains(key(for: $0)) }
+                .map(\.rawValue)
+        )
+        let unexpectedKeys = observedKeys.subtracting(expectedKeys)
+        return SM64RouteShardCoverage(
+            expectedKeys: expectedKeys,
+            observedKeys: observedKeys,
+            missingDomains: missingDomains,
+            unexpectedKeys: unexpectedKeys,
+            recordCountMatches: records.count == shard.expectedDomains.count
+        )
+    }
+
+    private static func key(for domain: SM64RouteShardTraceDomain) -> String {
+        "\(domain.cDomain):\(domain.cRecordKind)"
     }
 
     static func hash(_ value: String) -> UInt64 {

@@ -5,12 +5,14 @@ struct SM64RouteShardReplayTool {
     private enum ToolError: Error, CustomStringConvertible {
         case invalidArguments
         case missingArgument(String)
+        case incompleteCoverage(String)
 
         var description: String {
             switch self {
             case .invalidArguments:
                 return "usage: sm64-route-shard-replay --manifest MANIFEST --shard-id 0xID --output TRACE [--report REPORT]"
             case let .missingArgument(name): return "missing argument \(name)"
+            case let .incompleteCoverage(reason): return "fixture coverage incomplete: \(reason)"
             }
         }
     }
@@ -59,6 +61,12 @@ struct SM64RouteShardReplayTool {
             actualRecords: UInt64(records.count),
             matchedRecords: UInt64(records.count)
         )
+        let coverage = SM64RouteShardFixture.coverage(for: shard, records: records)
+        guard coverage.isComplete else {
+            throw ToolError.incompleteCoverage(
+                "missing=\(coverage.missingDomains.sorted()) unexpected=\(coverage.unexpectedKeys.sorted()) count=\(coverage.recordCountMatches)"
+            )
+        }
         try ledger.finish(id: options.shardID, state: .passed, evidence: evidence)
         if let report = options.report {
             try Data(ledger.report().utf8).write(to: report, options: .atomic)
