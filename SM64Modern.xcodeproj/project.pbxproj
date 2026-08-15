@@ -87,6 +87,7 @@
 		74F6B3961402E9A06DBC362B /* MarioWhirlpoolAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E9E5A575E124235D4817C6 /* MarioWhirlpoolAction.swift */; };
 		77C353336E88DAB6B5B3896D /* TTCPendulumBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */; };
 		7C7EE42E47926366AAC72840 /* MarioDeceleratingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E479D5A092A548EEA6715AA1 /* MarioDeceleratingAction.swift */; };
+		7D2D76204DE9F3841D35B4F9 /* TTCSpinnerBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB7DD2B8D112A3511DF6EBF /* TTCSpinnerBehavior.swift */; };
 		7E40F453DC179309A83CF1FF /* MarioLedgeCannonAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0036673A4084395EDD23BAF6 /* MarioLedgeCannonAction.swift */; };
 		7EACE268AB44F9FA25B0AC14 /* MarioSliding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DCD830F49B84A59E9E77430 /* MarioSliding.swift */; };
 		7FC210D0F220C0F3EC53E6B3 /* ProgressionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F201059126BC066BFF28F447 /* ProgressionState.swift */; };
@@ -369,6 +370,7 @@
 		F5BB9631CE7A07A55B9BDBCF /* MarioCommonAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCommonAirAction.swift; sourceTree = "<group>"; };
 		FC5B24277AF249CA2DFC7FD6 /* BirdEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirdEnemy.swift; sourceTree = "<group>"; };
 		FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCPendulumBehavior.swift; sourceTree = "<group>"; };
+		FFB7DD2B8D112A3511DF6EBF /* TTCSpinnerBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCSpinnerBehavior.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -552,6 +554,7 @@
 				8731782AE37E88BE8805B85C /* SwoopObjectBridge.swift */,
 				A033C381FC3DFA4B705E97C8 /* TTCElevatorBehavior.swift */,
 				FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */,
+				FFB7DD2B8D112A3511DF6EBF /* TTCSpinnerBehavior.swift */,
 				3272FC72F5FA191847C8D57B /* WaterBomb.swift */,
 				1DE7AE7AC1D8F6731FE45B3C /* WaterBombObjectBridge.swift */,
 				466600A4978BF6E07A6465C6 /* WhompEnemy.swift */,
@@ -830,6 +833,7 @@
 				0518B1301B06ABB7F0FD2988 /* SwoopObjectBridge.swift in Sources */,
 				8DA16E20D293AB90891F6FB7 /* TTCElevatorBehavior.swift in Sources */,
 				77C353336E88DAB6B5B3896D /* TTCPendulumBehavior.swift in Sources */,
+				7D2D76204DE9F3841D35B4F9 /* TTCSpinnerBehavior.swift in Sources */,
 				C64BB4E43DA2868B1767C6E3 /* WaterBomb.swift in Sources */,
 				C4A4E51360A88FDFC1106CEA /* WaterBombObjectBridge.swift in Sources */,
 				F3119272F792799B5D608AF1 /* WhompEnemy.swift in Sources */,

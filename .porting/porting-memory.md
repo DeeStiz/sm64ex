@@ -1360,6 +1360,23 @@
   ownership/collision, remaining mechanisms and hazards, effect delivery, and
   M20–M35 are still open.
 
+### M19j Completion Evidence
+
+- `SM64Modern/TTCSpinnerBehavior.swift` is the value counterpart of
+  `bhv_ttc_spinner_update`: speed-setting lookup, random direction-change
+  ordering, five-frame stop window, signed pitch velocity, and 16-bit pitch
+  wrap are explicit and pointer-free.
+- The independent C contract matches Swift at
+  `ttcSpinnerFingerprint=0x40d3eedffaef914d`; slow, fast, stopped, random
+  pause, random movement, and random direction-change paths are covered.
+- `script/test_ttc_spinner.sh` passes under Swift 6 complete strict concurrency
+  and clang `-ffp-contract=off`. The full matrix target is
+  `runs=147 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 mechanism seam; global TTC RNG ownership,
+  platform ownership/collision, remaining mechanisms and hazards, effect
+  delivery, and M20–M35 are still open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
