@@ -28,6 +28,7 @@ int main(void) {
     const uint64_t childLand[] = { 0x48, 1, 1, UINT64_C(0x41f00000), 0, 0 };
     const uint64_t childExpire[] = { 0x60, 1, 0x66, UINT64_C(0x41f00000), 0, 1 };
     const uint64_t bridgeParent[] = { 1, 0, 1, 0x42, 1, UINT64_C(0x40900000), 0 };
+    const uint64_t routedDeletion[] = { 1, 11, 1 };
     fingerprint = hash_values(fingerprint, far, sizeof(far) / sizeof(far[0]));
     fingerprint = hash_values(fingerprint, activate, sizeof(activate) / sizeof(activate[0]));
     fingerprint = hash_values(fingerprint, flame, sizeof(flame) / sizeof(flame[0]));
@@ -35,6 +36,7 @@ int main(void) {
     fingerprint = hash_values(fingerprint, childLand, sizeof(childLand) / sizeof(childLand[0]));
     fingerprint = hash_values(fingerprint, childExpire, sizeof(childExpire) / sizeof(childExpire[0]));
     fingerprint = hash_values(fingerprint, bridgeParent, sizeof(bridgeParent) / sizeof(bridgeParent[0]));
+    fingerprint = hash_values(fingerprint, routedDeletion, sizeof(routedDeletion) / sizeof(routedDeletion[0]));
     printf("bouncingFireballFingerprint=0x%016llx\n", (unsigned long long)fingerprint);
     return 0;
 }

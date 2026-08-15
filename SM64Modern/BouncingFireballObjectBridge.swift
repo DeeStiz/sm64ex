@@ -30,13 +30,21 @@ final class SM64BouncingFireballObjectBridge {
     static let flameBehaviorIdentity: UInt64 = 0x6268_765F_62666C6D
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var fireballStates: [SM64ObjectID: SM64BouncingFireballState] = [:]
     private var fireballInputs: [SM64ObjectID: SM64BouncingFireballTickInput] = [:]
     private var flameStates: [SM64ObjectID: SM64BouncingFireballFlameState] = [:]
     private var flameInputs: [SM64ObjectID: SM64BouncingFireballFlameTickInput] = [:]
     private(set) var effectLog: [SM64BouncingFireballObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) { self.scheduler = scheduler }
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
+        self.scheduler = scheduler
+        self.effectRouter = effectRouter
+    }
 
     var registeredIDs: [SM64ObjectID] {
         (Array(fireballStates.keys) + Array(flameStates.keys)).sorted { lhs, rhs in
@@ -105,6 +113,8 @@ final class SM64BouncingFireballObjectBridge {
         for (id, input) in frameInputs { fireballInputs[id] = input }
         for (id, input) in frameFlameInputs { flameInputs[id] = input }
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self else { return }
             if self.fireballStates[id] != nil {
@@ -157,7 +167,10 @@ final class SM64BouncingFireballObjectBridge {
             }
             spawned.append(child)
         }
-        if fireball.markedForDeletion { _ = pool.markForDeletion(id) }
+        if fireball.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64BouncingFireballObjectEffectRecord(
                 objectID: id,
@@ -182,7 +195,10 @@ final class SM64BouncingFireballObjectBridge {
             record.forwardVelocity = flame.forwardVelocity
             record.interactionType = flame.markedForDeletion ? 0 : 1
         }
-        if flame.markedForDeletion { _ = pool.markForDeletion(id) }
+        if flame.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64BouncingFireballObjectEffectRecord(
                 objectID: id,

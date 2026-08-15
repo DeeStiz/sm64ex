@@ -2,11 +2,11 @@
 
 ## Status
 
-M18ad is the latest validated checkpoint: the bouncing-fireball parent/flame
-bridge emits the independent Swift/C fingerprint `0x473a69850a182475`, and the
-strict focused contract, full 131-script matrix, and regenerated native Debug
-build pass. M18ac remains the preceding validated owner-thread effect-router
-checkpoint. M0–M17 local scopes remain complete
+M18ae is the latest validated checkpoint: the bouncing-fireball deletion path
+is delivered through the owner-thread effect router in the independent Swift/C
+fingerprint `0x6ad7b0bf4304989e`, and the strict focused contract, full
+131-script matrix, and regenerated native Debug build pass. M18ad remains the
+preceding validated parent/flame bridge checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
 platform, NPC, boss, save, frontend, audio, renderer, Swift-6-safety,
@@ -646,6 +646,16 @@ script matrix (`runs=131 failures=0`), regenerated native Debug build, and
 remaining enemy/projectile families, and physical/visual/audio/human
 acceptance remain open.
 
+M18ae adopts the common owner-thread effect router for the bouncing-fireball
+ bridge's parent/flame deletion path. The router delivers deletion intents
+ before the scheduler's end-of-frame unload, preserving stable child records
+ and the parent deletion fence in the independent Swift/C fingerprint
+ `0x6ad7b0bf4304989e`. Focused strict Swift 6/C validation passes; the full 131
+ script matrix (`runs=131 failures=0`), regenerated native Debug build, and
+ `git diff --check` pass. Other enemy bridges still need router adoption, and
+ whole-engine collision/effect presentation plus physical/visual/audio/human
+ acceptance remain open.
+
 M12h routes floor, ceiling, and wall candidates through the C-ordered partition with indexed Swift surface storage and dynamic replacement. M12i adds a value-type owner-thread gameplay tick that composes input/geometry, preserves paired simulation/legacy counters, carries demo state, and advances logical rumble with a matching Swift/C trace. Live runtime wiring, production content breadth, and physical haptic delivery remain open.
 
 M13a adds a Swift-owned Mario state POD boundary with C save-backed defaults, cap-loss flags, spawn floor clamping, water/idle action selection, stable object/surface IDs, counters, hitbox-adjacent state, and a matching initialization fingerprint. M13b adds the pure health/cap mutation kernel for poison gas, swimming recovery/drain, snow terrain, heal/hurt counters, C clamps, and near-drowning rumble intent with a matching mutation fingerprint. M13c adds exact cap-course/pickup flags and timers, four-action timer pauses, expiry cleanup, fade/flicker render intents, and a matching cap fingerprint. M13d applies collision-derived terrain snapshots into Swift Mario state with stable floor/ceiling/wall IDs, heights, water/angle/sound fields, input union, and a matching terrain fingerprint. M13e adds a C-matching `set_mario_action` transition kernel for moving, airborne, submerged, and cutscene entry paths, plus drop/hurt wrappers and a matching action fingerprint. M14a adds pointer-free common stationary cancel decisions for idle, crouching, and start-crouching input priority, low-health/terrain transitions, face-yaw intent, and held-object drop intent with a matching decision fingerprint. M14b extracts the C `update_walking_speed` callback into a finite-checked Swift value kernel, preserves the ABI callback through that kernel, and matches the independent C ground-speed fingerprint. M14c extracts the four-quarter `perform_ground_step` decision boundary over immutable floor/ceiling/wall snapshots, including wall continuation/normalization, floor departure, ceiling stop, shell water pseudo-floor, and a matching ground-step fingerprint. M14d extracts `anim_and_audio_for_walk` into a value state machine with exact speed-band animation IDs, fixed-point acceleration, timer transitions, walking-pitch easing, and deferred metal/terrain/quicksand step-sound intents with a matching fingerprint. M14e extracts the idle, crouching, and start-crouching action bodies into a value boundary with idle-cycle/sleep bookkeeping, animation IDs, cancellation/drop propagation, and stationary-step intents with a matching fingerprint. M14f extracts `push_or_sidle_wall` into a scalar wall-response boundary with forward-speed cap/velocity projection, canonical wall-yaw classification, pushing/sidestep animation and acceleration intents, wall-facing action argument, body roll, and sound/dust intents with a matching fingerprint. Full action bodies and interaction effects remain open.
@@ -725,6 +735,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M18ab: Chain Chomp release seam | Wooden-post ground-pound/release, coin orbit, gate destruction, owner-thread surface objects, collision identities, and effect delivery match C. | Complete locally — `0xdd959e6ce61c03bd`, strict Swift 6/C contract, 129-script matrix, regenerated native Debug build, and `git diff --check` pass; runtime collision/effect presentation remains open |
 | M18ac: Owner-thread effect router | Common effect intents are sequenced and delivered into Swift-owned object mutations while presentation intents remain immutable and ordered. | Complete locally — `0x6f4e529130b860b1`, strict Swift 6/C contract, 130-script matrix, regenerated native Debug build, and `git diff --check` pass; whole-engine routing remains open |
 | M18ad: Bouncing fireball bridge | Bouncing-fireball parent/flame actions, child allocation, scale/velocity state, and owner-thread deletion fencing match C. | Complete locally — `0x473a69850a182475`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; whole-engine effect routing and runtime collision/presentation remain open |
+| M18ae: Fireball router adoption | Bouncing-fireball parent/flame deletion intents use the common owner-thread effect router before scheduler unload. | Complete locally — `0x6ad7b0bf4304989e`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |

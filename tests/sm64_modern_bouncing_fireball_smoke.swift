@@ -111,6 +111,26 @@ enum SM64ModernBouncingFireballSmoke {
             fingerprint = hash(fingerprint, bridgeValues)
         }
 
+        var routedDeletionFrames = 0
+        for _ in 0..<130 {
+            _ = bridge.tick(
+                state: engineState,
+                inputs: [id: SM64BouncingFireballTickInput(
+                    distanceToMario: 1_000,
+                    surfaceContact: true
+                )]
+            )
+            routedDeletionFrames += bridge.deliveryLog.filter { $0.deleted == [id] }.count
+            if engineState.objects.record(for: id) == nil { break }
+        }
+        require(routedDeletionFrames == 1, "fireball deletion routed through owner thread")
+        require(engineState.objects.record(for: id) == nil, "fireball end-of-frame unload")
+        fingerprint = hash(fingerprint, [
+            UInt64(routedDeletionFrames),
+            UInt64(bridge.registeredIDs.count),
+            engineState.objects.record(for: id) == nil ? 1 : 0
+        ])
+
         print(String(format: "bouncingFireballFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern bouncing fireball smoke passed")
     }

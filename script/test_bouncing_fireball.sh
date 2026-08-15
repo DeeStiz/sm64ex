@@ -16,6 +16,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ObjectTransform.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineState.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectScheduler.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompRelease.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
   "$PROJECT_ROOT/SM64Modern/BouncingFireball.swift" \
   "$PROJECT_ROOT/SM64Modern/BouncingFireballObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_bouncing_fireball_smoke.swift" \
