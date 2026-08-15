@@ -45,6 +45,7 @@
 		456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */; };
 		45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */; };
 		4CF3DED116CEE6FBE9D53438 /* CameraCUpTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEF637017419435B14C766 /* CameraCUpTransition.swift */; };
+		4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795DAA620146CD3735BB84B /* SaveFileCodec.swift */; };
 		532A683D2BF89220ADEB6D64 /* CameraFOV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED5024BA5E198B6E29A4AF7 /* CameraFOV.swift */; };
 		53B872CB3B81DFEBF260C4C7 /* MarioGeometryInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93DAAFB0FF6CAB909448BA5 /* MarioGeometryInput.swift */; };
 		59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC89F10EF988BEB5D9624D69 /* LevelScript.swift */; };
@@ -142,6 +143,7 @@
 		328470043E0C3F9278C1A80E /* AppleAudioService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppleAudioService.m; sourceTree = "<group>"; };
 		34836A16DABAFE021C624BDF /* GeoLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayout.swift; sourceTree = "<group>"; };
 		34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputCore.swift; sourceTree = "<group>"; };
+		3795DAA620146CD3735BB84B /* SaveFileCodec.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveFileCodec.swift; sourceTree = "<group>"; };
 		386378DD6ECB9F78AC003073 /* MetalRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalRenderer.swift; sourceTree = "<group>"; };
 		399C03F347FC9A4D23DFECFD /* OracleTrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTrace.swift; sourceTree = "<group>"; };
 		3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeterministicPrimitives.swift; sourceTree = "<group>"; };
@@ -344,6 +346,7 @@
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
 				F201059126BC066BFF28F447 /* ProgressionState.swift */,
 				6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */,
+				3795DAA620146CD3735BB84B /* SaveFileCodec.swift */,
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
 				135C103AE0705B71EBE54DC5 /* SurfaceCollision.swift */,
 				2E23B1C6254504EAE6CE5C01 /* SurfaceCollisionData.swift */,
@@ -554,6 +557,7 @@
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
 				7FC210D0F220C0F3EC53E6B3 /* ProgressionState.swift in Sources */,
 				456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */,
+				4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */,
 				12FFA6069B5EABBA754D6DFF /* SurfaceCollision.swift in Sources */,
 				213C0A6E5D88CC7C1405FED4 /* SurfaceCollisionData.swift in Sources */,
 				AF40398B5A629439B358BCB6 /* SurfacePartition.swift in Sources */,
