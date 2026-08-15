@@ -1540,6 +1540,25 @@
   delivery remain before the NPC route is complete; races/dialog/secrets,
   remaining NPCs/puzzles, and physical/visual/human acceptance remain open.
 
+### M20d Completion Evidence
+
+- `RacingPenguinBehavior.swift` reproduces the racing-penguin proposal and
+  start gate, canonical yaw turns, path-speed weighting/clamps, Mario cheat
+  detection, finish wall stop, final dialog selection, and reward/sound/camera/
+  child-attachment intents. `RacingPenguinObjectBridge.swift` carries those
+  values through generation-safe owner-thread object records, including timer,
+  velocity, yaw, animation, final-dialog, and unload synchronization.
+- The focused strict Swift 6/C value contract emits
+  `racingPenguinFingerprint=0xac6463b624763b06`; the owner-thread contract
+  emits `racingPenguinObjectBridgeFingerprint=0x65b2ccecaa02d25a`. The
+  complete matrix reports `MATRIX_RESULT runs=157 failures=0` in
+  `/tmp/sm64-modern-m20d-matrix.log`, the regenerated native Swift 6/macOS 27
+  Debug build succeeds in `/tmp/sm64-modern-m20d-clean-build.log`, and
+  `git diff --check` plus the zero unchecked-Sendable audit pass.
+- This closes the race value/object route only. Full movement/path/child
+  ownership, effect/audio delivery, gravity/edge/steep-slope semantics,
+  remaining NPCs/puzzles, and physical/visual/human acceptance remain open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
