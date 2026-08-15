@@ -1377,6 +1377,24 @@
   platform ownership/collision, remaining mechanisms and hazards, effect
   delivery, and M20–M35 are still open.
 
+### M19k Completion Evidence
+
+- `SM64Modern/TTCTreadmillBehavior.swift` is the value counterpart of
+  `bhv_ttc_treadmill_init`/`bhv_ttc_treadmill_update`: collision-model index,
+  speed-surface initialization, master-election gate, random target-speed
+  approach, shared surface speed, and C's `0.084f` forward-velocity conversion
+  are explicit and pointer-free.
+- The independent C contract matches Swift at
+  `ttcTreadmillFingerprint=0xd19867880b32d14f`; non-master, random pause,
+  random approach, random switch, and master-election paths are covered.
+- `script/test_ttc_treadmill.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`. The full matrix target is
+  `runs=148 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 mechanism seam; global TTC RNG/master
+  ownership, platform ownership/collision, remaining mechanisms and hazards,
+  effect delivery, and M20–M35 are still open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
