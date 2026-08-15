@@ -2,11 +2,12 @@
 
 ## Status
 
-M31c is the latest validated checkpoint layered on M18am: the Swift runtime
+M31d is the latest validated checkpoint layered on M18am: the Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
-object pool, scheduler, per-tick receipt, explicit per-domain readiness, and
-the qualified progression route. The implementation still
+object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
+qualified progression route, and the qualified input normalizer route. The
+implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
 131-script matrix passes, and the regenerated native Debug build succeeds.
@@ -824,6 +825,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M31a: Swift lifecycle authority seam | Swift runtime owns lifecycle phases, invalid-order rejection, stop-request transition, failure fencing, and explicit C-domain bridge reporting while remaining domains migrate. | Complete locally — strict Swift 6 runtime smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; gameplay/content C bridge remains intentionally open |
 | M31b: Swift engine context seam | Swift owns a real owner-thread engine context with level reset, state/object-pool/scheduler advancement, immutable tick receipts, stop/shutdown cleanup, and explicit lifecycle-domain wiring while C remains the fallback for unmigrated domains. | Complete locally — strict Swift 6 context smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; C gameplay/content fallback remains intentionally open |
 | M31c: Domain readiness and progression route | Swift context reports per-domain readiness and consumes the qualified progression actor reducer on the owner thread with immutable receipts; persistence and all unmigrated domains remain explicit C fallback. | Complete locally — strict Swift 6 context/progression smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; save persistence, gameplay breadth, audio, rendering, and frontend remain open |
+| M31d: Input route cutover seam | Swift context owns the qualified controller normalizer, retains native-step button edges until the logical boundary, and emits immutable input receipts while camera/Mario action composition and all other domains remain explicit fallback. | Complete locally — strict Swift 6 input/context smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; full input/gameplay authority and physical controller acceptance remain open |
 | M32: Swift 6 safety closure | Strict concurrency passes with mutable engine state no longer relying on `@unchecked Sendable`; remaining unsafe code is limited to audited leaf shims. | Not started |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | Not started |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |

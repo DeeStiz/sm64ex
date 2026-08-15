@@ -24,6 +24,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/CoinScoreAges.swift" \
   "$PROJECT_ROOT/SM64Modern/ProgressionPersistence.swift" \
   "$PROJECT_ROOT/SM64Modern/ProgressionRuntime.swift" \
+  "$PROJECT_ROOT/SM64Modern/InputCore.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_engine_runtime_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-engine-runtime-smoke"

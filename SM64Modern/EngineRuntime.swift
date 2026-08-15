@@ -36,7 +36,7 @@ struct SM64ModernSwiftEngineDomainReadiness: Equatable, Sendable {
     let swiftOwned: Set<SM64ModernSwiftEngineDomain>
 
     static let context = Self(swiftOwned: [
-        .state, .objectScheduler, .progression
+        .state, .objectScheduler, .progression, .input
     ])
 
     func isSwiftOwned(_ domain: SM64ModernSwiftEngineDomain) -> Bool {
@@ -59,6 +59,12 @@ struct SM64ModernSwiftProgressionReceipt: Equatable, Sendable {
     let values: [UInt64]
 }
 
+struct SM64ModernSwiftInputReceipt: Equatable, Sendable {
+    let engineTick: UInt64
+    let advanceLegacyDomain: Bool
+    let controller: SM64ControllerState
+}
+
 /// Owner-thread Swift state used by the Swift runtime while product domains
 /// are migrated. It is deliberately a real engine context, not a callback
 /// counter: object lists, globals, transforms, arenas, and unload ordering
@@ -68,12 +74,14 @@ final class SM64ModernSwiftEngineContext {
     let state: SM64SwiftEngineState
     private let scheduler: SM64ObjectScheduler
     private let initialProgression: SM64ProgressionRuntime
+    private var inputNormalizer = SM64ControllerInputNormalizer()
     private(set) var progression: SM64ProgressionRuntime
     let domainReadiness = SM64ModernSwiftEngineDomainReadiness.context
     private(set) var phase: SM64ModernSwiftRuntimePhase = .cold
     private(set) var tickCount: UInt64 = 0
     private(set) var lastReceipt: SM64ModernSwiftEngineTickReceipt?
     private(set) var lastProgressionReceipt: SM64ModernSwiftProgressionReceipt?
+    private(set) var lastInputReceipt: SM64ModernSwiftInputReceipt?
 
     init(
         objectCapacity: Int = SM64ObjectPool.defaultCapacity,
@@ -90,9 +98,11 @@ final class SM64ModernSwiftEngineContext {
         guard phase == .cold else { return false }
         state.beginLevel(levelNumber: levelNumber, areaIndex: areaIndex)
         progression = initialProgression
+        inputNormalizer = SM64ControllerInputNormalizer()
         tickCount = 0
         lastReceipt = nil
         lastProgressionReceipt = nil
+        lastInputReceipt = nil
         phase = .initialized
         return true
     }
@@ -118,6 +128,23 @@ final class SM64ModernSwiftEngineContext {
             values: result.trace.values
         )
         lastProgressionReceipt = receipt
+        return receipt
+    }
+
+    func ingestInput(
+        _ sample: SM64ControllerRawSample,
+        advanceLegacyDomain: Bool
+    ) -> SM64ModernSwiftInputReceipt? {
+        guard phase == .initialized else { return nil }
+        let controller = inputNormalizer.update(
+            sample, advanceLegacyDomain: advanceLegacyDomain
+        )
+        let receipt = SM64ModernSwiftInputReceipt(
+            engineTick: tickCount,
+            advanceLegacyDomain: advanceLegacyDomain,
+            controller: controller
+        )
+        lastInputReceipt = receipt
         return receipt
     }
 
@@ -147,7 +174,9 @@ final class SM64ModernSwiftEngineContext {
         }
         state.reset()
         progression = initialProgression
+        inputNormalizer = SM64ControllerInputNormalizer()
         lastProgressionReceipt = nil
+        lastInputReceipt = nil
         phase = .stopped
         return true
     }
@@ -205,11 +234,11 @@ final class SM64ModernCEngineRuntimeAdapter: SM64ModernEngineRuntime {
 
 final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
     let authority: SM64ModernEngineAuthority = .swift
-    // M31c slice: Swift owns lifecycle ordering, failure state, the context's
-    // state/scheduler/progression domains, while remaining gameplay/content
-    // domains still run through the compatibility adapter. The implementation
-    // string intentionally names that boundary; it must not be mistaken for
-    // whole-engine Swift authority.
+    // M31d slice: Swift owns lifecycle ordering, failure state, the context's
+    // state/scheduler/progression/input domains, while remaining
+    // gameplay/content domains still run through the compatibility adapter.
+    // The implementation string intentionally names that boundary; it must
+    // not be mistaken for whole-engine Swift authority.
     let implementation = "swift_lifecycle_owner_c_domain_bridge"
 
     private let cFallback: SM64ModernEngineRuntime

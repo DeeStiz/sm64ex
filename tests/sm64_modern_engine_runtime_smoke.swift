@@ -91,8 +91,21 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.state))
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.objectScheduler))
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.progression))
+        precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.input))
         precondition(!swiftShell.swiftContext.domainReadiness.isSwiftOwned(.audio))
         precondition(swiftShell.swiftContext.domainReadiness.cFallbackRequired.contains(.savePersistence))
+        let heldInput = swiftShell.swiftContext.ingestInput(
+            .init(buttons: 0x0001, rawStickX: 16, rawStickY: 0),
+            advanceLegacyDomain: false
+        )!
+        precondition(heldInput.engineTick == 0)
+        precondition(heldInput.controller.buttonDown == 0x0001)
+        precondition(heldInput.controller.buttonPressed == 0)
+        let edgeInput = swiftShell.swiftContext.ingestInput(
+            .init(buttons: 0x0001, rawStickX: 16, rawStickY: 0),
+            advanceLegacyDomain: true
+        )!
+        precondition(edgeInput.controller.buttonPressed == 0x0001)
         let progressionReceipt = swiftShell.swiftContext.applyProgression(
             .collectRedCoin, simulationTick: 0
         )!
@@ -119,6 +132,7 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.phase == .stopped)
         precondition(swiftShell.swiftContext.phase == .stopped)
         precondition(swiftShell.swiftContext.lastProgressionReceipt == nil)
+        precondition(swiftShell.swiftContext.lastInputReceipt == nil)
         precondition(swiftShell.swiftContext.progression.progression.coins == 0)
         precondition(swiftShell.swiftContext.state.snapshot().objects.isEmpty)
         precondition(swiftShell.shutdown() == 4)
