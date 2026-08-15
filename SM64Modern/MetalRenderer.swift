@@ -142,8 +142,8 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private let sceneResidency: any MTLResidencySet
     private let shaderCompiler: MetalShaderCompiler
     private let recorder = MetalSceneRecorder()
-    private let isOwnerThread: @Sendable () -> Bool
-    private let consumeDrawableSize: @Sendable () -> CGSize?
+    private let isOwnerThread: () -> Bool
+    private let consumeDrawableSize: () -> CGSize?
     private let displayLink: CAMetalDisplayLink
     private var frameSlots: [FrameSlot] = []
     private var textures: [UInt32: TextureRecord] = [:]
@@ -162,8 +162,8 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     init(
         device: any MTLDevice,
         layer: CAMetalLayer,
-        isOwnerThread: @escaping @Sendable () -> Bool,
-        consumeDrawableSize: @escaping @Sendable () -> CGSize?
+        isOwnerThread: @escaping () -> Bool,
+        consumeDrawableSize: @escaping () -> CGSize?
     ) throws {
         self.device = device
         self.layer = layer

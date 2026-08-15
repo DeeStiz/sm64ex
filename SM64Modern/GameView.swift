@@ -4,7 +4,7 @@ import QuartzCore
 
 @MainActor
 final class GameView: NSView {
-    private var drawableSizeHandler: (@Sendable (CGSize) -> Void)?
+    private var drawableSizeHandler: ((CGSize) -> Void)?
 
     override init(frame frameRect: NSRect) {
         super.init(frame: frameRect)
@@ -53,7 +53,7 @@ final class GameView: NSView {
         return size
     }
 
-    func installDrawableSizeHandler(_ handler: @escaping @Sendable (CGSize) -> Void) {
+    func installDrawableSizeHandler(_ handler: @escaping (CGSize) -> Void) {
         drawableSizeHandler = handler
     }
 

@@ -184,7 +184,10 @@ private func platformError(
     engineLogger.error("core_error status=\(status) message=\(text, privacy: .public)")
 }
 
-final class EngineHost: @unchecked Sendable {
+/// Host facade with explicit owner-thread engine state. AppKit lifecycle work
+/// is routed through value messages/main-actor closures, while C callbacks
+/// recover this object only through the narrow unmanaged ABI leaf.
+final class EngineHost {
     private struct MetalConfiguration {
         let device: any MTLDevice
         let layer: CAMetalLayer
@@ -301,8 +304,16 @@ final class EngineHost: @unchecked Sendable {
         state = .starting
         condition.unlock()
 
-        let thread = Thread { [self] in
-            runEngineThread()
+        // Capture only the integer address in the Thread @Sendable closure;
+        // pointer recovery is the explicit owner-thread ABI leaf.
+        let contextAddress = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
+        let thread = Thread {
+            guard let context = UnsafeMutableRawPointer(bitPattern: contextAddress) else {
+                preconditionFailure("EngineHost thread context must be non-nil")
+            }
+            Unmanaged<EngineHost>.fromOpaque(context)
+                .takeUnretainedValue()
+                .runEngineThread()
         }
         thread.name = "SM64 Modern Engine"
         thread.qualityOfService = .userInteractive
@@ -634,7 +645,7 @@ final class EngineHost: @unchecked Sendable {
         // gameplay tick or sharing mutable C state with Swift.
         sm64_modern_oracle_trace_begin_tick()
         defer { sm64_modern_oracle_trace_end_tick() }
-        var values = record.values
+        let values = record.values
         let status = values.withUnsafeBufferPointer { buffer in
             sm64_modern_oracle_trace_record(
                 record.domain,

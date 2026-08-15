@@ -2,7 +2,7 @@
 
 ## Status
 
-M32j is the latest validated checkpoint layered on M18am: the Swift runtime
+M32k is the latest validated checkpoint layered on M18am: the Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
 object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
@@ -32,6 +32,10 @@ the dedicated compilation queue. M32j removes the renderer's
 unchecked-sendability escape; engine entry points are owner-thread-gated by
 `EngineHost.isCurrentEngineThread`, and the display-link callback rejects any
 foreign callback thread before touching mutable Metal state.
+M32k removes the final host unchecked-sendability escape. The engine thread
+bootstrap recovers the owner only from an integer address at the ABI leaf;
+resize delivery stays main-actor-local, and the native strict-concurrency
+audit now reports zero `@unchecked Sendable` declarations in `SM64Modern`.
 The implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
@@ -864,7 +868,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M32h: Persistence owner boundary | The legacy bundle and normalized EEPROM adapters are immutable `Sendable` descriptors; each commit/load/reload checks the engine token and construction pthread before touching external file state, while route replay retains a sendable adapter reference. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; filesystem fault injection, renderer/host/compiler annotations, and three remaining unchecked Sendable classes remain open |
 | M32i: Metal shader compiler boundary | `MetalShaderCompiler` is a plain class with lock-guarded cache/pending/failure state; asynchronous MSL/pipeline compilation is confined to its dedicated queue and completion returns through the synchronized finish path. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; Metal compiler stress, renderer/host annotations, and two remaining unchecked Sendable classes remain open |
 | M32j: Metal renderer owner boundary | `MetalRenderer` is a plain AppKit/Metal owner object; all engine-facing mutation enters through host owner-thread preconditions, and `CAMetalDisplayLinkDelegate` drops callbacks that fail the owner predicate before rendering or changing frame/residency state. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; callback/GPU stress, host annotation, and one remaining unchecked Sendable class remain open |
-| M32: Swift 6 safety closure | Strict concurrency passes with mutable engine state no longer relying on `@unchecked Sendable`; remaining unsafe code is limited to audited leaf shims. | Not started |
+| M32k: Engine host owner boundary | `EngineHost` is a plain owner-thread class; its thread bootstrap captures only an integer unmanaged address, Metal callbacks are owner-thread closures, and AppKit resize delivery is retained by the main-actor view without sending the host object. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, zero `@unchecked Sendable` audit results, and `git diff --check` pass; adversarial callback stress and sanitizer qualification remain open |
+| M32: Swift 6 safety closure | Strict concurrency passes with mutable engine state no longer relying on `@unchecked Sendable`; remaining unsafe code is limited to audited leaf shims. | Complete locally — M32a–M32k owner, value, lock, and callback boundaries are closed; M33 parity qualification and M34/M35 production/human gates remain open |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | Not started |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |
 | M35: Distribution and human acceptance | Developer ID, notarized/stapled DMG and ZIP, clean-machine Gatekeeper launch, and fresh-save human 120-star acceptance pass. | Not started |
