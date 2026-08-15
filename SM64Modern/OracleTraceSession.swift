@@ -52,7 +52,10 @@ private let oracleTraceReadRecord: @convention(c) (
     return session.read(record: record)
 }
 
-final class SM64ModernOracleTraceSession: @unchecked Sendable {
+/// Engine-owner-thread trace file session. The C stream callbacks below are
+/// the only unsafe boundary; the mutable file handle never crosses into a
+/// Swift concurrency domain.
+final class SM64ModernOracleTraceSession {
     private enum Mode {
         case record
         case replay
