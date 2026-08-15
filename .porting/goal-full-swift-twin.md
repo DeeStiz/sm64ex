@@ -863,6 +863,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M18ak: Spiny/router harness adoption | Spiny deletion uses the common owner-thread effect router, and the Enemy Lakitu composite strict harness includes its router dependencies. | Complete locally — Spiny `0xf7737180e4f09b3f`, Goomba `0xf2f6f39a90915ec3`, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M18al: Boo/Whomp router adoption | Boo and Whomp deletion paths use the common owner-thread effect router, and focused bridge tests prove routed deletion before scheduler unload. | Complete locally — Boo `0x7505d05143270ec7`, Whomp `0x672073b350af199a`, strict Swift 6/C contracts, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M18am: Complete bridge deletion router audit | Bird, Fly Guy, Chuckya, Heave Ho, Skeeter, Bully, Scuttlebug, Piranha Plant, Bob-omb, Moneybag, Pokey, Chain Chomp, Koopa shell, and Mr. I parent/child/transient deletion all route through the owner-thread effect sink. | Complete locally — direct bridge-side deletion audit empty; all unchanged focused Swift/C fingerprints, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; collision/effect presentation and Swift authority remain open |
+| M19a: Platform displacement seam | Swift applies native-step X/Z translation, previous/current ZXY platform rotation, Mario yaw wrap, and object/Mario position updates without sharing C object pointers. | Complete locally — strict Swift 6 value kernel, independent C trig/matrix contract, focused fingerprint `0xd981b07ed8324476`, 137-script matrix target, regenerated native Debug build, and `git diff --check` pass; platform behavior families, dynamic collision, and hazard volumes remain open |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
@@ -970,7 +971,10 @@ replayable trace, and the platform evidence listed in its exit gate.
    seesaws, pendulums, lifts, water/lava/snow/quicksand volumes, wind/fire,
    boulders, conveyors, poles, nets, and environmental damage. Verify dynamic
    collision replacement and owner-thread surface reload after every spawn/
-   despawn path.
+   despawn path. Start with the M19a displacement seam: preserve native-step
+   X/Z translation, ZXY previous/current orientation composition, signed 16-bit
+   yaw wrapping, and separate Mario/object position outputs before attaching
+   platform ownership and surface replacement.
 4. **M20 NPC, races, and puzzles.** Port Toads, penguins, birds, rabbits,
    MIPS, Lakitu, race timers, slide timers, red-coin puzzles, secrets,
    switches, paintings, and course-specific puzzle controllers. Include

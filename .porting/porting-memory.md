@@ -1204,6 +1204,24 @@
   closes one live input shard only; the remaining 7,418 rows and M34/M35 gates
   remain open.
 
+### M19a Completion Evidence
+
+- `SM64Modern/PlatformDisplacement.swift` is the value-only counterpart of
+  `apply_platform_displacement`: native-step X/Z translation, prior/current
+  ZXY rotation, platform-local offset conversion, signed 16-bit Mario yaw
+  wrapping, and separate Mario/object outputs are explicit and pointer-free.
+- `tests/sm64_modern_platform_displacement_contract.c` independently uses the
+  canonical US trig table and the same column-major matrix operations. The
+  Swift/C fingerprint is `platformDisplacementFingerprint=0xd981b07ed8324476`.
+- `script/test_platform_displacement.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`; the full matrix passes with
+  `runs=137 failures=0` (log `/tmp/sm64-modern-m19a-matrix.log`). The clean
+  regenerated native Debug build succeeds (log
+  `/tmp/sm64-modern-m19a-clean-build.log`) and `git diff --check` is clean.
+- This is the first M19 gameplay seam only. Platform behavior families,
+  dynamic surface replacement, hazards, collision/effects, and M20–M35 remain
+  open.
+
 ### M8b Completion Evidence
 
 - `tests/fixtures/sm64_modern_timebase_cadence.tsv` is the governing M8b/M8c/M8d ownership inventory; the aggregate fixture remains a checked drift detector. The audit includes scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, input/rumble boundaries, presentation, and Swift host deferrals.
