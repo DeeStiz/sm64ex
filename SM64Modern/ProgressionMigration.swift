@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 import os
 
@@ -28,15 +29,20 @@ private let swiftProgressionRecordEvent: @convention(c) (
 /// the compatibility authority in M17; this service receives the same
 /// mutation boundaries and persists a Swift shadow bundle for differential
 /// qualification before any gameplay authority cutover.
-final class SwiftProgressionMigrationService: @unchecked Sendable {
+/// Mutable progression migration state owned by the engine thread. The C API
+/// callback below is the only unsafe leaf; every service entry point verifies
+/// the thread token captured at construction.
+final class SwiftProgressionMigrationService {
     private let adapter: SM64OwnerThreadEEPROMAdapter
     private let ownerThreadToken: UInt64
+    private let ownerThreadIdentity: UInt64
     private var runtime: SM64ProgressionRuntime
     private var eventCount: UInt64 = 0
     private var lastError: SM64ModernStatus = SM64_MODERN_STATUS_OK
 
     init(saveDirectory: String, ownerThreadToken: UInt64) throws {
         self.ownerThreadToken = ownerThreadToken
+        self.ownerThreadIdentity = Self.currentThreadIdentity()
         self.adapter = try SM64OwnerThreadEEPROMAdapter(
             rootURL: URL(fileURLWithPath: saveDirectory)
                 .appendingPathComponent("swift-progression", isDirectory: true),
@@ -46,6 +52,7 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
     }
 
     func initialize() throws {
+        assertOwnerThread()
         let loaded = try adapter.reload(
             saveFileIndex: runtime.saveFileIndex,
             ownerThreadToken: ownerThreadToken
@@ -54,6 +61,7 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
     }
 
     func makeAPI() -> SM64ModernProgressionMigrationApiV1 {
+        assertOwnerThread()
         var api = SM64ModernProgressionMigrationApiV1()
         api.header.abi_version = SM64_MODERN_ABI_VERSION_1
         api.header.struct_size = UInt32(
@@ -65,6 +73,7 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
     }
 
     func record(event: SM64ModernProgressionEventV1) -> SM64ModernStatus {
+        assertOwnerThread()
         guard lastError == SM64_MODERN_STATUS_OK else { return lastError }
         guard event.header.abi_version == SM64_MODERN_ABI_VERSION_1,
               event.header.struct_size >= UInt32(
@@ -285,5 +294,19 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
             )
         }
         return status
+    }
+
+    private func assertOwnerThread() {
+        precondition(
+            Self.currentThreadIdentity() == ownerThreadIdentity,
+            "progression migration must run on its construction thread"
+        )
+    }
+
+    private static func currentThreadIdentity() -> UInt64 {
+        var identifier: UInt64 = 0
+        let result = pthread_threadid_np(nil, &identifier)
+        precondition(result == 0, "pthread_threadid_np must produce an owner token")
+        return identifier
     }
 }
