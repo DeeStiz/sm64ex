@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M31a is the current validated runtime seam layered on the M18am Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb/Bullet-Bill-smoke/Swoop/Goomba/Spiny/Boo/Whomp owner-thread enemy slice. Swift now owns runtime lifecycle phases and failure fencing, while every audited bridge-side deletion and transient-child retirement routes through the shared sink plus the corrected Enemy Lakitu composite harness. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M31b is the current validated runtime seam layered on the M18am Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb/Bullet-Bill-smoke/Swoop/Goomba/Spiny/Boo/Whomp owner-thread enemy slice. Swift now owns runtime lifecycle phases, failure fencing, and a real owner-thread engine context with state/object-pool/scheduler tick receipts, while every audited bridge-side deletion and transient-child retirement routes through the shared sink plus the corrected Enemy Lakitu composite harness. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -764,6 +764,30 @@
   succeeds (log `/tmp/sm64-modern-m31a-build.log`), and `git diff --check` is
   clean. Whole-engine gameplay/content replacement remains open.
 
+### M31b Completion Evidence
+
+- `SM64ModernSwiftEngineContext` is now a real owner-thread Swift context,
+  owning `SM64SwiftEngineState` and `SM64ObjectScheduler`. It begins a level,
+  advances the migrated object lists and globals, emits an immutable
+  `SM64ModernSwiftEngineTickReceipt`, routes stop/shutdown through Swift state
+  reset, and fences failure without pretending that unmigrated domains are
+  already Swift-owned.
+- `SM64ModernSwiftEngineRuntime` initializes and advances that context beside
+  the C compatibility fallback, records the Swift receipt, and logs the
+  explicit `swift_lifecycle_owner_c_domain_bridge` implementation marker.
+  This is a per-runtime context seam, not whole-engine authority: C still owns
+  unmigrated gameplay/content callbacks.
+- The strict Swift 6 runtime smoke compiles the state, arena, deterministic
+  primitive, transform, and scheduler dependencies with
+  `-Xfrontend -strict-concurrency=complete`. It spawns a Swift actor, checks
+  the first scheduler receipt and frame advance, then verifies reset removes
+  the object on shutdown.
+- The corrected full matrix passes with `runs=131 failures=0` (log
+  `/tmp/sm64-modern-m31b2-matrix.log`), the regenerated native Debug build
+  succeeds (log `/tmp/sm64-modern-m31b-build.log`), and `git diff --check` is
+  clean. Whole-engine gameplay/content replacement, domain cutover, and all
+  later M32-M35 gates remain open.
+
 ### M8b Completion Evidence
 
 - `tests/fixtures/sm64_modern_timebase_cadence.tsv` is the governing M8b/M8c/M8d ownership inventory; the aggregate fixture remains a checked drift detector. The audit includes scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, input/rumble boundaries, presentation, and Swift host deferrals.
@@ -885,7 +909,7 @@
 | macOS legacy build | Implemented — Apple Clang arm64 build, external ROM extraction, OpenGL launch, LLDB/visual evidence, and ASan route pass |
 | Callable C core | Implemented — versioned lifecycle/platform/gameplay POD ABI, static archive, legacy adapter, and C/C++ smoke consumer |
 | AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 60/30 C-core owner thread with clean shutdown |
-| Full Swift twin runtime | Partial — M0 baseline, M1 selector, M2 content-pack compiler, and M31a lifecycle-owner seam are complete locally; M3 oracle trace and M4-M31 domain migration remain |
+| Full Swift twin runtime | Partial — M0 baseline, M1 selector, M2 content-pack compiler, M31a lifecycle-owner seam, and M31b owner-thread context seam are complete locally; M3 oracle trace and M4-M31 domain migration remain |
 | Metal 4 device/presentation | Implemented — validated raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
 | Metal 4 rendering | Implemented — complete-scene POD bridge/replay with reusable batched frame storage, async Metal 4 MSL/pipeline preparation, device/schema-keyed descriptor fallback cache, private textures, memoryless depth, samplers, state, residency/barriers, trace inspection, and clean Metal validation |
 | Native input | Implemented — native-tick snapshots, retained edges, keyboard/mouse bridge, and haptic bridge passed; no physical controller was connected in M8d |

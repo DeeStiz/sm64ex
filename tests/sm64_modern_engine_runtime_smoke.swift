@@ -88,12 +88,23 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.initialize() == 0)
         precondition(swiftShell.phase == .initialized)
         precondition(swiftShell.initialize() == 4)
+        let actor = try! swiftShell.swiftContext.state.spawnObject(
+            in: .generalActor,
+            behaviorIdentity: 0x44
+        )
+        precondition(swiftShell.swiftContext.state.objects.contains(actor))
         precondition(swiftShell.step() == 0)
+        precondition(swiftShell.lastSwiftTick?.tick == 1)
+        precondition(swiftShell.lastSwiftTick?.frame == 1)
+        precondition(swiftShell.lastSwiftTick?.objectCount == 1)
+        precondition(swiftShell.swiftContext.state.globals.frame == 1)
         precondition(swiftShell.requestStop(reason: 199) == 8)
         precondition(swiftShell.phase == .stopping)
         precondition(swiftShell.step() == 4)
         precondition(swiftShell.shutdown() == 0)
         precondition(swiftShell.phase == .stopped)
+        precondition(swiftShell.swiftContext.phase == .stopped)
+        precondition(swiftShell.swiftContext.state.snapshot().objects.isEmpty)
         precondition(swiftShell.shutdown() == 4)
         precondition(swiftRecorder.initializeCalls == 1)
         precondition(swiftRecorder.stepCalls == 1)
