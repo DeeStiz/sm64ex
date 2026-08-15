@@ -21,7 +21,11 @@ enum MetalShaderCompilerError: LocalizedError {
     }
 }
 
-final class MetalShaderCompiler: @unchecked Sendable {
+/// Metal compiler state is shared between the engine owner thread and the
+/// dedicated pipeline queue. The lock guards the mutable cache; Metal compiler
+/// objects are confined to the compiler queue and completion results return
+/// through `finish` before the owner thread reads them.
+final class MetalShaderCompiler {
     struct CompiledPipeline {
         let state: any MTLRenderPipelineState
         let vertexStride: Int

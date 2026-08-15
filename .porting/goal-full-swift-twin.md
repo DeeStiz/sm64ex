@@ -2,7 +2,7 @@
 
 ## Status
 
-M32h is the latest validated checkpoint layered on M18am: the Swift runtime
+M32i is the latest validated checkpoint layered on M18am: the Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
 object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
@@ -26,7 +26,9 @@ coordinator's unchecked-sendability escape with an engine-owner pthread token
 checked at session start, tick boundaries, shutdown, and C stream callbacks.
 M32h makes both persistence adapters immutable `Sendable` descriptors with
 explicit engine-token and construction-pthread checks around every file
-operation.
+operation. M32i removes the shader compiler's unchecked-sendability escape;
+its mutable cache remains lock-guarded and Metal compiler work is isolated to
+the dedicated compilation queue.
 The implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
@@ -857,6 +859,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M32f: Apple input shared-state boundary | `AppleInputService` no longer relies on `@unchecked Sendable`; lock-protected keyboard/mouse/controller snapshots and separately locked haptics cross the AppKit/engine boundary as copied state, while `GameViewController` focus notifications remain MainActor-isolated. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; physical controller/haptics behavior, cross-thread stress, and six remaining unchecked Sendable classes remain open |
 | M32g: Gameplay parity owner boundary | `GameplayParityCoordinator` owns its mutable trace handle and C parity API on the construction thread, verifies its pthread token at begin/tick/end and inside the two C stream callbacks, and leaves only the recovered C callback leaf unsafe. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; callback stress, trace qualification, and five remaining unchecked Sendable classes remain open |
 | M32h: Persistence owner boundary | The legacy bundle and normalized EEPROM adapters are immutable `Sendable` descriptors; each commit/load/reload checks the engine token and construction pthread before touching external file state, while route replay retains a sendable adapter reference. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; filesystem fault injection, renderer/host/compiler annotations, and three remaining unchecked Sendable classes remain open |
+| M32i: Metal shader compiler boundary | `MetalShaderCompiler` is a plain class with lock-guarded cache/pending/failure state; asynchronous MSL/pipeline compilation is confined to its dedicated queue and completion returns through the synchronized finish path. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; Metal compiler stress, renderer/host annotations, and two remaining unchecked Sendable classes remain open |
 | M32: Swift 6 safety closure | Strict concurrency passes with mutable engine state no longer relying on `@unchecked Sendable`; remaining unsafe code is limited to audited leaf shims. | Not started |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | Not started |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |
