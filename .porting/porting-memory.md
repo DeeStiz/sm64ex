@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18f is the current validated Goomba/Spiny/Lakitu owner-thread allocation slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18g is the current validated Goomba/Spiny/Lakitu/Bullet Bill owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -160,6 +160,24 @@
   `runs=107 failures=0`, the generated native Debug build succeeds, and
   `git diff --check` is clean. Full collision/effect resolution, remaining
   enemy/projectile breadth, and physical/visual/human acceptance remain open.
+
+### M18g Completion Evidence
+
+- `BulletBill.swift` preserves the copied-POD projectile actions: reset to
+  home, strict distance/yaw launch admission, 3/−3 prelaunch cadence,
+  timer-50 smoke/sound/shake event, 30-unit flight and 0x100 yaw approach,
+  wall/timer termination, and timer-driven intangible return motion.
+- `BulletBillObjectBridge.swift` runs the projectile on the owner-thread object
+  scheduler, synchronizes action/timer/velocity/yaw/pitch/position fields, and
+  allocates a transient smoke child in the live general-actor list before the
+  end-of-frame unload. C remains the renderer/effect sink authority for the
+  actual smoke behavior.
+- The independent Swift/C contract emits
+  `bulletBillObjectBridgeFingerprint=0x95be3d7fa671c885`; focused strict Swift
+  6/C validation passes. The full matrix passes with `runs=108 failures=0`, the
+  generated native Debug build succeeds, and `git diff --check` is clean.
+  Complete collision/effect delivery, remaining enemy/projectile breadth, and
+  physical/visual/human acceptance remain open.
 
 ### M8b Completion Evidence
 
