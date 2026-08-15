@@ -896,7 +896,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M19l: TTC moving-bar behavior seam | Swift reproduces moving-bar initialization, wait/pull/extend/retract actions, threshold crossing, acceleration/deceleration, random delay/fake-out, and reset semantics. | Complete locally — strict Swift 6/C contract, focused fingerprint `0x189e979eb38062a6`, 149-script matrix target, regenerated native Debug build, and `git diff --check` pass; global RNG and remaining mechanisms/hazards remain open |
 | M19m: TTC rotating-solid behavior seam | Swift reproduces rotating-solid collision/side initialization, vertical dip/return, alert/click sound timers, symmetric roll approach, turn advance, and random delay reset. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xa75c9000a7214bb7`, 150-script matrix target, regenerated native Debug build, and `git diff --check` pass; remaining mechanisms/hazards and ownership remain open |
 | M19n: Dynamic platform collision ownership seam | Swift tracks platform owner generations, preserves first-seen object order across replacement, rejects duplicate surface IDs, removes stale owners safely, and applies the flattened dynamic list to the collision world. | Complete locally — strict Swift 6/C contract, focused fingerprint `0x39662ad973b730dc`, 151-script matrix target, regenerated native Debug build, and `git diff --check` pass; live object/platform binding and remaining mechanisms/hazards remain open |
-| M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | In progress — M19a–M19n value seams are complete locally; live platform object binding, remaining mechanisms, hazards, and effect delivery remain |
+| M19o: Engine-state platform collision route | Swift engine state owns a dependency-free owner-generation collision lease through level reset and exposes bind/remove APIs exercised beside object spawn/current-object state; concrete surfaces remain in the registry seam. | Complete locally — strict Swift 6 owner-thread state smoke plus C contract, 151-script matrix target, regenerated native Debug build, and `git diff --check` pass; live behavior-driven mesh generation and remaining mechanisms/hazards remain open |
+| M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | In progress — M19a–M19o value/owner seams are complete locally; behavior-driven mesh generation, remaining mechanisms, hazards, and effect delivery remain |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
@@ -1044,7 +1045,10 @@ replayable trace, and the platform evidence listed in its exit gate.
    delay reset before attaching the rotating collision object. Add M19n's
    owner/generation-keyed dynamic collision registry, first-seen ordering,
    duplicate-ID rejection, stale-owner removal, and atomic application to the
-   collision world before binding live platform objects.
+   collision world before binding live platform objects. Add M19o's
+   dependency-free owner-generation collision lease to
+   `SM64SwiftEngineState` reset/spawn/current-object flow and keep bind/remove
+   calls on the engine thread before adding behavior-driven mesh generation.
 4. **M20 NPC, races, and puzzles.** Port Toads, penguins, birds, rabbits,
    MIPS, Lakitu, race timers, slide timers, red-coin puzzles, secrets,
    switches, paintings, and course-specific puzzle controllers. Include

@@ -40,6 +40,7 @@ struct SM64EngineStateSnapshot: Equatable, Sendable {
 final class SM64SwiftEngineState {
     let objects: SM64ObjectPool
     let arenas: SM64EngineArenas
+    private(set) var platformCollisionOwners: [SM64ObjectID] = []
     private(set) var globals: SM64EngineGlobals
 
     init(
@@ -54,6 +55,7 @@ final class SM64SwiftEngineState {
     func reset() {
         objects.reset()
         arenas.resetAll()
+        platformCollisionOwners.removeAll(keepingCapacity: true)
         let nextEpoch = globals.resetEpoch == UInt64.max ? 1 : globals.resetEpoch + 1
         var resetGlobals = SM64EngineGlobals()
         resetGlobals.resetEpoch = nextEpoch
@@ -70,6 +72,20 @@ final class SM64SwiftEngineState {
         globals.areaIndex = areaIndex
         globals.timeStopState = []
         globals.currentObject = nil
+    }
+
+    @discardableResult
+    func bindPlatformCollisionOwner(_ owner: SM64ObjectID) -> Bool {
+        guard !platformCollisionOwners.contains(owner) else { return false }
+        platformCollisionOwners.append(owner)
+        return true
+    }
+
+    @discardableResult
+    func removePlatformCollisionOwner(_ owner: SM64ObjectID) -> Bool {
+        guard let index = platformCollisionOwners.firstIndex(of: owner) else { return false }
+        platformCollisionOwners.remove(at: index)
+        return true
     }
 
     func spawnObject(

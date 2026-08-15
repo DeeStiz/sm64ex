@@ -1450,6 +1450,23 @@
   surface generation from collision meshes, remaining mechanisms/hazards,
   effect delivery, and M20–M35 remain open.
 
+### M19o Completion Evidence
+
+- `SM64SwiftEngineState` now owns a dependency-free ordered
+  `platformCollisionOwners` lease list, resets it with object/arena state, and
+  exposes owner-generation bind/remove methods; the engine-state smoke
+  exercises the route beside Mario/actor spawn and current-object selection.
+- The concrete surface registry remains isolated in
+  `PlatformCollisionRegistry.swift`, so narrow bridge scripts that compile
+  `EngineState.swift` do not acquire surface-world dependencies. Focused output
+  remains the byte-matched C contract plus `SM64 Modern engine-state smoke
+  passed`.
+- The complete matrix remains `runs=151 failures=0`, the regenerated native
+  Debug build succeeds, and `git diff --check` is clean.
+- This closes lifecycle ownership only; behavior-driven collision-mesh
+  generation, live platform binding, remaining mechanisms/hazards, effects,
+  and M20–M35 remain open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
