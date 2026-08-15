@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18s is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18t is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -398,6 +398,23 @@
   validation passes. The full matrix passes with `runs=120 failures=0` (log
   `/tmp/sm64-modern-m18s-matrix.log`), the generated native Debug build
   succeeds (log `/tmp/sm64-modern-m18s-build.log`), and `git diff --check` is
+  clean. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
+### M18t Completion Evidence
+
+- `ScuttlebugEnemy.swift` preserves the initialize/chase/turn/knockback/
+  recovery subaction table, home capture, 5/15-speed chase, 0x200/0x400 turn
+  steps, 20-unit alert jump, edge/wall redirection, 30-frame recovery window,
+  copied bounce-top hitbox, and three-coin attack response.
+- `ScuttlebugObjectBridge.swift` owns the proximity spawner and general-actor
+  child, applies the 500–1500 distance and 31-frame spawn gates, and re-arms
+  the spawner after scheduler-boundary child unload.
+- The independent Swift/C owner-thread contract emits
+  `scuttlebugObjectBridgeFingerprint=0x7204b63131e2054b`; focused strict Swift
+  6/C validation passes. The full matrix passes with `runs=121 failures=0`
+  (log `/tmp/sm64-modern-m18t-matrix.log`), the generated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18t-build.log`), and `git diff --check` is
   clean. Complete collision/effect delivery, remaining enemy/projectile
   breadth, and physical/visual/human acceptance remain open.
 

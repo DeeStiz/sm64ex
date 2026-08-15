@@ -48,11 +48,13 @@
 		395E4FCD7396D3046C2A7A2F /* MarioGroundKnockbackAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497B887A768C172EC3ED7A98 /* MarioGroundKnockbackAction.swift */; };
 		3A185680189903BB0AA43307 /* GeoLayoutContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */; };
 		3D45F4E1ED09C5B5EC150CC5 /* ObjectTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */; };
+		3D8C6993DC34F356CD9F756D /* ScuttlebugEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF17DAA784F8FC1431F06A28 /* ScuttlebugEnemy.swift */; };
 		3F79F5D008AE1CE462208B18 /* PokeyEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D39626AC1CF73EA2D9419E7 /* PokeyEnemy.swift */; };
 		4466ED0AB9DEF36B791956B8 /* CameraCUp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8479BA4938E8AF21669E25E1 /* CameraCUp.swift */; };
 		4542710AB513728A46A876F6 /* MetalCompilerBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */; };
 		456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */; };
 		45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */; };
+		46C0FB257866DD3500A55A24 /* ScuttlebugObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC510DADD4B2F20AC7EA6B5A /* ScuttlebugObjectBridge.swift */; };
 		495557CCCBBCB01107A119F3 /* ProgressionPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E51884DE493C98BC81B06D2 /* ProgressionPersistence.swift */; };
 		4CF3DED116CEE6FBE9D53438 /* CameraCUpTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEF637017419435B14C766 /* CameraCUpTransition.swift */; };
 		4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795DAA620146CD3735BB84B /* SaveFileCodec.swift */; };
@@ -263,6 +265,7 @@
 		AB7C461E8C0CA23A1D8B2CA5 /* MarioQuicksandLandingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioQuicksandLandingAction.swift; sourceTree = "<group>"; };
 		AC89F10EF988BEB5D9624D69 /* LevelScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScript.swift; sourceTree = "<group>"; };
 		ACA3C10ED5253A613435EC7D /* AmpEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpEnemy.swift; sourceTree = "<group>"; };
+		AF17DAA784F8FC1431F06A28 /* ScuttlebugEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScuttlebugEnemy.swift; sourceTree = "<group>"; };
 		B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptVM.swift; sourceTree = "<group>"; };
 		B4872879FF660BB19A8FB4AC /* CoinScoreAges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScoreAges.swift; sourceTree = "<group>"; };
 		B512E26120B9CF2080159F3C /* BullyEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BullyEnemy.swift; sourceTree = "<group>"; };
@@ -280,6 +283,7 @@
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
 		CB4ABB8191E695DB49D9CF9E /* AppleAudioService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioService.h; sourceTree = "<group>"; };
 		CBE8B1473942F159FA54C7A8 /* CameraModeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeState.swift; sourceTree = "<group>"; };
+		CC510DADD4B2F20AC7EA6B5A /* ScuttlebugObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScuttlebugObjectBridge.swift; sourceTree = "<group>"; };
 		CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCUpExit.swift; sourceTree = "<group>"; };
 		D3CC8538BA0A2A1F3C291572 /* ObjectScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectScheduler.swift; sourceTree = "<group>"; };
 		D4426C0597C4FF50EA28B2FE /* MarioPoleHangingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioPoleHangingAction.swift; sourceTree = "<group>"; };
@@ -448,6 +452,8 @@
 				F201059126BC066BFF28F447 /* ProgressionState.swift */,
 				6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */,
 				3795DAA620146CD3735BB84B /* SaveFileCodec.swift */,
+				AF17DAA784F8FC1431F06A28 /* ScuttlebugEnemy.swift */,
+				CC510DADD4B2F20AC7EA6B5A /* ScuttlebugObjectBridge.swift */,
 				F27F167DF12FDB9DEDC9F64F /* SkeeterEnemy.swift */,
 				01C2DB40D32E69B4AFA3E55B /* SkeeterObjectBridge.swift */,
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
@@ -696,6 +702,8 @@
 				7FC210D0F220C0F3EC53E6B3 /* ProgressionState.swift in Sources */,
 				456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */,
 				4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */,
+				3D8C6993DC34F356CD9F756D /* ScuttlebugEnemy.swift in Sources */,
+				46C0FB257866DD3500A55A24 /* ScuttlebugObjectBridge.swift in Sources */,
 				B7586B785B0F798C60759CB5 /* SkeeterEnemy.swift in Sources */,
 				E2F11DDB5A2813A72A2C9A2A /* SkeeterObjectBridge.swift in Sources */,
 				AE1494F8689D5768D3874A69 /* SnufitEnemy.swift in Sources */,
