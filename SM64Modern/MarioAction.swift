@@ -31,6 +31,7 @@ enum SM64MarioActionID {
     static let headStuckInGround: UInt32 = 0x0002033A
     static let diveSlide: UInt32 = 0x00880456
     static let twirlLand: UInt32 = 0x18800238
+    static let lavaBoostLand: UInt32 = 0x08000239
     static let airHitWall: UInt32 = 0x000008A7
     static let softBonk: UInt32 = 0x010208B6
     static let hardForwardAirKnockback: UInt32 = 0x010208B2
