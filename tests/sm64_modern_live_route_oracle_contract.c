@@ -42,7 +42,7 @@ static SM64ModernOracleTraceStreamApiV1 make_stream(struct FileTrace *trace) {
     return stream;
 }
 
-static int load_trace(const char *path, struct FileTrace *trace) {
+static int load_trace(const char *path, struct FileTrace *trace, uint32_t expected_count) {
     FILE *file = fopen(path, "rb");
     if (!file) return 0;
     const int header_ok = fread(&trace->config, sizeof(trace->config), 1, file) == 1;
@@ -53,7 +53,7 @@ static int load_trace(const char *path, struct FileTrace *trace) {
     trace->count = (uint32_t) fread(
         trace->records, sizeof(trace->records[0]), TRACE_CAPACITY, file);
     fclose(file);
-    return trace->count == 7u;
+    return trace->count == expected_count;
 }
 
 static SM64ModernStatus emit_live_route_record(uint32_t index, int tamper) {
@@ -129,15 +129,31 @@ static int run_replay(struct FileTrace *trace, int tamper) {
 
 int main(int argc, char **argv) {
     if (argc < 2 || argc > 3) {
-        fprintf(stderr, "usage: live-route-oracle-contract TRACE [--tamper]\n");
+        fprintf(stderr, "usage: live-route-oracle-contract TRACE [--tamper|--input-only]\n");
         return 2;
+    }
+    int input_only = 0;
+    int tamper = 0;
+    if (argc == 3) {
+        if (strcmp(argv[2], "--input-only") == 0) {
+            input_only = 1;
+        } else if (strcmp(argv[2], "--tamper") == 0) {
+            tamper = 1;
+        } else {
+            fprintf(stderr, "unknown mode %s\n", argv[2]);
+            return 2;
+        }
     }
     struct FileTrace trace;
     memset(&trace, 0, sizeof(trace));
-    if (!load_trace(argv[1], &trace)) {
-        fprintf(stderr, "expected seven-record schema-4 trace\n");
+    if (!load_trace(argv[1], &trace, input_only ? 1u : 7u)) {
+        fprintf(stderr, "expected %s schema-4 trace\n",
+                input_only ? "one-record input-only" : "seven-record full-route");
         return 2;
     }
-    const int tamper = argc == 3 && strcmp(argv[2], "--tamper") == 0;
+    if (input_only && tamper) {
+        fprintf(stderr, "input-only mode cannot tamper\n");
+        return 2;
+    }
     return run_replay(&trace, tamper) ? 0 : 1;
 }

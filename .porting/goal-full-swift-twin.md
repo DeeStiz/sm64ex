@@ -2,7 +2,7 @@
 
 ## Status
 
-M33e is the latest validated checkpoint layered on M18am: the Swift runtime
+M33f is the latest validated checkpoint layered on M18am: the Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
 object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
@@ -57,10 +57,14 @@ rows restore their evidence, and a previously passed shard cannot be rerun.
 M33e requires each shard's emitted `(domain, record_kind)` keys to cover every
 expected trace-domain key with no extras before `passed` evidence is accepted;
 missing-domain and count mismatches fail closed.
-The implementation still
+M33f promotes the first real manifest row rather than a fixture: the existing
+Swift owner-thread input route emits a one-record input-only trace, the real C
+schema-4 oracle replays it, and a manifest-aware promoter persists `passed`
+only after exact domain coverage. A second process cannot rerun the terminal
+row. The implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
-132-script matrix passes, and the regenerated native Debug build succeeds.
+136-script matrix passes, and the regenerated native Debug build succeeds.
 M18am remains the preceding complete bridge-router checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
@@ -896,6 +900,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M33c: Live Swift route oracle replay | The existing Swift owner-thread input/Mario-action/progression/object/scheduler route emits sidecar-normalized schema-4 records that the real C oracle replays exactly, with first-divergence detection. | Complete locally — seven-record Swift route, C schema-4 replay `matched=7`, deliberate mutation reports `first_divergence=3`, strict Swift 6/C smoke, 135-script matrix (`runs=135 failures=0`), and `git diff --check` pass; whole-engine route closure remains open |
 | M33d: Persistent route-shard evidence | Route reports restore every manifest row and its terminal evidence across processes; incomplete, duplicate, running, or terminal-rerun state fails closed. | Complete locally — strict Swift 6 persistence/transition smoke, 14 C/Swift fixture shards with persistent rerun rejection, and `git diff --check` pass; live full-game execution remains open |
 | M33e: Expected-domain coverage gate | A shard cannot pass on aggregate counts alone; its schema-4 `(domain, record_kind)` keys must cover the manifest expectation exactly, with missing or extra keys rejected. | Complete locally — strict Swift 6 coverage validator, missing-domain regression, 14 fixture shards with exact coverage, 135-script matrix (`runs=135 failures=0`), and `git diff --check` pass; live full-game breadth remains open |
+| M33f: Live route shard promotion | A trace emitted by a real Swift route is replayed by the C oracle, matched against the selected manifest row's exact domain set, and persisted as terminal evidence that cannot be rerun. | Complete locally — strict Swift 6 input-only live trace, C replay `records=1`, manifest-aware exact-coverage promotion with `fixture_only=0`, persistent rerun rejection, 136-script matrix (`runs=136 failures=0`), clean native Debug build, and `git diff --check` pass; all other shards remain open |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | In progress — M33a inventory contract is complete; shard execution, C-vs-Swift schema-4 byte comparison, zero-unexecuted closure, and sanitizer reruns remain |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |
 | M35: Distribution and human acceptance | Developer ID, notarized/stapled DMG and ZIP, clean-machine Gatekeeper launch, and fresh-save human 120-star acceptance pass. | Not started |
@@ -1043,6 +1048,12 @@ mutation, and death/warp/retry path. For each shard:
 - reject missing/extra records and stop at the first divergent tick;
 - retain the input, content, build, timebase, and initial-save fingerprints;
 - rerun under normal, sanitizer, and optimized configurations.
+
+M33f is the first promotion slice: run the existing Swift input-only route,
+replay its one schema-4 record through the C oracle, select the canonical
+`oracle_hook|input` manifest row, require exact `(domain, record_kind)` coverage,
+and atomically persist the report. Use this as the template for the remaining
+promoters; fixture-generated records are never allowed to close a live shard.
 
 Close M33 only when the inventory has zero unexecuted reachable IDs and the
 full matrix is reproducible from isolated build/cache paths.

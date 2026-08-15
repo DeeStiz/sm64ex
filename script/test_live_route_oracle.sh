@@ -3,6 +3,14 @@ set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-live-route-oracle"
+MODE="${1:-full}"
+case "$MODE" in
+  full|input-only) ;;
+  *)
+    echo "usage: $0 [full|input-only]" >&2
+    exit 2
+    ;;
+esac
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
@@ -47,7 +55,18 @@ xcrun --sdk macosx clang \
   "$PROJECT_ROOT/tests/sm64_modern_live_route_oracle_contract.c" \
   -o "$BUILD_ROOT/sm64-modern-live-route-oracle-contract"
 
-"$BUILD_ROOT/sm64-modern-live-route-oracle-smoke" "$BUILD_ROOT/swift.trace" | tee "$BUILD_ROOT/swift-output.log"
-"$BUILD_ROOT/sm64-modern-live-route-oracle-contract" "$BUILD_ROOT/swift.trace"
-"$BUILD_ROOT/sm64-modern-live-route-oracle-contract" "$BUILD_ROOT/swift.trace" --tamper
-printf 'SM64 Modern live route oracle smoke passed c_swift_replay=1 first_divergence=3\n'
+TRACE_PATH="$BUILD_ROOT/$MODE.trace"
+SWIFT_ARGS=("$TRACE_PATH")
+C_ARGS=("$TRACE_PATH")
+if [[ "$MODE" == "input-only" ]]; then
+  SWIFT_ARGS+=(--input-only)
+  C_ARGS+=(--input-only)
+fi
+"$BUILD_ROOT/sm64-modern-live-route-oracle-smoke" "${SWIFT_ARGS[@]}" | tee "$BUILD_ROOT/$MODE-swift-output.log"
+"$BUILD_ROOT/sm64-modern-live-route-oracle-contract" "${C_ARGS[@]}"
+if [[ "$MODE" == "full" ]]; then
+  "$BUILD_ROOT/sm64-modern-live-route-oracle-contract" "$TRACE_PATH" --tamper
+  printf 'SM64 Modern live route oracle smoke passed mode=full c_swift_replay=1 first_divergence=3\n'
+else
+  printf 'SM64 Modern live route oracle smoke passed mode=input-only c_swift_replay=1 records=1\n'
+fi
