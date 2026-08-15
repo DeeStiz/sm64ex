@@ -104,6 +104,7 @@
 		E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */; };
 		ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */; };
 		F0BBFC46200149DAF4E60080 /* MarioPunchSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB36E00504555CA75EF4FF5 /* MarioPunchSequence.swift */; };
+		F54E76834ED4DE0BC05ECA90 /* CameraCUpExit.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */; };
 		F61977B2815412177D01918E /* GameplayTick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419DC71930B2E4EE76B0E18E /* GameplayTick.swift */; };
 		FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6B1983ADD652967A0372D10 /* BehaviorScript.swift */; };
 		FDFB158F79EC6A450D735577 /* LevelScriptContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */; };
@@ -198,6 +199,7 @@
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
 		CB4ABB8191E695DB49D9CF9E /* AppleAudioService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioService.h; sourceTree = "<group>"; };
 		CBE8B1473942F159FA54C7A8 /* CameraModeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeState.swift; sourceTree = "<group>"; };
+		CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCUpExit.swift; sourceTree = "<group>"; };
 		D3CC8538BA0A2A1F3C291572 /* ObjectScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectScheduler.swift; sourceTree = "<group>"; };
 		D4426C0597C4FF50EA28B2FE /* MarioPoleHangingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioPoleHangingAction.swift; sourceTree = "<group>"; };
 		D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectTransform.swift; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 				2BB8AD4D4F0B6D98AEBEEA9D /* CameraBehindKernel.swift */,
 				3EF32B94910902857B072626 /* CameraCollision.swift */,
 				8479BA4938E8AF21669E25E1 /* CameraCUp.swift */,
+				CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */,
 				83C823492EEFDF9990E00996 /* CameraGeometry.swift */,
 				724F73EC282345F4551FC1BF /* CameraInput.swift */,
 				CBE8B1473942F159FA54C7A8 /* CameraModeState.swift */,
@@ -439,6 +442,7 @@
 				0251DEA438C860732FDBE0C1 /* BehaviorScriptVM.swift in Sources */,
 				04B42C7E626E4B4A86900489 /* CameraBehindKernel.swift in Sources */,
 				4466ED0AB9DEF36B791956B8 /* CameraCUp.swift in Sources */,
+				F54E76834ED4DE0BC05ECA90 /* CameraCUpExit.swift in Sources */,
 				59D828BFA9A7DCFEEC96AAD2 /* CameraCollision.swift in Sources */,
 				36EB85680A608DBA2BC30633 /* CameraGeometry.swift in Sources */,
 				637DB55CFFCA4EDF63A29B58 /* CameraInput.swift in Sources */,
