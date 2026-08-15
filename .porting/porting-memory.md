@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18c is the current validated Goomba interaction/attack-table slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18d is the current validated Goomba/Spiny common-enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -111,6 +111,21 @@
   and `git diff --check` is clean. This remains bounded differential shadow
   evidence, not full collision authority, enemy breadth, or physical/visual/
   human acceptance.
+
+### M18d Completion Evidence
+
+- `SpinyEnemy.swift` and `SpinyObjectBridge.swift` preserve the bounded C
+  Spiny family: Lakitu-held and thrown actions, parent-distance deletion,
+  landed/wall-reflection transitions, walk-turn timers, the six-entry attack
+  table, reduced knockback, and owner-thread object/effect ordering.
+- The independent Swift/C Spiny contract emits
+  `spinyEnemyFingerprint=0x416df13a812fe31f`. The full matrix passes with
+  `runs=105 failures=0`; `xcodegen generate` includes the new sources and the
+  isolated native Debug build succeeds; `git diff --check` is clean.
+- This is bounded shadow/differential evidence: Lakitu production callbacks,
+  full interaction/collision resolution, remaining enemy/projectile families,
+  physical/visual/audio review, distribution, and human acceptance remain
+  open.
 
 ### M8b Completion Evidence
 
