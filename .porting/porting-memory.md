@@ -1306,6 +1306,24 @@
   remaining mechanisms and hazards, effect delivery, and M20–M35 are still
   open.
 
+### M19g Completion Evidence
+
+- `SM64Modern/ArrowLiftBehavior.swift` is the value counterpart of
+  `bhv_arrow_lift_loop` and its away/back helpers: 61-frame idle gates,
+  perpendicular movement yaw, 12-unit motion, 384-unit displacement clamp,
+  action transitions, and canonical-table X/Z deltas are explicit and
+  pointer-free.
+- The independent C contract matches Swift at
+  `arrowLiftFingerprint=0xcff4edab50dbc7ed`; waiting, start, normal travel,
+  away clamp, return wait, and return clamp paths are covered.
+- `script/test_arrow_lift.sh` passes under Swift 6 complete strict concurrency
+  and clang `-ffp-contract=off`. The full matrix target is
+  `runs=144 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 mechanism seam; platform ownership/collision,
+  remaining mechanisms and hazards, effect delivery, and M20–M35 are still
+  open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and

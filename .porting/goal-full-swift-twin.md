@@ -888,7 +888,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M19d: Swing platform behavior seam | Swift reproduces swing-platform initialization, sign-selected acceleration, accumulated f32 angle, signed object-roll truncation, and roll velocity. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xc38755874141aa35`, 141-script matrix target, regenerated native Debug build, and `git diff --check` pass; platform ownership/collision and remaining mechanisms remain open |
 | M19e: Seesaw platform behavior seam | Swift reproduces seesaw collision selection, BitS collision-distance override, Mario-driven pitch rotation, sound intent, velocity clamp, and return-to-zero oscillation. | Complete locally — strict Swift 6/C contract, focused fingerprint `0x84664f609b940e32`, 142-script matrix target, regenerated native Debug build, and `git diff --check` pass; platform ownership/collision and remaining mechanisms remain open |
 | M19f: Decorative pendulum behavior seam | Swift reproduces pendulum initialization/room intent, signed angular acceleration, roll accumulation, and the ±0x10 clock-sound edge. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xd9bba67deb7b6398`, 143-script matrix target, regenerated native Debug build, and `git diff --check` pass; remaining mechanisms and hazards remain open |
-| M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | In progress — M19a–M19f value seams are complete locally; platform ownership, dynamic collision replacement, remaining mechanisms, hazards, and effect delivery remain |
+| M19g: Arrow lift behavior seam | Swift reproduces arrow-lift idle/away/back gates, 384-unit displacement clamp, perpendicular yaw, and canonical X/Z movement. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xcff4edab50dbc7ed`, 144-script matrix target, regenerated native Debug build, and `git diff --check` pass; remaining mechanisms and hazards remain open |
+| M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | In progress — M19a–M19g value seams are complete locally; platform ownership, dynamic collision replacement, remaining mechanisms, hazards, and effect delivery remain |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
@@ -1013,7 +1014,10 @@ replayable trace, and the platform evidence listed in its exit gate.
    `oscillate_toward` return path before binding the platform pointer and
    dynamic surface reload. Add M19f's decorative-pendulum initialization,
    room-init intent, signed roll acceleration, and ±0x10 clock-sound edge
-   before wiring the Tick Tock Clock presentation object.
+   before wiring the Tick Tock Clock presentation object. Add M19g's arrow-lift
+   idle/away/back gates, 61-frame waits, 384-unit displacement clamp,
+   perpendicular yaw, and canonical X/Z movement before attaching Mario's
+   platform ownership and collision replacement.
 4. **M20 NPC, races, and puzzles.** Port Toads, penguins, birds, rabbits,
    MIPS, Lakitu, race timers, slide timers, red-coin puzzles, secrets,
    switches, paintings, and course-specific puzzle controllers. Include
