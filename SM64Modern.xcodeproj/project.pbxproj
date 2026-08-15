@@ -167,6 +167,7 @@
 		CC673E4A5BBE9BBDEFEECA83 /* MarioWaterInteractionAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF73C0EA06595D96E31445A /* MarioWaterInteractionAction.swift */; };
 		CF3A2F4EE5C0CD4A0C3AAF45 /* MarioGroundSpeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = A324AE8C019E9D59ECC1D057 /* MarioGroundSpeed.swift */; };
 		CFF98EAAB1C2B379F37CB33B /* EngineAuthority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6291FCF691572C0089D6194D /* EngineAuthority.swift */; };
+		D3919C39B72DEEB57976B4BA /* TuxiesMotherBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBADCC8D3A0FCE39EEF40AC3 /* TuxiesMotherBehavior.swift */; };
 		D65F07ACB7B0E4429D8D1086 /* ObjectSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */; };
 		D77819D0FD6CAB42ED53C410 /* ChuckyaEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDDABF519C9DA6F2577DA59 /* ChuckyaEnemy.swift */; };
 		D90B3C570D39D306BB4A38B1 /* MarioWalkingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99204A42040D31152F30F990 /* MarioWalkingAction.swift */; };
@@ -394,6 +395,7 @@
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
 		F5BB9631CE7A07A55B9BDBCF /* MarioCommonAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCommonAirAction.swift; sourceTree = "<group>"; };
 		F804D686AFFB6AA968F51DEE /* TTCMovingBarBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCMovingBarBehavior.swift; sourceTree = "<group>"; };
+		FBADCC8D3A0FCE39EEF40AC3 /* TuxiesMotherBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuxiesMotherBehavior.swift; sourceTree = "<group>"; };
 		FC5B24277AF249CA2DFC7FD6 /* BirdEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirdEnemy.swift; sourceTree = "<group>"; };
 		FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCPendulumBehavior.swift; sourceTree = "<group>"; };
 		FFB7DD2B8D112A3511DF6EBF /* TTCSpinnerBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCSpinnerBehavior.swift; sourceTree = "<group>"; };
@@ -594,6 +596,7 @@
 				214588F2B3DD80568BE38D36 /* TTCRotatingSolidBehavior.swift */,
 				FFB7DD2B8D112A3511DF6EBF /* TTCSpinnerBehavior.swift */,
 				852D9DAB7F34CD90FB03458B /* TTCTreadmillBehavior.swift */,
+				FBADCC8D3A0FCE39EEF40AC3 /* TuxiesMotherBehavior.swift */,
 				3272FC72F5FA191847C8D57B /* WaterBomb.swift */,
 				1DE7AE7AC1D8F6731FE45B3C /* WaterBombObjectBridge.swift */,
 				466600A4978BF6E07A6465C6 /* WhompEnemy.swift */,
@@ -886,6 +889,7 @@
 				1A9C263F2C7FC79C4A63A501 /* TTCRotatingSolidBehavior.swift in Sources */,
 				7D2D76204DE9F3841D35B4F9 /* TTCSpinnerBehavior.swift in Sources */,
 				2F283D29507BA88671C0F14E /* TTCTreadmillBehavior.swift in Sources */,
+				D3919C39B72DEEB57976B4BA /* TuxiesMotherBehavior.swift in Sources */,
 				C64BB4E43DA2868B1767C6E3 /* WaterBomb.swift in Sources */,
 				C4A4E51360A88FDFC1106CEA /* WaterBombObjectBridge.swift in Sources */,
 				F3119272F792799B5D608AF1 /* WhompEnemy.swift in Sources */,
