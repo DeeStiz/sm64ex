@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18aa is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18ab is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp plus wooden-post/gate owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -532,6 +532,22 @@
   (log `/tmp/sm64-modern-m18aa-matrix.log`), the generated native Debug build
   succeeds (log `/tmp/sm64-modern-m18aa-build.log`), and `git diff --check`
   passes. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
+### M18ab Completion Evidence
+
+- `ChainChompRelease.swift` is a finite value translation of the wooden-post
+  ground-pound/drop/orbit/release branches and the gate destruction effect
+  bundle from `src/game/behaviors/chain_chomp.inc.c`.
+- `ChainChompReleaseObjectBridge.swift` owns surface-list post/gate objects,
+  stable parent IDs, collision identities, owner-thread record synchronization,
+  release requests, and end-of-frame gate deletion without exposing C pointers.
+- The independent Swift/C owner-thread contract emits
+  `chainChompReleaseFingerprint=0xdd959e6ce61c03bd`; focused strict Swift 6/C
+  validation passes. The full matrix passes with `runs=129 failures=0` (log
+  `/tmp/sm64-modern-m18ab-matrix.log`), the regenerated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18ab-build.log`), and `git diff --check`
+  passes. Runtime collision resolution/effect presentation, remaining enemy
   breadth, and physical/visual/human acceptance remain open.
 
 ### M8b Completion Evidence
