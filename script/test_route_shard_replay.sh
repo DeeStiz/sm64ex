@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-route-shard-replay-smoke"
+BUILD_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/sm64-route-shard-replay-smoke.XXXXXX")"
 TOOL_ROOT="$BUILD_ROOT/tool"
 MANIFEST="$BUILD_ROOT/route-shards.tsv"
 INVENTORY="$BUILD_ROOT/reachability.tsv"
@@ -79,4 +79,11 @@ for shard_id in "${sample_ids[@]}"; do
   }
 done
 
-printf 'SM64 Modern route-shard replay smoke passed sample_shards=%s c_swift_byte_match=1 ledger_transition_fence=1 fixture_only=1\n' "${#sample_ids[@]}"
+first_id="${sample_ids[0]}"
+first_report="$BUILD_ROOT/$first_id-report.tsv"
+if "$SWIFT_OUTPUT" --manifest "$MANIFEST" --shard-id "$first_id" --output "$BUILD_ROOT/repeat.trace" --report "$first_report" >/dev/null 2>&1; then
+  echo "persisted terminal shard was allowed to rerun" >&2
+  exit 1
+fi
+
+printf 'SM64 Modern route-shard replay smoke passed sample_shards=%s c_swift_byte_match=1 ledger_transition_fence=1 persistent_rerun_rejected=1 fixture_only=1\n' "${#sample_ids[@]}"

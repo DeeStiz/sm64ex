@@ -76,6 +76,7 @@ enum SM64RouteShardExecutionError: Error, Equatable, CustomStringConvertible {
     case invalidTerminalState(SM64RouteShardExecutionState)
     case invalidHex(String)
     case invalidExpectedDomain(String)
+    case invalidReport(String)
 
     var description: String {
         switch self {
@@ -97,6 +98,8 @@ enum SM64RouteShardExecutionError: Error, Equatable, CustomStringConvertible {
             return "invalid hexadecimal value: \(value)"
         case let .invalidExpectedDomain(value):
             return "invalid expected trace domain: \(value)"
+        case let .invalidReport(reason):
+            return "invalid route-shard report: \(reason)"
         }
     }
 }
@@ -201,7 +204,7 @@ private struct RouteShardLedgerEntry: Sendable, Equatable {
 struct SM64RouteShardExecutionLedger: Sendable {
     private var entries: [UInt64: RouteShardLedgerEntry]
 
-    init(manifest: String) throws {
+    init(manifest: String, report: String? = nil) throws {
         let lines = manifest.split(whereSeparator: { $0.isNewline })
         guard lines.count >= 2,
               lines[0] == "# sm64-modern-route-shards-v1",
@@ -224,6 +227,9 @@ struct SM64RouteShardExecutionLedger: Sendable {
         }
         guard !parsed.isEmpty else { throw SM64RouteShardExecutionError.emptyManifest }
         self.entries = parsed
+        if let report {
+            try apply(report: report)
+        }
     }
 
     var count: Int { entries.count }
@@ -276,6 +282,75 @@ struct SM64RouteShardExecutionLedger: Sendable {
             }
         }
         try transition(id: id, to: state, evidence: evidence)
+    }
+
+    private mutating func apply(report: String) throws {
+        var seen: Set<UInt64> = []
+        for (offset, line) in report.split(whereSeparator: { $0.isNewline }).enumerated() {
+            let lineNumber = offset + 1
+            let fields = line.split(separator: "|", omittingEmptySubsequences: false).map(String.init)
+            guard fields.count == 6 else {
+                throw SM64RouteShardExecutionError.invalidReport(
+                    "line \(lineNumber) expected six fields"
+                )
+            }
+            guard let id = try? Self.parseReportHex(fields[0]), entries[id] != nil else {
+                throw SM64RouteShardExecutionError.invalidReport(
+                    "line \(lineNumber) has unknown shard ID"
+                )
+            }
+            guard seen.insert(id).inserted else {
+                throw SM64RouteShardExecutionError.invalidReport(
+                    "line \(lineNumber) duplicates shard ID"
+                )
+            }
+            guard let state = SM64RouteShardExecutionState(rawValue: fields[1]) else {
+                throw SM64RouteShardExecutionError.invalidReport(
+                    "line \(lineNumber) has unknown state"
+                )
+            }
+            guard let expected = UInt64(fields[2]),
+                  let actual = UInt64(fields[3]),
+                  let matched = UInt64(fields[4]) else {
+                throw SM64RouteShardExecutionError.invalidReport(
+                    "line \(lineNumber) has invalid evidence counts"
+                )
+            }
+            let divergence = fields[5].isEmpty ? nil : fields[5]
+            if state == .planned {
+                guard expected == 0, actual == 0, matched == 0, divergence == nil else {
+                    throw SM64RouteShardExecutionError.invalidReport(
+                        "planned row has terminal evidence"
+                    )
+                }
+                continue
+            }
+            guard state.isTerminal else {
+                throw SM64RouteShardExecutionError.invalidReport(
+                    "running rows cannot be persisted"
+                )
+            }
+            let evidence = SM64RouteShardExecutionEvidence(
+                expectedRecords: expected,
+                actualRecords: actual,
+                matchedRecords: matched,
+                firstDivergence: divergence
+            )
+            try transition(id: id, to: .running, evidence: nil)
+            try transition(id: id, to: state, evidence: evidence)
+        }
+        guard seen.count == entries.count else {
+            throw SM64RouteShardExecutionError.invalidReport(
+                "report does not contain every manifest shard"
+            )
+        }
+    }
+
+    private static func parseReportHex(_ value: String) throws -> UInt64 {
+        guard value.hasPrefix("0x"), let parsed = UInt64(value.dropFirst(2), radix: 16) else {
+            throw SM64RouteShardExecutionError.invalidReport("invalid shard ID \(value)")
+        }
+        return parsed
     }
 
     private mutating func transition(

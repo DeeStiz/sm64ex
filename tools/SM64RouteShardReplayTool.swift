@@ -27,7 +27,13 @@ struct SM64RouteShardReplayTool {
     private static func run(arguments: [String]) throws {
         let options = try parse(arguments: arguments)
         let manifest = try String(contentsOf: options.manifest, encoding: .utf8)
-        var ledger = try SM64RouteShardExecutionLedger(manifest: manifest)
+        let previousReport: String?
+        if let report = options.report, FileManager.default.fileExists(atPath: report.path) {
+            previousReport = try String(contentsOf: report, encoding: .utf8)
+        } else {
+            previousReport = nil
+        }
+        var ledger = try SM64RouteShardExecutionLedger(manifest: manifest, report: previousReport)
         let shard = try ledger.shard(id: options.shardID)
         try ledger.begin(id: options.shardID)
         let records: [SM64OracleTraceRecord]

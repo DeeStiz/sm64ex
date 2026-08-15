@@ -47,12 +47,19 @@ struct SM64ModernRouteShardLedgerSmoke {
         precondition(ledger.allTerminal)
         precondition(ledger.report().contains("0x0000000000000001|passed|1|1|1|"))
 
+        var restored = try SM64RouteShardExecutionLedger(
+            manifest: manifest,
+            report: ledger.report()
+        )
+        let restoredState = try restored.state(for: 1)
+        precondition(restoredState == .passed)
+
         do {
-            try ledger.begin(id: 1)
-            preconditionFailure("terminal shard was allowed to rerun")
+            try restored.begin(id: 1)
+            preconditionFailure("persisted terminal shard was allowed to rerun")
         } catch let error as SM64RouteShardExecutionError {
             guard case .invalidTransition = error else { preconditionFailure("wrong terminal failure: \(error)") }
         }
-        print("SM64 Modern route-shard ledger smoke passed transition_fence=1 partial_pass_rejected=1")
+        print("SM64 Modern route-shard ledger smoke passed transition_fence=1 partial_pass_rejected=1 persistent_report_fence=1")
     }
 }
