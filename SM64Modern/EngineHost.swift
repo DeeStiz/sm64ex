@@ -606,10 +606,49 @@ final class EngineHost: @unchecked Sendable {
         )
         switch engineAuthority {
         case .swift:
-            return SM64ModernSwiftEngineRuntime(cFallback: cAdapter)
+            let swiftContext = SM64ModernSwiftEngineContext(
+                traceSink: { [unowned self] record in
+                    self.recordSwiftOracleTrace(record)
+                }
+            )
+            return SM64ModernSwiftEngineRuntime(
+                cFallback: cAdapter,
+                swiftContext: swiftContext
+            )
         case .cCompatibility:
             return cAdapter
         }
+    }
+
+    private func recordSwiftOracleTrace(
+        _ record: SM64OracleTraceRecord
+    ) -> SM64ModernStatus {
+        precondition(isCurrentEngineThread)
+        guard sm64_modern_oracle_trace_is_active() != 0 else {
+            return SM64_MODERN_STATUS_OK
+        }
+
+        // The C lifecycle closes its trace tick before the Swift sidecar
+        // context advances. Give the sidecar an explicit owner-thread tick so
+        // schema-4 record/replay remains canonical without reopening the C
+        // gameplay tick or sharing mutable C state with Swift.
+        sm64_modern_oracle_trace_begin_tick()
+        defer { sm64_modern_oracle_trace_end_tick() }
+        var values = record.values
+        let status = values.withUnsafeBufferPointer { buffer in
+            sm64_modern_oracle_trace_record(
+                record.domain,
+                record.recordKind,
+                record.subjectID,
+                record.recordID,
+                record.flags,
+                buffer.baseAddress,
+                UInt32(buffer.count)
+            )
+        }
+        return status == SM64_MODERN_STATUS_OK
+            ? sm64_modern_oracle_trace_status()
+            : status
     }
 
     private func initializeCEngineOnEngineThread() -> SM64ModernStatus {

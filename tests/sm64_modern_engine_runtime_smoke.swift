@@ -127,6 +127,10 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(actionReceipt.decision.action == SM64MarioActionID.jump)
         precondition(actionReceipt.mutation?.action == SM64MarioActionID.jump)
         precondition(swiftShell.swiftContext.marioState.action == SM64MarioActionID.jump)
+        precondition(swiftShell.swiftContext.traceRecords.count == 5)
+        precondition(swiftShell.swiftContext.traceRecords.map(\.domain) == [1, 1, 1, 2, 2])
+        precondition(swiftShell.swiftContext.traceRecords.map(\.recordKind) == [2, 2, 2, 2, 3])
+        precondition(swiftShell.swiftContext.lastTraceRecord?.canonicalHash != 0)
         let progressionReceipt = swiftShell.swiftContext.applyProgression(
             .collectRedCoin, simulationTick: 0
         )!
@@ -156,10 +160,24 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.swiftContext.lastInputReceipt == nil)
         precondition(swiftShell.swiftContext.lastMarioInputReceipt == nil)
         precondition(swiftShell.swiftContext.lastMarioActionReceipt == nil)
+        precondition(swiftShell.swiftContext.traceRecords.isEmpty)
+        precondition(swiftShell.swiftContext.traceStatus == 0)
         precondition(swiftShell.swiftContext.marioState.action == 0)
         precondition(swiftShell.swiftContext.progression.progression.coins == 0)
         precondition(swiftShell.swiftContext.state.snapshot().objects.isEmpty)
         precondition(swiftShell.shutdown() == 4)
+
+        var sinkRecords: [SM64OracleTraceRecord] = []
+        let sinkContext = SM64ModernSwiftEngineContext(
+            traceSink: { record in
+                sinkRecords.append(record)
+                return 0
+            }
+        )
+        precondition(sinkContext.initialize())
+        precondition(sinkContext.step() != nil)
+        precondition(sinkRecords == sinkContext.traceRecords)
+        precondition(sinkRecords.count == 1)
         precondition(swiftRecorder.initializeCalls == 1)
         precondition(swiftRecorder.stepCalls == 1)
         precondition(swiftRecorder.stopCalls == 1)

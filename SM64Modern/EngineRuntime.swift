@@ -79,6 +79,8 @@ struct SM64ModernSwiftMarioActionReceipt: Equatable, Sendable {
     let mutation: SM64MarioActionMutation?
 }
 
+typealias SM64ModernSwiftTraceSink = (SM64OracleTraceRecord) -> SM64ModernStatus
+
 /// Owner-thread Swift state used by the Swift runtime while product domains
 /// are migrated. It is deliberately a real engine context, not a callback
 /// counter: object lists, globals, transforms, arenas, and unload ordering
@@ -88,6 +90,7 @@ final class SM64ModernSwiftEngineContext {
     let state: SM64SwiftEngineState
     private let scheduler: SM64ObjectScheduler
     private let initialProgression: SM64ProgressionRuntime
+    private let traceSink: SM64ModernSwiftTraceSink?
     private var inputNormalizer = SM64ControllerInputNormalizer()
     private var framesSinceA: UInt8 = 0
     private var framesSinceB: UInt8 = 0
@@ -101,16 +104,22 @@ final class SM64ModernSwiftEngineContext {
     private(set) var lastInputReceipt: SM64ModernSwiftInputReceipt?
     private(set) var lastMarioInputReceipt: SM64ModernSwiftMarioInputReceipt?
     private(set) var lastMarioActionReceipt: SM64ModernSwiftMarioActionReceipt?
+    private(set) var traceRecords: [SM64OracleTraceRecord] = []
+    private(set) var lastTraceRecord: SM64OracleTraceRecord?
+    private(set) var traceStatus: SM64ModernStatus = 0
+    private var traceSequence: UInt32 = 0
 
     init(
         objectCapacity: Int = SM64ObjectPool.defaultCapacity,
         scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
-        progression: SM64ProgressionRuntime = SM64ProgressionRuntime()
+        progression: SM64ProgressionRuntime = SM64ProgressionRuntime(),
+        traceSink: SM64ModernSwiftTraceSink? = nil
     ) {
         self.state = SM64SwiftEngineState(objectCapacity: objectCapacity)
         self.scheduler = scheduler
         self.initialProgression = progression
         self.progression = progression
+        self.traceSink = traceSink
     }
 
     func initialize(levelNumber: Int16 = 1, areaIndex: Int16 = 0) -> Bool {
@@ -127,6 +136,10 @@ final class SM64ModernSwiftEngineContext {
         lastInputReceipt = nil
         lastMarioInputReceipt = nil
         lastMarioActionReceipt = nil
+        traceRecords.removeAll(keepingCapacity: true)
+        lastTraceRecord = nil
+        traceStatus = 0
+        traceSequence = 0
         phase = .initialized
         return true
     }
@@ -152,6 +165,20 @@ final class SM64ModernSwiftEngineContext {
             values: result.trace.values
         )
         lastProgressionReceipt = receipt
+        guard emitTrace(
+            simulationTick: receipt.simulationTick,
+            domain: 10,
+            recordKind: 3,
+            subjectID: UInt64(progression.saveFileIndex),
+            recordID: 0x1700_0000 | UInt64(receipt.eventID.rawValue),
+            flags: UInt32(receipt.actorEffects.rawValue)
+                | (UInt32(receipt.progressionEffects.rawValue) << 16),
+            values: [
+                UInt64(receipt.eventID.rawValue),
+                receipt.accepted ? 1 : 0,
+                receipt.persistenceNeeded ? 1 : 0
+            ] + Array(receipt.values.prefix(5))
+        ) == 0 else { return nil }
         return receipt
     }
 
@@ -169,6 +196,22 @@ final class SM64ModernSwiftEngineContext {
             controller: controller
         )
         lastInputReceipt = receipt
+        guard emitTrace(
+            simulationTick: tickCount,
+            domain: 1,
+            recordKind: 2,
+            recordID: 0x3100_0001,
+            values: [
+                UInt64(controller.buttonDown),
+                UInt64(controller.buttonPressed),
+                UInt64(controller.stickX.bitPattern),
+                UInt64(controller.stickY.bitPattern),
+                UInt64(UInt16(bitPattern: controller.rawStickX)),
+                UInt64(UInt16(bitPattern: controller.rawStickY)),
+                UInt64(UInt16(bitPattern: controller.extStickX)),
+                UInt64(UInt16(bitPattern: controller.extStickY))
+            ]
+        ) == 0 else { return nil }
         return receipt
     }
 
@@ -202,6 +245,19 @@ final class SM64ModernSwiftEngineContext {
             mario: mario
         )
         lastMarioInputReceipt = receipt
+        guard emitTrace(
+            simulationTick: tickCount,
+            domain: 2,
+            recordKind: 2,
+            recordID: 0x3200_0001,
+            values: [
+                UInt64(mario.input.rawValue),
+                UInt64(mario.intendedMagnitude.bitPattern),
+                UInt64(UInt16(bitPattern: mario.intendedYaw)),
+                UInt64(mario.framesSinceA),
+                UInt64(mario.framesSinceB)
+            ]
+        ) == 0 else { return nil }
         return receipt
     }
 
@@ -235,6 +291,21 @@ final class SM64ModernSwiftEngineContext {
             mutation: mutation
         )
         lastMarioActionReceipt = receipt
+        guard emitTrace(
+            simulationTick: tickCount,
+            domain: 2,
+            recordKind: 3,
+            recordID: 0x3300_0001,
+            values: [
+                UInt64(decision.action ?? 0),
+                UInt64(decision.argument),
+                UInt64(mutation?.action ?? 0),
+                UInt64(mutation?.previousAction ?? 0),
+                UInt64(mutation?.actionState ?? 0),
+                UInt64(mutation?.actionTimer ?? 0),
+                mutation?.droppedHeldObject == true ? 1 : 0
+            ]
+        ) == 0 else { return nil }
         return receipt
     }
 
@@ -249,6 +320,17 @@ final class SM64ModernSwiftEngineContext {
             resetEpoch: state.globals.resetEpoch
         )
         lastReceipt = receipt
+        guard emitTrace(
+            simulationTick: tickCount,
+            domain: 3,
+            recordKind: 1,
+            recordID: 0x3100_0002,
+            values: [
+                receipt.frame,
+                UInt64(receipt.objectCount),
+                receipt.resetEpoch
+            ]
+        ) == 0 else { return nil }
         return receipt
     }
 
@@ -272,6 +354,10 @@ final class SM64ModernSwiftEngineContext {
         lastInputReceipt = nil
         lastMarioInputReceipt = nil
         lastMarioActionReceipt = nil
+        traceRecords.removeAll(keepingCapacity: true)
+        lastTraceRecord = nil
+        traceStatus = 0
+        traceSequence = 0
         phase = .stopped
         return true
     }
@@ -279,6 +365,44 @@ final class SM64ModernSwiftEngineContext {
     func fail() {
         guard phase != .stopped else { return }
         phase = .failed
+    }
+
+    @discardableResult
+    private func emitTrace(
+        simulationTick: UInt64,
+        domain: UInt32,
+        recordKind: UInt32,
+        subjectID: UInt64 = 0,
+        recordID: UInt64,
+        flags: UInt32 = 0,
+        values: [UInt64]
+    ) -> SM64ModernStatus {
+        let record: SM64OracleTraceRecord
+        do {
+            record = try SM64OracleTraceRecord(
+                simulationTick: simulationTick,
+                domain: domain,
+                recordKind: recordKind,
+                subjectID: subjectID,
+                recordID: recordID,
+                sequence: traceSequence,
+                flags: flags,
+                values: Array(values.prefix(8))
+            )
+        } catch {
+            traceStatus = 4
+            phase = .failed
+            return traceStatus
+        }
+        traceSequence &+= 1
+        traceRecords.append(record)
+        lastTraceRecord = record
+        let status = traceSink?(record) ?? 0
+        if status != 0 {
+            traceStatus = status
+            phase = .failed
+        }
+        return status
     }
 }
 
@@ -329,9 +453,11 @@ final class SM64ModernCEngineRuntimeAdapter: SM64ModernEngineRuntime {
 
 final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
     let authority: SM64ModernEngineAuthority = .swift
-    // M31f slice: Swift owns lifecycle ordering, failure state, the context's
-    // state/scheduler/progression/input/Mario-input/action domains, while remaining
-    // gameplay/content domains still run through the compatibility adapter.
+    // M31g slice: Swift owns lifecycle ordering, failure state, the context's
+    // state/scheduler/progression/input/Mario-input/action domains, and emits
+    // schema-4 receipt records through an owner-thread sidecar sink, while
+    // remaining gameplay/content domains still run through the compatibility
+    // adapter.
     // The implementation string intentionally names that boundary; it must
     // not be mistaken for whole-engine Swift authority.
     let implementation = "swift_lifecycle_owner_c_domain_bridge"

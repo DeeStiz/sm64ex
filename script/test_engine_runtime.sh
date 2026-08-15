@@ -32,6 +32,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/MarioState.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioAction.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioActionCancels.swift" \
+  "$PROJECT_ROOT/SM64Modern/OracleTrace.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_engine_runtime_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-engine-runtime-smoke"
