@@ -100,6 +100,17 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
         )
     }
 
+    @discardableResult
+    mutating func applyProgression(
+        _ event: SM64ProgressionEvent
+    ) -> SM64ProgressionReduceResult? {
+        guard let reduced = SM64ProgressionReducer.reduce(
+            event, state: progression
+        ) else { return nil }
+        progression = reduced.state
+        return reduced
+    }
+
     func saveSnapshot() -> SM64SaveFileSnapshot {
         SM64SaveFileCodec.snapshot(from: progression)
     }
@@ -218,4 +229,177 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
         case .completeLevel: return .completeLevel
         }
     }
+}
+
+/// Compact owner-thread result used by the M17 route replay fixture. It keeps
+/// route identity/generation and durable snapshot hashes together so a replay
+/// can reject stale object lifetimes without serializing Swift object graphs.
+struct SM64ProgressionReplayRecord: Equatable, Sendable {
+    let routeID: UInt8
+    let generation: UInt32
+    let accepted: Bool
+    let saveHash: UInt64
+    let menuHash: UInt64
+}
+
+private enum SM64ProgressionReplayHash {
+    static let offset: UInt64 = 1_469_598_103_934_665_603
+    static let prime: UInt64 = 1_099_511_628_211
+}
+
+/// Owner-thread progression route replay. This is deliberately a value-level
+/// harness: it drives the same reducer/runtime and EEPROM adapter composition
+/// used by the migration service, while C remains the differential authority.
+struct SM64ProgressionRouteReplay: Sendable {
+    private let adapter: SM64OwnerThreadEEPROMAdapter
+    private let ownerThreadToken: UInt64
+    private let saveFileIndex: Int
+    private var runtime: SM64ProgressionRuntime
+    private(set) var records: [SM64ProgressionReplayRecord] = []
+
+    init(
+        adapter: SM64OwnerThreadEEPROMAdapter,
+        ownerThreadToken: UInt64,
+        saveFileIndex: Int = 0
+    ) {
+        precondition(
+            (0..<SM64CoinScoreAgeState.fileCount).contains(saveFileIndex)
+        )
+        self.adapter = adapter
+        self.ownerThreadToken = ownerThreadToken
+        self.saveFileIndex = saveFileIndex
+        self.runtime = SM64ProgressionRuntime(saveFileIndex: saveFileIndex)
+    }
+
+    mutating func run() throws -> [SM64ProgressionReplayRecord] {
+        let fresh = try adapter.load(
+            saveFileIndex: saveFileIndex, ownerThreadToken: ownerThreadToken
+        )
+        runtime.adoptPersistedSnapshots(save: fresh.save, menu: fresh.menu)
+        append(
+            routeID: 1, generation: 0,
+            accepted: fresh.saveDecision == .eraseAndRewriteBoth
+                || fresh.menuDecision == .wipeAndRewriteBoth
+        )
+        try adapter.commit(
+            saveFileIndex: saveFileIndex, save: fresh.save, menu: fresh.menu,
+            ownerThreadToken: ownerThreadToken
+        )
+
+        let recovery = try recoverPrimary()
+        append(
+            routeID: 2, generation: 0,
+            accepted: recovery.saveDecision == .useBackupAndRewritePrimary
+        )
+
+        _ = runtime.selectCourse(1)
+        for tick in 0..<8 {
+            guard let result = runtime.apply(
+                .collectRedCoin, simulationTick: UInt64(tick)
+            ) else { throw SM64ProgressionReplayError.reducerRejected }
+            if tick == 7 {
+                append(
+                    routeID: 3, generation: 1, accepted: result.actor.redCoinStarSpawned
+                )
+            }
+        }
+        guard runtime.apply(
+            .pressCapSwitch(index: 0), simulationTick: 8
+        ) != nil else { throw SM64ProgressionReplayError.reducerRejected }
+        append(routeID: 4, generation: 1, accepted: true)
+
+        guard runtime.apply(
+            .completeLevel(
+                kind: .courseStar, starIndex: 0,
+                coinScore: 100, globalMaxCoinScore: 90
+            ), simulationTick: 9
+        ) != nil else { throw SM64ProgressionReplayError.reducerRejected }
+        try commitAndAdopt()
+        append(routeID: 5, generation: 1, accepted: true)
+
+        _ = runtime.apply(.resetLevel, simulationTick: 10)
+        let deathReload = try adapter.reload(
+            saveFileIndex: saveFileIndex, ownerThreadToken: ownerThreadToken
+        )
+        runtime.adoptPersistedSnapshots(
+            save: deathReload.save, menu: deathReload.menu
+        )
+        append(
+            routeID: 6, generation: 1,
+            accepted: SM64SaveFileCodec.encode(deathReload.save)
+                == SM64SaveFileCodec.encode(runtime.saveSnapshot())
+        )
+
+        guard runtime.applyProgression(
+            .setCapLocation(.klepto)
+        ) != nil else { throw SM64ProgressionReplayError.reducerRejected }
+        try commitAndAdopt()
+        append(routeID: 7, generation: 1, accepted: true)
+
+        guard runtime.applyProgression(
+            .requestWarp(
+                destination: .init(level: 9, area: 2, node: 3, argument: 4),
+                checkpoint: .init(act: 1, course: 1, level: 9, area: 2, node: 3)
+            )
+        ) != nil else { throw SM64ProgressionReplayError.reducerRejected }
+        append(routeID: 8, generation: 1, accepted: true)
+
+        var lifetime = SM64ProgressionRouteLifetime(
+            identity: .init(
+                level: 9, area: 2,
+                behaviorIdentity: 0x1234_5678_9ABC_DEF0, instance: 7
+            ),
+            kind: .hiddenRedCoinStar
+        )
+        let activated = lifetime.activate()
+        let duplicate = lifetime.activate()
+        let generation = lifetime.generation
+        let deactivated = lifetime.deactivate()
+        append(
+            routeID: 9, generation: generation,
+            accepted: activated && !duplicate && deactivated
+        )
+        return records
+    }
+
+    private mutating func commitAndAdopt() throws {
+        let save = runtime.saveSnapshot()
+        let menu = runtime.menuSnapshot()
+        try adapter.commit(
+            saveFileIndex: saveFileIndex, save: save, menu: menu,
+            ownerThreadToken: ownerThreadToken
+        )
+        runtime.adoptPersistedSnapshots(save: save, menu: menu)
+    }
+
+    private func recoverPrimary() throws -> SM64PersistenceLoadResult {
+        var bytes = Array(try Data(contentsOf: adapter.imageURL))
+        bytes[SM64SaveFileSnapshot.byteCount * saveFileIndex] ^= 1
+        try Data(bytes).write(to: adapter.imageURL, options: .atomic)
+        return try adapter.load(
+            saveFileIndex: saveFileIndex, ownerThreadToken: ownerThreadToken
+        )
+    }
+
+    private mutating func append(
+        routeID: UInt8, generation: UInt32, accepted: Bool
+    ) {
+        records.append(
+            SM64ProgressionReplayRecord(
+                routeID: routeID, generation: generation, accepted: accepted,
+                saveHash: hash(SM64SaveFileCodec.encode(runtime.saveSnapshot())),
+                menuHash: hash(SM64MenuDataCodec.encode(runtime.menuSnapshot()))
+            )
+        )
+    }
+
+    private func hash(_ bytes: [UInt8]) -> UInt64 {
+        bytes.reduce(SM64ProgressionReplayHash.offset) { hash, byte in
+            (hash ^ UInt64(byte)) &* SM64ProgressionReplayHash.prime
+        }
+    }
+}
+
+enum SM64ProgressionReplayError: Error {
+    case reducerRejected
 }
