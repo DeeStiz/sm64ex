@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18d is the current validated Goomba/Spiny common-enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18e is the current validated Goomba/Spiny/Lakitu common-enemy event slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -126,6 +126,21 @@
   full interaction/collision resolution, remaining enemy/projectile families,
   physical/visual/audio review, distribution, and human acceptance remain
   open.
+
+### M18e Completion Evidence
+
+- `EnemyLakitu.swift` models the Evil Lakitu control boundary as copied POD:
+  reveal/cloud admission at 2,000 units, distance/Mario-speed steering,
+  vertical approach, facing/move yaw limits, the three-Spiny cap, 30-frame
+  hold cooldown, distance/facing throw admission, animation-frame parent-link
+  clear, and randomized 100–199 frame rearm cooldown.
+- The independent Swift/C event contract emits
+  `enemyLakituFingerprint=0x4021eec4cfdb5938`. The complete matrix passes with
+  `runs=106 failures=0`; the generated native Debug build includes the source;
+  and `git diff --check` is clean.
+- This remains a value-only event shadow: object allocation/parent wiring,
+  Lakitu production callbacks, full collision/effect resolution, remaining
+  enemy/projectile breadth, and physical/visual/human acceptance remain open.
 
 ### M8b Completion Evidence
 
