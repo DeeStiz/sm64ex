@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18a is the current validated Goomba enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18b is the current validated Goomba scheduler/spawner slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -77,6 +77,23 @@
 - The complete matrix passes with `runs=103 failures=0`. This remains a
   bounded shadow: C object-list traversal, collision inputs, effect delivery,
   spawner behavior, other enemy families, and visual/human acceptance remain.
+
+### M18b Completion Evidence
+
+- `GoombaObjectBridge.swift` binds the copied-POD Goomba kernel to the
+  owner-thread `SM64ObjectScheduler`. It preserves the C 13-list callback
+  order, live append of triplet-spawner children, time-stop and end-of-frame
+  unload boundaries, object-record action/velocity/hitbox/transform mutation,
+  collision/attack input snapshots, and callback-ordered effect records.
+- The bridge carries triplet parent identity and child flags, updates the
+  parent dead-bit/respawn metadata, and emits value-only respawn requests after
+  tiny-child death. The independent Swift/C bridge fingerprint is
+  `goombaObjectBridgeFingerprint=0x4555e82cf78e277f`.
+- The complete matrix passes with `runs=104 failures=0`; the isolated native
+  Debug build includes the generated bridge source; and `git diff --check` is
+  clean. This remains a bounded shadow: C is still gameplay authority, full
+  collision dispatch and enemy/projectile breadth remain open, and no physical,
+  visual, store, or human acceptance claim is implied.
 
 ### M8b Completion Evidence
 
