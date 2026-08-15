@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18w is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18x is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -467,6 +467,22 @@
   validation passes. The full matrix passes with `runs=124 failures=0` (log
   `/tmp/sm64-modern-m18w-matrix.log`), the generated native Debug build
   succeeds (log `/tmp/sm64-modern-m18w-build.log`), and `git diff --check`
+  passes. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
+### M18x Completion Evidence
+
+- `ChuckyaEnemy.swift` preserves patrol/approach/brake/return, grab/release/
+  throw, holdable state, 2000/1900 home gates, movement speeds/yaw steps,
+  throw impulses, and collision-death coin/mist effect intents.
+- `ChuckyaObjectBridge.swift` owns the general-actor parent and anchored child,
+  stable IDs, parent-relative placement, yaw propagation, holdable/tangible/
+  hidden synchronization, and scheduler-boundary deletion.
+- The independent Swift/C owner-thread contract emits
+  `chuckyaObjectBridgeFingerprint=0x1c7a7a54fd31996a`; focused strict Swift 6/C
+  validation passes. The full matrix passes with `runs=125 failures=0` (log
+  `/tmp/sm64-modern-m18x-matrix.log`), the generated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18x-build.log`), and `git diff --check`
   passes. Complete collision/effect delivery, remaining enemy/projectile
   breadth, and physical/visual/human acceptance remain open.
 
