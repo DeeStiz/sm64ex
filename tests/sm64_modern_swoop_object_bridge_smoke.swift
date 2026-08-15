@@ -182,12 +182,18 @@ enum SM64ModernSwoopObjectBridgeSmoke {
             inputs: [swoop: SM64SwoopTickInput(attacked: true)]
         )
         require(bridgeAttack.scheduler.unloaded.map(\.traceSubject) == [1], "Swoop attack unload")
+        require(
+            bridge.deliveryLog.contains { $0.deleted == [swoop] },
+            "Swoop deletion routed through owner thread"
+        )
         require(!engineState.objects.contains(swoop) && bridge.state(for: swoop) == nil, "Swoop shadow removed")
 
         fingerprint = hashBridgeTick(fingerprint, bridgeIdle, record: idleRecord)
         fingerprint = hashBridgeTick(fingerprint, bridgeEnter, record: enterRecord)
         fingerprint = hashBridgeTick(fingerprint, bridgeDive, record: diveRecord)
         fingerprint = hashBridgeTick(fingerprint, bridgeAttack, record: nil)
+        fingerprint = hashU64(fingerprint, 1)
+        fingerprint = hashU64(fingerprint, 1)
 
         print(String(format: "swoopObjectBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern Swoop object bridge smoke passed")

@@ -16,6 +16,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ObjectTransform.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineState.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectScheduler.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompRelease.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
   "$PROJECT_ROOT/SM64Modern/SwoopEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/SwoopObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_swoop_object_bridge_smoke.swift" \

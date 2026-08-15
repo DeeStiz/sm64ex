@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18ah is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb/Bullet-Bill-smoke owner-thread enemy slice, including fireball, Snufit, water-bomb, and Bullet Bill deletion-router adoption. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18ai is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb/Bullet-Bill-smoke/Swoop owner-thread enemy slice, including fireball, Snufit, water-bomb, Bullet Bill, and Swoop deletion-router adoption. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -650,6 +650,21 @@
   `runs=131 failures=0` (log `/tmp/sm64-modern-m18ah-matrix.log`), the
   regenerated native Debug build succeeds (log
   `/tmp/sm64-modern-m18ah-build.log`), and `git diff --check` passes. Router
+  adoption across the remaining bridges, whole-engine collision/effect
+  delivery, and physical/visual/audio/human acceptance remain open.
+
+### M18ai Completion Evidence
+
+- `SwoopObjectBridge.swift` now owns an `SM64OwnerThreadEffectRouter` for the
+  attack/death deletion path. The copied hitbox response and stable object
+  record remain unchanged; only the mutable deletion crosses the sequenced
+  owner-thread boundary before unload.
+- The focused Swift/C contract extends the Swoop trace with the routed attack
+  deletion, emitting `swoopObjectBridgeFingerprint=0x17a41c6388260d46`.
+- Strict Swift 6/C validation passes. The full matrix passes with
+  `runs=131 failures=0` (log `/tmp/sm64-modern-m18ai-matrix.log`), the
+  regenerated native Debug build succeeds (log
+  `/tmp/sm64-modern-m18ai-build.log`), and `git diff --check` passes. Router
   adoption across the remaining bridges, whole-engine collision/effect
   delivery, and physical/visual/audio/human acceptance remain open.
 

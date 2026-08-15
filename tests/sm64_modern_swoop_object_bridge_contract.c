@@ -129,6 +129,8 @@ int main(void) {
                               0, 0, 0, 0x42c80000u, 1, 1);
     fingerprint = hash_bridge(fingerprint, 35, 1, 769, 1, 1, 0,
                               0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, 1);
 
     printf("swoopObjectBridgeFingerprint=0x%016llx\n",
            (unsigned long long)fingerprint);

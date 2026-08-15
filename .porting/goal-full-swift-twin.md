@@ -2,11 +2,11 @@
 
 ## Status
 
-M18ah is the latest validated checkpoint: Bullet Bill's transient smoke child
-deletion is delivered through the owner-thread effect router in the independent
-Swift/C fingerprint `0x98814f6acf3e0025`, and the strict focused contract, full
-131-script matrix, and regenerated native Debug build pass. M18ag remains the
-preceding validated water-bomb router-adoption checkpoint. M0–M17 local scopes remain complete
+M18ai is the latest validated checkpoint: Swoop attack deletion is delivered
+through the owner-thread effect router in the independent Swift/C fingerprint
+`0x17a41c6388260d46`, and the strict focused contract, full 131-script matrix,
+and regenerated native Debug build pass. M18ah remains the preceding validated
+Bullet Bill smoke router-adoption checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
 platform, NPC, boss, save, frontend, audio, renderer, Swift-6-safety,
@@ -685,6 +685,16 @@ regenerated native Debug build, and `git diff --check` pass. Remaining bridges
 still contain direct effect mutations, and whole-engine collision/effect
 presentation plus physical/visual/audio/human acceptance remain open.
 
+M18ai adopts the common owner-thread effect router for Swoop's attack/death
+ path. It preserves the hitbox attack response, stable object identity, and
+ end-of-frame unload while delivering the deletion intent through the common
+ sink in the independent Swift/C fingerprint `0x17a41c6388260d46`. Focused
+ strict Swift 6/C validation passes; the full 131-script matrix
+ (`runs=131 failures=0`), regenerated native Debug build, and `git diff --check`
+ pass. Remaining bridges still contain direct effect mutations, and
+ whole-engine collision/effect presentation plus physical/visual/audio/human
+ acceptance remain open.
+
 M12h routes floor, ceiling, and wall candidates through the C-ordered partition with indexed Swift surface storage and dynamic replacement. M12i adds a value-type owner-thread gameplay tick that composes input/geometry, preserves paired simulation/legacy counters, carries demo state, and advances logical rumble with a matching Swift/C trace. Live runtime wiring, production content breadth, and physical haptic delivery remain open.
 
 M13a adds a Swift-owned Mario state POD boundary with C save-backed defaults, cap-loss flags, spawn floor clamping, water/idle action selection, stable object/surface IDs, counters, hitbox-adjacent state, and a matching initialization fingerprint. M13b adds the pure health/cap mutation kernel for poison gas, swimming recovery/drain, snow terrain, heal/hurt counters, C clamps, and near-drowning rumble intent with a matching mutation fingerprint. M13c adds exact cap-course/pickup flags and timers, four-action timer pauses, expiry cleanup, fade/flicker render intents, and a matching cap fingerprint. M13d applies collision-derived terrain snapshots into Swift Mario state with stable floor/ceiling/wall IDs, heights, water/angle/sound fields, input union, and a matching terrain fingerprint. M13e adds a C-matching `set_mario_action` transition kernel for moving, airborne, submerged, and cutscene entry paths, plus drop/hurt wrappers and a matching action fingerprint. M14a adds pointer-free common stationary cancel decisions for idle, crouching, and start-crouching input priority, low-health/terrain transitions, face-yaw intent, and held-object drop intent with a matching decision fingerprint. M14b extracts the C `update_walking_speed` callback into a finite-checked Swift value kernel, preserves the ABI callback through that kernel, and matches the independent C ground-speed fingerprint. M14c extracts the four-quarter `perform_ground_step` decision boundary over immutable floor/ceiling/wall snapshots, including wall continuation/normalization, floor departure, ceiling stop, shell water pseudo-floor, and a matching ground-step fingerprint. M14d extracts `anim_and_audio_for_walk` into a value state machine with exact speed-band animation IDs, fixed-point acceleration, timer transitions, walking-pitch easing, and deferred metal/terrain/quicksand step-sound intents with a matching fingerprint. M14e extracts the idle, crouching, and start-crouching action bodies into a value boundary with idle-cycle/sleep bookkeeping, animation IDs, cancellation/drop propagation, and stationary-step intents with a matching fingerprint. M14f extracts `push_or_sidle_wall` into a scalar wall-response boundary with forward-speed cap/velocity projection, canonical wall-yaw classification, pushing/sidestep animation and acceleration intents, wall-facing action argument, body roll, and sound/dust intents with a matching fingerprint. Full action bodies and interaction effects remain open.
@@ -768,6 +778,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M18af: Snufit bullet router adoption | Snufit bowling-ball bullet wall/ground deletion uses the common owner-thread effect router and preserves child unload ordering. | Complete locally — `0xf6221010ed5e3f78`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M18ag: Water-bomb router adoption | Water-bomb bomb/shadow deletion, missing-parent cleanup, and end-of-frame unload use the common owner-thread effect router. | Complete locally — `0x2c7546919aa992ae`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M18ah: Bullet Bill smoke router adoption | Bullet Bill transient smoke deletion uses the common owner-thread effect router while preserving same-frame child traversal and unload. | Complete locally — `0x98814f6acf3e0025`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
+| M18ai: Swoop router adoption | Swoop attack/death deletion uses the common owner-thread effect router while preserving hitbox response and end-of-frame unload. | Complete locally — `0x17a41c6388260d46`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
