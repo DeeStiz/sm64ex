@@ -1,3 +1,4 @@
+import Darwin
 import Foundation
 import OSLog
 
@@ -74,7 +75,11 @@ struct SwiftGameplayEvidence {
     }
 }
 
-final class SwiftGameplayService: @unchecked Sendable {
+/// Owner-thread gameplay migration state. The C callbacks are the only unsafe
+/// leaf; mutable candidate snapshots never cross into a Swift concurrency
+/// domain and the first owner-thread reset binds the service to its engine
+/// thread.
+final class SwiftGameplayService {
     private struct MarioCandidate {
         let tick: UInt64
         let ownedInputMask: UInt32
@@ -98,9 +103,10 @@ final class SwiftGameplayService: @unchecked Sendable {
     private var marioButtonUpdates: UInt64 = 0
     private var marioGroundSpeedUpdates: UInt64 = 0
     private var bobombReleaseUpdates: UInt64 = 0
+    private var ownerThreadIdentity: UInt64?
 
     func resetEvidence() {
-        precondition(!Thread.isMainThread, "Gameplay migration is engine-owner-thread state")
+        assertOwnerThread(bindIfMissing: true)
         candidateTick = 0
         marioCandidate = nil
         marioGroundSpeedCandidate = nil
@@ -111,7 +117,8 @@ final class SwiftGameplayService: @unchecked Sendable {
     }
 
     func evidence() -> SwiftGameplayEvidence {
-        SwiftGameplayEvidence(
+        assertOwnerThread()
+        return SwiftGameplayEvidence(
             marioButtonUpdates: marioButtonUpdates,
             marioGroundSpeedUpdates: marioGroundSpeedUpdates,
             bobombReleaseUpdates: bobombReleaseUpdates
@@ -122,7 +129,7 @@ final class SwiftGameplayService: @unchecked Sendable {
         input: SM64ModernMarioButtonInputV1,
         output: UnsafeMutablePointer<SM64ModernMarioButtonOutputV1>
     ) -> SM64ModernStatus {
-        precondition(!Thread.isMainThread, "Swift gameplay callbacks require the engine owner thread")
+        assertOwnerThread()
         advanceCandidateTick(to: input.simulation_tick)
 
         var result = SM64ModernMarioButtonOutputV1()
@@ -178,7 +185,7 @@ final class SwiftGameplayService: @unchecked Sendable {
         input: SM64ModernMarioGroundSpeedInputV1,
         output: UnsafeMutablePointer<SM64ModernMarioGroundSpeedOutputV1>
     ) -> SM64ModernStatus {
-        precondition(!Thread.isMainThread, "Swift gameplay callbacks require the engine owner thread")
+        assertOwnerThread()
         advanceCandidateTick(to: input.simulation_tick)
 
         guard input.floor_is_slow <= 1, input.responsive_cheat <= 1,
@@ -222,7 +229,7 @@ final class SwiftGameplayService: @unchecked Sendable {
         input: SM64ModernBobombReleaseInputV1,
         output: UnsafeMutablePointer<SM64ModernBobombReleaseOutputV1>
     ) -> SM64ModernStatus {
-        precondition(!Thread.isMainThread, "Swift gameplay callbacks require the engine owner thread")
+        assertOwnerThread()
         guard input.subsystem == SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_BOBOMB_BATTLEFIELD,
               input.held_state == UInt32(SM64_MODERN_BOBOMB_HELD_THROWN)
                 || input.held_state == UInt32(SM64_MODERN_BOBOMB_HELD_DROPPED) else {
@@ -263,7 +270,7 @@ final class SwiftGameplayService: @unchecked Sendable {
         actual: SM64ModernGameplayTraceRecordV1,
         output: UnsafeMutablePointer<SM64ModernGameplayTraceRecordV1>
     ) -> SM64ModernStatus {
-        precondition(!Thread.isMainThread, "Candidate transforms require the engine owner thread")
+        assertOwnerThread()
         var candidate = actual
         let tick = actual.envelope.simulation_tick
 
@@ -335,6 +342,29 @@ final class SwiftGameplayService: @unchecked Sendable {
         marioCandidate = nil
         marioGroundSpeedCandidate = nil
         bobombCandidates.removeAll(keepingCapacity: true)
+    }
+
+    private func assertOwnerThread(bindIfMissing: Bool = false) {
+        let current = Self.currentThreadIdentity()
+        if let ownerThreadIdentity {
+            precondition(
+                current == ownerThreadIdentity,
+                "Swift gameplay migration must run on its owner thread"
+            )
+        } else {
+            precondition(
+                bindIfMissing,
+                "Swift gameplay migration owner thread is not bound"
+            )
+            ownerThreadIdentity = current
+        }
+    }
+
+    private static func currentThreadIdentity() -> UInt64 {
+        var identifier: UInt64 = 0
+        let result = pthread_threadid_np(nil, &identifier)
+        precondition(result == 0, "pthread_threadid_np must produce an owner token")
+        return identifier
     }
 
 }
