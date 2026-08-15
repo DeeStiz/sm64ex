@@ -2,13 +2,15 @@
 
 ## Status
 
-M31g is the latest validated checkpoint layered on M18am: the Swift runtime
+M32a is the latest validated checkpoint layered on M18am: the Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
 object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
 qualified progression route, the qualified input normalizer route, the
 qualified Mario input-core route, the qualified idle action-selection route,
-and schema-4 Swift receipt/sidecar emission. The implementation still
+and schema-4 Swift receipt/sidecar emission. M32a removes the mutable
+`MetalSceneFrameStorage` `@unchecked Sendable` escape by publishing
+copy-on-write value snapshots at the packet boundary. The implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
 131-script matrix passes, and the regenerated native Debug build succeeds.
@@ -830,6 +832,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M31e: Mario input-core route | Swift context consumes normalized controller state through the qualified Mario button/joystick core, retains A/B frame timers on the owner thread, and emits immutable Mario-input receipts while collision and action dispatch remain fallback. | Complete locally — strict Swift 6 Mario-input/context smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; full Mario action authority and physical acceptance remain open |
 | M31f: Mario action-selection seam | Swift context applies the qualified idle-cancel decision and `setAction` mutation from the Mario-input receipt, preserving action state on the owner thread while movement, collision, and complete action dispatch remain fallback. | Complete locally — strict Swift 6 action-selection/context smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; full Mario action authority remains open |
 | M31g: Schema-4 Swift receipt bridge | Swift context emits fixed-width schema-4 records for input, Mario input/action, progression, and scheduler state; the native owner-thread sink forwards sidecar records to the C oracle API after each closed C tick. | Complete locally — strict Swift 6 trace-sink smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; full trace inventory and parity qualification remain open |
+| M32a: Metal packet Sendable closure | Scene packets publish value-semantic copy-on-write vertex/draw snapshots so the display-link reader never receives mutable reusable storage. | Complete locally — strict Swift 6 packet-reuse smoke, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; Metal texture bindings, renderer ownership, and remaining unchecked Sendable classes remain open |
 | M32: Swift 6 safety closure | Strict concurrency passes with mutable engine state no longer relying on `@unchecked Sendable`; remaining unsafe code is limited to audited leaf shims. | Not started |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | Not started |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |

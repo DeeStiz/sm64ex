@@ -40,7 +40,7 @@ struct MetalSceneDraw: Sendable {
     let triangleCount: UInt32
 }
 
-final class MetalSceneFrameStorage: @unchecked Sendable {
+struct MetalSceneFrameStorage: Sendable {
     // Display lists are bounded by the legacy renderer's frame budget. Reserve
     // once per reusable storage so appending a draw does not allocate a new
     // per-draw vertex array or descriptor backing store during steady state.
@@ -57,7 +57,7 @@ final class MetalSceneFrameStorage: @unchecked Sendable {
         draws.reserveCapacity(Self.initialDrawCapacity)
     }
 
-    func reset() {
+    mutating func reset() {
         vertices.removeAll(keepingCapacity: true)
         draws.removeAll(keepingCapacity: true)
     }
@@ -65,10 +65,8 @@ final class MetalSceneFrameStorage: @unchecked Sendable {
 
 struct MetalScenePacket: Sendable {
     let sequence: UInt64
-    let storage: MetalSceneFrameStorage
-
-    var draws: [MetalSceneDraw] { storage.draws }
-    var vertices: [Float] { storage.vertices }
+    let vertices: [Float]
+    let draws: [MetalSceneDraw]
 }
 
 final class MetalSceneRecorder {
@@ -183,7 +181,15 @@ final class MetalSceneRecorder {
         let finishedStorage = activeStorage
         activeStorage = reusableStorage
         reusableStorage = finishedStorage
-        latestPacket = MetalScenePacket(sequence: nextSequence, storage: finishedStorage)
+        // Arrays are copy-on-write. The packet keeps an immutable value
+        // snapshot while the recorder mutates the alternate reusable storage
+        // on the owner thread; the display-link callback therefore never reads
+        // a mutable frame-storage reference.
+        latestPacket = MetalScenePacket(
+            sequence: nextSequence,
+            vertices: finishedStorage.vertices,
+            draws: finishedStorage.draws
+        )
         nextSequence += 1
     }
 
