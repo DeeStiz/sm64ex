@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18o is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18r is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -364,6 +364,23 @@
   Swift 6/C validation passes. The full matrix passes with `runs=118 failures=0`
   (log `/tmp/sm64-modern-m18q-matrix.log`), the generated native Debug build
   succeeds (log `/tmp/sm64-modern-m18q-build.log`), and `git diff --check` is
+  clean. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
+### M18r Completion Evidence
+
+- `MoneybagEnemy.swift` preserves the visible/hidden hitboxes, appearance
+  opacity ramp, move/return-home/disappear/death actions, landing/prepare/jump/
+  walk substates, attack bounce, hidden-coin transform admission, and death
+  loot as copied values.
+- `MoneybagObjectBridge.swift` owns general-actor Moneybag records, a
+  persistent hidden-coin level-list placeholder, and owner-thread transient
+  yellow-coin/mist children with scheduler-boundary unload and no C pointers.
+- The independent Swift/C owner-thread contract emits
+  `moneybagObjectBridgeFingerprint=0x3fc38246b5faee0f`; focused strict Swift 6/C
+  validation passes. The full matrix passes with `runs=119 failures=0` (log
+  `/tmp/sm64-modern-m18r-matrix.log`), the generated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18r-build.log`), and `git diff --check` is
   clean. Complete collision/effect delivery, remaining enemy/projectile
   breadth, and physical/visual/human acceptance remain open.
 
