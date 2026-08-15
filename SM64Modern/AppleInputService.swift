@@ -52,7 +52,11 @@ func makeAppleInputAPI(service: AppleInputService) -> SM64ModernInputApiV1 {
     return api
 }
 
-final class AppleInputService: @unchecked Sendable {
+/// Lock-protected bridge between main-queue AppKit/GameController callbacks and
+/// owner-thread input sampling. The service itself is not Sendable; only its
+/// copied POD snapshot crosses the C callback boundary, and haptic state has a
+/// separate lock.
+final class AppleInputService {
     private struct ControllerState {
         var buttons: UInt32 = 0
         var leftX: Int16 = 0

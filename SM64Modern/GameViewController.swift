@@ -44,7 +44,7 @@ final class GameViewController: NSViewController {
         let inputService = AppleInputService()
         self.inputService = inputService
         engineHost.configureInput(inputService)
-        installFocusObservers(service: inputService)
+        installFocusObservers()
         view.window?.makeFirstResponder(self)
         gameView.installDrawableSizeHandler { [engineHost] size in
             engineHost.requestDrawableSize(size)
@@ -92,23 +92,33 @@ final class GameViewController: NSViewController {
         }
     }
 
-    private func installFocusObservers(service: AppleInputService) {
+    private func installFocusObservers() {
         guard let window = view.window else { return }
         let center = NotificationCenter.default
         focusObservers.append(center.addObserver(forName: NSWindow.didBecomeKeyNotification, object: window, queue: .main) { _ in
-            service.setFocused(true)
+            MainActor.assumeIsolated { [weak self] in
+                self?.setInputFocus(true)
+            }
         })
         focusObservers.append(center.addObserver(forName: NSWindow.didResignKeyNotification, object: window, queue: .main) { _ in
-            service.setFocused(false)
+            MainActor.assumeIsolated { [weak self] in
+                self?.setInputFocus(false)
+            }
         })
         focusObservers.append(center.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { _ in
-            service.setFocused(false)
+            MainActor.assumeIsolated { [weak self] in
+                self?.setInputFocus(false)
+            }
         })
         focusObservers.append(center.addObserver(forName: NSApplication.didBecomeActiveNotification, object: nil, queue: .main) { _ in
             MainActor.assumeIsolated {
-                service.setFocused(window.isKeyWindow)
+                self.setInputFocus(window.isKeyWindow)
             }
         })
-        service.setFocused(NSApplication.shared.isActive && window.isKeyWindow)
+        setInputFocus(NSApplication.shared.isActive && window.isKeyWindow)
+    }
+
+    private func setInputFocus(_ focused: Bool) {
+        inputService?.setFocused(focused)
     }
 }

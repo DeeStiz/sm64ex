@@ -2,7 +2,7 @@
 
 ## Status
 
-M32e is the latest validated checkpoint layered on M18am: the Swift runtime
+M32f is the latest validated checkpoint layered on M18am: the Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
 object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
@@ -19,6 +19,9 @@ leaf boundary. M32d gives the progression migration service the same
 construction-thread token check at initialize/API/callback entry. M32e binds
 the gameplay migration service to the first engine-thread reset and checks
 every candidate/update/evidence callback. The implementation still
+M32f removes the input service's unchecked-sendability escape by keeping
+keyboard/controller state behind locks and routing AppKit focus notifications
+through MainActor-only closures. The implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
 132-script matrix passes, and the regenerated native Debug build succeeds.
@@ -845,6 +848,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M32c: Trace-session owner boundary | Oracle trace file state is explicitly owner-thread-only; the C stream callbacks remain isolated unsafe shims rather than making the mutable session unchecked-sendable. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; callback stress, remaining unchecked Sendable classes, and full trace qualification remain open |
 | M32d: Progression migration owner boundary | Swift progression migration state captures a pthread owner token, verifies it on initialize/API construction/event callbacks, and no longer relies on unchecked sendability. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; cross-thread callback stress, remaining unchecked Sendable classes, and full trace qualification remain open |
 | M32e: Gameplay migration owner boundary | Swift gameplay candidate state binds to the first engine-thread reset and verifies that token for every C update, candidate transform, and evidence read, removing another unchecked-sendability escape. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; cross-thread callback stress, remaining unchecked Sendable classes, and full trace qualification remain open |
+| M32f: Apple input shared-state boundary | `AppleInputService` no longer relies on `@unchecked Sendable`; lock-protected keyboard/mouse/controller snapshots and separately locked haptics cross the AppKit/engine boundary as copied state, while `GameViewController` focus notifications remain MainActor-isolated. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; physical controller/haptics behavior, cross-thread stress, and six remaining unchecked Sendable classes remain open |
 | M32: Swift 6 safety closure | Strict concurrency passes with mutable engine state no longer relying on `@unchecked Sendable`; remaining unsafe code is limited to audited leaf shims. | Not started |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | Not started |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |
