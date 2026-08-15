@@ -2,7 +2,7 @@
 
 ## Status
 
-M20d is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M20f is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -904,8 +904,9 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M20b: SL walking penguin owner-thread bridge | Swift attaches the walking-penguin kernel to generation-safe object IDs and the owner-thread scheduler, synchronizing action/timer, transform, yaw, velocity, animation, and end-of-frame unload state. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xaabb92f23fd8451a`, 154-script matrix (`runs=154 failures=0`), regenerated native Debug build, and `git diff --check` pass; floor/wall resolution remains caller-supplied and races, dialog, and remaining NPCs remain |
 | M20c: SL walking penguin floor/wall collision route | Swift queries the immutable surface world, applies C-style wall projection and facing admission, records floor identity/height/type/normal and move flags, and returns collision data through the owner-thread bridge. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xab2e63008759849f`, 155-script matrix (`runs=155 failures=0`), regenerated native Debug build, and `git diff --check` pass; full move-standard gravity/edge/steep-slope and effect/audio delivery remain |
 | M20d: racing penguin behavior and owner-thread route | Swift reproduces the race proposal/start gate, path-speed weighting, cheat detection, finish-wall stop, final dialog/reward branches, and sound/camera/star intents, then synchronizes those values through generation-safe owner-thread object records. | Complete locally — strict Swift 6/C value contract fingerprint `0xac6463b624763b06`, owner bridge fingerprint `0x65b2ccecaa02d25a`, 157-script matrix (`runs=157 failures=0`), regenerated native Debug build, and `git diff --check` pass; full movement/path ownership, effect delivery, and remaining NPC/puzzle families remain |
-| M20e: SL walking penguin move-standard route | Swift reproduces `cur_obj_move_standard(-78)` scalar movement for the walking penguin: drag, floor edge/steep-slope admission, gravity/bounce, water transitions, ground flags, canonical velocity decomposition, and owner-record publication. | Complete locally — strict Swift 6/C movement fingerprint `0x06637c47225dd8a1`, owner bridge fingerprint `0x2c3d22136511755b`, current 159-script matrix, regenerated native Debug build, and `git diff --check` pass; wall-prepass ordering, path/child ownership, and remaining effect/NPC families remain |
-| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20e close the first value-plus-object collision/race/movement slice; exact wall-prepass ordering, path/child ownership, effect/audio delivery, dialog integration, remaining NPCs, puzzles, secrets, and rewards remain |
+| M20e: SL walking penguin move-standard route | Swift reproduces `cur_obj_move_standard(-78)` scalar movement for the walking penguin: drag, floor edge/steep-slope admission, gravity/bounce, water transitions, ground flags, canonical velocity decomposition, and owner-record publication. | Complete locally — strict Swift 6/C movement fingerprint `0x06637c47225dd8a1`, owner bridge fingerprint `0x2c3d22136511755b`, current 159-script matrix, regenerated native Debug build, and `git diff --check` pass; C-order prepass integration and path/child/effect ownership remain |
+| M20f: SL walking penguin C-order prepass route | The opt-in movement path resolves the current wall/floor state before behavior, feeds the projected position and selected floor facts into movement, preserves wall identity/flags, and keeps the historical collision-only route unchanged. | Complete locally — strict Swift 6/C owner-bridge fingerprint `0xc1e522003a32dd59`, focused contract, 159-script matrix (`runs=159 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; path/child ownership, effect/audio delivery, and remaining NPC/puzzle families remain |
+| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20f close the first value-plus-object collision/race/movement slice; path/child ownership, effect/audio delivery, dialog integration, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1076,8 +1077,10 @@ replayable trace, and the platform evidence listed in its exit gate.
    finish handling, final dialog/reward choices, and explicit sound/camera/
    child-attachment intents. M20e adds the explicit `-78` movement kernel and
    opt-in owner-thread route for gravity, edge/steep-slope, water, ground flags,
-   drag, and canonical velocity publication. Finish wall-prepass ordering,
-   path/child/effect ownership before the remaining NPC/puzzle families.
+   drag, and canonical velocity publication. M20f closes the C-order wall/floor
+   prepass for that opt-in route while retaining the historical collision-only
+   path. Finish path/child/effect ownership before the remaining NPC/puzzle
+   families.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and

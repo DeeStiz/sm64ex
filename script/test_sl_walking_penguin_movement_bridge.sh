@@ -25,7 +25,7 @@ xcrun swiftc -parse-as-library -swift-version 6 -Xfrontend -strict-concurrency=c
 SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-sl-walking-penguin-movement-bridge-smoke)"
 printf '%s\n' "$SWIFT_OUTPUT"
 
-xcrun clang -std=c11 -ffp-contract=off \
+xcrun clang -std=c11 -ffp-contract=off -I"$PROJECT_ROOT/include" \
   "$PROJECT_ROOT/tests/sm64_modern_sl_walking_penguin_movement_bridge_contract.c" \
   -o "$BUILD_ROOT/sm64-modern-sl-walking-penguin-movement-bridge-contract"
 C_OUTPUT="$($BUILD_ROOT/sm64-modern-sl-walking-penguin-movement-bridge-contract)"

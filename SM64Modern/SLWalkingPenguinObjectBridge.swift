@@ -153,17 +153,29 @@ final class SM64SLWalkingPenguinObjectBridge {
     ) {
         guard var state = states[id], let record = pool.record(for: id) else { return }
         let previousAction = state.action
+        let prepass = (advanceMovement ? collisionWorld : nil).flatMap { world in
+            SM64SLWalkingPenguinCollision.resolve(
+                SM64SLWalkingPenguinCollisionInput(
+                    position: record.position,
+                    moveYaw: state.moveYaw,
+                    wallHitboxRadius: record.wallHitboxRadius,
+                    previousMoveFlags: record.moveFlags,
+                    world: world
+                )
+            )
+        }
+        let behaviorPosition = prepass?.position ?? record.position
         let output = SM64SLWalkingPenguinBehavior.update(
             SM64SLWalkingPenguinInput(
                 action: state.action,
                 timer: state.timer,
                 currentStep: state.currentStep,
                 currentStepTimer: state.currentStepTimer,
-                position: record.position,
+                position: behaviorPosition,
                 moveYaw: state.moveYaw
             )
         )
-        let collision = collisionWorld.flatMap { world in
+        let postBehaviorCollision = (!advanceMovement ? collisionWorld : nil).flatMap { world in
             SM64SLWalkingPenguinCollision.resolve(
                 SM64SLWalkingPenguinCollisionInput(
                     position: output.nextPosition,
@@ -174,10 +186,13 @@ final class SM64SLWalkingPenguinObjectBridge {
                 )
             )
         }
+        let collision = prepass ?? postBehaviorCollision
         let movement = movementResult(
             record: record,
-            candidatePosition: collision?.position ?? output.nextPosition,
-            previousMoveFlags: collision?.moveFlags ?? record.moveFlags,
+            startPosition: prepass?.position ?? record.position,
+            floorHeight: prepass?.floorHeight ?? record.floorHeight,
+            candidatePosition: output.nextPosition,
+            previousMoveFlags: prepass?.moveFlags ?? postBehaviorCollision?.moveFlags ?? record.moveFlags,
             forwardVelocity: output.forwardVelocity,
             moveYaw: output.moveYaw,
             collisionWorld: collisionWorld,
@@ -221,6 +236,8 @@ final class SM64SLWalkingPenguinObjectBridge {
 
     private func movementResult(
         record: SM64ObjectRecord,
+        startPosition: SM64ObjectVector3,
+        floorHeight: Float,
         candidatePosition: SM64ObjectVector3,
         previousMoveFlags: UInt32,
         forwardVelocity: Float,
@@ -239,12 +256,12 @@ final class SM64SLWalkingPenguinObjectBridge {
         } ?? 0
         return SM64SLWalkingPenguinMovement.resolve(
             SM64SLWalkingPenguinMovementInput(
-                startPosition: record.position,
+                startPosition: startPosition,
                 candidatePosition: candidatePosition,
                 velocityY: record.velocity.y,
                 forwardVelocity: forwardVelocity,
                 moveYaw: moveYaw,
-                floorHeight: record.floorHeight,
+                floorHeight: floorHeight,
                 floorRoom: Int8(truncatingIfNeeded: record.floorRoom),
                 objectRoom: Int8(truncatingIfNeeded: record.room),
                 moveFlags: previousMoveFlags,

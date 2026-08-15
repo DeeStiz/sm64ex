@@ -1,5 +1,10 @@
 #include <stdint.h>
 #include <stdio.h>
+#include <math.h>
+
+#include "PR/ultratypes.h"
+#define AVOID_UB 1
+#include "trig_tables.inc.c"
 
 static uint64_t hash_u32(uint64_t hash, uint32_t value) {
     for (int byte = 0; byte < 4; ++byte) {
@@ -43,12 +48,20 @@ static uint64_t hash_step(uint64_t hash, float movementX, float movementY,
 
 int main(void) {
     uint64_t fingerprint = UINT64_C(1469598103934665603);
-    fingerprint = hash_step(fingerprint, 600.0f, 0.0f, 6.0f,
+    fingerprint = hash_step(fingerprint, 600.0f, -0.0f, 6.0f,
                             0.0f, 2.0f, 6.0f, 6.0f, 1,
-                            600.0f, 0.0f, 6.0f, 2.0f, 6.0f, 1);
+                            600.0f, -0.0f, 6.0f, 2.0f, 6.0f, 1);
     fingerprint = hash_step(fingerprint, 600.0f, -0.0f, 12.0f,
                             0.0f, 1.0f, 6.0f, 6.0f, 2,
                             600.0f, -0.0f, 12.0f, 1.0f, 6.0f, 2);
+    float sine = gSineTable[0x900];
+    float cosine = gSineTable[0x400 + 0x900];
+    float x = 320.0f + sine * 6.0f;
+    float z = cosine * 6.0f;
+    union { float f; uint32_t u; } sx = { sine * 6.0f }, cz = { cosine * 6.0f }, cf = { sqrtf(sx.f * sx.f + cz.f * cz.f) };
+    fingerprint = hash_step(fingerprint, x, -0.0f, z,
+                            sx.f, 2.0f, cz.f, cf.f, 0x201,
+                            x, -0.0f, z, 2.0f, cf.f, 0x201);
     printf("slWalkingPenguinMovementBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);
     printf("SM64 Modern SL walking penguin movement bridge C contract passed\n");

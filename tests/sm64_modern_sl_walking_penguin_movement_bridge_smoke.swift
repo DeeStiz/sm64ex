@@ -54,6 +54,20 @@ private func triangle(id: UInt32) -> SM64Surface {
     )
 }
 
+private func wall(id: UInt32, x: Int16) -> SM64Surface {
+    SM64Surface(
+        id: id,
+        flags: SM64SurfaceCollisionWorld.xProjectionFlag,
+        lowerY: -100,
+        upperY: 100,
+        vertex1: SM64SurfaceVec3s(x: x, y: -100, z: -100),
+        vertex2: SM64SurfaceVec3s(x: x, y: 100, z: -100),
+        vertex3: SM64SurfaceVec3s(x: x, y: 100, z: 100),
+        normal: SM64SurfaceVec3f(x: 1, y: 0, z: 0),
+        originOffset: -Float(x)
+    )
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -61,7 +75,9 @@ private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
 @main
 enum SM64ModernSLWalkingPenguinMovementBridgeSmoke {
     static func main() throws {
-        let world = try SM64SurfaceCollisionWorld(staticSurfaces: [triangle(id: 1)])
+        let world = try SM64SurfaceCollisionWorld(
+            staticSurfaces: [triangle(id: 1), wall(id: 2, x: 300)]
+        )
         let engineState = SM64SwiftEngineState(objectCapacity: 2)
         let bridge = SM64SLWalkingPenguinObjectBridge()
         let id = try bridge.spawnPenguin(
@@ -89,6 +105,30 @@ enum SM64ModernSLWalkingPenguinMovementBridgeSmoke {
             require(record.moveFlags == movement.moveFlags, "record move flags follow movement")
             fingerprint = hashMovement(fingerprint, movement, record: record)
         }
+
+        let wallID = try bridge.spawnPenguin(
+            in: engineState,
+            position: SM64ObjectVector3(x: 290, y: 0, z: 0),
+            moveYaw: Int16(bitPattern: 0x9000),
+            wallHitboxRadius: 20
+        )
+        let wallTick = bridge.tick(
+            state: engineState,
+            collisionWorld: world,
+            advanceMovement: true
+        )
+        guard let wallEffect = wallTick.effects.last,
+              let wallMovement = wallEffect.movement,
+              let wallCollision = wallEffect.collision,
+              let wallRecord = engineState.objects.record(for: wallID) else {
+            preconditionFailure("wall prepass movement result missing")
+        }
+        require(wallEffect.action == SM64SLWalkingPenguinBehavior.movingForwards, "prepass keeps penguin on bridge")
+        require(wallCollision.wallSurfaceIDs == [2], "prepass reports wall identity")
+        require(wallCollision.position.x == 320, "prepass projects wall before behavior")
+        require(wallMovement.position.x > 300 && wallMovement.position.x < 320, "behavior moves from projected prepass")
+        require(wallRecord.moveFlags & SM64SLWalkingPenguinCollision.hitWall != 0, "prepass wall flag survives movement")
+        fingerprint = hashMovement(fingerprint, wallMovement, record: wallRecord)
 
         print(String(format: "slWalkingPenguinMovementBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern SL walking penguin movement bridge smoke passed")
