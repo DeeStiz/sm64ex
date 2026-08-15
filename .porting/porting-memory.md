@@ -1289,6 +1289,23 @@
 - This remains one bounded M19 seam; platform ownership/collision, remaining
   mechanisms and hazards, effect delivery, and M20–M35 are still open.
 
+### M19f Completion Evidence
+
+- `SM64Modern/DecorativePendulumBehavior.swift` is the value counterpart of
+  `bhv_decorative_pendulum_init`/`bhv_decorative_pendulum_loop`: the `0x100`
+  initial roll velocity, room-init intent, signed `0x08` acceleration, roll
+  accumulation, and exact `0x10`/`-0x10` clock-sound edge are explicit.
+- The independent C contract matches Swift at
+  `decorativePendulumFingerprint=0xd9bba67deb7b6398`; both swing directions and
+  the sound-edge states are covered.
+- `script/test_decorative_pendulum.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`. The full matrix target is
+  `runs=143 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 mechanism seam; platform ownership/collision,
+  remaining mechanisms and hazards, effect delivery, and M20–M35 are still
+  open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
