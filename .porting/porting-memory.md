@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M33a is the current validated qualification seam layered on the M18am Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb/Bullet-Bill-smoke/Swoop/Goomba/Spiny/Boo/Whomp owner-thread enemy slice. Swift now owns runtime lifecycle phases, failure fencing, a real owner-thread engine context with state/object-pool/scheduler tick receipts, explicit per-domain readiness, the qualified progression actor route, the qualified input normalizer route, the qualified Mario input-core route, the qualified idle action-selection route, and schema-4 Swift receipt/sidecar emission. M32a publishes Metal scene packets as value-semantic copy-on-write snapshots, M32b carries immutable texture-upload bytes in those packets while keeping mutable Metal residency state inside the renderer, M32c makes the oracle trace file session explicitly owner-thread-only, M32d adds the same token-checked owner boundary to progression migration, M32e adds a bind-on-first-reset token to gameplay migration, M32f makes Apple input a lock-protected shared-state bridge with MainActor-only focus notifications, M32g makes gameplay parity state explicitly engine-owner-thread-only, M32h makes both persistence adapters immutable `Sendable` descriptors with token and pthread checks, M32i makes shader compiler cache access lock-guarded with compilation queue ownership, M32j makes renderer mutation owner-thread-gated with display-link rejection, M32k removes the final host escape with an integer-address thread bootstrap and main-actor resize closure, and M33a maps all 7,419 reachability rows to unique planned route shards with deterministic seeds and expected trace domains. `SM64Modern` has zero unchecked-Sendable classes; every audited bridge-side deletion and transient-child retirement still routes through the shared sink plus the corrected Enemy Lakitu composite harness. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M33b is the current validated qualification seam layered on the M18am Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb/Bullet-Bill-smoke/Swoop/Goomba/Spiny/Boo/Whomp owner-thread enemy slice. Swift now owns runtime lifecycle phases, failure fencing, a real owner-thread engine context with state/object-pool/scheduler tick receipts, explicit per-domain readiness, the qualified progression actor route, the qualified input normalizer route, the qualified Mario input-core route, the qualified idle action-selection route, and schema-4 Swift receipt/sidecar emission. M32a publishes Metal scene packets as value-semantic copy-on-write snapshots, M32b carries immutable texture-upload bytes in those packets while keeping mutable Metal residency state inside the renderer, M32c makes the oracle trace file session explicitly owner-thread-only, M32d adds the same token-checked owner boundary to progression migration, M32e adds a bind-on-first-reset token to gameplay migration, M32f makes Apple input a lock-protected shared-state bridge with MainActor-only focus notifications, M32g makes gameplay parity state explicitly engine-owner-thread-only, M32h makes both persistence adapters immutable `Sendable` descriptors with token and pthread checks, M32i makes shader compiler cache access lock-guarded with compilation queue ownership, M32j makes renderer mutation owner-thread-gated with display-link rejection, M32k removes the final host escape with an integer-address thread bootstrap and main-actor resize closure, and M33a maps all 7,419 reachability rows to unique planned route shards with deterministic seeds and expected trace domains. M33b adds a value-only execution ledger plus 14 C/Swift byte-identical schema-4 fixture replays; these fixtures validate runner mechanics only, not live gameplay parity. `SM64Modern` has zero unchecked-Sendable classes; every audited bridge-side deletion and transient-child retirement still routes through the shared sink plus the corrected Enemy Lakitu composite harness. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -1107,6 +1107,30 @@
   `/tmp/sm64-modern-m33a-clean-build.log`), and `git diff --check` is clean.
   This is qualification inventory evidence, not whole-game parity, physical,
   visual, store, distribution, or human acceptance.
+
+### M33b Completion Evidence
+
+- `SM64Modern/RouteShardExecution.swift` implements a strict Swift 6
+  value-only ledger. A shard can move only from `planned` to `running` and
+  then to one terminal state; `passed` requires non-zero expected records,
+  exact actual/matched counts, and no first-divergence detail.
+- `tools/SM64RouteShardReplayTool.swift` consumes one canonical manifest row,
+  derives the fixed input/save seeds, emits schema-4 fixture records, and
+  writes a machine-readable ledger report. The fixture is explicitly marked
+  `fixture_only=1` and does not count as live gameplay coverage.
+- `tests/sm64_modern_route_shard_replay_contract.c` emits the same little-endian
+  header/record bytes from the C side. `script/test_route_shard_replay.sh`
+  compares fourteen oracle-hook shards byte-for-byte, exercises the partial-
+  pass and terminal-transition fences, and passes under Swift 6 complete
+  strict-concurrency checking.
+- The focused replay smoke passes with
+  `sample_shards=14 c_swift_byte_match=1 ledger_transition_fence=1`.
+  The full matrix passes with `runs=134 failures=0` (log
+  `/tmp/sm64-modern-m33b-matrix.log`), the clean regenerated native Debug
+  build succeeds (log `/tmp/sm64-modern-m33b-clean-build.log`), and
+  `git diff --check` is clean. This remains runner-contract evidence only;
+  all 7,419 live route shards, sanitizer parity, Metal production, release,
+  physical, and human gates remain open.
 
 ### M8b Completion Evidence
 
