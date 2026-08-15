@@ -350,6 +350,23 @@
   clean. Complete collision/effect delivery, remaining enemy/projectile
   breadth, and physical/visual/human acceptance remain open.
 
+### M18q Completion Evidence
+
+- `PiranhaPlant.swift` preserves the nine-action idle/sleep/wake/bite/attack/
+  shrink/wait/respawn table, sleeping and biting hitboxes, 0x400 yaw approach,
+  bite sound frames, metal-cap attack, level-height visibility, 0.04 shrink,
+  0.02 respawn growth, and blue-coin transition as copied values.
+- `PiranhaPlantObjectBridge.swift` owns general-actor plant records and
+  allocates twenty purple attack particles or blue-coin loot on the
+  unimportant list, with scheduler-boundary unload and no C pointers.
+- The independent Swift/C owner-thread contract emits
+  `piranhaPlantObjectBridgeFingerprint=0x4202eefc24547aa0`; focused strict
+  Swift 6/C validation passes. The full matrix passes with `runs=118 failures=0`
+  (log `/tmp/sm64-modern-m18q-matrix.log`), the generated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18q-build.log`), and `git diff --check` is
+  clean. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
 ### M8b Completion Evidence
 
 - `tests/fixtures/sm64_modern_timebase_cadence.tsv` is the governing M8b/M8c/M8d ownership inventory; the aggregate fixture remains a checked drift detector. The audit includes scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, input/rumble boundaries, presentation, and Swift host deferrals.
