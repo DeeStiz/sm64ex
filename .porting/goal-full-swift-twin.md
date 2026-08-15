@@ -2,11 +2,11 @@
 
 ## Status
 
-M18ac is the latest validated checkpoint: the owner-thread effect router emits
-the independent Swift/C fingerprint `0x6f4e529130b860b1`, consumes Chain Chomp
-post/gate effects, and the strict focused contract, full 130-script matrix,
-and regenerated native Debug build pass. M18ab remains the preceding validated
-release bridge checkpoint. M0–M17 local scopes remain complete
+M18ad is the latest validated checkpoint: the bouncing-fireball parent/flame
+bridge emits the independent Swift/C fingerprint `0x473a69850a182475`, and the
+strict focused contract, full 131-script matrix, and regenerated native Debug
+build pass. M18ac remains the preceding validated owner-thread effect-router
+checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
 platform, NPC, boss, save, frontend, audio, renderer, Swift-6-safety,
@@ -635,6 +635,17 @@ strict Swift 6/C validation passes; the full 130-script matrix
 pass. Whole-engine effect routing, collision resolution, remaining enemy/
 projectile families, and physical/visual/audio/human acceptance remain open.
 
+M18ad adds the bouncing-fireball parent/flame owner bridge. It preserves the
+2,000-unit activation fence, 11-frame flame emission and scale decay, rising
+and cycling vertical/forward velocities, surface/timer deletion fences, stable
+general-actor child allocation, parent-relative placement, and owner-thread
+scheduler cleanup in the independent Swift/C fingerprint
+`0x473a69850a182475`. Focused strict Swift 6/C validation passes; the full 131
+script matrix (`runs=131 failures=0`), regenerated native Debug build, and
+`git diff --check` pass. Whole-engine effect routing, collision resolution,
+remaining enemy/projectile families, and physical/visual/audio/human
+acceptance remain open.
+
 M12h routes floor, ceiling, and wall candidates through the C-ordered partition with indexed Swift surface storage and dynamic replacement. M12i adds a value-type owner-thread gameplay tick that composes input/geometry, preserves paired simulation/legacy counters, carries demo state, and advances logical rumble with a matching Swift/C trace. Live runtime wiring, production content breadth, and physical haptic delivery remain open.
 
 M13a adds a Swift-owned Mario state POD boundary with C save-backed defaults, cap-loss flags, spawn floor clamping, water/idle action selection, stable object/surface IDs, counters, hitbox-adjacent state, and a matching initialization fingerprint. M13b adds the pure health/cap mutation kernel for poison gas, swimming recovery/drain, snow terrain, heal/hurt counters, C clamps, and near-drowning rumble intent with a matching mutation fingerprint. M13c adds exact cap-course/pickup flags and timers, four-action timer pauses, expiry cleanup, fade/flicker render intents, and a matching cap fingerprint. M13d applies collision-derived terrain snapshots into Swift Mario state with stable floor/ceiling/wall IDs, heights, water/angle/sound fields, input union, and a matching terrain fingerprint. M13e adds a C-matching `set_mario_action` transition kernel for moving, airborne, submerged, and cutscene entry paths, plus drop/hurt wrappers and a matching action fingerprint. M14a adds pointer-free common stationary cancel decisions for idle, crouching, and start-crouching input priority, low-health/terrain transitions, face-yaw intent, and held-object drop intent with a matching decision fingerprint. M14b extracts the C `update_walking_speed` callback into a finite-checked Swift value kernel, preserves the ABI callback through that kernel, and matches the independent C ground-speed fingerprint. M14c extracts the four-quarter `perform_ground_step` decision boundary over immutable floor/ceiling/wall snapshots, including wall continuation/normalization, floor departure, ceiling stop, shell water pseudo-floor, and a matching ground-step fingerprint. M14d extracts `anim_and_audio_for_walk` into a value state machine with exact speed-band animation IDs, fixed-point acceleration, timer transitions, walking-pitch easing, and deferred metal/terrain/quicksand step-sound intents with a matching fingerprint. M14e extracts the idle, crouching, and start-crouching action bodies into a value boundary with idle-cycle/sleep bookkeeping, animation IDs, cancellation/drop propagation, and stationary-step intents with a matching fingerprint. M14f extracts `push_or_sidle_wall` into a scalar wall-response boundary with forward-speed cap/velocity projection, canonical wall-yaw classification, pushing/sidestep animation and acceleration intents, wall-facing action argument, body roll, and sound/dust intents with a matching fingerprint. Full action bodies and interaction effects remain open.
@@ -713,6 +724,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M18: Common enemies | Common enemy and projectile families match C across every reachable course. | In progress — M18a–M18d Goomba/Spiny shadow, scheduler, collision, and attack contracts plus M18e Lakitu control, M18f live allocation/parent-link bridge, M18g Bullet Bill projectile bridge, M18h Swoop enemy bridge, M18i Amp family bridge, M18j Bird six-child bridge, M18k Bully small/large bridge, M18l Skeeter/wave bridge, M18m Pokey parent/body bridge, M18n water-bomb spawner/bomb/cannon/shadow bridge, M18o Koopa shell/underwater shell bridge, M18p generic/stationary Bob-omb bridge, M18q Piranha Plant action/particle bridge, M18r Moneybag/hidden-coin bridge, M18s Snufit/bowling-ball bridge, M18t Scuttlebug/spawner bridge, M18u Mr. I eye/body/particle bridge, M18v Whomp/King Whomp bridge, M18w Heave Ho/throw-child bridge, and M18x Chuckya/anchor bridge, and M18y Fly Guy/flame bridge, and M18z Boo owner bridge, and M18aa Chain Chomp parent/segment bridge pass fingerprints \`0x0b1058cb88f78d06\`, \`0x7b7a91e29b3e1003\`, \`0x416df13a812fe31f\`, \`0x4021eec4cfdb5938\`, \`0xb2fd32a3d8fda71f\`, \`0x95be3d7fa671c885\`, \`0x322da26bf68945a6\`, \`0x491f58d4bb2b3a92\`, \`0xf97b3fef9a11eb4e\`, \`0x8d7dc5c6315293c4\`, \`0x171e3016f6b728d2\`, \`0x0dc81376f8b50092\`, \`0x4385c323194c376e\`, \`0x3dee340d1e85a07e\`, \`0x9e25e782f40ffdd0\`, \`0x4202eefc24547aa0\`, and \`0x3fc38246b5faee0f\`, and \`0xa388cd46139be059\`, and \`0x7204b63131e2054b\`, and \`0x18b1a7bddb65a836\`, and \`0x672073b350af199a\`, and \`0x9c4a7443f2c09281\`, and \`0x1c7a7a54fd31996a\`, and \`0x2fbf98eca64a5496\`, and \`0x7505d05143270ec7\`, and \`0x89d7ec70d95560c8\`; focused strict Swift 6/C validation, the 128-script matrix (`runs=128 failures=0`), generated native Debug build, and \`git diff --check\` pass; full collision resolution and remaining enemy/projectile families remain |
 | M18ab: Chain Chomp release seam | Wooden-post ground-pound/release, coin orbit, gate destruction, owner-thread surface objects, collision identities, and effect delivery match C. | Complete locally — `0xdd959e6ce61c03bd`, strict Swift 6/C contract, 129-script matrix, regenerated native Debug build, and `git diff --check` pass; runtime collision/effect presentation remains open |
 | M18ac: Owner-thread effect router | Common effect intents are sequenced and delivered into Swift-owned object mutations while presentation intents remain immutable and ordered. | Complete locally — `0x6f4e529130b860b1`, strict Swift 6/C contract, 130-script matrix, regenerated native Debug build, and `git diff --check` pass; whole-engine routing remains open |
+| M18ad: Bouncing fireball bridge | Bouncing-fireball parent/flame actions, child allocation, scale/velocity state, and owner-thread deletion fencing match C. | Complete locally — `0x473a69850a182475`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; whole-engine effect routing and runtime collision/presentation remain open |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |

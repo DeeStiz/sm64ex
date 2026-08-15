@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18ac is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp plus wooden-post/gate and common effect-router owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18ad is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -568,6 +568,25 @@
   --check` passes. Whole-engine routing, runtime collision/effect coverage,
   remaining enemy breadth, and physical/visual/audio/human acceptance remain
   open.
+
+### M18ad Completion Evidence
+
+- `BouncingFireball.swift` is a finite value translation of the parent and
+  flame behavior loops from `src/game/behaviors/bouncing_fireball.inc.c`,
+  including the 2,000-unit activation gate, flame scale/timer cadence,
+  velocity cycles, surface-contact deletion fences, and timeout cleanup.
+- `BouncingFireballObjectBridge.swift` owns default/general-actor scheduler
+  placement, stable parent-child IDs, parent-relative flame placement, record
+  synchronization, and owner-thread end-of-frame deletion without sharing C
+  object pointers.
+- The independent Swift/C contract emits
+  `bouncingFireballFingerprint=0x473a69850a182475`; focused strict Swift 6/C
+  validation passes. The full matrix passes with `runs=131 failures=0` (log
+  `/tmp/sm64-modern-m18ad-matrix.log`), the regenerated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18ad-build.log`), and `git diff --check`
+  passes. Whole-engine effect routing, runtime collision/presentation,
+  remaining enemy/projectile breadth, and physical/visual/audio/human
+  acceptance remain open.
 
 ### M8b Completion Evidence
 
