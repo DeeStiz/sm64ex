@@ -73,6 +73,9 @@ enum SM64MarioActionID {
     static let ridingShellGround: UInt32 = 0x20810446
     static let ridingShellJump: UInt32 = 0x0281089A
     static let ridingShellFall: UInt32 = 0x0081089B
+    static let burningGround: UInt32 = 0x00020449
+    static let burningJump: UInt32 = 0x010208B4
+    static let burningFall: UInt32 = 0x010208B5
     static let punching: UInt32 = 0x00800380
     static let movePunching: UInt32 = 0x00800457
     static let crouchSlide: UInt32 = 0x04808459
