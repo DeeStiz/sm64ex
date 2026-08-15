@@ -1222,6 +1222,23 @@
   dynamic surface replacement, hazards, collision/effects, and M20–M35 remain
   open.
 
+### M19b Completion Evidence
+
+- `SM64Modern/ElevatorBehavior.swift` extracts `elevator_act_0` through
+  `elevator_act_4` as a value machine. It preserves the standard/RR/custom
+  platform-kind branches, endpoint action selection, signed
+  `approach_f32_signed` velocity order, Mario-on-platform and in-air gates,
+  and movement/quiet-pound/metal-pound plus screen-shake intents.
+- `tests/sm64_modern_elevator_behavior_contract.c` independently mirrors the
+  action switch. The Swift/C fingerprint is
+  `elevatorBehaviorFingerprint=0x07f1d3fee9d22bac`.
+- `script/test_elevator_behavior.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`; the full matrix passes with
+  `runs=138 failures=0` (log `/tmp/sm64-modern-m19b-matrix.log`). The clean
+  regenerated native Debug build and `git diff --check` pass.
+- This remains a bounded M19 seam: object ownership, collision loading,
+  remaining mechanisms/hazards, effects, and M20–M35 remain open.
+
 ### M8b Completion Evidence
 
 - `tests/fixtures/sm64_modern_timebase_cadence.tsv` is the governing M8b/M8c/M8d ownership inventory; the aggregate fixture remains a checked drift detector. The audit includes scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, input/rumble boundaries, presentation, and Swift host deferrals.

@@ -39,6 +39,7 @@
 		1F18E249F019B6AA8EBB85C9 /* MarioBasicAirAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B5A3098ED731C8CD759DE75 /* MarioBasicAirAction.swift */; };
 		1F4EB6331042EECC1AFF0F44 /* ObjectPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29E29EEED44FF3034BE40C4C /* ObjectPool.swift */; };
 		1FD4FE652AA364FC5084A439 /* ObjectScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3CC8538BA0A2A1F3C291572 /* ObjectScheduler.swift */; };
+		205E67C2EEF8113A521111E0 /* ElevatorBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = E37C0994C353B61075C5EBCA /* ElevatorBehavior.swift */; };
 		21359BCC74C54CCBB6F28485 /* MarioAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEBF996423E617F30D67C1D /* MarioAction.swift */; };
 		213C0A6E5D88CC7C1405FED4 /* SurfaceCollisionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2E23B1C6254504EAE6CE5C01 /* SurfaceCollisionData.swift */; };
 		23438691E437DAAAC9B38229 /* BirdEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FC5B24277AF249CA2DFC7FD6 /* BirdEnemy.swift */; };
@@ -335,6 +336,7 @@
 		E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayoutContentRuntime.swift; sourceTree = "<group>"; };
 		E2C9C1CEC9C0000598706A91 /* MarioSlope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSlope.swift; sourceTree = "<group>"; };
 		E3353EA4B05B2088E0941DEB /* PiranhaPlantObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiranhaPlantObjectBridge.swift; sourceTree = "<group>"; };
+		E37C0994C353B61075C5EBCA /* ElevatorBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevatorBehavior.swift; sourceTree = "<group>"; };
 		E479D5A092A548EEA6715AA1 /* MarioDeceleratingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioDeceleratingAction.swift; sourceTree = "<group>"; };
 		E497FB3B17788DCEA3B3261F /* BirdObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirdObjectBridge.swift; sourceTree = "<group>"; };
 		E6490BF062BC1F8E0961D2B4 /* MoneybagObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneybagObjectBridge.swift; sourceTree = "<group>"; };
@@ -406,6 +408,7 @@
 				F3F0AEF5342F3B329237DD66 /* ContentPack.swift */,
 				8A6630058727A186889977A1 /* ContentPackRuntime.swift */,
 				3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */,
+				E37C0994C353B61075C5EBCA /* ElevatorBehavior.swift */,
 				49737667D24AE6AEA3374B3E /* EnemyLakitu.swift */,
 				994D08C3E7FCF937245A9757 /* EnemyLakituObjectBridge.swift */,
 				6291FCF691572C0089D6194D /* EngineAuthority.swift */,
@@ -678,6 +681,7 @@
 				B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */,
 				90B7F9D7BD419562B6E7A2F8 /* ContentPackRuntime.swift in Sources */,
 				11833E1637F8649E7554B9F6 /* DeterministicPrimitives.swift in Sources */,
+				205E67C2EEF8113A521111E0 /* ElevatorBehavior.swift in Sources */,
 				BFAC85948508CFC15B564EFE /* EnemyLakitu.swift in Sources */,
 				03FAB70D01EC36C629B7ACEE /* EnemyLakituObjectBridge.swift in Sources */,
 				CFF98EAAB1C2B379F37CB33B /* EngineAuthority.swift in Sources */,
