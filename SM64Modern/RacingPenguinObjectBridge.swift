@@ -86,11 +86,14 @@ struct SM64RacingPenguinObjectEffect: Equatable, Sendable {
     let output: SM64RacingPenguinOutput
     let raceChildren: SM64RacingPenguinRaceChildIDs?
     let path: SM64RacingPenguinPathOutput?
+    let spawnedChildren: [SM64ObjectID]
+    let presentedEffects: [SM64OwnerThreadEffectIntent]
 }
 
 struct SM64RacingPenguinSchedulerTickResult: Equatable, Sendable {
     let scheduler: SM64ObjectSchedulerTickResult
     let effects: [SM64RacingPenguinObjectEffect]
+    let deliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// Owner-thread bridge for `bhv_racing_penguin_update`.  Object IDs and
@@ -101,15 +104,27 @@ final class SM64RacingPenguinObjectBridge {
     static let defaultModel: UInt32 = 0x93 // MODEL_PENGUIN_RACING
     static let finishLineBehaviorIdentity: UInt64 = 0x6268_765F_72666C
     static let shortcutBehaviorIdentity: UInt64 = 0x6268_765F_727363
+    static let smokeModel: UInt32 = 0x96 // MODEL_SMOKE
+    static let smokeBehaviorIdentity: UInt64 = 0x6268_765F_707566
+    static let starModel: UInt32 = 0x7A // MODEL_STAR
+    static let starBehaviorIdentity: UInt64 = 0x6268_765F_73746E
+    static let starHomePosition = SM64ObjectVector3(x: -7_339, y: -5_700, z: -6_774)
+    static let starSpawnYOffset: Float = 200
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64RacingPenguinObjectState] = [:]
     private var environments: [SM64ObjectID: SM64RacingPenguinEnvironment] = [:]
     private var raceChildren: [SM64ObjectID: SM64RacingPenguinRaceChildIDs] = [:]
     private(set) var effectLog: [SM64RacingPenguinObjectEffect] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -181,6 +196,8 @@ final class SM64RacingPenguinObjectBridge {
     ) -> SM64RacingPenguinSchedulerTickResult {
         environments = frameEnvironments
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         advanceRaceChildren(state: engineState)
         let schedulerResult = scheduler.update(
             state: engineState,
@@ -206,13 +223,15 @@ final class SM64RacingPenguinObjectBridge {
         }
         return SM64RacingPenguinSchedulerTickResult(
             scheduler: schedulerResult,
-            effects: effectLog
+            effects: effectLog,
+            deliveries: deliveryLog
         )
     }
 
     private func update(id: SM64ObjectID, pool: SM64ObjectPool) {
         guard var state = states[id], let record = pool.record(for: id) else { return }
         let previousAction = state.action
+        let previousFinalTextbox = state.finalTextbox
         let environment = environments[id] ?? SM64RacingPenguinEnvironment(
             marioPositionY: record.position.y
         )
@@ -297,6 +316,68 @@ final class SM64RacingPenguinObjectBridge {
         }
         states[id] = state
 
+        var spawnedChildren: [SM64ObjectID] = []
+        if output.spawnSmoke,
+           let smoke = try? pool.spawn(
+               in: .unimportant,
+               model: Self.smokeModel,
+               behaviorIdentity: Self.smokeBehaviorIdentity,
+               parent: id
+           ) {
+            _ = pool.mutate(smoke) { record in
+                record.objectFlags |=
+                    SM64ObjectScheduler.objectFlagTransformRelativeToParent |
+                    SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+                record.parentRelativePosition = SM64ObjectVector3(x: 0, y: -100, z: 0)
+                record.scale = SM64ObjectVector3(x: 4, y: 4, z: 4)
+            }
+            spawnedChildren.append(smoke)
+            effectRouter.enqueue(objectID: smoke, kind: .markForDeletion)
+        }
+        if output.spawnStar,
+           let star = try? pool.spawn(
+               in: .level,
+               model: Self.starModel,
+               behaviorIdentity: Self.starBehaviorIdentity,
+               parent: id
+           ) {
+            let parentPosition = pool.record(for: id)?.position ?? .zero
+            _ = pool.mutate(star) { record in
+                // `cur_obj_spawn_star_at_y_offset` temporarily raises the
+                // source object by 200 before `spawn_star` copies its spawn
+                // position, while the home target remains course-authored.
+                record.objectFlags |=
+                    SM64ObjectScheduler.objectFlagBuildTransform |
+                    SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+                record.position = SM64ObjectVector3(
+                    x: parentPosition.x,
+                    y: parentPosition.y + Self.starSpawnYOffset,
+                    z: parentPosition.z
+                )
+                record.homePosition = Self.starHomePosition
+                record.behaviorParams2ndByte = 0
+            }
+            spawnedChildren.append(star)
+            effectRouter.enqueue(objectID: id, kind: .star)
+        }
+        if output.playRoughSlideSound {
+            effectRouter.enqueue(objectID: id, kind: .sound, value: 1)
+        }
+        if output.playWalkingSound {
+            effectRouter.enqueue(objectID: id, kind: .sound, value: 2)
+        }
+        if output.playPoundingSound {
+            effectRouter.enqueue(objectID: id, kind: .sound, value: 3)
+        }
+        if output.cameraShakeSmall {
+            effectRouter.enqueue(objectID: id, kind: .cameraShake, value: 1)
+        }
+        if output.finalDialogCompleted, previousFinalTextbox > 0 {
+            effectRouter.enqueue(objectID: id, kind: .dialog, value: previousFinalTextbox)
+        }
+        let delivery = effectRouter.deliver(to: pool)
+        deliveryLog.append(delivery)
+
         synchronize(
             id: id,
             state: state,
@@ -310,7 +391,9 @@ final class SM64RacingPenguinObjectBridge {
                 objectID: id,
                 output: output,
                 raceChildren: children,
-                path: pathOutput
+                path: pathOutput,
+                spawnedChildren: spawnedChildren,
+                presentedEffects: delivery.presented
             )
         )
     }

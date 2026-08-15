@@ -2,7 +2,7 @@
 
 ## Status
 
-M20i is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M20j is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -909,7 +909,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M20g: racing-penguin finish/shortcut child ownership | Swift creates generation-safe finish-line and shortcut-check child records when the race is accepted, evaluates the exact C distance/direction predicates before the parent tick, propagates win/cheat state, preserves parent identities, and retires children with the parent. | Complete locally — strict Swift 6/C child fingerprint `0x87b61e16494da173`, owner bridge fingerprint `0x5fcb16697e344061`, 161-script matrix (`runs=161 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; path waypoint ownership, effect/audio delivery, and remaining NPC/puzzle families remain |
 | M20h: racing-penguin waypoint/path owner | Swift reproduces `cur_obj_follow_path(0)` initialization, source waypoint flags, target selection, canonical target yaw/pitch, dot-product waypoint crossing, `PATH_REACHED_WAYPOINT`, and `PATH_REACHED_END`, then feeds the result into the owner-thread race behavior before each tick. | Complete locally — strict Swift 6/C path fingerprint `0x8c9a21508357868f`, owner bridge fingerprint `0x7063aa2d1b2dbf0a`, 163-script matrix (`runs=163 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; full course trajectory inventory, effect/audio delivery, and remaining NPC/puzzle families remain |
 | M20i: Snowman Land penguin trajectory inventory | Swift carries the full US `ccm_seg7_trajectory_penguin_race` value table, including the intentional missing ID 27 and terminal sentinel, with C-source hash parity. | Complete locally — strict Swift 6/C trajectory fingerprint `0x3a936052c3cb2cd1`, 164-script matrix (`runs=164 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; path selection for every other reachable trajectory, effect/audio delivery, and remaining NPC/puzzle families remain |
-| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20i close the first value-plus-object collision/race/movement/child/path/data slice; path selection for every other reachable trajectory, effect/audio delivery, dialog integration, remaining NPCs, puzzles, secrets, and rewards remain |
+| M20j: racing-penguin effect ownership | Swift routes racing-penguin rough-slide/walking/pounding audio, camera shake, smoke retirement, final dialog presentation, and the fixed-course star spawn through the owner-thread effect sink with source-authored child transforms and a Swift/C delivery contract. | Complete locally — effect fingerprint `0x7234f7283978c656`, 165-script matrix (`runs=165 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; broader effect identity/audio mixing, other trajectories, dialog integration, and remaining NPC/puzzle families remain |
+| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20j close the first value-plus-object collision/race/movement/child/path/data/effect slice; path selection for every other reachable trajectory, broader effect/audio identity, dialog integration, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1087,9 +1088,13 @@ replayable trace, and the platform evidence listed in its exit gate.
    parent tick, and fences their cleanup with the parent generation. M20h ports
    `cur_obj_follow_path(0)` and feeds copied waypoint state into the race tick.
    M20i inventories the full US Snowman Land penguin trajectory, preserving the
-   source's missing ID 27 and sentinel with a C-source hash contract. Finish
-   path selection for every other reachable trajectory and effect ownership
-   before the remaining NPC/puzzle families.
+   source's missing ID 27 and sentinel with a C-source hash contract. M20j
+   routes rough-slide/walking/pounding audio, camera shake, smoke retirement,
+   final dialog, and the fixed-course star spawn through the owner-thread
+   effect sink, preserving source-authored child transforms and a byte-matched
+   Swift/C delivery fingerprint. Finish path selection for every other
+   reachable trajectory and broader effect identity before the remaining
+   NPC/puzzle families.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and

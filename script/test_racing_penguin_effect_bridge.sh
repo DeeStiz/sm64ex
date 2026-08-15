@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-racing-penguin-path-object-bridge"
+BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-racing-penguin-effect-bridge"
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc -parse-as-library -swift-version 6 -Xfrontend -strict-concurrency=complete \
@@ -21,21 +21,21 @@ xcrun swiftc -parse-as-library -swift-version 6 -Xfrontend -strict-concurrency=c
   "$PROJECT_ROOT/SM64Modern/RacingPenguinPath.swift" \
   "$PROJECT_ROOT/SM64Modern/RacingPenguinRaceChildren.swift" \
   "$PROJECT_ROOT/SM64Modern/RacingPenguinObjectBridge.swift" \
-  "$PROJECT_ROOT/tests/sm64_modern_racing_penguin_path_object_bridge_smoke.swift" \
-  -o "$BUILD_ROOT/sm64-modern-racing-penguin-path-object-bridge-smoke"
-SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-racing-penguin-path-object-bridge-smoke)"
+  "$PROJECT_ROOT/tests/sm64_modern_racing_penguin_effect_bridge_smoke.swift" \
+  -o "$BUILD_ROOT/sm64-modern-racing-penguin-effect-bridge-smoke"
+SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-racing-penguin-effect-bridge-smoke)"
 printf '%s\n' "$SWIFT_OUTPUT"
 
-xcrun clang -std=c11 -ffp-contract=off \
-  "$PROJECT_ROOT/tests/sm64_modern_racing_penguin_path_object_bridge_contract.c" \
-  -o "$BUILD_ROOT/sm64-modern-racing-penguin-path-object-bridge-contract"
-C_OUTPUT="$($BUILD_ROOT/sm64-modern-racing-penguin-path-object-bridge-contract)"
+xcrun clang -std=c11 \
+  "$PROJECT_ROOT/tests/sm64_modern_racing_penguin_effect_bridge_contract.c" \
+  -o "$BUILD_ROOT/sm64-modern-racing-penguin-effect-bridge-contract"
+C_OUTPUT="$($BUILD_ROOT/sm64-modern-racing-penguin-effect-bridge-contract)"
 printf '%s\n' "$C_OUTPUT"
 
-SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^racingPenguinPathObjectBridgeFingerprint=//p')"
-C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^racingPenguinPathObjectBridgeFingerprint=//p')"
+SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^racingPenguinEffectBridgeFingerprint=//p')"
+C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^racingPenguinEffectBridgeFingerprint=//p')"
 [[ -n "$SWIFT_FINGERPRINT" && "$SWIFT_FINGERPRINT" == "$C_FINGERPRINT" ]] || {
-  echo "Swift/C racing penguin path object bridge fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
+  echo "Swift/C racing penguin effect bridge fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
   exit 1
 }
-printf '%s\n' "SM64 Modern racing penguin path object bridge C contract matched"
+printf '%s\n' "SM64 Modern racing penguin effect bridge C contract matched"
