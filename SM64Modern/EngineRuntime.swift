@@ -23,6 +23,14 @@ protocol SM64ModernEngineRuntime: AnyObject {
     func shutdown() -> SM64ModernStatus
 }
 
+enum SM64ModernSwiftRuntimePhase: String, Equatable, Sendable {
+    case cold
+    case initialized
+    case stopping
+    case failed
+    case stopped
+}
+
 final class SM64ModernCEngineRuntimeAdapter: SM64ModernEngineRuntime {
     let authority: SM64ModernEngineAuthority = .cCompatibility
     let implementation = "c_compatibility"
@@ -52,32 +60,57 @@ final class SM64ModernCEngineRuntimeAdapter: SM64ModernEngineRuntime {
 
 final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
     let authority: SM64ModernEngineAuthority = .swift
-    // STUB(M31): The Swift runtime shell delegates lifecycle work to the C
-    // adapter until the complete Swift engine has replaced each domain.
-    let implementation = "swift_shell_bootstrap_c_fallback"
+    // M31 slice: Swift owns lifecycle ordering and failure state while the
+    // remaining gameplay/content domains still run through the compatibility
+    // adapter. The implementation string intentionally names that boundary;
+    // it must not be mistaken for whole-engine Swift authority.
+    let implementation = "swift_lifecycle_owner_c_domain_bridge"
 
     private let cFallback: SM64ModernEngineRuntime
     private var didLogDelegation = false
+    private(set) var phase: SM64ModernSwiftRuntimePhase = .cold
+
+    private static let statusOK: SM64ModernStatus = 0
+    private static let statusInvalidState: SM64ModernStatus = 4
+    private static let statusStopRequested: SM64ModernStatus = 8
 
     init(cFallback: SM64ModernEngineRuntime) {
         self.cFallback = cFallback
     }
 
     func initialize() -> SM64ModernStatus {
+        guard phase == .cold else { return Self.statusInvalidState }
         logDelegationIfNeeded()
-        return cFallback.initialize()
+        let status = cFallback.initialize()
+        phase = status == Self.statusOK ? .initialized : .failed
+        return status
     }
 
     func step() -> SM64ModernStatus {
-        cFallback.step()
+        guard phase == .initialized else { return Self.statusInvalidState }
+        let status = cFallback.step()
+        if status != Self.statusOK { phase = .failed }
+        return status
     }
 
     func requestStop(reason: SM64ModernExitReason) -> SM64ModernStatus {
-        cFallback.requestStop(reason: reason)
+        guard phase == .initialized else { return Self.statusInvalidState }
+        let status = cFallback.requestStop(reason: reason)
+        if status == Self.statusOK || status == Self.statusStopRequested {
+            phase = .stopping
+        } else {
+            phase = .failed
+        }
+        return status
     }
 
     func shutdown() -> SM64ModernStatus {
-        cFallback.shutdown()
+        guard phase == .initialized || phase == .stopping || phase == .failed else {
+            return Self.statusInvalidState
+        }
+        let status = cFallback.shutdown()
+        phase = status == Self.statusOK ? .stopped : .failed
+        return status
     }
 
     private func logDelegationIfNeeded() {

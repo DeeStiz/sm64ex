@@ -73,20 +73,28 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(recorder.lastStopReason == 99)
 
         let swiftRecorder = CallbackRecorder(
-            initializeStatus: 21,
-            stepStatus: 22,
-            stopStatus: 23,
-            shutdownStatus: 24
+            initializeStatus: 0,
+            stepStatus: 0,
+            stopStatus: 8,
+            shutdownStatus: 0
         )
         let swiftShell = SM64ModernSwiftEngineRuntime(
             cFallback: SM64ModernCEngineRuntimeAdapter(callbacks: swiftRecorder.callbacks)
         )
         precondition(swiftShell.authority == .swift)
-        precondition(swiftShell.implementation == "swift_shell_bootstrap_c_fallback")
-        precondition(swiftShell.initialize() == 21)
-        precondition(swiftShell.step() == 22)
-        precondition(swiftShell.requestStop(reason: 199) == 23)
-        precondition(swiftShell.shutdown() == 24)
+        precondition(swiftShell.implementation == "swift_lifecycle_owner_c_domain_bridge")
+        precondition(swiftShell.phase == .cold)
+        precondition(swiftShell.step() == 4)
+        precondition(swiftShell.initialize() == 0)
+        precondition(swiftShell.phase == .initialized)
+        precondition(swiftShell.initialize() == 4)
+        precondition(swiftShell.step() == 0)
+        precondition(swiftShell.requestStop(reason: 199) == 8)
+        precondition(swiftShell.phase == .stopping)
+        precondition(swiftShell.step() == 4)
+        precondition(swiftShell.shutdown() == 0)
+        precondition(swiftShell.phase == .stopped)
+        precondition(swiftShell.shutdown() == 4)
         precondition(swiftRecorder.initializeCalls == 1)
         precondition(swiftRecorder.stepCalls == 1)
         precondition(swiftRecorder.stopCalls == 1)

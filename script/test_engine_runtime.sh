@@ -7,6 +7,8 @@ mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
   -parse-as-library \
+  -swift-version 6 \
+  -Xfrontend -strict-concurrency=complete \
   -module-cache-path "$BUILD_ROOT/module-cache" \
   "$PROJECT_ROOT/SM64Modern/EngineAuthority.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \

@@ -2,12 +2,13 @@
 
 ## Status
 
-M18am is the latest validated checkpoint: every audited object bridge deletion
-and transient-child retirement now crosses the common owner-thread effect
-router; the direct bridge-side deletion audit is empty. The Boo/Whomp bridge
-assertions remain green, all focused fingerprints are unchanged, the corrected
-full 131-script matrix passes, and the regenerated native Debug build succeeds.
-M18al remains the preceding Boo/Whomp router-adoption checkpoint. M0–M17 local scopes remain complete
+M31a is the latest validated checkpoint layered on M18am: the Swift runtime
+now owns lifecycle phase validation, stop-state transitions, and failure
+fencing instead of blindly forwarding invalid calls. The implementation still
+reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
+not closed. The complete bridge deletion audit remains empty, the corrected
+131-script matrix passes, and the regenerated native Debug build succeeds.
+M18am remains the preceding complete bridge-router checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
 platform, NPC, boss, save, frontend, audio, renderer, Swift-6-safety,
@@ -818,6 +819,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M29: Display-list translation | Swift produces immutable Metal scene packets identical to the C renderer bridge for every reachable command/state. | Not started |
 | M30: Goddard/Mario face | Product-reachable Mario-face update, geometry, material, animation, and render paths run in Swift. | Not started |
 | M31: Whole-engine Swift authority | Swift completes title-to-gameplay, saves, audio, rendering, and shutdown with no engine/gameplay C callback; C selector remains equivalent. | Not started |
+| M31a: Swift lifecycle authority seam | Swift runtime owns lifecycle phases, invalid-order rejection, stop-request transition, failure fencing, and explicit C-domain bridge reporting while remaining domains migrate. | Complete locally — strict Swift 6 runtime smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; gameplay/content C bridge remains intentionally open |
 | M32: Swift 6 safety closure | Strict concurrency passes with mutable engine state no longer relying on `@unchecked Sendable`; remaining unsafe code is limited to audited leaf shims. | Not started |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | Not started |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |
