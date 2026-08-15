@@ -5,9 +5,11 @@ struct SM64SLWalkingPenguinObjectState: Equatable, Sendable {
     var currentStep: Int32 = 0
     var currentStepTimer: Int32 = 0
     var timer: Int32 = 0
+    let homePosition: SM64ObjectVector3
     var moveYaw: Int16
 
-    init(moveYaw: Int16 = 0) {
+    init(homePosition: SM64ObjectVector3 = .zero, moveYaw: Int16 = 0) {
+        self.homePosition = homePosition
         self.moveYaw = moveYaw
     }
 }
@@ -23,6 +25,7 @@ struct SM64SLWalkingPenguinObjectEffect: Equatable, Sendable {
     let angleVelocityYaw: Int16
     let moveYaw: Int16
     let completedTurn: Bool
+    let collision: SM64SLWalkingPenguinCollisionResult?
 }
 
 struct SM64SLWalkingPenguinSchedulerTickResult: Equatable, Sendable {
@@ -61,6 +64,7 @@ final class SM64SLWalkingPenguinObjectBridge {
         in engineState: SM64SwiftEngineState,
         position: SM64ObjectVector3 = .zero,
         moveYaw: Int16 = 0,
+        wallHitboxRadius: Float = 0,
         model: UInt32 = SM64SLWalkingPenguinObjectBridge.defaultModel,
         behaviorIdentity: UInt64 = SM64SLWalkingPenguinObjectBridge.defaultBehaviorIdentity
     ) throws -> SM64ObjectID {
@@ -69,7 +73,13 @@ final class SM64SLWalkingPenguinObjectBridge {
             model: model,
             behaviorIdentity: behaviorIdentity
         )
-        guard attach(id, position: position, moveYaw: moveYaw, in: engineState.objects) else {
+        guard attach(
+            id,
+            position: position,
+            moveYaw: moveYaw,
+            wallHitboxRadius: wallHitboxRadius,
+            in: engineState.objects
+        ) else {
             _ = engineState.objects.despawn(id)
             preconditionFailure("newly spawned walking penguin could not attach")
         }
@@ -81,16 +91,21 @@ final class SM64SLWalkingPenguinObjectBridge {
         _ id: SM64ObjectID,
         position: SM64ObjectVector3 = .zero,
         moveYaw: Int16 = 0,
+        wallHitboxRadius: Float = 0,
         in pool: SM64ObjectPool
     ) -> Bool {
         guard pool.record(for: id) != nil else { return false }
-        let state = SM64SLWalkingPenguinObjectState(moveYaw: moveYaw)
+        let state = SM64SLWalkingPenguinObjectState(homePosition: position, moveYaw: moveYaw)
         states[id] = state
+        _ = pool.mutate(id) { record in
+            record.wallHitboxRadius = wallHitboxRadius
+        }
         synchronize(
             id: id,
             state: state,
             position: position,
             output: nil,
+            collision: nil,
             previousAction: state.action,
             pool: pool
         )
@@ -100,14 +115,15 @@ final class SM64SLWalkingPenguinObjectBridge {
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
-        advanceNativeDynamics: Bool = true
+        advanceNativeDynamics: Bool = true,
+        collisionWorld: SM64SurfaceCollisionWorld? = nil
     ) -> SM64SLWalkingPenguinSchedulerTickResult {
         effectLog.removeAll(keepingCapacity: true)
         let schedulerResult = scheduler.update(
             state: engineState,
             advanceNativeDynamics: advanceNativeDynamics
         ) { [weak self] id, pool in
-            self?.update(id: id, pool: pool)
+            self?.update(id: id, pool: pool, collisionWorld: collisionWorld)
         }
         for id in schedulerResult.unloaded {
             states.removeValue(forKey: id)
@@ -121,7 +137,11 @@ final class SM64SLWalkingPenguinObjectBridge {
         )
     }
 
-    private func update(id: SM64ObjectID, pool: SM64ObjectPool) {
+    private func update(
+        id: SM64ObjectID,
+        pool: SM64ObjectPool,
+        collisionWorld: SM64SurfaceCollisionWorld?
+    ) {
         guard var state = states[id], let record = pool.record(for: id) else { return }
         let previousAction = state.action
         let output = SM64SLWalkingPenguinBehavior.update(
@@ -134,6 +154,17 @@ final class SM64SLWalkingPenguinObjectBridge {
                 moveYaw: state.moveYaw
             )
         )
+        let collision = collisionWorld.flatMap { world in
+            SM64SLWalkingPenguinCollision.resolve(
+                SM64SLWalkingPenguinCollisionInput(
+                    position: output.nextPosition,
+                    moveYaw: output.moveYaw,
+                    wallHitboxRadius: record.wallHitboxRadius,
+                    previousMoveFlags: record.moveFlags,
+                    world: world
+                )
+            )
+        }
 
         state.action = output.action
         state.currentStep = output.currentStep
@@ -145,8 +176,9 @@ final class SM64SLWalkingPenguinObjectBridge {
         synchronize(
             id: id,
             state: state,
-            position: output.nextPosition,
+            position: collision?.position ?? output.nextPosition,
             output: output,
+            collision: collision,
             previousAction: previousAction,
             pool: pool
         )
@@ -161,7 +193,8 @@ final class SM64SLWalkingPenguinObjectBridge {
                 animationSpeed: output.animationSpeed,
                 angleVelocityYaw: output.angleVelocityYaw,
                 moveYaw: output.moveYaw,
-                completedTurn: output.completedTurn
+                completedTurn: output.completedTurn,
+                collision: collision
             )
         )
     }
@@ -171,6 +204,7 @@ final class SM64SLWalkingPenguinObjectBridge {
         state: SM64SLWalkingPenguinObjectState,
         position: SM64ObjectVector3,
         output: SM64SLWalkingPenguinOutput?,
+        collision: SM64SLWalkingPenguinCollisionResult?,
         previousAction: Int32,
         pool: SM64ObjectPool
     ) {
@@ -179,7 +213,12 @@ final class SM64SLWalkingPenguinObjectBridge {
                 SM64ObjectScheduler.objectFlagBuildTransform |
                 SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
             record.position = position
-            record.homePosition = position
+            record.homePosition = state.homePosition
+            if let collision {
+                record.floorHeight = collision.floorHeight
+                record.floorType = collision.floorType
+                record.moveFlags = collision.moveFlags
+            }
             record.forwardVelocity = output?.forwardVelocity ?? 0
             record.moveAngles.yaw = Int32(state.moveYaw)
             record.faceAngles.yaw = Int32(state.moveYaw)

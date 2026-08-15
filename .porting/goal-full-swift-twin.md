@@ -2,7 +2,7 @@
 
 ## Status
 
-M20b is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M20c is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -902,7 +902,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | In progress — M19a–M19p value/owner seams are complete locally; behavior dispatch, broad collision data inventory, remaining mechanisms, hazards, and effect delivery remain |
 | M20a: SL walking penguin state machine | Swift reproduces the erratic step table, action/timer ownership, boundary turns, canonical yaw increments, forward displacement, and animation intents for Snowman Land's walking penguin. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xf80b620bf18ccb4d`, 153-script matrix target, regenerated native Debug build, and `git diff --check` pass; collision resolution, object bridge, races, dialog, and remaining NPCs remain |
 | M20b: SL walking penguin owner-thread bridge | Swift attaches the walking-penguin kernel to generation-safe object IDs and the owner-thread scheduler, synchronizing action/timer, transform, yaw, velocity, animation, and end-of-frame unload state. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xaabb92f23fd8451a`, 154-script matrix (`runs=154 failures=0`), regenerated native Debug build, and `git diff --check` pass; floor/wall resolution remains caller-supplied and races, dialog, and remaining NPCs remain |
-| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a/M20b close the first value-plus-object NPC slice; floor/wall collision, effect/audio delivery, dialog/race ownership, remaining NPCs, puzzles, secrets, and rewards remain |
+| M20c: SL walking penguin floor/wall collision route | Swift queries the immutable surface world, applies C-style wall projection and facing admission, records floor identity/height/type/normal and move flags, and returns collision data through the owner-thread bridge. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xab2e63008759849f`, 155-script matrix (`runs=155 failures=0`), regenerated native Debug build, and `git diff --check` pass; full move-standard gravity/edge/steep-slope and effect/audio delivery remain |
+| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20c close the first value-plus-object-collision NPC slice; full move-standard gravity/edge/steep-slope behavior, effect/audio delivery, dialog/race ownership, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1065,9 +1066,12 @@ replayable trace, and the platform evidence listed in its exit gate.
    timer reset, current-step transition, boundary action changes, 0x400 yaw
    turns, canonical movement, and animation-speed intents. M20b attaches that
    kernel to generation-safe owner-thread object records, synchronizes
-   action/timer/transform/yaw/animation state, and proves end-of-frame unload;
-   floor/wall resolution remains an explicit caller seam before adding races,
-   dialog, and the remaining NPC/puzzle families.
+   action/timer/transform/yaw/animation state, and proves end-of-frame unload.
+   M20c feeds the bridge's candidate movement into the immutable surface world,
+   applies wall projection/facing admission, and records floor identity and
+   move flags. Complete move-standard gravity/edge/steep-slope handling and
+   effect/audio delivery before adding races, dialog, and the remaining
+   NPC/puzzle families.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and

@@ -293,6 +293,16 @@ struct SM64SurfaceCollisionWorld: Equatable, Sendable {
         return SM64WallCollisionResult(x: x, y: input.y, z: z, totalCollisions: total, surfaceIDs: ids)
     }
 
+    func surface(withID id: UInt32) -> SM64Surface? {
+        if let index = dynamicSurfaceIndices[id], dynamicSurfaces.indices.contains(index) {
+            return dynamicSurfaces[index]
+        }
+        if let index = staticSurfaceIndices[id], staticSurfaces.indices.contains(index) {
+            return staticSurfaces[index]
+        }
+        return nil
+    }
+
     func findSurfaceOnRay(origin: SM64SurfaceVec3f, direction: SM64SurfaceVec3f) -> SM64SurfaceRayHit? {
         let directionLength = sqrt(direction.x * direction.x + direction.y * direction.y + direction.z * direction.z)
         guard directionLength > 0 else { return nil }

@@ -1520,6 +1520,26 @@
   remaining NPCs and puzzles, effect/audio delivery, and physical/visual/
   human acceptance remain open.
 
+### M20c Completion Evidence
+
+- SLWalkingPenguinCollision.swift queries the immutable surface world after
+  the behavior candidate movement, applies wall projection with C-compatible
+  facing admission, selects floor identity/height/type/normal, and carries
+  hit-wall, in-air, lava, and death-plane move flags as value output.
+  SLWalkingPenguinObjectBridge.swift accepts the world on its owner-thread
+  tick, writes the resolved position/floor metadata/move flags to the object
+  record, and retains the generation-safe unload boundary.
+- The focused strict Swift 6/C collision contract emits
+  slWalkingPenguinCollisionFingerprint=0xab2e63008759849f. The complete
+  155-script matrix reports MATRIX_RESULT runs=155 failures=0 in the
+  chunked log /tmp/sm64-modern-m20c-matrix-chunks.log, the regenerated native
+  Swift 6/macOS 27 Debug build succeeds in
+  /tmp/sm64-modern-m20c-clean-build.log, and git diff --check is clean.
+- This closes the floor/wall data route only. Full cur_obj_move_standard
+  gravity, water, edge, steep-slope, room admission, and effect/audio
+  delivery remain before the NPC route is complete; races/dialog/secrets,
+  remaining NPCs/puzzles, and physical/visual/human acceptance remain open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
