@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M16 local Swift/C parity scopes are complete, and M17j is the current validated progression bridge slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18a is the current validated Goomba enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -63,6 +63,20 @@
 - The full matrix passes with `runs=102 failures=0`; the isolated native Debug
   build succeeds; and `git diff --check` is clean. This remains bounded
   shadow/differential evidence, not live Swift authority or human acceptance.
+
+### M18a Completion Evidence
+
+- `GoombaEnemy.swift` adds a copied-POD Goomba shadow for regular, huge, and
+  tiny variants. It preserves the C size table, hitbox/gravity/damage values,
+  walk/chase approach and random turn timing, wall/edge turn fencing,
+  jump/landing transitions, tiny death/coin/respawn effects, and huge weak
+  attack response.
+- The independent Swift/C contract emits
+  `goombaEnemyFingerprint=0x0b1058cb88f78d06`; the native Debug build includes
+  the new source after `xcodegen generate`.
+- The complete matrix passes with `runs=103 failures=0`. This remains a
+  bounded shadow: C object-list traversal, collision inputs, effect delivery,
+  spawner behavior, other enemy families, and visual/human acceptance remain.
 
 ### M8b Completion Evidence
 
