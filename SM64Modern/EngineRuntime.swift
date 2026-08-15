@@ -20,6 +20,45 @@ struct SM64ModernSwiftEngineTickReceipt: Equatable, Sendable {
     let resetEpoch: UInt64
 }
 
+enum SM64ModernSwiftEngineDomain: String, CaseIterable, Equatable, Hashable, Sendable {
+    case state
+    case objectScheduler
+    case progression
+    case savePersistence
+    case input
+    case camera
+    case audio
+    case rendering
+    case frontend
+}
+
+struct SM64ModernSwiftEngineDomainReadiness: Equatable, Sendable {
+    let swiftOwned: Set<SM64ModernSwiftEngineDomain>
+
+    static let context = Self(swiftOwned: [
+        .state, .objectScheduler, .progression
+    ])
+
+    func isSwiftOwned(_ domain: SM64ModernSwiftEngineDomain) -> Bool {
+        swiftOwned.contains(domain)
+    }
+
+    var cFallbackRequired: Set<SM64ModernSwiftEngineDomain> {
+        Set(SM64ModernSwiftEngineDomain.allCases).subtracting(swiftOwned)
+    }
+}
+
+struct SM64ModernSwiftProgressionReceipt: Equatable, Sendable {
+    let engineTick: UInt64
+    let simulationTick: UInt64
+    let eventID: SM64ProgressionRuntimeEventID
+    let accepted: Bool
+    let actorEffects: SM64ProgressionActorEffect
+    let progressionEffects: SM64ProgressionEffect
+    let persistenceNeeded: Bool
+    let values: [UInt64]
+}
+
 /// Owner-thread Swift state used by the Swift runtime while product domains
 /// are migrated. It is deliberately a real engine context, not a callback
 /// counter: object lists, globals, transforms, arenas, and unload ordering
@@ -28,25 +67,58 @@ struct SM64ModernSwiftEngineTickReceipt: Equatable, Sendable {
 final class SM64ModernSwiftEngineContext {
     let state: SM64SwiftEngineState
     private let scheduler: SM64ObjectScheduler
+    private let initialProgression: SM64ProgressionRuntime
+    private(set) var progression: SM64ProgressionRuntime
+    let domainReadiness = SM64ModernSwiftEngineDomainReadiness.context
     private(set) var phase: SM64ModernSwiftRuntimePhase = .cold
     private(set) var tickCount: UInt64 = 0
     private(set) var lastReceipt: SM64ModernSwiftEngineTickReceipt?
+    private(set) var lastProgressionReceipt: SM64ModernSwiftProgressionReceipt?
 
     init(
         objectCapacity: Int = SM64ObjectPool.defaultCapacity,
-        scheduler: SM64ObjectScheduler = SM64ObjectScheduler()
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        progression: SM64ProgressionRuntime = SM64ProgressionRuntime()
     ) {
         self.state = SM64SwiftEngineState(objectCapacity: objectCapacity)
         self.scheduler = scheduler
+        self.initialProgression = progression
+        self.progression = progression
     }
 
     func initialize(levelNumber: Int16 = 1, areaIndex: Int16 = 0) -> Bool {
         guard phase == .cold else { return false }
         state.beginLevel(levelNumber: levelNumber, areaIndex: areaIndex)
+        progression = initialProgression
         tickCount = 0
         lastReceipt = nil
+        lastProgressionReceipt = nil
         phase = .initialized
         return true
+    }
+
+    func applyProgression(
+        _ event: SM64ProgressionActorEvent,
+        simulationTick: UInt64? = nil
+    ) -> SM64ModernSwiftProgressionReceipt? {
+        guard phase == .initialized,
+              let result = progression.apply(
+                event, simulationTick: simulationTick ?? tickCount
+              ) else {
+            return nil
+        }
+        let receipt = SM64ModernSwiftProgressionReceipt(
+            engineTick: tickCount,
+            simulationTick: result.trace.simulationTick,
+            eventID: result.trace.eventID,
+            accepted: result.trace.accepted,
+            actorEffects: result.actorEffects,
+            progressionEffects: result.progressionEffects,
+            persistenceNeeded: result.persistenceNeeded,
+            values: result.trace.values
+        )
+        lastProgressionReceipt = receipt
+        return receipt
     }
 
     func step() -> SM64ModernSwiftEngineTickReceipt? {
@@ -74,6 +146,8 @@ final class SM64ModernSwiftEngineContext {
             return false
         }
         state.reset()
+        progression = initialProgression
+        lastProgressionReceipt = nil
         phase = .stopped
         return true
     }
@@ -131,10 +205,11 @@ final class SM64ModernCEngineRuntimeAdapter: SM64ModernEngineRuntime {
 
 final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
     let authority: SM64ModernEngineAuthority = .swift
-    // M31 slice: Swift owns lifecycle ordering and failure state while the
-    // remaining gameplay/content domains still run through the compatibility
-    // adapter. The implementation string intentionally names that boundary;
-    // it must not be mistaken for whole-engine Swift authority.
+    // M31c slice: Swift owns lifecycle ordering, failure state, the context's
+    // state/scheduler/progression domains, while remaining gameplay/content
+    // domains still run through the compatibility adapter. The implementation
+    // string intentionally names that boundary; it must not be mistaken for
+    // whole-engine Swift authority.
     let implementation = "swift_lifecycle_owner_c_domain_bridge"
 
     private let cFallback: SM64ModernEngineRuntime

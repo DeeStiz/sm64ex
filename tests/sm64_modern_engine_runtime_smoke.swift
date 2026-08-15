@@ -88,6 +88,20 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.initialize() == 0)
         precondition(swiftShell.phase == .initialized)
         precondition(swiftShell.initialize() == 4)
+        precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.state))
+        precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.objectScheduler))
+        precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.progression))
+        precondition(!swiftShell.swiftContext.domainReadiness.isSwiftOwned(.audio))
+        precondition(swiftShell.swiftContext.domainReadiness.cFallbackRequired.contains(.savePersistence))
+        let progressionReceipt = swiftShell.swiftContext.applyProgression(
+            .collectRedCoin, simulationTick: 0
+        )!
+        precondition(progressionReceipt.engineTick == 0)
+        precondition(progressionReceipt.simulationTick == 0)
+        precondition(progressionReceipt.eventID == .collectRedCoin)
+        precondition(progressionReceipt.accepted)
+        precondition(progressionReceipt.actorEffects.contains(.redCoin))
+        precondition(swiftShell.swiftContext.progression.progression.coins == 2)
         let actor = try! swiftShell.swiftContext.state.spawnObject(
             in: .generalActor,
             behaviorIdentity: 0x44
@@ -104,6 +118,8 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.shutdown() == 0)
         precondition(swiftShell.phase == .stopped)
         precondition(swiftShell.swiftContext.phase == .stopped)
+        precondition(swiftShell.swiftContext.lastProgressionReceipt == nil)
+        precondition(swiftShell.swiftContext.progression.progression.coins == 0)
         precondition(swiftShell.swiftContext.state.snapshot().objects.isEmpty)
         precondition(swiftShell.shutdown() == 4)
         precondition(swiftRecorder.initializeCalls == 1)
