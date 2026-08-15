@@ -1413,6 +1413,24 @@
   platform ownership/collision, remaining mechanisms and hazards, effect
   delivery, and M20–M35 are still open.
 
+### M19m Completion Evidence
+
+- `SM64Modern/TTCRotatingSolidBehavior.swift` is the value counterpart of
+  `bhv_ttc_rotating_solid_init`/`bhv_ttc_rotating_solid_update`: collision-model
+  and side initialization, vertical dip/return, alert/click sound timers,
+  symmetric roll approach, turn advance, and random delay reset are explicit
+  and pointer-free.
+- The independent C contract matches Swift at
+  `ttcRotatingSolidFingerprint=0xa75c9000a7214bb7`; waiting, dip, landing,
+  alert, rotation, and click paths are covered.
+- `script/test_ttc_rotating_solid.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`. The full matrix target is
+  `runs=150 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 mechanism seam; global TTC ownership, platform
+  ownership/collision, remaining mechanisms and hazards, effect delivery, and
+  M20–M35 are still open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and

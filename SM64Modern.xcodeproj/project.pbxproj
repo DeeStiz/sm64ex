@@ -34,6 +34,7 @@
 		161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */; };
 		1656D9B55126D41EB7138D99 /* BullyEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B512E26120B9CF2080159F3C /* BullyEnemy.swift */; };
 		1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */; };
+		1A9C263F2C7FC79C4A63A501 /* TTCRotatingSolidBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 214588F2B3DD80568BE38D36 /* TTCRotatingSolidBehavior.swift */; };
 		1C4B108E68AA5D0D4606F4F6 /* MarioAirKnockbackAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 869BF0981D81927B020A1F56 /* MarioAirKnockbackAction.swift */; };
 		1CE1EC535A176CA0924223CB /* SwingPlatformBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7152A9F5156A7D703C8708CE /* SwingPlatformBehavior.swift */; };
 		1D60D3C5D08D6CC2D9C827AB /* ChainChompRelease.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0C6C29EF4D3EDA95AE7DC1C /* ChainChompRelease.swift */; };
@@ -211,6 +212,7 @@
 		1DE7AE7AC1D8F6731FE45B3C /* WaterBombObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterBombObjectBridge.swift; sourceTree = "<group>"; };
 		1E51884DE493C98BC81B06D2 /* ProgressionPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionPersistence.swift; sourceTree = "<group>"; };
 		1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTraceSession.swift; sourceTree = "<group>"; };
+		214588F2B3DD80568BE38D36 /* TTCRotatingSolidBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCRotatingSolidBehavior.swift; sourceTree = "<group>"; };
 		2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptContentRuntime.swift; sourceTree = "<group>"; };
 		2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScriptContentRuntime.swift; sourceTree = "<group>"; };
 		26195252708283AFB936E392 /* GameplayParity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameplayParity.swift; sourceTree = "<group>"; };
@@ -559,6 +561,7 @@
 				A033C381FC3DFA4B705E97C8 /* TTCElevatorBehavior.swift */,
 				F804D686AFFB6AA968F51DEE /* TTCMovingBarBehavior.swift */,
 				FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */,
+				214588F2B3DD80568BE38D36 /* TTCRotatingSolidBehavior.swift */,
 				FFB7DD2B8D112A3511DF6EBF /* TTCSpinnerBehavior.swift */,
 				852D9DAB7F34CD90FB03458B /* TTCTreadmillBehavior.swift */,
 				3272FC72F5FA191847C8D57B /* WaterBomb.swift */,
@@ -840,6 +843,7 @@
 				8DA16E20D293AB90891F6FB7 /* TTCElevatorBehavior.swift in Sources */,
 				06B21ABCF7AFF06DB919000C /* TTCMovingBarBehavior.swift in Sources */,
 				77C353336E88DAB6B5B3896D /* TTCPendulumBehavior.swift in Sources */,
+				1A9C263F2C7FC79C4A63A501 /* TTCRotatingSolidBehavior.swift in Sources */,
 				7D2D76204DE9F3841D35B4F9 /* TTCSpinnerBehavior.swift in Sources */,
 				2F283D29507BA88671C0F14E /* TTCTreadmillBehavior.swift in Sources */,
 				C64BB4E43DA2868B1767C6E3 /* WaterBomb.swift in Sources */,
