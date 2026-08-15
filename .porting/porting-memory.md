@@ -1256,6 +1256,22 @@
 - Collision-data setup, dynamic surface replacement, remaining mechanisms,
   hazards, effects, and M20–M35 remain open.
 
+### M19d Completion Evidence
+
+- `SM64Modern/SwingPlatformBehavior.swift` is the value counterpart of
+  `bhv_swing_platform_init`/`bhv_swing_platform_update`: sign-selected
+  acceleration, f32 angle accumulation, signed object-roll truncation, and
+  angle-velocity output are explicit and pointer-free.
+- The independent C contract matches Swift at
+  `swingPlatformFingerprint=0xc38755874141aa35`; fractional and negative
+  fractional angles cover C's truncation-toward-zero boundary.
+- `script/test_swing_platform.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`. The full matrix target is
+  `runs=141 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 seam; platform ownership/collision, remaining
+  mechanisms and hazards, effect delivery, and M20–M35 are still open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
