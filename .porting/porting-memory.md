@@ -1431,6 +1431,25 @@
   ownership/collision, remaining mechanisms and hazards, effect delivery, and
   M20–M35 are still open.
 
+### M19n Completion Evidence
+
+- `SM64Modern/PlatformCollisionRegistry.swift` is the owner-thread value
+  registry for dynamic platform collision. It keys entries by full
+  `SM64ObjectID` generation, preserves first-seen owner order on replacement,
+  rejects duplicate surface IDs, removes only the exact owner generation, and
+  atomically applies the flattened list to `SM64SurfaceCollisionWorld`.
+- The independent C contract matches Swift at
+  `platformCollisionRegistryFingerprint=0x39662ad973b730dc`; replacement,
+  ordering, stale-generation removal, duplicate rejection, and world
+  application are covered.
+- `script/test_platform_collision_registry.sh` passes under Swift 6 complete
+  strict concurrency and clang `-ffp-contract=off`. The full matrix target is
+  `runs=151 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This closes the registry boundary only; live platform object binding,
+  surface generation from collision meshes, remaining mechanisms/hazards,
+  effect delivery, and M20–M35 remain open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
