@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18m is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18n is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -290,6 +290,26 @@
   validation passes. The full matrix passes with `runs=114 failures=0` (log
   `/tmp/sm64-modern-m18m-matrix.log`), the generated native Debug build
   succeeds (log `/tmp/sm64-modern-m18m-build.log`), and `git diff --check` is
+  clean. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
+### M18n Completion Evidence
+
+- `WaterBomb.swift` preserves the one-sided 200/50-radius spawner gate,
+  ahead-of-Mario placement, random delay, initialize/drop/explode action
+  timing, -4 gravity with -78 terminal velocity, bounce/stretch scale state,
+  interaction/water impact, cannon particle/scale decay, and shadow 500-unit
+  height clamp as copied Swift values.
+- `WaterBombObjectBridge.swift` allocates the bomb and shadow from the live
+  general-actor list, carries stable parent IDs, mirrors the bomb hitbox and
+  cannon intangibility, visits children in same-frame append order, clears the
+  spawner only at the explode callback, and unloads shadow then bomb at the
+  scheduler boundary without C pointers.
+- The independent Swift/C owner-thread contract emits
+  `waterBombObjectBridgeFingerprint=0x4385c323194c376e`; focused strict Swift
+  6/C validation passes. The full matrix passes with `runs=115 failures=0`
+  (log `/tmp/sm64-modern-m18n-matrix.log`), the generated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18n-build.log`), and `git diff --check` is
   clean. Complete collision/effect delivery, remaining enemy/projectile
   breadth, and physical/visual/human acceptance remain open.
 
