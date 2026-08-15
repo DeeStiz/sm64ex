@@ -117,6 +117,31 @@ enum SM64ModernBooObjectBridgeSmoke {
         require(second.effects.count == 1 && bridge.state(for: booID) != nil, "Boo bridge state")
         fingerprint = hashEffect(fingerprint, second.effects[0])
 
+        let attack = bridge.tick(
+            state: engineState,
+            inputs: [booID: SM64BooTickInput(
+                distanceToMario: 300,
+                angleToMario: 0,
+                marioFaceYaw: 0,
+                attackStatus: .attacked
+            )]
+        )
+        require(attack.effects.first?.action == .death, "Boo bridge death admission")
+        let deletion = bridge.tick(
+            state: engineState,
+            inputs: [booID: SM64BooTickInput(
+                distanceToMario: 300,
+                angleToMario: 0,
+                marioFaceYaw: 0,
+                hitWall: true
+            )]
+        )
+        require(
+            deletion.scheduler.unloaded == [booID] &&
+                bridge.deliveryLog.contains { $0.deleted == [booID] },
+            "Boo deletion must route through owner thread"
+        )
+
         print(String(format: "booObjectBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern Boo object bridge smoke passed")
     }

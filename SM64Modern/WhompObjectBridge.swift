@@ -22,12 +22,18 @@ final class SM64WhompObjectBridge {
     static let defaultModel: UInt32 = 0x67 // MODEL_WHOMP
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64WhompState] = [:]
     private var inputs: [SM64ObjectID: SM64WhompTickInput] = [:]
     private(set) var effectLog: [SM64WhompObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -108,6 +114,8 @@ final class SM64WhompObjectBridge {
     ) -> SM64WhompSchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
@@ -130,7 +138,10 @@ final class SM64WhompObjectBridge {
         let result = SM64WhompKernel.tick(input, state: &whomp)
         states[id] = whomp
         synchronizeRecord(id: id, state: whomp, pool: pool, previousAction: previousAction)
-        if whomp.markedForDeletion { _ = pool.markForDeletion(id) }
+        if whomp.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64WhompObjectEffectRecord(
                 objectID: id,

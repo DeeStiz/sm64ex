@@ -21,11 +21,19 @@ final class SM64BooObjectBridge {
     static let defaultModel: UInt32 = 0x54 // MODEL_BOO
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64BooState] = [:]
     private var inputs: [SM64ObjectID: SM64BooTickInput] = [:]
     private(set) var effectLog: [SM64BooObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) { self.scheduler = scheduler }
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
+        self.scheduler = scheduler
+        self.effectRouter = effectRouter
+    }
 
     var registeredIDs: [SM64ObjectID] {
         states.keys.sorted { lhs, rhs in
@@ -85,6 +93,8 @@ final class SM64BooObjectBridge {
     ) -> SM64BooSchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -106,7 +116,10 @@ final class SM64BooObjectBridge {
         let result = SM64BooKernel.tick(input, state: &boo)
         states[id] = boo
         synchronizeRecord(id: id, state: boo, pool: pool, previousAction: previousAction)
-        if boo.markedForDeletion { _ = pool.markForDeletion(id) }
+        if boo.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64BooObjectEffectRecord(
                 objectID: id,

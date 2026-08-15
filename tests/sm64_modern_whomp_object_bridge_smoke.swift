@@ -170,6 +170,50 @@ enum SM64ModernWhompObjectBridgeSmoke {
                 "Whomp bridge chase")
         fingerprint = hashEffect(fingerprint, bridgeEffect)
 
+        let bridgePound = bridge.tick(
+            state: engineState,
+            inputs: [whompID: SM64WhompTickInput(distanceToMario: 200)]
+        )
+        require(bridgePound.effects.first?.action == .pound, "Whomp bridge pound admission")
+        _ = bridge.tick(
+            state: engineState,
+            inputs: [whompID: SM64WhompTickInput(animationNearEnd: true)]
+        )
+
+        var finalDeletion: SM64WhompSchedulerTickResult?
+        for _ in 0..<64 {
+            guard let state = bridge.state(for: whompID) else { break }
+            let input: SM64WhompTickInput
+            switch state.action {
+            case .initialize:
+                input = SM64WhompTickInput(distanceToMario: 400)
+            case .chase:
+                input = SM64WhompTickInput(distanceToMario: 200)
+            case .pound:
+                input = SM64WhompTickInput(animationNearEnd: true)
+            case .fall:
+                input = SM64WhompTickInput()
+            case .landed:
+                input = SM64WhompTickInput(onGround: true)
+            case .onGround:
+                input = SM64WhompTickInput(marioGroundPound: true, marioOnPlatform: true)
+            case .death:
+                input = SM64WhompTickInput()
+            case .turn, .returnHome, .bossWait:
+                input = SM64WhompTickInput(distanceToMario: 200)
+            }
+            let result = bridge.tick(state: engineState, inputs: [whompID: input])
+            if result.scheduler.unloaded.contains(whompID) {
+                finalDeletion = result
+                break
+            }
+        }
+        require(
+            finalDeletion?.scheduler.unloaded == [whompID] &&
+                bridge.deliveryLog.contains { $0.deleted == [whompID] },
+            "Whomp deletion must route through owner thread"
+        )
+
         print(String(format: "whompObjectBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern Whomp object bridge smoke passed")
     }
