@@ -33,6 +33,9 @@ enum SM64MarioActionID {
     static let holdQuicksandJumpLand: UInt32 = 0x00000477
     static let softBackwardGroundKnockback: UInt32 = 0x00020464
     static let softForwardGroundKnockback: UInt32 = 0x00020465
+    static let hardBackwardGroundKnockback: UInt32 = 0x00020460
+    static let hardForwardGroundKnockback: UInt32 = 0x00020461
+    static let forwardGroundKnockback: UInt32 = 0x00020463
     static let standingAgainstWall: UInt32 = 0x0C400209
     static let braking: UInt32 = 0x04000445
     static let decelerating: UInt32 = 0x0400044A
@@ -41,6 +44,12 @@ enum SM64MarioActionID {
     static let brakingStop: UInt32 = 0x0C00023D
     static let backwardGroundKnockback: UInt32 = 0x00020462
     static let groundBonk: UInt32 = 0x00020466
+    static let deathExitLand: UInt32 = 0x00020467
+    static let forwardAirKnockback: UInt32 = 0x010208B1
+    static let backwardAirKnockback: UInt32 = 0x010208B0
+    static let standingDeath: UInt32 = 0x00021311
+    static let deathOnStomach: UInt32 = 0x00021315
+    static let deathOnBack: UInt32 = 0x00021316
     static let ridingShellGround: UInt32 = 0x20810446
     static let ridingShellJump: UInt32 = 0x0281089A
     static let ridingShellFall: UInt32 = 0x0081089B
