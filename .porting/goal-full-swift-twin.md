@@ -409,15 +409,18 @@ replayable trace, and the platform evidence listed in its exit gate.
 
 ### Phase B — migrate every product-reachable actor (M17–M22)
 
-1. **M17 progression actors.** Start with the M17a value reducer for stars,
+1. **M17 progression actors.** M17a supplies the value reducer for stars,
    keys, coins, lives, caps, cap switches, doors, warps, cannons, checkpoints,
-   and secrets, the M17b C-compatible SaveFile snapshot/recovery codec, and
-   the M17c coin-score-age/MainMenuData codec. Then define stable Swift actor
-   schemas and event reducers for red coins and level-completion rewards; port
-   spawn/despawn, collection persistence, interaction priority,
-   animation/sound/rumble/render intents, endian-aware EEPROM adapters, and
-   durable atomic writes. Differential routes must cover fresh save, wipe
-   defaults, newest-score aging, repeat collection, checksum corruption/
+   and secrets; M17b supplies the C-compatible SaveFile snapshot/recovery
+   codec; M17c supplies coin-score ages/MainMenuData; M17d supplies red-coin,
+   cap-switch, and level-reward actor routes; M17e supplies route lifetime and
+   an atomic owner-thread bundle; and M17f composes runtime events, age
+   mutation, dirty admission, commit, and backup reload. M17g must install that
+   runtime in EngineHost/GameplayTick and emit schema-4 save/event records.
+   Then port object spawn/despawn, hidden-star ownership, interaction priority,
+   animation/sound/rumble/render delivery, endian-aware EEPROM adapters, and
+   level-specific reward routes. Differential routes must cover fresh save,
+   wipe defaults, newest-score aging, repeat collection, checksum corruption/
    recovery, death/reload, warp, cap loss, and multiplayer/demo inputs where
    the C build exposes them.
 2. **M18 common enemies and projectiles.** Port each behavior family from the
