@@ -362,8 +362,19 @@ owner-thread event boundary. It preserves the reveal distance, speed/vertical
 steering, three-Spiny cap, 30-frame cooldown, hold/throw sub-actions,
 animation-frame parent-link clear, and randomized rearm cooldown in the
 independent Swift/C fingerprint `0x4021eec4cfdb5938`. The 106-script matrix
-and native Debug build pass; object allocation/parent wiring and remaining
-enemy/projectile families remain open.
+and native Debug build pass; live object allocation/parent wiring and
+remaining enemy/projectile families remain open.
+
+M18f connects that Lakitu event boundary to the owner-thread object pool and
+Spiny scheduler. A Lakitu callback allocates a real general-actor Spiny in the
+live list, records parent and previous-object identities, preserves the held
+relative transform, clears the link on the throw animation frame, and lets the
+child transition through the same-frame Spiny callback. Thrown attacks and
+parent-distance deletion decrement the Lakitu count through copied effect
+records, with an independent Swift/C bridge fingerprint
+`0xb2fd32a3d8fda71f`. The focused bridge, prior enemy/bridge regressions, the
+107-script matrix (`runs=107 failures=0`), generated native Debug build, and
+`git diff --check` pass; remaining enemy/projectile families remain open.
 
 M12h routes floor, ceiling, and wall candidates through the C-ordered partition with indexed Swift surface storage and dynamic replacement. M12i adds a value-type owner-thread gameplay tick that composes input/geometry, preserves paired simulation/legacy counters, carries demo state, and advances logical rumble with a matching Swift/C trace. Live runtime wiring, production content breadth, and physical haptic delivery remain open.
 
@@ -440,7 +451,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M15: Airborne/submerged/automatic actions | All reachable air, water, climbing, hanging, cannon, and automatic actions match C. | In progress — M15a shared `common_air_action_step`, M15b jump/double/triple/backflip/freefall/held-air callers, M15c side-flip/wall-kick/long-jump callers, M15d dive/air-throw/rollout callers, M15e twirl/water/held-water callers, M15f burning/lava callers, M15g submerged dispatch callers, M15h swimming callers, M15i water interaction callers, M15j water knockback/plunge callers, M15k whirlpool capture/death timing callers, M15l metal-water standing/walking/jump/fall/landing callers, M15m pole/hanging callers, M15n ledge/cannon callers, and M15o grabbed/tornado callers pass strict Swift/C fingerprints; automatic-action dispatch closure and owner-thread effect delivery remain |
 | M16: Camera system | Legacy/better camera, cutscene camera, shake, collision, transitions, and negative-coordinate behavior match C. | In progress — M16a camera math, M16b selection/mode-transition/HUD state, M16c height/focus/radial geometry, M16d collision/height-approach, M16e behind-Mario control, M16f C-up/shake/FOV intent, M16g C-up exit-search, M16h linear transition, M16i wall-avoidance, M16j data-driven mode callbacks, and M16k cutscene spline/shot clock/FOV state pass strict Swift/C fingerprints; covered-Mario status-3 routing, owner-thread cutscene delivery, camera shake channels beyond FOV, fixed/parallel/boss/spiral/water/behind/C-up callback bodies, and negative-coordinate whole-mode coverage remain |
 | M17: Progression actors | Stars, coins, lives, caps, switches, doors, warps, cannons, checkpoints, and secrets match C. | In progress — M17a progression schemas/reducer, M17b C-compatible SaveFile codec/recovery, M17c coin-score age/MainMenuData codec, M17d red-coin/cap-switch/level-reward actor routes, M17e owner-thread atomic bundle/recovery plus route lifetime, M17f runtime composition/commit/reload, M17g EngineHost owner-thread callback installation/save-domain schema-4 records, M17h event-complete C snapshot reconciliation, M17i four-slot atomic EEPROM image adapter, and M17j owner-thread route replay pass strict Swift/C fingerprints, the 102-script matrix, and a native Debug build; live C callback route closure, Swift authority cutover, object/effect ownership, durable platform error telemetry, dialog/camera/audio delivery, and complete level-specific reward routes remain |
-| M18: Common enemies | Common enemy and projectile families match C across every reachable course. | In progress — M18a–M18d Goomba/Spiny shadow, scheduler, collision, and attack contracts plus M18e Lakitu spawn-count events pass fingerprints \`0x0b1058cb88f78d06\`, \`0x7b7a91e29b3e1003\`, \`0x416df13a812fe31f\`, and \`0x4021eec4cfdb5938\`, the 106-script matrix, and native Debug build; object allocation, full collision resolution, and remaining enemy/projectile families remain |
+| M18: Common enemies | Common enemy and projectile families match C across every reachable course. | In progress — M18a–M18d Goomba/Spiny shadow, scheduler, collision, and attack contracts plus M18e Lakitu control and M18f live allocation/parent-link bridge pass fingerprints \`0x0b1058cb88f78d06\`, \`0x7b7a91e29b3e1003\`, \`0x416df13a812fe31f\`, \`0x4021eec4cfdb5938\`, and \`0xb2fd32a3d8fda71f\`; the 107-script matrix/native Debug qualification, full collision resolution, and remaining enemy/projectile families remain |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |

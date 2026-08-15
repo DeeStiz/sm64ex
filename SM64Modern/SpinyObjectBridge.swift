@@ -2,6 +2,7 @@ import Foundation
 
 struct SM64SpinyObjectEffectRecord: Equatable, Sendable {
     let objectID: SM64ObjectID
+    let parentID: SM64ObjectID?
     let effects: SM64SpinyEffect
     let attackHandler: SM64SpinyAttackHandler
     let action: SM64SpinyAction
@@ -27,6 +28,41 @@ final class SM64SpinyObjectBridge {
         self.scheduler = scheduler
     }
 
+    /// IDs currently owned by the Spiny shadow. The owner-thread Lakitu
+    /// bridge uses this narrow membership check while sharing the same live
+    /// object-list scheduler.
+    var registeredIDs: [SM64ObjectID] {
+        states.keys.sorted { lhs, rhs in
+            if lhs.slot != rhs.slot { return lhs.slot < rhs.slot }
+            return lhs.generation < rhs.generation
+        }
+    }
+
+    func contains(_ id: SM64ObjectID) -> Bool {
+        states[id] != nil
+    }
+
+    /// Clears callback effects before an enclosing composite bridge begins a
+    /// scheduler pass. The setter remains private so effect ordering can only
+    /// be produced by the owner-thread callback.
+    func resetEffectLog() {
+        effectLog.removeAll(keepingCapacity: true)
+    }
+
+    /// Removes shadows after the scheduler's end-of-frame unload. This is
+    /// separate from `tick` so a composite bridge can keep one scheduler pass
+    /// for Lakitu and its newly appended Spiny child.
+    func prune(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded {
+            states.removeValue(forKey: id)
+            inputs.removeValue(forKey: id)
+        }
+        for id in Array(states.keys) where pool.record(for: id) == nil {
+            states.removeValue(forKey: id)
+            inputs.removeValue(forKey: id)
+        }
+    }
+
     func state(for id: SM64ObjectID) -> SM64SpinyState? {
         states[id]
     }
@@ -47,6 +83,33 @@ final class SM64SpinyObjectBridge {
         guard attach(id, action: action, in: engineState.objects) else {
             _ = engineState.objects.despawn(id)
             preconditionFailure("newly spawned Spiny could not attach")
+        }
+        return id
+    }
+
+    /// Pool-only allocation used from another owner-thread scheduler
+    /// callback. The caller is responsible for recording any parent-side
+    /// previous-object link in the same callback before traversal continues.
+    @discardableResult
+    func spawnSpiny(
+        in pool: SM64ObjectPool,
+        action: SM64SpinyAction = .walk,
+        objectList: SM64ObjectList = .generalActor,
+        parent: SM64ObjectID? = nil,
+        model: UInt32 = 0,
+        behaviorIdentity: UInt64 = SM64SpinyObjectBridge.defaultBehaviorIdentity,
+        drawingDistance: Float = 4_000
+    ) -> SM64ObjectID? {
+        guard let id = try? pool.spawn(
+            in: objectList,
+            model: model,
+            behaviorIdentity: behaviorIdentity,
+            parent: parent,
+            drawingDistance: drawingDistance
+        ) else { return nil }
+        guard attach(id, action: action, in: pool) else {
+            _ = pool.despawn(id)
+            return nil
         }
         return id
     }
@@ -98,7 +161,10 @@ final class SM64SpinyObjectBridge {
         )
     }
 
-    private func update(id: SM64ObjectID, pool: SM64ObjectPool) {
+    /// Updates one Spiny from an enclosing owner-thread scheduler callback.
+    /// This remains deliberately narrow: callers cannot mutate the shadow
+    /// state directly or bypass the copied-input kernel.
+    func update(id: SM64ObjectID, pool: SM64ObjectPool) {
         guard var spiny = states[id], let record = pool.record(for: id) else { return }
         var input = inputs[id] ?? SM64SpinyTickInput()
         if record.parent != id, let parent = pool.record(for: record.parent) {
@@ -112,12 +178,16 @@ final class SM64SpinyObjectBridge {
         let result = SM64SpinyKernel.tick(input, state: &spiny)
         states[id] = spiny
         synchronizeRecord(id: id, state: spiny, pool: pool)
+        let parentID = pool.record(for: id).flatMap { record in
+            record.parent == id ? nil : record.parent
+        }
         if spiny.markedForDeletion {
             _ = pool.markForDeletion(id)
         }
         effectLog.append(
             SM64SpinyObjectEffectRecord(
                 objectID: id,
+                parentID: parentID,
                 effects: result.effects,
                 attackHandler: result.attackHandler,
                 action: result.state.action
@@ -150,6 +220,12 @@ final class SM64SpinyObjectBridge {
             record.timer = Int32(truncatingIfNeeded: state.timer)
             record.moveFlags = state.moveFlags
             record.interactionType = state.action == .walk ? 0 : 1
+            if state.action == .heldByLakitu {
+                record.objectFlags |= SM64ObjectScheduler.objectFlagTransformRelativeToParent
+                record.parentRelativePosition = SM64ObjectVector3(x: -50, y: 35, z: -100)
+            } else {
+                record.objectFlags &= ~SM64ObjectScheduler.objectFlagTransformRelativeToParent
+            }
         }
     }
 }

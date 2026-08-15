@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18e is the current validated Goomba/Spiny/Lakitu common-enemy event slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18f is the current validated Goomba/Spiny/Lakitu owner-thread allocation slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -138,8 +138,27 @@
   `enemyLakituFingerprint=0x4021eec4cfdb5938`. The complete matrix passes with
   `runs=106 failures=0`; the generated native Debug build includes the source;
   and `git diff --check` is clean.
-- This remains a value-only event shadow: object allocation/parent wiring,
+- This remains a value-only event kernel: live object allocation/parent wiring,
   Lakitu production callbacks, full collision/effect resolution, remaining
+  enemy/projectile breadth, and physical/visual/human acceptance remain open.
+
+### M18f Completion Evidence
+
+- `EnemyLakituObjectBridge.swift` connects the Lakitu kernel to the owner-thread
+  `SM64ObjectPool` and the existing Spiny scheduler. The Lakitu callback
+  allocates a `.generalActor` Spiny into the live list, records the stable
+  parent and `previousObject` identities, and preserves the C held relative
+  position (`-50, 35, -100`) until the animation-frame throw boundary clears
+  the link.
+- `SpinyObjectBridge.swift` now exposes only the narrow callback/prune surface
+  needed by the composite bridge and carries a copied parent ID in effect
+  records. Thrown attack and parent-distance deletion effects update the
+  Lakitu count before or after end-of-frame unload without exposing C pointers.
+- The independent Swift/C owner-thread bridge emits
+  `enemyLakituObjectBridgeFingerprint=0xb2fd32a3d8fda71f`; focused Lakitu,
+  Spiny, and Goomba bridge regressions pass. The full matrix passes with
+  `runs=107 failures=0`, the generated native Debug build succeeds, and
+  `git diff --check` is clean. Full collision/effect resolution, remaining
   enemy/projectile breadth, and physical/visual/human acceptance remain open.
 
 ### M8b Completion Evidence
