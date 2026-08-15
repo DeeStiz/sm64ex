@@ -1395,6 +1395,24 @@
   ownership, platform ownership/collision, remaining mechanisms and hazards,
   effect delivery, and M20–M35 are still open.
 
+### M19l Completion Evidence
+
+- `SM64Modern/TTCMovingBarBehavior.swift` is the value counterpart of
+  `bhv_ttc_moving_bar_init`/`bhv_ttc_moving_bar_update`: initialization,
+  wait/pull/extend/retract actions, threshold crossing,
+  acceleration/deceleration, random delay/fake-out inputs, and reset semantics
+  are explicit and pointer-free.
+- The independent C contract matches Swift at
+  `ttcMovingBarFingerprint=0x189e979eb38062a6`; wait, pull, extend crossing,
+  random fake-out, and retract reset paths are covered.
+- `script/test_ttc_moving_bar.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`. The full matrix target is
+  `runs=149 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 mechanism seam; global TTC RNG ownership,
+  platform ownership/collision, remaining mechanisms and hazards, effect
+  delivery, and M20–M35 are still open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
