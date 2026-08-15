@@ -25,6 +25,8 @@ enum SM64MarioActionID {
     static let shockwaveBounce: UInt32 = 0x00020226
     static let firstPerson: UInt32 = 0x0C000227
     static let freefall: UInt32 = 0x0100088C
+    static let groundPound: UInt32 = 0x008008A9
+    static let airThrow: UInt32 = 0x830008AB
     static let airHitWall: UInt32 = 0x000008A7
     static let softBonk: UInt32 = 0x010208B6
     static let hardForwardAirKnockback: UInt32 = 0x010208B2
