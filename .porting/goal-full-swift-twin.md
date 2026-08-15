@@ -2,7 +2,7 @@
 
 ## Status
 
-M20f is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M20g is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -906,7 +906,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M20d: racing penguin behavior and owner-thread route | Swift reproduces the race proposal/start gate, path-speed weighting, cheat detection, finish-wall stop, final dialog/reward branches, and sound/camera/star intents, then synchronizes those values through generation-safe owner-thread object records. | Complete locally — strict Swift 6/C value contract fingerprint `0xac6463b624763b06`, owner bridge fingerprint `0x65b2ccecaa02d25a`, 157-script matrix (`runs=157 failures=0`), regenerated native Debug build, and `git diff --check` pass; full movement/path ownership, effect delivery, and remaining NPC/puzzle families remain |
 | M20e: SL walking penguin move-standard route | Swift reproduces `cur_obj_move_standard(-78)` scalar movement for the walking penguin: drag, floor edge/steep-slope admission, gravity/bounce, water transitions, ground flags, canonical velocity decomposition, and owner-record publication. | Complete locally — strict Swift 6/C movement fingerprint `0x06637c47225dd8a1`, owner bridge fingerprint `0x2c3d22136511755b`, current 159-script matrix, regenerated native Debug build, and `git diff --check` pass; C-order prepass integration and path/child/effect ownership remain |
 | M20f: SL walking penguin C-order prepass route | The opt-in movement path resolves the current wall/floor state before behavior, feeds the projected position and selected floor facts into movement, preserves wall identity/flags, and keeps the historical collision-only route unchanged. | Complete locally — strict Swift 6/C owner-bridge fingerprint `0xc1e522003a32dd59`, focused contract, 159-script matrix (`runs=159 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; path/child ownership, effect/audio delivery, and remaining NPC/puzzle families remain |
-| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20f close the first value-plus-object collision/race/movement slice; path/child ownership, effect/audio delivery, dialog integration, remaining NPCs, puzzles, secrets, and rewards remain |
+| M20g: racing-penguin finish/shortcut child ownership | Swift creates generation-safe finish-line and shortcut-check child records when the race is accepted, evaluates the exact C distance/direction predicates before the parent tick, propagates win/cheat state, preserves parent identities, and retires children with the parent. | Complete locally — strict Swift 6/C child fingerprint `0x87b61e16494da173`, owner bridge fingerprint `0x5fcb16697e344061`, 161-script matrix (`runs=161 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; path waypoint ownership, effect/audio delivery, and remaining NPC/puzzle families remain |
+| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20g close the first value-plus-object collision/race/movement/child slice; path waypoint ownership, effect/audio delivery, dialog integration, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1079,8 +1080,10 @@ replayable trace, and the platform evidence listed in its exit gate.
    opt-in owner-thread route for gravity, edge/steep-slope, water, ground flags,
    drag, and canonical velocity publication. M20f closes the C-order wall/floor
    prepass for that opt-in route while retaining the historical collision-only
-   path. Finish path/child/effect ownership before the remaining NPC/puzzle
-   families.
+   path. M20g creates the finish-line and shortcut-check child records on the
+   owner thread, applies their exact distance/direction predicates before the
+   parent tick, and fences their cleanup with the parent generation. Finish
+   path-waypoint/effect ownership before the remaining NPC/puzzle families.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and

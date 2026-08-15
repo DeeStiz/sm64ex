@@ -89,6 +89,12 @@ enum SM64ModernRacingPenguinObjectBridgeSmoke {
             preconditionFailure("accepted racing penguin effect missing")
         }
         require(acceptedEffect.output.attachRaceObjects, "bridge exposes race child attachment intent")
+        guard let raceChildren = acceptedEffect.raceChildren,
+              let finishLine = engineState.objects.record(for: raceChildren.finishLine),
+              let shortcutCheck = engineState.objects.record(for: raceChildren.shortcutCheck) else {
+            preconditionFailure("race child objects were not attached")
+        }
+        require(finishLine.parent == id && shortcutCheck.parent == id, "race children retain parent identity")
         require(acceptedRecord.action == SM64RacingPenguinBehavior.prepareForRace, "prepare action synchronized")
         require(acceptedRecord.velocity.y == 60, "start velocity synchronized")
         fingerprint = hashOutput(fingerprint, acceptedEffect.output, record: acceptedRecord)
@@ -138,6 +144,8 @@ enum SM64ModernRacingPenguinObjectBridgeSmoke {
         let deletionTick = bridge.tick(state: engineState)
         require(deletionTick.scheduler.unloaded == [id], "scheduler unload ordering")
         require(bridge.state(for: id) == nil && bridge.registeredIDs.isEmpty, "bridge removes stale generation")
+        require(engineState.objects.record(for: raceChildren.finishLine) == nil, "finish child retires with parent")
+        require(engineState.objects.record(for: raceChildren.shortcutCheck) == nil, "shortcut child retires with parent")
 
         print(String(format: "racingPenguinObjectBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern racing penguin object bridge smoke passed")

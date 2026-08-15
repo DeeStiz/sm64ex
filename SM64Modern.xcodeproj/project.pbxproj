@@ -158,6 +158,7 @@
 		C26B5E45D862990F73216E20 /* CameraWallAvoidance.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8EAD015DAC9DCB859D04D1C /* CameraWallAvoidance.swift */; };
 		C2F45A5E7BF418E1FB457888 /* AmpObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FF0525B95F4052B6251D46 /* AmpObjectBridge.swift */; };
 		C4A4E51360A88FDFC1106CEA /* WaterBombObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE7AE7AC1D8F6731FE45B3C /* WaterBombObjectBridge.swift */; };
+		C51FA8AC1BCC4AEACB3EF387 /* RacingPenguinRaceChildren.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C87D408A2A3E729C89C36C3 /* RacingPenguinRaceChildren.swift */; };
 		C64BB4E43DA2868B1767C6E3 /* WaterBomb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3272FC72F5FA191847C8D57B /* WaterBomb.swift */; };
 		C86EE2726C8C3CB1AF7C47FC /* MarioSubmergedAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D50D50CB46C2409DDCA4E62E /* MarioSubmergedAction.swift */; };
 		C924667F20ADE7CC0CD84049 /* CameraModeCallbacks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96E5AD86B3742196A22A436 /* CameraModeCallbacks.swift */; };
@@ -318,6 +319,7 @@
 		97BD8678B319AD274378179C /* MetalShaderCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalShaderCompiler.swift; sourceTree = "<group>"; };
 		99204A42040D31152F30F990 /* MarioWalkingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWalkingAction.swift; sourceTree = "<group>"; };
 		994D08C3E7FCF937245A9757 /* EnemyLakituObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnemyLakituObjectBridge.swift; sourceTree = "<group>"; };
+		9C87D408A2A3E729C89C36C3 /* RacingPenguinRaceChildren.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RacingPenguinRaceChildren.swift; sourceTree = "<group>"; };
 		9D8C59955994453AFE524C2A /* MarioFinishTurningAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioFinishTurningAction.swift; sourceTree = "<group>"; };
 		9DEC5D253D4E679DB5AB13D6 /* MarioWalkAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWalkAnimation.swift; sourceTree = "<group>"; };
 		9EEBF996423E617F30D67C1D /* MarioAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioAction.swift; sourceTree = "<group>"; };
@@ -557,6 +559,7 @@
 				F201059126BC066BFF28F447 /* ProgressionState.swift */,
 				596D8EF20F09C73B0AFC37D3 /* RacingPenguinBehavior.swift */,
 				5FE7A3B1DDD9C35A23DE6E47 /* RacingPenguinObjectBridge.swift */,
+				9C87D408A2A3E729C89C36C3 /* RacingPenguinRaceChildren.swift */,
 				F28F9F86BA8486D9F6BB005C /* RotatingPlatformBehavior.swift */,
 				28BA5E297BC57291B44A28B4 /* RouteShardExecution.swift */,
 				6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */,
@@ -848,6 +851,7 @@
 				7FC210D0F220C0F3EC53E6B3 /* ProgressionState.swift in Sources */,
 				AA1E0D8AA06F9E83EFEB426F /* RacingPenguinBehavior.swift in Sources */,
 				A98FBF29A6F260B4883D8AFC /* RacingPenguinObjectBridge.swift in Sources */,
+				C51FA8AC1BCC4AEACB3EF387 /* RacingPenguinRaceChildren.swift in Sources */,
 				B4EB45CA367DED1BF59D3D99 /* RotatingPlatformBehavior.swift in Sources */,
 				2629A8504E963CF509456513 /* RouteShardExecution.swift in Sources */,
 				456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */,

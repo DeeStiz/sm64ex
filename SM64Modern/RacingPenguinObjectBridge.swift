@@ -16,6 +16,9 @@ struct SM64RacingPenguinEnvironment: Equatable, Sendable {
     let canActivateFinalText: Bool
     let finalDialogResult: Int32
     let marioInAirAction: Bool
+    let finishLineDistanceToMario: Float
+    let finishLineMarioDeltaZ: Float
+    let shortcutDistanceToMario: Float
 
     init(
         marioPositionY: Float = 0,
@@ -29,7 +32,10 @@ struct SM64RacingPenguinEnvironment: Equatable, Sendable {
         finalAnimationAtEnd: Bool = false,
         canActivateFinalText: Bool = false,
         finalDialogResult: Int32 = 0,
-        marioInAirAction: Bool = false
+        marioInAirAction: Bool = false,
+        finishLineDistanceToMario: Float = .greatestFiniteMagnitude,
+        finishLineMarioDeltaZ: Float = 0,
+        shortcutDistanceToMario: Float = .greatestFiniteMagnitude
     ) {
         self.marioPositionY = marioPositionY
         self.canActivateInitialText = canActivateInitialText
@@ -43,6 +49,9 @@ struct SM64RacingPenguinEnvironment: Equatable, Sendable {
         self.canActivateFinalText = canActivateFinalText
         self.finalDialogResult = finalDialogResult
         self.marioInAirAction = marioInAirAction
+        self.finishLineDistanceToMario = finishLineDistanceToMario
+        self.finishLineMarioDeltaZ = finishLineMarioDeltaZ
+        self.shortcutDistanceToMario = shortcutDistanceToMario
     }
 }
 
@@ -59,9 +68,15 @@ struct SM64RacingPenguinObjectState: Equatable, Sendable {
     var moveYaw: Int16 = 0
 }
 
+struct SM64RacingPenguinRaceChildIDs: Equatable, Sendable {
+    let finishLine: SM64ObjectID
+    let shortcutCheck: SM64ObjectID
+}
+
 struct SM64RacingPenguinObjectEffect: Equatable, Sendable {
     let objectID: SM64ObjectID
     let output: SM64RacingPenguinOutput
+    let raceChildren: SM64RacingPenguinRaceChildIDs?
 }
 
 struct SM64RacingPenguinSchedulerTickResult: Equatable, Sendable {
@@ -75,10 +90,13 @@ struct SM64RacingPenguinSchedulerTickResult: Equatable, Sendable {
 final class SM64RacingPenguinObjectBridge {
     static let defaultBehaviorIdentity: UInt64 = 0x6268_765F_727063
     static let defaultModel: UInt32 = 0x93 // MODEL_PENGUIN_RACING
+    static let finishLineBehaviorIdentity: UInt64 = 0x6268_765F_72666C
+    static let shortcutBehaviorIdentity: UInt64 = 0x6268_765F_727363
 
     private let scheduler: SM64ObjectScheduler
     private var states: [SM64ObjectID: SM64RacingPenguinObjectState] = [:]
     private var environments: [SM64ObjectID: SM64RacingPenguinEnvironment] = [:]
+    private var raceChildren: [SM64ObjectID: SM64RacingPenguinRaceChildIDs] = [:]
     private(set) var effectLog: [SM64RacingPenguinObjectEffect] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -127,6 +145,7 @@ final class SM64RacingPenguinObjectBridge {
         let state = SM64RacingPenguinObjectState(moveYaw: moveYaw)
         states[id] = state
         environments[id] = SM64RacingPenguinEnvironment()
+        raceChildren.removeValue(forKey: id)
         synchronize(
             id: id,
             state: state,
@@ -153,6 +172,7 @@ final class SM64RacingPenguinObjectBridge {
     ) -> SM64RacingPenguinSchedulerTickResult {
         environments = frameEnvironments
         effectLog.removeAll(keepingCapacity: true)
+        advanceRaceChildren(state: engineState)
         let schedulerResult = scheduler.update(
             state: engineState,
             advanceNativeDynamics: advanceNativeDynamics
@@ -160,10 +180,18 @@ final class SM64RacingPenguinObjectBridge {
             self?.update(id: id, pool: pool)
         }
         for id in schedulerResult.unloaded {
+            if let children = raceChildren.removeValue(forKey: id) {
+                _ = engineState.objects.despawn(children.finishLine)
+                _ = engineState.objects.despawn(children.shortcutCheck)
+            }
             states.removeValue(forKey: id)
             environments.removeValue(forKey: id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
+            if let children = raceChildren.removeValue(forKey: id) {
+                _ = engineState.objects.despawn(children.finishLine)
+                _ = engineState.objects.despawn(children.shortcutCheck)
+            }
             states.removeValue(forKey: id)
             environments.removeValue(forKey: id)
         }
@@ -207,6 +235,11 @@ final class SM64RacingPenguinObjectBridge {
             )
         )
 
+        var children = raceChildren[id]
+        if output.attachRaceObjects, children == nil {
+            children = attachRaceObjects(parent: id, pool: pool)
+        }
+
         state.action = output.action
         state.initTextCooldown = output.initTextCooldown
         state.finalTextbox = output.finalTextbox
@@ -231,7 +264,73 @@ final class SM64RacingPenguinObjectBridge {
             previousAction: previousAction,
             pool: pool
         )
-        effectLog.append(SM64RacingPenguinObjectEffect(objectID: id, output: output))
+        effectLog.append(
+            SM64RacingPenguinObjectEffect(
+                objectID: id,
+                output: output,
+                raceChildren: children
+            )
+        )
+    }
+
+    private func attachRaceObjects(parent: SM64ObjectID, pool: SM64ObjectPool)
+        -> SM64RacingPenguinRaceChildIDs?
+    {
+        guard pool.record(for: parent) != nil else { return nil }
+        guard let finishLine = try? pool.spawn(
+            in: .surface,
+            model: 0,
+            behaviorIdentity: Self.finishLineBehaviorIdentity,
+            parent: parent
+        ) else { return nil }
+        guard let shortcutCheck = try? pool.spawn(
+            in: .surface,
+            model: 0,
+            behaviorIdentity: Self.shortcutBehaviorIdentity,
+            parent: parent
+        ) else {
+            _ = pool.despawn(finishLine)
+            return nil
+        }
+        let children = SM64RacingPenguinRaceChildIDs(
+            finishLine: finishLine,
+            shortcutCheck: shortcutCheck
+        )
+        raceChildren[parent] = children
+        return children
+    }
+
+    private func advanceRaceChildren(state engineState: SM64SwiftEngineState) {
+        for (parentID, children) in raceChildren {
+            guard var parentState = states[parentID],
+                  engineState.objects.record(for: parentID) != nil,
+                  let environment = environments[parentID] else { continue }
+            let finishOutput = SM64RacingPenguinRaceChildren.update(
+                SM64RacingPenguinRaceChildInput(
+                    kind: .finishLine,
+                    parentReachedBottom: parentState.reachedBottom,
+                    distanceToMario: environment.finishLineDistanceToMario,
+                    marioDeltaZ: environment.finishLineMarioDeltaZ
+                )
+            )
+            let shortcutOutput = SM64RacingPenguinRaceChildren.update(
+                SM64RacingPenguinRaceChildInput(
+                    kind: .shortcutCheck,
+                    parentReachedBottom: parentState.reachedBottom,
+                    distanceToMario: environment.shortcutDistanceToMario,
+                    marioDeltaZ: 0
+                )
+            )
+            parentState.marioWon = parentState.marioWon || finishOutput.marioWon
+            parentState.marioCheated = parentState.marioCheated || shortcutOutput.marioCheated
+            states[parentID] = parentState
+            _ = engineState.objects.mutate(children.finishLine) { record in
+                record.parent = parentID
+            }
+            _ = engineState.objects.mutate(children.shortcutCheck) { record in
+                record.parent = parentID
+            }
+        }
     }
 
     private func synchronize(
