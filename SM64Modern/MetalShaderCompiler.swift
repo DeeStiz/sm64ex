@@ -110,8 +110,17 @@ final class MetalShaderCompiler {
         }
         pending.insert(key)
         lock.unlock()
-        compileQueue.async { [self] in
-            compile(key)
+        // Capture only an integer address in the @Sendable queue closure;
+        // recovery is the compiler-queue ownership leaf and the compiler is
+        // retained by its renderer until shutdown drains this queue.
+        let contextAddress = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
+        compileQueue.async {
+            guard let context = UnsafeMutableRawPointer(bitPattern: contextAddress) else {
+                preconditionFailure("MetalShaderCompiler queue context must be non-nil")
+            }
+            Unmanaged<MetalShaderCompiler>.fromOpaque(context)
+                .takeUnretainedValue()
+                .compile(key)
         }
     }
 

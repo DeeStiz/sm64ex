@@ -2,7 +2,7 @@
 
 ## Status
 
-M32k is the latest validated checkpoint layered on M18am: the Swift runtime
+M33a is the latest validated checkpoint layered on M18am: the Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
 object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
@@ -36,6 +36,11 @@ M32k removes the final host unchecked-sendability escape. The engine thread
 bootstrap recovers the owner only from an integer address at the ABI leaf;
 resize delivery stays main-actor-local, and the native strict-concurrency
 audit now reports zero `@unchecked Sendable` declarations in `SM64Modern`.
+M33a adds a strict Swift 6 route-shard manifest generator: all 7,419 rows from
+the reachability inventory receive a unique deterministic shard ID, input seed,
+save seed, expected trace-domain set, and explicit `planned` execution state.
+This is an inventory/execution contract, not whole-game parity evidence; no
+shard is marked executed until the C-vs-Swift replay runner closes its records.
 The implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
@@ -870,7 +875,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M32j: Metal renderer owner boundary | `MetalRenderer` is a plain AppKit/Metal owner object; all engine-facing mutation enters through host owner-thread preconditions, and `CAMetalDisplayLinkDelegate` drops callbacks that fail the owner predicate before rendering or changing frame/residency state. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; callback/GPU stress, host annotation, and one remaining unchecked Sendable class remain open |
 | M32k: Engine host owner boundary | `EngineHost` is a plain owner-thread class; its thread bootstrap captures only an integer unmanaged address, Metal callbacks are owner-thread closures, and AppKit resize delivery is retained by the main-actor view without sending the host object. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, zero `@unchecked Sendable` audit results, and `git diff --check` pass; adversarial callback stress and sanitizer qualification remain open |
 | M32: Swift 6 safety closure | Strict concurrency passes with mutable engine state no longer relying on `@unchecked Sendable`; remaining unsafe code is limited to audited leaf shims. | Complete locally — M32a–M32k owner, value, lock, and callback boundaries are closed; M33 parity qualification and M34/M35 production/human gates remain open |
-| M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | Not started |
+| M33a: Deterministic route-shard inventory | The reachability inventory is transformed into one canonical shard per reachable row with stable IDs/seeds and expected schema-4 trace domains; planned versus executed state is explicit. | Complete locally — strict Swift 6 manifest tool, 7,419-row inventory/shard count match, deterministic double generation, 133-script matrix, clean native Debug build, and `git diff --check` pass; all shards remain planned until replay execution |
+| M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | In progress — M33a inventory contract is complete; shard execution, C-vs-Swift schema-4 byte comparison, zero-unexecuted closure, and sanitizer reruns remain |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |
 | M35: Distribution and human acceptance | Developer ID, notarized/stapled DMG and ZIP, clean-machine Gatekeeper launch, and fresh-save human 120-star acceptance pass. | Not started |
 

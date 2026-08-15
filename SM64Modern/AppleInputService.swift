@@ -104,21 +104,28 @@ final class AppleInputService {
             setCurrentController(current)
         }
         let center = NotificationCenter.default
-        observers.append(center.addObserver(forName: .GCControllerDidConnect, object: nil, queue: .main) { [weak self] note in
+        let contextAddress = UInt(bitPattern: Unmanaged.passUnretained(self).toOpaque())
+        observers.append(center.addObserver(forName: .GCControllerDidConnect, object: nil, queue: .main) { note in
+            guard let context = UnsafeMutableRawPointer(bitPattern: contextAddress) else { return }
+            let service = Unmanaged<AppleInputService>.fromOpaque(context).takeUnretainedValue()
             let controller = note.object as? GCController
-            if let controller { self?.configure(controller) }
+            if let controller { service.configure(controller) }
             let name = controller?.vendorName ?? "unknown"
             inputLogger.notice("controller_connected name=\(name, privacy: .public)")
         })
-        observers.append(center.addObserver(forName: .GCControllerDidDisconnect, object: nil, queue: .main) { [weak self] note in
+        observers.append(center.addObserver(forName: .GCControllerDidDisconnect, object: nil, queue: .main) { note in
+            guard let context = UnsafeMutableRawPointer(bitPattern: contextAddress) else { return }
+            let service = Unmanaged<AppleInputService>.fromOpaque(context).takeUnretainedValue()
             let controller = note.object as? GCController
-            if let controller { self?.disconnect(controller) }
+            if let controller { service.disconnect(controller) }
             let name = controller?.vendorName ?? "unknown"
             inputLogger.notice("controller_disconnected name=\(name, privacy: .public)")
         })
-        observers.append(center.addObserver(forName: .GCControllerDidBecomeCurrent, object: nil, queue: .main) { [weak self] note in
+        observers.append(center.addObserver(forName: .GCControllerDidBecomeCurrent, object: nil, queue: .main) { note in
+            guard let context = UnsafeMutableRawPointer(bitPattern: contextAddress) else { return }
+            let service = Unmanaged<AppleInputService>.fromOpaque(context).takeUnretainedValue()
             let controller = note.object as? GCController
-            if let controller { self?.setCurrentController(controller) }
+            if let controller { service.setCurrentController(controller) }
             let name = controller?.vendorName ?? "unknown"
             inputLogger.notice("controller_current name=\(name, privacy: .public)")
         })
