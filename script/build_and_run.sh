@@ -21,9 +21,9 @@ if [[ -z "${SM64_MODERN_CODE_SIGN_IDENTITY:-}" ]]; then
   fi
 fi
 
-CODE_SIGN_RUNTIME_ARGS=()
+CODE_SIGN_ARGS=(--force --timestamp=none --sign "$SIGNING_IDENTITY")
 if [[ "$SIGNING_IDENTITY" != "-" ]]; then
-  CODE_SIGN_RUNTIME_ARGS=(--options runtime)
+  CODE_SIGN_ARGS+=(--options runtime)
 fi
 
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
@@ -59,19 +59,13 @@ else
   # locally available Apple Development identity without mutating portal state.
   while IFS= read -r nested_code; do
     codesign \
-      --force \
-      "${CODE_SIGN_RUNTIME_ARGS[@]}" \
-      --timestamp=none \
-      --sign "$SIGNING_IDENTITY" \
+      "${CODE_SIGN_ARGS[@]}" \
       "$nested_code"
   done < <(find "$APP_BUNDLE/Contents" -type f -name '*.dylib' -print)
 
   codesign \
-    --force \
-    "${CODE_SIGN_RUNTIME_ARGS[@]}" \
-    --timestamp=none \
+    "${CODE_SIGN_ARGS[@]}" \
     --entitlements "$DEBUG_ENTITLEMENTS" \
-    --sign "$SIGNING_IDENTITY" \
     "$APP_BUNDLE"
   codesign --verify --deep --strict "$APP_BUNDLE"
 fi

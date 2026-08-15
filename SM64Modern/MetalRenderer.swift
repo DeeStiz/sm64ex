@@ -413,6 +413,13 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         slot.allocator.reset()
         let commandBuffer = slot.commandBuffer
         commandBuffer.beginCommandBuffer(allocator: slot.allocator)
+        // MTL4 command buffers do not carry prior per-command-buffer
+        // residency declarations across begin/end cycles. Keep the queue-level
+        // residency sets as a broad safety net, but declare both the scene and
+        // CAMetalLayer allocations on every reusable submission as required by
+        // the Metal 4 command-buffer lifetime contract.
+        commandBuffer.useResidencySet(sceneResidency)
+        commandBuffer.useResidencySet(layer.residencySet)
         commandBuffer.pushDebugGroup("M4 SM64 Scene and Present")
 
         if !uploads.isEmpty {

@@ -2,7 +2,7 @@
 
 ## Status
 
-M33f is the latest validated checkpoint layered on M18am: the Swift runtime
+M34a is the latest validated checkpoint layered on M33f/M18am: the Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
 object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
@@ -65,6 +65,25 @@ row. The implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
 136-script matrix passes, and the regenerated native Debug build succeeds.
+M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
+submission redeclares both the scene and CAMetalLayer residency sets after
+`beginCommandBuffer`, while the existing queue-level residency, explicit
+blit-to-fragment barriers, drawable wait/commit/signal/present ordering,
+memoryless depth target, asynchronous MTL4 pipeline compiler, and archive
+lookup remain intact. A source-level Metal 4 contract rejects legacy Metal
+bindings and display-link `nextDrawable` acquisition. Focused Metal scene and
+contract smokes pass, the complete 140-script matrix passes, and the
+regenerated native Debug build succeeds. An elevated bounded run on Apple M5
+Max enabled Metal API/GPU validation, reached the real CAMetalLayer, loaded the
+Metal 4 descriptor cache, produced ready pipelines, presented three frames,
+and exited through `metal_shutdown_drained`/`engine_thread_finished status=0`.
+An 8.3 MiB `gpucapture` trace and `gpudebug` inspection show one MTL4 command
+buffer, two per-command residency declarations, a 960x720 BGRA8Unorm
+Clear/Store drawable, a zero-byte memoryless Depth32Float Clear/DontCare
+attachment, and a two-triangle argument-table draw. The fetched first-frame
+drawable is black (the renderer's approved clear while early pipelines are
+still warming), so sustained capture, resize/pause stress, physical display
+behavior, and human visual acceptance remain open.
 M18am remains the preceding complete bridge-router checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
@@ -905,7 +924,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M33e: Expected-domain coverage gate | A shard cannot pass on aggregate counts alone; its schema-4 `(domain, record_kind)` keys must cover the manifest expectation exactly, with missing or extra keys rejected. | Complete locally — strict Swift 6 coverage validator, missing-domain regression, 14 fixture shards with exact coverage, 135-script matrix (`runs=135 failures=0`), and `git diff --check` pass; live full-game breadth remains open |
 | M33f: Live route shard promotion | A trace emitted by a real Swift route is replayed by the C oracle, matched against the selected manifest row's exact domain set, and persisted as terminal evidence that cannot be rerun. | Complete locally — strict Swift 6 input-only live trace, C replay `records=1`, manifest-aware exact-coverage promotion with `fixture_only=0`, persistent rerun rejection, 136-script matrix (`runs=136 failures=0`), clean native Debug build, and `git diff --check` pass; all other shards remain open |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | In progress — M33a inventory contract is complete; shard execution, C-vs-Swift schema-4 byte comparison, zero-unexecuted closure, and sanitizer reruns remain |
-| M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |
+| M34a: Metal 4 command/residency contract | Every reusable MTL4 command buffer redeclares scene/layer residency after begin; legacy binding APIs and display-link drawable acquisition are rejected; explicit barrier and presentation ordering remain checked. | Complete locally — focused Metal 4 source/scene smokes, 140-script matrix (`runs=140 failures=0`), regenerated native Swift 6 Debug build, bounded API/GPU validation run with clean normal shutdown, 8.3 MiB `gpucapture` plus `gpudebug` inspection, and `git diff --check` pass; sustained capture, resize/pause stress, visual parity, and physical/human acceptance remain open |
+| M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | In progress — M34a closes the source/resource contract; live validation, capture/debug inspection, archive reuse, resize/pause stress, and drawable visual comparison remain |
 | M35: Distribution and human acceptance | Developer ID, notarized/stapled DMG and ZIP, clean-machine Gatekeeper launch, and fresh-save human 120-star acceptance pass. | Not started |
 
 ## Detailed Work Breakdown
@@ -1080,6 +1100,15 @@ Metal API validation, GPU capture, GPU debug inspection, and shader/resource
 validation. Capture real-layer screenshots and compare them to C reference
 packets. Prove 60/30 cadence, present-thread ownership, no display-link
 compilation, and clean shutdown under repeated resize/pause/resume.
+
+The first production slice is M34a: after every reusable command buffer begins,
+declare both the scene and layer residency sets again; retain queue-level
+residency as a broad guard; keep the upload-to-fragment producer/consumer
+barriers; and assert wait-for-drawable → commit → signal-drawable → present
+ordering. A source contract must reject legacy Metal binding/storage APIs and
+`nextDrawable` in the display-link path. Only after this contract and the
+scene-packet smoke pass should live Metal validation, capture, GPU inspection,
+archive reuse, resize/pause stress, and visual comparison be attempted.
 
 ### Phase G — release and human acceptance (M35)
 

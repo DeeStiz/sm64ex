@@ -3,6 +3,7 @@
 ## Current Milestone
 
 - Active goal: `full-swift-twin`; M33f is the current validated qualification seam layered on the M18am Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb/Bullet-Bill-smoke/Swoop/Goomba/Spiny/Boo/Whomp owner-thread enemy slice. Swift now owns runtime lifecycle phases, failure fencing, a real owner-thread engine context with state/object-pool/scheduler tick receipts, explicit per-domain readiness, the qualified progression actor route, the qualified input normalizer route, the qualified Mario input-core route, the qualified idle action-selection route, and schema-4 Swift receipt/sidecar emission. M32a publishes Metal scene packets as value-semantic copy-on-write snapshots, M32b carries immutable texture-upload bytes in those packets while keeping mutable Metal residency state inside the renderer, M32c makes the oracle trace file session explicitly owner-thread-only, M32d adds the same token-checked owner boundary to progression migration, M32e adds a bind-on-first-reset token to gameplay migration, M32f makes Apple input a lock-protected shared-state bridge with MainActor-only focus notifications, M32g makes gameplay parity state explicitly engine-owner-thread-only, M32h makes both persistence adapters immutable `Sendable` descriptors with token and pthread checks, M32i makes shader compiler cache access lock-guarded with compilation queue ownership, M32j makes renderer mutation owner-thread-gated with display-link rejection, M32k removes the final host escape with an integer-address thread bootstrap and main-actor resize closure, and M33a maps all 7,419 reachability rows to unique planned route shards with deterministic seeds and expected trace domains. M33b adds a value-only execution ledger plus 14 C/Swift byte-identical schema-4 fixture replays; M33c runs the existing Swift owner-thread input/Mario-action/progression/object/scheduler route through the real C schema-4 replay API with seven matched records and deliberate first-divergence detection; M33d restores persisted reports across processes and rejects terminal reruns; M33e rejects any shard whose emitted domain/kind keys do not exactly cover its manifest expectation; M33f promotes the real one-record Swift input route for `oracle_hook|input` with C replay, exact coverage, and persisted `fixture_only=0` evidence. These are bounded route proofs, not whole-game parity. `SM64Modern` has zero unchecked-Sendable classes; every audited bridge-side deletion and transient-child retirement still routes through the shared sink plus the corrected Enemy Lakitu composite harness. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- M34a adds per-command-buffer Metal 4 scene/layer residency declarations after each reusable `beginCommandBuffer`, preserves queue residency plus explicit upload-to-fragment barriers and drawable ordering, and adds a source contract rejecting legacy binding/storage APIs and display-link `nextDrawable` acquisition. Focused Metal scene/contract smokes pass, the complete matrix passes with `runs=140 failures=0`, and the regenerated native Debug build succeeds. A bounded elevated Apple M5 Max run enables Metal API/GPU validation, loads the descriptor cache, presents three frames, exits cleanly, and yields an 8.3 MiB `gpucapture`/`gpudebug` trace; sustained warm-pipeline capture, visual/physical acceptance, and resize/pause stress remain open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -1254,6 +1255,42 @@
   regenerated native Debug build and `git diff --check` pass.
 - Collision-data setup, dynamic surface replacement, remaining mechanisms,
   hazards, effects, and M20–M35 remain open.
+
+### M34a Completion Evidence
+
+- `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
+  `CAMetalLayer` residency sets on every reusable MTL4 command buffer after
+  `beginCommandBuffer`; queue-level residency remains attached as a broad
+  guard. The existing blit-to-fragment producer/consumer barriers,
+  memoryless Clear/DontCare depth target, asynchronous MTL4 pipeline compiler,
+  archive lookup, and wait/commit/signal-drawable/present ordering remain
+  intact.
+- `script/test_metal4_contract.sh` rejects legacy Metal binding/storage APIs,
+  display-link `nextDrawable`, missing residency/barrier/presentation seams,
+  and ordering regressions. `script/test_metal_scene_packet.sh` continues to
+  pass the immutable packet contract.
+- Focused output is `SM64 Modern Metal 4 source contract passed` plus
+  `SM64 Modern Metal scene packet smoke passed`. The complete matrix passes
+  with `runs=140 failures=0` (log `/tmp/sm64-modern-m34a-matrix.log`), the
+  regenerated native Swift 6/macOS 27 arm64 Debug build succeeds (log
+  `/tmp/sm64-modern-m34a-clean-build.log`), and `git diff --check` is clean.
+- `script/build_and_run.sh` now handles the no-certificate ad-hoc codesign
+  path safely under `set -u`; a bounded elevated 60-tick run enabled Metal API
+  and GPU validation, loaded the device-specific descriptor cache, presented
+  three frames, and exited with `metal_shutdown_drained`,
+  `platform_shutdown`, and `engine_thread_finished status=0`.
+- `gpucapture` produced `/tmp/sm64-modern-m34a-live.gputrace` (8.3 MiB).
+  `gpudebug` inspected one MTL4 command buffer with two per-command residency
+  declarations, a 960x720 `BGRA8Unorm` Clear/Store drawable, zero-byte
+  memoryless `Depth32Float` Clear/DontCare depth, and a two-triangle
+  argument-table draw. The first fetched drawable is black during pipeline
+  warm-up, so this is not visual-parity evidence. The bounded unified log had
+  no Metal validation fault/error record; managed-environment audio underruns
+  remain non-acceptance evidence.
+- This closes a source/resource lifecycle plus bounded live-runtime slice.
+  Sustained warm-pipeline capture, resize/pause stress, device-loss recovery,
+  physical display behavior, visual comparison, and human acceptance remain
+  open.
 
 ### M8b Completion Evidence
 
