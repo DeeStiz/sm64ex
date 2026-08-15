@@ -169,12 +169,20 @@ M16d adds the camera collision owner boundary. It preserves smooth versus
  remain explicit follow-on seams.
 
 M16e adds the behind-Mario camera control kernel. It preserves active-angle
- distance and focus offsets, water/metal pitch increments, C-button yaw/pitch
- goals, side-rotation and sound timers, asymptotic/symmetric approach ordering,
- minimum distance, and exact goal-yaw wrapping with the independent Swift/C
- fingerprint `0x00bc64108d4f037c`. Camera-mode bounds, collision feedback,
- shake/FOV, cutscene camera, and whole-mode differential coverage remain
- explicit follow-on seams.
+distance and focus offsets, water/metal pitch increments, C-button yaw/pitch
+goals, side-rotation and sound timers, asymptotic/symmetric approach ordering,
+minimum distance, and exact goal-yaw wrapping with the independent Swift/C
+fingerprint `0x00bc64108d4f037c`. Camera-mode bounds, collision feedback,
+shake/FOV, cutscene camera, and whole-mode differential coverage remain
+explicit follow-on seams.
+
+M16f adds C-up entry/head/update state and deterministic camera shake/FOV intent
+ descriptors. It preserves stored camera offsets, pitch/yaw clamps, three-
+quarter head constraints, +Z-forward C-up placement, attack/ground-pound/fall
+ damage plans, water-versus-land damage amplitudes, movement-speed intents, and
+ channel decay/increment values with the independent Swift/C fingerprint
+ `0xdeab0f4855d88e31`. C-up collision search, effect delivery, cutscene camera,
+ and whole-mode differential coverage remain explicit follow-on seams.
 
 M12h routes floor, ceiling, and wall candidates through the C-ordered partition with indexed Swift surface storage and dynamic replacement. M12i adds a value-type owner-thread gameplay tick that composes input/geometry, preserves paired simulation/legacy counters, carries demo state, and advances logical rumble with a matching Swift/C trace. Live runtime wiring, production content breadth, and physical haptic delivery remain open.
 
@@ -249,7 +257,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M13: Mario core and interactions | Swift Mario initialization, terrain, health/caps, interactions, hitboxes, effects, and held objects match C. | In progress — M13a initialization, M13b health mutation, M13c cap timers/state transitions, M13d terrain snapshots, and M13e action-entry/drop/hurt transitions pass strict Swift/C fingerprints; action bodies, interaction dispatch, hitboxes, effects, and held-object behavior remain |
 | M14: Stationary and moving actions | All reachable stationary and moving Mario actions match exact state/effect traces. | In progress — M14a common cancel decisions, M14b grounded-speed kernel, M14c four-quarter ground-step boundary, M14d walk animation/audio state machine, M14e idle/crouch action bodies, M14f wall-response boundary, M14g walking dispatch/composition, M14h landing-jump selection, M14i slope predicates/acceleration, M14j walking slope wiring/steep-jump projection, M14k punch sequence, M14l moving-punch body, M14m braking/decelerating bodies, M14n turning-around body, M14o finish-turning body, M14p shared slide bodies, M14q hold/crouch/slide-kick/dive-slide variants, M14r crawling, M14s held walking/decelerating, M14t shell-ground speed/action, M14u ground-knockback actions, M14v standard landing actions, M14w quicksand jump-land actions, M14x air-knockback actions, M14y shell-air action, and M14z burning-ground action pass strict Swift/C fingerprints; owner-thread effect application and full stationary/moving coverage remain |
 | M15: Airborne/submerged/automatic actions | All reachable air, water, climbing, hanging, cannon, and automatic actions match C. | In progress — M15a shared `common_air_action_step`, M15b jump/double/triple/backflip/freefall/held-air callers, M15c side-flip/wall-kick/long-jump callers, M15d dive/air-throw/rollout callers, M15e twirl/water/held-water callers, M15f burning/lava callers, M15g submerged dispatch callers, M15h swimming callers, M15i water interaction callers, M15j water knockback/plunge callers, M15k whirlpool capture/death timing callers, M15l metal-water standing/walking/jump/fall/landing callers, M15m pole/hanging callers, M15n ledge/cannon callers, and M15o grabbed/tornado callers pass strict Swift/C fingerprints; automatic-action dispatch closure and owner-thread effect delivery remain |
-| M16: Camera system | Legacy/better camera, cutscene camera, shake, collision, transitions, and negative-coordinate behavior match C. | In progress — M16a camera math, M16b selection/mode-transition/HUD state, M16c height/focus/radial geometry, M16d collision/height-approach, and M16e behind-Mario control boundaries pass strict Swift/C fingerprints; camera-specific wall-avoidance yaw, bounded-mode callbacks, shake/FOV, cutscene camera, and negative-coordinate whole-mode coverage remain |
+| M16: Camera system | Legacy/better camera, cutscene camera, shake, collision, transitions, and negative-coordinate behavior match C. | In progress — M16a camera math, M16b selection/mode-transition/HUD state, M16c height/focus/radial geometry, M16d collision/height-approach, M16e behind-Mario control, and M16f C-up/shake/FOV intent boundaries pass strict Swift/C fingerprints; camera-specific wall-avoidance yaw, bounded-mode callbacks, C-up collision search, cutscene camera, and negative-coordinate whole-mode coverage remain |
 | M17: Progression actors | Stars, coins, lives, caps, switches, doors, warps, cannons, checkpoints, and secrets match C. | Not started |
 | M18: Common enemies | Common enemy and projectile families match C across every reachable course. | Not started |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
