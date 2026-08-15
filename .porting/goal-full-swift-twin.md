@@ -2,11 +2,11 @@
 
 ## Status
 
-M18ae is the latest validated checkpoint: the bouncing-fireball deletion path
+M18af is the latest validated checkpoint: Snufit bowling-ball bullet deletion
 is delivered through the owner-thread effect router in the independent Swift/C
-fingerprint `0x6ad7b0bf4304989e`, and the strict focused contract, full
-131-script matrix, and regenerated native Debug build pass. M18ad remains the
-preceding validated parent/flame bridge checkpoint. M0–M17 local scopes remain complete
+fingerprint `0xf6221010ed5e3f78`, and the strict focused contract, full
+131-script matrix, and regenerated native Debug build pass. M18ae remains the
+preceding validated fireball router-adoption checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
 platform, NPC, boss, save, frontend, audio, renderer, Swift-6-safety,
@@ -647,14 +647,24 @@ remaining enemy/projectile families, and physical/visual/audio/human
 acceptance remain open.
 
 M18ae adopts the common owner-thread effect router for the bouncing-fireball
- bridge's parent/flame deletion path. The router delivers deletion intents
- before the scheduler's end-of-frame unload, preserving stable child records
+bridge's parent/flame deletion path. The router delivers deletion intents
+before the scheduler's end-of-frame unload, preserving stable child records
  and the parent deletion fence in the independent Swift/C fingerprint
  `0x6ad7b0bf4304989e`. Focused strict Swift 6/C validation passes; the full 131
  script matrix (`runs=131 failures=0`), regenerated native Debug build, and
  `git diff --check` pass. Other enemy bridges still need router adoption, and
- whole-engine collision/effect presentation plus physical/visual/audio/human
- acceptance remain open.
+whole-engine collision/effect presentation plus physical/visual/audio/human
+acceptance remain open.
+
+M18af adopts the same owner-thread deletion route for Snufit's bowling-ball
+ projectile child. It preserves the bullet wall/ground death decision, stable
+ parent-child identity, and scheduler unload ordering while routing the mutable
+ deletion through the common sink in the independent Swift/C fingerprint
+ `0xf6221010ed5e3f78`. Focused strict Swift 6/C validation passes; the full 131
+ script matrix (`runs=131 failures=0`), regenerated native Debug build, and
+ `git diff --check` pass. Remaining bridges still contain direct effect
+ mutations, and whole-engine collision/effect presentation plus physical/
+ visual/audio/human acceptance remain open.
 
 M12h routes floor, ceiling, and wall candidates through the C-ordered partition with indexed Swift surface storage and dynamic replacement. M12i adds a value-type owner-thread gameplay tick that composes input/geometry, preserves paired simulation/legacy counters, carries demo state, and advances logical rumble with a matching Swift/C trace. Live runtime wiring, production content breadth, and physical haptic delivery remain open.
 
@@ -736,6 +746,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M18ac: Owner-thread effect router | Common effect intents are sequenced and delivered into Swift-owned object mutations while presentation intents remain immutable and ordered. | Complete locally — `0x6f4e529130b860b1`, strict Swift 6/C contract, 130-script matrix, regenerated native Debug build, and `git diff --check` pass; whole-engine routing remains open |
 | M18ad: Bouncing fireball bridge | Bouncing-fireball parent/flame actions, child allocation, scale/velocity state, and owner-thread deletion fencing match C. | Complete locally — `0x473a69850a182475`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; whole-engine effect routing and runtime collision/presentation remain open |
 | M18ae: Fireball router adoption | Bouncing-fireball parent/flame deletion intents use the common owner-thread effect router before scheduler unload. | Complete locally — `0x6ad7b0bf4304989e`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
+| M18af: Snufit bullet router adoption | Snufit bowling-ball bullet wall/ground deletion uses the common owner-thread effect router and preserves child unload ordering. | Complete locally — `0xf6221010ed5e3f78`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |

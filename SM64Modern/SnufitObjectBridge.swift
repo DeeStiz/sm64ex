@@ -32,14 +32,20 @@ final class SM64SnufitObjectBridge {
     static let bulletModel: UInt32 = 0xB4 // MODEL_BOWLING_BALL
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var snufits: [SM64ObjectID: SM64SnufitState] = [:]
     private var bullets: [SM64ObjectID: SM64SnufitBulletState] = [:]
     private var snufitInputs: [SM64ObjectID: SM64SnufitTickInput] = [:]
     private var bulletInputs: [SM64ObjectID: SM64SnufitBulletTickInput] = [:]
     private(set) var effectLog: [SM64SnufitObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -183,6 +189,8 @@ final class SM64SnufitObjectBridge {
         snufitInputs = frameSnufitInputs
         bulletInputs = frameBulletInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
@@ -250,7 +258,10 @@ final class SM64SnufitObjectBridge {
         guard var state = bullets[id], let record = pool.record(for: id) else { return }
         let input = bulletInputs[id] ?? defaultBulletInput(for: record)
         let result = SM64SnufitKernel.tickBullet(input, state: &state)
-        if state.markedForDeletion { _ = pool.markForDeletion(id) }
+        if state.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         bullets[id] = state
         synchronizeBullet(id: id, state: state, pool: pool)
         effectLog.append(

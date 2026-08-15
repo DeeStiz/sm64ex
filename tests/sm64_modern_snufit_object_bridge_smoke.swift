@@ -169,6 +169,27 @@ enum SM64ModernSnufitObjectBridgeSmoke {
         require(shotEffect.spawnedBullets.count == 1, "snufit bridge child allocation")
         fingerprint = hashEffect(fingerprint, shotEffect)
 
+        let bulletID = shotEffect.spawnedBullets[0]
+        let deletionTick = bridge.tick(
+            state: engineState,
+            snufitInputs: [snufitID: SM64SnufitTickInput(distanceToMario: 10_000)],
+            bulletInputs: [bulletID: SM64SnufitBulletTickInput(
+                distanceToMario: 200,
+                hitWallOrGround: true
+            )]
+        )
+        require(
+            bridge.deliveryLog.contains { $0.deleted == [bulletID] },
+            "snufit bullet deletion routed through owner thread"
+        )
+        require(
+            deletionTick.scheduler.unloaded.contains(bulletID),
+            "snufit bullet end-of-frame unload"
+        )
+        fingerprint = hashU64(fingerprint, 1)
+        fingerprint = hashU64(fingerprint, UInt64(bridge.deliveryLog.count))
+        fingerprint = hashU64(fingerprint, UInt64(deletionTick.scheduler.unloaded.count))
+
         print(String(format: "snufitObjectBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern Snufit object bridge smoke passed")
     }

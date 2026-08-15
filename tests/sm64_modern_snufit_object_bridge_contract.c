@@ -113,6 +113,9 @@ int main(void) {
     hash = hash_effect(hash, 1, 0, 0, 255, 135, 0, NULL, 0);
     const uint64_t child[] = { 2 };
     hash = hash_effect(hash, 1, 0, 1, 255, 251, 1, child, 0);
+    hash = hash_u64(hash, 1);
+    hash = hash_u64(hash, 1);
+    hash = hash_u64(hash, 1);
 
     printf("snufitObjectBridgeFingerprint=0x%016llx\n", (unsigned long long)hash);
     return 0;
