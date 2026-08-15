@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M32a is the current validated runtime seam layered on the M18am Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb/Bullet-Bill-smoke/Swoop/Goomba/Spiny/Boo/Whomp owner-thread enemy slice. Swift now owns runtime lifecycle phases, failure fencing, a real owner-thread engine context with state/object-pool/scheduler tick receipts, explicit per-domain readiness, the qualified progression actor route, the qualified input normalizer route, the qualified Mario input-core route, the qualified idle action-selection route, and schema-4 Swift receipt/sidecar emission. M32a additionally publishes Metal scene packets as value-semantic copy-on-write snapshots, removing the mutable scene-storage unchecked-Sendable escape, while every audited bridge-side deletion and transient-child retirement routes through the shared sink plus the corrected Enemy Lakitu composite harness. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M32b is the current validated runtime seam layered on the M18am Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully/Skeeter/Pokey/water-bomb/Koopa-shell/Bob-omb/Piranha Plant/Moneybag/Snufit/Scuttlebug/Mr. I/Whomp/Heave Ho/Chuckya/Fly Guy/Boo/Chain Chomp/wooden-post/gate/effect-router/bouncing-fireball/Snufit-bullet/water-bomb/Bullet-Bill-smoke/Swoop/Goomba/Spiny/Boo/Whomp owner-thread enemy slice. Swift now owns runtime lifecycle phases, failure fencing, a real owner-thread engine context with state/object-pool/scheduler tick receipts, explicit per-domain readiness, the qualified progression actor route, the qualified input normalizer route, the qualified Mario input-core route, the qualified idle action-selection route, and schema-4 Swift receipt/sidecar emission. M32a publishes Metal scene packets as value-semantic copy-on-write snapshots, and M32b carries immutable texture-upload bytes in those packets while keeping mutable Metal residency state inside the renderer, removing the binding-state unchecked-Sendable escape. Every audited bridge-side deletion and transient-child retirement still routes through the shared sink plus the corrected Enemy Lakitu composite harness. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -906,6 +906,27 @@
   clean. Texture bindings, renderer-wide owner-thread isolation, the remaining
   `@unchecked Sendable` classes, and later M32-M35 gates remain open.
 
+### M32b Completion Evidence
+
+- `MetalTextureUpload` is a strict `Sendable` value containing generation,
+  dimensions, and immutable pixel bytes. `MetalSceneDraw` carries uploads rather
+  than a mutable Metal binding. `MetalTextureResidency` is private renderer
+  state holding only the display-side `MTLTexture`, dimensions, and generation;
+  frame slots retain residencies until the GPU completion fence.
+- Upload staging now creates a residency exactly once per generation, resolves
+  packet uploads to resident textures while preparing draws, and collects
+  unused residencies without mutating any packet-visible object. This preserves
+  Metal 4 residency/barrier behavior while eliminating the shared mutable
+  `MetalTextureBinding` unchecked-Sendable class.
+- The strict Swift 6 packet smoke now compiles against immutable upload values
+  and still verifies packet reuse, viewport snapshots, and reset cleanup. The
+  native Debug build validates the full Metal renderer integration.
+- The corrected full matrix passes with `runs=132 failures=0` (log
+  `/tmp/sm64-modern-m32b-matrix.log`), the regenerated native Debug build
+  succeeds (log `/tmp/sm64-modern-m32b-build.log`), and `git diff --check` is
+  clean. Renderer-wide owner-thread isolation, the remaining `@unchecked
+  Sendable` classes, and later M32-M35 gates remain open.
+
 ### M8b Completion Evidence
 
 - `tests/fixtures/sm64_modern_timebase_cadence.tsv` is the governing M8b/M8c/M8d ownership inventory; the aggregate fixture remains a checked drift detector. The audit includes scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, input/rumble boundaries, presentation, and Swift host deferrals.
@@ -1027,7 +1048,7 @@
 | macOS legacy build | Implemented — Apple Clang arm64 build, external ROM extraction, OpenGL launch, LLDB/visual evidence, and ASan route pass |
 | Callable C core | Implemented — versioned lifecycle/platform/gameplay POD ABI, static archive, legacy adapter, and C/C++ smoke consumer |
 | AppKit host | Implemented — signed Swift/AppKit bundle, pixel-sized `CAMetalLayer`, menus/fullscreen, and dedicated 60/30 C-core owner thread with clean shutdown |
-| Full Swift twin runtime | Partial — M0 baseline, M1 selector, M2 content-pack compiler, M31a lifecycle-owner seam, M31b owner-thread context seam, M31c readiness/progression seam, M31d input route seam, M31e Mario input-core seam, M31f action-selection seam, M31g schema-4 receipt bridge, and M32a Metal packet Sendable closure are complete locally; M3 oracle trace and M4-M31 domain migration remain |
+| Full Swift twin runtime | Partial — M0 baseline, M1 selector, M2 content-pack compiler, M31a lifecycle-owner seam, M31b owner-thread context seam, M31c readiness/progression seam, M31d input route seam, M31e Mario input-core seam, M31f action-selection seam, M31g schema-4 receipt bridge, M32a Metal packet Sendable closure, and M32b Metal upload isolation are complete locally; M3 oracle trace and M4-M31 domain migration remain |
 | Metal 4 device/presentation | Implemented — validated raw-layer Metal 4 clear/present, two reusable frame slots, explicit drawable residency, owner-thread display link, resize handoff, and GPU-drained shutdown |
 | Metal 4 rendering | Implemented — complete-scene POD bridge/replay with reusable batched frame storage, async Metal 4 MSL/pipeline preparation, device/schema-keyed descriptor fallback cache, private textures, memoryless depth, samplers, state, residency/barriers, trace inspection, and clean Metal validation |
 | Native input | Implemented — native-tick snapshots, retained edges, keyboard/mouse bridge, and haptic bridge passed; no physical controller was connected in M8d |

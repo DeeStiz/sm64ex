@@ -26,8 +26,8 @@ struct MetalSceneDraw: Sendable {
     let shader: MetalShaderKey
     let textureID0: UInt32
     let textureID1: UInt32
-    let textureBinding0: MetalTextureBinding?
-    let textureBinding1: MetalTextureBinding?
+    let textureUpload0: MetalTextureUpload?
+    let textureUpload1: MetalTextureUpload?
     let sampler0: MetalSamplerKey
     let sampler1: MetalSamplerKey
     let depthTest: Bool
@@ -140,8 +140,8 @@ final class MetalSceneRecorder {
         vertices: UnsafePointer<Float>,
         floatCount: UInt32,
         triangleCount: UInt32,
-        textureBinding0: MetalTextureBinding?,
-        textureBinding1: MetalTextureBinding?
+        textureUpload0: MetalTextureUpload?,
+        textureUpload1: MetalTextureUpload?
     ) -> Bool {
         guard let selectedShaderID, let registered = shaders[selectedShaderID], floatCount > 0 else {
             return false
@@ -161,8 +161,8 @@ final class MetalSceneRecorder {
             shader: shader,
             textureID0: selectedTextureIDs[0],
             textureID1: selectedTextureIDs[1],
-            textureBinding0: textureBinding0,
-            textureBinding1: textureBinding1,
+            textureUpload0: textureUpload0,
+            textureUpload1: textureUpload1,
             sampler0: samplerKeys[0],
             sampler1: samplerKeys[1],
             depthTest: depthTest,

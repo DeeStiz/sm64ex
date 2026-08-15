@@ -1,9 +1,15 @@
 import Foundation
 
-// The production binding owns Metal objects and is intentionally covered by
-// the native build. This isolated packet smoke supplies the narrow type needed
-// to compile the value-semantic scene recorder under strict Swift 6 checking.
-final class MetalTextureBinding: @unchecked Sendable {}
+// The production residency owns Metal objects and is intentionally covered by
+// the native build. This isolated packet smoke supplies the immutable upload
+// value needed to compile the scene recorder under strict Swift 6 checking.
+struct MetalTextureUpload: Sendable, Equatable {
+    let generation: UInt64
+    let textureID: UInt32
+    let width: Int
+    let height: Int
+    let pixels: Data
+}
 
 @main
 struct SM64ModernMetalScenePacketSmoke {
@@ -19,8 +25,8 @@ struct SM64ModernMetalScenePacketSmoke {
                 vertices: buffer.baseAddress!,
                 floatCount: UInt32(buffer.count),
                 triangleCount: 1,
-                textureBinding0: nil,
-                textureBinding1: nil
+                textureUpload0: nil,
+                textureUpload1: nil
             ))
         }
         recorder.endFrame()
@@ -38,8 +44,8 @@ struct SM64ModernMetalScenePacketSmoke {
                 vertices: buffer.baseAddress!,
                 floatCount: UInt32(buffer.count),
                 triangleCount: 1,
-                textureBinding0: nil,
-                textureBinding1: nil
+                textureUpload0: nil,
+                textureUpload1: nil
             ))
         }
         recorder.endFrame()

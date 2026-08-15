@@ -6,18 +6,17 @@ import os
 
 private let metalLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "Metal")
 
-final class MetalTextureBinding: @unchecked Sendable {
+struct MetalTextureUpload: Sendable, Equatable {
     let generation: UInt64
     let textureID: UInt32
     let width: Int
     let height: Int
-    var pendingPixels: Data?
-    var texture: (any MTLTexture)?
+    let pixels: Data
 
     init(generation: UInt64, textureID: UInt32, pixels: Data, width: Int, height: Int) {
         self.generation = generation
         self.textureID = textureID
-        self.pendingPixels = pixels
+        self.pixels = pixels
         self.width = width
         self.height = height
     }
@@ -58,6 +57,22 @@ enum MetalRendererError: LocalizedError {
 }
 
 final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Sendable {
+    private final class MetalTextureResidency {
+        let generation: UInt64
+        let textureID: UInt32
+        let width: Int
+        let height: Int
+        let texture: any MTLTexture
+
+        init(upload: MetalTextureUpload, texture: any MTLTexture) {
+            self.generation = upload.generation
+            self.textureID = upload.textureID
+            self.width = upload.width
+            self.height = upload.height
+            self.texture = texture
+        }
+    }
+
     private final class FrameSlot {
         let index: Int
         let allocator: any MTL4CommandAllocator
@@ -65,7 +80,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
         let argumentTable: any MTL4ArgumentTable
         var transientBuffer: any MTLBuffer
         var depthTexture: (any MTLTexture)?
-        var retainedTextureBindings: [MetalTextureBinding] = []
+        var retainedTextureResidencies: [MetalTextureResidency] = []
         var completionValue: UInt64 = 0
 
         init(
@@ -85,14 +100,14 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
 
     private final class TextureRecord {
         let id: UInt32
-        var binding: MetalTextureBinding?
+        var upload: MetalTextureUpload?
         var sampler = MetalSamplerKey(linear: false, wrapS: 0, wrapT: 0)
 
         init(id: UInt32) { self.id = id }
     }
 
     private struct PreparedUpload {
-        let binding: MetalTextureBinding
+        let binding: MetalTextureResidency
         let texture: any MTLTexture
         let offset: Int
         let bytesPerRow: Int
@@ -103,6 +118,8 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
         let pipeline: MetalShaderCompiler.CompiledPipeline
         let vertexOffset: Int
         let uniformOffset: Int
+        let texture0: (any MTLTexture)?
+        let texture1: (any MTLTexture)?
     }
 
     private struct DepthStateKey: Hashable {
@@ -127,7 +144,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
     private let displayLink: CAMetalDisplayLink
     private var frameSlots: [FrameSlot] = []
     private var textures: [UInt32: TextureRecord] = [:]
-    private var residentTextureBindings: [UInt64: MetalTextureBinding] = [:]
+    private var residentTextureBindings: [UInt64: MetalTextureResidency] = [:]
     private var samplers: [MetalSamplerKey: any MTLSamplerState] = [:]
     private var depthStates: [DepthStateKey: any MTLDepthStencilState] = [:]
     private var nextTextureGeneration: UInt64 = 1
@@ -264,7 +281,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
         let (pixelCount, pixelOverflow) = Int(width).multipliedReportingOverflow(by: Int(height))
         let (byteCount, byteOverflow) = pixelCount.multipliedReportingOverflow(by: 4)
         guard !pixelOverflow, !byteOverflow else { return SM64_MODERN_STATUS_INVALID_ARGUMENT }
-        let binding = MetalTextureBinding(
+        let upload = MetalTextureUpload(
             generation: nextTextureGeneration,
             textureID: id,
             pixels: Data(bytes: pixels, count: byteCount),
@@ -272,7 +289,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
             height: Int(height)
         )
         nextTextureGeneration += 1
-        record.binding = binding
+        record.upload = upload
         return SM64_MODERN_STATUS_OK
     }
 
@@ -295,8 +312,8 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
             vertices: vertices,
             floatCount: floatCount,
             triangleCount: triangleCount,
-            textureBinding0: textures[textureID0]?.binding,
-            textureBinding1: textures[textureID1]?.binding
+            textureUpload0: textures[textureID0]?.upload,
+            textureUpload1: textures[textureID1]?.upload
         ) else {
             return SM64_MODERN_STATUS_INVALID_ARGUMENT
         }
@@ -319,7 +336,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
 
     func logSceneStatus(step: UInt64) {
         let packet = recorder.latestPacket
-        let pendingUploads = textureBindings(in: packet).filter { $0.pendingPixels != nil }.count
+        let pendingUploads = textureBindings(in: packet).filter {
+            residentTextureBindings[$0.generation] == nil
+        }.count
         metalLogger.notice(
             "metal_scene_status step=\(step) latest_packet=\(packet?.sequence ?? 0) latest_draws=\(packet?.draws.count ?? 0) presented=\(self.presentedFrameCount) gpu_completed=\(self.completionEvent.signaledValue) pending_uploads=\(pendingUploads)"
         )
@@ -347,7 +366,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
         displayLink.invalidate()
         for slot in frameSlots where slot.completionValue != 0 { try waitForGPU(value: slot.completionValue) }
         for binding in residentTextureBindings.values {
-            if let texture = binding.texture { sceneResidency.removeAllocation(texture) }
+            sceneResidency.removeAllocation(binding.texture)
         }
         if !residentTextureBindings.isEmpty { sceneResidency.commit() }
         residentTextureBindings.removeAll()
@@ -366,7 +385,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
         let colorTexture = drawable.texture
         let slot = frameSlots[frameIndex]
         if slot.completionValue != 0 { try waitForGPU(value: slot.completionValue) }
-        slot.retainedTextureBindings.removeAll(keepingCapacity: true)
+        slot.retainedTextureResidencies.removeAll(keepingCapacity: true)
         collectUnusedTextureBindings()
 
         let packet = recorder.latestPacket
@@ -470,14 +489,14 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
             slot.argumentTable.setAddress(slot.transientBuffer.gpuAddress + UInt64(prepared.vertexOffset), index: 0)
             slot.argumentTable.setAddress(slot.transientBuffer.gpuAddress + UInt64(prepared.uniformOffset), index: 1)
             if draw.shader.textureMask & 1 != 0 {
-                guard let texture = draw.textureBinding0?.texture else {
+                guard let texture = prepared.texture0 else {
                     throw MetalRendererError.textureUnavailable(id: draw.textureID0)
                 }
                 slot.argumentTable.setTexture(texture.gpuResourceID, index: 0)
                 slot.argumentTable.setSamplerState(try sampler(for: draw.sampler0, filteringMode: draw.shader.filteringMode).gpuResourceID, index: 0)
             }
             if draw.shader.textureMask & 2 != 0 {
-                guard let texture = draw.textureBinding1?.texture else {
+                guard let texture = prepared.texture1 else {
                     throw MetalRendererError.textureUnavailable(id: draw.textureID1)
                 }
                 slot.argumentTable.setTexture(texture.gpuResourceID, index: 1)
@@ -499,7 +518,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
         queue.signalDrawable(drawable)
         drawable.present()
         slot.completionValue = completionValue
-        slot.retainedTextureBindings = frameTextureBindings
+        slot.retainedTextureResidencies = frameTextureBindings.compactMap {
+            residentTextureBindings[$0.generation]
+        }
 
         if let packet { lastPresentedPacket = packet.sequence }
         presentedFrameCount += 1
@@ -514,7 +535,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
     }
 
     private func requiredTransientBytes(for packet: MetalScenePacket?) -> Int {
-        var total = textureBindings(in: packet).reduce(0) { $0 + ($1.pendingPixels?.count ?? 0) + 255 }
+        var total = textureBindings(in: packet).reduce(0) { $0 + $1.pixels.count + 255 }
         if let packet {
             total += packet.vertices.count * MemoryLayout<Float>.size
             total += packet.draws.count * 512
@@ -538,34 +559,34 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
     }
 
     private func prepareUploads(
-        _ bindings: [MetalTextureBinding],
+        _ bindings: [MetalTextureUpload],
         into buffer: any MTLBuffer,
         cursor: inout Int
     ) throws -> [PreparedUpload] {
         var uploads: [PreparedUpload] = []
         var residencyChanged = false
-        for binding in bindings.sorted(by: { $0.generation < $1.generation }) {
-            guard let pixels = binding.pendingPixels else { continue }
+        for upload in bindings.sorted(by: { $0.generation < $1.generation }) {
+            guard residentTextureBindings[upload.generation] == nil else { continue }
+            let pixels = upload.pixels
             cursor = aligned(cursor, to: 256)
             pixels.copyBytes(to: buffer.contents().advanced(by: cursor).assumingMemoryBound(to: UInt8.self), count: pixels.count)
             let descriptor = MTLTextureDescriptor.texture2DDescriptor(
                 pixelFormat: .rgba8Unorm,
-                width: binding.width,
-                height: binding.height,
+                width: upload.width,
+                height: upload.height,
                 mipmapped: false
             )
             descriptor.storageMode = .private
             descriptor.usage = .shaderRead
             guard let texture = device.makeTexture(descriptor: descriptor) else {
-                throw MetalRendererError.textureUnavailable(id: binding.textureID)
+                throw MetalRendererError.textureUnavailable(id: upload.textureID)
             }
-            texture.label = "SM64 Texture \(binding.textureID).\(binding.generation) \(binding.width)x\(binding.height)"
-            binding.texture = texture
-            binding.pendingPixels = nil
+            texture.label = "SM64 Texture \(upload.textureID).\(upload.generation) \(upload.width)x\(upload.height)"
+            let residency = MetalTextureResidency(upload: upload, texture: texture)
             sceneResidency.addAllocation(texture)
-            residentTextureBindings[binding.generation] = binding
+            residentTextureBindings[upload.generation] = residency
             residencyChanged = true
-            uploads.append(PreparedUpload(binding: binding, texture: texture, offset: cursor, bytesPerRow: binding.width * 4))
+            uploads.append(PreparedUpload(binding: residency, texture: texture, offset: cursor, bytesPerRow: upload.width * 4))
             cursor += pixels.count
         }
         if residencyChanged { sceneResidency.commit() }
@@ -603,7 +624,20 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
                     buffer.contents().advanced(by: uniformOffset).assumingMemoryBound(to: UInt32.self).initialize(repeating: 0, count: 4)
                     buffer.contents().advanced(by: uniformOffset).assumingMemoryBound(to: UInt32.self).pointee = UInt32(truncatingIfNeeded: packet.sequence)
                     cursor += 16
-                    prepared.append(PreparedDraw(draw: draw, pipeline: pipeline, vertexOffset: vertexOffset, uniformOffset: uniformOffset))
+                    let texture0 = draw.textureUpload0.flatMap {
+                        residentTextureBindings[$0.generation]?.texture
+                    }
+                    let texture1 = draw.textureUpload1.flatMap {
+                        residentTextureBindings[$0.generation]?.texture
+                    }
+                    prepared.append(PreparedDraw(
+                        draw: draw,
+                        pipeline: pipeline,
+                        vertexOffset: vertexOffset,
+                        uniformOffset: uniformOffset,
+                        texture0: texture0,
+                        texture1: texture1
+                    ))
                 }
             }
         } catch MetalShaderCompilerError.pipelineNotReady {
@@ -670,32 +704,32 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Send
         return MTLScissorRect(x: x, y: y, width: min(max(Int(rect.width), 1), width - x), height: min(max(Int(rect.height), 1), height - y))
     }
 
-    private func textureBindings(in packet: MetalScenePacket?) -> [MetalTextureBinding] {
+    private func textureBindings(in packet: MetalScenePacket?) -> [MetalTextureUpload] {
         guard let packet else { return [] }
         var seen = Set<UInt64>()
-        var result: [MetalTextureBinding] = []
+        var result: [MetalTextureUpload] = []
         result.reserveCapacity(packet.draws.count)
 
-        func appendIfNew(_ binding: MetalTextureBinding?) {
-            guard let binding, seen.insert(binding.generation).inserted else { return }
-            result.append(binding)
+        func appendIfNew(_ upload: MetalTextureUpload?) {
+            guard let upload, seen.insert(upload.generation).inserted else { return }
+            result.append(upload)
         }
 
         for draw in packet.draws {
-            appendIfNew(draw.textureBinding0)
-            appendIfNew(draw.textureBinding1)
+            appendIfNew(draw.textureUpload0)
+            appendIfNew(draw.textureUpload1)
         }
         return result
     }
 
     private func collectUnusedTextureBindings() {
-        var liveGenerations = Set(textures.values.compactMap { $0.binding?.generation })
-        for binding in textureBindings(in: recorder.latestPacket) { liveGenerations.insert(binding.generation) }
-        for binding in frameSlots.flatMap(\.retainedTextureBindings) { liveGenerations.insert(binding.generation) }
+        var liveGenerations = Set(textures.values.compactMap { $0.upload?.generation })
+        for upload in textureBindings(in: recorder.latestPacket) { liveGenerations.insert(upload.generation) }
+        for residency in frameSlots.flatMap(\.retainedTextureResidencies) { liveGenerations.insert(residency.generation) }
         let unused = residentTextureBindings.values.filter { !liveGenerations.contains($0.generation) }
         guard !unused.isEmpty else { return }
         for binding in unused {
-            if let texture = binding.texture { sceneResidency.removeAllocation(texture) }
+            sceneResidency.removeAllocation(binding.texture)
             residentTextureBindings.removeValue(forKey: binding.generation)
         }
         sceneResidency.commit()
