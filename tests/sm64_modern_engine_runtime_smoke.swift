@@ -92,6 +92,7 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.objectScheduler))
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.progression))
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.input))
+        precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.marioInput))
         precondition(!swiftShell.swiftContext.domainReadiness.isSwiftOwned(.audio))
         precondition(swiftShell.swiftContext.domainReadiness.cFallbackRequired.contains(.savePersistence))
         let heldInput = swiftShell.swiftContext.ingestInput(
@@ -106,6 +107,20 @@ enum SM64ModernEngineRuntimeSmoke {
             advanceLegacyDomain: true
         )!
         precondition(edgeInput.controller.buttonPressed == 0x0001)
+        let marioInput = swiftShell.swiftContext.ingestInput(
+            .init(buttons: 0x8000, rawStickX: 38),
+            advanceLegacyDomain: true
+        )!
+        let marioReceipt = swiftShell.swiftContext.updateMarioInput(
+            squishTimer: 0,
+            faceYaw: 0x1111,
+            cameraYaw: 0x0200
+        )!
+        precondition(marioReceipt.engineTick == 0)
+        precondition(marioReceipt.controller == marioInput.controller)
+        precondition(marioReceipt.mario.input.contains(.aPressed))
+        precondition(marioReceipt.mario.intendedMagnitude == 8)
+        precondition(marioReceipt.mario.intendedYaw == 0x4200)
         let progressionReceipt = swiftShell.swiftContext.applyProgression(
             .collectRedCoin, simulationTick: 0
         )!
@@ -133,6 +148,7 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.swiftContext.phase == .stopped)
         precondition(swiftShell.swiftContext.lastProgressionReceipt == nil)
         precondition(swiftShell.swiftContext.lastInputReceipt == nil)
+        precondition(swiftShell.swiftContext.lastMarioInputReceipt == nil)
         precondition(swiftShell.swiftContext.progression.progression.coins == 0)
         precondition(swiftShell.swiftContext.state.snapshot().objects.isEmpty)
         precondition(swiftShell.shutdown() == 4)

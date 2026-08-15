@@ -26,6 +26,7 @@ enum SM64ModernSwiftEngineDomain: String, CaseIterable, Equatable, Hashable, Sen
     case progression
     case savePersistence
     case input
+    case marioInput
     case camera
     case audio
     case rendering
@@ -36,7 +37,7 @@ struct SM64ModernSwiftEngineDomainReadiness: Equatable, Sendable {
     let swiftOwned: Set<SM64ModernSwiftEngineDomain>
 
     static let context = Self(swiftOwned: [
-        .state, .objectScheduler, .progression, .input
+        .state, .objectScheduler, .progression, .input, .marioInput
     ])
 
     func isSwiftOwned(_ domain: SM64ModernSwiftEngineDomain) -> Bool {
@@ -65,6 +66,12 @@ struct SM64ModernSwiftInputReceipt: Equatable, Sendable {
     let controller: SM64ControllerState
 }
 
+struct SM64ModernSwiftMarioInputReceipt: Equatable, Sendable {
+    let engineTick: UInt64
+    let controller: SM64ControllerState
+    let mario: SM64MarioInputState
+}
+
 /// Owner-thread Swift state used by the Swift runtime while product domains
 /// are migrated. It is deliberately a real engine context, not a callback
 /// counter: object lists, globals, transforms, arenas, and unload ordering
@@ -75,6 +82,8 @@ final class SM64ModernSwiftEngineContext {
     private let scheduler: SM64ObjectScheduler
     private let initialProgression: SM64ProgressionRuntime
     private var inputNormalizer = SM64ControllerInputNormalizer()
+    private var framesSinceA: UInt8 = 0
+    private var framesSinceB: UInt8 = 0
     private(set) var progression: SM64ProgressionRuntime
     let domainReadiness = SM64ModernSwiftEngineDomainReadiness.context
     private(set) var phase: SM64ModernSwiftRuntimePhase = .cold
@@ -82,6 +91,7 @@ final class SM64ModernSwiftEngineContext {
     private(set) var lastReceipt: SM64ModernSwiftEngineTickReceipt?
     private(set) var lastProgressionReceipt: SM64ModernSwiftProgressionReceipt?
     private(set) var lastInputReceipt: SM64ModernSwiftInputReceipt?
+    private(set) var lastMarioInputReceipt: SM64ModernSwiftMarioInputReceipt?
 
     init(
         objectCapacity: Int = SM64ObjectPool.defaultCapacity,
@@ -99,10 +109,13 @@ final class SM64ModernSwiftEngineContext {
         state.beginLevel(levelNumber: levelNumber, areaIndex: areaIndex)
         progression = initialProgression
         inputNormalizer = SM64ControllerInputNormalizer()
+        framesSinceA = 0
+        framesSinceB = 0
         tickCount = 0
         lastReceipt = nil
         lastProgressionReceipt = nil
         lastInputReceipt = nil
+        lastMarioInputReceipt = nil
         phase = .initialized
         return true
     }
@@ -148,6 +161,39 @@ final class SM64ModernSwiftEngineContext {
         return receipt
     }
 
+    func updateMarioInput(
+        squishTimer: Int32,
+        faceYaw: Int16,
+        cameraYaw: Int16,
+        firstPerson: Bool = false,
+        interactionUnknown10: Bool = false,
+        geometryFlags: SM64MarioInputFlags = []
+    ) -> SM64ModernSwiftMarioInputReceipt? {
+        guard phase == .initialized, let controller = lastInputReceipt?.controller else {
+            return nil
+        }
+        let mario = SM64MarioInputCore.update(
+            controller: controller,
+            squishTimer: squishTimer,
+            previousFramesSinceA: framesSinceA,
+            previousFramesSinceB: framesSinceB,
+            faceYaw: faceYaw,
+            cameraYaw: cameraYaw,
+            firstPerson: firstPerson,
+            interactionUnknown10: interactionUnknown10,
+            geometryFlags: geometryFlags
+        )
+        framesSinceA = mario.framesSinceA
+        framesSinceB = mario.framesSinceB
+        let receipt = SM64ModernSwiftMarioInputReceipt(
+            engineTick: tickCount,
+            controller: controller,
+            mario: mario
+        )
+        lastMarioInputReceipt = receipt
+        return receipt
+    }
+
     func step() -> SM64ModernSwiftEngineTickReceipt? {
         guard phase == .initialized else { return nil }
         let result = scheduler.update(state: state) { _, _ in }
@@ -175,8 +221,11 @@ final class SM64ModernSwiftEngineContext {
         state.reset()
         progression = initialProgression
         inputNormalizer = SM64ControllerInputNormalizer()
+        framesSinceA = 0
+        framesSinceB = 0
         lastProgressionReceipt = nil
         lastInputReceipt = nil
+        lastMarioInputReceipt = nil
         phase = .stopped
         return true
     }
@@ -234,8 +283,8 @@ final class SM64ModernCEngineRuntimeAdapter: SM64ModernEngineRuntime {
 
 final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
     let authority: SM64ModernEngineAuthority = .swift
-    // M31d slice: Swift owns lifecycle ordering, failure state, the context's
-    // state/scheduler/progression/input domains, while remaining
+    // M31e slice: Swift owns lifecycle ordering, failure state, the context's
+    // state/scheduler/progression/input/Mario-input domains, while remaining
     // gameplay/content domains still run through the compatibility adapter.
     // The implementation string intentionally names that boundary; it must
     // not be mistaken for whole-engine Swift authority.
