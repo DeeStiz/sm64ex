@@ -33,6 +33,8 @@ enum SM64MarioActionID {
     static let thrownBackward: UInt32 = 0x010208BE
     static let jumpLand: UInt32 = 0x04000470
     static let freefallLand: UInt32 = 0x04000471
+    static let startHanging: UInt32 = 0x08200348
+    static let ledgeGrab: UInt32 = 0x0800034B
     static let doubleJumpLand: UInt32 = 0x04000472
     static let sideFlipLand: UInt32 = 0x04000473
     static let holdJumpLand: UInt32 = 0x00000474
