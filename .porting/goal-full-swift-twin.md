@@ -2,7 +2,8 @@
 
 ## Status
 
-M34a is the latest validated checkpoint layered on M33f/M18am: the Swift runtime
+M20b is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
 object pool, scheduler, per-tick receipt, explicit per-domain readiness, the
@@ -900,7 +901,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M19p: Collision mesh decode and live binding | Swift decodes bounded `COL_*` streams, applies the C signed-16 transform/normal/bounds sequencing, atomically replaces owner-generation surfaces in the registry/world, and records surface IDs in engine state. | Complete locally — strict Swift 6/C contract, focused fingerprint `0x266b6fef37fcfa11`, 152-script matrix target, regenerated native Debug build, and `git diff --check` pass; behavior dispatch, broad collision data inventory, remaining mechanisms/hazards, and effect delivery remain |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | In progress — M19a–M19p value/owner seams are complete locally; behavior dispatch, broad collision data inventory, remaining mechanisms, hazards, and effect delivery remain |
 | M20a: SL walking penguin state machine | Swift reproduces the erratic step table, action/timer ownership, boundary turns, canonical yaw increments, forward displacement, and animation intents for Snowman Land's walking penguin. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xf80b620bf18ccb4d`, 153-script matrix target, regenerated native Debug build, and `git diff --check` pass; collision resolution, object bridge, races, dialog, and remaining NPCs remain |
-| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a closes the first deterministic NPC behavior seam; object bridge/collision, dialog/race ownership, remaining NPCs, puzzles, secrets, and rewards remain |
+| M20b: SL walking penguin owner-thread bridge | Swift attaches the walking-penguin kernel to generation-safe object IDs and the owner-thread scheduler, synchronizing action/timer, transform, yaw, velocity, animation, and end-of-frame unload state. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xaabb92f23fd8451a`, 154-script matrix (`runs=154 failures=0`), regenerated native Debug build, and `git diff --check` pass; floor/wall resolution remains caller-supplied and races, dialog, and remaining NPCs remain |
+| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a/M20b close the first value-plus-object NPC slice; floor/wall collision, effect/audio delivery, dialog/race ownership, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1061,8 +1063,11 @@ replayable trace, and the platform evidence listed in its exit gate.
    dialog IDs, camera requests, cutscene handoffs, and reward ownership.
    Start with M20a's Snowman Land walking-penguin step table, preserving its
    timer reset, current-step transition, boundary action changes, 0x400 yaw
-   turns, canonical movement, and animation-speed intents before attaching
-   floor/wall resolution and the NPC object bridge.
+   turns, canonical movement, and animation-speed intents. M20b attaches that
+   kernel to generation-safe owner-thread object records, synchronizes
+   action/timer/transform/yaw/animation state, and proves end-of-frame unload;
+   floor/wall resolution remains an explicit caller seam before adding races,
+   dialog, and the remaining NPC/puzzle families.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and

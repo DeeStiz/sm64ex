@@ -1501,6 +1501,25 @@
   owner-thread object bridge, race/dialog/secret ownership, and remaining NPCs
   and puzzles remain open.
 
+### M20b Completion Evidence
+
+- SLWalkingPenguinObjectBridge.swift attaches the walking-penguin value kernel
+  to generation-safe SM64 object IDs and the owner-thread scheduler. It
+  synchronizes action/current-step timers, canonical movement and yaw,
+  transform flags, velocity, animation state, and previous-action fields into
+  the object record, then removes stale bridge state only after the scheduler
+  unload boundary.
+- The focused strict Swift 6/C owner-thread contract emits
+  slWalkingPenguinObjectBridgeFingerprint=0xaabb92f23fd8451a. The complete
+  154-script matrix reports MATRIX_RESULT runs=154 failures=0 in
+  /tmp/sm64-modern-m20b-matrix.log, the regenerated native Swift 6/macOS 27
+  Debug build succeeds in /tmp/sm64-modern-m20b-clean-build.log, and
+  git diff --check is clean.
+- This closes the first NPC value-plus-object slice only. Floor/wall
+  resolution remains an explicit caller seam; race/dialog/secret ownership,
+  remaining NPCs and puzzles, effect/audio delivery, and physical/visual/
+  human acceptance remain open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
