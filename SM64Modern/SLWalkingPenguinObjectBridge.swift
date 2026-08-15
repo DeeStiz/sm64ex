@@ -26,6 +26,7 @@ struct SM64SLWalkingPenguinObjectEffect: Equatable, Sendable {
     let moveYaw: Int16
     let completedTurn: Bool
     let collision: SM64SLWalkingPenguinCollisionResult?
+    let movement: SM64SLWalkingPenguinMovementResult?
 }
 
 struct SM64SLWalkingPenguinSchedulerTickResult: Equatable, Sendable {
@@ -106,6 +107,7 @@ final class SM64SLWalkingPenguinObjectBridge {
             position: position,
             output: nil,
             collision: nil,
+            movement: nil,
             previousAction: state.action,
             pool: pool
         )
@@ -116,14 +118,20 @@ final class SM64SLWalkingPenguinObjectBridge {
     func tick(
         state engineState: SM64SwiftEngineState,
         advanceNativeDynamics: Bool = true,
-        collisionWorld: SM64SurfaceCollisionWorld? = nil
+        collisionWorld: SM64SurfaceCollisionWorld? = nil,
+        advanceMovement: Bool = false
     ) -> SM64SLWalkingPenguinSchedulerTickResult {
         effectLog.removeAll(keepingCapacity: true)
         let schedulerResult = scheduler.update(
             state: engineState,
             advanceNativeDynamics: advanceNativeDynamics
         ) { [weak self] id, pool in
-            self?.update(id: id, pool: pool, collisionWorld: collisionWorld)
+            self?.update(
+                id: id,
+                pool: pool,
+                collisionWorld: collisionWorld,
+                advanceMovement: advanceMovement
+            )
         }
         for id in schedulerResult.unloaded {
             states.removeValue(forKey: id)
@@ -140,7 +148,8 @@ final class SM64SLWalkingPenguinObjectBridge {
     private func update(
         id: SM64ObjectID,
         pool: SM64ObjectPool,
-        collisionWorld: SM64SurfaceCollisionWorld?
+        collisionWorld: SM64SurfaceCollisionWorld?,
+        advanceMovement: Bool
     ) {
         guard var state = states[id], let record = pool.record(for: id) else { return }
         let previousAction = state.action
@@ -165,6 +174,15 @@ final class SM64SLWalkingPenguinObjectBridge {
                 )
             )
         }
+        let movement = movementResult(
+            record: record,
+            candidatePosition: collision?.position ?? output.nextPosition,
+            previousMoveFlags: collision?.moveFlags ?? record.moveFlags,
+            forwardVelocity: output.forwardVelocity,
+            moveYaw: output.moveYaw,
+            collisionWorld: collisionWorld,
+            enabled: advanceMovement
+        )
 
         state.action = output.action
         state.currentStep = output.currentStep
@@ -176,9 +194,10 @@ final class SM64SLWalkingPenguinObjectBridge {
         synchronize(
             id: id,
             state: state,
-            position: collision?.position ?? output.nextPosition,
+            position: movement?.position ?? collision?.position ?? output.nextPosition,
             output: output,
             collision: collision,
+            movement: movement,
             previousAction: previousAction,
             pool: pool
         )
@@ -194,7 +213,55 @@ final class SM64SLWalkingPenguinObjectBridge {
                 angleVelocityYaw: output.angleVelocityYaw,
                 moveYaw: output.moveYaw,
                 completedTurn: output.completedTurn,
-                collision: collision
+                collision: collision,
+                movement: movement
+            )
+        )
+    }
+
+    private func movementResult(
+        record: SM64ObjectRecord,
+        candidatePosition: SM64ObjectVector3,
+        previousMoveFlags: UInt32,
+        forwardVelocity: Float,
+        moveYaw: Int16,
+        collisionWorld: SM64SurfaceCollisionWorld?,
+        enabled: Bool
+    ) -> SM64SLWalkingPenguinMovementResult? {
+        guard enabled, let collisionWorld else { return nil }
+        let intendedFloor = collisionWorld.findFloor(
+            x: candidatePosition.x,
+            y: record.position.y,
+            z: candidatePosition.z
+        )
+        let intendedRoom: Int8 = intendedFloor.surfaceID.flatMap {
+            collisionWorld.surface(withID: $0)?.room
+        } ?? 0
+        return SM64SLWalkingPenguinMovement.resolve(
+            SM64SLWalkingPenguinMovementInput(
+                startPosition: record.position,
+                candidatePosition: candidatePosition,
+                velocityY: record.velocity.y,
+                forwardVelocity: forwardVelocity,
+                moveYaw: moveYaw,
+                floorHeight: record.floorHeight,
+                floorRoom: Int8(truncatingIfNeeded: record.floorRoom),
+                objectRoom: Int8(truncatingIfNeeded: record.room),
+                moveFlags: previousMoveFlags,
+                gravity: -4,
+                bounciness: -0.5,
+                dragStrength: 0,
+                buoyancy: 2,
+                nativeStepScale: 1,
+                intendedFloorHeight: intendedFloor.height,
+                intendedFloorNormalY: intendedFloor.normalY ?? 0,
+                intendedFloorRoom: intendedRoom,
+                intendedFloorExists: intendedFloor.surfaceID != nil,
+                waterLevel: collisionWorld.findWaterLevel(
+                    x: candidatePosition.x,
+                    z: candidatePosition.z
+                ),
+                activeFarAway: false
             )
         )
     }
@@ -205,6 +272,7 @@ final class SM64SLWalkingPenguinObjectBridge {
         position: SM64ObjectVector3,
         output: SM64SLWalkingPenguinOutput?,
         collision: SM64SLWalkingPenguinCollisionResult?,
+        movement: SM64SLWalkingPenguinMovementResult?,
         previousAction: Int32,
         pool: SM64ObjectPool
     ) {
@@ -227,6 +295,11 @@ final class SM64SLWalkingPenguinObjectBridge {
             record.timer = state.timer
             record.animationState = output?.animation ?? 0
             record.angleVelocity.yaw = Int32(output?.angleVelocityYaw ?? 0)
+            if let movement {
+                record.velocity = movement.velocity
+                record.forwardVelocity = movement.forwardVelocity
+                record.moveFlags = movement.moveFlags
+            }
             if output?.animation == SM64SLWalkingPenguinBehavior.idleAnimation {
                 record.graphFlags &= ~SM64ObjectScheduler.graphRenderHasAnimation
             } else {

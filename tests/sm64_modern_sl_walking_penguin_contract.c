@@ -31,7 +31,7 @@ struct Output {
 static struct Output update(int32_t action, int32_t timer, int32_t step, int32_t step_timer,
                             float x, float z, int16_t move_yaw) {
     static const struct { int32_t length; float speed; } steps[] = {
-        { 60, 6 }, { 30, 0 }, { 30, 12 }, { 30, 0 }, { 30, -6 },
+        { 60, 6 }, { 30, 0 }, { 30, 12 }, { 30, 0 }, { 30, -6 }, { 30, 0 },
     };
     struct Output output = { action, step, step_timer, 0, 0, move_yaw, x, z };
     if (action == 0) {
@@ -40,7 +40,7 @@ static struct Output update(int32_t action, int32_t timer, int32_t step, int32_t
         else {
             output.step_timer = 0;
             output.step++;
-            if (output.step >= 5) output.step = 0;
+            if (output.step >= 6) output.step = 0;
         }
         if (x >= 300) output.speed = steps[output.step].speed;
         else output.action++;
@@ -62,7 +62,7 @@ int main(void) {
     float x = 600, z = -40;
     int16_t move_yaw = 0x2000;
     uint64_t fingerprint = FNV_OFFSET;
-    for (int32_t timer = 0; timer < 65; ++timer) {
+    for (int32_t timer = 0; timer < 230; ++timer) {
         struct Output output = update(action, timer, step, step_timer, x, z, move_yaw);
         action = output.action; step = output.step; step_timer = output.step_timer;
         x = output.x; z = output.z; move_yaw = output.move_yaw;

@@ -22,7 +22,9 @@ enum SM64ModernSLWalkingPenguinSmoke {
         var moveYaw: Int16 = 0x2000
         var fingerprint = fnvOffset
 
-        for timer in 0..<65 {
+        // Run through the complete six-entry table and its sentinel wrap;
+        // a short sample would miss the final idle entry.
+        for timer in 0..<230 {
             let output = SM64SLWalkingPenguinBehavior.update(
                 .init(
                     action: action,

@@ -48,6 +48,7 @@ enum SM64SLWalkingPenguinBehavior {
         Step(length: 30, animation: walkAnimation, speed: 12, animationSpeed: 2),
         Step(length: 30, animation: idleAnimation, speed: 0, animationSpeed: 1),
         Step(length: 30, animation: walkAnimation, speed: -6, animationSpeed: 1),
+        Step(length: 30, animation: idleAnimation, speed: 0, animationSpeed: 1),
     ]
 
     static func update(_ input: SM64SLWalkingPenguinInput) -> SM64SLWalkingPenguinOutput {

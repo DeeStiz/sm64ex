@@ -188,6 +188,7 @@
 		F3924A69F245DCF391361490 /* ChainChompEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB5BA3959D2F4ECAC2E0F25 /* ChainChompEnemy.swift */; };
 		F4AE316C577F3165D6FA6E7D /* SpinyObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E8CE0F23C268072CA9D6E61 /* SpinyObjectBridge.swift */; };
 		F54E76834ED4DE0BC05ECA90 /* CameraCUpExit.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */; };
+		F5E5450EBF04AB49D0A4B12F /* SLWalkingPenguinMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B233DE16CF1D57DB2E69846 /* SLWalkingPenguinMovement.swift */; };
 		F61977B2815412177D01918E /* GameplayTick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419DC71930B2E4EE76B0E18E /* GameplayTick.swift */; };
 		F635692396D181B8EEE8464A /* FlyGuyEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D35EE8DC4AB3016AB7352A /* FlyGuyEnemy.swift */; };
 		F9A793CA3048B14A9BE9DA03 /* ChuckyaObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8972955B5A5B93E0345EE4EB /* ChuckyaObjectBridge.swift */; };
@@ -308,6 +309,7 @@
 		8753C291A7DE7C9166C33873 /* SLWalkingPenguinObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinObjectBridge.swift; sourceTree = "<group>"; };
 		8972955B5A5B93E0345EE4EB /* ChuckyaObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChuckyaObjectBridge.swift; sourceTree = "<group>"; };
 		8A6630058727A186889977A1 /* ContentPackRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPackRuntime.swift; sourceTree = "<group>"; };
+		8B233DE16CF1D57DB2E69846 /* SLWalkingPenguinMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinMovement.swift; sourceTree = "<group>"; };
 		8C3F3E0A2388B47713DA5889 /* ProgressionActors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionActors.swift; sourceTree = "<group>"; };
 		92C22E70845A716BECE93CE0 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		94BED6B07789579D6D43B013 /* MarioTurningAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioTurningAction.swift; sourceTree = "<group>"; };
@@ -566,6 +568,7 @@
 				01C2DB40D32E69B4AFA3E55B /* SkeeterObjectBridge.swift */,
 				287F32D28BA6DAF70AE72591 /* SLWalkingPenguinBehavior.swift */,
 				14C3AD2F912846687082EA12 /* SLWalkingPenguinCollision.swift */,
+				8B233DE16CF1D57DB2E69846 /* SLWalkingPenguinMovement.swift */,
 				8753C291A7DE7C9166C33873 /* SLWalkingPenguinObjectBridge.swift */,
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
 				A1B59B269230B9E7A9B9EDFF /* SnufitEnemy.swift */,
@@ -850,6 +853,7 @@
 				456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */,
 				54BE2C1D3F624579927D2313 /* SLWalkingPenguinBehavior.swift in Sources */,
 				3836963C80D7739E6B29B4E8 /* SLWalkingPenguinCollision.swift in Sources */,
+				F5E5450EBF04AB49D0A4B12F /* SLWalkingPenguinMovement.swift in Sources */,
 				21DFAA3C389A206B19099257 /* SLWalkingPenguinObjectBridge.swift in Sources */,
 				4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */,
 				3D8C6993DC34F356CD9F756D /* ScuttlebugEnemy.swift in Sources */,

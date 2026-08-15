@@ -1488,12 +1488,13 @@
 
 ### M20a Completion Evidence
 
-- `SLWalkingPenguinBehavior.swift` reproduces the five-entry erratic movement
-  table, timer-zero step reset, step transition/wrap, X-boundary action
-  changes, 0x400 turn increments, 16-bit yaw wrap, and canonical X/Z
-  displacement with animation intents.
+- `SLWalkingPenguinBehavior.swift` reproduces the six-entry erratic movement
+  table, including the final idle entry before the C sentinel, timer-zero step
+  reset, step transition/wrap, X-boundary action changes, 0x400 turn
+  increments, 16-bit yaw wrap, and canonical X/Z displacement with animation
+  intents.
 - Focused output is
-  `slWalkingPenguinFingerprint=0xf80b620bf18ccb4d` with the independent C
+  `slWalkingPenguinFingerprint=0xc99ad9a0e7015251` with the independent C
   contract match; the complete matrix is `MATRIX_RESULT runs=153 failures=0`
   in `/tmp/sm64-modern-m20a-matrix.log`; regenerated native Swift 6/macOS
   27 Debug build and `git diff --check` pass.
@@ -1558,6 +1559,25 @@
 - This closes the race value/object route only. Full movement/path/child
   ownership, effect/audio delivery, gravity/edge/steep-slope semantics,
   remaining NPCs/puzzles, and physical/visual/human acceptance remain open.
+
+### M20e Completion Evidence
+
+- `SLWalkingPenguinMovement.swift` ports the scalar `cur_obj_move_standard(-78)`
+  route: canonical X/Z velocity decomposition and drag, floor edge and steep
+  slope admission, gravity/bounce, water entry/surface/underwater transitions,
+  ground/air flags, and signed forward-speed reconstruction. The walking
+  penguin owner bridge exposes it through an explicit `advanceMovement` tick
+  gate and publishes movement velocity/flags into the object record.
+- The focused strict Swift 6/C movement contract emits
+  `slWalkingPenguinMovementFingerprint=0x06637c47225dd8a1`; the owner-thread
+  contract emits
+  `slWalkingPenguinMovementBridgeFingerprint=0x2c3d22136511755b`. The current
+  complete matrix is 159 scripts with zero failures, followed by a regenerated
+  native Swift 6/macOS 27 Debug build, `git diff --check`, and the zero
+  unchecked-Sendable audit.
+- This closes the scalar movement route only. Exact wall-prepass ordering,
+  path/child ownership, effect/audio delivery, remaining NPC/puzzles, and
+  physical/visual/human acceptance remain open.
 
 ### M34a Completion Evidence
 

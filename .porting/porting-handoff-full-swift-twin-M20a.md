@@ -8,7 +8,8 @@ ownership, or the remaining NPC/puzzle inventory.
 
 ## Implementation
 
-- `SM64SLWalkingPenguinBehavior` owns the exact five-step movement table,
+- `SM64SLWalkingPenguinBehavior` owns the exact six-entry movement table,
+  including the final idle entry before the C sentinel,
   timer-zero initialization, step transition/wrap, X-boundary action changes,
   turn action/timer behavior, 16-bit yaw update, and animation/speed intents.
 - The output includes canonical forward displacement so the owner-thread
@@ -18,10 +19,10 @@ ownership, or the remaining NPC/puzzle inventory.
 ## Validation
 
 - Focused strict Swift 6/C output:
-  `slWalkingPenguinFingerprint=0xf80b620bf18ccb4d`.
-- Full `script/test_*.sh` matrix:
-  `MATRIX_RESULT runs=153 failures=0` in
-  `/tmp/sm64-modern-m20a-matrix.log`.
+  `slWalkingPenguinFingerprint=0xc99ad9a0e7015251`.
+- The current full `script/test_*.sh` matrix includes the corrected table and
+  movement routes; it is rerun as `MATRIX_RESULT runs=159 failures=0` in
+  `/tmp/sm64-modern-m20e-matrix.log`.
 - `xcodegen generate`, regenerated native Swift 6/macOS 27 Debug build,
   and `git diff --check` pass.
 
