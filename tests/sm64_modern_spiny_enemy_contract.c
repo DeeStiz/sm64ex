@@ -65,6 +65,8 @@ int main(void) {
                              0x3f666667u, 0x41a80000u, 0xc1880000u);
     fingerprint = hash_tick(fingerprint, 4, 1, 33, 0, 0,
                              0x3f666667u, 0x41a80000u, 0xc1880000u);
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, 1);
     fingerprint = hash_attack_table(fingerprint);
     printf("spinyEnemyFingerprint=0x%016llx\n",
            (unsigned long long)fingerprint);

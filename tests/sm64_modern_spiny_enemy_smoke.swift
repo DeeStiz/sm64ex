@@ -109,6 +109,10 @@ enum SM64ModernSpinyEnemySmoke {
             inputs: [spiny: SM64SpinyTickInput(distanceToMario: 3_000)]
         )
         require(unloaded.effects[0].effects == [.animate, .markForDeletion], "parent-distance unload effect")
+        require(
+            bridge.deliveryLog.contains { $0.deleted == [spiny] },
+            "Spiny deletion routed through owner thread"
+        )
         require(unloaded.scheduler.unloaded.map(\.traceSubject) == [2], "Spiny end-of-frame unload")
         require(!engineState.objects.contains(spiny) && bridge.state(for: spiny) == nil, "Spiny shadow removed")
 
@@ -120,6 +124,8 @@ enum SM64ModernSpinyEnemySmoke {
         // attack result and the scheduler/effect values directly.
         let unloadedRecord = attackedRecord
         fingerprint = hashTick(fingerprint, unloaded, record: unloadedRecord)
+        fingerprint = hashU64(fingerprint, 1)
+        fingerprint = hashU64(fingerprint, 1)
         fingerprint = hashAttackTable(fingerprint)
 
         print(String(format: "spinyEnemyFingerprint=0x%016llx", fingerprint))

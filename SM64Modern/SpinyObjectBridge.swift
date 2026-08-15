@@ -20,12 +20,18 @@ final class SM64SpinyObjectBridge {
     static let defaultBehaviorIdentity: UInt64 = 0x6268_765F_7370_696E
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64SpinyState] = [:]
     private var inputs: [SM64ObjectID: SM64SpinyTickInput] = [:]
     private(set) var effectLog: [SM64SpinyObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     /// IDs currently owned by the Spiny shadow. The owner-thread Lakitu
@@ -142,6 +148,8 @@ final class SM64SpinyObjectBridge {
     ) -> SM64SpinySchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -182,7 +190,8 @@ final class SM64SpinyObjectBridge {
             record.parent == id ? nil : record.parent
         }
         if spiny.markedForDeletion {
-            _ = pool.markForDeletion(id)
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
         }
         effectLog.append(
             SM64SpinyObjectEffectRecord(
