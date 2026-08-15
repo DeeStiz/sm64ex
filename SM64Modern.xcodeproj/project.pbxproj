@@ -92,6 +92,7 @@
 		AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */ = {isa = PBXBuildFile; fileRef = 328470043E0C3F9278C1A80E /* AppleAudioService.m */; };
 		ACC2FB1D1A49430F7673E036 /* MarioMovePunchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595FCD866921E9B396C8E841 /* MarioMovePunchAction.swift */; };
 		ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */; };
+		AE596370EA0B5CCE60572B0E /* ProgressionMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9549A37C181D287986F52525 /* ProgressionMigration.swift */; };
 		AF3674FF77CC4CD476294319 /* MarioTwirlingWaterAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44193C66533F87518241D742 /* MarioTwirlingWaterAction.swift */; };
 		AF40398B5A629439B358BCB6 /* SurfacePartition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */; };
 		B188BC254D2FE77844ADEE0F /* MemoryArena.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25BB84567898B7DD0F01721 /* MemoryArena.swift */; };
@@ -193,6 +194,7 @@
 		8C3F3E0A2388B47713DA5889 /* ProgressionActors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionActors.swift; sourceTree = "<group>"; };
 		92C22E70845A716BECE93CE0 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		94BED6B07789579D6D43B013 /* MarioTurningAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioTurningAction.swift; sourceTree = "<group>"; };
+		9549A37C181D287986F52525 /* ProgressionMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionMigration.swift; sourceTree = "<group>"; };
 		96143C0812CD3AA2EE120132 /* MarioState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioState.swift; sourceTree = "<group>"; };
 		97BD8678B319AD274378179C /* MetalShaderCompiler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalShaderCompiler.swift; sourceTree = "<group>"; };
 		99204A42040D31152F30F990 /* MarioWalkingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWalkingAction.swift; sourceTree = "<group>"; };
@@ -354,6 +356,7 @@
 				399C03F347FC9A4D23DFECFD /* OracleTrace.swift */,
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
 				8C3F3E0A2388B47713DA5889 /* ProgressionActors.swift */,
+				9549A37C181D287986F52525 /* ProgressionMigration.swift */,
 				1E51884DE493C98BC81B06D2 /* ProgressionPersistence.swift */,
 				322C784FFE351A6135FA2ECE /* ProgressionRuntime.swift */,
 				F201059126BC066BFF28F447 /* ProgressionState.swift */,
@@ -569,6 +572,7 @@
 				1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */,
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
 				EF3F4EC4818F96BA083A23B6 /* ProgressionActors.swift in Sources */,
+				AE596370EA0B5CCE60572B0E /* ProgressionMigration.swift in Sources */,
 				495557CCCBBCB01107A119F3 /* ProgressionPersistence.swift in Sources */,
 				0FAB9AF89873C70EE4547AB5 /* ProgressionRuntime.swift in Sources */,
 				7FC210D0F220C0F3EC53E6B3 /* ProgressionState.swift in Sources */,

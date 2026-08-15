@@ -24,6 +24,7 @@
 #include "platform.h"
 #include "sm64_modern_gameplay_migration.h"
 #include "sm64_modern_gameplay_parity.h"
+#include "sm64_modern_progression_migration.h"
 #include "sm64_modern_timebase.h"
 
 #ifdef DISCORDRPC
@@ -316,6 +317,8 @@ static SM64ModernStatus lifecycle_step(void) {
     sm64_modern_parity_end_tick();
     const SM64ModernStatus parity_status = sm64_modern_parity_status();
     const SM64ModernStatus migration_status = sm64_modern_gameplay_migration_active_status();
+    const SM64ModernStatus progression_status =
+        sm64_modern_progression_migration_active_status();
 
     if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING) {
         gfx_end_frame();
@@ -333,6 +336,12 @@ static SM64ModernStatus lifecycle_step(void) {
     if (migration_status != SM64_MODERN_STATUS_OK) {
         report_error(migration_status, "The Swift gameplay migration callback failed");
         return migration_status;
+    }
+    if (progression_status != SM64_MODERN_STATUS_OK) {
+        report_error(
+            progression_status,
+            "The Swift progression migration callback failed");
+        return progression_status;
     }
 
 #ifdef DISCORDRPC

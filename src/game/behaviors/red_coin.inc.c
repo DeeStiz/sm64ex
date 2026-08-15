@@ -4,6 +4,8 @@
  * the course's red coin star.
  */
 
+#include "pc/sm64_modern_progression_migration.h"
+
 /**
  * Red coin's hitbox details.
  */
@@ -56,6 +58,10 @@ void bhv_red_coin_loop(void) {
         if (o->parentObj != NULL) {
             // ...increment the star's counter.
             o->parentObj->oHiddenStarTriggerCounter++;
+            sm64_modern_progression_record_event(
+                SM64_MODERN_PROGRESSION_EVENT_RED_COIN,
+                (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
+                (u32) gCurrCourseNum, 0, -1, 0, 0, 0, 0);
 
             // For JP version, play an identical sound for all coins.
 #ifdef VERSION_JP

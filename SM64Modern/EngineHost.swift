@@ -130,6 +130,7 @@ private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     guard let host = engineHost(from: context) else { return }
     assert(host.isCurrentEngineThread)
     host.shutdownAudioOnEngineThread()
+    sm64_modern_uninstall_progression_migration_api()
     sm64_modern_uninstall_gameplay_migration_api()
     sm64_modern_uninstall_input_api()
     sm64_modern_uninstall_rendering_api()
@@ -231,6 +232,7 @@ final class EngineHost: @unchecked Sendable {
     private var timebaseSnapshot = SM64ModernTimebaseSnapshotV1()
     private var parityCoordinator: GameplayParityCoordinator?
     private var oracleTraceSession: SM64ModernOracleTraceSession?
+    private var progressionMigrationService: SwiftProgressionMigrationService?
     private let gameplayService = SwiftGameplayService()
     private var automaticTerminationRequested = false
     private var inputService: AppleInputService?
@@ -352,6 +354,8 @@ final class EngineHost: @unchecked Sendable {
 
         let initializeStatus = runtime.initialize()
         guard initializeStatus == SM64_MODERN_STATUS_OK else {
+            sm64_modern_uninstall_progression_migration_api()
+            progressionMigrationService = nil
             finish(state: .failed, status: initializeStatus)
             DispatchQueue.main.async {
                 NSApplication.shared.terminate(nil)
@@ -384,6 +388,7 @@ final class EngineHost: @unchecked Sendable {
         let oracleTraceStatus = oracleTraceSession?.end() ?? SM64_MODERN_STATUS_OK
         oracleTraceSession = nil
         let shutdownStatus = runtime.shutdown()
+        progressionMigrationService = nil
         engineRuntime = nil
         let executionStatus = engineRunStatus != SM64_MODERN_STATUS_OK
             && engineRunStatus != SM64_MODERN_STATUS_STOP_REQUESTED
@@ -689,8 +694,34 @@ final class EngineHost: @unchecked Sendable {
 
         status = sm64_modern_validate_platform_api(&platform)
         guard status == SM64_MODERN_STATUS_OK else { return status }
+
+        if engineAuthority == .swift {
+            do {
+                let service = try SwiftProgressionMigrationService(
+                    saveDirectory: paths.saveDirectory,
+                    ownerThreadToken: engineThreadIdentifier
+                )
+                try service.initialize()
+                var migration = service.makeAPI()
+                status = sm64_modern_install_progression_migration_api(&migration)
+                guard status == SM64_MODERN_STATUS_OK else {
+                    return status
+                }
+                progressionMigrationService = service
+                engineLogger.notice("progression_bridge_installed abi=1 authority=swift")
+            } catch {
+                engineLogger.error(
+                    "progression_bridge_initialize_failed error=\(error.localizedDescription, privacy: .public)"
+                )
+                return SM64_MODERN_STATUS_PLATFORM_ERROR
+            }
+        }
         status = self.lifecycle.initialize(&config, &platform)
-        guard status == SM64_MODERN_STATUS_OK else { return status }
+        guard status == SM64_MODERN_STATUS_OK else {
+            sm64_modern_uninstall_progression_migration_api()
+            progressionMigrationService = nil
+            return status
+        }
 
         let oracleStart = SM64ModernOracleTraceSession.beginFromEnvironment(
             saveDirectory: paths.saveDirectory

@@ -1,5 +1,7 @@
 // capswitch.c.inc
 
+#include "pc/sm64_modern_progression_migration.h"
+
 void cap_switch_act_0(void) {
     o->oAnimState = o->oBehParams2ndByte;
     cur_obj_scale(0.5f);
@@ -18,6 +20,12 @@ void cap_switch_act_0(void) {
 void cap_switch_act_1(void) {
     if (cur_obj_is_mario_on_platform()) {
         save_file_set_flags(D_8032F0C0[o->oBehParams2ndByte]);
+        sm64_modern_progression_record_event(
+            SM64_MODERN_PROGRESSION_EVENT_CAP_SWITCH,
+            (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
+            (u32) gCurrCourseNum, 0, -1, 0, 0,
+            (u32) o->oBehParams2ndByte,
+            D_8032F0C0[o->oBehParams2ndByte]);
         o->oAction = 2;
         cur_obj_play_sound_2(SOUND_GENERAL_ACTIVATE_CAP_SWITCH);
     }

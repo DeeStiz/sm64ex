@@ -435,6 +435,49 @@ typedef struct SM64ModernMarioGroundSpeedApiV1 {
     SM64ModernMarioGroundSpeedUpdateFn update;
 } SM64ModernMarioGroundSpeedApiV1;
 
+// Optional progression migration extension. The C engine remains the
+// compatibility authority; when installed by the Swift authority these
+// owner-thread events mirror red-coin, cap-switch, reward, and persistence
+// boundaries into the Swift progression runtime.
+typedef uint32_t SM64ModernProgressionEventKind;
+
+#define SM64_MODERN_PROGRESSION_EVENT_RED_COIN 1u
+#define SM64_MODERN_PROGRESSION_EVENT_CAP_SWITCH 2u
+#define SM64_MODERN_PROGRESSION_EVENT_LEVEL_REWARD 3u
+#define SM64_MODERN_PROGRESSION_EVENT_SAVE_PERSIST 4u
+#define SM64_MODERN_PROGRESSION_EVENT_SAVE_LOAD 5u
+#define SM64_MODERN_PROGRESSION_EVENT_SAVE_RELOAD 6u
+
+#define SM64_MODERN_PROGRESSION_COLLECTION_COURSE_STAR 0u
+#define SM64_MODERN_PROGRESSION_COLLECTION_SECRET_STAR 1u
+#define SM64_MODERN_PROGRESSION_COLLECTION_KEY_1 2u
+#define SM64_MODERN_PROGRESSION_COLLECTION_KEY_2 3u
+#define SM64_MODERN_PROGRESSION_COLLECTION_GRAND_STAR 4u
+
+typedef struct SM64ModernProgressionEventV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    SM64ModernProgressionEventKind event_kind;
+    uint32_t save_file_index;
+    uint32_t course_number;
+    uint32_t collection_kind;
+    int32_t star_index;
+    int32_t coin_score;
+    int32_t global_max_coin_score;
+    uint32_t cap_switch_index;
+    uint32_t flags;
+} SM64ModernProgressionEventV1;
+
+typedef SM64ModernStatus (*SM64ModernProgressionEventFn)(
+    void *context,
+    const SM64ModernProgressionEventV1 *event);
+
+typedef struct SM64ModernProgressionMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernProgressionEventFn record_event;
+} SM64ModernProgressionMigrationApiV1;
+
 // The native renderer is installed from the platform initialize callback, on
 // the lifecycle owner thread. Every pointer passed to a callback is borrowed
 // for that callback only; hosts must copy scene and texture data synchronously.
@@ -741,6 +784,12 @@ SM64ModernStatus sm64_modern_install_mario_ground_speed_api(
     const SM64ModernMarioGroundSpeedApiV1 *api);
 void sm64_modern_uninstall_mario_ground_speed_api(void);
 SM64ModernStatus sm64_modern_mario_ground_speed_status(void);
+SM64ModernStatus sm64_modern_validate_progression_migration_api(
+    const SM64ModernProgressionMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_progression_migration_api(
+    const SM64ModernProgressionMigrationApiV1 *migration);
+void sm64_modern_uninstall_progression_migration_api(void);
+SM64ModernStatus sm64_modern_progression_migration_status(void);
 SM64ModernStatus sm64_modern_validate_rendering_api(const SM64ModernRenderingApiV1 *rendering);
 SM64ModernStatus sm64_modern_install_rendering_api(const SM64ModernRenderingApiV1 *rendering);
 void sm64_modern_uninstall_rendering_api(void);

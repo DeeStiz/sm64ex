@@ -13,6 +13,7 @@
 #include "macros.h"
 #include "pc/ini.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_progression_migration.h"
 #include "pc/sm64_modern_timebase.h"
 
 #define MENU_DATA_MAGIC 0x4849
@@ -386,6 +387,9 @@ void save_file_do_save(s32 fileIndex) {
     save_main_menu_data();
 #endif
     record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_PERSIST, (u32) fileIndex);
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_PERSIST,
+        (u32) fileIndex, 0, 0, -1, 0, 0, 0, 0);
 }
 
 void save_file_erase(s32 fileIndex) {
@@ -475,6 +479,8 @@ void save_file_load_all(void) {
 #endif // TEXTSAVES
     stub_save_file_1();
     record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_LOAD, 0);
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_LOAD, 0, 0, 0, -1, 0, 0, 0, 0);
 }
 
 /**
@@ -495,6 +501,10 @@ void save_file_reload(void) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_RELOAD,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_RELOAD,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
+        0, 0, -1, 0, 0, 0, 0);
 }
 
 /**
@@ -507,6 +517,8 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
     }
     s32 fileIndex = gCurrSaveFileNum - 1;
     s32 courseIndex = gCurrCourseNum - 1;
+    u32 collectionKind = SM64_MODERN_PROGRESSION_COLLECTION_COURSE_STAR;
+    s32 globalMaxCoinScore = 0;
 
     s32 starFlag = 1 << starIndex;
     UNUSED s32 flags = save_file_get_flags();
@@ -520,7 +532,8 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
         //! Compares the coin score as a 16 bit value, but only writes the 8 bit
         // truncation. This can allow a high score to decrease.
 
-        if (coinScore > ((u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF)) {
+        globalMaxCoinScore = (s32) ((u16) save_file_get_max_coin_score(courseIndex) & 0xFFFF);
+        if (coinScore > globalMaxCoinScore) {
             sUnusedGotGlobalCoinHiScore = 1;
         }
 
@@ -535,12 +548,14 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
 
     switch (gCurrLevelNum) {
         case LEVEL_BOWSER_1:
+            collectionKind = SM64_MODERN_PROGRESSION_COLLECTION_KEY_1;
             if (!(save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_1 | SAVE_FLAG_UNLOCKED_BASEMENT_DOOR))) {
                 save_file_set_flags(SAVE_FLAG_HAVE_KEY_1);
             }
             break;
 
         case LEVEL_BOWSER_2:
+            collectionKind = SM64_MODERN_PROGRESSION_COLLECTION_KEY_2;
             if (!(save_file_get_flags() & (SAVE_FLAG_HAVE_KEY_2 | SAVE_FLAG_UNLOCKED_UPSTAIRS_DOOR))) {
                 save_file_set_flags(SAVE_FLAG_HAVE_KEY_2);
             }
@@ -556,6 +571,10 @@ void save_file_collect_star_or_key(s16 coinScore, s16 starIndex) {
             break;
     }
     record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) fileIndex);
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_LEVEL_REWARD,
+        (u32) fileIndex, (u32) gCurrCourseNum, collectionKind,
+        (s32) starIndex, (s32) coinScore, globalMaxCoinScore, 0, 0);
 }
 
 s32 save_file_exists(s32 fileIndex) {

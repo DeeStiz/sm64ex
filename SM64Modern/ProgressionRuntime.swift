@@ -31,7 +31,7 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
     private(set) var actor: SM64ProgressionActorState
     private(set) var progression: SM64ProgressionState
     private(set) var menuAges: SM64CoinScoreAgeState
-    let saveFileIndex: Int
+    private(set) var saveFileIndex: Int
 
     init(
         actor: SM64ProgressionActorState = .init(),
@@ -103,6 +103,24 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
 
     func menuSnapshot() -> SM64MenuDataSnapshot {
         SM64MenuDataCodec.snapshot(from: menuAges)
+    }
+
+    @discardableResult
+    mutating func selectSaveFile(_ index: Int) -> Bool {
+        guard (0..<SM64CoinScoreAgeState.fileCount).contains(index) else {
+            return false
+        }
+        saveFileIndex = index
+        return true
+    }
+
+    @discardableResult
+    mutating func selectCourse(_ number: Int) -> Bool {
+        guard (1...SM64ProgressionState.courseCount).contains(number) else {
+            return false
+        }
+        progression.courseNumber = Int16(number)
+        return true
     }
 
     @discardableResult
