@@ -179,6 +179,10 @@ enum SM64ModernBulletBillObjectBridgeSmoke {
         require(smokeID.traceSubject == 3, "smoke child slot")
         require(bridgeSmoke.scheduler.updated.map(\.traceSubject) == [2, 1, 3], "same-frame smoke callback")
         require(bridgeSmoke.scheduler.unloaded.map(\.traceSubject) == [3], "smoke end-of-frame unload")
+        require(
+            bridge.deliveryLog.contains { $0.deleted == [smokeID] },
+            "smoke deletion routed through owner thread"
+        )
         require(!engineState.objects.contains(smokeID), "smoke transient unloaded")
         guard let bridgeSmokeRecord = engineState.objects.record(for: bullet) else {
             preconditionFailure("bridge smoke record missing")
@@ -201,6 +205,8 @@ enum SM64ModernBulletBillObjectBridgeSmoke {
         fingerprint = hashBridgeTick(fingerprint, bridgeReset, bulletRecord: bridgeResetRecord, smokeRecord: nil)
         fingerprint = hashBridgeTick(fingerprint, bridgeLaunch, bulletRecord: bridgeLaunchRecord, smokeRecord: nil)
         fingerprint = hashBridgeTick(fingerprint, bridgeSmoke, bulletRecord: bridgeSmokeRecord, smokeRecord: nil)
+        fingerprint = hashU64(fingerprint, 1)
+        fingerprint = hashU64(fingerprint, 1)
         fingerprint = hashBridgeTick(fingerprint, bridgeEnd, bulletRecord: bridgeEndRecord, smokeRecord: nil)
 
         print(String(format: "bulletBillObjectBridgeFingerprint=0x%016llx", fingerprint))

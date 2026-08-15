@@ -116,6 +116,8 @@ int main(void) {
                               2, 1, 2, 0, 0, 0, 0, 0x42a00000u, 0);
     fingerprint = hash_bridge(fingerprint, 51, 1, 1, 57, 2, 3,
                               2, 2, 51, 0x41f00000u, 0, 0, 0, 0x42a00000u, 0);
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, 1);
     fingerprint = hash_bridge(fingerprint, 52, 1, 1, 73, 3, 3,
                               3, 2, 52, 0x41f00000u, 0, 0, 0, 0x42a00000u, 0);
 

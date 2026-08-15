@@ -23,12 +23,18 @@ final class SM64BulletBillObjectBridge {
     static let smokeBehaviorIdentity: UInt64 = 0x6268_765F_736D6B
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64BulletBillState] = [:]
     private var inputs: [SM64ObjectID: SM64BulletBillTickInput] = [:]
     private(set) var effectLog: [SM64BulletBillObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -92,6 +98,8 @@ final class SM64BulletBillObjectBridge {
     ) -> SM64BulletBillSchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
@@ -126,9 +134,10 @@ final class SM64BulletBillObjectBridge {
                behaviorIdentity: Self.smokeBehaviorIdentity,
                parent: id,
                drawingDistance: 1_000
-           ) {
+        ) {
             spawnedSmoke = smoke
-            _ = pool.markForDeletion(smoke)
+            effectRouter.enqueue(objectID: smoke, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
         }
 
         states[id] = bullet
