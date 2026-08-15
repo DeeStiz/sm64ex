@@ -332,6 +332,24 @@
   clean. Complete collision/effect delivery, remaining enemy/projectile
   breadth, and physical/visual/human acceptance remain open.
 
+### M18p Completion Evidence
+
+- `BobombEnemy.swift` preserves the generic/stationary subtype split, the
+  65-by-113 grabbable/kickable hitbox, patrol/chase admission and 0x800 yaw
+  turn, launched gravity/bounce movement, held/thrown/dropped release, fuse
+  lighting/smoke cadence, deterministic blink state, explosion scale, and
+  coin/respawn/mist effect intents as copied values.
+- `BobombObjectBridge.swift` owns general-actor Bob-omb records and allocates
+  explosion, fuse-smoke, and yellow-coin children on the unimportant list;
+  marked records unload at the scheduler boundary without C pointers.
+- The independent Swift/C owner-thread contract emits
+  `bobombObjectBridgeFingerprint=0x9e25e782f40ffdd0`; focused strict Swift 6/C
+  validation passes. The full matrix passes with `runs=117 failures=0` (log
+  `/tmp/sm64-modern-m18p-matrix.log`), the generated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18p-build.log`), and `git diff --check` is
+  clean. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
 ### M8b Completion Evidence
 
 - `tests/fixtures/sm64_modern_timebase_cadence.tsv` is the governing M8b/M8c/M8d ownership inventory; the aggregate fixture remains a checked drift detector. The audit includes scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, input/rumble boundaries, presentation, and Swift host deferrals.
