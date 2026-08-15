@@ -73,6 +73,7 @@
 		4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795DAA620146CD3735BB84B /* SaveFileCodec.swift */; };
 		532A683D2BF89220ADEB6D64 /* CameraFOV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED5024BA5E198B6E29A4AF7 /* CameraFOV.swift */; };
 		53B872CB3B81DFEBF260C4C7 /* MarioGeometryInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93DAAFB0FF6CAB909448BA5 /* MarioGeometryInput.swift */; };
+		54BE2C1D3F624579927D2313 /* SLWalkingPenguinBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F32D28BA6DAF70AE72591 /* SLWalkingPenguinBehavior.swift */; };
 		59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC89F10EF988BEB5D9624D69 /* LevelScript.swift */; };
 		59D828BFA9A7DCFEEC96AAD2 /* CameraCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF32B94910902857B072626 /* CameraCollision.swift */; };
 		5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */; };
@@ -218,6 +219,7 @@
 		2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptContentRuntime.swift; sourceTree = "<group>"; };
 		2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScriptContentRuntime.swift; sourceTree = "<group>"; };
 		26195252708283AFB936E392 /* GameplayParity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameplayParity.swift; sourceTree = "<group>"; };
+		287F32D28BA6DAF70AE72591 /* SLWalkingPenguinBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinBehavior.swift; sourceTree = "<group>"; };
 		28BA5E297BC57291B44A28B4 /* RouteShardExecution.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RouteShardExecution.swift; sourceTree = "<group>"; };
 		29E29EEED44FF3034BE40C4C /* ObjectPool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectPool.swift; sourceTree = "<group>"; };
 		29F9BA67FD54486573E891D8 /* CameraCutscene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCutscene.swift; sourceTree = "<group>"; };
@@ -552,6 +554,7 @@
 				4789FFED823D9EAAB8F54ACB /* SeesawPlatformBehavior.swift */,
 				F27F167DF12FDB9DEDC9F64F /* SkeeterEnemy.swift */,
 				01C2DB40D32E69B4AFA3E55B /* SkeeterObjectBridge.swift */,
+				287F32D28BA6DAF70AE72591 /* SLWalkingPenguinBehavior.swift */,
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
 				A1B59B269230B9E7A9B9EDFF /* SnufitEnemy.swift */,
 				64D278BDD2C95F399F543A0B /* SnufitObjectBridge.swift */,
@@ -831,6 +834,7 @@
 				B4EB45CA367DED1BF59D3D99 /* RotatingPlatformBehavior.swift in Sources */,
 				2629A8504E963CF509456513 /* RouteShardExecution.swift in Sources */,
 				456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */,
+				54BE2C1D3F624579927D2313 /* SLWalkingPenguinBehavior.swift in Sources */,
 				4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */,
 				3D8C6993DC34F356CD9F756D /* ScuttlebugEnemy.swift in Sources */,
 				46C0FB257866DD3500A55A24 /* ScuttlebugObjectBridge.swift in Sources */,

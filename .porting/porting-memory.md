@@ -1486,6 +1486,21 @@
   the platform inventory, content-pack collision resource inventory, remaining
   mechanisms/hazards, effects, and M20–M35 remain open.
 
+### M20a Completion Evidence
+
+- `SLWalkingPenguinBehavior.swift` reproduces the five-entry erratic movement
+  table, timer-zero step reset, step transition/wrap, X-boundary action
+  changes, 0x400 turn increments, 16-bit yaw wrap, and canonical X/Z
+  displacement with animation intents.
+- Focused output is
+  `slWalkingPenguinFingerprint=0xf80b620bf18ccb4d` with the independent C
+  contract match; the complete matrix is `MATRIX_RESULT runs=153 failures=0`
+  in `/tmp/sm64-modern-m20a-matrix.log`; regenerated native Swift 6/macOS
+  27 Debug build and `git diff --check` pass.
+- This closes the value behavior seam only. Floor/wall movement resolution,
+  owner-thread object bridge, race/dialog/secret ownership, and remaining NPCs
+  and puzzles remain open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and

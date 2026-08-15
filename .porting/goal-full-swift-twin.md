@@ -899,7 +899,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M19o: Engine-state platform collision route | Swift engine state owns a dependency-free owner-generation collision lease through level reset and exposes bind/remove APIs exercised beside object spawn/current-object state; concrete surfaces remain in the registry seam. | Complete locally — strict Swift 6 owner-thread state smoke plus C contract, 151-script matrix target, regenerated native Debug build, and `git diff --check` pass; live behavior-driven mesh generation and remaining mechanisms/hazards remain open |
 | M19p: Collision mesh decode and live binding | Swift decodes bounded `COL_*` streams, applies the C signed-16 transform/normal/bounds sequencing, atomically replaces owner-generation surfaces in the registry/world, and records surface IDs in engine state. | Complete locally — strict Swift 6/C contract, focused fingerprint `0x266b6fef37fcfa11`, 152-script matrix target, regenerated native Debug build, and `git diff --check` pass; behavior dispatch, broad collision data inventory, remaining mechanisms/hazards, and effect delivery remain |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | In progress — M19a–M19p value/owner seams are complete locally; behavior dispatch, broad collision data inventory, remaining mechanisms, hazards, and effect delivery remain |
-| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
+| M20a: SL walking penguin state machine | Swift reproduces the erratic step table, action/timer ownership, boundary turns, canonical yaw increments, forward displacement, and animation intents for Snowman Land's walking penguin. | Complete locally — strict Swift 6/C contract, focused fingerprint `0xf80b620bf18ccb4d`, 153-script matrix target, regenerated native Debug build, and `git diff --check` pass; collision resolution, object bridge, races, dialog, and remaining NPCs remain |
+| M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a closes the first deterministic NPC behavior seam; object bridge/collision, dialog/race ownership, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1058,6 +1059,10 @@ replayable trace, and the platform evidence listed in its exit gate.
    MIPS, Lakitu, race timers, slide timers, red-coin puzzles, secrets,
    switches, paintings, and course-specific puzzle controllers. Include
    dialog IDs, camera requests, cutscene handoffs, and reward ownership.
+   Start with M20a's Snowman Land walking-penguin step table, preserving its
+   timer reset, current-step transition, boundary action changes, 0x400 yaw
+   turns, canonical movement, and animation-speed intents before attaching
+   floor/wall resolution and the NPC object bridge.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and
