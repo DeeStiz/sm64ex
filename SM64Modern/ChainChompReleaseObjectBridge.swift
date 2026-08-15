@@ -232,7 +232,6 @@ final class SM64ChainChompReleaseObjectBridge {
         guard var gate = gateStates[id], pool.record(for: id) != nil else { return }
         let result = SM64ChainChompGateKernel.tick(hitGate: gateInputs[id] ?? false, state: &gate)
         gateStates[id] = gate
-        if result.state.markedForDeletion { _ = pool.markForDeletion(id) }
         effectLog.append(
             SM64ChainChompReleaseObjectEffectRecord(
                 objectID: id,

@@ -73,6 +73,7 @@
 		65F4BEF23300074C1E392842 /* MarioShellAirAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820DE3AD7B88D2679E91FFF4 /* MarioShellAirAction.swift */; };
 		6623355865D93A2C5631F1DF /* GoombaEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 351FD4FF55CB608F105C75CD /* GoombaEnemy.swift */; };
 		6835A925361AE3096638249D /* MarioBurningGroundAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CFDEEEED1CA8A6F5DCE17A5 /* MarioBurningGroundAction.swift */; };
+		696004D36164301F6C01B251 /* OwnerThreadEffectRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB115FFD181E778F9AFE67C /* OwnerThreadEffectRouter.swift */; };
 		6C8640CA9C5EE9B633AEB081 /* MarioState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96143C0812CD3AA2EE120132 /* MarioState.swift */; };
 		6D6741A38B952F78FA967775 /* MarioMetalWaterAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85E6EB0BA26CB1B54C215C9F /* MarioMetalWaterAction.swift */; };
 		6ECAFD9E539A164C43EBA731 /* HeaveHoEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80B185797853434E28E3A2F /* HeaveHoEnemy.swift */; };
@@ -179,6 +180,7 @@
 		01C2DB40D32E69B4AFA3E55B /* SkeeterObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeeterObjectBridge.swift; sourceTree = "<group>"; };
 		05D35EE8DC4AB3016AB7352A /* FlyGuyEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyGuyEnemy.swift; sourceTree = "<group>"; };
 		0C50416E3A3BDC9F17816FA9 /* MarioInputCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioInputCore.swift; sourceTree = "<group>"; };
+		0CB115FFD181E778F9AFE67C /* OwnerThreadEffectRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerThreadEffectRouter.swift; sourceTree = "<group>"; };
 		0E8CE0F23C268072CA9D6E61 /* SpinyObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinyObjectBridge.swift; sourceTree = "<group>"; };
 		102B791DCCC1F75BC03F0F6B /* GoombaObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoombaObjectBridge.swift; sourceTree = "<group>"; };
 		106B51D9CC6C878D9C69F33F /* SwoopEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwoopEnemy.swift; sourceTree = "<group>"; };
@@ -487,6 +489,7 @@
 				D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */,
 				399C03F347FC9A4D23DFECFD /* OracleTrace.swift */,
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
+				0CB115FFD181E778F9AFE67C /* OwnerThreadEffectRouter.swift */,
 				375EBE2D9BBFCAD8B34FDF89 /* PiranhaPlant.swift */,
 				E3353EA4B05B2088E0941DEB /* PiranhaPlantObjectBridge.swift */,
 				5D39626AC1CF73EA2D9419E7 /* PokeyEnemy.swift */,
@@ -753,6 +756,7 @@
 				3D45F4E1ED09C5B5EC150CC5 /* ObjectTransform.swift in Sources */,
 				1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */,
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
+				696004D36164301F6C01B251 /* OwnerThreadEffectRouter.swift in Sources */,
 				B966D97864B94F9E3BD0EA18 /* PiranhaPlant.swift in Sources */,
 				8F0287C04E3BF3452E17B97B /* PiranhaPlantObjectBridge.swift in Sources */,
 				3F79F5D008AE1CE462208B18 /* PokeyEnemy.swift in Sources */,

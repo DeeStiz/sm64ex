@@ -92,6 +92,11 @@ enum SM64ModernChainChompReleaseSmoke {
         require(bridgeTick.effects.count == 2, "release bridge effect count")
         require(bridgeTick.effects.contains { $0.kind == .woodenPost && $0.effects.contains(.poundSound) }, "release bridge post effect")
         require(bridgeTick.effects.contains { $0.kind == .gate && $0.markedForDeletion }, "release bridge gate effect")
+        let router = SM64OwnerThreadEffectRouter()
+        router.enqueue(bridgeTick.effects)
+        let delivery = router.deliver(to: engineState.objects)
+        require(delivery.deleted == [gateID], "gate owner deletion")
+        require(delivery.presented.contains { $0.kind == .sound }, "release effect presentation")
         require(engineState.objects.record(for: gateID)?.activeFlags ?? 0 & SM64ObjectPool.activeFlagActive == 0, "gate owner deletion")
         for effect in bridgeTick.effects {
             fingerprint = hashValues(fingerprint, [

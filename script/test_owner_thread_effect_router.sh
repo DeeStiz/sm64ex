@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-chain-chomp-release"
+BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-owner-thread-effect-router"
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
@@ -19,22 +19,22 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ChainChompRelease.swift" \
   "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
-  "$PROJECT_ROOT/tests/sm64_modern_chain_chomp_release_smoke.swift" \
-  -o "$BUILD_ROOT/sm64-modern-chain-chomp-release-smoke"
+  "$PROJECT_ROOT/tests/sm64_modern_owner_thread_effect_router_smoke.swift" \
+  -o "$BUILD_ROOT/sm64-modern-owner-thread-effect-router-smoke"
 
-SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-chain-chomp-release-smoke)"
+SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-owner-thread-effect-router-smoke)"
 printf '%s\n' "$SWIFT_OUTPUT"
 
 xcrun clang -std=c11 \
-  "$PROJECT_ROOT/tests/sm64_modern_chain_chomp_release_contract.c" \
-  -o "$BUILD_ROOT/sm64-modern-chain-chomp-release-contract"
-C_OUTPUT="$($BUILD_ROOT/sm64-modern-chain-chomp-release-contract)"
+  "$PROJECT_ROOT/tests/sm64_modern_owner_thread_effect_router_contract.c" \
+  -o "$BUILD_ROOT/sm64-modern-owner-thread-effect-router-contract"
+C_OUTPUT="$($BUILD_ROOT/sm64-modern-owner-thread-effect-router-contract)"
 printf '%s\n' "$C_OUTPUT"
 
-SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^chainChompReleaseFingerprint=//p')"
-C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^chainChompReleaseFingerprint=//p')"
+SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^ownerThreadEffectRouterFingerprint=//p')"
+C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^ownerThreadEffectRouterFingerprint=//p')"
 [[ -n "$SWIFT_FINGERPRINT" && "$SWIFT_FINGERPRINT" == "$C_FINGERPRINT" ]] || {
-  echo "Swift/C Chain Chomp release fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
+  echo "Swift/C owner-thread effect router fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
   exit 1
 }
-printf '%s\n' "SM64 Modern Chain Chomp release C contract matched"
+printf '%s\n' "SM64 Modern owner-thread effect router C contract matched"
