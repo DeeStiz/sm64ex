@@ -1239,6 +1239,22 @@
 - This remains a bounded M19 seam: object ownership, collision loading,
   remaining mechanisms/hazards, effects, and M20–M35 remain open.
 
+### M19c Completion Evidence
+
+- `SM64Modern/RotatingPlatformBehavior.swift` extracts the rotating-wooden
+  action/timer gate and common rotating-platform yaw update. It preserves the
+  signed high behavior-byte conversion, 16-bit yaw wrapping, action reset, and
+  loop-sound intent.
+- `tests/sm64_modern_rotating_platform_contract.c` independently mirrors the
+  C arithmetic. The Swift/C fingerprint is
+  `rotatingPlatformFingerprint=0x8d77ef02524f8933`.
+- `script/test_rotating_platform.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`; the full matrix passes with
+  `runs=139 failures=0` (log `/tmp/sm64-modern-m19c-matrix.log`). The clean
+  regenerated native Debug build and `git diff --check` pass.
+- Collision-data setup, dynamic surface replacement, remaining mechanisms,
+  hazards, effects, and M20–M35 remain open.
+
 ### M8b Completion Evidence
 
 - `tests/fixtures/sm64_modern_timebase_cadence.tsv` is the governing M8b/M8c/M8d ownership inventory; the aggregate fixture remains a checked drift detector. The audit includes scripts, timers, animation/events, RNG, transitions, HUD/menu/dialog/title, save sinks, input/rumble boundaries, presentation, and Swift host deferrals.

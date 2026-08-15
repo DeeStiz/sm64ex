@@ -865,6 +865,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M18am: Complete bridge deletion router audit | Bird, Fly Guy, Chuckya, Heave Ho, Skeeter, Bully, Scuttlebug, Piranha Plant, Bob-omb, Moneybag, Pokey, Chain Chomp, Koopa shell, and Mr. I parent/child/transient deletion all route through the owner-thread effect sink. | Complete locally — direct bridge-side deletion audit empty; all unchanged focused Swift/C fingerprints, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; collision/effect presentation and Swift authority remain open |
 | M19a: Platform displacement seam | Swift applies native-step X/Z translation, previous/current ZXY platform rotation, Mario yaw wrap, and object/Mario position updates without sharing C object pointers. | Complete locally — strict Swift 6 value kernel, independent C trig/matrix contract, focused fingerprint `0xd981b07ed8324476`, 137-script matrix target, regenerated native Debug build, and `git diff --check` pass; platform behavior families, dynamic collision, and hazard volumes remain open |
 | M19b: Elevator behavior seam | Swift reproduces elevator idle/rising/descending/resting actions, endpoint transitions, signed velocity approach, Mario-on-platform gates, and sound/shake intents as value output. | Complete locally — strict Swift 6/C contract, focused fingerprint `0x07f1d3fee9d22bac`, 138-script matrix target, regenerated native Debug build, and `git diff --check` pass; remaining platform families, dynamic collision, and hazard volumes remain open |
+| M19c: Rotating platform behavior seam | Swift reproduces the rotating-wooden action/timer gate, signed behavior-byte yaw velocity, 16-bit yaw wrap, and loop-sound intent. | Complete locally — strict Swift 6/C contract, focused fingerprint `0x8d77ef02524f8933`, 139-script matrix target, regenerated native Debug build, and `git diff --check` pass; platform initialization/collision and remaining mechanisms remain open |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
@@ -978,7 +979,9 @@ replayable trace, and the platform evidence listed in its exit gate.
    platform ownership and surface replacement. Add M19b's elevator action
    machine next: retain endpoint/action transitions, `approach_f32_signed`
    velocity order, Mario-on-platform/air-action gates, and explicit movement,
-   pound, and screen-shake intents before wiring sound/effect delivery.
+   pound, and screen-shake intents before wiring sound/effect delivery. Add
+   M19c's rotating-platform action/timer gate and signed behavior-byte yaw
+   update with explicit loop-sound intent before collision-data initialization.
 4. **M20 NPC, races, and puzzles.** Port Toads, penguins, birds, rabbits,
    MIPS, Lakitu, race timers, slide timers, red-coin puzzles, secrets,
    switches, paintings, and course-specific puzzle controllers. Include
