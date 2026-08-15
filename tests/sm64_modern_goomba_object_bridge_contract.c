@@ -133,7 +133,11 @@ int main(void) {
     uint64_t fingerprint = FNV_OFFSET;
     fingerprint = hash_tick(fingerprint, 1, 0, 0, 133, 136, 1, 1, 0);
     fingerprint = hash_tick(fingerprint, 2, 2, 1, 128, 240, 1, 0, 1);
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, 1);
     fingerprint = hash_triplet(fingerprint);
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, 1);
     fingerprint = hash_attack_table(fingerprint);
     fingerprint = hash_collision_admission(fingerprint);
     printf("goombaObjectBridgeFingerprint=0x%016llx\n",

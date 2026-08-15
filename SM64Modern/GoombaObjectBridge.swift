@@ -61,6 +61,7 @@ final class SM64GoombaObjectBridge {
     static let defaultTripletSpawnerBehaviorIdentity: UInt64 = 0x6268_765F_7472_6970
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64GoombaState] = [:]
     private var inputs: [SM64ObjectID: SM64GoombaTickInput] = [:]
     private var spawners: [SM64ObjectID: SM64GoombaTripletSpawnerState] = [:]
@@ -68,9 +69,14 @@ final class SM64GoombaObjectBridge {
     private var memberships: [SM64ObjectID: (parent: SM64ObjectID, tripletFlag: UInt8)] = [:]
     private(set) var effectLog: [SM64GoombaObjectEffectRecord] = []
     private(set) var respawnRequests: [SM64GoombaRespawnRequest] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -225,6 +231,8 @@ final class SM64GoombaObjectBridge {
         spawnerInputs = frameSpawnerInputs
         effectLog.removeAll(keepingCapacity: true)
         respawnRequests.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
@@ -292,13 +300,15 @@ final class SM64GoombaObjectBridge {
         )
         if goomba.markedForDeletion {
             recordRespawn(for: id, state: goomba, pool: pool)
-            _ = pool.markForDeletion(id)
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
         }
 
         if let membership = memberships[id],
            let parent = pool.record(for: membership.parent),
            parent.action == Int32(SM64GoombaTripletSpawnerAction.unloaded.rawValue) {
-            _ = pool.markForDeletion(id)
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
         }
 
         effectLog.append(

@@ -172,6 +172,10 @@ enum SM64ModernGoombaObjectBridgeSmoke {
         require(second.scheduler.unloaded.map(\.traceSubject) == [2], "tiny unload follows full callback pass")
         require(second.effects.map { $0.objectID.traceSubject } == [1, 2], "death effects retain callback order")
         require(second.effects[1].effects == [.animate, .death, .coinDrop, .markRespawn], "tiny death effects")
+        require(
+            bridge.deliveryLog.contains { $0.deleted == [tiny] },
+            "tiny deletion routed through owner thread"
+        )
         require(!engineState.objects.contains(tiny), "tiny removed after scheduler unload")
         require(bridge.state(for: tiny) == nil, "shadow removed after slot unload")
 
@@ -183,6 +187,8 @@ enum SM64ModernGoombaObjectBridgeSmoke {
         var fingerprint = fnvOffset
         fingerprint = hashTick(fingerprint, first, regularRecord: firstRecord)
         fingerprint = hashTick(fingerprint, second, regularRecord: secondRecord)
+        fingerprint = hashU64(fingerprint, 1)
+        fingerprint = hashU64(fingerprint, 1)
 
         let tripletEngine = SM64SwiftEngineState(objectCapacity: 12)
         let tripletBridge = SM64GoombaObjectBridge()
@@ -221,6 +227,10 @@ enum SM64ModernGoombaObjectBridgeSmoke {
         require(death.respawnRequests.count == 1, "triplet respawn request")
         require(death.respawnRequests[0].parentID == spawner && death.respawnRequests[0].tripletFlag == 4, "triplet respawn identity")
         require(death.respawnRequests[0].parentMask == 0x100 && death.respawnRequests[0].respawnBit == 1, "triplet respawn masks")
+        require(
+            tripletBridge.deliveryLog.contains { $0.deleted == [children[0]] },
+            "triplet deletion routed through owner thread"
+        )
         require(tripletEngine.objects.record(for: spawner)?.behaviorParams == 0x100, "parent dead flag")
         fingerprint = hashTriplet(
             fingerprint,
@@ -230,6 +240,8 @@ enum SM64ModernGoombaObjectBridgeSmoke {
             death: death,
             parentBehaviorParams: tripletEngine.objects.record(for: spawner)?.behaviorParams ?? 0
         )
+        fingerprint = hashU64(fingerprint, 1)
+        fingerprint = hashU64(fingerprint, 1)
         fingerprint = hashAttackTable(fingerprint)
 
         let collisionEngine = SM64SwiftEngineState(objectCapacity: 6)

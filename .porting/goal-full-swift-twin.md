@@ -2,11 +2,11 @@
 
 ## Status
 
-M18ai is the latest validated checkpoint: Swoop attack deletion is delivered
-through the owner-thread effect router in the independent Swift/C fingerprint
-`0x17a41c6388260d46`, and the strict focused contract, full 131-script matrix,
-and regenerated native Debug build pass. M18ah remains the preceding validated
-Bullet Bill smoke router-adoption checkpoint. M0–M17 local scopes remain complete
+M18aj is the latest validated checkpoint: Goomba regular/triplet deletion is
+delivered through the owner-thread effect router in the independent Swift/C
+fingerprint `0xf2f6f39a90915ec3`, and the strict focused contract, full
+131-script matrix, and regenerated native Debug build pass. M18ai remains the
+preceding validated Swoop router-adoption checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
 platform, NPC, boss, save, frontend, audio, renderer, Swift-6-safety,
@@ -693,7 +693,17 @@ M18ai adopts the common owner-thread effect router for Swoop's attack/death
  (`runs=131 failures=0`), regenerated native Debug build, and `git diff --check`
  pass. Remaining bridges still contain direct effect mutations, and
  whole-engine collision/effect presentation plus physical/visual/audio/human
- acceptance remain open.
+acceptance remain open.
+
+M18aj adopts the common owner-thread effect router for Goomba regular and
+triplet-child deletion. Respawn requests and parent triplet flags remain
+ordered value records, while mutable child removal is delivered before
+scheduler unload in the independent Swift/C fingerprint
+`0xf2f6f39a90915ec3`. Focused strict Swift 6/C validation passes; the full 131
+script matrix (`runs=131 failures=0`), regenerated native Debug build, and
+`git diff --check` pass. Remaining bridges still contain direct effect
+mutations, and whole-engine collision/effect presentation plus physical/
+visual/audio/human acceptance remain open.
 
 M12h routes floor, ceiling, and wall candidates through the C-ordered partition with indexed Swift surface storage and dynamic replacement. M12i adds a value-type owner-thread gameplay tick that composes input/geometry, preserves paired simulation/legacy counters, carries demo state, and advances logical rumble with a matching Swift/C trace. Live runtime wiring, production content breadth, and physical haptic delivery remain open.
 
@@ -779,6 +789,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M18ag: Water-bomb router adoption | Water-bomb bomb/shadow deletion, missing-parent cleanup, and end-of-frame unload use the common owner-thread effect router. | Complete locally — `0x2c7546919aa992ae`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M18ah: Bullet Bill smoke router adoption | Bullet Bill transient smoke deletion uses the common owner-thread effect router while preserving same-frame child traversal and unload. | Complete locally — `0x98814f6acf3e0025`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M18ai: Swoop router adoption | Swoop attack/death deletion uses the common owner-thread effect router while preserving hitbox response and end-of-frame unload. | Complete locally — `0x17a41c6388260d46`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
+| M18aj: Goomba router adoption | Goomba regular and triplet-child deletion use the common owner-thread effect router while preserving respawn requests and parent flags. | Complete locally — `0xf2f6f39a90915ec3`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
