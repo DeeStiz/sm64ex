@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18i is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18j is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -216,6 +216,25 @@
   validation passes. The full matrix passes with `runs=110 failures=0` (log
   `/tmp/sm64-modern-m18i-matrix.log`), the generated native Debug build
   succeeds (log `/tmp/sm64-modern-m18i-build.log`), and `git diff --check` is
+  clean. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
+### M18j Completion Evidence
+
+- `BirdEnemy.swift` preserves the spawner/spawned bird boundary: the 2,000-unit
+  spawner admission, six-child flight-away event, random-seeded initial yaw and
+  pitch, canonical home/parent target angles, 40-unit base speed, distance-based
+  child catch-up speed, 140/800 angle approaches, bounded roll, forward/pitch
+  movement, and parent-height-above-8,000 deletion.
+- `BirdObjectBridge.swift` allocates six spawned birds in the live general-actor
+  list with stable parent IDs, carries copied parent-target inputs, synchronizes
+  transform/flight/visibility fields, and unloads child groups through the
+  owner-thread scheduler without exposing C pointers.
+- The independent Swift/C owner-thread contract emits
+  `birdObjectBridgeFingerprint=0xf97b3fef9a11eb4e`; focused strict Swift 6/C
+  validation passes. The full matrix passes with `runs=111 failures=0` (log
+  `/tmp/sm64-modern-m18j-matrix.log`), the generated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18j-build.log`), and `git diff --check` is
   clean. Complete collision/effect delivery, remaining enemy/projectile
   breadth, and physical/visual/human acceptance remain open.
 
