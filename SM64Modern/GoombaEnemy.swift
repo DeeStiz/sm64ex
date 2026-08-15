@@ -17,6 +17,10 @@ enum SM64GoombaAttack: UInt8, Equatable, Sendable {
     case weak = 1
     case fromAbove = 2
     case groundPound = 3
+    case punch = 4
+    case kickOrTrip = 5
+    case fastAttack = 6
+    case fromBelow = 7
 }
 
 enum SM64GoombaDeathSound: UInt8, Equatable, Sendable {
@@ -99,6 +103,7 @@ struct SM64GoombaTickInput: Equatable, Sendable {
     var randomU16: UInt16
     var randomFraction: Float
     var attack: SM64GoombaAttack
+    var attackedMario: Bool
 
     init(
         distanceToMario: Float = 10_000,
@@ -110,7 +115,8 @@ struct SM64GoombaTickInput: Equatable, Sendable {
         objectCollision: Bool = false,
         randomU16: UInt16 = 0,
         randomFraction: Float = 0,
-        attack: SM64GoombaAttack = .none
+        attack: SM64GoombaAttack = .none,
+        attackedMario: Bool = false
     ) {
         self.distanceToMario = distanceToMario
         self.angleToMario = angleToMario
@@ -122,6 +128,7 @@ struct SM64GoombaTickInput: Equatable, Sendable {
         self.randomU16 = randomU16
         self.randomFraction = randomFraction
         self.attack = attack
+        self.attackedMario = attackedMario
     }
 }
 
@@ -141,9 +148,139 @@ struct SM64GoombaEffect: OptionSet, Equatable, Sendable {
     static let landed = Self(rawValue: 1 << 8)
 }
 
+enum SM64GoombaAttackHandler: UInt8, Equatable, Sendable {
+    case nop = 0
+    case knockback = 2
+    case squished = 3
+    case hugeWeaklyAttacked = 7
+    case squishedWithBlueCoin = 8
+}
+
+struct SM64GoombaAttackDecision: Equatable, Sendable {
+    let handler: SM64GoombaAttackHandler
+    let accepted: Bool
+    let dropsBlueCoin: Bool
+}
+
+enum SM64GoombaAttackTable {
+    /// Direct transcription of `sGoombaAttackHandlers` in goomba.inc.c.
+    static func decision(
+        size: SM64GoombaSize,
+        attack: SM64GoombaAttack
+    ) -> SM64GoombaAttackDecision {
+        let handler: SM64GoombaAttackHandler
+        switch size {
+        case .regular, .tiny:
+            switch attack {
+            case .none:
+                handler = .nop
+            case .fromAbove, .groundPound:
+                handler = .squished
+            case .weak, .punch, .kickOrTrip, .fastAttack, .fromBelow:
+                handler = .knockback
+            }
+        case .huge:
+            switch attack {
+            case .none:
+                handler = .nop
+            case .fromAbove:
+                handler = .squished
+            case .groundPound:
+                handler = .squishedWithBlueCoin
+            case .weak, .punch, .kickOrTrip, .fastAttack, .fromBelow:
+                handler = .hugeWeaklyAttacked
+            }
+        }
+        return SM64GoombaAttackDecision(
+            handler: handler,
+            accepted: handler != .nop,
+            dropsBlueCoin: handler == .squishedWithBlueCoin
+        )
+    }
+}
+
+struct SM64GoombaCollisionSnapshot: Equatable, Sendable {
+    var distanceToMario: Float
+    var angleToMario: Int16
+    var onGround: Bool
+    var hitWall: Bool
+    var reflectedYaw: Int16
+    var hitEdge: Bool
+    var objectCollision: Bool
+    var randomU16: UInt16
+    var randomFraction: Float
+    var interactionStatus: UInt32
+
+    init(
+        distanceToMario: Float = 10_000,
+        angleToMario: Int16 = 0,
+        onGround: Bool = true,
+        hitWall: Bool = false,
+        reflectedYaw: Int16 = 0,
+        hitEdge: Bool = false,
+        objectCollision: Bool = false,
+        randomU16: UInt16 = 0,
+        randomFraction: Float = 0,
+        interactionStatus: UInt32 = 0
+    ) {
+        self.distanceToMario = distanceToMario
+        self.angleToMario = angleToMario
+        self.onGround = onGround
+        self.hitWall = hitWall
+        self.reflectedYaw = reflectedYaw
+        self.hitEdge = hitEdge
+        self.objectCollision = objectCollision
+        self.randomU16 = randomU16
+        self.randomFraction = randomFraction
+        self.interactionStatus = interactionStatus
+    }
+}
+
+enum SM64GoombaCollisionKernel {
+    static let attackMask: UInt32 = 0x0000_00FF
+    static let attackedMarioMask: UInt32 = 1 << 13
+    static let interactedMask: UInt32 = 1 << 15
+
+    static func input(from snapshot: SM64GoombaCollisionSnapshot) -> SM64GoombaTickInput {
+        let interacted = snapshot.interactionStatus & interactedMask != 0
+        let attackedMario = snapshot.interactionStatus & attackedMarioMask != 0
+        let encodedAttack = UInt8(truncatingIfNeeded: snapshot.interactionStatus & attackMask)
+        let attack: SM64GoombaAttack
+        if interacted && !attackedMario {
+            switch encodedAttack {
+            case 1: attack = .punch
+            case 2: attack = .kickOrTrip
+            case 3: attack = .fromAbove
+            case 4: attack = .groundPound
+            case 5: attack = .fastAttack
+            case 6: attack = .fromBelow
+            default: attack = .none
+            }
+        } else {
+            attack = .none
+        }
+        return SM64GoombaTickInput(
+            distanceToMario: snapshot.distanceToMario,
+            angleToMario: snapshot.angleToMario,
+            onGround: snapshot.onGround,
+            hitWall: snapshot.hitWall,
+            reflectedYaw: snapshot.reflectedYaw,
+            hitEdge: snapshot.hitEdge,
+            objectCollision: snapshot.objectCollision,
+            randomU16: snapshot.randomU16,
+            randomFraction: snapshot.randomFraction,
+            attack: attack,
+            attackedMario: interacted && attackedMario
+        )
+    }
+}
+
 struct SM64GoombaTickResult: Equatable, Sendable {
     let state: SM64GoombaState
     let effects: SM64GoombaEffect
+    let attackHandler: SM64GoombaAttackHandler
+    let attackAccepted: Bool
+    let attackDropsBlueCoin: Bool
 }
 
 /// Bounded Swift shadow of `bhv_goomba_init` and its walk/attacked/jump action
@@ -155,6 +292,10 @@ enum SM64GoombaKernel {
         state: inout SM64GoombaState
     ) -> SM64GoombaTickResult {
         var effects: SM64GoombaEffect = [.animate]
+        let attackDecision = SM64GoombaAttackTable.decision(
+            size: state.size,
+            attack: input.attack
+        )
         state.animationSpeed = max(
             1, state.forwardVelocity / state.scale * 0.4
         )
@@ -186,10 +327,15 @@ enum SM64GoombaKernel {
             }
         }
 
+        if input.attackedMario {
+            state.action = .attackedMario
+            effects.insert(.attackResponse)
+        }
+
         switch input.attack {
         case .none:
             break
-        case .weak:
+        case .weak, .punch, .kickOrTrip, .fastAttack, .fromBelow:
             state.action = .attackedMario
             effects.insert(.attackResponse)
         case .fromAbove, .groundPound:
@@ -201,7 +347,13 @@ enum SM64GoombaKernel {
         }
 
         if state.timer < 0x3FFF_FFFF { state.timer &+= 1 }
-        return SM64GoombaTickResult(state: state, effects: effects)
+        return SM64GoombaTickResult(
+            state: state,
+            effects: effects,
+            attackHandler: attackDecision.handler,
+            attackAccepted: attackDecision.accepted,
+            attackDropsBlueCoin: attackDecision.dropsBlueCoin
+        )
     }
 
     private static func walk(

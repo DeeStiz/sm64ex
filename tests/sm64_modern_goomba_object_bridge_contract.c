@@ -50,6 +50,8 @@ static uint64_t hash_tick(uint64_t initial, uint64_t frame,
 
     hash = hash_u64(hash, 1);
     hash = hash_u64(hash, regular_effects);
+    hash = hash_u64(hash, 0);   // no attack handler
+    hash = hash_u64(hash, 0);   // no blue coin
     hash = hash_u64(hash, 2);   // jump
     hash = hash_u64(hash, 0);   // high death sound
     hash = hash_u64(hash, 1);
@@ -57,6 +59,8 @@ static uint64_t hash_tick(uint64_t initial, uint64_t frame,
 
     hash = hash_u64(hash, 2);
     hash = hash_u64(hash, tiny_effects);
+    hash = hash_u64(hash, frame == 1 ? 3 : 0); // squished only on first attack tick
+    hash = hash_u64(hash, 0);   // no blue coin
     hash = hash_u64(hash, tiny_action);
     hash = hash_u64(hash, 0);   // high death sound
     hash = hash_u64(hash, tiny_coins);
@@ -89,11 +93,49 @@ static uint64_t hash_triplet(uint64_t initial) {
     return hash_u64(hash, 0x100);
 }
 
+static uint64_t hash_attack_table(uint64_t initial) {
+    static const uint8_t handlers[3][8] = {
+        { 0, 2, 3, 3, 2, 2, 2, 2 },
+        { 0, 7, 3, 8, 7, 7, 7, 7 },
+        { 0, 2, 3, 3, 2, 2, 2, 2 },
+    };
+    uint64_t hash = initial;
+    for (unsigned size = 0; size < 3; ++size) {
+        hash = hash_u64(hash, size == 2 ? 2 : size);
+        for (unsigned attack = 0; attack < 8; ++attack) {
+            const uint8_t handler = handlers[size][attack];
+            hash = hash_u64(hash, attack);
+            hash = hash_u64(hash, handler);
+            hash = hash_u64(hash, handler != 0);
+            hash = hash_u64(hash, handler == 8);
+        }
+    }
+    return hash;
+}
+
+static uint64_t hash_collision_admission(uint64_t initial) {
+    static const uint32_t statuses[9] = {
+        0, 0x8001, 0x8002, 0x8003, 0x8004,
+        0x8005, 0x8006, 0xA000, 0x8007,
+    };
+    static const uint8_t attacks[9] = { 0, 4, 5, 2, 3, 6, 7, 0, 0 };
+    static const uint8_t attacked_mario[9] = { 0, 0, 0, 0, 0, 0, 0, 1, 0 };
+    uint64_t hash = initial;
+    for (unsigned index = 0; index < 9; ++index) {
+        hash = hash_u64(hash, statuses[index]);
+        hash = hash_u64(hash, attacks[index]);
+        hash = hash_u64(hash, attacked_mario[index]);
+    }
+    return hash;
+}
+
 int main(void) {
     uint64_t fingerprint = FNV_OFFSET;
     fingerprint = hash_tick(fingerprint, 1, 0, 0, 133, 136, 1, 1, 0);
     fingerprint = hash_tick(fingerprint, 2, 2, 1, 128, 240, 1, 0, 1);
     fingerprint = hash_triplet(fingerprint);
+    fingerprint = hash_attack_table(fingerprint);
+    fingerprint = hash_collision_admission(fingerprint);
     printf("goombaObjectBridgeFingerprint=0x%016llx\n",
            (unsigned long long)fingerprint);
     return 0;

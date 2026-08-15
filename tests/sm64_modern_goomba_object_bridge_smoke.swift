@@ -39,6 +39,8 @@ private func hashTick(
     for effect in tick.effects {
         hash = hashU64(hash, UInt64(effect.objectID.traceSubject))
         hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.attackHandler.rawValue))
+        hash = hashU64(hash, effect.attackDropsBlueCoin ? 1 : 0)
         hash = hashU64(hash, UInt64(effect.action.rawValue))
         hash = hashU64(hash, UInt64(effect.deathSound.rawValue))
         hash = hashU64(hash, UInt64(effect.numLootCoins))
@@ -77,6 +79,45 @@ private func hashTriplet(
     return hashU64(hash, UInt64(UInt32(bitPattern: parentBehaviorParams)))
 }
 
+private func hashAttackTable(_ initial: UInt64) -> UInt64 {
+    let sizes: [SM64GoombaSize] = [.regular, .huge, .tiny]
+    let attacks: [SM64GoombaAttack] = [
+        .none, .weak, .fromAbove, .groundPound,
+        .punch, .kickOrTrip, .fastAttack, .fromBelow,
+    ]
+    var hash = initial
+    for size in sizes {
+        hash = hashU64(hash, UInt64(size.rawValue))
+        for attack in attacks {
+            let decision = SM64GoombaAttackTable.decision(size: size, attack: attack)
+            hash = hashU64(hash, UInt64(attack.rawValue))
+            hash = hashU64(hash, UInt64(decision.handler.rawValue))
+            hash = hashU64(hash, decision.accepted ? 1 : 0)
+            hash = hashU64(hash, decision.dropsBlueCoin ? 1 : 0)
+        }
+    }
+    return hash
+}
+
+private func hashCollisionAdmission(_ initial: UInt64) -> UInt64 {
+    let statuses: [UInt32] = [
+        0,
+        0x8001, 0x8002, 0x8003, 0x8004, 0x8005, 0x8006,
+        0xA000,
+        0x8007,
+    ]
+    var hash = initial
+    for status in statuses {
+        let input = SM64GoombaCollisionKernel.input(
+            from: SM64GoombaCollisionSnapshot(interactionStatus: status)
+        )
+        hash = hashU64(hash, UInt64(status))
+        hash = hashU64(hash, UInt64(input.attack.rawValue))
+        hash = hashU64(hash, input.attackedMario ? 1 : 0)
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -111,7 +152,9 @@ enum SM64ModernGoombaObjectBridgeSmoke {
         require(first.scheduler.unloaded.isEmpty, "attack response is one frame before tiny death")
         require(first.effects.map { $0.objectID.traceSubject } == [1, 2], "Goomba effects follow scheduler order")
         require(first.effects[0].effects == [.animate, .alertSound, .jump], "regular jump effects")
+        require(first.effects[0].attackHandler == .nop && !first.effects[0].attackDropsBlueCoin, "regular no-attack handler")
         require(first.effects[1].effects == [.animate, .attackResponse], "tiny attack response effects raw=\(first.effects[1].effects.rawValue)")
+        require(first.effects[1].attackHandler == .squished && !first.effects[1].attackDropsBlueCoin, "tiny squish handler")
 
         guard let firstRecord = engineState.objects.record(for: regular) else {
             preconditionFailure("regular record missing after first tick")
@@ -187,6 +230,29 @@ enum SM64ModernGoombaObjectBridgeSmoke {
             death: death,
             parentBehaviorParams: tripletEngine.objects.record(for: spawner)?.behaviorParams ?? 0
         )
+        fingerprint = hashAttackTable(fingerprint)
+
+        let collisionEngine = SM64SwiftEngineState(objectCapacity: 6)
+        let collisionBridge = SM64GoombaObjectBridge()
+        let huge = try collisionBridge.spawnGoomba(
+            in: collisionEngine,
+            objectList: .generalActor,
+            size: .huge
+        )
+        _ = try collisionEngine.spawnObject(in: .player, isMario: true)
+        let collisionTick = collisionBridge.tick(
+            state: collisionEngine,
+            collisionInputs: [
+                huge: SM64GoombaCollisionSnapshot(
+                    randomU16: 1,
+                    interactionStatus: 0x8001
+                ),
+            ]
+        )
+        require(collisionTick.effects.count == 1, "collision adapter effect")
+        require(collisionTick.effects[0].attackHandler == .hugeWeaklyAttacked, "huge punch handler admission")
+        require(!collisionTick.effects[0].attackDropsBlueCoin, "weak huge attack has no blue coin")
+        fingerprint = hashCollisionAdmission(fingerprint)
 
         print(String(format: "goombaObjectBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern Goomba object bridge smoke passed")

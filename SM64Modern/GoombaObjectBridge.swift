@@ -6,6 +6,8 @@ import Foundation
 struct SM64GoombaObjectEffectRecord: Equatable, Sendable {
     let objectID: SM64ObjectID
     let effects: SM64GoombaEffect
+    let attackHandler: SM64GoombaAttackHandler
+    let attackDropsBlueCoin: Bool
     let action: SM64GoombaAction
     let deathSound: SM64GoombaDeathSound
     let numLootCoins: UInt8
@@ -254,6 +256,23 @@ final class SM64GoombaObjectBridge {
         )
     }
 
+    /// Collision/interaction entry point. The raw C interaction bitfield is
+    /// decoded before the scheduler callback; behavior code receives only the
+    /// copied motion and attack POD values.
+    @discardableResult
+    func tick(
+        state engineState: SM64SwiftEngineState,
+        collisionInputs: [SM64ObjectID: SM64GoombaCollisionSnapshot],
+        spawnerInputs frameSpawnerInputs: [SM64ObjectID: SM64GoombaSpawnerTickInput] = [:]
+    ) -> SM64GoombaSchedulerTickResult {
+        let frameInputs = collisionInputs.mapValues(SM64GoombaCollisionKernel.input(from:))
+        return tick(
+            state: engineState,
+            inputs: frameInputs,
+            spawnerInputs: frameSpawnerInputs
+        )
+    }
+
     private func update(id: SM64ObjectID, pool: SM64ObjectPool) {
         if let spawner = spawners[id] {
             updateSpawner(id: id, state: spawner, pool: pool)
@@ -286,6 +305,8 @@ final class SM64GoombaObjectBridge {
             SM64GoombaObjectEffectRecord(
                 objectID: id,
                 effects: result.effects,
+                attackHandler: result.attackHandler,
+                attackDropsBlueCoin: result.attackDropsBlueCoin,
                 action: goomba.action,
                 deathSound: goomba.deathSound,
                 numLootCoins: goomba.numLootCoins,

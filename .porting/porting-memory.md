@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18b is the current validated Goomba scheduler/spawner slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18c is the current validated Goomba interaction/attack-table slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -94,6 +94,23 @@
   clean. This remains a bounded shadow: C is still gameplay authority, full
   collision dispatch and enemy/projectile breadth remain open, and no physical,
   visual, store, or human acceptance claim is implied.
+
+### M18c Completion Evidence
+
+- `SM64GoombaCollisionKernel` decodes the retained C interaction bitfield into
+  copied motion, wall, edge, object-collision, attacked-Mario, and six attack
+  values. Invalid/no-interaction encodings become a no-op attack rather than
+  indexing a handler table out of bounds.
+- `SM64GoombaAttackTable` preserves the regular/tiny knockback and squish
+  rows, huge weak-attack row, and huge ground-pound `SQUISHED_WITH_BLUE_COIN`
+  row. Handler IDs and blue-coin intent travel through
+  `SM64GoombaObjectEffectRecord`.
+- The independent bridge contract emits
+  `goombaObjectBridgeFingerprint=0x7b7a91e29b3e1003`; the complete matrix
+  passes with `runs=104 failures=0`; the isolated native Debug build succeeds;
+  and `git diff --check` is clean. This remains bounded differential shadow
+  evidence, not full collision authority, enemy breadth, or physical/visual/
+  human acceptance.
 
 ### M8b Completion Evidence
 
