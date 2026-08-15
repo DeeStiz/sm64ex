@@ -60,6 +60,7 @@
 		7C7EE42E47926366AAC72840 /* MarioDeceleratingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E479D5A092A548EEA6715AA1 /* MarioDeceleratingAction.swift */; };
 		7E40F453DC179309A83CF1FF /* MarioLedgeCannonAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0036673A4084395EDD23BAF6 /* MarioLedgeCannonAction.swift */; };
 		7EACE268AB44F9FA25B0AC14 /* MarioSliding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DCD830F49B84A59E9E77430 /* MarioSliding.swift */; };
+		7FC210D0F220C0F3EC53E6B3 /* ProgressionState.swift in Sources */ = {isa = PBXBuildFile; fileRef = F201059126BC066BFF28F447 /* ProgressionState.swift */; };
 		7FFA3B76B0386131EC825C39 /* MarioWalkAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DEC5D253D4E679DB5AB13D6 /* MarioWalkAnimation.swift */; };
 		84709253EEFBE6AC141B9897 /* MarioBurningLavaAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59C730F1F018835E69DE47B1 /* MarioBurningLavaAction.swift */; };
 		862583ABDC99F7D05524622B /* MetalRenderingBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C1E6EA63844F230101DC36D /* MetalRenderingBridge.swift */; };
@@ -227,6 +228,7 @@
 		EEAB73816A053C9CDE0415E1 /* MarioGrabbedTornadoAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGrabbedTornadoAction.swift; sourceTree = "<group>"; };
 		F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfacePartition.swift; sourceTree = "<group>"; };
 		F0B9175C21F74A9AA2E6085B /* MarioLandingJump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioLandingJump.swift; sourceTree = "<group>"; };
+		F201059126BC066BFF28F447 /* ProgressionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionState.swift; sourceTree = "<group>"; };
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
 		F5BB9631CE7A07A55B9BDBCF /* MarioCommonAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCommonAirAction.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -340,6 +342,7 @@
 				D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */,
 				399C03F347FC9A4D23DFECFD /* OracleTrace.swift */,
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
+				F201059126BC066BFF28F447 /* ProgressionState.swift */,
 				6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */,
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
 				135C103AE0705B71EBE54DC5 /* SurfaceCollision.swift */,
@@ -549,6 +552,7 @@
 				3D45F4E1ED09C5B5EC150CC5 /* ObjectTransform.swift in Sources */,
 				1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */,
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
+				7FC210D0F220C0F3EC53E6B3 /* ProgressionState.swift in Sources */,
 				456CF8F2E4A8AE46AC0D050A /* RumbleCore.swift in Sources */,
 				12FFA6069B5EABBA754D6DFF /* SurfaceCollision.swift in Sources */,
 				213C0A6E5D88CC7C1405FED4 /* SurfaceCollisionData.swift in Sources */,
