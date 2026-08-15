@@ -27,14 +27,20 @@ final class SM64KoopaShellObjectBridge {
     static let flameModel: UInt32 = 0x90 // MODEL_RED_FLAME
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var shells: [SM64ObjectID: SM64KoopaShellState] = [:]
     private var underwaters: [SM64ObjectID: SM64KoopaShellState] = [:]
     private var inputs: [SM64ObjectID: SM64KoopaShellTickInput] = [:]
     private var underwaterInputs: [SM64ObjectID: SM64KoopaShellTickInput] = [:]
     private(set) var effectLog: [SM64KoopaShellObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -179,6 +185,8 @@ final class SM64KoopaShellObjectBridge {
         inputs = frameInputs
         underwaterInputs = frameUnderwaterInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -221,7 +229,10 @@ final class SM64KoopaShellObjectBridge {
         let spawnedChildren = spawnEffects(result.effects, parent: id, pool: pool)
         shells[id] = state
         synchronize(id: id, state: state, pool: pool, previousAction: previousAction)
-        if state.markedForDeletion { _ = pool.markForDeletion(id) }
+        if state.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64KoopaShellObjectEffectRecord(
                 objectID: id,
@@ -250,7 +261,10 @@ final class SM64KoopaShellObjectBridge {
             : []
         underwaters[id] = state
         synchronize(id: id, state: state, pool: pool, previousAction: previousAction)
-        if state.markedForDeletion { _ = pool.markForDeletion(id) }
+        if state.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64KoopaShellObjectEffectRecord(
                 objectID: id,
@@ -305,7 +319,8 @@ final class SM64KoopaShellObjectBridge {
             parent: parent,
             drawingDistance: 1_000
         ) else { return nil }
-        _ = pool.markForDeletion(id)
+        effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+        deliveryLog.append(effectRouter.deliver(to: pool))
         return id
     }
 

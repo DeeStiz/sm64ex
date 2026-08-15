@@ -27,15 +27,21 @@ final class SM64PokeyObjectBridge {
     static let bodyModel: UInt32 = 0x55 // MODEL_POKEY_BODY_PART
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var parents: [SM64ObjectID: SM64PokeyState] = [:]
     private var bodies: [SM64ObjectID: SM64PokeyState] = [:]
     private var parentInputs: [SM64ObjectID: SM64PokeyParentTickInput] = [:]
     private var bodyInputs: [SM64ObjectID: SM64PokeyBodyTickInput] = [:]
     private var currentFrame: UInt64 = 0
     private(set) var effectLog: [SM64PokeyObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -124,6 +130,8 @@ final class SM64PokeyObjectBridge {
         parentInputs = frameInputs
         bodyInputs = frameBodyInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         currentFrame = engineState.globals.frame &+ 1
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
@@ -191,7 +199,10 @@ final class SM64PokeyObjectBridge {
 
         parents[id] = parent
         synchronizeParent(id: id, state: parent, pool: pool, previousAction: previousAction)
-        if parent.markedForDeletion { _ = pool.markForDeletion(id) }
+        if parent.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64PokeyObjectEffectRecord(
                 objectID: id,
@@ -224,7 +235,10 @@ final class SM64PokeyObjectBridge {
             synchronizeParent(id: parentID, state: updatedParent, pool: pool, previousAction: updatedParent.action)
         }
         synchronizeBody(id: id, state: body, pool: pool)
-        if body.markedForDeletion { _ = pool.markForDeletion(id) }
+        if body.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64PokeyObjectEffectRecord(
                 objectID: id,

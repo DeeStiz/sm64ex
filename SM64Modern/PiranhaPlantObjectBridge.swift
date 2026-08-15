@@ -23,12 +23,18 @@ final class SM64PiranhaPlantObjectBridge {
     static let blueCoinModel: UInt32 = 0x76 // MODEL_BLUE_COIN
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64PiranhaPlantState] = [:]
     private var inputs: [SM64ObjectID: SM64PiranhaPlantTickInput] = [:]
     private(set) var effectLog: [SM64PiranhaPlantObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -111,6 +117,8 @@ final class SM64PiranhaPlantObjectBridge {
     ) -> SM64PiranhaPlantSchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -177,7 +185,8 @@ final class SM64PiranhaPlantObjectBridge {
             behaviorIdentity: behaviorIdentity,
             parent: parent
         ) else { return nil }
-        _ = pool.markForDeletion(child)
+        effectRouter.enqueue(objectID: child, kind: .markForDeletion)
+        deliveryLog.append(effectRouter.deliver(to: pool))
         return child
     }
 

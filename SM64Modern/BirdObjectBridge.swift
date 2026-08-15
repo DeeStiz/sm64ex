@@ -22,12 +22,18 @@ final class SM64BirdObjectBridge {
     static let defaultModel: UInt32 = 0x72 // MODEL_BIRDS
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64BirdState] = [:]
     private var inputs: [SM64ObjectID: SM64BirdTickInput] = [:]
     private(set) var effectLog: [SM64BirdObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -120,6 +126,8 @@ final class SM64BirdObjectBridge {
     ) -> SM64BirdSchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -176,7 +184,8 @@ final class SM64BirdObjectBridge {
         states[id] = bird
         synchronizeRecord(id: id, state: bird, pool: pool, previousAction: previousAction)
         if bird.markedForDeletion {
-            _ = pool.markForDeletion(id)
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
         }
         effectLog.append(
             SM64BirdObjectEffectRecord(

@@ -29,13 +29,21 @@ final class SM64ChainChompObjectBridge {
     static let segmentModel: UInt32 = 0x65 // MODEL_METALLIC_BALL
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64ChainChompState] = [:]
     private var inputs: [SM64ObjectID: SM64ChainChompTickInput] = [:]
     private var segmentIndex: [SM64ObjectID: UInt8] = [:]
     private var segmentsForParent: [SM64ObjectID: [SM64ObjectID]] = [:]
     private(set) var effectLog: [SM64ChainChompObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) { self.scheduler = scheduler }
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
+        self.scheduler = scheduler
+        self.effectRouter = effectRouter
+    }
 
     var registeredIDs: [SM64ObjectID] {
         (Array(states.keys) + Array(segmentIndex.keys)).sorted { lhs, rhs in
@@ -95,6 +103,8 @@ final class SM64ChainChompObjectBridge {
     ) -> SM64ChainChompSchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -126,9 +136,16 @@ final class SM64ChainChompObjectBridge {
                 created = allocateSegments(parent: id, state: chomp, pool: pool)
             }
             if chomp.action == .unloadChain {
-                for child in segmentsForParent[id] ?? [] { _ = pool.markForDeletion(child) }
+                for child in segmentsForParent[id] ?? [] {
+                    effectRouter.enqueue(objectID: child, kind: .markForDeletion)
+                }
             }
-            if chomp.markedForDeletion { _ = pool.markForDeletion(id) }
+            if chomp.markedForDeletion {
+                effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            }
+            if chomp.action == .unloadChain || chomp.markedForDeletion {
+                deliveryLog.append(effectRouter.deliver(to: pool))
+            }
             effectLog.append(
                 SM64ChainChompObjectEffectRecord(
                     objectID: id,
@@ -145,7 +162,8 @@ final class SM64ChainChompObjectBridge {
 
         guard let index = segmentIndex[id], let record = pool.record(for: id), let parent = record.parent as SM64ObjectID?, let state = states[parent] else { return }
         if state.action == .unloadChain {
-            _ = pool.markForDeletion(id)
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
             effectLog.append(SM64ChainChompObjectEffectRecord(objectID: id, kind: .segment, index: index, effects: [.unload, .markForDeletion], action: nil, markedForDeletion: true))
             return
         }

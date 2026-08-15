@@ -2,13 +2,12 @@
 
 ## Status
 
-M18al is the latest validated checkpoint: Boo and Whomp deletion are delivered
-through the owner-thread effect router, with bridge-level tests forcing each
-actor through scheduler unload and verifying the routed deletion result. The
-independent Boo/Whomp Swift/C fingerprints remain `0x7505d05143270ec7` and
-`0x672073b350af199a`; the corrected composite harness, strict focused
-contracts, full 131-script matrix, and regenerated native Debug build pass.
-M18ak remains the preceding validated Spiny/router-harness checkpoint. M0–M17 local scopes remain complete
+M18am is the latest validated checkpoint: every audited object bridge deletion
+and transient-child retirement now crosses the common owner-thread effect
+router; the direct bridge-side deletion audit is empty. The Boo/Whomp bridge
+assertions remain green, all focused fingerprints are unchanged, the corrected
+full 131-script matrix passes, and the regenerated native Debug build succeeds.
+M18al remains the preceding Boo/Whomp router-adoption checkpoint. M0–M17 local scopes remain complete
 for their bounded contracts; M18 is still open for remaining common-enemy/
 projectile families and complete collision/effect delivery. M19–M35 remain the ordered
 platform, NPC, boss, save, frontend, audio, renderer, Swift-6-safety,
@@ -805,6 +804,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M18aj: Goomba router adoption | Goomba regular and triplet-child deletion use the common owner-thread effect router while preserving respawn requests and parent flags. | Complete locally — `0xf2f6f39a90915ec3`, strict Swift 6/C contract, 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M18ak: Spiny/router harness adoption | Spiny deletion uses the common owner-thread effect router, and the Enemy Lakitu composite strict harness includes its router dependencies. | Complete locally — Spiny `0xf7737180e4f09b3f`, Goomba `0xf2f6f39a90915ec3`, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
 | M18al: Boo/Whomp router adoption | Boo and Whomp deletion paths use the common owner-thread effect router, and focused bridge tests prove routed deletion before scheduler unload. | Complete locally — Boo `0x7505d05143270ec7`, Whomp `0x672073b350af199a`, strict Swift 6/C contracts, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; remaining bridges and whole-engine routing remain open |
+| M18am: Complete bridge deletion router audit | Bird, Fly Guy, Chuckya, Heave Ho, Skeeter, Bully, Scuttlebug, Piranha Plant, Bob-omb, Moneybag, Pokey, Chain Chomp, Koopa shell, and Mr. I parent/child/transient deletion all route through the owner-thread effect sink. | Complete locally — direct bridge-side deletion audit empty; all unchanged focused Swift/C fingerprints, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; collision/effect presentation and Swift authority remain open |
 | M19: Platforms and hazards | Platforms, mechanisms, terrain hazards, water, lava, snow, wind, fire, and boulders match C. | Not started |
 | M20: NPCs/races/puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | Not started |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |

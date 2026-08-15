@@ -26,14 +26,20 @@ final class SM64HeaveHoObjectBridge {
     static let defaultModel: UInt32 = 0x59 // MODEL_HEAVE_HO
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64HeaveHoState] = [:]
     private var throwChildren: [SM64ObjectID: SM64HeaveHoThrowChildState] = [:]
     private var parentForChild: [SM64ObjectID: SM64ObjectID] = [:]
     private var inputs: [SM64ObjectID: SM64HeaveHoTickInput] = [:]
     private(set) var effectLog: [SM64HeaveHoObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -120,6 +126,8 @@ final class SM64HeaveHoObjectBridge {
     ) -> SM64HeaveHoSchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -147,7 +155,10 @@ final class SM64HeaveHoObjectBridge {
             let result = SM64HeaveHoKernel.tick(input, state: &heaveHo)
             states[id] = heaveHo
             synchronizeRecord(id: id, state: heaveHo, pool: pool, previousAction: previousAction)
-            if heaveHo.markedForDeletion { _ = pool.markForDeletion(id) }
+            if heaveHo.markedForDeletion {
+                effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+                deliveryLog.append(effectRouter.deliver(to: pool))
+            }
             effectLog.append(
                 SM64HeaveHoObjectEffectRecord(
                     objectID: id,

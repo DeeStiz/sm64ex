@@ -35,6 +35,7 @@ final class SM64MrIObjectBridge {
     static let particleBehaviorIdentity: UInt64 = 0x6268_765F_6D72_70
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var eyes: [SM64ObjectID: SM64MrIState] = [:]
     private var bodies: [SM64ObjectID: SM64MrIBodyState] = [:]
     private var particles: [SM64ObjectID: SM64MrIParticleState] = [:]
@@ -43,8 +44,15 @@ final class SM64MrIObjectBridge {
     private var particleInputs: [SM64ObjectID: SM64MrIParticleTickInput] = [:]
     private var particleFlashEyes: Set<SM64ObjectID> = []
     private(set) var effectLog: [SM64MrIObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) { self.scheduler = scheduler }
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
+        self.scheduler = scheduler
+        self.effectRouter = effectRouter
+    }
 
     var registeredIDs: [SM64ObjectID] {
         (Array(eyes.keys) + Array(bodies.keys) + Array(particles.keys)).sorted { lhs, rhs in
@@ -145,6 +153,8 @@ final class SM64MrIObjectBridge {
         particleInputs = frameParticleInputs
         particleFlashEyes.removeAll(keepingCapacity: true)
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
@@ -201,7 +211,8 @@ final class SM64MrIObjectBridge {
                    behaviorIdentity: 0x6268_765F_6D72_63,
                    parent: id
                ) {
-                _ = pool.markForDeletion(coin)
+                effectRouter.enqueue(objectID: coin, kind: .markForDeletion)
+                deliveryLog.append(effectRouter.deliver(to: pool))
                 children.append(coin)
             }
             if result.effects.contains(.star),
@@ -211,10 +222,14 @@ final class SM64MrIObjectBridge {
                    behaviorIdentity: 0x6268_765F_7374_72,
                    parent: id
                ) {
-                _ = pool.markForDeletion(star)
+                effectRouter.enqueue(objectID: star, kind: .markForDeletion)
+                deliveryLog.append(effectRouter.deliver(to: pool))
                 children.append(star)
             }
-            if eye.markedForDeletion { _ = pool.markForDeletion(id) }
+            if eye.markedForDeletion {
+                effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+                deliveryLog.append(effectRouter.deliver(to: pool))
+            }
             effectLog.append(
                 SM64MrIObjectEffectRecord(
                     objectID: id,
@@ -233,7 +248,8 @@ final class SM64MrIObjectBridge {
             guard let eyeID = eyeForBody[id], let eye = eyes[eyeID] else {
                 body.markedForDeletion = true
                 bodies[id] = body
-                _ = pool.markForDeletion(id)
+                effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+                deliveryLog.append(effectRouter.deliver(to: pool))
                 return
             }
             let result = SM64MrIKernel.tickBody(
@@ -249,7 +265,10 @@ final class SM64MrIObjectBridge {
             )
             bodies[id] = body
             synchronizeBody(id: id, state: body, pool: pool)
-            if body.markedForDeletion { _ = pool.markForDeletion(id) }
+            if body.markedForDeletion {
+                effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+                deliveryLog.append(effectRouter.deliver(to: pool))
+            }
             effectLog.append(
                 SM64MrIObjectEffectRecord(
                     objectID: id,
@@ -276,14 +295,18 @@ final class SM64MrIObjectBridge {
                     behaviorIdentity: 0x6268_765F_707572,
                     parent: id
                 ) {
-                    _ = pool.markForDeletion(child)
+                    effectRouter.enqueue(objectID: child, kind: .markForDeletion)
+                    deliveryLog.append(effectRouter.deliver(to: pool))
                     children.append(child)
                 }
             }
         }
         particles[id] = particle
         synchronizeParticle(id: id, state: particle, pool: pool)
-        if particle.markedForDeletion { _ = pool.markForDeletion(id) }
+        if particle.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64MrIObjectEffectRecord(
                 objectID: id,

@@ -33,14 +33,20 @@ final class SM64SkeeterObjectBridge {
     ]
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64SkeeterState] = [:]
     private var waveStates: [SM64ObjectID: SM64SkeeterWaveState] = [:]
     private var inputs: [SM64ObjectID: SM64SkeeterTickInput] = [:]
     private var currentFrame: UInt64 = 0
     private(set) var effectLog: [SM64SkeeterObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -123,6 +129,8 @@ final class SM64SkeeterObjectBridge {
     ) -> SM64SkeeterSchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         currentFrame = engineState.globals.frame &+ 1
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
@@ -147,7 +155,10 @@ final class SM64SkeeterObjectBridge {
             wave.tick(globalFrame: currentFrame)
             waveStates[id] = wave
             synchronizeWave(id: id, state: wave, pool: pool)
-            if wave.markedForDeletion { _ = pool.markForDeletion(id) }
+            if wave.markedForDeletion {
+                effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+                deliveryLog.append(effectRouter.deliver(to: pool))
+            }
             effectLog.append(
                 SM64SkeeterObjectEffectRecord(
                     objectID: id,
@@ -187,7 +198,10 @@ final class SM64SkeeterObjectBridge {
 
         states[id] = skeeter
         synchronizeSkeeter(id: id, state: skeeter, pool: pool, previousAction: previousAction)
-        if skeeter.markedForDeletion { _ = pool.markForDeletion(id) }
+        if skeeter.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64SkeeterObjectEffectRecord(
                 objectID: id,

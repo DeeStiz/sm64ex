@@ -27,13 +27,21 @@ final class SM64FlyGuyObjectBridge {
     static let flameModel: UInt32 = 0xCB // MODEL_RED_FLAME_SHADOW
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64FlyGuyState] = [:]
     private var flames: [SM64ObjectID: SM64FlyGuyFlameState] = [:]
     private var parentForFlame: [SM64ObjectID: SM64ObjectID] = [:]
     private var inputs: [SM64ObjectID: SM64FlyGuyTickInput] = [:]
     private(set) var effectLog: [SM64FlyGuyObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) { self.scheduler = scheduler }
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
+        self.scheduler = scheduler
+        self.effectRouter = effectRouter
+    }
 
     var registeredIDs: [SM64ObjectID] {
         (Array(states.keys) + Array(flames.keys)).sorted { lhs, rhs in
@@ -94,6 +102,8 @@ final class SM64FlyGuyObjectBridge {
     ) -> SM64FlyGuySchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -153,7 +163,10 @@ final class SM64FlyGuyObjectBridge {
         let result = SM64FlyGuyKernel.tickFlame(parent: parent, state: &flame)
         flames[id] = flame
         synchronizeFlame(id: id, state: flame, pool: pool)
-        if flame.markedForDeletion { _ = pool.markForDeletion(id) }
+        if flame.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(
             SM64FlyGuyObjectEffectRecord(
                 objectID: id,

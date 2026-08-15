@@ -16,6 +16,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ObjectTransform.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineState.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectScheduler.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompRelease.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
   "$PROJECT_ROOT/SM64Modern/BullyEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BullyObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_bully_object_bridge_smoke.swift" \

@@ -21,12 +21,18 @@ final class SM64BullyObjectBridge {
     static let defaultModel: UInt32 = 0x6A // MODEL_BULLY
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64BullyState] = [:]
     private var inputs: [SM64ObjectID: SM64BullyTickInput] = [:]
     private(set) var effectLog: [SM64BullyObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -117,6 +123,8 @@ final class SM64BullyObjectBridge {
     ) -> SM64BullySchedulerTickResult {
         inputs = frameInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -139,7 +147,8 @@ final class SM64BullyObjectBridge {
         states[id] = bully
         synchronizeRecord(id: id, state: bully, pool: pool, previousAction: previousAction)
         if bully.markedForDeletion {
-            _ = pool.markForDeletion(id)
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
         }
         effectLog.append(
             SM64BullyObjectEffectRecord(

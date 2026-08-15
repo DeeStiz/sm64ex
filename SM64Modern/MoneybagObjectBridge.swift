@@ -26,13 +26,21 @@ final class SM64MoneybagObjectBridge {
     static let hiddenBehaviorIdentity: UInt64 = 0x6268_765F_686964
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var moneybags: [SM64ObjectID: SM64MoneybagState] = [:]
     private var hiddenCoins: [SM64ObjectID: SM64MoneybagHiddenState] = [:]
     private var inputs: [SM64ObjectID: SM64MoneybagTickInput] = [:]
     private var hiddenInputs: [SM64ObjectID: SM64MoneybagHiddenTickInput] = [:]
     private(set) var effectLog: [SM64MoneybagObjectEffectRecord] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) { self.scheduler = scheduler }
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
+        self.scheduler = scheduler
+        self.effectRouter = effectRouter
+    }
 
     var registeredIDs: [SM64ObjectID] {
         (Array(moneybags.keys) + Array(hiddenCoins.keys)).sorted { lhs, rhs in
@@ -150,6 +158,8 @@ final class SM64MoneybagObjectBridge {
     ) -> SM64MoneybagSchedulerTickResult {
         inputs = frameInputs; hiddenInputs = frameHiddenInputs
         effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
@@ -199,7 +209,10 @@ final class SM64MoneybagObjectBridge {
         }
         if result.effects.contains(.mist),
            let child = spawnTransient(model: Self.mistModel, behaviorIdentity: 0x6268_765F_6D6973, parent: id, pool: pool) { children.append(child) }
-        if state.markedForDeletion { _ = pool.markForDeletion(id) }
+        if state.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
         effectLog.append(SM64MoneybagObjectEffectRecord(objectID: id, kind: false, action: state.action.rawValue, effects: result.effects, spawnedChildren: children, markedForDeletion: state.markedForDeletion))
     }
 
@@ -221,7 +234,8 @@ final class SM64MoneybagObjectBridge {
 
     private func spawnTransient(model: UInt32, behaviorIdentity: UInt64, parent: SM64ObjectID, pool: SM64ObjectPool) -> SM64ObjectID? {
         guard let child = try? pool.spawn(in: .unimportant, model: model, behaviorIdentity: behaviorIdentity, parent: parent) else { return nil }
-        _ = pool.markForDeletion(child)
+        effectRouter.enqueue(objectID: child, kind: .markForDeletion)
+        deliveryLog.append(effectRouter.deliver(to: pool))
         return child
     }
 
