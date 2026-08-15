@@ -18,6 +18,7 @@
 		06B21ABCF7AFF06DB919000C /* TTCMovingBarBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804D686AFFB6AA968F51DEE /* TTCMovingBarBehavior.swift */; };
 		08F7D30BD0D76407E02ED406 /* MoneybagObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6490BF062BC1F8E0961D2B4 /* MoneybagObjectBridge.swift */; };
 		09C260568C8A5ECD27002AC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */; };
+		0B293D835010C91F6939BB5C /* RacingPenguinPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4840C223F4AFD7C0B36D74C /* RacingPenguinPath.swift */; };
 		0C110C47F377370F18974E8D /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */; };
 		0FAB9AF89873C70EE4547AB5 /* ProgressionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 322C784FFE351A6135FA2ECE /* ProgressionRuntime.swift */; };
 		0FB0244A4299B42C2708E41F /* MrIEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BFB8BBA80617F7A115E9E6 /* MrIEnemy.swift */; };
@@ -351,6 +352,7 @@
 		BB40062F0B74B53B43A517BA /* EngineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineState.swift; sourceTree = "<group>"; };
 		C04B8FC7D6A5B7B768EA99CF /* MarioSwimmingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSwimmingAction.swift; sourceTree = "<group>"; };
 		C23B165EA0ECBB7202A73BB8 /* MarioBrakingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioBrakingAction.swift; sourceTree = "<group>"; };
+		C4840C223F4AFD7C0B36D74C /* RacingPenguinPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RacingPenguinPath.swift; sourceTree = "<group>"; };
 		C6F47456E9B2F4A650F55D12 /* MarioSteepJump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSteepJump.swift; sourceTree = "<group>"; };
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
 		CA77F04AF689DCD409910BEE /* BooEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BooEnemy.swift; sourceTree = "<group>"; };
@@ -559,6 +561,7 @@
 				F201059126BC066BFF28F447 /* ProgressionState.swift */,
 				596D8EF20F09C73B0AFC37D3 /* RacingPenguinBehavior.swift */,
 				5FE7A3B1DDD9C35A23DE6E47 /* RacingPenguinObjectBridge.swift */,
+				C4840C223F4AFD7C0B36D74C /* RacingPenguinPath.swift */,
 				9C87D408A2A3E729C89C36C3 /* RacingPenguinRaceChildren.swift */,
 				F28F9F86BA8486D9F6BB005C /* RotatingPlatformBehavior.swift */,
 				28BA5E297BC57291B44A28B4 /* RouteShardExecution.swift */,
@@ -851,6 +854,7 @@
 				7FC210D0F220C0F3EC53E6B3 /* ProgressionState.swift in Sources */,
 				AA1E0D8AA06F9E83EFEB426F /* RacingPenguinBehavior.swift in Sources */,
 				A98FBF29A6F260B4883D8AFC /* RacingPenguinObjectBridge.swift in Sources */,
+				0B293D835010C91F6939BB5C /* RacingPenguinPath.swift in Sources */,
 				C51FA8AC1BCC4AEACB3EF387 /* RacingPenguinRaceChildren.swift in Sources */,
 				B4EB45CA367DED1BF59D3D99 /* RotatingPlatformBehavior.swift in Sources */,
 				2629A8504E963CF509456513 /* RouteShardExecution.swift in Sources */,

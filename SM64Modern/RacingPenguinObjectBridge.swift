@@ -11,6 +11,7 @@ struct SM64RacingPenguinEnvironment: Equatable, Sendable {
     let pathStatus: Int32
     let pathWaypointFlags: UInt32
     let pathTargetYaw: Int16
+    let pathWaypoints: [SM64RacingPenguinWaypoint]
     let animationAtEnd: Bool
     let finalAnimationAtEnd: Bool
     let canActivateFinalText: Bool
@@ -28,6 +29,7 @@ struct SM64RacingPenguinEnvironment: Equatable, Sendable {
         pathStatus: Int32 = SM64RacingPenguinBehavior.pathNone,
         pathWaypointFlags: UInt32 = 0,
         pathTargetYaw: Int16 = 0,
+        pathWaypoints: [SM64RacingPenguinWaypoint] = [],
         animationAtEnd: Bool = false,
         finalAnimationAtEnd: Bool = false,
         canActivateFinalText: Bool = false,
@@ -44,6 +46,7 @@ struct SM64RacingPenguinEnvironment: Equatable, Sendable {
         self.pathStatus = pathStatus
         self.pathWaypointFlags = pathWaypointFlags
         self.pathTargetYaw = pathTargetYaw
+        self.pathWaypoints = pathWaypoints
         self.animationAtEnd = animationAtEnd
         self.finalAnimationAtEnd = finalAnimationAtEnd
         self.canActivateFinalText = canActivateFinalText
@@ -66,6 +69,11 @@ struct SM64RacingPenguinObjectState: Equatable, Sendable {
     var weightedTargetSpeed: Float = 0
     var forwardVelocity: Float = 0
     var moveYaw: Int16 = 0
+    var pathWaypoints: [SM64RacingPenguinWaypoint] = []
+    var pathStartIndex = 0
+    var pathPreviousIndex = 0
+    var pathPreviousFlags: Int32 = 0
+    var pathInitialized = false
 }
 
 struct SM64RacingPenguinRaceChildIDs: Equatable, Sendable {
@@ -77,6 +85,7 @@ struct SM64RacingPenguinObjectEffect: Equatable, Sendable {
     let objectID: SM64ObjectID
     let output: SM64RacingPenguinOutput
     let raceChildren: SM64RacingPenguinRaceChildIDs?
+    let path: SM64RacingPenguinPathOutput?
 }
 
 struct SM64RacingPenguinSchedulerTickResult: Equatable, Sendable {
@@ -207,6 +216,25 @@ final class SM64RacingPenguinObjectBridge {
         let environment = environments[id] ?? SM64RacingPenguinEnvironment(
             marioPositionY: record.position.y
         )
+        var pathOutput: SM64RacingPenguinPathOutput?
+        var pathStatus = environment.pathStatus
+        var pathWaypointFlags = environment.pathWaypointFlags
+        var pathTargetYaw = environment.pathTargetYaw
+        if state.pathInitialized, !state.pathWaypoints.isEmpty {
+            let result = SM64RacingPenguinPath.update(
+                SM64RacingPenguinPathInput(
+                    waypoints: state.pathWaypoints,
+                    startIndex: state.pathStartIndex,
+                    previousIndex: state.pathPreviousIndex,
+                    previousFlags: state.pathPreviousFlags,
+                    position: record.position
+                )
+            )
+            pathOutput = result
+            pathStatus = result.status
+            pathWaypointFlags = UInt32(bitPattern: result.previousFlags)
+            pathTargetYaw = result.targetYaw
+        }
         let output = SM64RacingPenguinBehavior.update(
             SM64RacingPenguinInput(
                 action: state.action,
@@ -217,9 +245,9 @@ final class SM64RacingPenguinObjectBridge {
                 canActivateInitialText: environment.canActivateInitialText,
                 initialDialogResponse: environment.initialDialogResponse,
                 raceBeginComplete: environment.raceBeginComplete,
-                pathStatus: environment.pathStatus,
-                pathWaypointFlags: environment.pathWaypointFlags,
-                pathTargetYaw: environment.pathTargetYaw,
+                pathStatus: pathStatus,
+                pathWaypointFlags: pathWaypointFlags,
+                pathTargetYaw: pathTargetYaw,
                 moveFlags: record.moveFlags,
                 animationAtEnd: environment.animationAtEnd,
                 finalAnimationAtEnd: environment.finalAnimationAtEnd,
@@ -238,6 +266,19 @@ final class SM64RacingPenguinObjectBridge {
         var children = raceChildren[id]
         if output.attachRaceObjects, children == nil {
             children = attachRaceObjects(parent: id, pool: pool)
+        }
+
+        if output.initializePath {
+            if !environment.pathWaypoints.isEmpty {
+                state.pathWaypoints = environment.pathWaypoints
+            }
+            state.pathStartIndex = 0
+            state.pathPreviousIndex = 0
+            state.pathPreviousFlags = 0
+            state.pathInitialized = !state.pathWaypoints.isEmpty
+        } else if let pathOutput {
+            state.pathPreviousIndex = pathOutput.previousIndex
+            state.pathPreviousFlags = pathOutput.previousFlags
         }
 
         state.action = output.action
@@ -268,7 +309,8 @@ final class SM64RacingPenguinObjectBridge {
             SM64RacingPenguinObjectEffect(
                 objectID: id,
                 output: output,
-                raceChildren: children
+                raceChildren: children,
+                path: pathOutput
             )
         )
     }
