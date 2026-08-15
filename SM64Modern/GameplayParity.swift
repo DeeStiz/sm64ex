@@ -1,4 +1,5 @@
 import Foundation
+import Darwin
 import os
 
 private let parityLogger = Logger(subsystem: "io.github.deestiz.sm64modern", category: "GameplayParity")
@@ -30,7 +31,11 @@ private let parityTraceRead: @convention(c) (
     return coordinator.read(record: record)
 }
 
-final class GameplayParityCoordinator: @unchecked Sendable {
+/// Engine-owner-thread parity session. The mutable trace handle and C parity
+/// API are driven only by the engine thread; the stream callbacks are the
+/// narrow unsafe ABI leaf recovered from the C-owned context pointer.
+final class GameplayParityCoordinator {
+    private let ownerThreadIdentity: UInt64
     private let mode: SM64ModernGameplayParityMode
     private let traceURL: URL
     private let handle: FileHandle
@@ -55,6 +60,12 @@ final class GameplayParityCoordinator: @unchecked Sendable {
         promoteAfterShadow: Bool,
         swiftAuthorityTicks: UInt64?
     ) {
+        var ownerThreadIdentity: UInt64 = 0
+        precondition(
+            pthread_threadid_np(nil, &ownerThreadIdentity) == 0,
+            "pthread_threadid_np must produce an owner token"
+        )
+        self.ownerThreadIdentity = ownerThreadIdentity
         self.mode = mode
         self.traceURL = traceURL
         self.handle = handle
@@ -63,6 +74,18 @@ final class GameplayParityCoordinator: @unchecked Sendable {
         self.swiftSubsystems = swiftSubsystems
         self.promoteAfterShadow = promoteAfterShadow
         self.swiftAuthorityTicks = swiftAuthorityTicks
+    }
+
+    private func assertOwnerThread() {
+        var currentThreadIdentity: UInt64 = 0
+        precondition(
+            pthread_threadid_np(nil, &currentThreadIdentity) == 0,
+            "pthread_threadid_np must produce an owner token"
+        )
+        precondition(
+            currentThreadIdentity == ownerThreadIdentity,
+            "GameplayParityCoordinator is engine-owner-thread-only"
+        )
     }
 
     static func beginFromEnvironment(
@@ -176,6 +199,7 @@ final class GameplayParityCoordinator: @unchecked Sendable {
     }
 
     private func begin(saveDirectory: String) -> SM64ModernStatus {
+        assertOwnerThread()
         var status = sm64_modern_get_gameplay_parity_api(
             SM64_MODERN_ABI_VERSION_1,
             UInt32(MemoryLayout<SM64ModernGameplayParityApiV1>.size),
@@ -242,6 +266,7 @@ final class GameplayParityCoordinator: @unchecked Sendable {
     }
 
     func handleTickBoundary(step: UInt64) -> (status: SM64ModernStatus, shouldStop: Bool) {
+        assertOwnerThread()
         if let promotionStep, let swiftAuthorityTicks,
            step >= promotionStep + swiftAuthorityTicks {
             let evidence = gameplayService.evidence()
@@ -290,6 +315,7 @@ final class GameplayParityCoordinator: @unchecked Sendable {
     }
 
     func endAndReport() -> SM64ModernStatus {
+        assertOwnerThread()
         guard sessionActive else { return SM64_MODERN_STATUS_OK }
         let status = api.end_session()
         sessionActive = false
@@ -330,6 +356,7 @@ final class GameplayParityCoordinator: @unchecked Sendable {
     }
 
     fileprivate func write(record: UnsafePointer<SM64ModernGameplayTraceRecordV1>) -> SM64ModernStatus {
+        assertOwnerThread()
         do {
             try handle.write(contentsOf: Data(bytes: record, count: MemoryLayout<SM64ModernGameplayTraceRecordV1>.size))
             return SM64_MODERN_STATUS_OK
@@ -339,6 +366,7 @@ final class GameplayParityCoordinator: @unchecked Sendable {
     }
 
     fileprivate func read(record: UnsafeMutablePointer<SM64ModernGameplayTraceRecordV1>) -> SM64ModernStatus {
+        assertOwnerThread()
         do {
             let size = MemoryLayout<SM64ModernGameplayTraceRecordV1>.size
             guard let data = try handle.read(upToCount: size), !data.isEmpty else {
