@@ -296,6 +296,157 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | Not started |
 | M35: Distribution and human acceptance | Developer ID, notarized/stapled DMG and ZIP, clean-machine Gatekeeper launch, and fresh-save human 120-star acceptance pass. | Not started |
 
+## Detailed Work Breakdown
+
+This is the execution order for the remaining rewrite. A milestone is not
+closed by compiling a type or by a fixture-only smoke: each work package must
+produce a Swift-owned implementation, an independent C oracle contract, a
+replayable trace, and the platform evidence listed in its exit gate.
+
+### Phase A — finish the camera and gameplay substrate (M16i–M16k)
+
+1. **M16i: bounded camera and wall avoidance.** Add value descriptors for
+   clamp_positions_and_find_yaw, calc_avoid_yaw, the symmetric avoid-yaw
+   approach, coarse/fine wall probes, near-wall versus Mario-covered status,
+   camera-boundary filtering, and floor/ceiling geometry resolution. Exercise
+   positive/negative coordinates, yaw wrap, perpendicular-wall tie breaking,
+   stacked walls, no-wall, near-only, and cover cases. Exit only when the
+   Swift/C wall IDs, status flags, yaw, and pushed camera vectors match.
+2. **M16j: bounded-mode callbacks.** Port radial, outward-radial, parallel,
+   fixed, eight-direction, slide/hoot, cannon, boss, spiral-stairs, water
+   surface, and close-mode callback state as pure descriptors. Keep callback
+   lookup data-driven and preserve mode-specific distance/pitch/yaw clamps,
+   area-yaw changes, transition seeds, and camera sound intents.
+3. **M16k: camera closure.** Add cutscene shot/spline state, dialog-trigger
+   camera events, FOV presets, camera shake decay, whole-mode negative-
+   coordinate traces, and a C/Swift replay that traverses every camera mode.
+   Require a no-C-callback Swift camera tick in the owner-thread runtime before
+   advancing to actors.
+
+### Phase B — migrate every product-reachable actor (M17–M22)
+
+1. **M17 progression actors.** Define stable Swift actor schemas and event
+   reducers for stars, coins, red coins, lives, caps, cap switches, doors,
+   warps, cannons, checkpoints, secrets, and level-completion rewards. Port
+   spawn/despawn, collection persistence, interaction priority, animation/
+   sound/rumble/render intents, and save mutations. Differential routes must
+   cover fresh save, repeat collection, death/reload, warp, cap loss, and
+   multiplayer/demo inputs where the C build exposes them.
+2. **M18 common enemies and projectiles.** Port each behavior family from the
+   dispatch inventory: ground walkers, flyers, shells, fireballs, bombs,
+   goombas/koopas, piranha families, boos, bullies, water enemies, and
+   projectiles. Preserve behavior bytecode arguments, object-list ordering,
+   hitbox/interaction precedence, timers, random streams, and effect traces.
+3. **M19 platforms and hazards.** Port moving/rotating platforms, elevators,
+   seesaws, pendulums, lifts, water/lava/snow/quicksand volumes, wind/fire,
+   boulders, conveyors, poles, nets, and environmental damage. Verify dynamic
+   collision replacement and owner-thread surface reload after every spawn/
+   despawn path.
+4. **M20 NPC, races, and puzzles.** Port Toads, penguins, birds, rabbits,
+   MIPS, Lakitu, race timers, slide timers, red-coin puzzles, secrets,
+   switches, paintings, and course-specific puzzle controllers. Include
+   dialog IDs, camera requests, cutscene handoffs, and reward ownership.
+5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
+   Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
+   damage windows, boss music, reward stars, warp/ending transitions, and
+   death/retry paths. Require deterministic route shards for every boss phase.
+6. **M22 behavior coverage closure.** Generate a reachable behavior/callback
+   report from the US content pack. Every reachable behavior must point to a
+   Swift implementation; unmapped behavior, fallback callback, C-only state
+   mutation, or missing trace record is a hard failure. Freeze the behavior
+   inventory hash for qualification.
+
+### Phase C — replace all product systems (M23–M31)
+
+1. **M23 save system.** Implement the single Swift codec for slots, options,
+   checksum, byte order, atomic replacement, backup/recovery, corruption
+   handling, and C compatibility. Prove Swift-to-C-to-Swift and C-to-Swift-
+   to-C byte identity for every slot and mutation.
+2. **M24 configuration and cheats.** Port defaults, bindings, camera
+   settings, audio/video options, language, legal-ROM settings, cheats, and
+   invalid-value recovery. Keep engine authority immutable after launch and
+   prove restart-required C compatibility selection.
+3. **M25 HUD and dialogs.** Port power meter, star/coin/life counters, cap
+   icons, pause menu, dialogs, text layout, timers, fade state, and HUD
+   camera status. Compare fixed-width layout/render packets and dialog timing,
+   not only strings.
+4. **M26 front end.** Port title, file select, course select, demos, loading,
+   credits, ending, pause, and all transition/fade paths. Each screen must
+   boot, accept input, persist choices, and shut down without a C engine
+   callback.
+5. **M27 audio sequencing/loading.** Port banks, sequence tables, heaps,
+   channels, layers, note allocation, instrument lookup, sequence timing,
+   streaming, and load/unload boundaries. Compare pre-synthesis event traces
+   and allocation decisions before touching the mixer.
+6. **M28 audio synthesis/effects.** Port envelopes, pitch, resampling,
+   filters, reverb, mixing, music/effects priority, and 32-kHz output.
+   Compare PCM bit-for-bit over deterministic windows and keep AVAudio as the
+   only audited realtime leaf shim.
+7. **M29 display-list translation.** Decode every reachable display-list
+   command into immutable Swift scene packets, including textures, combine
+   modes, geometry modes, matrices, lights, fog, and render-layer ordering.
+   Compare packet bytes and resource IDs before Metal encoding.
+8. **M30 Goddard/Mario face.** Port face geometry, materials, animation,
+   eye/mouth state, cap/skin variants, lighting, and product-reachable
+   render callbacks. Verify front-end, gameplay, cutscene, and ending paths.
+9. **M31 whole-engine authority.** Wire title-to-shutdown through
+   SwiftEngineRuntime by default. Prove no Swift-mode gameplay, save, audio,
+   renderer, or shutdown path enters a C engine callback. Retain the C adapter
+   behind the restart-required selector and replay identical traces in both
+   modes.
+
+### Phase D — strict Swift 6 closure (M32)
+
+Audit every Unsafe pointer, pointer bridge, global, callback, actor
+annotation, and unchecked Sendable. Move mutable state behind the dedicated
+owner thread; make snapshots, trace records, content packs, and effect
+intents Sendable; replace accidental shared mutable storage with immutable
+copies or audited realtime rings. Build with Swift 6 language mode and
+complete strict-concurrency diagnostics, then run TSan/ASan/UBSan and the
+normal rebuild again. The only remaining unsafe boundary may be a documented
+AVAudio or Metal SDK leaf shim with an owner, lifetime, and thread proof.
+
+### Phase E — qualification and parity closure (M33)
+
+Generate route shards from the content/behavior inventory. The shard set must
+cover every course/area, star, red-coin route, enemy family, platform/hazard,
+NPC/puzzle, boss phase, camera mode, cutscene, menu, audio sequence, save
+mutation, and death/warp/retry path. For each shard:
+
+- run the same fixed input and initial-save trace through C and Swift;
+- compare schema-4 state, RNG, collision, camera, object, effect, render,
+  audio-event, PCM, and save records byte-for-byte;
+- reject missing/extra records and stop at the first divergent tick;
+- retain the input, content, build, timebase, and initial-save fingerprints;
+- rerun under normal, sanitizer, and optimized configurations.
+
+Close M33 only when the inventory has zero unexecuted reachable IDs and the
+full matrix is reproducible from isolated build/cache paths.
+
+### Phase F — Metal 4 production closure (M34)
+
+Load the Metal-specific porting skills before this phase. Replace any
+remaining legacy pipeline/resource path with Metal 4 descriptors, explicit
+resource usage, heaps/residency, barriers/events, and drawable presentation.
+Validate shader/pipeline archives, argument tables, texture formats, depth/
+stencil, MSAA, HDR/sRGB, resize, minimized windows, and device loss. Run
+Metal API validation, GPU capture, GPU debug inspection, and shader/resource
+validation. Capture real-layer screenshots and compare them to C reference
+packets. Prove 60/30 cadence, present-thread ownership, no display-link
+compilation, and clean shutdown under repeated resize/pause/resume.
+
+### Phase G — release and human acceptance (M35)
+
+Archive Release with the ordinary (non-beta) toolchain, Developer ID sign all
+code, notarize and staple both DMG and ZIP, and verify Gatekeeper on a clean
+machine. Rebuild once after sanitizer work. Test first launch with no
+content, legal-ROM import, invalid ROM, corrupt save, backup recovery,
+Swift/C selector restart, controller reconnect, audio device changes, and
+window/display changes. Finish with a fresh-save human 120-star pass covering
+normal gameplay, controls, camera feel, audio, haptics, visual parity, menus,
+credits, and ending. Record separate source/build/install/launch, physical,
+store, and human evidence; do not collapse them into one “passed” claim.
+
 ## Cross-Milestone Test Contract
 
 - Run focused Swift unit/property tests and C differential tests for every migrated domain.
