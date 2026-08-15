@@ -22,6 +22,7 @@
 		0FB0244A4299B42C2708E41F /* MrIEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BFB8BBA80617F7A115E9E6 /* MrIEnemy.swift */; };
 		0FF51E99A1537E8C64BD9839 /* MarioStationaryAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4FC5292003781121076585 /* MarioStationaryAction.swift */; };
 		1000A98A2958DA1238E20A6D /* EngineRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */; };
+		1142EE42E057A98B722C09BD /* BooEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA77F04AF689DCD409910BEE /* BooEnemy.swift */; };
 		11833E1637F8649E7554B9F6 /* DeterministicPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */; };
 		12FFA6069B5EABBA754D6DFF /* SurfaceCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135C103AE0705B71EBE54DC5 /* SurfaceCollision.swift */; };
 		139E7960DE4C5B3DA9CE17B8 /* AppleAudioRing.c in Sources */ = {isa = PBXBuildFile; fileRef = A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */; };
@@ -110,6 +111,7 @@
 		AA0B49BED7B13B398A2731F6 /* CoinScoreAges.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4872879FF660BB19A8FB4AC /* CoinScoreAges.swift */; };
 		AA11511562A943F3C8B9C98C /* MarioSlopeDeceleration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FF9C20F66B7B90ADA98EC0 /* MarioSlopeDeceleration.swift */; };
 		AA5279A05B7F71EC1A8B3965 /* MarioTurningAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94BED6B07789579D6D43B013 /* MarioTurningAction.swift */; };
+		AACD57508B2998F2000A2232 /* BooObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96CEA38FA4BFC38D3E850B6 /* BooObjectBridge.swift */; };
 		AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */ = {isa = PBXBuildFile; fileRef = 328470043E0C3F9278C1A80E /* AppleAudioService.m */; };
 		ACC2FB1D1A49430F7673E036 /* MarioMovePunchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595FCD866921E9B396C8E841 /* MarioMovePunchAction.swift */; };
 		ACE960B8863E817C3755E7CE /* BullyObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A04F268C62D7061D48BDE8CC /* BullyObjectBridge.swift */; };
@@ -300,6 +302,7 @@
 		C23B165EA0ECBB7202A73BB8 /* MarioBrakingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioBrakingAction.swift; sourceTree = "<group>"; };
 		C6F47456E9B2F4A650F55D12 /* MarioSteepJump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSteepJump.swift; sourceTree = "<group>"; };
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
+		CA77F04AF689DCD409910BEE /* BooEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BooEnemy.swift; sourceTree = "<group>"; };
 		CB4ABB8191E695DB49D9CF9E /* AppleAudioService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioService.h; sourceTree = "<group>"; };
 		CBE8B1473942F159FA54C7A8 /* CameraModeState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeState.swift; sourceTree = "<group>"; };
 		CC510DADD4B2F20AC7EA6B5A /* ScuttlebugObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScuttlebugObjectBridge.swift; sourceTree = "<group>"; };
@@ -319,6 +322,7 @@
 		E479D5A092A548EEA6715AA1 /* MarioDeceleratingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioDeceleratingAction.swift; sourceTree = "<group>"; };
 		E497FB3B17788DCEA3B3261F /* BirdObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirdObjectBridge.swift; sourceTree = "<group>"; };
 		E6490BF062BC1F8E0961D2B4 /* MoneybagObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneybagObjectBridge.swift; sourceTree = "<group>"; };
+		E96CEA38FA4BFC38D3E850B6 /* BooObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BooObjectBridge.swift; sourceTree = "<group>"; };
 		EA427ABCC49BED80322C10D5 /* MarioShellGroundAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioShellGroundAction.swift; sourceTree = "<group>"; };
 		EA95695B8D532F2B761602DE /* BulletBillObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulletBillObjectBridge.swift; sourceTree = "<group>"; };
 		EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneratedTrigTables.swift; sourceTree = "<group>"; };
@@ -353,6 +357,8 @@
 				E497FB3B17788DCEA3B3261F /* BirdObjectBridge.swift */,
 				60F74F1DC90A46BBEF7D28FE /* BobombEnemy.swift */,
 				406EDDE3B748218288E16122 /* BobombObjectBridge.swift */,
+				CA77F04AF689DCD409910BEE /* BooEnemy.swift */,
+				E96CEA38FA4BFC38D3E850B6 /* BooObjectBridge.swift */,
 				3B2DFA1C27E45B1D51C0A506 /* BulletBill.swift */,
 				EA95695B8D532F2B761602DE /* BulletBillObjectBridge.swift */,
 				B512E26120B9CF2080159F3C /* BullyEnemy.swift */,
@@ -614,6 +620,8 @@
 				9F843A73A64A5646F34206E5 /* BirdObjectBridge.swift in Sources */,
 				71832214A0EA82FFBAE64390 /* BobombEnemy.swift in Sources */,
 				E4DC22B427B7BADD0E429F67 /* BobombObjectBridge.swift in Sources */,
+				1142EE42E057A98B722C09BD /* BooEnemy.swift in Sources */,
+				AACD57508B2998F2000A2232 /* BooObjectBridge.swift in Sources */,
 				E1AE2DF359A0296B0EAA7E67 /* BulletBill.swift in Sources */,
 				E9D87E92CAED2015676448A6 /* BulletBillObjectBridge.swift in Sources */,
 				1656D9B55126D41EB7138D99 /* BullyEnemy.swift in Sources */,
