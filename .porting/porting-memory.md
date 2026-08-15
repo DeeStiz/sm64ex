@@ -1324,6 +1324,24 @@
   remaining mechanisms and hazards, effect delivery, and M20–M35 are still
   open.
 
+### M19h Completion Evidence
+
+- `SM64Modern/TTCElevatorBehavior.swift` is the value counterpart of
+  `bhv_ttc_elevator_init`/`bhv_ttc_elevator_update`: peak selection from the
+  high behavior parameter, the slow/fast/random/stopped speed table, random
+  pause/change ordering, gravity-before-position update, endpoint clamp, and
+  direction flip are explicit and pointer-free.
+- The independent C contract matches Swift at
+  `ttcElevatorFingerprint=0xf5fec77dc56be959`; slow, fast, stopped, random
+  pause/change, and endpoint paths are covered.
+- `script/test_ttc_elevator.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`. The full matrix target is
+  `runs=145 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 mechanism seam; platform ownership/collision,
+  remaining mechanisms and hazards, effect delivery, and M20–M35 are still
+  open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
