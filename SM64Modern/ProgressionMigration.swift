@@ -29,7 +29,7 @@ private let swiftProgressionRecordEvent: @convention(c) (
 /// mutation boundaries and persists a Swift shadow bundle for differential
 /// qualification before any gameplay authority cutover.
 final class SwiftProgressionMigrationService: @unchecked Sendable {
-    private let adapter: SM64OwnerThreadPersistenceAdapter
+    private let adapter: SM64OwnerThreadEEPROMAdapter
     private let ownerThreadToken: UInt64
     private var runtime: SM64ProgressionRuntime
     private var eventCount: UInt64 = 0
@@ -37,7 +37,7 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
 
     init(saveDirectory: String, ownerThreadToken: UInt64) throws {
         self.ownerThreadToken = ownerThreadToken
-        self.adapter = try SM64OwnerThreadPersistenceAdapter(
+        self.adapter = try SM64OwnerThreadEEPROMAdapter(
             rootURL: URL(fileURLWithPath: saveDirectory)
                 .appendingPathComponent("swift-progression", isDirectory: true),
             ownerThreadToken: ownerThreadToken
@@ -46,9 +46,11 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
     }
 
     func initialize() throws {
-        _ = try runtime.reloadFromBackup(
-            using: adapter, ownerThreadToken: ownerThreadToken
+        let loaded = try adapter.reload(
+            saveFileIndex: runtime.saveFileIndex,
+            ownerThreadToken: ownerThreadToken
         )
+        runtime.adoptPersistedSnapshots(save: loaded.save, menu: loaded.menu)
     }
 
     func makeAPI() -> SM64ModernProgressionMigrationApiV1 {
@@ -163,6 +165,7 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
         runtime.adoptPersistedSnapshots(save: snapshot.save, menu: snapshot.menu)
         do {
             try adapter.commit(
+                saveFileIndex: Int(event.save_file_index),
                 save: snapshot.save, menu: snapshot.menu,
                 ownerThreadToken: ownerThreadToken
             )
@@ -179,6 +182,7 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
         runtime.adoptPersistedSnapshots(save: snapshot.save, menu: snapshot.menu)
         do {
             try adapter.commit(
+                saveFileIndex: Int(event.save_file_index),
                 save: snapshot.save, menu: snapshot.menu,
                 ownerThreadToken: ownerThreadToken
             )

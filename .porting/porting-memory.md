@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M16 local Swift/C parity scopes are complete, and M17h is the current validated progression bridge slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M16 local Swift/C parity scopes are complete, and M17i is the current validated progression bridge slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -36,6 +36,21 @@
   and `git diff --check` is clean. This remains shadow/differential evidence:
   C is still the gameplay/save authority and no physical, visual, store, or
   human acceptance claim is implied.
+
+### M17i Completion Evidence
+
+- The live migration service now uses `SM64OwnerThreadEEPROMAdapter` and a
+  normalized 512-byte image: four primary SaveFile slots, four backup slots,
+  and shared primary/backup menu blocks. Persist/load/reload select an explicit
+  save-file index and replace the image atomically.
+- A legacy 176-byte M17 bundle is accepted as slot zero and upgraded on the
+  next image commit. The Swift/C EEPROM smoke matches
+  `progressionEEPROMFingerprint=0x3fac91b6c0a1f3cd`.
+- The full matrix passes with `runs=101 failures=0`; the isolated native Debug
+  build succeeds; and `git diff --check` is clean. This is still shadow
+  evidence: owner-thread route replay, object/effect ownership, Swift
+  authority, physical behavior, visual review, distribution, and human
+  acceptance remain open.
 
 ### M8b Completion Evidence
 
