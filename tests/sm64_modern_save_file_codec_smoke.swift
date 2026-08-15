@@ -55,6 +55,13 @@ enum SM64ModernSaveFileCodecSmoke {
             && decoded.courseStars == stars
             && decoded.courseCoinScores == scores)
 
+        let secretState = SM64ProgressionState(
+            flags: SM64ProgressionReducer.fileExists,
+            secretStars: 0x04
+        )
+        let secretSnapshot = SM64SaveFileCodec.snapshot(from: secretState)
+        precondition(secretSnapshot.flags & 0x0700_0000 == 0x0400_0000)
+
         var corruptPrimary = bytes
         corruptPrimary[20] ^= 0x01
         let backupRecovery = SM64SaveFileCodec.recover(

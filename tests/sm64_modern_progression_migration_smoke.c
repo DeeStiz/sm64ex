@@ -76,6 +76,29 @@ int main(void) {
            "event reward values");
     expect(gLastEvent.flags == 0x40u, "event flags");
 
+    expect(sm64_modern_progression_record_event(
+               SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+               0, 0, 0, -1, 0, 0, 0,
+               SM64_MODERN_PROGRESSION_SAVE_MUTATION_STARS)
+               == SM64_MODERN_STATUS_OK,
+           "mutation callback");
+    expect(gCallbackCount == 2
+               && gLastEvent.event_kind
+                   == SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+           "mutation event kind");
+    expect(sm64_modern_progression_record_event(
+               SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION + 1u,
+               0, 0, 0, -1, 0, 0, 0, 0)
+               == SM64_MODERN_STATUS_INVALID_ARGUMENT,
+           "unknown event kind");
+    expect(sm64_modern_progression_migration_status()
+               == SM64_MODERN_STATUS_INVALID_ARGUMENT,
+           "unknown event latch");
+    sm64_modern_uninstall_progression_migration_api();
+    expect(sm64_modern_install_progression_migration_api(&api)
+               == SM64_MODERN_STATUS_OK,
+           "reinstall after invalid event");
+
     gCallbackStatus = SM64_MODERN_STATUS_PLATFORM_ERROR;
     expect(sm64_modern_progression_record_event(
                SM64_MODERN_PROGRESSION_EVENT_SAVE_PERSIST,

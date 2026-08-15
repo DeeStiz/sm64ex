@@ -31,18 +31,21 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
     private(set) var actor: SM64ProgressionActorState
     private(set) var progression: SM64ProgressionState
     private(set) var menuAges: SM64CoinScoreAgeState
+    private(set) var soundMode: UInt16
     private(set) var saveFileIndex: Int
 
     init(
         actor: SM64ProgressionActorState = .init(),
         progression: SM64ProgressionState = .init(),
         menuAges: SM64CoinScoreAgeState = .init(),
+        soundMode: UInt16 = 0,
         saveFileIndex: Int = 0
     ) {
         precondition((0..<SM64CoinScoreAgeState.fileCount).contains(saveFileIndex))
         self.actor = actor
         self.progression = progression
         self.menuAges = menuAges
+        self.soundMode = soundMode
         self.saveFileIndex = saveFileIndex
     }
 
@@ -102,7 +105,35 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
     }
 
     func menuSnapshot() -> SM64MenuDataSnapshot {
-        SM64MenuDataCodec.snapshot(from: menuAges)
+        var snapshot = SM64MenuDataCodec.snapshot(from: menuAges)
+        snapshot.soundMode = soundMode
+        return snapshot
+    }
+
+    /// Replaces persisted fields from a canonical C snapshot after a live
+    /// save boundary. Transient course/actor routing stays under the owner
+    /// thread's event policy; dirty bits are cleared only after the caller has
+    /// accepted these bytes as the new durable source.
+    mutating func adoptPersistedSnapshots(
+        save: SM64SaveFileSnapshot,
+        menu: SM64MenuDataSnapshot
+    ) {
+        progression.flags = save.flags & 0x00FF_FFFF
+        progression.secretStars = UInt8((save.flags >> 24) & 0x7F)
+        progression.courseStars = save.courseStars
+        progression.courseCoinScores = save.courseCoinScores
+        progression.capLevel = save.capLevel
+        progression.capArea = save.capArea
+        progression.capPosition = .init(
+            x: Float(save.capPosition.x),
+            y: Float(save.capPosition.y),
+            z: Float(save.capPosition.z)
+        )
+        progression.saveModified = false
+        menuAges = SM64CoinScoreAgeState(
+            ages: menu.coinScoreAges, modified: false
+        )
+        soundMode = menu.soundMode
     }
 
     @discardableResult
@@ -144,6 +175,8 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
     ) throws -> SM64PersistenceLoadResult {
         let loaded = try adapter.reload(ownerThreadToken: ownerThreadToken)
         progression.flags = loaded.save.flags
+        progression.secretStars = UInt8((loaded.save.flags >> 24) & 0x7F)
+        progression.flags &= 0x00FF_FFFF
         progression.courseStars = loaded.save.courseStars
         progression.courseCoinScores = loaded.save.courseCoinScores
         progression.capLevel = loaded.save.capLevel
@@ -157,6 +190,7 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
         menuAges = SM64CoinScoreAgeState(
             ages: loaded.menu.coinScoreAges, modified: false
         )
+        soundMode = loaded.menu.soundMode
         actor = .init()
         return loaded
     }

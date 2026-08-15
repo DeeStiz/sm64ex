@@ -15,4 +15,14 @@ SM64ModernStatus sm64_modern_progression_record_event(
     uint32_t flags);
 SM64ModernStatus sm64_modern_progression_migration_active_status(void);
 
+// Reads the current canonical C slots synchronously on the lifecycle owner
+// thread. The helper emits normalized little-endian bytes so Swift can reuse
+// the existing checksum/recovery codecs even before C recomputes signatures.
+SM64ModernStatus sm64_modern_progression_read_snapshot(
+    uint32_t save_file_index,
+    uint8_t *save_bytes,
+    uint32_t save_capacity,
+    uint8_t *menu_bytes,
+    uint32_t menu_capacity);
+
 #endif // SM64_MODERN_PROGRESSION_MIGRATION_H

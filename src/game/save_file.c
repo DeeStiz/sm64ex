@@ -20,6 +20,10 @@
 #define SAVE_FILE_MAGIC 0x4441
 
 STATIC_ASSERT(sizeof(struct SaveBuffer) == EEPROM_SIZE, "eeprom buffer size must match");
+STATIC_ASSERT(sizeof(struct SaveFile) == SM64_MODERN_SAVE_FILE_BYTE_COUNT,
+              "Swift save snapshot size must match C SaveFile");
+STATIC_ASSERT(sizeof(struct MainMenuSaveData) == SM64_MODERN_MENU_DATA_BYTE_COUNT,
+              "Swift menu snapshot size must match C MainMenuSaveData");
 
 extern struct SaveBuffer gSaveBuffer;
 
@@ -222,6 +226,69 @@ static void add_save_block_signature(void *buffer, s32 size, u16 magic) {
     sig->chksum = calc_checksum(buffer, size);
 }
 
+static void sm64_modern_write_u16(u8 *destination, u16 value) {
+    destination[0] = (u8) (value & 0xFFu);
+    destination[1] = (u8) (value >> 8u);
+}
+
+static void sm64_modern_write_u32(u8 *destination, u32 value) {
+    for (u32 byte = 0; byte < 4u; ++byte) {
+        destination[byte] = (u8) (value >> (byte * 8u));
+    }
+}
+
+static void sm64_modern_encode_save_snapshot(
+    const struct SaveFile *save, u8 *destination) {
+    destination[0] = save->capLevel;
+    destination[1] = save->capArea;
+    sm64_modern_write_u16(destination + 2, (u16) save->capPos[0]);
+    sm64_modern_write_u16(destination + 4, (u16) save->capPos[1]);
+    sm64_modern_write_u16(destination + 6, (u16) save->capPos[2]);
+    sm64_modern_write_u32(destination + 8, save->flags);
+    bcopy(save->courseStars, destination + 12, COURSE_COUNT);
+    bcopy(save->courseCoinScores, destination + 12 + COURSE_COUNT,
+          COURSE_STAGES_COUNT);
+    sm64_modern_write_u16(destination + 52, SAVE_FILE_MAGIC);
+    sm64_modern_write_u16(destination + 54, calc_checksum(
+        destination, SM64_MODERN_SAVE_FILE_BYTE_COUNT));
+}
+
+static void sm64_modern_encode_menu_snapshot(
+    const struct MainMenuSaveData *menu, u8 *destination) {
+    for (u32 index = 0; index < NUM_SAVE_FILES; ++index) {
+        sm64_modern_write_u32(destination + index * 4u, menu->coinScoreAges[index]);
+    }
+    sm64_modern_write_u16(destination + 16, menu->soundMode);
+#ifdef VERSION_EU
+    // The native full-Swift goal targets US; preserve EU language bytes in the
+    // filler region rather than silently dropping them in the shared helper.
+    sm64_modern_write_u16(destination + 18, menu->language);
+    bcopy(menu->filler, destination + 20, sizeof(menu->filler));
+#else
+    bcopy(menu->filler, destination + 18, sizeof(menu->filler));
+#endif
+    sm64_modern_write_u16(destination + 28, MENU_DATA_MAGIC);
+    sm64_modern_write_u16(destination + 30, calc_checksum(
+        destination, SM64_MODERN_MENU_DATA_BYTE_COUNT));
+}
+
+SM64ModernStatus sm64_modern_progression_read_snapshot(
+    uint32_t save_file_index,
+    uint8_t *save_bytes,
+    uint32_t save_capacity,
+    uint8_t *menu_bytes,
+    uint32_t menu_capacity) {
+    if (save_file_index >= NUM_SAVE_FILES || !save_bytes || !menu_bytes
+        || save_capacity < SM64_MODERN_SAVE_FILE_BYTE_COUNT
+        || menu_capacity < SM64_MODERN_MENU_DATA_BYTE_COUNT) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    sm64_modern_encode_save_snapshot(
+        &gSaveBuffer.files[save_file_index][0], save_bytes);
+    sm64_modern_encode_menu_snapshot(&gSaveBuffer.menuData[0], menu_bytes);
+    return SM64_MODERN_STATUS_OK;
+}
+
 /**
  * Copy main menu data from one backup slot to the other slot.
  */
@@ -404,6 +471,10 @@ void save_file_erase(s32 fileIndex) {
 
     gSaveFileModified = TRUE;
     record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) fileIndex);
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+        (u32) fileIndex, 0, 0, -1, 0, 0, 0,
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_ERASE);
     save_file_do_save(fileIndex);
 }
 
@@ -421,6 +492,10 @@ BAD_RETURN(s32) save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
 
     gSaveFileModified = TRUE;
     record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) destFileIndex);
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+        (u32) destFileIndex, 0, 0, -1, 0, 0, 0,
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_COPY);
     save_file_do_save(destFileIndex);
 }
 
@@ -642,6 +717,11 @@ void save_file_set_flags(u32 flags) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
+        0, 0, -1, 0, 0, 0,
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_FLAGS);
 }
 
 void save_file_clear_flags(u32 flags) {
@@ -654,6 +734,11 @@ void save_file_clear_flags(u32 flags) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
+        0, 0, -1, 0, 0, 0,
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_FLAGS);
 }
 
 u32 save_file_get_flags(void) {
@@ -702,6 +787,12 @@ void save_file_set_star_flags(s32 fileIndex, s32 courseIndex, u32 starFlags) {
     gSaveBuffer.files[fileIndex][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
     record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) fileIndex);
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+        (u32) fileIndex,
+        (u32) (courseIndex >= 0 ? courseIndex + 1 : 0),
+        0, -1, 0, 0, 0,
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_STARS);
 }
 
 s32 save_file_get_course_coin_score(s32 fileIndex, s32 courseIndex) {
@@ -728,6 +819,11 @@ void save_file_set_cannon_unlocked(void) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
+        (u32) gCurrCourseNum, 0, -1, 0, 0, 0,
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_CANNON);
 }
 
 void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
@@ -743,6 +839,11 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
+        0, 0, -1, 0, 0, 0,
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_CAP);
 }
 
 s32 save_file_get_cap_pos(Vec3s capPos) {
@@ -769,6 +870,11 @@ void save_file_set_sound_mode(u16 mode) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
+    sm64_modern_progression_record_event(
+        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+        (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
+        0, 0, -1, 0, 0, 0,
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_MENU);
 }
 
 u16 save_file_get_sound_mode(void) {

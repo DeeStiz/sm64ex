@@ -115,6 +115,8 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
                 event: event,
                 requiresCourse: true
             )
+        case SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION:
+            status = recordMutation(event: event)
         case SM64_MODERN_PROGRESSION_EVENT_SAVE_PERSIST:
             status = persist(event: event)
         case SM64_MODERN_PROGRESSION_EVENT_SAVE_LOAD,
@@ -131,7 +133,7 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
         event: SM64ModernProgressionEventV1,
         requiresCourse: Bool
     ) -> SM64ModernStatus {
-        if requiresCourse {
+        if requiresCourse && event.course_number != 0 {
             guard runtime.selectCourse(Int(event.course_number)) else {
                 return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, message: "course")
             }
@@ -147,47 +149,88 @@ final class SwiftProgressionMigrationService: @unchecked Sendable {
                 | (UInt32(result.progressionEffects.rawValue) << 16),
             values: result.trace.values
         )
-        return SM64_MODERN_STATUS_OK
+        return recordSnapshot(event: event, flags: 0)
+    }
+
+    private func recordMutation(event: SM64ModernProgressionEventV1) -> SM64ModernStatus {
+        recordSnapshot(event: event, flags: event.flags)
     }
 
     private func persist(event: SM64ModernProgressionEventV1) -> SM64ModernStatus {
+        guard let snapshot = readSnapshot(fileIndex: Int(event.save_file_index)) else {
+            return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "persist_snapshot")
+        }
+        runtime.adoptPersistedSnapshots(save: snapshot.save, menu: snapshot.menu)
         do {
-            _ = try runtime.commitIfNeeded(
-                using: adapter, ownerThreadToken: ownerThreadToken
+            try adapter.commit(
+                save: snapshot.save, menu: snapshot.menu,
+                ownerThreadToken: ownerThreadToken
             )
         } catch {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "persist")
         }
-        let saveBytes = SM64SaveFileCodec.encode(runtime.saveSnapshot())
-        let menuBytes = SM64MenuDataCodec.encode(runtime.menuSnapshot())
-        recordOracle(
-            event: event,
-            recordKind: SM64_MODERN_ORACLE_RECORD_SAVE_BYTES,
-            flags: 0,
-            values: [
-                hash(bytes: saveBytes), hash(bytes: menuBytes), eventCount
-            ]
-        )
-        return SM64_MODERN_STATUS_OK
+        return recordSnapshot(event: event, flags: 2)
     }
 
     private func reload(event: SM64ModernProgressionEventV1) -> SM64ModernStatus {
+        guard let snapshot = readSnapshot(fileIndex: Int(event.save_file_index)) else {
+            return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "reload_snapshot")
+        }
+        runtime.adoptPersistedSnapshots(save: snapshot.save, menu: snapshot.menu)
         do {
-            _ = try runtime.reloadFromBackup(
-                using: adapter, ownerThreadToken: ownerThreadToken
+            try adapter.commit(
+                save: snapshot.save, menu: snapshot.menu,
+                ownerThreadToken: ownerThreadToken
             )
         } catch {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "reload")
         }
+        return recordSnapshot(event: event, flags: 1)
+    }
+
+    private func readSnapshot(fileIndex: Int) -> (
+        save: SM64SaveFileSnapshot, menu: SM64MenuDataSnapshot
+    )? {
+        guard (0..<SM64CoinScoreAgeState.fileCount).contains(fileIndex) else {
+            return nil
+        }
+        var saveBytes = [UInt8](
+            repeating: 0, count: Int(SM64_MODERN_SAVE_FILE_BYTE_COUNT)
+        )
+        var menuBytes = [UInt8](
+            repeating: 0, count: Int(SM64_MODERN_MENU_DATA_BYTE_COUNT)
+        )
+        let status = saveBytes.withUnsafeMutableBufferPointer { saveBuffer in
+            menuBytes.withUnsafeMutableBufferPointer { menuBuffer in
+                sm64_modern_progression_read_snapshot(
+                    UInt32(fileIndex), saveBuffer.baseAddress,
+                    UInt32(saveBuffer.count), menuBuffer.baseAddress,
+                    UInt32(menuBuffer.count)
+                )
+            }
+        }
+        guard status == SM64_MODERN_STATUS_OK,
+              let save = SM64SaveFileCodec.decode(saveBytes),
+              let menu = SM64MenuDataCodec.decode(menuBytes) else {
+            return nil
+        }
+        return (save, menu)
+    }
+
+    private func recordSnapshot(
+        event: SM64ModernProgressionEventV1,
+        flags: UInt32
+    ) -> SM64ModernStatus {
+        guard let snapshot = readSnapshot(fileIndex: Int(event.save_file_index)) else {
+            return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "snapshot")
+        }
+        let saveBytes = SM64SaveFileCodec.encode(snapshot.save)
+        let menuBytes = SM64MenuDataCodec.encode(snapshot.menu)
         recordOracle(
             event: event,
             recordKind: SM64_MODERN_ORACLE_RECORD_SAVE_BYTES,
-            flags: 1,
-            values: [
-                hash(bytes: SM64SaveFileCodec.encode(runtime.saveSnapshot())),
-                hash(bytes: SM64MenuDataCodec.encode(runtime.menuSnapshot())),
-                eventCount
-            ]
+            flags: flags,
+            values: [hash(bytes: saveBytes), hash(bytes: menuBytes), eventCount]
         )
         return SM64_MODERN_STATUS_OK
     }

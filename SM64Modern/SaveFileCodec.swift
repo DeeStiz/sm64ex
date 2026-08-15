@@ -64,9 +64,11 @@ enum SM64SaveFileCodec {
             y: Int16(truncatingIfNeeded: Int32(state.capPosition.y)),
             z: Int16(truncatingIfNeeded: Int32(state.capPosition.z))
         )
+        let persistedFlags = (state.flags & 0x00FF_FFFF)
+            | (UInt32(state.secretStars & 0x7F) << 24)
         return SM64SaveFileSnapshot(
             capLevel: state.capLevel, capArea: state.capArea,
-            capPosition: position, flags: state.flags,
+            capPosition: position, flags: persistedFlags,
             courseStars: state.courseStars,
             courseCoinScores: state.courseCoinScores
         )

@@ -52,6 +52,18 @@ enum SM64ModernProgressionRuntimeSmoke {
         ) == 0)
         precondition(runtime.saveSnapshot().courseCoinScores[2] == 100)
 
+        var secretRuntime = SM64ProgressionRuntime()
+        _ = secretRuntime.apply(
+            .completeLevel(
+                kind: .secretStar, starIndex: 1, coinScore: 0,
+                globalMaxCoinScore: 0
+            ), simulationTick: 12
+        )
+        precondition(secretRuntime.progression.secretStars == 0x02)
+        precondition(
+            secretRuntime.saveSnapshot().flags & 0x7F00_0000 == 0x0200_0000
+        )
+
         let root = FileManager.default.temporaryDirectory
             .appendingPathComponent("sm64-modern-runtime-\(UUID().uuidString)")
         let adapter = try SM64OwnerThreadPersistenceAdapter(

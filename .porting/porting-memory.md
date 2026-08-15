@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`, M0 baseline, M1 dual-engine lifecycle, and M2 content-pack compiler complete for local code/test scope; M3 schema-4 oracle foundation is in progress. The prior SM64 Modern M0-M14 goal remains complete and unchanged.
+- Active goal: `full-swift-twin`; M0-M16 local Swift/C parity scopes are complete, and M17h is the current validated progression bridge slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -20,6 +20,22 @@
 - M8c splits the whole object pass into paired-boundary script/event work plus native actor/Mario movement, platform displacement, collision preparation, camera, particle, painting, and environmental update seams; M8d activates that policy in the product.
 - Legacy scripts/timers/RNG/one-shot sinks remain paired-boundary owned while continuous world state advances on native steps; the private world smoke remains bounded-model evidence rather than independent full-world proof.
 - Preserve the M7 copied POD boundary and per-subsystem `cAuthority` -> `shadowSwift` -> `swiftAuthority` gates; M8 must not expose the C object graph to Swift, create a second simulation/presentation owner, replace the raw `CAMetalLayer`, or disturb the existing Metal queue/shared-event retirement contract.
+
+### M17h Completion Evidence
+
+- M17g's owner-thread Swift progression shadow now receives every supported
+  save mutation boundary: erase, copy, flags, stars, cannon, cap, and menu.
+  The C side serializes normalized 56-byte SaveFile and 32-byte MainMenuData
+  snapshots with explicit little-endian field ordering and checksum bytes.
+- Persist and reload read the C snapshot first, adopt it into the Swift runtime,
+  and commit the reconciled bundle. Actor events emit a post-mutation snapshot
+  record, preserving secret-star high bits, cap fields, course stars, coin
+  scores, sound mode, and backup recovery semantics.
+- Focused migration/runtime/save-codec fingerprints pass; the full 100-script
+  matrix passes with zero failures; the isolated native Debug build succeeds;
+  and `git diff --check` is clean. This remains shadow/differential evidence:
+  C is still the gameplay/save authority and no physical, visual, store, or
+  human acceptance claim is implied.
 
 ### M8b Completion Evidence
 

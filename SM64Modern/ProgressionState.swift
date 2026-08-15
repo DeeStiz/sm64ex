@@ -181,15 +181,15 @@ enum SM64ProgressionReducer {
                   globalMax >= 0 else { return nil }
             let starFlag = UInt8(1) << UInt8(starIndex)
             let courseIndex = Int(state.courseNumber) - 1
-            guard courseIndex >= 0 && courseIndex < state.courseStars.count else {
-                return nil
-            }
             state.lastCompletedCourse = state.courseNumber
             state.lastCompletedStar = starIndex &+ 1
             state.flags |= Self.fileExists
 
             switch kind {
             case .courseStar:
+                guard courseIndex >= 0 && courseIndex < state.courseStars.count else {
+                    return nil
+                }
                 if coinScore > Int16(state.courseCoinScores[courseIndex]) {
                     state.courseCoinScores[courseIndex] = UInt8(truncatingIfNeeded: coinScore)
                     state.saveModified = true

@@ -8,11 +8,6 @@ static SM64ModernProgressionMigrationApiV1 sMigration;
 static SM64ModernStatus sMigrationStatus = SM64_MODERN_STATUS_OK;
 static bool sMigrationInstalled;
 
-static bool valid_header(const SM64ModernAbiHeader *header, uint32_t size) {
-    return header && header->abi_version == SM64_MODERN_ABI_VERSION_1
-        && header->struct_size >= size;
-}
-
 SM64ModernStatus sm64_modern_validate_progression_migration_api(
     const SM64ModernProgressionMigrationApiV1 *migration) {
     if (!migration) {
@@ -70,6 +65,13 @@ SM64ModernStatus sm64_modern_progression_record_event(
     uint32_t flags) {
     if (!sMigrationInstalled) {
         return SM64_MODERN_STATUS_OK;
+    }
+    if (event_kind < SM64_MODERN_PROGRESSION_EVENT_RED_COIN
+        || event_kind > SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION) {
+        if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
+            sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return sMigrationStatus;
     }
     SM64ModernProgressionEventV1 event;
     memset(&event, 0, sizeof(event));
