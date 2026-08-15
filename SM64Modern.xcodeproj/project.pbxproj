@@ -56,6 +56,7 @@
 		8F2434A3E57287185819D685 /* EngineState.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB40062F0B74B53B43A517BA /* EngineState.swift */; };
 		90B7F9D7BD419562B6E7A2F8 /* ContentPackRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A6630058727A186889977A1 /* ContentPackRuntime.swift */; };
 		91C2638AD622C8B3EA6A375A /* MarioDiveAirAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DEEA6CF81A7B22A4F271F8E /* MarioDiveAirAction.swift */; };
+		935AE189C10684993A3AB7A8 /* MarioSwimmingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C04B8FC7D6A5B7B768EA99CF /* MarioSwimmingAction.swift */; };
 		946B96572AA7C94347AF500E /* EngineHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C737B1A16857D51F7C7FE7A /* EngineHost.swift */; };
 		956281711CE88DA51EC7508B /* MarioSlope.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C9C1CEC9C0000598706A91 /* MarioSlope.swift */; };
 		9627E9AE58999FC21A1D20C2 /* MarioDeceleratingSpeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D8458E2279F08B24E32A53 /* MarioDeceleratingSpeed.swift */; };
@@ -168,6 +169,7 @@
 		B93DAAFB0FF6CAB909448BA5 /* MarioGeometryInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGeometryInput.swift; sourceTree = "<group>"; };
 		B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftGameplay.swift; sourceTree = "<group>"; };
 		BB40062F0B74B53B43A517BA /* EngineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineState.swift; sourceTree = "<group>"; };
+		C04B8FC7D6A5B7B768EA99CF /* MarioSwimmingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSwimmingAction.swift; sourceTree = "<group>"; };
 		C23B165EA0ECBB7202A73BB8 /* MarioBrakingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioBrakingAction.swift; sourceTree = "<group>"; };
 		C6F47456E9B2F4A650F55D12 /* MarioSteepJump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSteepJump.swift; sourceTree = "<group>"; };
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
@@ -262,6 +264,7 @@
 				1D4FC5292003781121076585 /* MarioStationaryAction.swift */,
 				C6F47456E9B2F4A650F55D12 /* MarioSteepJump.swift */,
 				D50D50CB46C2409DDCA4E62E /* MarioSubmergedAction.swift */,
+				C04B8FC7D6A5B7B768EA99CF /* MarioSwimmingAction.swift */,
 				94BED6B07789579D6D43B013 /* MarioTurningAction.swift */,
 				44193C66533F87518241D742 /* MarioTwirlingWaterAction.swift */,
 				9DEC5D253D4E679DB5AB13D6 /* MarioWalkAnimation.swift */,
@@ -452,6 +455,7 @@
 				0FF51E99A1537E8C64BD9839 /* MarioStationaryAction.swift in Sources */,
 				A7501784CDB204083C9F308D /* MarioSteepJump.swift in Sources */,
 				C86EE2726C8C3CB1AF7C47FC /* MarioSubmergedAction.swift in Sources */,
+				935AE189C10684993A3AB7A8 /* MarioSwimmingAction.swift in Sources */,
 				AA5279A05B7F71EC1A8B3965 /* MarioTurningAction.swift in Sources */,
 				AF3674FF77CC4CD476294319 /* MarioTwirlingWaterAction.swift in Sources */,
 				7FFA3B76B0386131EC825C39 /* MarioWalkAnimation.swift in Sources */,
