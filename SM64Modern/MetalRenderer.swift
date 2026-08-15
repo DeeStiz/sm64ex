@@ -56,7 +56,10 @@ enum MetalRendererError: LocalizedError {
     }
 }
 
-final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate, @unchecked Sendable {
+/// Engine-owner-thread Metal 4 renderer. The display-link callback is admitted
+/// only when the host's owner-thread predicate succeeds; mutable frame slots,
+/// residency, textures, samplers, and pipeline handles never cross that guard.
+final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private final class MetalTextureResidency {
         let generation: UInt64
         let textureID: UInt32
