@@ -54,6 +54,7 @@
 		36EB85680A608DBA2BC30633 /* CameraGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C823492EEFDF9990E00996 /* CameraGeometry.swift */; };
 		395E4FCD7396D3046C2A7A2F /* MarioGroundKnockbackAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497B887A768C172EC3ED7A98 /* MarioGroundKnockbackAction.swift */; };
 		3A185680189903BB0AA43307 /* GeoLayoutContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */; };
+		3BC4C0E9319AF629A5330E7E /* SeesawPlatformBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4789FFED823D9EAAB8F54ACB /* SeesawPlatformBehavior.swift */; };
 		3D3D38C8A3F908CCFF0C6E7D /* BouncingFireballObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0D4C3FC8AC2456B981C1640 /* BouncingFireballObjectBridge.swift */; };
 		3D45F4E1ED09C5B5EC150CC5 /* ObjectTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */; };
 		3D8C6993DC34F356CD9F756D /* ScuttlebugEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF17DAA784F8FC1431F06A28 /* ScuttlebugEnemy.swift */; };
@@ -236,6 +237,7 @@
 		419DC71930B2E4EE76B0E18E /* GameplayTick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameplayTick.swift; sourceTree = "<group>"; };
 		44193C66533F87518241D742 /* MarioTwirlingWaterAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioTwirlingWaterAction.swift; sourceTree = "<group>"; };
 		466600A4978BF6E07A6465C6 /* WhompEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhompEnemy.swift; sourceTree = "<group>"; };
+		4789FFED823D9EAAB8F54ACB /* SeesawPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeesawPlatformBehavior.swift; sourceTree = "<group>"; };
 		49737667D24AE6AEA3374B3E /* EnemyLakitu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnemyLakitu.swift; sourceTree = "<group>"; };
 		497B887A768C172EC3ED7A98 /* MarioGroundKnockbackAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGroundKnockbackAction.swift; sourceTree = "<group>"; };
 		4B5A3098ED731C8CD759DE75 /* MarioBasicAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioBasicAirAction.swift; sourceTree = "<group>"; };
@@ -523,6 +525,7 @@
 				3795DAA620146CD3735BB84B /* SaveFileCodec.swift */,
 				AF17DAA784F8FC1431F06A28 /* ScuttlebugEnemy.swift */,
 				CC510DADD4B2F20AC7EA6B5A /* ScuttlebugObjectBridge.swift */,
+				4789FFED823D9EAAB8F54ACB /* SeesawPlatformBehavior.swift */,
 				F27F167DF12FDB9DEDC9F64F /* SkeeterEnemy.swift */,
 				01C2DB40D32E69B4AFA3E55B /* SkeeterObjectBridge.swift */,
 				667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */,
@@ -797,6 +800,7 @@
 				4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */,
 				3D8C6993DC34F356CD9F756D /* ScuttlebugEnemy.swift in Sources */,
 				46C0FB257866DD3500A55A24 /* ScuttlebugObjectBridge.swift in Sources */,
+				3BC4C0E9319AF629A5330E7E /* SeesawPlatformBehavior.swift in Sources */,
 				B7586B785B0F798C60759CB5 /* SkeeterEnemy.swift in Sources */,
 				E2F11DDB5A2813A72A2C9A2A /* SkeeterObjectBridge.swift in Sources */,
 				AE1494F8689D5768D3874A69 /* SnufitEnemy.swift in Sources */,

@@ -1272,6 +1272,23 @@
 - This remains one bounded M19 seam; platform ownership/collision, remaining
   mechanisms and hazards, effect delivery, and M20–M35 are still open.
 
+### M19e Completion Evidence
+
+- `SM64Modern/SeesawPlatformBehavior.swift` is the value counterpart of
+  `bhv_seesaw_platform_init`/`bhv_seesaw_platform_update`: collision-model
+  selection, the BitS `2000.0f` distance override, canonical-table cosine,
+  Mario-driven pitch response, rocking-sound intent, velocity clamp, and
+  `oscillate_toward` return-to-zero behavior are explicit and pointer-free.
+- The independent C contract matches Swift at
+  `seesawPlatformFingerprint=0x84664f609b940e32`; it covers accelerating,
+  decelerating, clamped, and off-platform return paths.
+- `script/test_seesaw_platform.sh` passes under Swift 6 complete strict
+  concurrency and clang `-ffp-contract=off`. The full matrix target is
+  `runs=142 failures=0`, the regenerated native Debug build succeeds, and
+  `git diff --check` is clean.
+- This remains one bounded M19 seam; platform ownership/collision, remaining
+  mechanisms and hazards, effect delivery, and M20–M35 are still open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and
