@@ -144,6 +144,7 @@
 		B4EB45CA367DED1BF59D3D99 /* RotatingPlatformBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28F9F86BA8486D9F6BB005C /* RotatingPlatformBehavior.swift */; };
 		B5333ED03F4E4EB691D052B7 /* MarioBrakingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23B165EA0ECBB7202A73BB8 /* MarioBrakingAction.swift */; };
 		B7586B785B0F798C60759CB5 /* SkeeterEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27F167DF12FDB9DEDC9F64F /* SkeeterEnemy.swift */; };
+		B9245CF366E36C7CE74E6B46 /* CollisionMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEBABA4A2D4F82877B3BB8A /* CollisionMesh.swift */; };
 		B966D97864B94F9E3BD0EA18 /* PiranhaPlant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375EBE2D9BBFCAD8B34FDF89 /* PiranhaPlant.swift */; };
 		BD144231679BF45B1B35259B /* DecorativePendulumBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 87414B6C37E5673C98429C04 /* DecorativePendulumBehavior.swift */; };
 		BE23A40DFA87E7269FD595E6 /* MarioQuicksandLandingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = AB7C461E8C0CA23A1D8B2CA5 /* MarioQuicksandLandingAction.swift */; };
@@ -319,6 +320,7 @@
 		AB7C461E8C0CA23A1D8B2CA5 /* MarioQuicksandLandingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioQuicksandLandingAction.swift; sourceTree = "<group>"; };
 		AC89F10EF988BEB5D9624D69 /* LevelScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScript.swift; sourceTree = "<group>"; };
 		ACA3C10ED5253A613435EC7D /* AmpEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AmpEnemy.swift; sourceTree = "<group>"; };
+		ADEBABA4A2D4F82877B3BB8A /* CollisionMesh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollisionMesh.swift; sourceTree = "<group>"; };
 		AF17DAA784F8FC1431F06A28 /* ScuttlebugEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScuttlebugEnemy.swift; sourceTree = "<group>"; };
 		B0C6C29EF4D3EDA95AE7DC1C /* ChainChompRelease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChainChompRelease.swift; sourceTree = "<group>"; };
 		B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptVM.swift; sourceTree = "<group>"; };
@@ -430,6 +432,7 @@
 				4DDDABF519C9DA6F2577DA59 /* ChuckyaEnemy.swift */,
 				8972955B5A5B93E0345EE4EB /* ChuckyaObjectBridge.swift */,
 				B4872879FF660BB19A8FB4AC /* CoinScoreAges.swift */,
+				ADEBABA4A2D4F82877B3BB8A /* CollisionMesh.swift */,
 				F3F0AEF5342F3B329237DD66 /* ContentPack.swift */,
 				8A6630058727A186889977A1 /* ContentPackRuntime.swift */,
 				87414B6C37E5673C98429C04 /* DecorativePendulumBehavior.swift */,
@@ -715,6 +718,7 @@
 				D77819D0FD6CAB42ED53C410 /* ChuckyaEnemy.swift in Sources */,
 				F9A793CA3048B14A9BE9DA03 /* ChuckyaObjectBridge.swift in Sources */,
 				AA0B49BED7B13B398A2731F6 /* CoinScoreAges.swift in Sources */,
+				B9245CF366E36C7CE74E6B46 /* CollisionMesh.swift in Sources */,
 				B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */,
 				90B7F9D7BD419562B6E7A2F8 /* ContentPackRuntime.swift in Sources */,
 				BD144231679BF45B1B35259B /* DecorativePendulumBehavior.swift in Sources */,

@@ -1467,6 +1467,25 @@
   generation, live platform binding, remaining mechanisms/hazards, effects,
   and M20–M35 remain open.
 
+### M19p Completion Evidence
+
+- `CollisionMesh.swift` decodes bounded `COL_INIT`/vertex/triangle streams,
+  rejects malformed commands, indices, counts, missing terminators, and surface
+  ID overflow, then reproduces C's signed-16 transformed vertices, integer
+  cross-product sequencing, normal, force, flags, room, and Y-bound fields.
+- `SM64PlatformCollisionRuntime` performs candidate-copy replacement and
+  applies dynamic surfaces to `SM64SurfaceCollisionWorld` before committing the
+  registry and `SM64SwiftEngineState` generation/surface-ID lease. A malformed
+  replacement leaves the prior world and lease untouched.
+- Focused output is `collisionMeshFingerprint=0x266b6fef37fcfa11` with the
+  independent C contract match; the complete matrix is
+  `MATRIX_RESULT runs=152 failures=0` in
+  `/tmp/sm64-modern-m19p-matrix.log`; regenerated native Swift 6/macOS 27
+  Debug build and `git diff --check` pass.
+- This closes the collision-data binding seam only. Behavior dispatch across
+  the platform inventory, content-pack collision resource inventory, remaining
+  mechanisms/hazards, effects, and M20–M35 remain open.
+
 ### M34a Completion Evidence
 
 - `SM64Modern/MetalRenderer.swift` now redeclares both the scene and

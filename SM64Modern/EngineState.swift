@@ -29,6 +29,8 @@ struct SM64EngineGlobals: Equatable, Sendable {
 struct SM64EngineStateSnapshot: Equatable, Sendable {
     let globals: SM64EngineGlobals
     let objects: [SM64ObjectRecord]
+    let platformCollisionOwners: [SM64ObjectID]
+    let platformCollisionSurfaceIDs: [SM64ObjectID: [UInt32]]
     let levelArena: SM64ArenaSnapshot
     let objectArena: SM64ArenaSnapshot
     let effectsArena: SM64ArenaSnapshot
@@ -41,6 +43,7 @@ final class SM64SwiftEngineState {
     let objects: SM64ObjectPool
     let arenas: SM64EngineArenas
     private(set) var platformCollisionOwners: [SM64ObjectID] = []
+    private(set) var platformCollisionSurfaceIDs: [SM64ObjectID: [UInt32]] = [:]
     private(set) var globals: SM64EngineGlobals
 
     init(
@@ -56,6 +59,7 @@ final class SM64SwiftEngineState {
         objects.reset()
         arenas.resetAll()
         platformCollisionOwners.removeAll(keepingCapacity: true)
+        platformCollisionSurfaceIDs.removeAll(keepingCapacity: true)
         let nextEpoch = globals.resetEpoch == UInt64.max ? 1 : globals.resetEpoch + 1
         var resetGlobals = SM64EngineGlobals()
         resetGlobals.resetEpoch = nextEpoch
@@ -75,9 +79,23 @@ final class SM64SwiftEngineState {
     }
 
     @discardableResult
-    func bindPlatformCollisionOwner(_ owner: SM64ObjectID) -> Bool {
+    func bindPlatformCollisionOwner(
+        _ owner: SM64ObjectID,
+        surfaceIDs: [UInt32] = []
+    ) -> Bool {
         guard !platformCollisionOwners.contains(owner) else { return false }
         platformCollisionOwners.append(owner)
+        platformCollisionSurfaceIDs[owner] = surfaceIDs
+        return true
+    }
+
+    @discardableResult
+    func updatePlatformCollisionOwner(
+        _ owner: SM64ObjectID,
+        surfaceIDs: [UInt32]
+    ) -> Bool {
+        guard platformCollisionOwners.contains(owner) else { return false }
+        platformCollisionSurfaceIDs[owner] = surfaceIDs
         return true
     }
 
@@ -85,6 +103,7 @@ final class SM64SwiftEngineState {
     func removePlatformCollisionOwner(_ owner: SM64ObjectID) -> Bool {
         guard let index = platformCollisionOwners.firstIndex(of: owner) else { return false }
         platformCollisionOwners.remove(at: index)
+        platformCollisionSurfaceIDs.removeValue(forKey: owner)
         return true
     }
 
@@ -156,6 +175,8 @@ final class SM64SwiftEngineState {
         SM64EngineStateSnapshot(
             globals: globals,
             objects: objects.allRecords(),
+            platformCollisionOwners: platformCollisionOwners,
+            platformCollisionSurfaceIDs: platformCollisionSurfaceIDs,
             levelArena: arenas.level.snapshot(),
             objectArena: arenas.object.snapshot(),
             effectsArena: arenas.effects.snapshot()
