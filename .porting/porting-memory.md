@@ -2,7 +2,7 @@
 
 ## Current Milestone
 
-- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18j is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
+- Active goal: `full-swift-twin`; M0-M17 local Swift/C progression scopes are complete, and M18k is the current validated Goomba/Spiny/Lakitu/Bullet Bill/Swoop/Amp/Bird/Bully owner-thread enemy slice. The prior SM64 Modern M0-M14 goal remains complete and unchanged; M18-M35 are still open.
 - The full Swift twin keeps a permanent C compatibility selector, uses exact C differential parity, targets the US product on macOS 27 arm64, and commits validated milestones locally without pushing.
 - M0 baseline evidence: audio-ring smoke, fixed-step scheduler smoke with isolated Swift module cache, timebase audit, isolated Xcode Debug build, and `git diff --check` all pass on 2026-08-14; handoff is `.porting/porting-handoff-full-swift-twin-M0.md`.
 - M1 evidence: `EngineAuthority.swift`, `EngineRuntime.swift`, `EngineHost` runtime dispatch, AppDelegate Advanced selector, authority/runtime smokes, and isolated Swift 6 Debug build pass; local GUI launch is blocked by managed LaunchServices/signing constraints, so no visual or human claim is made. Handoff is `.porting/porting-handoff-full-swift-twin-M1.md`.
@@ -235,6 +235,24 @@
   validation passes. The full matrix passes with `runs=111 failures=0` (log
   `/tmp/sm64-modern-m18j-matrix.log`), the generated native Debug build
   succeeds (log `/tmp/sm64-modern-m18j-build.log`), and `git diff --check` is
+  clean. Complete collision/effect delivery, remaining enemy/projectile
+  breadth, and physical/visual/human acceptance remain open.
+
+### M18k Completion Evidence
+
+- `BullyEnemy.swift` preserves small and large Bully size/subtype properties,
+  hitboxes, patrol/chase admission and speeds, home-radius return, attack
+  knockback, collision-flag fencing, backup recovery, activation/fall, coin or
+  star/mist lava death, and death-plane deletion as copied values.
+- `BullyObjectBridge.swift` binds both sizes to the owner-thread object
+  scheduler, mirrors action/timer/transform/velocity/facing, graph and
+  tangibility fields, and size-specific hitboxes into stable records, and
+  emits callback-ordered effect records without exposing C pointers.
+- The independent Swift/C owner-thread contract emits
+  `bullyObjectBridgeFingerprint=0x8d7dc5c6315293c4`; focused strict Swift 6/C
+  validation passes. The full matrix passes with `runs=112 failures=0` (log
+  `/tmp/sm64-modern-m18k-matrix.log`), the generated native Debug build
+  succeeds (log `/tmp/sm64-modern-m18k-build.log`), and `git diff --check` is
   clean. Complete collision/effect delivery, remaining enemy/projectile
   breadth, and physical/visual/human acceptance remain open.
 
