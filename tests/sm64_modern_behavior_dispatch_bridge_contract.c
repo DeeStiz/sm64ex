@@ -57,6 +57,8 @@
 #define MRI_PARTICLE_BEHAVIOR UINT64_C(0x6268765f6d7270)
 #define RACING_PENGUIN_BEHAVIOR UINT64_C(0x6268765f727063)
 #define YOSHI_BEHAVIOR UINT64_C(0x6268765f797368)
+#define BOWSER_BOMB_BEHAVIOR UINT64_C(0x6268765f626f6d62)
+#define BOWSER_BOMB_SMOKE_BEHAVIOR UINT64_C(0x6268765f626d73)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -1115,6 +1117,34 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // spawned
     fingerprint = hash_u64(fingerprint, 0); // deleted
     fingerprint = hash_u64(fingerprint, 0); // rejected
+
+    // Isolated shared-dispatch Bowser bomb parent route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t bowser_bomb_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, bowser_bomb_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, BOWSER_BOMB_BEHAVIOR, 40);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // bomb kind
+    fingerprint = hash_u64(fingerprint, 0); // no effects
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 0); // no generic explosion request
+    fingerprint = hash_u64(fingerprint, 1); // timer
+    fingerprint = hash_u64(fingerprint, 0x3f800000); // scale 1.0
+    fingerprint = hash_u64(fingerprint, 255); // opacity
+    fingerprint = hash_u64(fingerprint, UINT64_MAX); // no animation
+    fingerprint = hash_u64(fingerprint, 0); // no presented effects
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_u64(fingerprint, 0); // no deliveries
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

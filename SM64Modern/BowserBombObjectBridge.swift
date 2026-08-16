@@ -66,6 +66,36 @@ final class SM64BowserBombObjectBridge {
         }
     }
 
+    /// Clears per-tick effects before shared dispatch traverses Bowser-bomb
+    /// identities on the owner thread.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard registeredIDs.contains(id), pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        bombs.removeValue(forKey: id)
+        bombInputs.removeValue(forKey: id)
+        explosions.removeValue(forKey: id)
+        explosionInputs.removeValue(forKey: id)
+        smokes.removeValue(forKey: id)
+        genericExplosions.removeValue(forKey: id)
+        genericExplosionInputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil { remove(id) }
+    }
+
     func bombState(for id: SM64ObjectID) -> SM64BowserBombState? { bombs[id] }
     func explosionState(for id: SM64ObjectID) -> SM64BowserBombExplosionState? { explosions[id] }
     func smokeState(for id: SM64ObjectID) -> SM64BowserBombSmokeState? { smokes[id] }
@@ -238,36 +268,11 @@ final class SM64BowserBombObjectBridge {
         bombInputs = frameBombInputs
         explosionInputs = frameExplosionInputs
         genericExplosionInputs = frameGenericExplosionInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            bombs.removeValue(forKey: id)
-            bombInputs.removeValue(forKey: id)
-            explosions.removeValue(forKey: id)
-            explosionInputs.removeValue(forKey: id)
-            smokes.removeValue(forKey: id)
-            genericExplosions.removeValue(forKey: id)
-            genericExplosionInputs.removeValue(forKey: id)
-        }
-        for id in Array(bombs.keys) where engineState.objects.record(for: id) == nil {
-            bombs.removeValue(forKey: id)
-            bombInputs.removeValue(forKey: id)
-        }
-        for id in Array(explosions.keys) where engineState.objects.record(for: id) == nil {
-            explosions.removeValue(forKey: id)
-            explosionInputs.removeValue(forKey: id)
-        }
-        for id in Array(smokes.keys) where engineState.objects.record(for: id) == nil {
-            smokes.removeValue(forKey: id)
-        }
-        for id in Array(genericExplosions.keys) where engineState.objects.record(for: id) == nil {
-            genericExplosions.removeValue(forKey: id)
-            genericExplosionInputs.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64BowserBombSchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog,

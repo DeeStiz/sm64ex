@@ -2,6 +2,26 @@
 
 ## Current Milestone
 
+- M22at registers the existing Bowser-bomb owner bridge in the shared
+  general-actor `SM64BehaviorDispatchBridge` for the bomb and smoke identities.
+  The route preserves bomb state, same-frame flame/spawn requests, smoke
+  identity, and generation-safe delivery receipts. The source explosion
+  identity aliases the generic explosion route and remains an explicit seam;
+  collision, camera/audio, and presentation consumers are still typed external
+  boundaries. Forty-one-route Swift/C fingerprint
+  `0x5224e91ce4f4e6fe`, standalone Bowser bomb fingerprint
+  `0x1570ecd9d93c5b41`, behavior manifest fingerprint
+  `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461
+  explicit `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Bowser-bomb contracts, native Debug target
+  `/tmp/sm64-modern-m22at-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix
+  (`/tmp/sm64-modern-m22at-final-matrix.log`), `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full Bowser
+  bomb/explosion/smoke collision/presentation consumers, remaining adapters,
+  and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22at.md`.
+
 - M22as registers the existing Yoshi owner bridge in the shared general-actor
   `SM64BehaviorDispatchBridge` and injects the dispatcher’s respawner bridge
   into Yoshi’s owner seam. The route preserves idle/talk/progression state,

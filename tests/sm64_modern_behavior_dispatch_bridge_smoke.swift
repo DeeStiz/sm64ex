@@ -1199,6 +1199,49 @@ private func hashYoshiDispatch(
     return hash
 }
 
+private func hashBowserBombDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.bowserBombEffects.count))
+    for effect in tick.bowserBombEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+        hash = hashU64(hash, effect.spawnedExplosionRequest ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.timer))
+        hash = hashU64(hash, UInt64(effect.scale.bitPattern))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.opacity)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.animationState)))
+        hash = hashU64(hash, UInt64(effect.presentedEffects.count))
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.bowserBombDeliveries.count))
+    for delivery in tick.bowserBombDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1911,6 +1954,25 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(yoshiTick.yoshiDeliveries.count == 1, "Yoshi owner delivery is explicit")
         fingerprint = hashYoshiDispatch(fingerprint, yoshiTick)
+
+        let bowserBombEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let bowserBombBridge = SM64BehaviorDispatchBridge()
+        let bowserBomb = try bowserBombBridge.spawnBowserBomb(in: bowserBombEngine)
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64BowserBombObjectBridge.smokeBehaviorIdentity) == .bowserBomb,
+            "Bowser-bomb smoke identity route"
+        )
+        let bowserBombTick = bowserBombBridge.tick(state: bowserBombEngine)
+        require(bowserBombTick.events.map(\.route) == [.bowserBomb], "Bowser-bomb route dispatch")
+        require(bowserBombTick.scheduler.updated.map(\.traceSubject) == [1], "Bowser-bomb callback ordering")
+        require(
+            bowserBombTick.bowserBombEffects.count == 1
+                && bowserBombTick.bowserBombEffects[0].objectID == bowserBomb
+                && bowserBombTick.bowserBombEffects[0].kind == .bomb,
+            "Bowser-bomb value/owner route is preserved"
+        )
+        require(bowserBombTick.bowserBombDeliveries.isEmpty, "Bowser-bomb idle route has no delivery")
+        fingerprint = hashBowserBombDispatch(fingerprint, bowserBombTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

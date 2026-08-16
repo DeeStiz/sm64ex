@@ -41,6 +41,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case mrI = 37
     case racingPenguin = 38
     case yoshi = 39
+    case bowserBomb = 40
     case unmigrated = 255
 }
 
@@ -128,6 +129,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let racingPenguinDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let yoshiEffects: [SM64YoshiObjectEffect]
     let yoshiDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let bowserBombEffects: [SM64BowserBombObjectEffectRecord]
+    let bowserBombDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -175,6 +178,7 @@ final class SM64BehaviorDispatchBridge {
     let mrI: SM64MrIObjectBridge
     let racingPenguin: SM64RacingPenguinObjectBridge
     let yoshi: SM64YoshiObjectBridge
+    let bowserBomb: SM64BowserBombObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -221,6 +225,7 @@ final class SM64BehaviorDispatchBridge {
         self.mrI = SM64MrIObjectBridge(scheduler: scheduler)
         self.racingPenguin = SM64RacingPenguinObjectBridge(scheduler: scheduler)
         self.yoshi = SM64YoshiObjectBridge(scheduler: scheduler, respawnerBridge: sharedRespawner)
+        self.bowserBomb = SM64BowserBombObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -332,6 +337,9 @@ final class SM64BehaviorDispatchBridge {
             return .racingPenguin
         case SM64YoshiObjectBridge.defaultBehaviorIdentity:
             return .yoshi
+        case SM64BowserBombObjectBridge.bombBehaviorIdentity,
+             SM64BowserBombObjectBridge.smokeBehaviorIdentity:
+            return .bowserBomb
         default:
             return .unmigrated
         }
@@ -379,6 +387,7 @@ final class SM64BehaviorDispatchBridge {
         for id in mrI.registeredIDs { mrI.remove(id) }
         for id in racingPenguin.registeredIDs { racingPenguin.remove(id) }
         for id in yoshi.registeredIDs { yoshi.remove(id) }
+        for id in bowserBomb.registeredIDs { bowserBomb.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -419,6 +428,7 @@ final class SM64BehaviorDispatchBridge {
         mrI.beginExternalTick()
         racingPenguin.beginExternalTick()
         yoshi.beginExternalTick()
+        bowserBomb.beginExternalTick()
     }
 
     @discardableResult
@@ -1240,6 +1250,21 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnBowserBomb(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        model: UInt32 = SM64BowserBombObjectBridge.bombModel,
+        behaviorIdentity: UInt64 = SM64BowserBombObjectBridge.bombBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try bowserBomb.spawnBomb(
+            in: engineState,
+            position: position,
+            model: model,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -1280,6 +1305,7 @@ final class SM64BehaviorDispatchBridge {
         mrI.beginExternalTick()
         racingPenguin.beginExternalTick(state: engineState)
         yoshi.beginExternalTick()
+        bowserBomb.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -1380,6 +1406,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.racingPenguin.updateInline(id, pool: pool)
             case .yoshi:
                 _ = self.yoshi.updateInline(id, state: engineState, pool: pool)
+            case .bowserBomb:
+                _ = self.bowserBomb.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -1428,6 +1456,7 @@ final class SM64BehaviorDispatchBridge {
             mrI.remove(id)
             racingPenguin.remove(id, pool: engineState.objects)
             yoshi.remove(id)
+            bowserBomb.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -1508,6 +1537,7 @@ final class SM64BehaviorDispatchBridge {
         mrI.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         racingPenguin.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         yoshi.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        bowserBomb.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -1586,7 +1616,9 @@ final class SM64BehaviorDispatchBridge {
             racingPenguinEffects: racingPenguin.effectLog,
             racingPenguinDeliveries: racingPenguin.deliveryLog,
             yoshiEffects: yoshi.effectLog,
-            yoshiDeliveries: yoshi.deliveryLog
+            yoshiDeliveries: yoshi.deliveryLog,
+            bowserBombEffects: bowserBomb.effectLog,
+            bowserBombDeliveries: bowserBomb.deliveryLog
         )
     }
 }
