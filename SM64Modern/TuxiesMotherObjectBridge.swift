@@ -188,24 +188,44 @@ final class SM64TuxiesMotherObjectBridge {
         return true
     }
 
+    /// Clears per-tick owner receipts before shared dispatch traverses the
+    /// general-actor Tuxie's-mother identity.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard states[id] != nil, pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        environments.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { retire(id: id, pool: pool) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            retire(id: id, pool: pool)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
         environments frameEnvironments: [SM64ObjectID: SM64TuxiesMotherEnvironment] = [:]
     ) -> SM64TuxiesMotherSchedulerTickResult {
         environments = frameEnvironments
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            retire(id: id, pool: engineState.objects)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            retire(id: id, pool: engineState.objects)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64TuxiesMotherSchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog,

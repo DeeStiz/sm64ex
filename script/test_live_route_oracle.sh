@@ -109,6 +109,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/YoshiObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BowserBomb.swift" \
   "$PROJECT_ROOT/SM64Modern/BowserBombObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/TuxiesMotherBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/TuxiesMotherEyes.swift" \
+  "$PROJECT_ROOT/SM64Modern/TuxiesMotherObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooObjectBridge.swift" \

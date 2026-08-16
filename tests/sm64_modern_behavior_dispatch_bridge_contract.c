@@ -59,6 +59,7 @@
 #define YOSHI_BEHAVIOR UINT64_C(0x6268765f797368)
 #define BOWSER_BOMB_BEHAVIOR UINT64_C(0x6268765f626f6d62)
 #define BOWSER_BOMB_SMOKE_BEHAVIOR UINT64_C(0x6268765f626d73)
+#define TUXIES_MOTHER_BEHAVIOR UINT64_C(0x6268765f74786d)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -1145,6 +1146,52 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // no presented effects
     fingerprint = hash_u64(fingerprint, 0); // not marked
     fingerprint = hash_u64(fingerprint, 0); // no deliveries
+
+    // Isolated shared-dispatch Tuxie's mother parent route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t tuxies_mother_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, tuxies_mother_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, TUXIES_MOTHER_BEHAVIOR, 41);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // no child
+    fingerprint = hash_u64(fingerprint, 0); // follow-child action
+    fingerprint = hash_u64(fingerprint, 0); // idle subaction
+    fingerprint = hash_u64(fingerprint, 0x40800000); // scale 4.0
+    fingerprint = hash_u64(fingerprint, 3); // idle animation
+    fingerprint = hash_u64(fingerprint, 0); // forward velocity
+    fingerprint = hash_u64(fingerprint, 0); // move yaw
+    fingerprint = hash_u64(fingerprint, 0); // angle velocity
+    fingerprint = hash_u64(fingerprint, 0); // dialog ID
+    fingerprint = hash_u64(fingerprint, 0); // dialog requested
+    fingerprint = hash_u64(fingerprint, 0); // child link flag
+    fingerprint = hash_u64(fingerprint, 0); // child interaction mask
+    fingerprint = hash_u64(fingerprint, 0); // clear child drop
+    fingerprint = hash_u64(fingerprint, UINT64_MAX); // no child behavior
+    fingerprint = hash_u64(fingerprint, 0); // no star
+    fingerprint = hash_u64(fingerprint, 0); // no star home
+    fingerprint = hash_u64(fingerprint, 0); // no star offset
+    fingerprint = hash_u64(fingerprint, 0); // no walking sound
+    fingerprint = hash_u64(fingerprint, 0); // no yell sound
+    fingerprint = hash_u64(fingerprint, 1); // active flag
+    fingerprint = hash_u64(fingerprint, 1); // clear interaction
+    fingerprint = hash_u64(fingerprint, 0); // no spawned children
+    fingerprint = hash_u64(fingerprint, 0); // no presented effects
+    fingerprint = hash_u64(fingerprint, 1); // delivery receipts
+    fingerprint = hash_u64(fingerprint, 0); // delivered
+    fingerprint = hash_u64(fingerprint, 0); // presented
+    fingerprint = hash_u64(fingerprint, 0); // spawned
+    fingerprint = hash_u64(fingerprint, 0); // deleted
+    fingerprint = hash_u64(fingerprint, 0); // rejected
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

@@ -2,6 +2,26 @@
 
 ## Current Milestone
 
+- M22au registers the existing Tuxie's-mother owner bridge in the shared
+  general-actor `SM64BehaviorDispatchBridge` for `bhvTuxiesMother`. The route
+  preserves the mother action/subaction reducer, generation-safe record
+  synchronization, eye-selection output, and owner-thread dialog/audio/star
+  receipts. The carried `bhvSmallPenguin` identity intentionally stays on the
+  small-penguin route; mother-owned baby/unused child transitions and their
+  collision/held consumers remain explicit seams. Forty-two-route Swift/C
+  fingerprint `0xa114f54c82f5b270`, standalone Tuxie's-mother owner fingerprint
+  `0xbe32e199efb473f8`, behavior manifest fingerprint
+  `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461
+  explicit `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Tuxie's-mother contracts, native Debug target
+  `/tmp/sm64-modern-m22au-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix
+  (`/tmp/sm64-modern-m22au-final-matrix.log`), `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full child,
+  collision, dialog, presentation, remaining adapters, and live parity remain
+  open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22au.md`.
+
 - M22at registers the existing Bowser-bomb owner bridge in the shared
   general-actor `SM64BehaviorDispatchBridge` for the bomb and smoke identities.
   The route preserves bomb state, same-frame flame/spawn requests, smoke

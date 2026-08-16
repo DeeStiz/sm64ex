@@ -1242,6 +1242,66 @@ private func hashBowserBombDispatch(
     return hash
 }
 
+private func hashTuxiesMotherDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.tuxiesMotherEffects.count))
+    for effect in tick.tuxiesMotherEffects {
+        hash = hashID(hash, effect.objectID)
+        if let child = effect.childID {
+            hash = hashID(hash, child)
+        } else {
+            hash = hashU64(hash, 0)
+        }
+        let output = effect.output
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.action)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.subAction)))
+        hash = hashU64(hash, UInt64(output.scale.bitPattern))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.animation)))
+        hash = hashU64(hash, UInt64(output.forwardVelocity.bitPattern))
+        hash = hashU64(hash, UInt64(UInt16(bitPattern: output.moveYaw)))
+        hash = hashU64(hash, UInt64(UInt16(bitPattern: output.angleVelocityYaw)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.dialogID)))
+        hash = hashU64(hash, output.dialogRequested ? 1 : 0)
+        hash = hashU64(hash, output.childSmallPenguinUnk88 ? 1 : 0)
+        hash = hashU64(hash, UInt64(output.childInteractionSetMask))
+        hash = hashU64(hash, output.clearChildDropImmediate ? 1 : 0)
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.childBehavior)))
+        hash = hashU64(hash, output.spawnStar ? 1 : 0)
+        hash = hashU64(hash, output.starHomePosition == nil ? 0 : 1)
+        hash = hashU64(hash, UInt64(output.starSpawnYOffset.bitPattern))
+        hash = hashU64(hash, output.playWalkingSound ? 1 : 0)
+        hash = hashU64(hash, output.playYellSound ? 1 : 0)
+        hash = hashU64(hash, output.activeFlagUnk10 ? 1 : 0)
+        hash = hashU64(hash, output.clearInteractionStatus ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        hash = hashU64(hash, UInt64(effect.presentedEffects.count))
+    }
+    hash = hashU64(hash, UInt64(tick.tuxiesMotherDeliveries.count))
+    for delivery in tick.tuxiesMotherDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1973,6 +2033,24 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(bowserBombTick.bowserBombDeliveries.isEmpty, "Bowser-bomb idle route has no delivery")
         fingerprint = hashBowserBombDispatch(fingerprint, bowserBombTick)
+
+        let tuxiesEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let tuxiesBridge = SM64BehaviorDispatchBridge()
+        let tuxiesMother = try tuxiesBridge.spawnTuxiesMother(in: tuxiesEngine)
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64TuxiesMotherObjectBridge.defaultMotherBehaviorIdentity) == .tuxiesMother,
+            "Tuxie's mother identity route"
+        )
+        let tuxiesTick = tuxiesBridge.tick(state: tuxiesEngine)
+        require(tuxiesTick.events.map(\.route) == [.tuxiesMother], "Tuxie's mother route dispatch")
+        require(tuxiesTick.scheduler.updated.map(\.traceSubject) == [1], "Tuxie's mother callback ordering")
+        require(
+            tuxiesTick.tuxiesMotherEffects.count == 1
+                && tuxiesTick.tuxiesMotherEffects[0].objectID == tuxiesMother
+                && tuxiesTick.tuxiesMotherEffects[0].output.action == SM64TuxiesMotherBehavior.followChild,
+            "Tuxie's mother value/owner route is preserved"
+        )
+        fingerprint = hashTuxiesMotherDispatch(fingerprint, tuxiesTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")
