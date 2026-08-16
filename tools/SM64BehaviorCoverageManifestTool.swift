@@ -117,6 +117,7 @@ struct SM64BehaviorCoverageManifestTool {
         "bhvSmallWhomp": ("WhompObjectBridge", "small Whomp variant owner route"),
         "bhvMerryGoRoundBigBoo": ("BigBooObjectBridge", "Merry-Go-Round Big Boo variant owner route"),
         "bhvCirclingAmp": ("AmpObjectBridge", "circling Amp variant owner route"),
+        "bhvDecorativePendulum": ("DecorativePendulumObjectBridge", "decorative pendulum value/owner route"),
         "bhvWoodenPost": ("ChainChompReleaseObjectBridge", "wooden-post release owner route"),
         "bhvYoshi": ("YoshiObjectBridge", "Yoshi value/owner route"),
     ]

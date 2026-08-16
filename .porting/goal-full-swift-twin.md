@@ -2,7 +2,7 @@
 
 ## Status
 
-M22f is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M22g is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -374,6 +374,16 @@ independent Swift/C Yoshi owner fingerprint is
 `0x0d985a32a8a93715`; the focused contract, regenerated native Debug build,
 204-script matrix, `git diff --check`, and zero unchecked-Sendable audit pass.
 This is live Yoshi integration, not whole-level dispatch or whole-game parity.
+M22g attaches the existing `bhvDecorativePendulum` value kernel to a
+generation-safe default-list owner bridge. Initialization publishes the
+source roll velocity and update-gfx flag; each live callback advances the
+fixed-point roll and routes `SOUND_GENERAL_BIG_CLOCK` through the shared
+owner-thread effect sink. Its independent Swift/C owner fingerprint is
+`0xb45d1c83aa454dc3`; the behavior manifest now records 73 Swift value/owner
+routes and 461 explicit adapters. Focused contracts, regenerated Xcode
+sources/native Debug build, 205-script matrix, `git diff --check`, and zero
+unchecked-Sendable audit are the evidence boundary. This remains a bounded
+live route, not whole-level dispatch or whole-game parity.
 M22e replaces the `bhvRespawner` C callback with a pointer-free Swift value
 kernel and owner bridge. It preserves the source outside-radius gate,
 single-spawn/deactivation ordering, behavior-parameter transfer, transform
@@ -1275,7 +1285,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M22d: transient and child behavior identity reconciliation | Swift's existing fireball, Fly Guy, Chain Chomp, Chuckya, Lakitu, Goomba, Koopa, Moneybag, racing-penguin, Skeeter, and water-bomb owners receive their exact reachable child/variant declarations. | Complete locally — manifest fingerprint `0x2f7887e32de75f61`, 534 rows (71 Swift value/owner, 463 explicit C adapters), focused Swift/C contract, 203-script matrix (runs=203 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m22d-build.log`), git diff --check, and zero unchecked-Sendable audit pass; live route execution, real dispatch, and eliminating the remaining 463 adapters remain |
 | M22e: Respawner value/owner behavior route | Swift replaces `bhvRespawner` with a source-ordered outside-radius gate, one-shot child allocation, model/behavior/parameter/transform transfer, and owner-thread deactivation. | Complete locally — strict Swift 6/C respawner fingerprint `0x601bae83c1bd4083`, behavior manifest fingerprint `0xf8bbfcbc86b888d9`, 534 rows (72 Swift value/owner, 462 explicit C adapters), focused Swift/C contracts, regenerated Xcode sources/native Debug build (`/tmp/sm64-modern-m22e-build.log`), 204-script matrix (runs=204 failures=0), git diff --check, and zero unchecked-Sendable audit pass; live level integration and the remaining 462 adapters remain |
 | M22f: live Yoshi respawner scheduler integration | Yoshi's source-authored respawner is allocated in the default list, dispatched by the live scheduler in C list order, spawns the replacement Yoshi in the same traversal, transfers behavior/parameter/transform fields, and retires both source and respawner safely. | Complete locally — strict Swift 6/C Yoshi owner fingerprint `0x0d985a32a8a93715`, behavior manifest fingerprint `0xf8bbfcbc86b888d9`, 534 rows (72 Swift value/owner, 462 explicit C adapters), focused Swift/C ordering contract, regenerated native Debug build (`/tmp/sm64-modern-m22f-build.log`), 204-script matrix (runs=204 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-level behavior dispatch, the remaining 462 adapters, and parity remain |
-| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22f close deterministic identity accounting and two live respawner routes with 534 rows, 72 known Swift value/owner routes, and 462 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
+| M22g: live decorative pendulum owner route | The existing decorative-pendulum value kernel is attached to a generation-safe `OBJ_LIST_DEFAULT` owner bridge, preserves initialization/update-gfx state, advances the source fixed-point roll, and delivers the big-clock sound intent. | Complete locally — strict Swift 6/C owner fingerprint `0xb45d1c83aa454dc3`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused Swift/C owner contract, regenerated Xcode sources/native Debug build (`/tmp/sm64-modern-m22g-build.log`), 205-script matrix (runs=205 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-level behavior dispatch, the remaining 461 adapters, and parity remain |
+| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22g close deterministic identity accounting and three live value/owner routes with 534 rows, 73 known Swift value/owner routes, and 461 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |

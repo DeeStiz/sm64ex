@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M22g attaches the existing `bhvDecorativePendulum` value kernel to a
+  generation-safe `OBJ_LIST_DEFAULT` owner bridge. Initialization publishes
+  the source roll velocity and update-gfx flag; every live callback advances
+  the fixed-point roll and routes `SOUND_GENERAL_BIG_CLOCK` through the
+  owner-thread effect sink. Strict Swift/C owner fingerprint
+  0xb45d1c83aa454dc3, behavior manifest fingerprint 0x9bb2863444c51d6d,
+  534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused owner
+  contract, regenerated Xcode sources/native Debug build target
+  /tmp/sm64-modern-m22g-build.log, full 205-script matrix,
+  `git diff --check`, and zero unchecked-Sendable audit are required evidence.
+  Whole-level behavior dispatch, the remaining adapters, and live parity are
+  still open. Handoff: .porting/porting-handoff-full-swift-twin-M22g.md.
 - M22f integrates `SM64RespawnerObjectBridge` into the live Yoshi owner
   scheduler. The respawner is allocated in the source `OBJ_LIST_DEFAULT`
   list, visited after Yoshi during the same scheduler traversal, spawns the
