@@ -188,6 +188,42 @@ final class SM64RacingPenguinObjectBridge {
         return true
     }
 
+    /// Clears per-tick receipts before the shared scheduler traverses the
+    /// racing-penguin owner bridge.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Clears receipts and advances owner-thread race children before the
+    /// shared scheduler traverses their parent and surface lists.
+    func beginExternalTick(state engineState: SM64SwiftEngineState) {
+        beginExternalTick()
+        advanceRaceChildren(state: engineState)
+    }
+
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard states[id] != nil, pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID, pool: SM64ObjectPool? = nil) {
+        if let children = raceChildren.removeValue(forKey: id), let pool {
+            _ = pool.despawn(children.finishLine)
+            _ = pool.despawn(children.shortcutCheck)
+        }
+        states.removeValue(forKey: id)
+        environments.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id, pool: pool) }
+        for id in registeredIDs where pool.record(for: id) == nil { remove(id, pool: pool) }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -195,32 +231,14 @@ final class SM64RacingPenguinObjectBridge {
         advanceNativeDynamics: Bool = true
     ) -> SM64RacingPenguinSchedulerTickResult {
         environments = frameEnvironments
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
-        advanceRaceChildren(state: engineState)
+        beginExternalTick(state: engineState)
         let schedulerResult = scheduler.update(
             state: engineState,
             advanceNativeDynamics: advanceNativeDynamics
         ) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            if let children = raceChildren.removeValue(forKey: id) {
-                _ = engineState.objects.despawn(children.finishLine)
-                _ = engineState.objects.despawn(children.shortcutCheck)
-            }
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            if let children = raceChildren.removeValue(forKey: id) {
-                _ = engineState.objects.despawn(children.finishLine)
-                _ = engineState.objects.despawn(children.shortcutCheck)
-            }
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64RacingPenguinSchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog,

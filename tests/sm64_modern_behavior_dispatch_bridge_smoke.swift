@@ -1100,6 +1100,53 @@ private func hashMrIDispatch(
     return hash
 }
 
+private func hashRacingPenguinDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.racingPenguinEffects.count))
+    for effect in tick.racingPenguinEffects {
+        let output = effect.output
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.action)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.initTextCooldown)))
+        hash = hashU64(hash, UInt64(output.forwardVelocity.bitPattern))
+        hash = hashU64(hash, UInt64(output.weightedTargetSpeed.bitPattern))
+        hash = hashU64(hash, UInt64(UInt16(bitPattern: output.moveYaw)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.animation)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.finalTextbox)))
+        hash = hashU64(hash, output.marioWon ? 1 : 0)
+        hash = hashU64(hash, output.marioCheated ? 1 : 0)
+        hash = hashU64(hash, output.reachedBottom ? 1 : 0)
+        hash = hashU64(hash, output.resetTimer ? 1 : 0)
+        hash = hashU64(hash, effect.raceChildren == nil ? 0 : 1)
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        hash = hashU64(hash, UInt64(effect.presentedEffects.count))
+    }
+    hash = hashU64(hash, UInt64(tick.racingPenguinDeliveries.count))
+    for delivery in tick.racingPenguinDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1774,6 +1821,27 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(mrITick.mrIDeliveries.isEmpty, "Mr I idle route has no delivery")
         fingerprint = hashMrIDispatch(fingerprint, mrITick)
+
+        let racingEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let racingBridge = SM64BehaviorDispatchBridge()
+        let racingPenguin = try racingBridge.spawnRacingPenguin(in: racingEngine)
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64RacingPenguinObjectBridge.finishLineBehaviorIdentity) == .racingPenguin
+                && SM64BehaviorDispatchBridge.route(for: SM64RacingPenguinObjectBridge.shortcutBehaviorIdentity) == .racingPenguin,
+            "Racing-penguin child identities share the owner route"
+        )
+        let racingTick = racingBridge.tick(state: racingEngine)
+        require(racingTick.events.map(\.route) == [.racingPenguin], "Racing-penguin route dispatch")
+        require(racingTick.scheduler.updated.map(\.traceSubject) == [1], "Racing-penguin callback ordering")
+        require(
+            racingTick.racingPenguinEffects.count == 1
+                && racingTick.racingPenguinEffects[0].objectID == racingPenguin
+                && racingTick.racingPenguinEffects[0].output.action == SM64RacingPenguinBehavior.waitForMario
+                && racingTick.racingPenguinEffects[0].raceChildren == nil,
+            "Racing-penguin value/owner route is preserved"
+        )
+        require(racingTick.racingPenguinDeliveries.count == 1, "Racing-penguin owner delivery is explicit")
+        fingerprint = hashRacingPenguinDispatch(fingerprint, racingTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

@@ -2,6 +2,23 @@
 
 ## Current Milestone
 
+- M22ar registers the existing racing-penguin owner bridge in the shared
+  general-actor/surface `SM64BehaviorDispatchBridge`. The route preserves
+  parent-to-finish-line and shortcut child allocation, source list ordering,
+  race-state transitions, and generation-safe owner delivery while path,
+  collision, camera/dialog, audio, and reward consumers remain typed external
+  seams. Thirty-nine-route Swift/C fingerprint `0xfe3c941c18c045f5`, standalone
+  racing-penguin fingerprint `0x65b2ccecaa02d25a`, behavior manifest fingerprint
+  `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/racing-penguin contracts, native Debug target
+  `/tmp/sm64-modern-m22ar-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix (`/tmp/sm64-modern-m22ar-final-matrix2.log`),
+  `git diff --check`, and zero unchecked-Sendable audit pass are the evidence
+  boundary. Full path/collision/camera/dialog/audio/reward consumers, remaining
+  adapters, and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ar.md`.
+
 - M22aq registers the existing Mr. I eye and persistent iris owner bridge in
   the shared general-actor/default `SM64BehaviorDispatchBridge`. The route
   preserves eye-to-iris allocation, identity-specific list order, idle/tangible

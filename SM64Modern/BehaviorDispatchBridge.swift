@@ -39,6 +39,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case waterBomb = 35
     case eyerok = 36
     case mrI = 37
+    case racingPenguin = 38
     case unmigrated = 255
 }
 
@@ -122,6 +123,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let eyerokDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let mrIEffects: [SM64MrIObjectEffectRecord]
     let mrIDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let racingPenguinEffects: [SM64RacingPenguinObjectEffect]
+    let racingPenguinDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -167,6 +170,7 @@ final class SM64BehaviorDispatchBridge {
     let waterBomb: SM64WaterBombObjectBridge
     let eyerok: SM64EyerokObjectBridge
     let mrI: SM64MrIObjectBridge
+    let racingPenguin: SM64RacingPenguinObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -210,6 +214,7 @@ final class SM64BehaviorDispatchBridge {
         self.waterBomb = SM64WaterBombObjectBridge(scheduler: scheduler)
         self.eyerok = SM64EyerokObjectBridge(scheduler: scheduler)
         self.mrI = SM64MrIObjectBridge(scheduler: scheduler)
+        self.racingPenguin = SM64RacingPenguinObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -314,6 +319,11 @@ final class SM64BehaviorDispatchBridge {
              SM64MrIObjectBridge.bodyBehaviorIdentity,
              SM64MrIObjectBridge.particleBehaviorIdentity:
             return .mrI
+        case SM64RacingPenguinObjectBridge.defaultBehaviorIdentity,
+             SM64RacingPenguinObjectBridge.finishLineBehaviorIdentity,
+             SM64RacingPenguinObjectBridge.shortcutBehaviorIdentity,
+             SM64RacingPenguinObjectBridge.smokeBehaviorIdentity:
+            return .racingPenguin
         default:
             return .unmigrated
         }
@@ -359,6 +369,7 @@ final class SM64BehaviorDispatchBridge {
         for id in waterBomb.registeredIDs { waterBomb.remove(id) }
         for id in eyerok.registeredIDs { eyerok.remove(id) }
         for id in mrI.registeredIDs { mrI.remove(id) }
+        for id in racingPenguin.registeredIDs { racingPenguin.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -397,6 +408,7 @@ final class SM64BehaviorDispatchBridge {
         waterBomb.beginExternalTick()
         eyerok.beginExternalTick()
         mrI.beginExternalTick()
+        racingPenguin.beginExternalTick()
     }
 
     @discardableResult
@@ -1182,6 +1194,23 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnRacingPenguin(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        moveYaw: Int16 = 0,
+        model: UInt32 = SM64RacingPenguinObjectBridge.defaultModel,
+        behaviorIdentity: UInt64 = SM64RacingPenguinObjectBridge.defaultBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try racingPenguin.spawnPenguin(
+            in: engineState,
+            position: position,
+            moveYaw: moveYaw,
+            model: model,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -1220,6 +1249,7 @@ final class SM64BehaviorDispatchBridge {
         waterBomb.beginExternalTick()
         eyerok.beginExternalTick()
         mrI.beginExternalTick()
+        racingPenguin.beginExternalTick(state: engineState)
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -1316,6 +1346,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.eyerok.updateInline(id, pool: pool)
             case .mrI:
                 _ = self.mrI.updateInline(id, pool: pool)
+            case .racingPenguin:
+                _ = self.racingPenguin.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -1362,6 +1394,7 @@ final class SM64BehaviorDispatchBridge {
             waterBomb.remove(id)
             eyerok.remove(id)
             mrI.remove(id)
+            racingPenguin.remove(id, pool: engineState.objects)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -1440,6 +1473,7 @@ final class SM64BehaviorDispatchBridge {
         waterBomb.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         eyerok.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         mrI.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        racingPenguin.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -1514,7 +1548,9 @@ final class SM64BehaviorDispatchBridge {
             eyerokEffects: eyerok.effectLog,
             eyerokDeliveries: eyerok.deliveryLog,
             mrIEffects: mrI.effectLog,
-            mrIDeliveries: mrI.deliveryLog
+            mrIDeliveries: mrI.deliveryLog,
+            racingPenguinEffects: racingPenguin.effectLog,
+            racingPenguinDeliveries: racingPenguin.deliveryLog
         )
     }
 }
