@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M21c adds the King Bob-omb floor/wall collision and
+  `cur_obj_move_standard(-78)` value seam: 10-unit wall probe, wall-facing
+  and 60-degree steep-floor flags, floor identity/type/room/normal, C-order
+  edge/slope admission, gravity/terminal velocity, first-touch landing, and
+  signed forward-speed preservation. Focused strict Swift/C fingerprint
+  `0x0fae8eeffa0db03b`, script `script/test_king_bobomb_collision.sh`, full
+  matrix `runs=179 failures=0` (`/tmp/sm64-modern-m21c-final-matrix.log`),
+  regenerated native Debug build (`/tmp/sm64-modern-m21c-build.log`),
+  `git diff --check`, and zero unchecked-Sendable audit pass. The collision
+  world is not yet live gameplay authority; owner adoption, arena/camera,
+  reward, presentation, and other boss families remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M21c.md`.
+
 - M21b attaches the King Bob-omb value route to generation-safe owner records
   and the live 13-list scheduler. It synchronizes action/subaction/health,
   animation, transform/physics, tangibility, hidden/holdable interaction,

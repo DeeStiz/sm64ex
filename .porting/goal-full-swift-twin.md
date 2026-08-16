@@ -2,7 +2,7 @@
 
 ## Status
 
-M21b is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M21c is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -86,6 +86,14 @@ and star intents through the shared owner-thread sink; and retires stale
 generations at the scheduler boundary. Its strict Swift/C owner fingerprint
 is `0xaaf3e5fffd276cde`; collision admission, floor/wall movement, arena
 camera/cutscene ownership, reward persistence, and real presentation remain
+open.
+M21c adds the King Bob-omb floor/wall collision and `cur_obj_move_standard(-78)`
+value seam. It preserves the 10-unit wall probe, wall-facing/steep-floor
+flags, floor identity/type/room/normal publication, C-order edge and slope
+admission, gravity/terminal velocity, first-touch landing transition, and
+forward-speed sign. Its strict Swift/C fingerprint is
+`0x0fae8eeffa0db03b`; the owner bridge has not yet made this collision world
+the live gameplay authority, and arena/camera/reward/presentation gates remain
 open.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
@@ -945,7 +953,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20u close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie/small-penguin/geo/Bob-omb Buddy/Yoshi slice; broader collision/movement integration, path selection for every other reachable trajectory, dialog/effect/audio identity, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21a: King Bob-omb value route | Swift reproduces King Bob-omb's nine source action values, intro activation/dialog gate, chase/grab/throw branches, damage phases, return-home path, defeat dialog/star effects, boss-music stop timing, and held/thrown object branches as an explicit value contract. | Complete locally — strict Swift 6/C fingerprint `0xa15d577dbb4d9afc`, focused contract, 177-script matrix (`runs=177 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m21a-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; owner records, collision/movement, camera/audio/dialog owners, and arena integration remain |
 | M21b: King Bob-omb owner/effect bridge | Swift binds the King Bob-omb kernel to generation-safe object records and the live scheduler, synchronizes action/animation/physics/interaction/held fields, routes music/dialog/sound/particle/camera/star intents through the owner-thread sink, and retires stale generations at the scheduler boundary. | Complete locally — strict Swift 6/C owner fingerprint `0xaaf3e5fffd276cde`, focused owner contract, 178-script matrix (`runs=178 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m21b-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; collision admission, floor/wall movement, arena camera/cutscene ownership, reward persistence, and real presentation remain |
-| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a/M21b close the King Bob-omb value and owner/effect seams; King Bob-omb collision/movement/arena wiring, Whomp King integration, Big Boo, Eyerok, Chief Chilly, Bowser arenas, reward/camera/music transitions, and deterministic boss-phase shards remain |
+| M21c: King Bob-omb collision/movement value seam | Swift reproduces the 10-unit floor/wall prepass, wall-facing and 60-degree steep-floor flags, floor identity/type/room/normal publication, C-order edge/slope admission, gravity/terminal velocity, landing transition, and signed `cur_obj_move_standard(-78)` speed as value-only inputs/results. | Complete locally — strict Swift 6/C fingerprint `0x0fae8eeffa0db03b`, focused collision contract, 179-script matrix (`runs=179 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m21c-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; owner bridge collision-world adoption, arena/camera ownership, rewards, real presentation, and boss-family breadth remain |
+| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21c close the King Bob-omb value, owner/effect, and collision/movement seams; owner collision-world adoption, arena wiring, Whomp King integration, Big Boo, Eyerok, Chief Chilly, Bowser arenas, reward/camera/music transitions, and deterministic boss-phase shards remain |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
@@ -1178,6 +1187,11 @@ replayable trace, and the platform evidence listed in its exit gate.
    are all covered by an independent Swift/C owner trace. Collision admission,
    floor/wall movement, arena camera/cutscene state, reward persistence, and
    real presentation owners still require later boss milestones.
+   M21c adds the copied collision/movement seam behind that bridge. The value
+   result preserves the source wall probe, steep-floor admission, floor
+   identity/type/room, edge rejection, gravity clamp, and first-touch landing
+   flags; it is independently C-fingerprinted but remains an explicit input to
+   the owner bridge until the live world/camera/collision cutover is qualified.
    Finish broader collision/movement integration, path selection for every
    other reachable trajectory, and effect identity before owner-wiring the
    remaining NPC families.

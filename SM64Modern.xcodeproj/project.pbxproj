@@ -168,6 +168,7 @@
 		C26B5E45D862990F73216E20 /* CameraWallAvoidance.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8EAD015DAC9DCB859D04D1C /* CameraWallAvoidance.swift */; };
 		C2F45A5E7BF418E1FB457888 /* AmpObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85FF0525B95F4052B6251D46 /* AmpObjectBridge.swift */; };
 		C4A4E51360A88FDFC1106CEA /* WaterBombObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1DE7AE7AC1D8F6731FE45B3C /* WaterBombObjectBridge.swift */; };
+		C4F2DF30B2F22A044509F0FF /* KingBobombCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10AAD085B7A7F0D27BEC7FE2 /* KingBobombCollision.swift */; };
 		C51FA8AC1BCC4AEACB3EF387 /* RacingPenguinRaceChildren.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C87D408A2A3E729C89C36C3 /* RacingPenguinRaceChildren.swift */; };
 		C64BB4E43DA2868B1767C6E3 /* WaterBomb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3272FC72F5FA191847C8D57B /* WaterBomb.swift */; };
 		C86EE2726C8C3CB1AF7C47FC /* MarioSubmergedAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D50D50CB46C2409DDCA4E62E /* MarioSubmergedAction.swift */; };
@@ -223,6 +224,7 @@
 		0E8CE0F23C268072CA9D6E61 /* SpinyObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinyObjectBridge.swift; sourceTree = "<group>"; };
 		102B791DCCC1F75BC03F0F6B /* GoombaObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoombaObjectBridge.swift; sourceTree = "<group>"; };
 		106B51D9CC6C878D9C69F33F /* SwoopEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwoopEnemy.swift; sourceTree = "<group>"; };
+		10AAD085B7A7F0D27BEC7FE2 /* KingBobombCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingBobombCollision.swift; sourceTree = "<group>"; };
 		129A98B13AFB161495B1C646 /* LevelScriptVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScriptVM.swift; sourceTree = "<group>"; };
 		135C103AE0705B71EBE54DC5 /* SurfaceCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfaceCollision.swift; sourceTree = "<group>"; };
 		14C3AD2F912846687082EA12 /* SLWalkingPenguinCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinCollision.swift; sourceTree = "<group>"; };
@@ -502,6 +504,7 @@
 				3B50BE71193A3FEA1F2989D6 /* HeaveHoObjectBridge.swift */,
 				34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */,
 				6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */,
+				10AAD085B7A7F0D27BEC7FE2 /* KingBobombCollision.swift */,
 				89E04BA8076B6B4EC9BEA57D /* KingBobombObjectBridge.swift */,
 				5EBCDC28A1DADF92929BD72A /* KoopaShell.swift */,
 				BAB7D9714A5D0EEB844F6E3A /* KoopaShellObjectBridge.swift */,
@@ -808,6 +811,7 @@
 				4C4E1312ABA85E0E64E74747 /* HeaveHoObjectBridge.swift in Sources */,
 				ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */,
 				719A899A4EB08E524438CFD3 /* KingBobombBehavior.swift in Sources */,
+				C4F2DF30B2F22A044509F0FF /* KingBobombCollision.swift in Sources */,
 				E8C1689E9E20F1D6F8F051A3 /* KingBobombObjectBridge.swift in Sources */,
 				DA4DF9B4F9D992BFE4FFAD06 /* KoopaShell.swift in Sources */,
 				E6EB1E83D40B684FD3B7426A /* KoopaShellObjectBridge.swift in Sources */,
