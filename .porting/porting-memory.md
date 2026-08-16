@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21m adds the pointer-free Eyerok boss controller. It preserves the five
+  source boss actions, hand-spawn transforms/models, wake/music/intro-dialog
+  gates, Mario-relative hand selection and double-pound target clamp, defeat
+  dialog/star coordinates, and boss-music stop/deletion timing. Focused strict
+  Swift/C fingerprint 0x581005e57751119e, script
+  script/test_eyerok_boss.sh, full matrix target runs=189 failures=0, and
+  regenerated native Debug build target /tmp/sm64-modern-m21m-build.log are
+  the evidence boundary. Eyerok hand behavior/owner records, collision
+  movement, real camera/audio/dialog consumers, durable reward persistence,
+  and device/visual/human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21m.md.
+
 - M21l makes the Big Boo owner bridge consume the immutable surface world
   behind an explicit movement gate. The owner tick preserves source wall/floor
   identity, executes the action-before-standard-movement order, applies the

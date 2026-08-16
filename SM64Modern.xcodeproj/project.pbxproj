@@ -147,6 +147,7 @@
 		AA11511562A943F3C8B9C98C /* MarioSlopeDeceleration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17FF9C20F66B7B90ADA98EC0 /* MarioSlopeDeceleration.swift */; };
 		AA1E0D8AA06F9E83EFEB426F /* RacingPenguinBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596D8EF20F09C73B0AFC37D3 /* RacingPenguinBehavior.swift */; };
 		AA5279A05B7F71EC1A8B3965 /* MarioTurningAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94BED6B07789579D6D43B013 /* MarioTurningAction.swift */; };
+		AABD8C2EDF09336DC5C998EC /* EyerokBoss.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EA80AEA8F534EA712E1C090 /* EyerokBoss.swift */; };
 		AACD57508B2998F2000A2232 /* BooObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96CEA38FA4BFC38D3E850B6 /* BooObjectBridge.swift */; };
 		AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */ = {isa = PBXBuildFile; fileRef = 328470043E0C3F9278C1A80E /* AppleAudioService.m */; };
 		ACC2FB1D1A49430F7673E036 /* MarioMovePunchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595FCD866921E9B396C8E841 /* MarioMovePunchAction.swift */; };
@@ -351,6 +352,7 @@
 		9C87D408A2A3E729C89C36C3 /* RacingPenguinRaceChildren.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RacingPenguinRaceChildren.swift; sourceTree = "<group>"; };
 		9D8C59955994453AFE524C2A /* MarioFinishTurningAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioFinishTurningAction.swift; sourceTree = "<group>"; };
 		9DEC5D253D4E679DB5AB13D6 /* MarioWalkAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWalkAnimation.swift; sourceTree = "<group>"; };
+		9EA80AEA8F534EA712E1C090 /* EyerokBoss.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyerokBoss.swift; sourceTree = "<group>"; };
 		9EEBF996423E617F30D67C1D /* MarioAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioAction.swift; sourceTree = "<group>"; };
 		A033C381FC3DFA4B705E97C8 /* TTCElevatorBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCElevatorBehavior.swift; sourceTree = "<group>"; };
 		A04F268C62D7061D48BDE8CC /* BullyObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BullyObjectBridge.swift; sourceTree = "<group>"; };
@@ -501,6 +503,7 @@
 				5C737B1A16857D51F7C7FE7A /* EngineHost.swift */,
 				EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */,
 				BB40062F0B74B53B43A517BA /* EngineState.swift */,
+				9EA80AEA8F534EA712E1C090 /* EyerokBoss.swift */,
 				A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */,
 				05D35EE8DC4AB3016AB7352A /* FlyGuyEnemy.swift */,
 				59206E9C56FA9ADDE5FD3301 /* FlyGuyObjectBridge.swift */,
@@ -813,6 +816,7 @@
 				946B96572AA7C94347AF500E /* EngineHost.swift in Sources */,
 				1000A98A2958DA1238E20A6D /* EngineRuntime.swift in Sources */,
 				8F2434A3E57287185819D685 /* EngineState.swift in Sources */,
+				AABD8C2EDF09336DC5C998EC /* EyerokBoss.swift in Sources */,
 				ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */,
 				F635692396D181B8EEE8464A /* FlyGuyEnemy.swift in Sources */,
 				9931F629C3ED5181495396D9 /* FlyGuyObjectBridge.swift in Sources */,
