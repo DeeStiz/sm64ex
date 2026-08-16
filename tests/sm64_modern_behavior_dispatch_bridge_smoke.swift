@@ -933,6 +933,44 @@ private func hashExplosionDispatch(
     return hash
 }
 
+private func hashMoneybagDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.moneybagEffects.count))
+    for effect in tick.moneybagEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, effect.kind ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.action))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.moneybagDeliveries.count))
+    for delivery in tick.moneybagDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1471,6 +1509,33 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             "Explosion value/owner route is preserved"
         )
         fingerprint = hashExplosionDispatch(fingerprint, explosionTick)
+
+        let moneybagEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let moneybagBridge = SM64BehaviorDispatchBridge()
+        let moneybag = try moneybagBridge.spawnMoneybag(
+            in: moneybagEngine,
+            action: .death,
+            positionX: 20,
+            positionY: 30,
+            positionZ: 40
+        )
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64MoneybagObjectBridge.hiddenBehaviorIdentity) == .moneybag,
+            "hidden Moneybag identity shares the owner route"
+        )
+        let moneybagTick = moneybagBridge.tick(state: moneybagEngine)
+        require(moneybagTick.events.map(\.route) == [.moneybag], "Moneybag route dispatch")
+        require(moneybagTick.scheduler.updated.map(\.traceSubject) == [1], "Moneybag callback ordering")
+        require(
+            moneybagTick.moneybagEffects.count == 1
+                && moneybagTick.moneybagEffects.first?.objectID == moneybag
+                && moneybagTick.moneybagEffects.first?.kind == false
+                && moneybagTick.moneybagEffects.first?.action == SM64MoneybagAction.death.rawValue
+                && moneybagTick.moneybagEffects.first?.effects == [.death],
+            "Moneybag value/owner route is preserved"
+        )
+        require(moneybagTick.moneybagDeliveries.isEmpty, "Moneybag initial death has no delivery")
+        fingerprint = hashMoneybagDispatch(fingerprint, moneybagTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

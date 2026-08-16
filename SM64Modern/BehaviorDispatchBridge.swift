@@ -35,6 +35,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case koopaShell = 31
     case bowserKeyCutscene = 32
     case explosion = 33
+    case moneybag = 34
     case unmigrated = 255
 }
 
@@ -110,6 +111,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let bowserKeyCutsceneEffects: [SM64BowserKeyCutsceneObjectEffectRecord]
     let explosionEffects: [SM64ExplosionObjectEffectRecord]
     let explosionDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let moneybagEffects: [SM64MoneybagObjectEffectRecord]
+    let moneybagDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -151,6 +154,7 @@ final class SM64BehaviorDispatchBridge {
     let koopaShell: SM64KoopaShellObjectBridge
     let bowserKeyCutscene: SM64BowserKeyCutsceneObjectBridge
     let explosion: SM64ExplosionObjectBridge
+    let moneybag: SM64MoneybagObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -190,6 +194,7 @@ final class SM64BehaviorDispatchBridge {
         self.koopaShell = SM64KoopaShellObjectBridge(scheduler: scheduler)
         self.bowserKeyCutscene = SM64BowserKeyCutsceneObjectBridge(scheduler: scheduler)
         self.explosion = SM64ExplosionObjectBridge(scheduler: scheduler)
+        self.moneybag = SM64MoneybagObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -281,6 +286,9 @@ final class SM64BehaviorDispatchBridge {
              SM64ExplosionObjectBridge.bubbleBehaviorIdentity,
              SM64ExplosionObjectBridge.groundSmokeBehaviorIdentity:
             return .explosion
+        case SM64MoneybagObjectBridge.moneybagBehaviorIdentity,
+             SM64MoneybagObjectBridge.hiddenBehaviorIdentity:
+            return .moneybag
         default:
             return .unmigrated
         }
@@ -322,6 +330,7 @@ final class SM64BehaviorDispatchBridge {
         for id in koopaShell.registeredIDs { koopaShell.remove(id) }
         for id in bowserKeyCutscene.registeredIDs { bowserKeyCutscene.remove(id) }
         for id in explosion.registeredIDs { explosion.remove(id) }
+        for id in moneybag.registeredIDs { moneybag.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -356,6 +365,7 @@ final class SM64BehaviorDispatchBridge {
         koopaShell.beginExternalTick()
         bowserKeyCutscene.beginExternalTick()
         explosion.beginExternalTick()
+        moneybag.beginExternalTick()
     }
 
     @discardableResult
@@ -1029,6 +1039,42 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnMoneybag(
+        in engineState: SM64SwiftEngineState,
+        action: SM64MoneybagAction = .appear,
+        positionX: Float = 0,
+        positionY: Float = 0,
+        positionZ: Float = 0,
+        floorHeight: Float = 0,
+        moveYaw: Int16 = 0
+    ) throws -> SM64ObjectID {
+        try moneybag.spawnMoneybag(
+            in: engineState,
+            action: action,
+            positionX: positionX,
+            positionY: positionY,
+            positionZ: positionZ,
+            floorHeight: floorHeight,
+            moveYaw: moveYaw
+        )
+    }
+
+    @discardableResult
+    func spawnHiddenMoneybagCoin(
+        in engineState: SM64SwiftEngineState,
+        positionX: Float = 0,
+        positionY: Float = 0,
+        positionZ: Float = 0
+    ) throws -> SM64ObjectID {
+        try moneybag.spawnHiddenCoin(
+            in: engineState,
+            positionX: positionX,
+            positionY: positionY,
+            positionZ: positionZ
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -1063,6 +1109,7 @@ final class SM64BehaviorDispatchBridge {
         koopaShell.beginExternalTick()
         bowserKeyCutscene.beginExternalTick()
         explosion.beginExternalTick()
+        moneybag.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -1151,6 +1198,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.bowserKeyCutscene.updateInline(id, pool: pool)
             case .explosion:
                 _ = self.explosion.updateInline(id, pool: pool)
+            case .moneybag:
+                _ = self.moneybag.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -1193,6 +1242,7 @@ final class SM64BehaviorDispatchBridge {
             koopaShell.remove(id)
             bowserKeyCutscene.remove(id)
             explosion.remove(id)
+            moneybag.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -1267,6 +1317,7 @@ final class SM64BehaviorDispatchBridge {
         koopaShell.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         bowserKeyCutscene.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         explosion.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        moneybag.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -1333,7 +1384,9 @@ final class SM64BehaviorDispatchBridge {
             koopaShellDeliveries: koopaShell.deliveryLog,
             bowserKeyCutsceneEffects: bowserKeyCutscene.effectLog,
             explosionEffects: explosion.effectLog,
-            explosionDeliveries: explosion.deliveryLog
+            explosionDeliveries: explosion.deliveryLog,
+            moneybagEffects: moneybag.effectLog,
+            moneybagDeliveries: moneybag.deliveryLog
         )
     }
 }

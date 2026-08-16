@@ -2,6 +2,24 @@
 
 ## Current Milestone
 
+- M22an registers the existing Moneybag owner bridge for both the visible
+  general-actor and hidden level-list identities in the shared
+  `SM64BehaviorDispatchBridge`. The route preserves death/appear state,
+  object-list placement, generation-safe retirement, and explicit owner
+  delivery while loot, mist, collision, and progression consumers remain
+  typed external seams. Thirty-five-route Swift/C fingerprint
+  `0x0f13ddc8b41d0d0c`, standalone Moneybag fingerprint
+  `0x3fc38246b5faee0f`, behavior manifest fingerprint `0x9bb2863444c51d6d`,
+  534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Moneybag contracts, native Debug target
+  `/tmp/sm64-modern-m22an-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full
+  loot/collision/presentation consumers, remaining adapters, and live parity
+  remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22an.md`.
+
 - M22am registers the existing generic explosion owner bridge and its bubble
   and ground-smoke child identities in the shared
   `SM64BehaviorDispatchBridge`. The destructive-list route preserves

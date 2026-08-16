@@ -150,6 +150,34 @@ final class SM64MoneybagObjectBridge {
         return true
     }
 
+    /// Starts a shared-dispatch tick without running the standalone scheduler.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard registeredIDs.contains(id), pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        moneybags.removeValue(forKey: id)
+        hiddenCoins.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+        hiddenInputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -157,22 +185,11 @@ final class SM64MoneybagObjectBridge {
         hiddenInputs frameHiddenInputs: [SM64ObjectID: SM64MoneybagHiddenTickInput] = [:]
     ) -> SM64MoneybagSchedulerTickResult {
         inputs = frameInputs; hiddenInputs = frameHiddenInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            moneybags.removeValue(forKey: id); inputs.removeValue(forKey: id)
-            hiddenCoins.removeValue(forKey: id); hiddenInputs.removeValue(forKey: id)
-        }
-        for id in Array(moneybags.keys) where engineState.objects.record(for: id) == nil {
-            moneybags.removeValue(forKey: id); inputs.removeValue(forKey: id)
-        }
-        for id in Array(hiddenCoins.keys) where engineState.objects.record(for: id) == nil {
-            hiddenCoins.removeValue(forKey: id); hiddenInputs.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64MoneybagSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
 

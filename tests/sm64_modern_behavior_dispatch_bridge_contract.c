@@ -46,6 +46,7 @@
 #define KOOPA_UNDERWATER_BEHAVIOR UINT64_C(0x6268765f6b7375)
 #define BOWSER_KEY_CUTSCENE_COURSE_EXIT UINT64_C(0x6268765f6b637865)
 #define EXPLOSION_BEHAVIOR UINT64_C(0x6268765f657870)
+#define MONEYBAG_BEHAVIOR UINT64_C(0x6268765f6d6f6e)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -867,6 +868,29 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // spawned
     fingerprint = hash_u64(fingerprint, 0); // deleted
     fingerprint = hash_u64(fingerprint, 0); // rejected
+
+    // Isolated shared-dispatch Moneybag general-actor route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t moneybag_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, moneybag_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, MONEYBAG_BEHAVIOR, 34);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // visible moneybag
+    fingerprint = hash_u64(fingerprint, 5); // death action
+    fingerprint = hash_u64(fingerprint, 16); // death effect
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_u64(fingerprint, 0); // no deliveries
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);
