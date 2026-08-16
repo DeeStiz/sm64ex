@@ -125,6 +125,7 @@
 		86873A7F75CAAF78C48A991F /* GeoLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34836A16DABAFE021C624BDF /* GeoLayout.swift */; };
 		8890816E4404396A10B3AEBD /* CameraPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635680A88C033EBD3EDB337C /* CameraPrimitives.swift */; };
 		89F94D81CF952EF5180F927B /* SwoopEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106B51D9CC6C878D9C69F33F /* SwoopEnemy.swift */; };
+		8AC19AB29646962A8EF430E1 /* BehaviorDispatchBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDE26E083CE3C79E2FBCCDB /* BehaviorDispatchBridge.swift */; };
 		8B39EE65AFE88631047099E2 /* BowserShockWaveObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11D52133743C33476F7C744 /* BowserShockWaveObjectBridge.swift */; };
 		8BBC062591E99F1CF48973CB /* BowserShockWave.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EACF5C30D1F0023F354876 /* BowserShockWave.swift */; };
 		8CD39743040501EE125066B3 /* MarioSlideVariants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00F6C1413CC0CD0ED1403F51 /* MarioSlideVariants.swift */; };
@@ -313,6 +314,7 @@
 		4C0CFFDA8636E0474D01D970 /* MarioInputFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioInputFrame.swift; sourceTree = "<group>"; };
 		4CFDEEEED1CA8A6F5DCE17A5 /* MarioBurningGroundAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioBurningGroundAction.swift; sourceTree = "<group>"; };
 		4DDDABF519C9DA6F2577DA59 /* ChuckyaEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChuckyaEnemy.swift; sourceTree = "<group>"; };
+		4DDE26E083CE3C79E2FBCCDB /* BehaviorDispatchBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorDispatchBridge.swift; sourceTree = "<group>"; };
 		4ED5024BA5E198B6E29A4AF7 /* CameraFOV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFOV.swift; sourceTree = "<group>"; };
 		54E9E5A575E124235D4817C6 /* MarioWhirlpoolAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWhirlpoolAction.swift; sourceTree = "<group>"; };
 		57057E1BD2CCF58B27F411E9 /* MarioWaterDiveAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWaterDiveAction.swift; sourceTree = "<group>"; };
@@ -487,6 +489,7 @@
 				C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */,
 				D5723E1972C2FF3BB21E3A5B /* AppMain.swift */,
 				CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */,
+				4DDE26E083CE3C79E2FBCCDB /* BehaviorDispatchBridge.swift */,
 				D6B1983ADD652967A0372D10 /* BehaviorScript.swift */,
 				2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */,
 				B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */,
@@ -818,6 +821,7 @@
 				AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */,
 				45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */,
 				DD3A03E522F13B396092C761 /* ArrowLiftBehavior.swift in Sources */,
+				8AC19AB29646962A8EF430E1 /* BehaviorDispatchBridge.swift in Sources */,
 				FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */,
 				161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */,
 				0251DEA438C860732FDBE0C1 /* BehaviorScriptVM.swift in Sources */,

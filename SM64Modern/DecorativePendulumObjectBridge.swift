@@ -45,6 +45,25 @@ final class SM64DecorativePendulumObjectBridge {
         registered.contains(id)
     }
 
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        pool: SM64ObjectPool
+    ) -> SM64DecorativePendulumObjectEffectRecord? {
+        guard registered.contains(id) else { return nil }
+        return update(id: id, pool: pool)
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        registered.remove(id)
+    }
+
     @discardableResult
     func spawnPendulum(
         in engineState: SM64SwiftEngineState,
@@ -86,18 +105,13 @@ final class SM64DecorativePendulumObjectBridge {
 
     @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64DecorativePendulumSchedulerTickResult {
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            guard let self, self.registered.contains(id) else { return }
-            self.update(id: id, pool: pool)
+            _ = self?.updateInline(id, pool: pool)
         }
-        for id in schedulerResult.unloaded where registered.remove(id) != nil {
-            // The scheduler owns deactivation and unload ordering.
-        }
+        for id in schedulerResult.unloaded { remove(id) }
         for id in Array(registered) where engineState.objects.record(for: id) == nil {
-            registered.remove(id)
+            remove(id)
         }
         return SM64DecorativePendulumSchedulerTickResult(
             scheduler: schedulerResult,

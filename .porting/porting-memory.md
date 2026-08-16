@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M22h adds the first shared behavior-identity dispatch pass. One owner-thread
+  scheduler selects the proven decorative-pendulum and respawner routes,
+  preserves live default-list insertion order, and records unknown child
+  identities as explicit `unmigrated` events instead of silently invoking a
+  C-shaped fallback. Mixed-route Swift/C fingerprint 0x9445d688831ca6c7,
+  behavior manifest fingerprint 0x9bb2863444c51d6d, 534 rows, 73 Swift
+  value/owner routes, and 461 explicit `unmigrated_c_adapter` rows are the
+  accounting boundary. Focused dispatch contract, regenerated Xcode
+  sources/native Debug build target /tmp/sm64-modern-m22h-build.log, full
+  206-script matrix, `git diff --check`, and zero unchecked-Sendable audit
+  are required evidence. Whole-engine dispatch, the remaining adapters, and
+  live parity are still open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22h.md.
 - M22g attaches the existing `bhvDecorativePendulum` value kernel to a
   generation-safe `OBJ_LIST_DEFAULT` owner bridge. Initialization publishes
   the source roll velocity and update-gfx flag; every live callback advances

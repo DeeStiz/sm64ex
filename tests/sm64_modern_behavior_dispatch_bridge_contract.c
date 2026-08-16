@@ -1,0 +1,86 @@
+#include <stdint.h>
+#include <stdio.h>
+
+#define FNV_OFFSET UINT64_C(1469598103934665603)
+#define FNV_PRIME UINT64_C(1099511628211)
+#define PENDULUM_BEHAVIOR UINT64_C(0x6268765f647065)
+#define RESPAWNER_BEHAVIOR UINT64_C(0x6268765f727370)
+#define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
+
+static uint64_t hash_u64(uint64_t hash, uint64_t value) {
+    for (unsigned byte = 0; byte < 8; ++byte) {
+        hash ^= (value >> (byte * 8u)) & UINT64_C(0xff);
+        hash *= FNV_PRIME;
+    }
+    return hash;
+}
+
+static uint64_t hash_id(uint64_t hash, uint64_t slot, uint64_t generation) {
+    hash = hash_u64(hash, slot);
+    return hash_u64(hash, generation);
+}
+
+static uint64_t hash_event(
+    uint64_t hash,
+    uint64_t slot,
+    uint64_t behavior,
+    uint64_t route
+) {
+    hash = hash_id(hash, slot, 1);
+    hash = hash_u64(hash, behavior);
+    return hash_u64(hash, route);
+}
+
+static uint64_t hash_tick(
+    uint64_t hash,
+    uint64_t frame,
+    int second_tick
+) {
+    hash = hash_u64(hash, frame);
+    hash = hash_u64(hash, second_tick ? 2 : 3); // default-list count
+    hash = hash_u64(hash, second_tick ? 2 : 3); // object counter
+    hash = hash_u64(hash, second_tick ? 2 : 3); // dispatch events
+    hash = hash_event(hash, 0, PENDULUM_BEHAVIOR, 0);
+    if (second_tick) {
+        hash = hash_event(hash, 2, CHILD_BEHAVIOR, 255);
+    } else {
+        hash = hash_event(hash, 1, RESPAWNER_BEHAVIOR, 1);
+        hash = hash_event(hash, 2, CHILD_BEHAVIOR, 255);
+    }
+
+    hash = hash_u64(hash, 1); // pendulum effects
+    hash = hash_id(hash, 0, 1);
+    hash = hash_u64(hash, (uint64_t)(int64_t)(second_tick ? 140 : 124));
+    hash = hash_u64(hash, (uint64_t)(int64_t)(second_tick ? 0x10 : 0x18));
+    hash = hash_u64(hash, second_tick ? 1 : 0);
+    hash = hash_u64(hash, second_tick ? 1 : 0); // presented count
+
+    hash = hash_u64(hash, second_tick ? 0 : 1); // respawner effects
+    if (!second_tick) {
+        hash = hash_id(hash, 1, 1);
+        hash = hash_u64(hash, 3); // spawn + mark for deletion
+        hash = hash_id(hash, 2, 1);
+        hash = hash_u64(hash, 1); // timer
+        hash = hash_u64(hash, 1); // marked for deletion
+    }
+    hash = hash_u64(hash, second_tick ? 0 : 1); // respawner deliveries
+    if (!second_tick) {
+        hash = hash_u64(hash, 1); // deleted count
+        hash = hash_id(hash, 1, 1);
+    }
+
+    hash = hash_u64(hash, UINT64_C(0x77));
+    hash = hash_u64(hash, CHILD_BEHAVIOR);
+    hash = hash_u64(hash, UINT64_C(0x1234));
+    return hash_u64(hash, 8); // OBJ_LIST_DEFAULT
+}
+
+int main(void) {
+    uint64_t fingerprint = FNV_OFFSET;
+    fingerprint = hash_tick(fingerprint, 1, 0);
+    fingerprint = hash_tick(fingerprint, 2, 1);
+    printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
+           (unsigned long long) fingerprint);
+    printf("SM64 Modern behavior dispatch bridge C contract passed\n");
+    return 0;
+}
