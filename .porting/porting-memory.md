@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M22c reconciles exact reachable behavior declarations with existing Swift
+  owner bridges. The manifest now maps Homing/Circling Amp, Ghost
+  Hunt/Merry-Go-Round/Balcony Big Boo, small/big/Chief Chilly Bully including
+  the minion parent, Eyerok's actual boss declaration, Mr. I iris/particle
+  children, Snufit bullets, and Small/King Whomp variants. Manifest fingerprint
+  0xde447c5b375461c6, 534 rows, 57 Swift value/owner routes, and 477 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  script/test_behavior_manifest.sh, full matrix runs=203 failures=0, native
+  Debug build, git diff --check, and zero unchecked-Sendable audit remain the
+  evidence boundary. This corrects identity accounting; it does not prove live
+  execution or parity and does not close the remaining 477 adapters. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22c.md.
 - M22b makes the `bhvBobombExplosionBubble3600` child seam explicit. The
   explosion-child value kernel accepts a deterministic micro-offset, the
   owner bridge preserves it in the spawned bubble record, and the fail-closed
