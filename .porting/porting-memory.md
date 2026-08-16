@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21j adds a pointer-free Big Boo value route for Ghost Hunt,
+  Merry-Go-Round, and Balcony variants. The kernel preserves the five-minion
+  activation gate, health-dependent chase tuning, bounce/nonlethal/lethal hit
+  phases, source reward-star coordinates, and the Ghost Hunt staircase-bridge
+  transition. Focused strict Swift/C fingerprint
+  0xb7435992fb1c22df, script script/test_big_boo.sh, full matrix target
+  runs=186 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21j-build.log are the evidence boundary. Owner object and
+  effect delivery, collision authority, progression/save mutation, real
+  camera/audio consumption, and device/visual/human acceptance remain open.
+  Handoff: .porting/porting-handoff-full-swift-twin-M21j.md.
+
 - M21i makes the Whomp owner bridge consume the immutable surface world behind
   an explicit movement gate. The owner tick now executes the source order of
   floor/wall prepass, Whomp action, and `cur_obj_move_standard(-20)`, applies

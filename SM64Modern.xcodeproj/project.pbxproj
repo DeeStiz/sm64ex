@@ -160,6 +160,7 @@
 		B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F0AEF5342F3B329237DD66 /* ContentPack.swift */; };
 		B4EB45CA367DED1BF59D3D99 /* RotatingPlatformBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28F9F86BA8486D9F6BB005C /* RotatingPlatformBehavior.swift */; };
 		B5333ED03F4E4EB691D052B7 /* MarioBrakingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23B165EA0ECBB7202A73BB8 /* MarioBrakingAction.swift */; };
+		B5C0B662E0729E2A61D81CAA /* BigBooEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = E4F2302F1BDE312495444C39 /* BigBooEnemy.swift */; };
 		B7586B785B0F798C60759CB5 /* SkeeterEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F27F167DF12FDB9DEDC9F64F /* SkeeterEnemy.swift */; };
 		B9245CF366E36C7CE74E6B46 /* CollisionMesh.swift in Sources */ = {isa = PBXBuildFile; fileRef = ADEBABA4A2D4F82877B3BB8A /* CollisionMesh.swift */; };
 		B966D97864B94F9E3BD0EA18 /* PiranhaPlant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 375EBE2D9BBFCAD8B34FDF89 /* PiranhaPlant.swift */; };
@@ -406,6 +407,7 @@
 		E37C0994C353B61075C5EBCA /* ElevatorBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevatorBehavior.swift; sourceTree = "<group>"; };
 		E479D5A092A548EEA6715AA1 /* MarioDeceleratingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioDeceleratingAction.swift; sourceTree = "<group>"; };
 		E497FB3B17788DCEA3B3261F /* BirdObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirdObjectBridge.swift; sourceTree = "<group>"; };
+		E4F2302F1BDE312495444C39 /* BigBooEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigBooEnemy.swift; sourceTree = "<group>"; };
 		E6490BF062BC1F8E0961D2B4 /* MoneybagObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneybagObjectBridge.swift; sourceTree = "<group>"; };
 		E96CEA38FA4BFC38D3E850B6 /* BooObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BooObjectBridge.swift; sourceTree = "<group>"; };
 		E9E6A3C4C6160016A676FD11 /* PlatformDisplacement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformDisplacement.swift; sourceTree = "<group>"; };
@@ -446,6 +448,7 @@
 				D6B1983ADD652967A0372D10 /* BehaviorScript.swift */,
 				2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */,
 				B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */,
+				E4F2302F1BDE312495444C39 /* BigBooEnemy.swift */,
 				FC5B24277AF249CA2DFC7FD6 /* BirdEnemy.swift */,
 				E497FB3B17788DCEA3B3261F /* BirdObjectBridge.swift */,
 				B3E4F781D55FAEFF9757C3F1 /* BobombBuddyBehavior.swift */,
@@ -755,6 +758,7 @@
 				FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */,
 				161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */,
 				0251DEA438C860732FDBE0C1 /* BehaviorScriptVM.swift in Sources */,
+				B5C0B662E0729E2A61D81CAA /* BigBooEnemy.swift in Sources */,
 				23438691E437DAAAC9B38229 /* BirdEnemy.swift in Sources */,
 				9F843A73A64A5646F34206E5 /* BirdObjectBridge.swift in Sources */,
 				6321601F8F550EE3305561A4 /* BobombBuddyBehavior.swift in Sources */,

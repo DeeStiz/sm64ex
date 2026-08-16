@@ -147,6 +147,15 @@ when the gate is disabled. Its strict Swift/C fingerprint is
 matrix, regenerated native Debug build, and zero unchecked-Sendable audit
 pass. Real collision mesh coverage, durable progression/save mutation, camera
 consumption, and human/device acceptance remain open.
+M21j adds a pointer-free Big Boo value route for Ghost Hunt, Merry-Go-Round,
+and Balcony variants. It preserves the five-minion activation gate,
+health-dependent chase tuning, bounce/nonlethal/lethal hit phases, reward-star
+coordinates, and the Ghost Hunt staircase-bridge transition. Its strict
+Swift/C fingerprint is `0xb7435992fb1c22df`; the focused value smoke,
+expanded 186-script matrix, regenerated native Debug build, and zero
+unchecked-Sendable audit pass. Owner object/effect delivery, collision
+authority, progression/save mutation, real camera/audio consumption, and
+human/device acceptance remain open.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
 `beginCommandBuffer`, while the existing queue-level residency, explicit
@@ -1012,7 +1021,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M21g: King Bob-omb reward-star owner spawn | Swift gates the defeat reward path, spawns one source-identity MODEL_STAR child in the level list at the exact C coordinates, preserves parent generation, and emits the owner-thread star intent. | Complete locally — strict Swift 6/C fingerprint 0x49cb52405765e2d1, focused reward-star contract, 183-script matrix (runs=183 failures=0), regenerated native Debug build (/tmp/sm64-modern-m21g-build.log), git diff --check, and zero unchecked-Sendable audit pass; durable progression/save mutation, star behavior execution, and boss-family breadth remain |
 | M21h: King Whomp owner effects and reward | Swift routes King Whomp sound, boss music, camera mode, particles, shake, and star intents through the owner sink and optionally spawns the source-identity level-list reward star at (180, 3880, 340). | Complete locally — strict Swift 6/C fingerprint 0x433b57a9f31daabb, focused owner contract, 184-script matrix (runs=184 failures=0), regenerated native Debug build (/tmp/sm64-modern-m21h-build.log), git diff --check, and zero unchecked-Sendable audit pass; collision authority, durable progression/save mutation, real camera consumption, and boss-family breadth remain |
 | M21i: Whomp owner collision/movement bridge | Swift executes the Whomp owner tick against an immutable surface world in source order, applies the `SET_OBJ_PHYSICS` constants and `cur_obj_move_standard(-20)` movement, and publishes copied collision/movement facts into the generation-safe record. | Complete locally — strict Swift 6/C fingerprint 0xf5bc6ef25b45cfac, focused owner movement contract, 185-script matrix (runs=185 failures=0), regenerated native Debug build (/tmp/sm64-modern-m21i-build.log), git diff --check, and zero unchecked-Sendable audit pass; broad collision data, progression/save, camera consumption, and boss-family breadth remain |
-| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21i close the King Bob-omb value/owner/collision/home/camera/reward seams and the Whomp effect/reward/collision/movement seams; broad collision authority, durable reward persistence, real camera/cutscene wiring, Big Boo, Eyerok, Chief Chilly, Bowser arenas, reward/music transitions, and deterministic boss-phase shards remain |
+| M21j: Big Boo value route | Swift reproduces Ghost Hunt, Merry-Go-Round, and Balcony Big Boo activation, health-dependent chase, hit/death phases, reward-star coordinates, and Ghost Hunt bridge transition as a pointer-free value contract. | Complete locally — strict Swift 6/C fingerprint `0xb7435992fb1c22df`, focused value contract, 186-script matrix (runs=186 failures=0), regenerated native Debug build (/tmp/sm64-modern-m21j-build.log), git diff --check, and zero unchecked-Sendable audit pass; owner/effect delivery, collision authority, progression/save, and boss-family breadth remain |
+| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21j close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, and Big Boo value route; broad collision authority, durable reward persistence, real camera/cutscene/audio wiring, Big Boo owner integration, Eyerok, Chief Chilly, Bowser arenas, reward/music transitions, and deterministic boss-phase shards remain |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
@@ -1258,9 +1268,10 @@ replayable trace, and the platform evidence listed in its exit gate.
    presentation intent. M21h extends that bounded owner delivery to King Whomp
    while keeping collision and progression consumers explicit. M21i adds the
    opt-in immutable-world floor/wall prepass and source `-20` movement route
-   for Whomp. Finish broader collision/movement integration, path selection for
-   every other reachable trajectory, and effect identity before owner-wiring
-   the remaining NPC families.
+   for Whomp. M21j adds the Big Boo value route and keeps its owner/effect
+   consumer explicit. Finish broader collision/movement integration, path
+   selection for every other reachable trajectory, and effect identity before
+   owner-wiring the remaining NPC families.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and
