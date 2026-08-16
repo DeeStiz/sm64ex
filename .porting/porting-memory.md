@@ -2,6 +2,17 @@
 
 ## Current Milestone
 
+- M21u adds the Bowser key level-list value/owner seam. Swift reproduces
+  source spin damping, launch velocity, landing/sparkle cadence, delayed
+  `INTERACT_STAR_OR_KEY` hitbox activation, interaction clearing, and
+  generation-safe deletion. Focused strict Swift/C fingerprint
+  0xcd796d923af75c27, script script/test_bowser_key.sh, full matrix
+  runs=197 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21u-build.log are the evidence boundary. Full Bowser
+  controller/arena routes, collision movement authority, cutscene key
+  consumers, durable reward/warp transitions, and device/visual/human
+  acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21u.md.
 - M21t adds a pointer-free Bowser shockwave value/owner seam. Swift
   reproduces the expanding ring scale, three-frame opacity cadence, late fade,
   strict Mario-distance interaction windows, deletion fence, and owner-thread

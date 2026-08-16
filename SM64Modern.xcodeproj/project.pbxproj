@@ -80,6 +80,7 @@
 		4C4E1312ABA85E0E64E74747 /* HeaveHoObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B50BE71193A3FEA1F2989D6 /* HeaveHoObjectBridge.swift */; };
 		4CF3DED116CEE6FBE9D53438 /* CameraCUpTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEF637017419435B14C766 /* CameraCUpTransition.swift */; };
 		4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795DAA620146CD3735BB84B /* SaveFileCodec.swift */; };
+		528D3B2C102405B8655DD87A /* BowserKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884DACAF76A66E2ACF25162B /* BowserKey.swift */; };
 		532A683D2BF89220ADEB6D64 /* CameraFOV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED5024BA5E198B6E29A4AF7 /* CameraFOV.swift */; };
 		53B872CB3B81DFEBF260C4C7 /* MarioGeometryInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93DAAFB0FF6CAB909448BA5 /* MarioGeometryInput.swift */; };
 		54BE2C1D3F624579927D2313 /* SLWalkingPenguinBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F32D28BA6DAF70AE72591 /* SLWalkingPenguinBehavior.swift */; };
@@ -223,6 +224,7 @@
 		FB50ED38F05CFBC7C775F143 /* GoombaObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 102B791DCCC1F75BC03F0F6B /* GoombaObjectBridge.swift */; };
 		FDFB158F79EC6A450D735577 /* LevelScriptContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */; };
 		FED6F33A5979BD4671A99A6D /* MarioCrawlingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E9DA580874381501BF6F49F /* MarioCrawlingAction.swift */; };
+		FF0373D370D57DC78FE086ED /* BowserKeyObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 186043B47AD790B3A117E4E5 /* BowserKeyObjectBridge.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -241,6 +243,7 @@
 		135C103AE0705B71EBE54DC5 /* SurfaceCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfaceCollision.swift; sourceTree = "<group>"; };
 		14C3AD2F912846687082EA12 /* SLWalkingPenguinCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinCollision.swift; sourceTree = "<group>"; };
 		17FF9C20F66B7B90ADA98EC0 /* MarioSlopeDeceleration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSlopeDeceleration.swift; sourceTree = "<group>"; };
+		186043B47AD790B3A117E4E5 /* BowserKeyObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserKeyObjectBridge.swift; sourceTree = "<group>"; };
 		189D1521FD7CFA3D234A28F6 /* WhompObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhompObjectBridge.swift; sourceTree = "<group>"; };
 		1A4D0A85B420C44DA84C20A2 /* ChainChompObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChainChompObjectBridge.swift; sourceTree = "<group>"; };
 		1A661430B38AD3D4CDBEE43E /* MetalCompilerBridge.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MetalCompilerBridge.m; sourceTree = "<group>"; };
@@ -344,6 +347,7 @@
 		8731782AE37E88BE8805B85C /* SwoopObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwoopObjectBridge.swift; sourceTree = "<group>"; };
 		87414B6C37E5673C98429C04 /* DecorativePendulumBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecorativePendulumBehavior.swift; sourceTree = "<group>"; };
 		8753C291A7DE7C9166C33873 /* SLWalkingPenguinObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinObjectBridge.swift; sourceTree = "<group>"; };
+		884DACAF76A66E2ACF25162B /* BowserKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserKey.swift; sourceTree = "<group>"; };
 		8972955B5A5B93E0345EE4EB /* ChuckyaObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChuckyaObjectBridge.swift; sourceTree = "<group>"; };
 		89E04BA8076B6B4EC9BEA57D /* KingBobombObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingBobombObjectBridge.swift; sourceTree = "<group>"; };
 		8A6630058727A186889977A1 /* ContentPackRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPackRuntime.swift; sourceTree = "<group>"; };
@@ -479,6 +483,8 @@
 				E96CEA38FA4BFC38D3E850B6 /* BooObjectBridge.swift */,
 				0320CB55118E41AB1705469F /* BouncingFireball.swift */,
 				E0D4C3FC8AC2456B981C1640 /* BouncingFireballObjectBridge.swift */,
+				884DACAF76A66E2ACF25162B /* BowserKey.swift */,
+				186043B47AD790B3A117E4E5 /* BowserKeyObjectBridge.swift */,
 				F2EACF5C30D1F0023F354876 /* BowserShockWave.swift */,
 				E11D52133743C33476F7C744 /* BowserShockWaveObjectBridge.swift */,
 				3B2DFA1C27E45B1D51C0A506 /* BulletBill.swift */,
@@ -798,6 +804,8 @@
 				AACD57508B2998F2000A2232 /* BooObjectBridge.swift in Sources */,
 				98F4DF77445264C24B3326CC /* BouncingFireball.swift in Sources */,
 				3D3D38C8A3F908CCFF0C6E7D /* BouncingFireballObjectBridge.swift in Sources */,
+				528D3B2C102405B8655DD87A /* BowserKey.swift in Sources */,
+				FF0373D370D57DC78FE086ED /* BowserKeyObjectBridge.swift in Sources */,
 				8BBC062591E99F1CF48973CB /* BowserShockWave.swift in Sources */,
 				8B39EE65AFE88631047099E2 /* BowserShockWaveObjectBridge.swift in Sources */,
 				E1AE2DF359A0296B0EAA7E67 /* BulletBill.swift in Sources */,
