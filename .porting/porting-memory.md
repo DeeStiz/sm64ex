@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21h extends the Whomp owner bridge for the King Whomp path. Explicit
+  presentation and reward gates now deliver source sound, boss music,
+  CAMERA_MODE_BOSS_FIGHT, particles, shake, and star intents; the reward path
+  materializes one source-identity level-list star at (180, 3880, 340) with
+  generation-safe parentage. Focused strict Swift/C fingerprint
+  0x433b57a9f31daabb, script script/test_whomp_boss_owner.sh, full matrix
+  runs=184 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21h-build.log are the evidence boundary. Collision
+  authority, durable progression/save mutation, the real camera consumer, and
+  device/visual/human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21h.md.
+
 - M21g adds an opt-in owner-thread defeat reward boundary for King Bob-omb.
   The bridge materializes one generation-safe MODEL_STAR child in the level
   list at (2000, 4500, -4500), preserves parentage and source behavior

@@ -2,7 +2,7 @@
 
 ## Status
 
-M21g is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M21h is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -129,6 +129,14 @@ shared star presentation intent. Its strict Swift 6/C fingerprint is
 matrix, regenerated native Debug build, and zero unchecked-Sendable audit pass.
 Durable progression/save mutation, star behavior execution, and human/device
 acceptance remain downstream gates.
+M21h extends the Whomp owner bridge for the King Whomp path. With explicit
+presentation and reward gates, it now delivers source sound, camera-mode,
+music, particle, shake, and star intents and materializes the fixed level-list
+reward star at (180, 3880, 340) with source identity and parent generation.
+Its strict Swift 6/C fingerprint is 0x433b57a9f31daabb; the focused owner
+smoke, expanded 184-script matrix, regenerated native Debug build, and zero
+unchecked-Sendable audit pass. Collision authority, durable progression/save
+mutation, the real camera consumer, and human/device acceptance remain open.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
 `beginCommandBuffer`, while the existing queue-level residency, explicit
@@ -992,7 +1000,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M21e: King Bob-omb home trajectory owner seam | Swift reproduces `arc_to_goal_pos` launch yaw/speed/frame count and `cur_obj_move_using_fvel_and_gravity` no-terminal-velocity steps, then wires that trajectory through the owner bridge while preserving copied collision facts and home transforms. | Complete locally — strict Swift 6/C fingerprint `0x1640c0cb197a0aa5`, focused home-motion contract, 181-script matrix (`runs=181 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m21e-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; arena/camera ownership, rewards, real presentation, and boss-family breadth remain |
 | M21f: King Bob-omb arena camera intent | Swift gates an immutable owner-thread `cameraFocus` intent behind arena presentation, preserves music-before-camera ordering, and carries `CAMERA_MODE_BOSS_FIGHT` (`11`) without mutating camera state. | Complete locally — strict Swift 6/C fingerprint `0x9226cd78a06a16eb`, focused arena-camera contract, 182-script matrix (`runs=182 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m21f-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; real camera/cutscene consumption, rewards, presentation, and boss-family breadth remain |
 | M21g: King Bob-omb reward-star owner spawn | Swift gates the defeat reward path, spawns one source-identity MODEL_STAR child in the level list at the exact C coordinates, preserves parent generation, and emits the owner-thread star intent. | Complete locally — strict Swift 6/C fingerprint 0x49cb52405765e2d1, focused reward-star contract, 183-script matrix (runs=183 failures=0), regenerated native Debug build (/tmp/sm64-modern-m21g-build.log), git diff --check, and zero unchecked-Sendable audit pass; durable progression/save mutation, star behavior execution, and boss-family breadth remain |
-| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21g close the King Bob-omb value, owner/effect, collision/movement value, owner-world, home-trajectory, opt-in arena-camera intent, and opt-in reward-star spawn seams; durable reward persistence, real camera/cutscene wiring, Whomp King integration, Big Boo, Eyerok, Chief Chilly, Bowser arenas, reward/music transitions, and deterministic boss-phase shards remain |
+| M21h: King Whomp owner effects and reward | Swift routes King Whomp sound, boss music, camera mode, particles, shake, and star intents through the owner sink and optionally spawns the source-identity level-list reward star at (180, 3880, 340). | Complete locally — strict Swift 6/C fingerprint 0x433b57a9f31daabb, focused owner contract, 184-script matrix (runs=184 failures=0), regenerated native Debug build (/tmp/sm64-modern-m21h-build.log), git diff --check, and zero unchecked-Sendable audit pass; collision authority, durable progression/save mutation, real camera consumption, and boss-family breadth remain |
+| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21h close the King Bob-omb value/owner/collision/home/camera/reward seams and the King Whomp owner effect/reward seam; collision authority, durable reward persistence, real camera/cutscene wiring, Big Boo, Eyerok, Chief Chilly, Bowser arenas, reward/music transitions, and deterministic boss-phase shards remain |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
@@ -1235,10 +1244,11 @@ replayable trace, and the platform evidence listed in its exit gate.
    `CAMERA_MODE_BOSS_FIGHT` presentation intent, preserving music ordering;
    the actual camera/cutscene consumer remains a later owner milestone. M21g
    adds only the opt-in source-identity level-list reward-star child and
-   presentation intent. The progression/save consumer remains a later owner.
-   Finish broader collision/movement integration, path selection for every
-   other reachable trajectory, and effect identity before owner-wiring the
-   remaining NPC families.
+   presentation intent. M21h extends that bounded owner delivery to King Whomp
+   while keeping collision and progression consumers explicit. Finish broader
+   collision/movement integration, path selection for every other reachable
+   trajectory, and effect identity before owner-wiring the remaining NPC
+   families.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and
