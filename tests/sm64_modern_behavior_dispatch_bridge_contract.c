@@ -40,6 +40,7 @@
 #define BOWSER_KEY_BEHAVIOR UINT64_C(0x6268765f6b6579)
 #define BOUNCING_FIREBALL_BEHAVIOR UINT64_C(0x6268765f62666972)
 #define BOUNCING_FIREBALL_FLAME_BEHAVIOR UINT64_C(0x6268765f62666c6d)
+#define KING_BOBOMB_BEHAVIOR UINT64_C(0x6268765f6b626d)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -672,6 +673,34 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // no children
     fingerprint = hash_u64(fingerprint, 0); // scale
     fingerprint = hash_u64(fingerprint, 0); // not marked
+
+    // Isolated shared-dispatch King Bob-omb intro route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t king_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, king_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, KING_BOBOMB_BEHAVIOR, 28);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // action
+    fingerprint = hash_u64(fingerprint, 1); // subaction
+    fingerprint = hash_u64(fingerprint, 66055); // reset/camera/music/intangible/rendering
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 1); // presented intents
+    fingerprint = hash_u64(fingerprint, 1); // deliveries
+    fingerprint = hash_u64(fingerprint, 1); // delivered intents
+    fingerprint = hash_u64(fingerprint, 1); // presented intents
+    fingerprint = hash_u64(fingerprint, 0); // spawned
+    fingerprint = hash_u64(fingerprint, 0); // deleted
+    fingerprint = hash_u64(fingerprint, 0); // rejected
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

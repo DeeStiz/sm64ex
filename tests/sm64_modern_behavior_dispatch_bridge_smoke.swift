@@ -687,6 +687,44 @@ private func hashBouncingFireballDispatch(
     return hash
 }
 
+private func hashKingBobombDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.kingBobombEffects.count))
+    for effect in tick.kingBobombEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.output.state.action)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.output.state.subAction)))
+        hash = hashU64(hash, UInt64(effect.output.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+        hash = hashU64(hash, UInt64(effect.presentedEffects.count))
+    }
+    hash = hashU64(hash, UInt64(tick.kingBobombDeliveries.count))
+    for delivery in tick.kingBobombDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1093,6 +1131,33 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             "Bouncing fireball parent/flame effects are preserved"
         )
         fingerprint = hashBouncingFireballDispatch(fingerprint, fireballTick)
+
+        let kingEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let kingBridge = SM64BehaviorDispatchBridge()
+        let king = try kingBridge.spawnKingBobomb(in: kingEngine, homeY: 100, positionY: 100)
+        require(kingBridge.kingBobomb.setEnvironment(
+            SM64KingBobombEnvironment(input: SM64KingBobombInput(
+                positionY: 100,
+                dialogCanActivate: true
+            )),
+            for: king
+        ), "King Bob-omb dispatch environment attaches")
+        let kingTick = kingBridge.tick(state: kingEngine)
+        require(kingTick.events.map(\.route) == [.kingBobomb], "King Bob-omb route dispatch")
+        require(kingTick.scheduler.updated.map(\.traceSubject) == [1], "King Bob-omb callback ordering")
+        require(
+            kingTick.kingBobombEffects.count == 1
+                && kingTick.kingBobombEffects.first?.output.state.subAction == 1
+                && kingTick.kingBobombEffects.first?.output.effects == [.resetHome, .cameraFocus, .bossMusic, .intangible, .renderingEnabled]
+                && kingTick.kingBobombEffects.first?.presentedEffects.count == 1,
+            "King Bob-omb intro route is preserved effects=\(kingTick.kingBobombEffects.first?.output.effects.rawValue ?? 0) sub=\(kingTick.kingBobombEffects.first?.output.state.subAction ?? -1) presented=\(kingTick.kingBobombEffects.first?.presentedEffects.count ?? -1)"
+        )
+        require(
+            kingTick.kingBobombDeliveries.count == 1
+                && kingTick.kingBobombDeliveries.first?.presented.count == 1,
+            "King Bob-omb owner presentation is explicit"
+        )
+        fingerprint = hashKingBobombDispatch(fingerprint, kingTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

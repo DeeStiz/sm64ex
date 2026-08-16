@@ -49,6 +49,10 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BowserKeyObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BouncingFireball.swift" \
   "$PROJECT_ROOT/SM64Modern/BouncingFireballObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/KingBobombBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/KingBobombCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/KingBobombHomeMovement.swift" \
+  "$PROJECT_ROOT/SM64Modern/KingBobombObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \

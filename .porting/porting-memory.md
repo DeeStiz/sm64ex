@@ -2,6 +2,22 @@
 
 ## Current Milestone
 
+- M22ah registers the existing King Bob-omb owner bridge in the shared
+  `SM64BehaviorDispatchBridge`. The general-actor route advances the
+  initialize/intro reducer and returns the owner-thread boss-music presentation
+  receipt while preserving generation-safe records. Twenty-nine-route Swift/C
+  fingerprint `0x858060fa042b5979`, standalone King Bob-omb object-bridge
+  fingerprint `0xaaf3e5fffd276cde`, behavior manifest fingerprint
+  `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/King Bob-omb contracts, native Debug target
+  `/tmp/sm64-modern-m22ah-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full boss
+  collision/home movement, camera/dialog/reward consumers, remaining adapters,
+  and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ah.md`.
+
 - M22ag registers the existing Bouncing Fireball parent and flame behavior
   identities in the shared `SM64BehaviorDispatchBridge`. The flame's
   general-actor route runs before the parent's default-list route, preserving

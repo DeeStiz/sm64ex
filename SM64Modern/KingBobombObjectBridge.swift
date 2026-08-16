@@ -152,6 +152,45 @@ final class SM64KingBobombObjectBridge {
         return true
     }
 
+    /// Starts one externally-owned scheduler tick. The shared behavior
+    /// dispatcher uses this boundary so King Bob-omb can execute in the
+    /// engine traversal without creating a nested scheduler update.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Advances one King Bob-omb object from the shared scheduler callback.
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        state engineState: SM64SwiftEngineState,
+        pool: SM64ObjectPool
+    ) -> Bool {
+        guard states[id] != nil else { return false }
+        update(
+            id: id,
+            engineState: engineState,
+            pool: pool,
+            collisionWorld: nil,
+            advanceMovement: false,
+            presentArenaCamera: false,
+            spawnRewardStar: false
+        )
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        environments.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil { remove(id) }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -162,9 +201,7 @@ final class SM64KingBobombObjectBridge {
         spawnRewardStar: Bool = false
     ) -> SM64KingBobombSchedulerTickResult {
         environments = frameEnvironments
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(
@@ -177,14 +214,7 @@ final class SM64KingBobombObjectBridge {
                 spawnRewardStar: spawnRewardStar
             )
         }
-        for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64KingBobombSchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog,
