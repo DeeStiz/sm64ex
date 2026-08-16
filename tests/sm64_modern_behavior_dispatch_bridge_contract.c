@@ -45,6 +45,7 @@
 #define SMALL_PENGUIN_BEHAVIOR UINT64_C(0x6268765f73706e)
 #define KOOPA_UNDERWATER_BEHAVIOR UINT64_C(0x6268765f6b7375)
 #define BOWSER_KEY_CUTSCENE_COURSE_EXIT UINT64_C(0x6268765f6b637865)
+#define EXPLOSION_BEHAVIOR UINT64_C(0x6268765f657870)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -829,6 +830,43 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, UINT64_C(0x3e4ccccd)); // scale
     fingerprint = hash_u64(fingerprint, 1); // timer
     fingerprint = hash_u64(fingerprint, 0); // not marked
+
+    // Isolated shared-dispatch generic explosion destructive-list route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t explosion_counts[13] = {
+        0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, explosion_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, EXPLOSION_BEHAVIOR, 33);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 51); // sound + shake + fade + animate
+    fingerprint = hash_u64(fingerprint, 0); // bubble count
+    fingerprint = hash_u64(fingerprint, 0); // no smoke
+    fingerprint = hash_u64(fingerprint, 1); // timer
+    fingerprint = hash_u64(fingerprint, UINT64_C(0x3f800000)); // scale
+    fingerprint = hash_u64(fingerprint, 241); // opacity
+    fingerprint = hash_u64(fingerprint, 0); // animation state
+    fingerprint = hash_u64(fingerprint, 2); // presented intents
+    fingerprint = hash_u64(fingerprint, 0); // sound kind
+    fingerprint = hash_u64(fingerprint, UINT64_C(0xffffffff802e2081)); // sound value
+    fingerprint = hash_u64(fingerprint, 2); // camera-shake kind
+    fingerprint = hash_u64(fingerprint, 1); // environmental shake
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 1); // deliveries
+    fingerprint = hash_u64(fingerprint, 2); // delivered intents
+    fingerprint = hash_u64(fingerprint, 2); // presented intents
+    fingerprint = hash_u64(fingerprint, 0); // spawned
+    fingerprint = hash_u64(fingerprint, 0); // deleted
+    fingerprint = hash_u64(fingerprint, 0); // rejected
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

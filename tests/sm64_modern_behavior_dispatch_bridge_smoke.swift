@@ -886,6 +886,53 @@ private func hashBowserKeyCutsceneDispatch(
     return hash
 }
 
+private func hashExplosionDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.explosionEffects.count))
+    for effect in tick.explosionEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.bubbleCount)))
+        hash = hashU64(hash, effect.spawnedSmoke ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.timer))
+        hash = hashU64(hash, UInt64(effect.scale.bitPattern))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.opacity)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.animationState)))
+        hash = hashU64(hash, UInt64(effect.presentedEffects.count))
+        for intent in effect.presentedEffects {
+            hash = hashU64(hash, UInt64(intent.kind.rawValue))
+            hash = hashU64(hash, UInt64(bitPattern: Int64(intent.value)))
+        }
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+    }
+    hash = hashU64(hash, UInt64(tick.explosionDeliveries.count))
+    for delivery in tick.explosionDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1404,6 +1451,26 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             "Bowser key cutscene value route is preserved"
         )
         fingerprint = hashBowserKeyCutsceneDispatch(fingerprint, cutsceneTick)
+
+        let explosionEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let explosionBridge = SM64BehaviorDispatchBridge()
+        let explosion = try explosionBridge.spawnExplosion(
+            in: explosionEngine,
+            position: SM64ObjectVector3(x: 10, y: 20, z: 30)
+        )
+        let explosionTick = explosionBridge.tick(state: explosionEngine)
+        require(explosionTick.events.map(\.route) == [.explosion], "Explosion route dispatch")
+        require(explosionTick.scheduler.updated.map(\.traceSubject) == [1], "Explosion callback ordering")
+        require(
+            explosionTick.explosionEffects.count == 1
+                && explosionTick.explosionEffects.first?.objectID == explosion
+                && explosionTick.explosionEffects.first?.effects == [.sound, .cameraShake, .fade, .animate]
+                && explosionTick.explosionEffects.first?.timer == 1
+                && explosionTick.explosionEffects.first?.presentedEffects.count == 2
+                && explosionTick.explosionDeliveries.count == 1,
+            "Explosion value/owner route is preserved"
+        )
+        fingerprint = hashExplosionDispatch(fingerprint, explosionTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

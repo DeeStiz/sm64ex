@@ -88,6 +88,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/KoopaShellObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BowserKeyCutscene.swift" \
   "$PROJECT_ROOT/SM64Modern/BowserKeyCutsceneObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/Explosion.swift" \
+  "$PROJECT_ROOT/SM64Modern/ExplosionChildren.swift" \
+  "$PROJECT_ROOT/SM64Modern/ExplosionObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooObjectBridge.swift" \

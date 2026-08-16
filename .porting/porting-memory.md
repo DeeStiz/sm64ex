@@ -2,6 +2,24 @@
 
 ## Current Milestone
 
+- M22am registers the existing generic explosion owner bridge and its bubble
+  and ground-smoke child identities in the shared
+  `SM64BehaviorDispatchBridge`. The destructive-list route preserves
+  initialization sound/camera presentation, fade/animation state, explicit
+  child allocation inputs, and generation-safe owner delivery; camera/audio
+  consumers remain typed external seams. Thirty-four-route Swift/C fingerprint
+  `0x27dd12efd4a84c8d`, standalone explosion fingerprint
+  `0x29e3dc6674824f4a`, behavior manifest fingerprint `0x9bb2863444c51d6d`,
+  534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/explosion contracts, native Debug target
+  `/tmp/sm64-modern-m22am-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full bubble/smoke
+  presentation and water/collision consumers, remaining adapters, and live
+  parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22am.md`.
+
 - M22al registers the existing Bowser key cutscene owner bridge for both
   unlock-door and course-exit identities in the shared
   `SM64BehaviorDispatchBridge`. The level-list route preserves source
