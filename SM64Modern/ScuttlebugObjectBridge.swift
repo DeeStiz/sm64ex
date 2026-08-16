@@ -150,6 +150,39 @@ final class SM64ScuttlebugObjectBridge {
         return true
     }
 
+    /// Clears per-tick effects before a shared scheduler pass. The shared
+    /// behavior dispatcher owns list traversal; this bridge must not start a
+    /// nested scheduler of its own.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Advances one Scuttlebug spawner or child in the enclosing scheduler's
+    /// current list order.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard pool.record(for: id) != nil,
+              spawners[id] != nil || bugs[id] != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        bugs.removeValue(forKey: id)
+        spawners.removeValue(forKey: id)
+        bugInputs.removeValue(forKey: id)
+        spawnerInputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -158,24 +191,11 @@ final class SM64ScuttlebugObjectBridge {
     ) -> SM64ScuttlebugSchedulerTickResult {
         bugInputs = frameBugInputs
         spawnerInputs = frameSpawnerInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, pool: pool)
+            _ = self?.updateInline(id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            bugs.removeValue(forKey: id)
-            spawners.removeValue(forKey: id)
-            bugInputs.removeValue(forKey: id)
-            spawnerInputs.removeValue(forKey: id)
-        }
-        for id in registeredIDs where engineState.objects.record(for: id) == nil {
-            bugs.removeValue(forKey: id)
-            spawners.removeValue(forKey: id)
-            bugInputs.removeValue(forKey: id)
-            spawnerInputs.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64ScuttlebugSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
 

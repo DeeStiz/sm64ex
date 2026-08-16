@@ -24,6 +24,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case chainChomp = 20
     case chainChompRelease = 21
     case pokey = 22
+    case scuttlebug = 23
     case unmigrated = 255
 }
 
@@ -82,6 +83,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let chainChompReleaseDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let pokeyEffects: [SM64PokeyObjectEffectRecord]
     let pokeyDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let scuttlebugEffects: [SM64ScuttlebugObjectEffectRecord]
+    let scuttlebugDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -112,6 +115,7 @@ final class SM64BehaviorDispatchBridge {
     let chainChomp: SM64ChainChompObjectBridge
     let chainChompRelease: SM64ChainChompReleaseObjectBridge
     let pokey: SM64PokeyObjectBridge
+    let scuttlebug: SM64ScuttlebugObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -140,6 +144,7 @@ final class SM64BehaviorDispatchBridge {
         self.chainChomp = SM64ChainChompObjectBridge(scheduler: scheduler)
         self.chainChompRelease = SM64ChainChompReleaseObjectBridge(scheduler: scheduler)
         self.pokey = SM64PokeyObjectBridge(scheduler: scheduler)
+        self.scuttlebug = SM64ScuttlebugObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -201,6 +206,9 @@ final class SM64BehaviorDispatchBridge {
         case SM64PokeyObjectBridge.defaultBehaviorIdentity,
              SM64PokeyObjectBridge.defaultBodyBehaviorIdentity:
             return .pokey
+        case SM64ScuttlebugObjectBridge.defaultSpawnerBehaviorIdentity,
+             SM64ScuttlebugObjectBridge.defaultBugBehaviorIdentity:
+            return .scuttlebug
         default:
             return .unmigrated
         }
@@ -231,6 +239,7 @@ final class SM64BehaviorDispatchBridge {
         for id in chainChomp.registeredIDs { chainChomp.remove(id) }
         for id in chainChompRelease.registeredIDs { chainChompRelease.remove(id) }
         for id in pokey.registeredIDs { pokey.remove(id) }
+        for id in scuttlebug.registeredIDs { scuttlebug.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -253,6 +262,7 @@ final class SM64BehaviorDispatchBridge {
         chainChomp.beginExternalTick()
         chainChompRelease.beginExternalTick()
         pokey.beginExternalTick()
+        scuttlebug.beginExternalTick()
     }
 
     @discardableResult
@@ -670,6 +680,42 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnScuttlebugSpawner(
+        in engineState: SM64SwiftEngineState,
+        model: UInt32 = SM64ScuttlebugObjectBridge.spawnerModel,
+        behaviorIdentity: UInt64 = SM64ScuttlebugObjectBridge.defaultSpawnerBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try scuttlebug.spawnSpawner(
+            in: engineState,
+            model: model,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
+    func spawnScuttlebug(
+        in engineState: SM64SwiftEngineState,
+        homeX: Float = 0,
+        homeY: Float = 0,
+        homeZ: Float = 0,
+        moveYaw: Int16 = 0,
+        parent: SM64ObjectID? = nil,
+        model: UInt32 = SM64ScuttlebugObjectBridge.bugModel,
+        behaviorIdentity: UInt64 = SM64ScuttlebugObjectBridge.defaultBugBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try scuttlebug.spawnBug(
+            in: engineState,
+            homeX: homeX,
+            homeY: homeY,
+            homeZ: homeZ,
+            moveYaw: moveYaw,
+            parent: parent,
+            model: model,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -694,6 +740,7 @@ final class SM64BehaviorDispatchBridge {
         chainChomp.beginExternalTick()
         chainChompRelease.beginExternalTick()
         pokey.beginExternalTick(globalFrame: engineState.globals.frame)
+        scuttlebug.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -756,6 +803,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.chainChompRelease.updateInline(id, pool: pool)
             case .pokey:
                 _ = self.pokey.updateInline(id, pool: pool)
+            case .scuttlebug:
+                _ = self.scuttlebug.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -787,6 +836,7 @@ final class SM64BehaviorDispatchBridge {
             chainChomp.remove(id)
             chainChompRelease.remove(id)
             pokey.remove(id)
+            scuttlebug.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -850,6 +900,7 @@ final class SM64BehaviorDispatchBridge {
         chainChompRelease.finalizeExternalTick(pool: engineState.objects)
         chainChompRelease.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         pokey.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        scuttlebug.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -899,7 +950,9 @@ final class SM64BehaviorDispatchBridge {
             chainChompReleaseRequests: chainChompRelease.releaseRequestLog,
             chainChompReleaseDeliveries: chainChompRelease.deliveryLog,
             pokeyEffects: pokey.effectLog,
-            pokeyDeliveries: pokey.deliveryLog
+            pokeyDeliveries: pokey.deliveryLog,
+            scuttlebugEffects: scuttlebug.effectLog,
+            scuttlebugDeliveries: scuttlebug.deliveryLog
         )
     }
 }

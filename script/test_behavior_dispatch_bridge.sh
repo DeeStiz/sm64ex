@@ -39,6 +39,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/PiranhaPlantObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/PokeyEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/PokeyObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/ScuttlebugEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/ScuttlebugObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \

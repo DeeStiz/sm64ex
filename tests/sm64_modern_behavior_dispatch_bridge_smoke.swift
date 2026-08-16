@@ -498,6 +498,46 @@ private func hashPokeyDispatch(
     return hash
 }
 
+private func hashScuttlebugDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.scuttlebugEffects.count))
+    for effect in tick.scuttlebugEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.action?.rawValue ?? 255))
+        if let child = effect.spawnedChild {
+            hash = hashU64(hash, 1)
+            hash = hashID(hash, child)
+        } else {
+            hash = hashU64(hash, 0)
+        }
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.scuttlebugDeliveries.count))
+    for delivery in tick.scuttlebugDeliveries {
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        for id in delivery.deleted { hash = hashID(hash, id) }
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -810,6 +850,41 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(pokeyTick.pokeyDeliveries.isEmpty, "Pokey spawn route has no deletion delivery")
         fingerprint = hashPokeyDispatch(fingerprint, pokeyTick)
+
+        let scuttlebugEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let scuttlebugBridge = SM64BehaviorDispatchBridge()
+        let scuttlebugSpawner = try scuttlebugBridge.spawnScuttlebugSpawner(in: scuttlebugEngine)
+        var scuttlebugSpawnTick: SM64BehaviorDispatchTickResult?
+        for _ in 0..<40 where scuttlebugSpawnTick == nil {
+            require(scuttlebugBridge.scuttlebug.setSpawnerInput(
+                SM64ScuttlebugSpawnerTickInput(distanceToMario: 1_000),
+                for: scuttlebugSpawner
+            ), "Scuttlebug spawner input attaches")
+            let candidate = scuttlebugBridge.tick(state: scuttlebugEngine)
+            if candidate.scuttlebugEffects.contains(where: { $0.spawnedChild != nil }) {
+                scuttlebugSpawnTick = candidate
+            }
+        }
+        guard let scuttlebugTick = scuttlebugSpawnTick else {
+            preconditionFailure("Scuttlebug child did not spawn")
+        }
+        require(
+            scuttlebugTick.events.map(\.route) == [.scuttlebug, .scuttlebug],
+            "Scuttlebug spawner and child dispatch"
+        )
+        require(
+            scuttlebugTick.scheduler.updated.map(\.traceSubject) == [1, 2],
+            "Scuttlebug child follows spawner across lists"
+        )
+        require(
+            scuttlebugTick.scuttlebugEffects.count == 2
+                && scuttlebugTick.scuttlebugEffects.first?.kind == .spawner
+                && scuttlebugTick.scuttlebugEffects.first?.spawnedChild?.traceSubject == 2
+                && scuttlebugTick.scuttlebugEffects.last?.kind == .scuttlebug,
+            "Scuttlebug spawn effect is preserved"
+        )
+        require(scuttlebugTick.scuttlebugDeliveries.isEmpty, "Scuttlebug spawn route has no deletion delivery")
+        fingerprint = hashScuttlebugDispatch(fingerprint, scuttlebugTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

@@ -33,6 +33,8 @@
 #define CHAIN_CHOMP_GATE_BEHAVIOR UINT64_C(0x6268765f67617465)
 #define POKEY_BEHAVIOR UINT64_C(0x6268765f706f6b)
 #define POKEY_BODY_BEHAVIOR UINT64_C(0x6268765f7062)
+#define SCUTTLEBUG_SPAWNER_BEHAVIOR UINT64_C(0x6268765f736273)
+#define SCUTTLEBUG_BEHAVIOR UINT64_C(0x6268765f736275)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -508,6 +510,39 @@ int main(void) {
         fingerprint = hash_u64(fingerprint, UINT64_C(0x3f800000));
         fingerprint = hash_u64(fingerprint, 0); // not marked
     }
+    fingerprint = hash_u64(fingerprint, 0); // deliveries
+
+    // Isolated shared-dispatch Scuttlebug spawner followed by its
+    // general-actor child in the same live traversal.
+    fingerprint = hash_u64(fingerprint, 32); // scheduler frame
+    static const uint64_t scuttlebug_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, scuttlebug_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 2); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_id(fingerprint, 1, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 2); // events
+    fingerprint = hash_event(fingerprint, 0, SCUTTLEBUG_SPAWNER_BEHAVIOR, 23);
+    fingerprint = hash_event(fingerprint, 1, SCUTTLEBUG_BEHAVIOR, 23);
+    fingerprint = hash_u64(fingerprint, 2); // effects
+    fingerprint = hash_id(fingerprint, 0, 1); // spawner trace subject
+    fingerprint = hash_u64(fingerprint, 1); // spawner kind
+    fingerprint = hash_u64(fingerprint, 1024); // spawn scuttlebug
+    fingerprint = hash_u64(fingerprint, 255); // no action
+    fingerprint = hash_u64(fingerprint, 1); // child present
+    fingerprint = hash_id(fingerprint, 1, 1);
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_id(fingerprint, 1, 1); // child trace subject
+    fingerprint = hash_u64(fingerprint, 0); // bug kind
+    fingerprint = hash_u64(fingerprint, 1); // animate
+    fingerprint = hash_u64(fingerprint, 0); // initialize
+    fingerprint = hash_u64(fingerprint, 0); // no child
+    fingerprint = hash_u64(fingerprint, 0); // not marked
     fingerprint = hash_u64(fingerprint, 0); // deliveries
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",

@@ -2,6 +2,21 @@
 
 ## Current Milestone
 
+- M22ad registers the existing Scuttlebug owner bridge and both exact behavior
+  identities in the shared `SM64BehaviorDispatchBridge`. The spawner-list route
+  creates and dispatches its general-actor child in the same live traversal,
+  preserving cross-list order, generation-safe records, and owner-thread
+  effects. Twenty-four-route Swift/C fingerprint `0xd76fe2277f9b8226`,
+  standalone Scuttlebug fingerprint `0x7204b63131e2054b`, behavior manifest
+  fingerprint `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and
+  461 explicit `unmigrated_c_adapter` rows are the accounting boundary.
+  Focused dispatch/Scuttlebug contracts, native Debug target
+  `/tmp/sm64-modern-m22ad-build.log`, full shebang-corrected 206-script matrix,
+  `git diff --check`, and zero unchecked-Sendable audit pass are the evidence
+  boundary. Scuttlebug collision/progression/presentation, remaining adapters,
+  and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ad.md`.
+
 - M22ac registers the existing Pokey owner bridge and five body-part
   identities in the shared `SM64BehaviorDispatchBridge`. The general-actor
   route allocates the parent and body parts during one live traversal,
