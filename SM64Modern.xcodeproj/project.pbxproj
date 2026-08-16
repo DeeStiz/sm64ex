@@ -84,6 +84,7 @@
 		59D828BFA9A7DCFEEC96AAD2 /* CameraCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF32B94910902857B072626 /* CameraCollision.swift */; };
 		5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */; };
 		5C1840210026D9416120F870 /* WhompObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189D1521FD7CFA3D234A28F6 /* WhompObjectBridge.swift */; };
+		5C4BFBD421D7D3B422C7571A /* YoshiBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21635A888B1CF4C5B13766F6 /* YoshiBehavior.swift */; };
 		6321601F8F550EE3305561A4 /* BobombBuddyBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E4F781D55FAEFF9757C3F1 /* BobombBuddyBehavior.swift */; };
 		637DB55CFFCA4EDF63A29B58 /* CameraInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724F73EC282345F4551FC1BF /* CameraInput.swift */; };
 		65F4BEF23300074C1E392842 /* MarioShellAirAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820DE3AD7B88D2679E91FFF4 /* MarioShellAirAction.swift */; };
@@ -232,6 +233,7 @@
 		1E51884DE493C98BC81B06D2 /* ProgressionPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionPersistence.swift; sourceTree = "<group>"; };
 		1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTraceSession.swift; sourceTree = "<group>"; };
 		214588F2B3DD80568BE38D36 /* TTCRotatingSolidBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCRotatingSolidBehavior.swift; sourceTree = "<group>"; };
+		21635A888B1CF4C5B13766F6 /* YoshiBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoshiBehavior.swift; sourceTree = "<group>"; };
 		2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptContentRuntime.swift; sourceTree = "<group>"; };
 		2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScriptContentRuntime.swift; sourceTree = "<group>"; };
 		26195252708283AFB936E392 /* GameplayParity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameplayParity.swift; sourceTree = "<group>"; };
@@ -622,6 +624,7 @@
 				1DE7AE7AC1D8F6731FE45B3C /* WaterBombObjectBridge.swift */,
 				466600A4978BF6E07A6465C6 /* WhompEnemy.swift */,
 				189D1521FD7CFA3D234A28F6 /* WhompObjectBridge.swift */,
+				21635A888B1CF4C5B13766F6 /* YoshiBehavior.swift */,
 			);
 			path = SM64Modern;
 			sourceTree = "<group>";
@@ -922,6 +925,7 @@
 				C4A4E51360A88FDFC1106CEA /* WaterBombObjectBridge.swift in Sources */,
 				F3119272F792799B5D608AF1 /* WhompEnemy.swift in Sources */,
 				5C1840210026D9416120F870 /* WhompObjectBridge.swift in Sources */,
+				5C4BFBD421D7D3B422C7571A /* YoshiBehavior.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
