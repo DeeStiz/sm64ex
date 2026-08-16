@@ -14,6 +14,7 @@ xcrun swiftc -parse-as-library -swift-version 6 \
   "$PROJECT_ROOT/SM64Modern/ProgressionState.swift" \
   "$PROJECT_ROOT/SM64Modern/SaveFileCodec.swift" \
   "$PROJECT_ROOT/SM64Modern/CoinScoreAges.swift" \
+  "$PROJECT_ROOT/SM64Modern/SaveFileMutator.swift" \
   "$PROJECT_ROOT/SM64Modern/ProgressionPersistence.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_progression_eeprom_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-progression-eeprom-smoke"

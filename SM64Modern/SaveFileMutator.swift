@@ -5,6 +5,28 @@ struct SM64SaveCapRelocationResult: Equatable, Sendable {
     let location: SM64ProgressionCapLocation
 }
 
+enum SM64SaveFileMutation: Equatable, Sendable {
+    case setFlags(UInt32)
+    case clearFlags(UInt32)
+    case setStarFlags(starFlags: UInt32, courseIndex: Int)
+    case setCannonUnlocked(currentCourseNumber: Int)
+    case setCapPosition(
+        level: UInt8,
+        area: UInt8,
+        position: SM64SaveInt16Vector3
+    )
+    case moveCapToDefaultLocation(level: UInt8)
+    case setSoundMode(UInt16)
+}
+
+struct SM64SaveFileMutationResult: Equatable, Sendable {
+    let save: SM64SaveFileSnapshot
+    let menu: SM64MenuDataSnapshot
+    /// C marks the corresponding block dirty for every admitted setter. This
+    /// stays true even when the resulting bytes equal the input bytes.
+    let didMutate: Bool
+}
+
 /// Pure counterparts of the C save mutation helpers. Callers choose the
 /// owner-thread persistence boundary; these functions only rewrite snapshots
 /// and never touch C globals or files.
@@ -120,5 +142,49 @@ enum SM64SaveFileMutator {
         var next = menu
         next.soundMode = mode
         return next
+    }
+
+    static func apply(
+        _ mutation: SM64SaveFileMutation,
+        save: SM64SaveFileSnapshot,
+        menu: SM64MenuDataSnapshot
+    ) -> SM64SaveFileMutationResult? {
+        switch mutation {
+        case let .setFlags(flags):
+            return .init(
+                save: setFlags(flags, in: save), menu: menu, didMutate: true
+            )
+        case let .clearFlags(flags):
+            return .init(
+                save: clearFlags(flags, in: save), menu: menu, didMutate: true
+            )
+        case let .setStarFlags(starFlags, courseIndex):
+            guard let next = setStarFlags(
+                starFlags, courseIndex: courseIndex, in: save
+            ) else { return nil }
+            return .init(save: next, menu: menu, didMutate: true)
+        case let .setCannonUnlocked(currentCourseNumber):
+            guard let next = setCannonUnlocked(
+                currentCourseNumber: currentCourseNumber, in: save
+            ) else { return nil }
+            return .init(save: next, menu: menu, didMutate: true)
+        case let .setCapPosition(level, area, position):
+            return .init(
+                save: setCapPosition(
+                    level: level, area: area, position: position, in: save
+                ), menu: menu, didMutate: true
+            )
+        case let .moveCapToDefaultLocation(level):
+            guard save.flags & capOnGroundFlag != 0 else { return nil }
+            return .init(
+                save: moveCapToDefaultLocation(level: level, in: save).save,
+                menu: menu,
+                didMutate: true
+            )
+        case let .setSoundMode(mode):
+            return .init(
+                save: save, menu: setSoundMode(mode, in: menu), didMutate: true
+            )
+        }
     }
 }

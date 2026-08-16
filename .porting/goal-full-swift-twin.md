@@ -2,13 +2,14 @@
 
 ## Status
 
-M23e is the latest validated persistence slice layered on M34a/M33f/M22bc;
-the owner-thread progression runtime now admits the pure Swift save mutator
-kernel in C order, fences paused legacy-domain calls as no-ops, tracks save and
-menu dirty bits through atomic commit, and restores cap-location state on
-reload. M23d's value kernel and M23c's owner-thread copy/erase operations
-remain in force, with independent Swift/C fingerprints. M22 remains
-behavior-coverage work in progress: the
+M23f is the latest validated persistence slice layered on M34a/M33f/M22bc;
+the normalized EEPROM adapter now applies the complete Swift save mutation
+family with recovery-before-mutation, atomic primary/backup replacement,
+menu-filler preservation, paused-domain no-ops, and a normalized runtime
+commit overload. M23e's owner-thread admission/dirty boundary, M23d's value
+kernel, and M23c's copy/erase operations remain in force, with independent
+Swift/C replay fingerprints. M22 remains behavior-coverage work in progress:
+the
 latest bounded gameplay slice is M22bc. M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
@@ -1827,12 +1828,13 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M22bb: Heave Ho/Pokey child manifest accounting | The reachable `bhvHeaveHoThrowMario` and `bhvPokeyBodyPart` declarations now map to their already-live `HeaveHoObjectBridge` and `PokeyObjectBridge` owner routes, respectively, without changing the shared dispatcher or adding child schedulers. | Complete locally — Swift/C manifest fingerprint `0x103cb984bb585a21`, 534 rows (80 `swift_value_owner`, 454 `unmigrated_c_adapter`), focused manifest contract, regenerated native Debug build, complete 206-script matrix, live oracle/promotion, `git diff --check`, and zero unchecked-Sendable audit pass; throw/body collision/presentation consumers, remaining adapters, whole-engine execution, and parity remain |
 | M22bc: Bob-omb Buddy cannon-role identity dispatch route | `SM64BehaviorDispatchBridge` registers `bhvBobombBuddyOpensCannon` beside the ordinary Buddy and cannon-closed child identities; the existing owner carries the source cannon-role state so no second scheduler is introduced. | Complete locally — strict Swift 6/C dispatch fingerprint `0x681ceb2358bf2e21`, behavior manifest fingerprint `0x6c4d82af10c767ba`, 534 rows (81 `swift_value_owner`, 453 `unmigrated_c_adapter`), focused dispatch/manifest contracts, regenerated native Debug build, complete 206-script matrix, live oracle/promotion, `git diff --check`, and zero unchecked-Sendable audit pass; cannon-role collision/dialog/presentation consumers, remaining adapters, whole-engine execution, and parity remain |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22bc close deterministic identity accounting, forty-two live value/owner routes plus the Fly Guy flame, Bowser mine-flame, Big Boo staircase, Tuxie terminal-child, Heave Ho throw-child, Pokey body-part, and Bob-omb Buddy cannon-role identities, a shared forty-two-route dispatch seam, and Swift engine-context dispatch authority with 534 rows, 81 known Swift value/owner routes, and 453 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
-| M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | In progress — M23a–M23e cover repair/upgrade, queries, owner-thread copy/erase, pure mutators, and runtime dirty/admission integration; options, restart-selector parity, byte-identity replay, and complete C↔Swift authority closure remain |
+| M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | In progress — M23a–M23f cover repair/upgrade, queries, owner-thread copy/erase, pure mutators, runtime dirty/admission integration, and normalized-image replay; options, restart-selector parity, and complete C↔Swift authority closure remain |
 | M23a: Atomic EEPROM recovery repair | `SM64OwnerThreadEEPROMAdapter.load` now repairs a single invalid primary/backup copy, wipes and rewrites both copies on dual corruption, and upgrades a valid legacy 176-byte bundle to the normalized 512-byte image on the owner thread. | Complete locally — Swift/C EEPROM fingerprints `0x3fac91b6c0a1f3cd`, focused legacy-upgrade and post-repair assertions, persistence regression, `git diff --check`; full save mutation/option/restart parity remains |
 | M23b: C-compatible save-file query surface | `SM64SaveFileQueries` mirrors file existence, secret/course star flags, cannon indexing, course/total counts, cap-position gating, coin-score reads, and `save_file_get_max_coin_score` age tie-breaks as pure Swift values. | Complete locally — Swift/C query fingerprint `0x5562efafd48db61c`, focused Swift 6/C contract, regenerated native Debug build, complete 206-script matrix, strict-concurrency audit, and `git diff --check`; save mutations, options, and full authority replay remain |
 | M23c: Owner-thread save copy/erase mutations | `SM64OwnerThreadEEPROMAdapter.copy` and `.erase` mirror `save_file_copy`/`save_file_erase`: touch destination high-score ages first, then copy or clear the SaveFile and atomically persist both save copies plus the shared menu pair. | Complete locally — Swift/C mutation fingerprint `0x33186d5894562d7b`, focused mutation contract plus M23a/M23b regressions, regenerated native Debug build, complete 208-script matrix, strict-concurrency audit, and `git diff --check`; flag/star/cannon/cap/sound mutators and full authority replay remain |
 | M23d: C-compatible save flag and cap mutators | `SM64SaveFileMutator` is a pure Swift 6 value kernel for `save_file_set_flags`, `save_file_clear_flags`, `save_file_set_star_flags`, `save_file_set_cannon_unlocked`, `save_file_set_cap_pos`, `save_file_move_cap_to_default_location`, and menu sound-mode updates, preserving C sentinel/indexing, dirty-bit semantics, cap-location flags, and checksum-ready snapshots. | Complete locally — Swift/C fingerprint `0x1aa5cef94856d8be`, focused mutator contract plus M23a–M23c regressions, regenerated native Debug build (`/tmp/sm64-modern-m23d-build.log`), complete 209-script matrix (`/tmp/sm64-modern-m23d-final-matrix.log`, runs=209 failures=0), strict-concurrency audit, and `git diff --check`; owner-thread dirty/menu writes, restart-selector parity, full replay, and authority closure remain |
 | M23e: Owner-thread save mutation admission and dirty integration | `SM64ProgressionRuntime` now routes flag/star/cannon/cap/cap-relocation/sound calls through `SM64SaveFileMutator`, rejects paused legacy-domain calls without changing state, marks save/menu dirty exactly at admitted C boundaries, propagates cap-location state, and clears dirty bits only after atomic commit. | Complete locally — Swift/C runtime fingerprint `0x837f4055094f2508`, focused runtime contract plus M23a–M23d regressions, regenerated native Debug build (`/tmp/sm64-modern-m23e-build.log`), complete 210-script matrix (`/tmp/sm64-modern-m23e-final-matrix-rerun.log`, runs=210 failures=0), strict-concurrency audit, and `git diff --check`; normalized EEPROM owner wiring, restart-selector parity, full replay, and authority closure remain |
+| M23f: Normalized EEPROM mutation replay | `SM64OwnerThreadEEPROMAdapter.apply` recovers the whole image before applying each C-compatible mutation, preserves menu filler/ages, writes both copies atomically, fails closed for invalid moves, and supports normalized `SM64ProgressionRuntime.commitIfNeeded`. | Complete locally — Swift/C replay fingerprint `0x12990736c21cd899`, focused normalized replay plus M23a–M23e regressions, regenerated native Debug build (`/tmp/sm64-modern-m23f-build.log`), complete 211-script matrix (`/tmp/sm64-modern-m23f-final-matrix.log`, runs=211 failures=0), strict-concurrency audit, and `git diff --check`; migration-event authority, restart-selector parity, full bidirectional replay, and authority closure remain |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |
 | M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | Not started |
@@ -2137,6 +2139,13 @@ replayable trace, and the platform evidence listed in its exit gate.
    atomic legacy bundle commit. Its exit gate compares the full encoded save
    and menu sequence plus dirty-state transitions against an independent C
    contract.
+   M23f closes the normalized-image mutation boundary. The EEPROM adapter
+   repairs all slot/menu pairs before each admitted value mutation, applies
+   the Swift kernel, preserves menu filler/ages, writes both copies atomically,
+   and returns a fail-closed error for an invalid no-ground cap move. The
+   runtime can now commit its dirty snapshot through the normalized adapter;
+   the replay gate compares every encoded step, paused no-op, invalid branch,
+   and final dirty-bit clear against an independent C contract.
 2. **M24 configuration and cheats.** Port defaults, bindings, camera
    settings, audio/video options, language, legal-ROM settings, cheats, and
    invalid-value recovery. Keep engine authority immutable after launch and

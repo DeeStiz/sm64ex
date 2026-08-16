@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M23f adds normalized `SM64OwnerThreadEEPROMAdapter.apply` mutation replay
+  for the complete flag/star/cannon/cap/cap-relocation/sound family. Each
+  admitted operation repairs the full normalized image first, preserves menu
+  filler and ages, atomically writes both copies, and fails closed for an
+  invalid no-ground cap move; paused operations are strict no-ops. The
+  progression runtime now has a normalized-adapter commit overload and
+  preserves menu filler across load/commit. Swift/C replay fingerprint
+  `0x12990736c21cd899`; focused normalized replay plus M23a–M23e regressions,
+  regenerated native Debug build, complete 211-script matrix
+  (`runs=211 failures=0`), `git diff --check`, and zero unchecked-Sendable
+  audit pass. Migration-event authority, restart-selector parity, and full
+  bidirectional save replay remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M23f.md`.
+
 - M23e integrates `SM64SaveFileMutator` into the owner-thread
   `SM64ProgressionRuntime`. Flag/star/cannon/cap/cap-relocation/sound calls
   now accept the legacy-domain admission decision, paused calls are strict

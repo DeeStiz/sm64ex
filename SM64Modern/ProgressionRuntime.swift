@@ -32,6 +32,7 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
     private(set) var progression: SM64ProgressionState
     private(set) var menuAges: SM64CoinScoreAgeState
     private(set) var soundMode: UInt16
+    private(set) var menuFiller: [UInt8]
     private(set) var saveFileIndex: Int
 
     init(
@@ -39,13 +40,18 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
         progression: SM64ProgressionState = .init(),
         menuAges: SM64CoinScoreAgeState = .init(),
         soundMode: UInt16 = 0,
-        saveFileIndex: Int = 0
+        saveFileIndex: Int = 0,
+        menuFiller: [UInt8] = Array(
+            repeating: 0, count: SM64MenuDataSnapshot.fillerCount
+        )
     ) {
         precondition((0..<SM64CoinScoreAgeState.fileCount).contains(saveFileIndex))
+        precondition(menuFiller.count == SM64MenuDataSnapshot.fillerCount)
         self.actor = actor
         self.progression = progression
         self.menuAges = menuAges
         self.soundMode = soundMode
+        self.menuFiller = menuFiller
         self.saveFileIndex = saveFileIndex
     }
 
@@ -116,9 +122,11 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
     }
 
     func menuSnapshot() -> SM64MenuDataSnapshot {
-        var snapshot = SM64MenuDataCodec.snapshot(from: menuAges)
-        snapshot.soundMode = soundMode
-        return snapshot
+        SM64MenuDataSnapshot(
+            coinScoreAges: menuAges.ages,
+            soundMode: soundMode,
+            filler: menuFiller
+        )
     }
 
     /// Replaces persisted fields from a canonical C snapshot after a live
@@ -146,6 +154,7 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
             ages: menu.coinScoreAges, modified: false
         )
         soundMode = menu.soundMode
+        menuFiller = menu.filler
     }
 
     @discardableResult
@@ -280,6 +289,23 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
         return true
     }
 
+    @discardableResult
+    mutating func commitIfNeeded(
+        using adapter: SM64OwnerThreadEEPROMAdapter,
+        ownerThreadToken: UInt64
+    ) throws -> Bool {
+        guard progression.saveModified || menuAges.modified else { return false }
+        try adapter.commit(
+            saveFileIndex: saveFileIndex,
+            save: saveSnapshot(),
+            menu: menuSnapshot(),
+            ownerThreadToken: ownerThreadToken
+        )
+        progression.saveModified = false
+        menuAges.modified = false
+        return true
+    }
+
     mutating func reloadFromBackup(
         using adapter: SM64OwnerThreadPersistenceAdapter,
         ownerThreadToken: UInt64
@@ -303,6 +329,7 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
             ages: loaded.menu.coinScoreAges, modified: false
         )
         soundMode = loaded.menu.soundMode
+        menuFiller = loaded.menu.filler
         actor = .init()
         return loaded
     }

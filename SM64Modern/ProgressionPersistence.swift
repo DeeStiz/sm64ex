@@ -325,6 +325,50 @@ final class SM64OwnerThreadEEPROMAdapter: Sendable {
         try Data(image.bytes).write(to: imageURL, options: .atomic)
     }
 
+    /// Applies one admitted C save mutation to the normalized image. Recovery
+    /// runs first so all primary/backup pairs are valid before the operation;
+    /// the changed pair and shared menu pair are then replaced atomically.
+    /// Passing `legacyDomainAdvances == false` is a strict value no-op, matching
+    /// the timebase fence at every native save helper.
+    @discardableResult
+    func apply(
+        _ mutation: SM64SaveFileMutation,
+        saveFileIndex: Int,
+        ownerThreadToken: UInt64,
+        legacyDomainAdvances: Bool = true
+    ) throws -> SM64SaveFileMutationResult {
+        assertOwnerThread(ownerThreadToken)
+        try validate(saveFileIndex: saveFileIndex)
+        let loaded = try load(
+            saveFileIndex: saveFileIndex,
+            ownerThreadToken: ownerThreadToken
+        )
+        guard legacyDomainAdvances else {
+            return SM64SaveFileMutationResult(
+                save: loaded.save, menu: loaded.menu, didMutate: false
+            )
+        }
+        var image = try readImage() ?? .empty()
+        let save = SM64SaveFileCodec.decode(
+            image.savePrimary[saveFileIndex]
+        ) ?? SM64SaveFileSnapshot()
+        let menu = SM64MenuDataCodec.decode(image.menuPrimary)
+            ?? SM64MenuDataSnapshot()
+        guard let result = SM64SaveFileMutator.apply(
+            mutation, save: save, menu: menu
+        ) else {
+            throw SM64PersistenceAdapterError.invalidMutation
+        }
+        let saveBytes = SM64SaveFileCodec.encode(result.save)
+        let menuBytes = SM64MenuDataCodec.encode(result.menu)
+        image.savePrimary[saveFileIndex] = saveBytes
+        image.saveBackup[saveFileIndex] = saveBytes
+        image.menuPrimary = menuBytes
+        image.menuBackup = menuBytes
+        try writeImage(image)
+        return result
+    }
+
     /// C `save_file_erase`: touch the destination file's high-score ages,
     /// clear its complete SaveFile payload, and persist both save copies plus
     /// the shared menu pair in one owner-thread atomic image replacement.
@@ -560,4 +604,5 @@ final class SM64OwnerThreadEEPROMAdapter: Sendable {
 
 enum SM64PersistenceAdapterError: Error {
     case invalidSaveFileIndex
+    case invalidMutation
 }
