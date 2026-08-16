@@ -183,6 +183,38 @@ final class SM64BullyObjectBridge {
         return true
     }
 
+    /// Starts a tick owned by the shared behavior dispatcher. The bridge's
+    /// private scheduler is intentionally bypassed in that mode.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Updates one Bully parent/minion without nesting another scheduler pass.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard states[id] != nil, pool.record(for: id) != nil else { return false }
+        update(
+            id: id,
+            pool: pool,
+            collisionWorld: nil,
+            advanceMovement: false,
+            presentEffects: false,
+            spawnRewards: false,
+            spawnBridge: false
+        )
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+        minionParents.removeValue(forKey: id)
+        let childIDs = minionParents.compactMap { child, parent in parent == id ? child : nil }
+        for child in childIDs { minionParents.removeValue(forKey: child) }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -194,9 +226,7 @@ final class SM64BullyObjectBridge {
         spawnBridge: Bool = false
     ) -> SM64BullySchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(
                 id: id,
@@ -209,14 +239,10 @@ final class SM64BullyObjectBridge {
             )
         }
         for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-            minionParents.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-            minionParents.removeValue(forKey: id)
+            remove(id)
         }
         return SM64BullySchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }

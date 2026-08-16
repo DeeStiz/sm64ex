@@ -19,6 +19,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case heaveHo = 15
     case chuckya = 16
     case skeeter = 17
+    case bully = 18
     case unmigrated = 255
 }
 
@@ -67,6 +68,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let chuckyaDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let skeeterEffects: [SM64SkeeterObjectEffectRecord]
     let skeeterDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let bullyEffects: [SM64BullyObjectEffectRecord]
+    let bullyDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -92,6 +95,7 @@ final class SM64BehaviorDispatchBridge {
     let heaveHo: SM64HeaveHoObjectBridge
     let chuckya: SM64ChuckyaObjectBridge
     let skeeter: SM64SkeeterObjectBridge
+    let bully: SM64BullyObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -114,6 +118,7 @@ final class SM64BehaviorDispatchBridge {
         self.heaveHo = SM64HeaveHoObjectBridge(scheduler: scheduler)
         self.chuckya = SM64ChuckyaObjectBridge(scheduler: scheduler)
         self.skeeter = SM64SkeeterObjectBridge(scheduler: scheduler)
+        self.bully = SM64BullyObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -159,6 +164,11 @@ final class SM64BehaviorDispatchBridge {
         case SM64SkeeterObjectBridge.defaultBehaviorIdentity,
              SM64SkeeterObjectBridge.defaultWaveBehaviorIdentity:
             return .skeeter
+        case SM64BullyObjectBridge.defaultBehaviorIdentity,
+             SM64BullyObjectBridge.starBehaviorIdentity,
+             SM64BullyObjectBridge.bridgeBehaviorIdentity,
+             SM64BullyObjectBridge.coinBehaviorIdentity:
+            return .bully
         default:
             return .unmigrated
         }
@@ -184,6 +194,7 @@ final class SM64BehaviorDispatchBridge {
         for id in heaveHo.registeredIDs { heaveHo.remove(id) }
         for id in chuckya.registeredIDs { chuckya.remove(id) }
         for id in skeeter.registeredIDs { skeeter.remove(id) }
+        for id in bully.registeredIDs { bully.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -202,6 +213,7 @@ final class SM64BehaviorDispatchBridge {
         heaveHo.beginExternalTick()
         chuckya.beginExternalTick()
         skeeter.beginExternalTick()
+        bully.beginExternalTick()
     }
 
     @discardableResult
@@ -529,6 +541,29 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnBully(
+        in engineState: SM64SwiftEngineState,
+        size: SM64BullySize,
+        subtype: SM64BullySubtype = .generic,
+        homeX: Float = 0,
+        homeY: Float = 0,
+        homeZ: Float = 0,
+        moveYaw: Int16 = 0,
+        action: SM64BullyAction = .patrol
+    ) throws -> SM64ObjectID {
+        try bully.spawnBully(
+            in: engineState,
+            size: size,
+            subtype: subtype,
+            homeX: homeX,
+            homeY: homeY,
+            homeZ: homeZ,
+            moveYaw: moveYaw,
+            action: action
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -549,6 +584,7 @@ final class SM64BehaviorDispatchBridge {
         heaveHo.beginExternalTick()
         chuckya.beginExternalTick()
         skeeter.beginExternalTick(globalFrame: engineState.globals.frame)
+        bully.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -601,6 +637,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.chuckya.updateInline(id, pool: pool)
             case .skeeter:
                 _ = self.skeeter.updateInline(id, pool: pool)
+            case .bully:
+                _ = self.bully.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -625,6 +663,7 @@ final class SM64BehaviorDispatchBridge {
             heaveHo.remove(id)
             chuckya.remove(id)
             skeeter.remove(id)
+            bully.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -680,6 +719,9 @@ final class SM64BehaviorDispatchBridge {
         for id in skeeter.registeredIDs where engineState.objects.record(for: id) == nil {
             skeeter.remove(id)
         }
+        for id in bully.registeredIDs where engineState.objects.record(for: id) == nil {
+            bully.remove(id)
+        }
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -719,7 +761,9 @@ final class SM64BehaviorDispatchBridge {
             chuckyaEffects: chuckya.effectLog,
             chuckyaDeliveries: chuckya.deliveryLog,
             skeeterEffects: skeeter.effectLog,
-            skeeterDeliveries: skeeter.deliveryLog
+            skeeterDeliveries: skeeter.deliveryLog,
+            bullyEffects: bully.effectLog,
+            bullyDeliveries: bully.deliveryLog
         )
     }
 }

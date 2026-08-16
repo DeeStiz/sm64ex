@@ -77,6 +77,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ChuckyaObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SkeeterEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/SkeeterObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/BullyCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/BullyEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/BullyObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_engine_runtime_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-engine-runtime-smoke"

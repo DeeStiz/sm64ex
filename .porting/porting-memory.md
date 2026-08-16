@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M22y registers the existing `bhvBully` owner bridge for small and big
+  variants in the shared `SM64BehaviorDispatchBridge`. The general-actor route
+  preserves source-order variant dispatch, chase/patrol state, generation-safe
+  records, and explicit owner-thread delivery while collision admission,
+  minion breadth, and reward/presentation consumers remain explicit seams.
+  Nineteen-route Swift/C fingerprint 0x0795fa60e1764868, standalone Bully
+  fingerprint 0x8d7dc5c6315293c4, behavior manifest fingerprint
+  0x9bb2863444c51d6d, 534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused dispatch
+  contract, native Debug build target /tmp/sm64-modern-m22y-build.log, full
+  206-script matrix, `git diff --check`, and zero unchecked-Sendable audit
+  pass are the evidence boundary. Whole-engine route breadth, the remaining
+  adapters, and live parity remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22y.md.
 - M22x registers the existing `bhvSkeeter` owner bridge and water-wave child
   identity in the shared `SM64BehaviorDispatchBridge`. The general-actor route
   preserves parent/four-wave ordering, water-surface wave spawning, stable
