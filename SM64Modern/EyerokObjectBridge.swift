@@ -64,6 +64,9 @@ final class SM64EyerokObjectBridge {
 
     var registeredBossIDs: [SM64ObjectID] { sortedIDs(bossStates.keys) }
     var registeredHandIDs: [SM64ObjectID] { sortedIDs(handStates.keys) }
+    var registeredIDs: [SM64ObjectID] {
+        sortedIDs(Array(bossStates.keys) + Array(handStates.keys))
+    }
 
     func bossState(for id: SM64ObjectID) -> SM64EyerokBossState? { bossStates[id] }
     func handState(for id: SM64ObjectID) -> SM64EyerokHandState? { handStates[id] }
@@ -154,6 +157,47 @@ final class SM64EyerokObjectBridge {
         return true
     }
 
+    /// Starts a shared-dispatch tick without running the standalone scheduler.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        pool: SM64ObjectPool,
+        presentEffects: Bool = false,
+        spawnRewardStar: Bool = false
+    ) -> Bool {
+        guard registeredIDs.contains(id), pool.record(for: id) != nil else { return false }
+        if bossStates[id] != nil {
+            updateBoss(id: id, pool: pool, presentEffects: presentEffects, spawnRewardStar: spawnRewardStar)
+        } else if handStates[id] != nil {
+            updateHand(id: id, pool: pool, collisionWorld: nil, advanceMovement: false, presentEffects: presentEffects)
+        }
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        bossStates.removeValue(forKey: id)
+        bossInputs.removeValue(forKey: id)
+        handStates.removeValue(forKey: id)
+        handInputs.removeValue(forKey: id)
+        handParents.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+        for id in registeredHandIDs where handParents[id].flatMap({ bossStates[$0] }) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -166,9 +210,7 @@ final class SM64EyerokObjectBridge {
     ) -> SM64EyerokSchedulerTickResult {
         bossInputs = frameBossInputs
         handInputs = frameHandInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self else { return }
@@ -190,27 +232,7 @@ final class SM64EyerokObjectBridge {
             }
         }
 
-        for id in schedulerResult.unloaded {
-            bossStates.removeValue(forKey: id)
-            bossInputs.removeValue(forKey: id)
-            handStates.removeValue(forKey: id)
-            handInputs.removeValue(forKey: id)
-            handParents.removeValue(forKey: id)
-        }
-        for id in Array(bossStates.keys) where engineState.objects.record(for: id) == nil {
-            bossStates.removeValue(forKey: id)
-            bossInputs.removeValue(forKey: id)
-        }
-        for id in Array(handStates.keys) where engineState.objects.record(for: id) == nil {
-            handStates.removeValue(forKey: id)
-            handInputs.removeValue(forKey: id)
-            handParents.removeValue(forKey: id)
-        }
-        for id in Array(handStates.keys) where handParents[id].flatMap({ bossStates[$0] }) == nil {
-            handStates.removeValue(forKey: id)
-            handInputs.removeValue(forKey: id)
-            handParents.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64EyerokSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }

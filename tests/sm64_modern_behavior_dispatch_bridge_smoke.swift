@@ -1014,6 +1014,53 @@ private func hashWaterBombDispatch(
     return hash
 }
 
+private func hashEyerokDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.eyerokEffects.count))
+    for effect in tick.eyerokEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.parentID?.slot ?? UInt16.max))
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.side)))
+        hash = hashU64(hash, UInt64(effect.bossAction?.rawValue ?? 0xff))
+        hash = hashU64(hash, UInt64(effect.handAction?.rawValue ?? 0xff))
+        hash = hashU64(hash, UInt64(effect.bossEffects.rawValue))
+        hash = hashU64(hash, UInt64(effect.handEffects.rawValue))
+        hash = hashU64(hash, effect.starPosition == nil ? 0 : 1)
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+        hash = hashU64(hash, UInt64(effect.presentedEffects.count))
+        for intent in effect.presentedEffects {
+            hash = hashU64(hash, UInt64(intent.kind.rawValue))
+            hash = hashU64(hash, UInt64(bitPattern: Int64(intent.value)))
+        }
+    }
+    hash = hashU64(hash, UInt64(tick.eyerokDeliveries.count))
+    for delivery in tick.eyerokDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1632,6 +1679,39 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(waterBombTick.waterBombDeliveries.isEmpty, "Water-bomb initial family has no delivery")
         fingerprint = hashWaterBombDispatch(fingerprint, waterBombTick)
+
+        let eyerokEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let eyerokBridge = SM64BehaviorDispatchBridge()
+        let eyerok = try eyerokBridge.spawnEyerok(
+            in: eyerokEngine,
+            homeX: 10,
+            homeY: 20,
+            homeZ: 30
+        )
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64EyerokObjectBridge.handBehaviorIdentity) == .eyerok,
+            "Eyerok hand identity shares the owner route"
+        )
+        let eyerokTick = eyerokBridge.tick(state: eyerokEngine)
+        require(
+            eyerokTick.events.map(\.route) == [.eyerok, .eyerok, .eyerok],
+            "Eyerok family route dispatch"
+        )
+        require(eyerokTick.scheduler.updated.map(\.traceSubject) == [1, 2, 3], "Eyerok callback ordering")
+        require(
+            eyerokTick.eyerokEffects.count == 3
+                && eyerokTick.eyerokEffects[0].objectID == eyerok
+                && eyerokTick.eyerokEffects[0].kind == .boss
+                && eyerokTick.eyerokEffects[0].bossEffects == [.spawnHands]
+                && eyerokTick.eyerokEffects[0].spawnedChildren.count == 2
+                && eyerokTick.eyerokEffects[1].kind == .hand
+                && eyerokTick.eyerokEffects[1].handAction == .sleep
+                && eyerokTick.eyerokEffects[2].kind == .hand
+                && eyerokTick.eyerokEffects[2].handAction == .sleep,
+            "Eyerok value/owner route is preserved"
+        )
+        require(eyerokTick.eyerokDeliveries.count == 3, "Eyerok owner delivery receipts are explicit")
+        fingerprint = hashEyerokDispatch(fingerprint, eyerokTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

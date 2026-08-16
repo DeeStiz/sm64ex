@@ -2,6 +2,23 @@
 
 ## Current Milestone
 
+- M22ap registers the existing Eyerok boss and hand owner bridge in the shared
+  general-actor `SM64BehaviorDispatchBridge`. The route preserves boss-to-two-
+  hand same-frame allocation, parent links, sleep/hand state, and generation-
+  safe owner delivery; camera/collision/reward-star consumers remain typed
+  external seams. Thirty-seven-route Swift/C fingerprint
+  `0xb04e67dc1779953b`, standalone Eyerok fingerprint
+  `0xcc5a9ee16597604f`, behavior manifest fingerprint `0x9bb2863444c51d6d`,
+  534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Eyerok contracts, native Debug target
+  `/tmp/sm64-modern-m22ap-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full
+  collision/camera/dialog/reward consumers, remaining adapters, and live
+  parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ap.md`.
+
 - M22ao registers the existing Water Bomb spawner, bomb, and parent-relative
   shadow identities in the shared general-actor dispatch table. The same-frame
   route preserves spawner-to-bomb/shadow allocation order, falling-bomb action

@@ -50,6 +50,8 @@
 #define WATER_BOMB_SPAWNER_BEHAVIOR UINT64_C(0x6268765f776273)
 #define WATER_BOMB_BEHAVIOR UINT64_C(0x6268765f77626d)
 #define WATER_BOMB_SHADOW_BEHAVIOR UINT64_C(0x6268765f776273)
+#define EYEROK_BEHAVIOR UINT64_C(0x62685f657972)
+#define EYEROK_HAND_BEHAVIOR UINT64_C(0x62685f686e64)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -935,6 +937,67 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // no children
     fingerprint = hash_u64(fingerprint, 0); // not marked
     fingerprint = hash_u64(fingerprint, 0); // no deliveries
+
+    // Isolated shared-dispatch Eyerok boss and two hand family.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t eyerok_counts[13] = {
+        0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, eyerok_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 3); // object counter
+    fingerprint = hash_u64(fingerprint, 3); // updated count
+    for (uint64_t id = 0; id < 3; ++id) fingerprint = hash_id(fingerprint, id, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 3); // events
+    fingerprint = hash_event(fingerprint, 0, EYEROK_BEHAVIOR, 36);
+    fingerprint = hash_event(fingerprint, 1, EYEROK_HAND_BEHAVIOR, 36);
+    fingerprint = hash_event(fingerprint, 2, EYEROK_HAND_BEHAVIOR, 36);
+    fingerprint = hash_u64(fingerprint, 3); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, UINT64_C(0xffff)); // no parent sentinel
+    fingerprint = hash_u64(fingerprint, 0); // boss kind
+    fingerprint = hash_u64(fingerprint, 0); // side
+    fingerprint = hash_u64(fingerprint, 0); // sleep boss action
+    fingerprint = hash_u64(fingerprint, 255); // no hand action
+    fingerprint = hash_u64(fingerprint, 1); // spawn hands
+    fingerprint = hash_u64(fingerprint, 0); // no hand effects
+    fingerprint = hash_u64(fingerprint, 0); // no star
+    fingerprint = hash_u64(fingerprint, 2); // hand children
+    fingerprint = hash_id(fingerprint, 1, 1);
+    fingerprint = hash_id(fingerprint, 2, 1);
+    fingerprint = hash_u64(fingerprint, 0); // no presentation
+    fingerprint = hash_id(fingerprint, 1, 1);
+    fingerprint = hash_u64(fingerprint, 0); // parent slot
+    fingerprint = hash_u64(fingerprint, 1); // hand kind
+    fingerprint = hash_u64(fingerprint, UINT64_MAX); // left side
+    fingerprint = hash_u64(fingerprint, 255); // no boss action
+    fingerprint = hash_u64(fingerprint, 0); // sleep hand action
+    fingerprint = hash_u64(fingerprint, 0); // no boss effects
+    fingerprint = hash_u64(fingerprint, 0); // no hand effects
+    fingerprint = hash_u64(fingerprint, 0); // no star
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 0); // no presentation
+    fingerprint = hash_id(fingerprint, 2, 1);
+    fingerprint = hash_u64(fingerprint, 0); // parent slot
+    fingerprint = hash_u64(fingerprint, 1); // hand kind
+    fingerprint = hash_u64(fingerprint, 1); // right side
+    fingerprint = hash_u64(fingerprint, 255); // no boss action
+    fingerprint = hash_u64(fingerprint, 0); // sleep hand action
+    fingerprint = hash_u64(fingerprint, 0); // no boss effects
+    fingerprint = hash_u64(fingerprint, 0); // no hand effects
+    fingerprint = hash_u64(fingerprint, 0); // no star
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 0); // no presentation
+    fingerprint = hash_u64(fingerprint, 3); // delivery receipts
+    for (unsigned index = 0; index < 3; ++index) {
+        fingerprint = hash_u64(fingerprint, 0); // delivered
+        fingerprint = hash_u64(fingerprint, 0); // presented
+        fingerprint = hash_u64(fingerprint, 0); // spawned
+        fingerprint = hash_u64(fingerprint, 0); // deleted
+        fingerprint = hash_u64(fingerprint, 0); // rejected
+    }
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);
