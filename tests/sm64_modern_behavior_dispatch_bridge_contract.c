@@ -43,6 +43,7 @@
 #define KING_BOBOMB_BEHAVIOR UINT64_C(0x6268765f6b626d)
 #define SL_WALKING_PENGUIN_BEHAVIOR UINT64_C(0x6268765f736c70)
 #define SMALL_PENGUIN_BEHAVIOR UINT64_C(0x6268765f73706e)
+#define KOOPA_UNDERWATER_BEHAVIOR UINT64_C(0x6268765f6b7375)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -778,6 +779,31 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // spawned
     fingerprint = hash_u64(fingerprint, 0); // deleted
     fingerprint = hash_u64(fingerprint, 0); // rejected
+
+    // Isolated shared-dispatch underwater Koopa shell route. The underwater
+    // shell lives in the general-actor list and has no transient children on
+    // its initial free/tangible callback.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t koopa_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, koopa_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, KOOPA_UNDERWATER_BEHAVIOR, 31);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 1); // underwater kind
+    fingerprint = hash_u64(fingerprint, 4097); // animate + tangible
+    fingerprint = hash_u64(fingerprint, 0); // free action
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_u64(fingerprint, 0); // no deliveries
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

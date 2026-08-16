@@ -176,6 +176,34 @@ final class SM64KoopaShellObjectBridge {
         return true
     }
 
+    /// Starts a shared-dispatch tick without running the standalone scheduler.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard registeredIDs.contains(id), pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        shells.removeValue(forKey: id)
+        underwaters.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+        underwaterInputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -184,26 +212,11 @@ final class SM64KoopaShellObjectBridge {
     ) -> SM64KoopaShellSchedulerTickResult {
         inputs = frameInputs
         underwaterInputs = frameUnderwaterInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            shells.removeValue(forKey: id)
-            underwaters.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-            underwaterInputs.removeValue(forKey: id)
-        }
-        for id in Array(shells.keys) where engineState.objects.record(for: id) == nil {
-            shells.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-        }
-        for id in Array(underwaters.keys) where engineState.objects.record(for: id) == nil {
-            underwaters.removeValue(forKey: id)
-            underwaterInputs.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64KoopaShellSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
 

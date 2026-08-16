@@ -817,6 +817,44 @@ private func hashSmallPenguinDispatch(
     return hash
 }
 
+private func hashKoopaShellDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.koopaShellEffects.count))
+    for effect in tick.koopaShellEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.action.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.koopaShellDeliveries.count))
+    for delivery in tick.koopaShellDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1294,6 +1332,29 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             "small penguin owner delivery is explicit"
         )
         fingerprint = hashSmallPenguinDispatch(fingerprint, smallTick)
+
+        let shellEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let shellBridge = SM64BehaviorDispatchBridge()
+        let underwaterShell = try shellBridge.spawnKoopaUnderwaterShell(
+            in: shellEngine,
+            positionX: -30,
+            positionY: 20,
+            positionZ: 4
+        )
+        let shellTick = shellBridge.tick(state: shellEngine)
+        require(shellTick.events.map(\.route) == [.koopaShell], "Koopa underwater shell route dispatch")
+        require(shellTick.scheduler.updated.map(\.traceSubject) == [1], "Koopa shell callback ordering")
+        require(
+            shellTick.koopaShellEffects.count == 1
+                && shellTick.koopaShellEffects.first?.objectID == underwaterShell
+                && shellTick.koopaShellEffects.first?.kind == .underwater
+                && shellTick.koopaShellEffects.first?.effects == [.animate, .tangible]
+                && shellTick.koopaShellEffects.first?.action == .free
+                && shellTick.koopaShellEffects.first?.spawnedChildren.isEmpty == true,
+            "Koopa underwater shell value route is preserved"
+        )
+        require(shellTick.koopaShellDeliveries.isEmpty, "Koopa shell idle route has no delivery")
+        fingerprint = hashKoopaShellDispatch(fingerprint, shellTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

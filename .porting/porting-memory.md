@@ -2,6 +2,24 @@
 
 ## Current Milestone
 
+- M22ak registers the existing Koopa shell owner bridge for both the level-list
+  shell and underwater shell identities in the shared
+  `SM64BehaviorDispatchBridge`. The general-actor route preserves the
+  underwater tangible/free seam while the level-list route remains available
+  for the same generation-safe owner bridge; effect-only children and deletion
+  receipts stay explicit at the owner boundary. Thirty-two-route Swift/C
+  fingerprint `0x6de28a477071254e`, standalone Koopa shell object-bridge
+  fingerprint `0x3dee340d1e85a07e`, behavior manifest fingerprint
+  `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461
+  explicit `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Koopa shell contracts, native Debug target
+  `/tmp/sm64-modern-m22ak-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full shell
+  movement/ride/presentation consumers, remaining adapters, and live parity
+  remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ak.md`.
+
 - M22aj registers the existing small-penguin owner bridge for both the default
   and baby behavior identities in the shared `SM64BehaviorDispatchBridge`.
   The general-actor route advances the idle/action reducer, preserves
