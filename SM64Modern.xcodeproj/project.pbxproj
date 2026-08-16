@@ -83,6 +83,7 @@
 		59D828BFA9A7DCFEEC96AAD2 /* CameraCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF32B94910902857B072626 /* CameraCollision.swift */; };
 		5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */; };
 		5C1840210026D9416120F870 /* WhompObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189D1521FD7CFA3D234A28F6 /* WhompObjectBridge.swift */; };
+		6321601F8F550EE3305561A4 /* BobombBuddyBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E4F781D55FAEFF9757C3F1 /* BobombBuddyBehavior.swift */; };
 		637DB55CFFCA4EDF63A29B58 /* CameraInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724F73EC282345F4551FC1BF /* CameraInput.swift */; };
 		65F4BEF23300074C1E392842 /* MarioShellAirAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820DE3AD7B88D2679E91FFF4 /* MarioShellAirAction.swift */; };
 		6623355865D93A2C5631F1DF /* GoombaEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 351FD4FF55CB608F105C75CD /* GoombaEnemy.swift */; };
@@ -348,6 +349,7 @@
 		AF17DAA784F8FC1431F06A28 /* ScuttlebugEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScuttlebugEnemy.swift; sourceTree = "<group>"; };
 		B0C6C29EF4D3EDA95AE7DC1C /* ChainChompRelease.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChainChompRelease.swift; sourceTree = "<group>"; };
 		B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptVM.swift; sourceTree = "<group>"; };
+		B3E4F781D55FAEFF9757C3F1 /* BobombBuddyBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BobombBuddyBehavior.swift; sourceTree = "<group>"; };
 		B4872879FF660BB19A8FB4AC /* CoinScoreAges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoinScoreAges.swift; sourceTree = "<group>"; };
 		B512E26120B9CF2080159F3C /* BullyEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BullyEnemy.swift; sourceTree = "<group>"; };
 		B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectSnapshot.swift; sourceTree = "<group>"; };
@@ -430,6 +432,7 @@
 				B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */,
 				FC5B24277AF249CA2DFC7FD6 /* BirdEnemy.swift */,
 				E497FB3B17788DCEA3B3261F /* BirdObjectBridge.swift */,
+				B3E4F781D55FAEFF9757C3F1 /* BobombBuddyBehavior.swift */,
 				60F74F1DC90A46BBEF7D28FE /* BobombEnemy.swift */,
 				406EDDE3B748218288E16122 /* BobombObjectBridge.swift */,
 				CA77F04AF689DCD409910BEE /* BooEnemy.swift */,
@@ -730,6 +733,7 @@
 				0251DEA438C860732FDBE0C1 /* BehaviorScriptVM.swift in Sources */,
 				23438691E437DAAAC9B38229 /* BirdEnemy.swift in Sources */,
 				9F843A73A64A5646F34206E5 /* BirdObjectBridge.swift in Sources */,
+				6321601F8F550EE3305561A4 /* BobombBuddyBehavior.swift in Sources */,
 				71832214A0EA82FFBAE64390 /* BobombEnemy.swift in Sources */,
 				E4DC22B427B7BADD0E429F67 /* BobombObjectBridge.swift in Sources */,
 				1142EE42E057A98B722C09BD /* BooEnemy.swift in Sources */,
