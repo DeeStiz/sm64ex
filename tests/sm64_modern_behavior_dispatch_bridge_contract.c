@@ -36,6 +36,8 @@
 #define SCUTTLEBUG_SPAWNER_BEHAVIOR UINT64_C(0x6268765f736273)
 #define SCUTTLEBUG_BEHAVIOR UINT64_C(0x6268765f736275)
 #define BOBOMB_BUDDY_BEHAVIOR UINT64_C(0x6268765f626262)
+#define BOWSER_SHOCK_WAVE_BEHAVIOR UINT64_C(0x6268765f627377)
+#define BOWSER_KEY_BEHAVIOR UINT64_C(0x6268765f6b6579)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -585,6 +587,55 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // spawned
     fingerprint = hash_u64(fingerprint, 0); // deleted
     fingerprint = hash_u64(fingerprint, 0); // rejected
+
+    // Isolated shared-dispatch Bowser shockwave unimportant-list route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t shock_counts[13] = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, shock_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, BOWSER_SHOCK_WAVE_BEHAVIOR, 25);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // no effect
+    fingerprint = hash_u64(fingerprint, 1); // timer
+    fingerprint = hash_u64(fingerprint, 0); // scale
+    fingerprint = hash_u64(fingerprint, 255); // opacity
+    fingerprint = hash_u64(fingerprint, 0); // no Mario interaction
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+
+    // Isolated shared-dispatch Bowser key level-list route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t key_counts[13] = {
+        0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, key_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, BOWSER_KEY_BEHAVIOR, 26);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // airborne action
+    fingerprint = hash_u64(fingerprint, 3); // sparkle particles + spawn
+    fingerprint = hash_u64(fingerprint, 1); // timer
+    fingerprint = hash_u64(fingerprint, UINT64_C(0x3f000000)); // scale
+    fingerprint = hash_u64(fingerprint, 0); // face yaw
+    fingerprint = hash_u64(fingerprint, UINT64_C(0xffffffffffffc000)); // face roll
+    fingerprint = hash_u64(fingerprint, UINT64_C(0x43250000)); // graph Y offset
+    fingerprint = hash_u64(fingerprint, 0); // not tangible
+    fingerprint = hash_u64(fingerprint, 0); // not marked
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

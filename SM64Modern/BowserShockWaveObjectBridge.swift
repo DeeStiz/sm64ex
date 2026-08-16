@@ -100,6 +100,36 @@ final class SM64BowserShockWaveObjectBridge {
         return true
     }
 
+    /// Clears per-tick effect records before a shared scheduler pass.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+    }
+
+    /// Advances one shockwave in the enclosing scheduler, optionally applying
+    /// its interaction bit to the generation-checked Mario record.
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        pool: SM64ObjectPool,
+        marioID: SM64ObjectID? = nil
+    ) -> Bool {
+        guard pool.record(for: id) != nil, states[id] != nil else { return false }
+        update(id: id, pool: pool, marioID: marioID)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -107,18 +137,11 @@ final class SM64BowserShockWaveObjectBridge {
         marioID: SM64ObjectID? = nil
     ) -> SM64BowserShockWaveSchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, pool: pool, marioID: marioID)
+            _ = self?.updateInline(id, pool: pool, marioID: marioID)
         }
-        for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64BowserShockWaveSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
 

@@ -26,6 +26,8 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case pokey = 22
     case scuttlebug = 23
     case bobombBuddy = 24
+    case bowserShockWave = 25
+    case bowserKey = 26
     case unmigrated = 255
 }
 
@@ -88,6 +90,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let scuttlebugDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let bobombBuddyEffects: [SM64BobombBuddyObjectEffect]
     let bobombBuddyDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let bowserShockWaveEffects: [SM64BowserShockWaveObjectEffectRecord]
+    let bowserKeyEffects: [SM64BowserKeyObjectEffectRecord]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -120,6 +124,8 @@ final class SM64BehaviorDispatchBridge {
     let pokey: SM64PokeyObjectBridge
     let scuttlebug: SM64ScuttlebugObjectBridge
     let bobombBuddy: SM64BobombBuddyObjectBridge
+    let bowserShockWave: SM64BowserShockWaveObjectBridge
+    let bowserKey: SM64BowserKeyObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -150,6 +156,8 @@ final class SM64BehaviorDispatchBridge {
         self.pokey = SM64PokeyObjectBridge(scheduler: scheduler)
         self.scuttlebug = SM64ScuttlebugObjectBridge(scheduler: scheduler)
         self.bobombBuddy = SM64BobombBuddyObjectBridge(scheduler: scheduler)
+        self.bowserShockWave = SM64BowserShockWaveObjectBridge(scheduler: scheduler)
+        self.bowserKey = SM64BowserKeyObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -217,6 +225,10 @@ final class SM64BehaviorDispatchBridge {
         case SM64BobombBuddyObjectBridge.defaultBehaviorIdentity,
              SM64BobombBuddyObjectBridge.cannonClosedBehaviorIdentity:
             return .bobombBuddy
+        case SM64BowserShockWaveObjectBridge.defaultBehaviorIdentity:
+            return .bowserShockWave
+        case SM64BowserKeyObjectBridge.defaultBehaviorIdentity:
+            return .bowserKey
         default:
             return .unmigrated
         }
@@ -249,6 +261,8 @@ final class SM64BehaviorDispatchBridge {
         for id in pokey.registeredIDs { pokey.remove(id) }
         for id in scuttlebug.registeredIDs { scuttlebug.remove(id) }
         for id in bobombBuddy.registeredIDs { bobombBuddy.remove(id) }
+        for id in bowserShockWave.registeredIDs { bowserShockWave.remove(id) }
+        for id in bowserKey.registeredIDs { bowserKey.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -273,6 +287,9 @@ final class SM64BehaviorDispatchBridge {
         pokey.beginExternalTick()
         scuttlebug.beginExternalTick()
         bobombBuddy.beginExternalTick()
+        bowserShockWave.beginExternalTick()
+        bowserKey.beginExternalTick()
+        bowserKey.beginExternalTick()
     }
 
     @discardableResult
@@ -749,6 +766,40 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnBowserShockWave(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        model: UInt32 = SM64BowserShockWaveObjectBridge.defaultModel,
+        behaviorIdentity: UInt64 = SM64BowserShockWaveObjectBridge.defaultBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try bowserShockWave.spawnShockWave(
+            in: engineState,
+            position: position,
+            model: model,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
+    func spawnBowserKey(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        faceYaw: Int16 = 0,
+        angleVelocityYaw: Int16 = 0,
+        model: UInt32 = SM64BowserKeyObjectBridge.defaultModel,
+        behaviorIdentity: UInt64 = SM64BowserKeyObjectBridge.defaultBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try bowserKey.spawnKey(
+            in: engineState,
+            position: position,
+            faceYaw: faceYaw,
+            angleVelocityYaw: angleVelocityYaw,
+            model: model,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -775,6 +826,7 @@ final class SM64BehaviorDispatchBridge {
         pokey.beginExternalTick(globalFrame: engineState.globals.frame)
         scuttlebug.beginExternalTick()
         bobombBuddy.beginExternalTick()
+        bowserShockWave.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -841,6 +893,14 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.scuttlebug.updateInline(id, pool: pool)
             case .bobombBuddy:
                 _ = self.bobombBuddy.updateInline(id, state: engineState, pool: pool)
+            case .bowserShockWave:
+                _ = self.bowserShockWave.updateInline(
+                    id,
+                    pool: pool,
+                    marioID: engineState.globals.marioObject
+                )
+            case .bowserKey:
+                _ = self.bowserKey.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -874,6 +934,8 @@ final class SM64BehaviorDispatchBridge {
             pokey.remove(id)
             scuttlebug.remove(id)
             bobombBuddy.remove(id)
+            bowserShockWave.remove(id)
+            bowserKey.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -939,6 +1001,8 @@ final class SM64BehaviorDispatchBridge {
         pokey.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         scuttlebug.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         bobombBuddy.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        bowserShockWave.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        bowserKey.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -992,7 +1056,9 @@ final class SM64BehaviorDispatchBridge {
             scuttlebugEffects: scuttlebug.effectLog,
             scuttlebugDeliveries: scuttlebug.deliveryLog,
             bobombBuddyEffects: bobombBuddy.effectLog,
-            bobombBuddyDeliveries: bobombBuddy.deliveryLog
+            bobombBuddyDeliveries: bobombBuddy.deliveryLog,
+            bowserShockWaveEffects: bowserShockWave.effectLog,
+            bowserKeyEffects: bowserKey.effectLog
         )
     }
 }

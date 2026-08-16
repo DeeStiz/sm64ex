@@ -593,6 +593,69 @@ private func hashBobombBuddyDispatch(
     return hash
 }
 
+private func hashBowserShockWaveDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.bowserShockWaveEffects.count))
+    for effect in tick.bowserShockWaveEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.timer))
+        hash = hashU64(hash, UInt64(effect.scale.bitPattern))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.opacity)))
+        hash = hashU64(hash, effect.interactedMario ? 1 : 0)
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    return hash
+}
+
+private func hashBowserKeyDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.bowserKeyEffects.count))
+    for effect in tick.bowserKeyEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.action.rawValue))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.timer))
+        hash = hashU64(hash, UInt64(effect.scale.bitPattern))
+        hash = hashU64(hash, UInt64(UInt16(bitPattern: effect.faceYaw)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.faceRoll)))
+        hash = hashU64(hash, UInt64(effect.graphYOffset.bitPattern))
+        hash = hashU64(hash, effect.tangible ? 1 : 0)
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -950,6 +1013,32 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(buddyTick.bobombBuddyEffects.count == 1, "Bob-omb Buddy effect is recorded")
         require(buddyTick.bobombBuddyDeliveries.count == 1 && buddyTick.bobombBuddyDeliveries.first?.presented.isEmpty == true, "Bob-omb Buddy empty owner delivery is explicit")
         fingerprint = hashBobombBuddyDispatch(fingerprint, buddyTick)
+
+        let shockEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let shockBridge = SM64BehaviorDispatchBridge()
+        _ = try shockBridge.spawnBowserShockWave(in: shockEngine)
+        let shockTick = shockBridge.tick(state: shockEngine)
+        require(shockTick.events.map(\.route) == [.bowserShockWave], "Bowser shockwave route dispatch")
+        require(shockTick.scheduler.updated.map(\.traceSubject) == [1], "Bowser shockwave callback ordering")
+        require(
+            shockTick.bowserShockWaveEffects.count == 1
+                && shockTick.bowserShockWaveEffects.first?.timer == 1,
+            "Bowser shockwave effect is recorded"
+        )
+        fingerprint = hashBowserShockWaveDispatch(fingerprint, shockTick)
+
+        let keyEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let keyBridge = SM64BehaviorDispatchBridge()
+        _ = try keyBridge.spawnBowserKey(in: keyEngine)
+        let keyTick = keyBridge.tick(state: keyEngine)
+        require(keyTick.events.map(\.route) == [.bowserKey], "Bowser key route dispatch")
+        require(keyTick.scheduler.updated.map(\.traceSubject) == [1], "Bowser key callback ordering")
+        require(
+            keyTick.bowserKeyEffects.count == 1
+                && keyTick.bowserKeyEffects.first?.effects == [.sparkleParticles, .sparkleSpawn],
+            "Bowser key effect is recorded"
+        )
+        fingerprint = hashBowserKeyDispatch(fingerprint, keyTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

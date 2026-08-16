@@ -2,6 +2,22 @@
 
 ## Current Milestone
 
+- M22af registers the existing Bowser shockwave and Bowser key owner bridges
+  in the shared `SM64BehaviorDispatchBridge`. The general-actor and level-list
+  routes advance both reducers in one owner-thread traversal, preserving
+  generation-safe effect records and deletion receipts. Twenty-seven-route
+  Swift/C fingerprint `0x9a877c03788fbd70`, standalone shockwave fingerprint
+  `0x4dbf62c6e6d1688d`, standalone key fingerprint `0xcd796d923af75c27`,
+  behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows, 73 Swift
+  value/owner routes, and 461 explicit `unmigrated_c_adapter` rows are the
+  accounting boundary. Focused dispatch/shockwave/key contracts, native
+  Debug target `/tmp/sm64-modern-m22af-build.log`, full shebang-corrected
+  206-script matrix, `git diff --check`, and zero unchecked-Sendable audit
+  pass are the evidence boundary. Full Bowser controller/arena,
+  collision/presentation/progression consumers, remaining adapters, and live
+  parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22af.md`.
+
 - M22ae registers the existing Bob-omb Buddy owner bridge and its exact buddy
   and cannon-closed behavior identities in the shared
   `SM64BehaviorDispatchBridge`. The general-actor route advances the value

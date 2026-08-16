@@ -43,6 +43,10 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ScuttlebugObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BobombBuddyBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/BobombBuddyObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/BowserShockWave.swift" \
+  "$PROJECT_ROOT/SM64Modern/BowserShockWaveObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/BowserKey.swift" \
+  "$PROJECT_ROOT/SM64Modern/BowserKeyObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \
