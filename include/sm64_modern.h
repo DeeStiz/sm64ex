@@ -478,6 +478,21 @@ typedef struct SM64ModernProgressionEventV1 {
     int32_t global_max_coin_score;
     uint32_t cap_switch_index;
     uint32_t flags;
+    // Save-mutation payload. These fields are zero for non-mutation events;
+    // mutation_kind mirrors the SAVE_MUTATION_* constants while the remaining
+    // values carry the exact C operands needed by the Swift value kernel.
+    uint32_t mutation_kind;
+    uint32_t mutation_operation;
+    uint32_t mutation_source_file_index;
+    uint32_t mutation_flags;
+    uint32_t mutation_course_index;
+    int32_t mutation_star_flags;
+    uint32_t mutation_level;
+    uint32_t mutation_area;
+    int32_t mutation_cap_x;
+    int32_t mutation_cap_y;
+    int32_t mutation_cap_z;
+    uint32_t mutation_sound_mode;
 } SM64ModernProgressionEventV1;
 
 typedef SM64ModernStatus (*SM64ModernProgressionEventFn)(

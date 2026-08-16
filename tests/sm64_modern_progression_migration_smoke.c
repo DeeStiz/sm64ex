@@ -86,6 +86,72 @@ int main(void) {
                && gLastEvent.event_kind
                    == SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
            "mutation event kind");
+    expect(sm64_modern_progression_record_save_mutation(
+               1, SM64_MODERN_PROGRESSION_SAVE_MUTATION_CAP, 0, UINT32_MAX, 0,
+               UINT32_MAX, -1, 9, 3, -100, 200, 300, 0)
+               == SM64_MODERN_STATUS_OK,
+           "mutation payload callback");
+    expect(gCallbackCount == 3
+               && gLastEvent.mutation_kind
+                   == SM64_MODERN_PROGRESSION_SAVE_MUTATION_CAP
+               && gLastEvent.mutation_operation == 0
+               && gLastEvent.mutation_level == 9
+               && gLastEvent.mutation_area == 3
+               && gLastEvent.mutation_cap_x == -100
+               && gLastEvent.mutation_cap_y == 200
+               && gLastEvent.mutation_cap_z == 300,
+           "mutation payload values");
+    expect(sm64_modern_progression_record_save_mutation(
+               0, SM64_MODERN_PROGRESSION_SAVE_MUTATION_FLAGS, 0,
+               UINT32_MAX, 0x40u, UINT32_MAX, -1, 0, 0, 0, 0, 0, 0)
+               == SM64_MODERN_STATUS_OK,
+           "flags payload callback");
+    expect(gLastEvent.mutation_operation == 0
+               && gLastEvent.mutation_flags == 0x40u,
+           "flags payload values");
+    expect(sm64_modern_progression_record_save_mutation(
+               0, SM64_MODERN_PROGRESSION_SAVE_MUTATION_FLAGS, 1,
+               UINT32_MAX, 0x40u, UINT32_MAX, -1, 0, 0, 0, 0, 0, 0)
+               == SM64_MODERN_STATUS_OK,
+           "clear-flags payload callback");
+    expect(gLastEvent.mutation_operation == 1,
+           "clear-flags payload value");
+    expect(sm64_modern_progression_record_save_mutation(
+               0, SM64_MODERN_PROGRESSION_SAVE_MUTATION_STARS, 0,
+               UINT32_MAX, 0, 2, 0x04, 0, 0, 0, 0, 0, 0)
+               == SM64_MODERN_STATUS_OK,
+           "stars payload callback");
+    expect(gLastEvent.mutation_course_index == 2
+               && gLastEvent.mutation_star_flags == 0x04,
+           "stars payload values");
+    expect(sm64_modern_progression_record_save_mutation(
+               1, SM64_MODERN_PROGRESSION_SAVE_MUTATION_CANNON, 0,
+               UINT32_MAX, 0, 7, -1, 0, 0, 0, 0, 0, 0)
+               == SM64_MODERN_STATUS_OK,
+           "cannon payload callback");
+    expect(gLastEvent.mutation_course_index == 7,
+           "cannon payload value");
+    expect(sm64_modern_progression_record_save_mutation(
+               1, SM64_MODERN_PROGRESSION_SAVE_MUTATION_COPY, 0, 3,
+               0, UINT32_MAX, -1, 0, 0, 0, 0, 0, 0)
+               == SM64_MODERN_STATUS_OK,
+           "copy payload callback");
+    expect(gLastEvent.mutation_source_file_index == 3,
+           "copy payload value");
+    expect(sm64_modern_progression_record_save_mutation(
+               2, SM64_MODERN_PROGRESSION_SAVE_MUTATION_ERASE, 0,
+               UINT32_MAX, 0, UINT32_MAX, -1, 0, 0, 0, 0, 0, 0)
+               == SM64_MODERN_STATUS_OK,
+           "erase payload callback");
+    expect(gLastEvent.mutation_source_file_index == UINT32_MAX,
+           "erase payload value");
+    expect(sm64_modern_progression_record_save_mutation(
+               0, SM64_MODERN_PROGRESSION_SAVE_MUTATION_MENU, 0,
+               UINT32_MAX, 0, UINT32_MAX, -1, 0, 0, 0, 0, 0, 0x4321)
+               == SM64_MODERN_STATUS_OK,
+           "menu payload callback");
+    expect(gLastEvent.mutation_sound_mode == 0x4321,
+           "menu payload value");
     expect(sm64_modern_progression_record_event(
                SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION + 1u,
                0, 0, 0, -1, 0, 0, 0, 0)

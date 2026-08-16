@@ -13,6 +13,21 @@ SM64ModernStatus sm64_modern_progression_record_event(
     int32_t global_max_coin_score,
     uint32_t cap_switch_index,
     uint32_t flags);
+
+SM64ModernStatus sm64_modern_progression_record_save_mutation(
+    uint32_t save_file_index,
+    uint32_t mutation_kind,
+    uint32_t mutation_operation,
+    uint32_t source_file_index,
+    uint32_t mutation_flags,
+    uint32_t course_index,
+    int32_t star_flags,
+    uint32_t level,
+    uint32_t area,
+    int32_t cap_x,
+    int32_t cap_y,
+    int32_t cap_z,
+    uint32_t sound_mode);
 SM64ModernStatus sm64_modern_progression_migration_active_status(void);
 
 // Reads the current canonical C slots synchronously on the lifecycle owner

@@ -53,11 +53,22 @@ final class SwiftProgressionMigrationService {
 
     func initialize() throws {
         assertOwnerThread()
-        let loaded = try adapter.reload(
-            saveFileIndex: runtime.saveFileIndex,
-            ownerThreadToken: ownerThreadToken
-        )
-        runtime.adoptPersistedSnapshots(save: loaded.save, menu: loaded.menu)
+        if let snapshot = readSnapshot(fileIndex: runtime.saveFileIndex) {
+            try adapter.commit(
+                saveFileIndex: runtime.saveFileIndex,
+                save: snapshot.save, menu: snapshot.menu,
+                ownerThreadToken: ownerThreadToken
+            )
+            runtime.adoptPersistedSnapshots(
+                save: snapshot.save, menu: snapshot.menu
+            )
+        } else {
+            let loaded = try adapter.reload(
+                saveFileIndex: runtime.saveFileIndex,
+                ownerThreadToken: ownerThreadToken
+            )
+            runtime.adoptPersistedSnapshots(save: loaded.save, menu: loaded.menu)
+        }
     }
 
     func makeAPI() -> SM64ModernProgressionMigrationApiV1 {
@@ -164,7 +175,149 @@ final class SwiftProgressionMigrationService {
     }
 
     private func recordMutation(event: SM64ModernProgressionEventV1) -> SM64ModernStatus {
-        recordSnapshot(event: event, flags: event.flags)
+        // Older producers only set the legacy mutation kind in `flags`; keep
+        // their post-mutation snapshot shadow path until the payload extension
+        // is present.
+        guard event.mutation_kind != SM64_MODERN_PROGRESSION_SAVE_MUTATION_GENERIC else {
+            return recordSnapshot(event: event, flags: event.flags)
+        }
+        guard event.mutation_kind <= SM64_MODERN_PROGRESSION_SAVE_MUTATION_MENU,
+              event.mutation_operation <= 1 else {
+            return fail(
+                SM64_MODERN_STATUS_INVALID_ARGUMENT,
+                message: "mutation_payload_kind"
+            )
+        }
+
+        do {
+            let expected: (save: SM64SaveFileSnapshot, menu: SM64MenuDataSnapshot)
+            switch event.mutation_kind {
+            case SM64_MODERN_PROGRESSION_SAVE_MUTATION_ERASE:
+                guard event.mutation_source_file_index == UInt32.max else {
+                    return fail(
+                        SM64_MODERN_STATUS_INVALID_ARGUMENT,
+                        message: "mutation_erase_source"
+                    )
+                }
+                try adapter.erase(
+                    saveFileIndex: Int(event.save_file_index),
+                    ownerThreadToken: ownerThreadToken
+                )
+                let loaded = try adapter.load(
+                    saveFileIndex: Int(event.save_file_index),
+                    ownerThreadToken: ownerThreadToken
+                )
+                expected = (loaded.save, loaded.menu)
+            case SM64_MODERN_PROGRESSION_SAVE_MUTATION_COPY:
+                guard event.mutation_source_file_index
+                    < UInt32(SM64CoinScoreAgeState.fileCount) else {
+                    return fail(
+                        SM64_MODERN_STATUS_INVALID_ARGUMENT,
+                        message: "mutation_copy_source"
+                    )
+                }
+                try adapter.copy(
+                    saveFileIndex: Int(event.mutation_source_file_index),
+                    to: Int(event.save_file_index),
+                    ownerThreadToken: ownerThreadToken
+                )
+                let loaded = try adapter.load(
+                    saveFileIndex: Int(event.save_file_index),
+                    ownerThreadToken: ownerThreadToken
+                )
+                expected = (loaded.save, loaded.menu)
+            default:
+                guard let mutation = mutation(from: event) else {
+                    return fail(
+                        SM64_MODERN_STATUS_INVALID_ARGUMENT,
+                        message: "mutation_payload_values"
+                    )
+                }
+                let result = try adapter.apply(
+                    mutation,
+                    saveFileIndex: Int(event.save_file_index),
+                    ownerThreadToken: ownerThreadToken
+                )
+                expected = (result.save, result.menu)
+            }
+
+            guard let cSnapshot = readSnapshot(
+                fileIndex: Int(event.save_file_index)
+            ), SM64SaveFileCodec.encode(cSnapshot.save)
+                == SM64SaveFileCodec.encode(expected.save),
+                SM64MenuDataCodec.encode(cSnapshot.menu)
+                == SM64MenuDataCodec.encode(expected.menu) else {
+                return fail(
+                    SM64_MODERN_STATUS_PARITY_DIVERGED,
+                    message: "mutation_payload_replay"
+                )
+            }
+            runtime.adoptPersistedSnapshots(
+                save: expected.save, menu: expected.menu
+            )
+            recordOracle(
+                event: event,
+                recordKind: SM64_MODERN_ORACLE_RECORD_SAVE_BYTES,
+                flags: event.flags,
+                values: [
+                    hash(bytes: SM64SaveFileCodec.encode(expected.save)),
+                    hash(bytes: SM64MenuDataCodec.encode(expected.menu)),
+                    eventCount
+                ]
+            )
+            return SM64_MODERN_STATUS_OK
+        } catch {
+            return fail(
+                SM64_MODERN_STATUS_PLATFORM_ERROR,
+                message: "mutation_payload_apply"
+            )
+        }
+    }
+
+    private func mutation(
+        from event: SM64ModernProgressionEventV1
+    ) -> SM64SaveFileMutation? {
+        switch event.mutation_kind {
+        case SM64_MODERN_PROGRESSION_SAVE_MUTATION_FLAGS:
+            return event.mutation_operation == 0
+                ? .setFlags(event.mutation_flags)
+                : .clearFlags(event.mutation_flags)
+        case SM64_MODERN_PROGRESSION_SAVE_MUTATION_STARS:
+            let courseIndex = event.mutation_course_index == UInt32.max
+                ? -1 : Int(event.mutation_course_index)
+            return .setStarFlags(
+                starFlags: UInt32(bitPattern: event.mutation_star_flags),
+                courseIndex: courseIndex
+            )
+        case SM64_MODERN_PROGRESSION_SAVE_MUTATION_CANNON:
+            return .setCannonUnlocked(
+                currentCourseNumber: Int(event.mutation_course_index)
+            )
+        case SM64_MODERN_PROGRESSION_SAVE_MUTATION_CAP:
+            guard event.mutation_level <= UInt32(UInt8.max),
+                  event.mutation_area <= UInt32(UInt8.max),
+                  (Int32(-32_768)...Int32(32_767)).contains(event.mutation_cap_x),
+                  (Int32(-32_768)...Int32(32_767)).contains(event.mutation_cap_y),
+                  (Int32(-32_768)...Int32(32_767)).contains(event.mutation_cap_z) else {
+                return nil
+            }
+            return .setCapPosition(
+                level: UInt8(event.mutation_level),
+                area: UInt8(event.mutation_area),
+                position: .init(
+                    x: Int16(event.mutation_cap_x),
+                    y: Int16(event.mutation_cap_y),
+                    z: Int16(event.mutation_cap_z)
+                )
+            )
+        case SM64_MODERN_PROGRESSION_SAVE_MUTATION_MENU:
+            guard event.mutation_sound_mode <= UInt32(UInt16.max) else {
+                return nil
+            }
+            return .setSoundMode(UInt16(event.mutation_sound_mode))
+        default:
+            return nil
+        }
     }
 
     private func persist(event: SM64ModernProgressionEventV1) -> SM64ModernStatus {

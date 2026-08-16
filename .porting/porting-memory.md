@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M23g extends `SM64ModernProgressionEventV1` with exact save mutation
+  operands: set/clear operation, source slot, flags, course/star indices,
+  cannon course, cap level/area/coordinates, and sound mode. C save helpers
+  emit payloads; Swift seeds the normalized EEPROM shadow from canonical C
+  bytes, replays each payload through the normalized adapter, compares the
+  post-event bytes, and latches `PARITY_DIVERGED` on mismatch. Migration
+  payload fingerprint `0x5f56c0c4d6b0e8b1`; focused payload assertions,
+  regenerated native Debug build, complete 211-script matrix
+  (`runs=211 failures=0`), `git diff --check`, and zero unchecked-Sendable
+  audit pass. Restart-selector authority, persistent bidirectional replay,
+  and production Swift save authority remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M23g.md`.
+
 - M23f adds normalized `SM64OwnerThreadEEPROMAdapter.apply` mutation replay
   for the complete flag/star/cannon/cap/cap-relocation/sound family. Each
   admitted operation repairs the full normalized image first, preserves menu

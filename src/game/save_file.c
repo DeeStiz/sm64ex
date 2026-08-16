@@ -471,10 +471,9 @@ void save_file_erase(s32 fileIndex) {
 
     gSaveFileModified = TRUE;
     record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) fileIndex);
-    sm64_modern_progression_record_event(
-        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
-        (u32) fileIndex, 0, 0, -1, 0, 0, 0,
-        SM64_MODERN_PROGRESSION_SAVE_MUTATION_ERASE);
+    sm64_modern_progression_record_save_mutation(
+        (u32) fileIndex, SM64_MODERN_PROGRESSION_SAVE_MUTATION_ERASE,
+        0, UINT32_MAX, 0, UINT32_MAX, -1, 0, 0, 0, 0, 0, 0);
     save_file_do_save(fileIndex);
 }
 
@@ -492,10 +491,9 @@ BAD_RETURN(s32) save_file_copy(s32 srcFileIndex, s32 destFileIndex) {
 
     gSaveFileModified = TRUE;
     record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) destFileIndex);
-    sm64_modern_progression_record_event(
-        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
-        (u32) destFileIndex, 0, 0, -1, 0, 0, 0,
-        SM64_MODERN_PROGRESSION_SAVE_MUTATION_COPY);
+    sm64_modern_progression_record_save_mutation(
+        (u32) destFileIndex, SM64_MODERN_PROGRESSION_SAVE_MUTATION_COPY,
+        0, (u32) srcFileIndex, 0, UINT32_MAX, -1, 0, 0, 0, 0, 0, 0);
     save_file_do_save(destFileIndex);
 }
 
@@ -717,11 +715,10 @@ void save_file_set_flags(u32 flags) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
-    sm64_modern_progression_record_event(
-        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+    sm64_modern_progression_record_save_mutation(
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
-        0, 0, -1, 0, 0, 0,
-        SM64_MODERN_PROGRESSION_SAVE_MUTATION_FLAGS);
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_FLAGS, 0, UINT32_MAX, flags,
+        UINT32_MAX, -1, 0, 0, 0, 0, 0, 0);
 }
 
 void save_file_clear_flags(u32 flags) {
@@ -734,11 +731,10 @@ void save_file_clear_flags(u32 flags) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
-    sm64_modern_progression_record_event(
-        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+    sm64_modern_progression_record_save_mutation(
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
-        0, 0, -1, 0, 0, 0,
-        SM64_MODERN_PROGRESSION_SAVE_MUTATION_FLAGS);
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_FLAGS, 1, UINT32_MAX, flags,
+        UINT32_MAX, -1, 0, 0, 0, 0, 0, 0);
 }
 
 u32 save_file_get_flags(void) {
@@ -787,12 +783,11 @@ void save_file_set_star_flags(s32 fileIndex, s32 courseIndex, u32 starFlags) {
     gSaveBuffer.files[fileIndex][0].flags |= SAVE_FLAG_FILE_EXISTS;
     gSaveFileModified = TRUE;
     record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION, (u32) fileIndex);
-    sm64_modern_progression_record_event(
-        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
-        (u32) fileIndex,
-        (u32) (courseIndex >= 0 ? courseIndex + 1 : 0),
-        0, -1, 0, 0, 0,
-        SM64_MODERN_PROGRESSION_SAVE_MUTATION_STARS);
+    sm64_modern_progression_record_save_mutation(
+        (u32) fileIndex, SM64_MODERN_PROGRESSION_SAVE_MUTATION_STARS,
+        0, UINT32_MAX, 0,
+        (u32) (courseIndex >= 0 ? courseIndex : UINT32_MAX),
+        (int32_t) starFlags, 0, 0, 0, 0, 0, 0);
 }
 
 s32 save_file_get_course_coin_score(s32 fileIndex, s32 courseIndex) {
@@ -819,11 +814,10 @@ void save_file_set_cannon_unlocked(void) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
-    sm64_modern_progression_record_event(
-        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+    sm64_modern_progression_record_save_mutation(
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
-        (u32) gCurrCourseNum, 0, -1, 0, 0, 0,
-        SM64_MODERN_PROGRESSION_SAVE_MUTATION_CANNON);
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_CANNON, 0, UINT32_MAX, 0,
+        (u32) gCurrCourseNum, -1, 0, 0, 0, 0, 0, 0);
 }
 
 void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
@@ -839,11 +833,11 @@ void save_file_set_cap_pos(s16 x, s16 y, s16 z) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
-    sm64_modern_progression_record_event(
-        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+    sm64_modern_progression_record_save_mutation(
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
-        0, 0, -1, 0, 0, 0,
-        SM64_MODERN_PROGRESSION_SAVE_MUTATION_CAP);
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_CAP, 0, UINT32_MAX, 0,
+        UINT32_MAX, -1, (u32) gCurrLevelNum, (u32) gCurrAreaIndex,
+        (int32_t) x, (int32_t) y, (int32_t) z, 0);
 }
 
 s32 save_file_get_cap_pos(Vec3s capPos) {
@@ -870,11 +864,10 @@ void save_file_set_sound_mode(u16 mode) {
     record_save_oracle_state(
         SM64_MODERN_ORACLE_SAVE_EVENT_MUTATION,
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0));
-    sm64_modern_progression_record_event(
-        SM64_MODERN_PROGRESSION_EVENT_SAVE_MUTATION,
+    sm64_modern_progression_record_save_mutation(
         (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0),
-        0, 0, -1, 0, 0, 0,
-        SM64_MODERN_PROGRESSION_SAVE_MUTATION_MENU);
+        SM64_MODERN_PROGRESSION_SAVE_MUTATION_MENU, 0, UINT32_MAX, 0,
+        UINT32_MAX, -1, 0, 0, 0, 0, 0, (u32) mode);
 }
 
 u16 save_file_get_sound_mode(void) {
