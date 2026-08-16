@@ -52,6 +52,7 @@ final class SM64ChainChompReleaseObjectBridge {
     static let gateCollisionIdentity: UInt64 = 0x6368_6F6D_705F_6761 // "chomp_ga"
 
     private let scheduler: SM64ObjectScheduler
+    private let effectRouter: SM64OwnerThreadEffectRouter
     private var postStates: [SM64ObjectID: SM64ChainChompPostState] = [:]
     private var postInputs: [SM64ObjectID: SM64ChainChompPostTickInput] = [:]
     private var postParents: [SM64ObjectID: SM64ObjectID] = [:]
@@ -59,9 +60,15 @@ final class SM64ChainChompReleaseObjectBridge {
     private var gateInputs: [SM64ObjectID: Bool] = [:]
     private var gateParents: [SM64ObjectID: SM64ObjectID] = [:]
     private(set) var effectLog: [SM64ChainChompReleaseObjectEffectRecord] = []
+    private(set) var releaseRequestLog: [SM64ObjectID] = []
+    private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
-    init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+    ) {
         self.scheduler = scheduler
+        self.effectRouter = effectRouter
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -163,6 +170,60 @@ final class SM64ChainChompReleaseObjectBridge {
         return true
     }
 
+    /// Clears per-tick effects before a shared scheduler pass.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        releaseRequestLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Advances one surface post or gate without nesting a scheduler
+    /// traversal. The enclosing dispatcher remains list-order authority.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard pool.record(for: id) != nil,
+              postStates[id] != nil || gateStates[id] != nil else { return false }
+        if postStates[id] != nil {
+            updatePost(id: id, pool: pool)
+        } else {
+            updateGate(id: id, pool: pool)
+        }
+        return true
+    }
+
+    /// Completes a shared dispatcher pass: derive parent release requests and
+    /// apply the typed surface effects through the common owner sink.
+    func finalizeExternalTick(pool: SM64ObjectPool) {
+        releaseRequestLog = effectLog.compactMap { effect in
+            effect.kind == .woodenPost && effect.effects.contains(.releaseChain)
+                ? postParents[effect.objectID] : nil
+        }
+        effectRouter.enqueue(effectLog)
+        let delivery = effectRouter.deliver(to: pool)
+        if !delivery.delivered.isEmpty || !delivery.presented.isEmpty
+            || !delivery.spawned.isEmpty || !delivery.deleted.isEmpty || !delivery.rejected.isEmpty {
+            deliveryLog.append(delivery)
+        }
+    }
+
+    /// Removes a surface child shadow after scheduler unload or reset.
+    func remove(_ id: SM64ObjectID) {
+        postStates.removeValue(forKey: id)
+        postInputs.removeValue(forKey: id)
+        postParents.removeValue(forKey: id)
+        gateStates.removeValue(forKey: id)
+        gateInputs.removeValue(forKey: id)
+        gateParents.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -171,7 +232,7 @@ final class SM64ChainChompReleaseObjectBridge {
     ) -> SM64ChainChompReleaseSchedulerTickResult {
         for (id, input) in framePostInputs { postInputs[id] = input }
         for (id, hit) in frameGateHits { gateInputs[id] = hit }
-        effectLog.removeAll(keepingCapacity: true)
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self else { return }
             if self.postStates[id] != nil {
@@ -181,33 +242,12 @@ final class SM64ChainChompReleaseObjectBridge {
             }
         }
 
-        for id in schedulerResult.unloaded {
-            postStates.removeValue(forKey: id)
-            postInputs.removeValue(forKey: id)
-            postParents.removeValue(forKey: id)
-            gateStates.removeValue(forKey: id)
-            gateInputs.removeValue(forKey: id)
-            gateParents.removeValue(forKey: id)
-        }
-        for id in Array(postStates.keys) where engineState.objects.record(for: id) == nil {
-            postStates.removeValue(forKey: id)
-            postInputs.removeValue(forKey: id)
-            postParents.removeValue(forKey: id)
-        }
-        for id in Array(gateStates.keys) where engineState.objects.record(for: id) == nil {
-            gateStates.removeValue(forKey: id)
-            gateInputs.removeValue(forKey: id)
-            gateParents.removeValue(forKey: id)
-        }
-
-        let releaseRequests = effectLog.compactMap { effect in
-            effect.kind == .woodenPost && effect.effects.contains(.releaseChain)
-                ? postParents[effect.objectID] : nil
-        }
+        finalizeExternalTick(pool: engineState.objects)
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64ChainChompReleaseSchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog,
-            releaseRequests: releaseRequests
+            releaseRequests: releaseRequestLog
         )
     }
 

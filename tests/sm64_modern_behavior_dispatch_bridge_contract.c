@@ -29,6 +29,8 @@
 #define ENEMY_LAKITU_BEHAVIOR UINT64_C(0x6268765f6c616b)
 #define CHAIN_CHOMP_BEHAVIOR UINT64_C(0x6268765f63686d70)
 #define CHAIN_CHOMP_SEGMENT_BEHAVIOR UINT64_C(0x6268765f63687367)
+#define CHAIN_CHOMP_POST_BEHAVIOR UINT64_C(0x6268765f77707374)
+#define CHAIN_CHOMP_GATE_BEHAVIOR UINT64_C(0x6268765f67617465)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -397,6 +399,70 @@ int main(void) {
         fingerprint = hash_u64(fingerprint, 0); // not marked
     }
     fingerprint = hash_u64(fingerprint, 0); // deliveries
+
+    // Isolated shared-dispatch Chain Chomp surface post/gate followed by the
+    // parent and five metallic segments in the source list order.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t release_counts[13] = {
+        0, 0, 0, 0, 6, 0, 0, 0, 0, 2, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, release_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 8); // object counter
+    fingerprint = hash_u64(fingerprint, 8); // updated count
+    const uint64_t release_updated[] = { 2, 3, 1, 4, 5, 6, 7, 8 };
+    for (size_t index = 0; index < sizeof(release_updated) / sizeof(release_updated[0]); ++index) {
+        fingerprint = hash_u64(fingerprint, release_updated[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 8); // events
+    fingerprint = hash_u64(fingerprint, 2);
+    fingerprint = hash_u64(fingerprint, CHAIN_CHOMP_POST_BEHAVIOR);
+    fingerprint = hash_u64(fingerprint, 21);
+    fingerprint = hash_u64(fingerprint, 3);
+    fingerprint = hash_u64(fingerprint, CHAIN_CHOMP_GATE_BEHAVIOR);
+    fingerprint = hash_u64(fingerprint, 21);
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, CHAIN_CHOMP_BEHAVIOR);
+    fingerprint = hash_u64(fingerprint, 20);
+    for (uint64_t id = 4; id <= 8; ++id) {
+        fingerprint = hash_u64(fingerprint, id);
+        fingerprint = hash_u64(fingerprint, CHAIN_CHOMP_SEGMENT_BEHAVIOR);
+        fingerprint = hash_u64(fingerprint, 20);
+    }
+    fingerprint = hash_u64(fingerprint, 2); // release effects
+    fingerprint = hash_u64(fingerprint, 2); // wooden post trace subject
+    fingerprint = hash_u64(fingerprint, 0); // wooden post kind
+    fingerprint = hash_u64(fingerprint, 1); // pound sound
+    fingerprint = hash_u64(fingerprint, 0); // no coins
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_u64(fingerprint, 3); // gate trace subject
+    fingerprint = hash_u64(fingerprint, 1); // gate kind
+    fingerprint = hash_u64(fingerprint, 0x3e0); // all gate effects
+    fingerprint = hash_u64(fingerprint, 0); // no coins
+    fingerprint = hash_u64(fingerprint, 1); // marked
+    fingerprint = hash_u64(fingerprint, 0); // no release request
+    fingerprint = hash_u64(fingerprint, 1); // one owner delivery
+    fingerprint = hash_u64(fingerprint, 1); // deleted count
+    fingerprint = hash_u64(fingerprint, 3); // deleted gate
+    fingerprint = hash_u64(fingerprint, 5); // presented effects
+    fingerprint = hash_u64(fingerprint, 6); // Chain Chomp effects
+    fingerprint = hash_u64(fingerprint, 1); // parent trace subject
+    fingerprint = hash_u64(fingerprint, 0); // chomp kind
+    fingerprint = hash_u64(fingerprint, 255); // parent index
+    fingerprint = hash_u64(fingerprint, 7); // animate + allocate + turn
+    fingerprint = hash_u64(fingerprint, 1); // move action
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    for (uint64_t index = 0; index < 5; ++index) {
+        fingerprint = hash_u64(fingerprint, index + 4); // segment subject
+        fingerprint = hash_u64(fingerprint, 1); // segment kind
+        fingerprint = hash_u64(fingerprint, index);
+        fingerprint = hash_u64(fingerprint, 1); // animate
+        fingerprint = hash_u64(fingerprint, 255); // no action
+        fingerprint = hash_u64(fingerprint, 0); // not marked
+    }
+    fingerprint = hash_u64(fingerprint, 0); // Chain Chomp deliveries
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

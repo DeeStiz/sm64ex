@@ -22,6 +22,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case bully = 18
     case enemyLakitu = 19
     case chainChomp = 20
+    case chainChompRelease = 21
     case unmigrated = 255
 }
 
@@ -75,6 +76,9 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let enemyLakituEffects: [SM64EnemyLakituObjectEffectRecord]
     let chainChompEffects: [SM64ChainChompObjectEffectRecord]
     let chainChompDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let chainChompReleaseEffects: [SM64ChainChompReleaseObjectEffectRecord]
+    let chainChompReleaseRequests: [SM64ObjectID]
+    let chainChompReleaseDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -103,6 +107,7 @@ final class SM64BehaviorDispatchBridge {
     let bully: SM64BullyObjectBridge
     let enemyLakitu: SM64EnemyLakituObjectBridge
     let chainChomp: SM64ChainChompObjectBridge
+    let chainChompRelease: SM64ChainChompReleaseObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -129,6 +134,7 @@ final class SM64BehaviorDispatchBridge {
         self.bully = SM64BullyObjectBridge(scheduler: scheduler)
         self.enemyLakitu = SM64EnemyLakituObjectBridge(scheduler: scheduler, spinyBridge: sharedSpiny)
         self.chainChomp = SM64ChainChompObjectBridge(scheduler: scheduler)
+        self.chainChompRelease = SM64ChainChompReleaseObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -184,6 +190,9 @@ final class SM64BehaviorDispatchBridge {
         case SM64ChainChompObjectBridge.defaultBehaviorIdentity,
              SM64ChainChompObjectBridge.segmentBehaviorIdentity:
             return .chainChomp
+        case SM64ChainChompReleaseObjectBridge.postBehaviorIdentity,
+             SM64ChainChompReleaseObjectBridge.gateBehaviorIdentity:
+            return .chainChompRelease
         default:
             return .unmigrated
         }
@@ -212,6 +221,7 @@ final class SM64BehaviorDispatchBridge {
         for id in bully.registeredIDs { bully.remove(id) }
         for id in enemyLakitu.registeredIDs { enemyLakitu.remove(id) }
         for id in chainChomp.registeredIDs { chainChomp.remove(id) }
+        for id in chainChompRelease.registeredIDs { chainChompRelease.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -232,6 +242,7 @@ final class SM64BehaviorDispatchBridge {
         bully.beginExternalTick()
         enemyLakitu.beginExternalTick()
         chainChomp.beginExternalTick()
+        chainChompRelease.beginExternalTick()
     }
 
     @discardableResult
@@ -614,6 +625,24 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnChainChompPost(
+        in engineState: SM64SwiftEngineState,
+        parent: SM64ObjectID,
+        homeY: Float = 0
+    ) throws -> SM64ObjectID {
+        try chainChompRelease.spawnWoodenPost(in: engineState, parent: parent, homeY: homeY)
+    }
+
+    @discardableResult
+    func spawnChainChompGate(
+        in engineState: SM64SwiftEngineState,
+        parent: SM64ObjectID,
+        position: SM64ObjectVector3 = .zero
+    ) throws -> SM64ObjectID {
+        try chainChompRelease.spawnGate(in: engineState, parent: parent, position: position)
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -636,6 +665,7 @@ final class SM64BehaviorDispatchBridge {
         bully.beginExternalTick()
         enemyLakitu.beginExternalTick()
         chainChomp.beginExternalTick()
+        chainChompRelease.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -694,6 +724,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.enemyLakitu.updateInline(id, pool: pool)
             case .chainChomp:
                 _ = self.chainChomp.updateInline(id, pool: pool)
+            case .chainChompRelease:
+                _ = self.chainChompRelease.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -723,6 +755,7 @@ final class SM64BehaviorDispatchBridge {
             bully.remove(id)
             enemyLakitu.remove(id)
             chainChomp.remove(id)
+            chainChompRelease.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -783,6 +816,8 @@ final class SM64BehaviorDispatchBridge {
         }
         enemyLakitu.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         chainChomp.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        chainChompRelease.finalizeExternalTick(pool: engineState.objects)
+        chainChompRelease.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -827,7 +862,10 @@ final class SM64BehaviorDispatchBridge {
             bullyDeliveries: bully.deliveryLog,
             enemyLakituEffects: enemyLakitu.effectLog,
             chainChompEffects: chainChomp.effectLog,
-            chainChompDeliveries: chainChomp.deliveryLog
+            chainChompDeliveries: chainChomp.deliveryLog,
+            chainChompReleaseEffects: chainChompRelease.effectLog,
+            chainChompReleaseRequests: chainChompRelease.releaseRequestLog,
+            chainChompReleaseDeliveries: chainChompRelease.deliveryLog
         )
     }
 }

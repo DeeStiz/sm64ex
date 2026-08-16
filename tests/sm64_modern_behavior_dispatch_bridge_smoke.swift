@@ -415,6 +415,52 @@ private func hashChainDispatch(
     return hash
 }
 
+private func hashChainReleaseDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashU64(hash, UInt64(id.traceSubject)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashU64(hash, UInt64(id.traceSubject)) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashU64(hash, UInt64(event.objectID.traceSubject))
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.chainChompReleaseEffects.count))
+    for effect in tick.chainChompReleaseEffects {
+        hash = hashU64(hash, UInt64(effect.objectID.traceSubject))
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedCoins))
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.chainChompReleaseRequests.count))
+    for id in tick.chainChompReleaseRequests { hash = hashU64(hash, UInt64(id.traceSubject)) }
+    hash = hashU64(hash, UInt64(tick.chainChompReleaseDeliveries.count))
+    for delivery in tick.chainChompReleaseDeliveries {
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        for id in delivery.deleted { hash = hashU64(hash, UInt64(id.traceSubject)) }
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+    }
+    hash = hashU64(hash, UInt64(tick.chainChompEffects.count))
+    for effect in tick.chainChompEffects {
+        hash = hashU64(hash, UInt64(effect.objectID.traceSubject))
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.index))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.action?.rawValue ?? 255))
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.chainChompDeliveries.count))
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -651,6 +697,53 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(chainTick.chainChompEffects.dropFirst().allSatisfy { $0.kind == .segment && $0.effects == [.animate] }, "Chain Chomp segment effects are synchronized")
         require(chainTick.chainChompDeliveries.isEmpty, "Chain Chomp idle route has no delivery")
         fingerprint = hashChainDispatch(fingerprint, chainTick)
+
+        let releaseEngine = SM64SwiftEngineState(objectCapacity: 24)
+        let releaseBridge = SM64BehaviorDispatchBridge()
+        let releaseParent = try releaseBridge.spawnChainChomp(in: releaseEngine, homeX: 10, homeY: 200, homeZ: 20)
+        let releasePost = try releaseBridge.spawnChainChompPost(in: releaseEngine, parent: releaseParent, homeY: 200)
+        let releaseGate = try releaseBridge.spawnChainChompGate(
+            in: releaseEngine,
+            parent: releaseParent,
+            position: SM64ObjectVector3(x: 10, y: 20, z: 30)
+        )
+        require(releasePost.traceSubject == 2 && releaseGate.traceSubject == 3, "Chain Chomp release IDs are stable")
+        require(releaseBridge.chainChomp.setInput(
+            SM64ChainChompTickInput(distanceToMario: 200, angleToMario: 0), for: releaseParent
+        ), "Chain Chomp release parent input attaches")
+        require(releaseBridge.chainChompRelease.setPostInput(
+            SM64ChainChompPostTickInput(marioGroundPounding: true), for: releasePost
+        ), "Chain Chomp post input attaches")
+        require(releaseBridge.chainChompRelease.setGateHit(true, for: releaseGate), "Chain Chomp gate input attaches")
+        let releaseTick = releaseBridge.tick(state: releaseEngine)
+        require(
+            releaseTick.events.map(\.route) == [.chainChompRelease, .chainChompRelease] + Array(repeating: .chainChomp, count: 6),
+            "Chain Chomp release children precede parent route"
+        )
+        require(
+            releaseTick.scheduler.updated.map(\.traceSubject) == [2, 3, 1, 4, 5, 6, 7, 8],
+            "Chain Chomp release surface order is preserved"
+        )
+        require(releaseTick.chainChompReleaseEffects.count == 2, "Chain Chomp release effects are recorded")
+        require(
+            releaseTick.chainChompReleaseEffects.first?.effects == [.poundSound]
+                && releaseTick.chainChompReleaseEffects.first?.kind == .woodenPost,
+            "Chain Chomp post pound effect is preserved"
+        )
+        require(
+            releaseTick.chainChompReleaseEffects.last?.kind == .gate
+                && releaseTick.chainChompReleaseEffects.last?.effects.rawValue == 0x3E0
+                && releaseTick.chainChompReleaseEffects.last?.markedForDeletion == true,
+            "Chain Chomp gate break effect is preserved"
+        )
+        require(releaseTick.chainChompReleaseRequests.isEmpty, "Chain Chomp post pound does not release early")
+        require(
+            releaseTick.chainChompReleaseDeliveries.count == 1
+                && releaseTick.chainChompReleaseDeliveries.first?.deleted == [releaseGate],
+            "Chain Chomp gate deletion uses owner delivery"
+        )
+        require(releaseTick.chainChompEffects.count == 6, "Chain Chomp parent still allocates its segments")
+        fingerprint = hashChainReleaseDispatch(fingerprint, releaseTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

@@ -2,6 +2,22 @@
 
 ## Current Milestone
 
+- M22ab registers Chain Chomp's wooden-post and breakable-gate surface
+  identities in the shared `SM64BehaviorDispatchBridge`. The surface route
+  runs before the general-actor parent, preserves release/gate effect records
+  and release-request receipts, delivers gate deletion through the owner sink,
+  and still allocates the parent plus five metallic segments in one live
+  traversal. Twenty-two-route Swift/C fingerprint
+  `0x61b2f7d54a6523e9`, standalone release fingerprint
+  `0xdd959e6ce61c03bd`, behavior manifest fingerprint `0x9bb2863444c51d6d`,
+  534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused dispatch,
+  release, runtime/oracle/promotion, native Debug target
+  `/tmp/sm64-modern-m22ab-build.log`, full shebang-corrected 206-script matrix,
+  `git diff --check`, and zero unchecked-Sendable audit pass are the evidence
+  boundary. Whole-engine route breadth, complete release/collision/presentation
+  consumers, the remaining adapters, and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ab.md`.
 - M22aa registers the existing Chain Chomp owner bridge and five metallic
   segment identities in the shared `SM64BehaviorDispatchBridge`. The
   general-actor route allocates the parent and all segments during one live
