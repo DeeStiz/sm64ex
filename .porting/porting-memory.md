@@ -2,6 +2,17 @@
 
 ## Current Milestone
 
+- M21f adds an opt-in owner-thread arena camera-focus presentation intent for
+  the King Bob-omb intro. The shared router keeps boss music before
+  `cameraFocus`, and the intent carries `CAMERA_MODE_BOSS_FIGHT` (`11`) without
+  mutating camera state. Focused strict Swift/C fingerprint
+  `0x9226cd78a06a16eb`, script `script/test_king_bobomb_arena_camera.sh`, full
+  matrix `runs=182 failures=0`, and regenerated native Debug build target
+  `/tmp/sm64-modern-m21f-build.log` are the evidence boundary. This is an
+  immutable presentation intent only: real camera/cutscene consumption,
+  rewards, remaining bosses, and device/visual/human acceptance remain open.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M21f.md`.
+
 - M21e closes the bounded King Bob-omb return-home trajectory seam. The owner
   route matches `arc_to_goal_pos`'s 49-frame launch setup and advances with
   the source no-terminal-velocity `cur_obj_move_using_fvel_and_gravity`

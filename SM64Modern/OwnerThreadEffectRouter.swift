@@ -15,6 +15,7 @@ enum SM64OwnerThreadEffectKind: UInt8, Equatable, Sendable {
     case dialog = 8
     case star = 9
     case music = 10
+    case cameraFocus = 11
 }
 
 struct SM64OwnerThreadEffectIntent: Equatable, Sendable {
@@ -178,7 +179,7 @@ final class SM64OwnerThreadEffectRouter {
                     record.behaviorParams |= intent.value << 8
                 }
                 delivered.append(intent)
-            case .sound, .particle, .cameraShake, .releaseChain, .updatePosition, .dialog, .star, .music:
+            case .sound, .particle, .cameraShake, .releaseChain, .updatePosition, .dialog, .star, .music, .cameraFocus:
                 guard pool.record(for: intent.objectID) != nil else {
                     rejected.append(intent)
                     continue

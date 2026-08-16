@@ -31,6 +31,7 @@ final class SM64KingBobombObjectBridge {
     static let defaultModel: UInt32 = 0x56 // MODEL_KING_BOBOMB
     static let defaultWallHitboxRadius: Float = 30
     static let interactionSubtypeGrabsMario: UInt32 = 0x0000_0004
+    static let bossCameraModeValue: Int32 = 11 // CAMERA_MODE_BOSS_FIGHT
     static let starEffectValue: Int32 = 1
 
     private let scheduler: SM64ObjectScheduler
@@ -153,7 +154,8 @@ final class SM64KingBobombObjectBridge {
         state engineState: SM64SwiftEngineState,
         environments frameEnvironments: [SM64ObjectID: SM64KingBobombEnvironment] = [:],
         collisionWorld: SM64SurfaceCollisionWorld? = nil,
-        advanceMovement: Bool = false
+        advanceMovement: Bool = false,
+        presentArenaCamera: Bool = false
     ) -> SM64KingBobombSchedulerTickResult {
         environments = frameEnvironments
         effectLog.removeAll(keepingCapacity: true)
@@ -166,7 +168,8 @@ final class SM64KingBobombObjectBridge {
                 engineState: engineState,
                 pool: pool,
                 collisionWorld: collisionWorld,
-                advanceMovement: advanceMovement
+                advanceMovement: advanceMovement,
+                presentArenaCamera: presentArenaCamera
             )
         }
         for id in schedulerResult.unloaded {
@@ -189,7 +192,8 @@ final class SM64KingBobombObjectBridge {
         engineState: SM64SwiftEngineState,
         pool: SM64ObjectPool,
         collisionWorld: SM64SurfaceCollisionWorld?,
-        advanceMovement: Bool
+        advanceMovement: Bool,
+        presentArenaCamera: Bool
     ) {
         guard let oldState = states[id], let record = pool.record(for: id) else { return }
         let input = environments[id]?.input ?? defaultInput(for: oldState, record: record)
@@ -333,6 +337,13 @@ final class SM64KingBobombObjectBridge {
         }
         if output.effects.contains(.bossMusic) {
             effectRouter.enqueue(objectID: id, kind: .music, value: 1)
+        }
+        if presentArenaCamera, output.effects.contains(.cameraFocus) {
+            effectRouter.enqueue(
+                objectID: id,
+                kind: .cameraFocus,
+                value: Self.bossCameraModeValue
+            )
         }
         if output.effects.contains(.stopBossMusic) {
             effectRouter.enqueue(objectID: id, kind: .music, value: 0)
