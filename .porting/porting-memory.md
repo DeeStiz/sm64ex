@@ -2,6 +2,21 @@
 
 ## Current Milestone
 
+- M21b attaches the King Bob-omb value route to generation-safe owner records
+  and the live 13-list scheduler. It synchronizes action/subaction/health,
+  animation, transform/physics, tangibility, hidden/holdable interaction,
+  and held-state fields; routes boss music, dialog, sound, particle,
+  camera-shake, and star intents through the shared owner-thread sink; and
+  retires stale generations at scheduler unload. Focused strict Swift/C owner
+  fingerprint `0xaaf3e5fffd276cde`, focused script
+  `script/test_king_bobomb_object_bridge.sh`, full matrix
+  `runs=178 failures=0` (`/tmp/sm64-modern-m21b-final-matrix.log`), and
+  regenerated native Debug build (`/tmp/sm64-modern-m21b-build.log`) pass;
+  `git diff --check` and zero unchecked-Sendable audit pass. Collision
+  admission, floor/wall movement, arena camera/cutscene ownership, reward
+  persistence, and real presentation remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M21b.md`.
+
 - M21a adds the King Bob-omb value route after M20u: source action values
   `0`–`8`, intro/return dialogs, grab escape, throw damage, return-home and
   defeat phases, boss-music stop timing, defeat star effects, and all four

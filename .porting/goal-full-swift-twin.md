@@ -2,7 +2,7 @@
 
 ## Status
 
-M21a is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M21b is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -78,6 +78,15 @@ phases, defeat dialog/star effects, boss-music stop timing, and held/thrown
 object branches. Its strict Swift/C fingerprint is
 `0xa15d577dbb4d9afc`; owner records, collision movement, camera/audio/dialog
 owners, and arena integration remain downstream work.
+M21b attaches that kernel to generation-safe owner records and the live
+13-list scheduler. The bridge now synchronizes action/subaction/health,
+animation, transform/physics, tangibility, hidden/holdable interaction, and
+held-state fields; routes boss music, dialog, sound, particle, camera-shake,
+and star intents through the shared owner-thread sink; and retires stale
+generations at the scheduler boundary. Its strict Swift/C owner fingerprint
+is `0xaaf3e5fffd276cde`; collision admission, floor/wall movement, arena
+camera/cutscene ownership, reward persistence, and real presentation remain
+open.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
 `beginCommandBuffer`, while the existing queue-level residency, explicit
@@ -935,7 +944,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M20u: Yoshi owner/effect bridge | Swift attaches Yoshi to generation-safe owner records, routes dialog/life/audio/camera/deletion intents, applies dialog time-stop cleanup, creates source-authored respawners, synchronizes roof/credits transforms, and retires deactivated records at the scheduler boundary. | Complete locally — strict Swift 6/C owner fingerprint `0xc62592c8da944321`, focused Swift/C owner contract, 176-script matrix (`runs=176 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m20u-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; progression/save consumers, real camera/dialog/audio presentation, broader NPC/puzzle families, and human/device acceptance remain |
 | M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20u close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie/small-penguin/geo/Bob-omb Buddy/Yoshi slice; broader collision/movement integration, path selection for every other reachable trajectory, dialog/effect/audio identity, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21a: King Bob-omb value route | Swift reproduces King Bob-omb's nine source action values, intro activation/dialog gate, chase/grab/throw branches, damage phases, return-home path, defeat dialog/star effects, boss-music stop timing, and held/thrown object branches as an explicit value contract. | Complete locally — strict Swift 6/C fingerprint `0xa15d577dbb4d9afc`, focused contract, 177-script matrix (`runs=177 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m21a-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; owner records, collision/movement, camera/audio/dialog owners, and arena integration remain |
-| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a closes the King Bob-omb value kernel only; King Bob-omb owner/collision/arena wiring, Whomp King integration, Big Boo, Eyerok, Chief Chilly, Bowser arenas, reward/camera/music transitions, and deterministic boss-phase shards remain |
+| M21b: King Bob-omb owner/effect bridge | Swift binds the King Bob-omb kernel to generation-safe object records and the live scheduler, synchronizes action/animation/physics/interaction/held fields, routes music/dialog/sound/particle/camera/star intents through the owner-thread sink, and retires stale generations at the scheduler boundary. | Complete locally — strict Swift 6/C owner fingerprint `0xaaf3e5fffd276cde`, focused owner contract, 178-script matrix (`runs=178 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m21b-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; collision admission, floor/wall movement, arena camera/cutscene ownership, reward persistence, and real presentation remain |
+| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a/M21b close the King Bob-omb value and owner/effect seams; King Bob-omb collision/movement/arena wiring, Whomp King integration, Big Boo, Eyerok, Chief Chilly, Bowser arenas, reward/camera/music transitions, and deterministic boss-phase shards remain |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
@@ -1162,6 +1172,12 @@ replayable trace, and the platform evidence listed in its exit gate.
    `HELD_*` branches as typed inputs/effects. The focused C contract proves
    the value transition sequence; owner-thread object/arena/collision and
    actual camera/audio/dialog consumers are intentionally not implied.
+   M21b carries that kernel through the owner-thread bridge: generation-safe
+   records, scheduler callback order, animation/physics/interaction fields,
+   held-state visibility, and music/dialog/sound/particle/camera/star delivery
+   are all covered by an independent Swift/C owner trace. Collision admission,
+   floor/wall movement, arena camera/cutscene state, reward persistence, and
+   real presentation owners still require later boss milestones.
    Finish broader collision/movement integration, path selection for every
    other reachable trajectory, and effect identity before owner-wiring the
    remaining NPC families.

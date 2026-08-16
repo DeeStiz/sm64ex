@@ -191,6 +191,7 @@
 		E2F11DDB5A2813A72A2C9A2A /* SkeeterObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C2DB40D32E69B4AFA3E55B /* SkeeterObjectBridge.swift */; };
 		E4DC22B427B7BADD0E429F67 /* BobombObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406EDDE3B748218288E16122 /* BobombObjectBridge.swift */; };
 		E6EB1E83D40B684FD3B7426A /* KoopaShellObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAB7D9714A5D0EEB844F6E3A /* KoopaShellObjectBridge.swift */; };
+		E8C1689E9E20F1D6F8F051A3 /* KingBobombObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89E04BA8076B6B4EC9BEA57D /* KingBobombObjectBridge.swift */; };
 		E9D87E92CAED2015676448A6 /* BulletBillObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA95695B8D532F2B761602DE /* BulletBillObjectBridge.swift */; };
 		ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */; };
 		EF3F4EC4818F96BA083A23B6 /* ProgressionActors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3F3E0A2388B47713DA5889 /* ProgressionActors.swift */; };
@@ -325,6 +326,7 @@
 		87414B6C37E5673C98429C04 /* DecorativePendulumBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecorativePendulumBehavior.swift; sourceTree = "<group>"; };
 		8753C291A7DE7C9166C33873 /* SLWalkingPenguinObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinObjectBridge.swift; sourceTree = "<group>"; };
 		8972955B5A5B93E0345EE4EB /* ChuckyaObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChuckyaObjectBridge.swift; sourceTree = "<group>"; };
+		89E04BA8076B6B4EC9BEA57D /* KingBobombObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingBobombObjectBridge.swift; sourceTree = "<group>"; };
 		8A6630058727A186889977A1 /* ContentPackRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPackRuntime.swift; sourceTree = "<group>"; };
 		8B233DE16CF1D57DB2E69846 /* SLWalkingPenguinMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinMovement.swift; sourceTree = "<group>"; };
 		8C3F3E0A2388B47713DA5889 /* ProgressionActors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionActors.swift; sourceTree = "<group>"; };
@@ -500,6 +502,7 @@
 				3B50BE71193A3FEA1F2989D6 /* HeaveHoObjectBridge.swift */,
 				34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */,
 				6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */,
+				89E04BA8076B6B4EC9BEA57D /* KingBobombObjectBridge.swift */,
 				5EBCDC28A1DADF92929BD72A /* KoopaShell.swift */,
 				BAB7D9714A5D0EEB844F6E3A /* KoopaShellObjectBridge.swift */,
 				AC89F10EF988BEB5D9624D69 /* LevelScript.swift */,
@@ -805,6 +808,7 @@
 				4C4E1312ABA85E0E64E74747 /* HeaveHoObjectBridge.swift in Sources */,
 				ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */,
 				719A899A4EB08E524438CFD3 /* KingBobombBehavior.swift in Sources */,
+				E8C1689E9E20F1D6F8F051A3 /* KingBobombObjectBridge.swift in Sources */,
 				DA4DF9B4F9D992BFE4FFAD06 /* KoopaShell.swift in Sources */,
 				E6EB1E83D40B684FD3B7426A /* KoopaShellObjectBridge.swift in Sources */,
 				59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */,
