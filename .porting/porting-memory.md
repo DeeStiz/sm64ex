@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M22ba registers Tuxie's terminal child identities in the existing mother
+  owner route. `bhvPenguinBaby` and `bhvUnused20E0` are source `BREAK()`
+  terminal behaviors reached through the mother's held-child state machine;
+  the dispatcher records both under `TuxiesMotherObjectBridge` without a
+  second child scheduler. Strict Swift/C dispatch fingerprint
+  `0xad08314b577b6419`, behavior manifest fingerprint `0xe7718dc2db19ec7c`,
+  534 rows, 78 `swift_value_owner` routes, and 456 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/manifest contracts, regenerated native Debug build, complete
+  206-script matrix, live oracle/promotion, `git diff --check`, and zero
+  unchecked-Sendable audit are the evidence boundary. Full held-child,
+  collision, presentation, whole-engine execution, and live parity remain
+  open. Handoff: `.porting/porting-handoff-full-swift-twin-M22ba.md`.
+
 - M22az records two more parent-owned child identities in the fail-closed
   behavior manifest: `bhvCannonClosed` maps to `BobombBuddyObjectBridge` and
   `bhvLllTumblingBridge` maps to `BullyObjectBridge`. Both already resolve

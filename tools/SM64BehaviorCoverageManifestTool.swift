@@ -111,6 +111,8 @@ struct SM64BehaviorCoverageManifestTool {
         "bhvSpinyBall": ("SpinyObjectBridge", "Spiny ball owner route"),
         "bhvSwoop": ("SwoopObjectBridge", "Swoop value/owner route"),
         "bhvTuxiesMother": ("TuxiesMotherObjectBridge", "Tuxie's mother value/owner route"),
+        "bhvPenguinBaby": ("TuxiesMotherObjectBridge", "Tuxie's mother baby-child terminal route"),
+        "bhvUnused20E0": ("TuxiesMotherObjectBridge", "Tuxie's mother unused-child terminal route"),
         "bhvSmallPenguin": ("SmallPenguinObjectBridge", "small penguin value/owner route"),
         "bhvWaterBomb": ("WaterBombObjectBridge", "water bomb value/owner route"),
         "bhvWaterBombShadow": ("WaterBombObjectBridge", "water bomb shadow child route"),

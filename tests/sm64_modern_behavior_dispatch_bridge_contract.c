@@ -1199,6 +1199,9 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 40); // shared Bowser-bomb route
     // Big Boo's bridge-owned static staircase child shares the parent route.
     fingerprint = hash_u64(fingerprint, 8); // shared Big Boo route
+    // Tuxie's terminal child behaviors share the mother owner route.
+    fingerprint = hash_u64(fingerprint, 41); // unused-child terminal route
+    fingerprint = hash_u64(fingerprint, 41); // baby-child terminal route
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

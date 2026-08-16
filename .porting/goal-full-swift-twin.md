@@ -2,7 +2,7 @@
 
 ## Status
 
-M22az is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M22ba is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -815,6 +815,17 @@ contract, regenerated native Debug build, complete 206-script matrix, live
 oracle/promotion, strict-concurrency audit, and diff gates pass. This closes
 identity accounting only; cannon/bridge collision and presentation consumers,
 remaining adapters, whole-engine execution, and parity remain open.
+M22ba registers Tuxie's two terminal child identities in the existing mother
+owner route. `bhvPenguinBaby` and `bhvUnused20E0` are source `BREAK()` terminal
+behaviors reached through the mother's held-child state machine, so the shared
+dispatcher records them under `TuxiesMotherObjectBridge` without creating a
+second child scheduler. The strict Swift/C dispatch fingerprint is
+`0xad08314b577b6419`; the behavior manifest is `0xe7718dc2db19ec7c` with 534
+rows, 78 `swift_value_owner` routes, and 456 explicit
+`unmigrated_c_adapter` rows. Focused dispatch/manifest contracts, regenerated
+native Debug build, complete 206-script matrix, live oracle/promotion,
+strict-concurrency audit, and diff gates pass. Full held-child, collision,
+presentation, whole-engine execution, and parity remain open.
 M22v registers the existing `bhvWhomp` owner bridge in the shared dispatch
 table. The surface-list route runs through the shared scheduler before the
 general-actor routes, preserves initialize/reset-home state and explicit
@@ -1784,7 +1795,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M22ay: Big Boo staircase manifest accounting | The reachable `bhvBooBossSpawnedBridge` identity maps to `BigBooObjectBridge`, aligning the fail-closed behavior manifest with the already-validated parent-owned staircase dispatch route. | Complete locally — Swift/C manifest fingerprint `0xcafe6a658d2f3342`, 534 rows (74 `swift_value_owner`, 460 `unmigrated_c_adapter`), focused manifest contract, regenerated native Debug build, complete 206-script matrix, live oracle/promotion, `git diff --check`, and zero unchecked-Sendable audit pass; full staircase collision/presentation consumers, remaining adapters, whole-engine execution, and parity remain |
 | M22w: shared Heave Ho and Chuckya behavior dispatch routes | `SM64BehaviorDispatchBridge` registers the existing `bhvHeaveHo` and `bhvChuckya` owner bridges plus throw/anchor child identities in the general-actor route, preserves parent/child list ordering and submerged/tangible/hidden state, and keeps throw consumption pointer-free with explicit owner-thread delivery. | Complete locally — strict Swift 6/C seventeen-route fingerprint `0xff2841bbbfbe7db0`, standalone Heave Ho `0x9c4a7443f2c09281`, standalone Chuckya `0x1c7a7a54fd31996a`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused dispatch contract, regenerated native Debug build (`/tmp/sm64-modern-m22w-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine route breadth, the remaining 461 adapters, and parity remain |
 | M22az: parent-owned child manifest accounting | The reachable `bhvCannonClosed` and `bhvLllTumblingBridge` identities map to `BobombBuddyObjectBridge` and `BullyObjectBridge`, respectively, aligning the manifest with existing shared owner dispatch routes without adding child schedulers. | Complete locally — Swift/C manifest fingerprint `0x90c89a83cab41760`, 534 rows (76 `swift_value_owner`, 458 `unmigrated_c_adapter`), focused manifest contract, regenerated native Debug build, complete 206-script matrix, live oracle/promotion, `git diff --check`, and zero unchecked-Sendable audit pass; cannon/bridge collision/presentation consumers, remaining adapters, whole-engine execution, and parity remain |
-| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22az close deterministic identity accounting, forty-two live value/owner routes plus the Fly Guy flame, Bowser mine-flame, and Big Boo staircase identities, a shared forty-two-route dispatch seam, and Swift engine-context dispatch authority with 534 rows, 76 known Swift value/owner routes, and 458 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
+| M22ba: Tuxie's terminal child identity dispatch route | `SM64BehaviorDispatchBridge` routes the source `bhvPenguinBaby` and `bhvUnused20E0` `BREAK()` terminal identities through `TuxiesMotherObjectBridge`, preserving the mother's held-child ownership without creating a second scheduler. | Complete locally — strict Swift 6/C dispatch fingerprint `0xad08314b577b6419`, behavior manifest fingerprint `0xe7718dc2db19ec7c`, 534 rows (78 `swift_value_owner`, 456 `unmigrated_c_adapter`), focused dispatch/manifest contracts, regenerated native Debug build, complete 206-script matrix, live oracle/promotion, `git diff --check`, and zero unchecked-Sendable audit pass; held-child/collision/presentation consumers, remaining adapters, whole-engine execution, and parity remain |
+| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22ba close deterministic identity accounting, forty-two live value/owner routes plus the Fly Guy flame, Bowser mine-flame, Big Boo staircase, and Tuxie terminal-child identities, a shared forty-two-route dispatch seam, and Swift engine-context dispatch authority with 534 rows, 78 known Swift value/owner routes, and 456 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |

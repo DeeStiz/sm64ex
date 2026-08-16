@@ -348,7 +348,9 @@ final class SM64BehaviorDispatchBridge {
              SM64BowserBombObjectBridge.explosionBehaviorIdentity,
              SM64BowserBombObjectBridge.smokeBehaviorIdentity:
             return .bowserBomb
-        case SM64TuxiesMotherObjectBridge.defaultMotherBehaviorIdentity:
+        case SM64TuxiesMotherObjectBridge.defaultMotherBehaviorIdentity,
+             SM64TuxiesMotherObjectBridge.unusedChildBehaviorIdentity,
+             SM64TuxiesMotherObjectBridge.babyChildBehaviorIdentity:
             return .tuxiesMother
         default:
             return .unmigrated
