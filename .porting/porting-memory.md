@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M23j closes the live progression-boundary shadow seam. Non-mutation C
+  progression callbacks now commit the canonical snapshot into the normalized
+  Swift image at that owner-thread boundary and append the same before/after
+  hashes when `SM64_MODERN_SAVE_REPLAY_ARTIFACT` is enabled. The explicit
+  `SM64_MODERN_SAVE_AUTHORITY_TRIAL=1` mode logs the shadow commit while leaving
+  the restart-required selector unchanged. Operand-complete artifact
+  fingerprint `0x0ab6d5b2827a9435`, fresh-image execution fingerprint
+  `0x23b4cdd9dd948b53`, regenerated native Debug build, complete 213-script
+  matrix (`runs=213 failures=0`), `git diff --check`, and zero
+  unchecked-Sendable audit pass. Physical/live artifact capture and production
+  Swift save authority remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M23j.md`.
+
 - M23i makes the durable save shadow replay executable. The fixed-width record
   now carries every operand needed to replay flags, course/star, cap, sound,
   source-slot, and recovery operations against a fresh normalized EEPROM image;

@@ -38,6 +38,7 @@ final class SwiftProgressionMigrationService {
     private let ownerThreadIdentity: UInt64
     private let engineAuthority: SM64ModernEngineAuthority
     private let replayArtifactURL: URL?
+    private let saveAuthorityTrial: Bool
     private var runtime: SM64ProgressionRuntime
     private var eventCount: UInt64 = 0
     private var lastError: SM64ModernStatus = SM64_MODERN_STATUS_OK
@@ -58,6 +59,9 @@ final class SwiftProgressionMigrationService {
         } else {
             self.replayArtifactURL = nil
         }
+        self.saveAuthorityTrial = ProcessInfo.processInfo.environment[
+            "SM64_MODERN_SAVE_AUTHORITY_TRIAL"
+        ] == "1"
         self.adapter = try SM64OwnerThreadEEPROMAdapter(
             rootURL: URL(fileURLWithPath: saveDirectory)
                 .appendingPathComponent("swift-progression", isDirectory: true),
@@ -375,7 +379,7 @@ final class SwiftProgressionMigrationService {
         } catch {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "persist")
         }
-        return recordSnapshot(event: event, flags: 2)
+        return recordSnapshot(event: event, flags: 2, captureReplay: false)
     }
 
     private func reload(event: SM64ModernProgressionEventV1) -> SM64ModernStatus {
@@ -406,7 +410,7 @@ final class SwiftProgressionMigrationService {
         } catch {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "reload")
         }
-        return recordSnapshot(event: event, flags: 1)
+        return recordSnapshot(event: event, flags: 1, captureReplay: false)
     }
 
     private func readSnapshot(fileIndex: Int) -> (
@@ -440,10 +444,50 @@ final class SwiftProgressionMigrationService {
 
     private func recordSnapshot(
         event: SM64ModernProgressionEventV1,
-        flags: UInt32
+        flags: UInt32,
+        captureReplay: Bool = true
     ) -> SM64ModernStatus {
         guard let snapshot = readSnapshot(fileIndex: Int(event.save_file_index)) else {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "snapshot")
+        }
+        let before: (save: SM64SaveFileSnapshot, menu: SM64MenuDataSnapshot)
+        do {
+            let loaded = try adapter.load(
+                saveFileIndex: Int(event.save_file_index),
+                ownerThreadToken: ownerThreadToken
+            )
+            before = (loaded.save, loaded.menu)
+            try adapter.commit(
+                saveFileIndex: Int(event.save_file_index),
+                save: snapshot.save, menu: snapshot.menu,
+                ownerThreadToken: ownerThreadToken
+            )
+        } catch {
+            return fail(
+                SM64_MODERN_STATUS_PLATFORM_ERROR,
+                message: "snapshot_shadow_commit"
+            )
+        }
+        if saveAuthorityTrial {
+            progressionMigrationLogger.notice(
+                "save_authority_trial_shadow_commit event=\(event.event_kind, privacy: .public) file=\(event.save_file_index, privacy: .public)"
+            )
+        }
+        if captureReplay {
+            do {
+                try appendReplay(
+                    event: event,
+                    operation: .mutation,
+                    before: before,
+                    after: (snapshot.save, snapshot.menu),
+                    mutationFlags: flags
+                )
+            } catch {
+                return fail(
+                    SM64_MODERN_STATUS_PLATFORM_ERROR,
+                    message: "snapshot_replay_append"
+                )
+            }
         }
         let saveBytes = SM64SaveFileCodec.encode(snapshot.save)
         let menuBytes = SM64MenuDataCodec.encode(snapshot.menu)
@@ -482,6 +526,7 @@ final class SwiftProgressionMigrationService {
         after: (save: SM64SaveFileSnapshot, menu: SM64MenuDataSnapshot),
         saveRecoveryDecision: UInt32 = 0,
         menuRecoveryDecision: UInt32 = 0,
+        mutationFlags: UInt32? = nil,
         direction: SM64SaveReplayDirection = .cToSwift,
         status: UInt32 = 0
     ) throws {
@@ -495,7 +540,7 @@ final class SwiftProgressionMigrationService {
             mutationKind: event.mutation_kind,
             mutationOperation: event.mutation_operation,
             sourceFileIndex: event.mutation_source_file_index,
-            mutationFlags: event.mutation_flags,
+            mutationFlags: mutationFlags ?? event.mutation_flags,
             mutationCourseIndex: event.mutation_course_index,
             mutationStarFlags: event.mutation_star_flags,
             mutationLevel: event.mutation_level,
