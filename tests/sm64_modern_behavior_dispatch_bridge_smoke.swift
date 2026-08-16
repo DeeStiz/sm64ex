@@ -1061,6 +1061,45 @@ private func hashEyerokDispatch(
     return hash
 }
 
+private func hashMrIDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.mrIEffects.count))
+    for effect in tick.mrIEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.action?.rawValue ?? 0xff))
+        hash = hashU64(hash, UInt64(effect.particleAction?.rawValue ?? 0xff))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.mrIDeliveries.count))
+    for delivery in tick.mrIDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1712,6 +1751,29 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(eyerokTick.eyerokDeliveries.count == 3, "Eyerok owner delivery receipts are explicit")
         fingerprint = hashEyerokDispatch(fingerprint, eyerokTick)
+
+        let mrIEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let mrIBridge = SM64BehaviorDispatchBridge()
+        let mrI = try mrIBridge.spawnMrI(in: mrIEngine, homeX: 40, homeY: 50, homeZ: 60)
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64MrIObjectBridge.bodyBehaviorIdentity) == .mrI
+                && SM64BehaviorDispatchBridge.route(for: SM64MrIObjectBridge.particleBehaviorIdentity) == .mrI,
+            "Mr I child identities share the owner route"
+        )
+        let mrITick = mrIBridge.tick(state: mrIEngine)
+        require(mrITick.events.map(\.route) == [.mrI, .mrI], "Mr I eye/body route dispatch")
+        require(mrITick.scheduler.updated.map(\.traceSubject) == [1, 2], "Mr I callback ordering")
+        require(
+            mrITick.mrIEffects.count == 2
+                && mrITick.mrIEffects[0].objectID == mrI
+                && mrITick.mrIEffects[0].kind == .eye
+                && mrITick.mrIEffects[0].action == .idle
+                && mrITick.mrIEffects[0].effects == [.resetHome, .intangible]
+                && mrITick.mrIEffects[1].kind == .body,
+            "Mr I value/owner route is preserved"
+        )
+        require(mrITick.mrIDeliveries.isEmpty, "Mr I idle route has no delivery")
+        fingerprint = hashMrIDispatch(fingerprint, mrITick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

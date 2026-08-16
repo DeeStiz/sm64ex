@@ -38,6 +38,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case moneybag = 34
     case waterBomb = 35
     case eyerok = 36
+    case mrI = 37
     case unmigrated = 255
 }
 
@@ -119,6 +120,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let waterBombDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let eyerokEffects: [SM64EyerokObjectEffectRecord]
     let eyerokDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let mrIEffects: [SM64MrIObjectEffectRecord]
+    let mrIDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -163,6 +166,7 @@ final class SM64BehaviorDispatchBridge {
     let moneybag: SM64MoneybagObjectBridge
     let waterBomb: SM64WaterBombObjectBridge
     let eyerok: SM64EyerokObjectBridge
+    let mrI: SM64MrIObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -205,6 +209,7 @@ final class SM64BehaviorDispatchBridge {
         self.moneybag = SM64MoneybagObjectBridge(scheduler: scheduler)
         self.waterBomb = SM64WaterBombObjectBridge(scheduler: scheduler)
         self.eyerok = SM64EyerokObjectBridge(scheduler: scheduler)
+        self.mrI = SM64MrIObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -305,6 +310,10 @@ final class SM64BehaviorDispatchBridge {
         case SM64EyerokObjectBridge.defaultBehaviorIdentity,
              SM64EyerokObjectBridge.handBehaviorIdentity:
             return .eyerok
+        case SM64MrIObjectBridge.defaultEyeBehaviorIdentity,
+             SM64MrIObjectBridge.bodyBehaviorIdentity,
+             SM64MrIObjectBridge.particleBehaviorIdentity:
+            return .mrI
         default:
             return .unmigrated
         }
@@ -349,6 +358,7 @@ final class SM64BehaviorDispatchBridge {
         for id in moneybag.registeredIDs { moneybag.remove(id) }
         for id in waterBomb.registeredIDs { waterBomb.remove(id) }
         for id in eyerok.registeredIDs { eyerok.remove(id) }
+        for id in mrI.registeredIDs { mrI.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -386,6 +396,7 @@ final class SM64BehaviorDispatchBridge {
         moneybag.beginExternalTick()
         waterBomb.beginExternalTick()
         eyerok.beginExternalTick()
+        mrI.beginExternalTick()
     }
 
     @discardableResult
@@ -1148,6 +1159,29 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnMrI(
+        in engineState: SM64SwiftEngineState,
+        isKing: Bool = false,
+        homeX: Float = 0,
+        homeY: Float = 0,
+        homeZ: Float = 0,
+        moveYaw: Int16 = 0,
+        model: UInt32 = SM64MrIObjectBridge.eyeModel,
+        behaviorIdentity: UInt64 = SM64MrIObjectBridge.defaultEyeBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try mrI.spawnMrI(
+            in: engineState,
+            isKing: isKing,
+            homeX: homeX,
+            homeY: homeY,
+            homeZ: homeZ,
+            moveYaw: moveYaw,
+            model: model,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -1185,6 +1219,7 @@ final class SM64BehaviorDispatchBridge {
         moneybag.beginExternalTick()
         waterBomb.beginExternalTick()
         eyerok.beginExternalTick()
+        mrI.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -1279,6 +1314,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.waterBomb.updateInline(id, pool: pool)
             case .eyerok:
                 _ = self.eyerok.updateInline(id, pool: pool)
+            case .mrI:
+                _ = self.mrI.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -1324,6 +1361,7 @@ final class SM64BehaviorDispatchBridge {
             moneybag.remove(id)
             waterBomb.remove(id)
             eyerok.remove(id)
+            mrI.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -1401,6 +1439,7 @@ final class SM64BehaviorDispatchBridge {
         moneybag.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         waterBomb.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         eyerok.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        mrI.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -1473,7 +1512,9 @@ final class SM64BehaviorDispatchBridge {
             waterBombEffects: waterBomb.effectLog,
             waterBombDeliveries: waterBomb.deliveryLog,
             eyerokEffects: eyerok.effectLog,
-            eyerokDeliveries: eyerok.deliveryLog
+            eyerokDeliveries: eyerok.deliveryLog,
+            mrIEffects: mrI.effectLog,
+            mrIDeliveries: mrI.deliveryLog
         )
     }
 }

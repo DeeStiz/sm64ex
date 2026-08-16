@@ -91,6 +91,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/EyerokHand.swift" \
   "$PROJECT_ROOT/SM64Modern/EyerokHandCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/EyerokObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/MrIEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/MrIObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooObjectBridge.swift" \

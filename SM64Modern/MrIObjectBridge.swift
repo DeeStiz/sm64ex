@@ -61,6 +61,43 @@ final class SM64MrIObjectBridge {
         }
     }
 
+    /// Clears per-tick owner-thread receipts before the shared behavior
+    /// dispatcher begins traversing the object lists.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Runs exactly one already-registered Mr. I identity from the shared
+    /// scheduler callback. The parent eye, persistent iris, and transient
+    /// particle all use the same owner bridge while retaining their source
+    /// object-list ordering.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard registeredIDs.contains(id), pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        eyes.removeValue(forKey: id)
+        bodies.removeValue(forKey: id)
+        particles.removeValue(forKey: id)
+        eyeForBody.removeValue(forKey: id)
+        eyeInputs.removeValue(forKey: id)
+        particleInputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil { remove(id) }
+        let orphanedBodies = eyeForBody.compactMap { bodyID, eyeID in
+            eyes[eyeID] == nil ? bodyID : nil
+        }
+        for id in orphanedBodies { remove(id) }
+    }
+
     func eyeState(for id: SM64ObjectID) -> SM64MrIState? { eyes[id] }
     func bodyState(for id: SM64ObjectID) -> SM64MrIBodyState? { bodies[id] }
     func particleState(for id: SM64ObjectID) -> SM64MrIParticleState? { particles[id] }
@@ -152,29 +189,12 @@ final class SM64MrIObjectBridge {
         eyeInputs = frameEyeInputs
         particleInputs = frameParticleInputs
         particleFlashEyes.removeAll(keepingCapacity: true)
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            eyes.removeValue(forKey: id)
-            bodies.removeValue(forKey: id)
-            particles.removeValue(forKey: id)
-            eyeForBody.removeValue(forKey: id)
-            eyeInputs.removeValue(forKey: id)
-            particleInputs.removeValue(forKey: id)
-        }
-        for id in registeredIDs where engineState.objects.record(for: id) == nil {
-            eyes.removeValue(forKey: id)
-            bodies.removeValue(forKey: id)
-            particles.removeValue(forKey: id)
-            eyeForBody.removeValue(forKey: id)
-            eyeInputs.removeValue(forKey: id)
-            particleInputs.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64MrISchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
 

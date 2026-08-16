@@ -2,6 +2,23 @@
 
 ## Current Milestone
 
+- M22aq registers the existing Mr. I eye and persistent iris owner bridge in
+  the shared general-actor/default `SM64BehaviorDispatchBridge`. The route
+  preserves eye-to-iris allocation, identity-specific list order, idle/tangible
+  state, and generation-safe owner delivery while particle, collision, camera,
+  and reward consumers remain typed external seams. Thirty-eight-route Swift/C
+  fingerprint `0xb5967a4a609f387f`, standalone Mr. I fingerprint
+  `0x18b1a7bddb65a836`, behavior manifest fingerprint `0x9bb2863444c51d6d`,
+  534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Mr. I contracts, native Debug target
+  `/tmp/sm64-modern-m22aq-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full
+  particle/collision/camera/reward consumers, remaining adapters, and live
+  parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22aq.md`.
+
 - M22ap registers the existing Eyerok boss and hand owner bridge in the shared
   general-actor `SM64BehaviorDispatchBridge`. The route preserves boss-to-two-
   hand same-frame allocation, parent links, sleep/hand state, and generation-
