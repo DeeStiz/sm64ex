@@ -10,6 +10,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case swoop = 6
     case piranhaPlant = 7
     case bigBoo = 8
+    case flyGuy = 9
     case unmigrated = 255
 }
 
@@ -39,6 +40,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let piranhaPlantDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let bigBooEffects: [SM64BigBooObjectEffectRecord]
     let bigBooDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let flyGuyEffects: [SM64FlyGuyObjectEffectRecord]
+    let flyGuyDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -55,6 +58,7 @@ final class SM64BehaviorDispatchBridge {
     let swoop: SM64SwoopObjectBridge
     let piranhaPlant: SM64PiranhaPlantObjectBridge
     let bigBoo: SM64BigBooObjectBridge
+    let flyGuy: SM64FlyGuyObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -68,6 +72,7 @@ final class SM64BehaviorDispatchBridge {
         self.swoop = SM64SwoopObjectBridge(scheduler: scheduler)
         self.piranhaPlant = SM64PiranhaPlantObjectBridge(scheduler: scheduler)
         self.bigBoo = SM64BigBooObjectBridge(scheduler: scheduler)
+        self.flyGuy = SM64FlyGuyObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -90,6 +95,8 @@ final class SM64BehaviorDispatchBridge {
             return .piranhaPlant
         case SM64BigBooObjectBridge.defaultBehaviorIdentity:
             return .bigBoo
+        case SM64FlyGuyObjectBridge.defaultBehaviorIdentity:
+            return .flyGuy
         default:
             return .unmigrated
         }
@@ -106,6 +113,7 @@ final class SM64BehaviorDispatchBridge {
         for id in swoop.registeredIDs { swoop.remove(id) }
         for id in piranhaPlant.registeredIDs { piranhaPlant.remove(id) }
         for id in bigBoo.registeredIDs { bigBoo.remove(id) }
+        for id in flyGuy.registeredIDs { flyGuy.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -115,6 +123,7 @@ final class SM64BehaviorDispatchBridge {
         swoop.beginExternalTick()
         piranhaPlant.beginExternalTick()
         bigBoo.beginExternalTick()
+        flyGuy.beginExternalTick()
     }
 
     @discardableResult
@@ -284,6 +293,23 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnFlyGuy(
+        in engineState: SM64SwiftEngineState,
+        homeX: Float = 0,
+        homeY: Float = 0,
+        homeZ: Float = 0,
+        moveYaw: Int16 = 0
+    ) throws -> SM64ObjectID {
+        try flyGuy.spawnFlyGuy(
+            in: engineState,
+            homeX: homeX,
+            homeY: homeY,
+            homeZ: homeZ,
+            moveYaw: moveYaw
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -295,6 +321,7 @@ final class SM64BehaviorDispatchBridge {
         swoop.beginExternalTick()
         piranhaPlant.beginExternalTick()
         bigBoo.beginExternalTick()
+        flyGuy.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -329,6 +356,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.piranhaPlant.updateInline(id, pool: pool)
             case .bigBoo:
                 _ = self.bigBoo.updateInline(id, pool: pool)
+            case .flyGuy:
+                _ = self.flyGuy.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -344,6 +373,7 @@ final class SM64BehaviorDispatchBridge {
             swoop.remove(id)
             piranhaPlant.remove(id)
             bigBoo.remove(id)
+            flyGuy.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -372,6 +402,9 @@ final class SM64BehaviorDispatchBridge {
         for id in bigBoo.registeredIDs where engineState.objects.record(for: id) == nil {
             bigBoo.remove(id)
         }
+        for id in flyGuy.registeredIDs where engineState.objects.record(for: id) == nil {
+            flyGuy.remove(id)
+        }
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -392,7 +425,9 @@ final class SM64BehaviorDispatchBridge {
             piranhaPlantEffects: piranhaPlant.effectLog,
             piranhaPlantDeliveries: piranhaPlant.deliveryLog,
             bigBooEffects: bigBoo.effectLog,
-            bigBooDeliveries: bigBoo.deliveryLog
+            bigBooDeliveries: bigBoo.deliveryLog,
+            flyGuyEffects: flyGuy.effectLog,
+            flyGuyDeliveries: flyGuy.deliveryLog
         )
     }
 }

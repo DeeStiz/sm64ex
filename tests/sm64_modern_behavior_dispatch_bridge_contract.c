@@ -13,6 +13,7 @@
 #define SWOOP_BEHAVIOR UINT64_C(0x6268765f73776f)
 #define PIRANHA_PLANT_BEHAVIOR UINT64_C(0x6268765f70706c)
 #define BIG_BOO_BEHAVIOR UINT64_C(0x6268765f626967)
+#define FLY_GUY_BEHAVIOR UINT64_C(0x6268765f666c79)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -46,8 +47,8 @@ static uint64_t hash_tick(
 ) {
     hash = hash_u64(hash, frame);
     hash = hash_u64(hash, second_tick ? 2 : 3); // default-list count
-    hash = hash_u64(hash, second_tick ? 9 : 11); // object counter
-    hash = hash_u64(hash, second_tick ? 9 : 11); // dispatch events
+    hash = hash_u64(hash, second_tick ? 10 : 12); // object counter
+    hash = hash_u64(hash, second_tick ? 10 : 12); // dispatch events
     hash = hash_event(hash, 2, AMP_BEHAVIOR, 2);
     hash = hash_event(hash, 3, BOO_BEHAVIOR, 3);
     hash = hash_event(hash, 4, BOBOMB_BEHAVIOR, 4);
@@ -55,13 +56,14 @@ static uint64_t hash_tick(
     hash = hash_event(hash, 6, SWOOP_BEHAVIOR, 6);
     hash = hash_event(hash, 7, PIRANHA_PLANT_BEHAVIOR, 7);
     hash = hash_event(hash, 8, BIG_BOO_BEHAVIOR, 8);
+    hash = hash_event(hash, 9, FLY_GUY_BEHAVIOR, 9);
     hash = hash_event(hash, 0, PENDULUM_BEHAVIOR, 0);
     if (second_tick) {
-        hash = hash_event(hash, 10, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 11, CHILD_BEHAVIOR, 255);
     } else {
         hash = hash_event(hash, 1, RESPAWNER_BEHAVIOR, 1);
-        hash = hash_event(hash, 10, CHILD_BEHAVIOR, 255);
-        hash = hash_event(hash, 9, BOBOMB_SMOKE_BEHAVIOR, 255);
+        hash = hash_event(hash, 11, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 10, BOBOMB_SMOKE_BEHAVIOR, 255);
     }
 
     hash = hash_u64(hash, 1); // pendulum effects
@@ -75,7 +77,7 @@ static uint64_t hash_tick(
     if (!second_tick) {
         hash = hash_id(hash, 1, 1);
         hash = hash_u64(hash, 3); // spawn + mark for deletion
-        hash = hash_id(hash, 10, 1);
+        hash = hash_id(hash, 11, 1);
         hash = hash_u64(hash, 1); // timer
         hash = hash_u64(hash, 1); // marked for deletion
     }
@@ -109,13 +111,13 @@ static uint64_t hash_tick(
     hash = hash_u64(hash, second_tick ? 36 : 44); // chase + fuse state
     hash = hash_u64(hash, second_tick ? 0 : 1); // spawned children
     if (!second_tick) {
-        hash = hash_id(hash, 9, 1);
+        hash = hash_id(hash, 10, 1);
     }
     hash = hash_u64(hash, 0); // not marked for deletion
     hash = hash_u64(hash, second_tick ? 0 : 1); // Bob-omb deliveries
     if (!second_tick) {
         hash = hash_u64(hash, 1); // deleted count
-        hash = hash_id(hash, 9, 1);
+        hash = hash_id(hash, 10, 1);
     }
 
     hash = hash_u64(hash, 1); // Bird effects
@@ -155,6 +157,16 @@ static uint64_t hash_tick(
     hash = hash_u64(hash, 0); // presented effects
     hash = hash_u64(hash, 1); // Big Boo deliveries
     hash = hash_u64(hash, 0); // no deleted objects
+
+    hash = hash_u64(hash, 1); // Fly Guy effects
+    hash = hash_id(hash, 9, 1);
+    hash = hash_u64(hash, 0); // Fly Guy kind
+    hash = hash_u64(hash, UINT64_C(515)); // animate + oscillate + idle
+    hash = hash_u64(hash, 1); // action is present
+    hash = hash_u64(hash, 0); // idle action
+    hash = hash_u64(hash, 0); // spawned children
+    hash = hash_u64(hash, 0); // not marked for deletion
+    hash = hash_u64(hash, 0); // Fly Guy deliveries
 
     hash = hash_u64(hash, UINT64_C(0x77));
     hash = hash_u64(hash, CHILD_BEHAVIOR);

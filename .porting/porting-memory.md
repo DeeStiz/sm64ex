@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M22q registers the existing `bhvFlyGuy` owner bridge in the shared
+  `SM64BehaviorDispatchBridge`. The general-actor route dispatches Amp, Boo,
+  Bob-omb, Bird, Swoop, Piranha Plant, Big Boo, and Fly Guy in source list
+  order, preserves Fly Guy's idle/oscillation state and generation-safe flame
+  compatibility seam, and keeps the Bob-omb smoke and respawner replacement
+  children explicitly unmigrated. Ten-route Swift/C fingerprint
+  0xc587e7525da91eef, behavior manifest fingerprint 0x9bb2863444c51d6d, 534
+  rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused dispatch
+  contract, native Debug build target /tmp/sm64-modern-m22q-build.log, full
+  206-script matrix, `git diff --check`, and zero unchecked-Sendable audit are
+  required evidence. Whole-engine route breadth, the remaining adapters, and
+  live parity remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22q.md.
 - M22p registers the existing `bhvBigBoo` owner bridge in the shared
   `SM64BehaviorDispatchBridge`. The general-actor route dispatches Amp, Boo,
   Bob-omb, Bird, Swoop, Piranha Plant, and Big Boo in source list order,

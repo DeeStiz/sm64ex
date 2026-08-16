@@ -44,6 +44,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/FlyGuyEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/FlyGuyObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_behavior_dispatch_bridge_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke"
 SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke)"
