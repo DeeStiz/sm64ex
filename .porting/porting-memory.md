@@ -2,6 +2,17 @@
 
 ## Current Milestone
 
+- M23d adds the pure Swift 6 `SM64SaveFileMutator` kernel for C flag,
+  star, cannon, cap-position, cap-relocation, and sound-mode mutations. It
+  preserves C's secret-star sentinel, one-based cannon indexing, file-exists
+  dirty-bit semantics, cap-location flags, and checksum-ready snapshots.
+  Swift/C fingerprint `0x1aa5cef94856d8be`; the focused mutator contract,
+  M23a–M23c regressions, regenerated native Debug build, complete 209-script
+  matrix (`runs=209 failures=0`), `git diff --check`, and zero
+  unchecked-Sendable audit pass. Owner-thread dirty/menu writes, restart
+  selector parity, and full save authority replay remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M23d.md`.
+
 - M23c adds owner-thread `SM64OwnerThreadEEPROMAdapter.copy` and `.erase`
   equivalents for C `save_file_copy`/`save_file_erase`. They touch destination
   high-score ages in source order, preserve menu sound/filler bytes, recompute

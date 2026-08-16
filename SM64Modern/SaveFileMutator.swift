@@ -1,0 +1,124 @@
+import Foundation
+
+struct SM64SaveCapRelocationResult: Equatable, Sendable {
+    let save: SM64SaveFileSnapshot
+    let location: SM64ProgressionCapLocation
+}
+
+/// Pure counterparts of the C save mutation helpers. Callers choose the
+/// owner-thread persistence boundary; these functions only rewrite snapshots
+/// and never touch C globals or files.
+enum SM64SaveFileMutator {
+    static let fileExistsFlag: UInt32 = 1 << 0
+    static let capOnGroundFlag: UInt32 = 1 << 16
+    static let capOnKleptoFlag: UInt32 = 1 << 17
+    static let capOnUkikiFlag: UInt32 = 1 << 18
+    static let capOnMrBlizzardFlag: UInt32 = 1 << 19
+
+    static func setFlags(
+        _ flags: UInt32,
+        in save: SM64SaveFileSnapshot
+    ) -> SM64SaveFileSnapshot {
+        var next = save
+        next.flags |= flags | fileExistsFlag
+        return next
+    }
+
+    static func clearFlags(
+        _ flags: UInt32,
+        in save: SM64SaveFileSnapshot
+    ) -> SM64SaveFileSnapshot {
+        var next = save
+        next.flags &= ~flags
+        next.flags |= fileExistsFlag
+        return next
+    }
+
+    /// `courseIndex == -1` targets the seven castle-secret stars stored in
+    /// the high byte of flags; standard courses target the courseStars byte.
+    static func setStarFlags(
+        _ starFlags: UInt32,
+        courseIndex: Int,
+        in save: SM64SaveFileSnapshot
+    ) -> SM64SaveFileSnapshot? {
+        var next = save
+        if courseIndex == -1 {
+            next.flags |= starFlags << 24
+        } else {
+            guard (0..<SM64SaveFileSnapshot.courseCount).contains(courseIndex) else {
+                return nil
+            }
+            next.courseStars[courseIndex] |= UInt8(truncatingIfNeeded: starFlags)
+        }
+        next.flags |= fileExistsFlag
+        return next
+    }
+
+    /// C's current-course helper intentionally uses the one-based course
+    /// number as the byte index, because courseStars[0] is the preceding
+    /// course's cannon bit in the original layout.
+    static func setCannonUnlocked(
+        currentCourseNumber: Int,
+        in save: SM64SaveFileSnapshot
+    ) -> SM64SaveFileSnapshot? {
+        guard (1...SM64SaveFileSnapshot.stageCount).contains(currentCourseNumber) else {
+            return nil
+        }
+        var next = save
+        next.courseStars[currentCourseNumber] |= 0x80
+        next.flags |= fileExistsFlag
+        return next
+    }
+
+    static func setCapPosition(
+        level: UInt8,
+        area: UInt8,
+        position: SM64SaveInt16Vector3,
+        in save: SM64SaveFileSnapshot
+    ) -> SM64SaveFileSnapshot {
+        var next = save
+        next.capLevel = level
+        next.capArea = area
+        next.capPosition = position
+        next.flags |= capOnGroundFlag | fileExistsFlag
+        return next
+    }
+
+    /// Mirrors `save_file_move_cap_to_default_location`: only a cap currently
+    /// on the ground is relocated, and the source C order leaves unrelated
+    /// location bits untouched while clearing CAP_ON_GROUND.
+    static func moveCapToDefaultLocation(
+        level: UInt8,
+        in save: SM64SaveFileSnapshot
+    ) -> SM64SaveCapRelocationResult {
+        var next = save
+        var location: SM64ProgressionCapLocation = .none
+        if save.flags & capOnGroundFlag != 0 {
+            switch level {
+            case 0x08: // LEVEL_SSL
+                next.flags |= capOnKleptoFlag | fileExistsFlag
+                location = .klepto
+            case 0x0A: // LEVEL_SL
+                next.flags |= capOnMrBlizzardFlag | fileExistsFlag
+                location = .mrBlizzard
+            case 0x24: // LEVEL_TTM
+                next.flags |= capOnUkikiFlag | fileExistsFlag
+                location = .ukiki
+            default:
+                break
+            }
+            next.flags &= ~capOnGroundFlag
+            next.flags |= fileExistsFlag
+        }
+        return SM64SaveCapRelocationResult(save: next, location: location)
+    }
+
+    static func setSoundMode(
+        _ mode: UInt16,
+        in menu: SM64MenuDataSnapshot
+    ) -> SM64MenuDataSnapshot {
+        var next = menu
+        next.soundMode = mode
+        return next
+    }
+}

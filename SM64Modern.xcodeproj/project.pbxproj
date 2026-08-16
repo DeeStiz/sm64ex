@@ -113,6 +113,7 @@
 		74F6B3961402E9A06DBC362B /* MarioWhirlpoolAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E9E5A575E124235D4817C6 /* MarioWhirlpoolAction.swift */; };
 		77C353336E88DAB6B5B3896D /* TTCPendulumBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */; };
 		794F70AFB48B7D7AA1B13D15 /* TuxiesMotherEyes.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80D7D687104873CF663B8AB /* TuxiesMotherEyes.swift */; };
+		7B150B4F3135E36D8F32D53A /* SaveFileMutator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A8B5589C8E65130A7B540D71 /* SaveFileMutator.swift */; };
 		7C7EE42E47926366AAC72840 /* MarioDeceleratingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = E479D5A092A548EEA6715AA1 /* MarioDeceleratingAction.swift */; };
 		7D2D76204DE9F3841D35B4F9 /* TTCSpinnerBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFB7DD2B8D112A3511DF6EBF /* TTCSpinnerBehavior.swift */; };
 		7D4DC059653506AF1994A0FE /* TuxiesMotherObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 841FB989A9A3D6C38F573C2C /* TuxiesMotherObjectBridge.swift */; };
@@ -394,6 +395,7 @@
 		A324AE8C019E9D59ECC1D057 /* MarioGroundSpeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGroundSpeed.swift; sourceTree = "<group>"; };
 		A4B9263B0BC8B2ECBC71F7DC /* SpinyEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinyEnemy.swift; sourceTree = "<group>"; };
 		A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = AppleAudioRing.c; sourceTree = "<group>"; };
+		A8B5589C8E65130A7B540D71 /* SaveFileMutator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveFileMutator.swift; sourceTree = "<group>"; };
 		A8B624CEA2E264D3A38B48EA /* SmallPenguinObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallPenguinObjectBridge.swift; sourceTree = "<group>"; };
 		AB7C461E8C0CA23A1D8B2CA5 /* MarioQuicksandLandingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioQuicksandLandingAction.swift; sourceTree = "<group>"; };
 		AC89F10EF988BEB5D9624D69 /* LevelScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScript.swift; sourceTree = "<group>"; };
@@ -674,6 +676,7 @@
 				28BA5E297BC57291B44A28B4 /* RouteShardExecution.swift */,
 				6B0613A393A0D8C9EBA9E6D5 /* RumbleCore.swift */,
 				3795DAA620146CD3735BB84B /* SaveFileCodec.swift */,
+				A8B5589C8E65130A7B540D71 /* SaveFileMutator.swift */,
 				4F1624BCF90E209A7872E3B2 /* SaveFileQueries.swift */,
 				AF17DAA784F8FC1431F06A28 /* ScuttlebugEnemy.swift */,
 				CC510DADD4B2F20AC7EA6B5A /* ScuttlebugObjectBridge.swift */,
@@ -1010,6 +1013,7 @@
 				F5E5450EBF04AB49D0A4B12F /* SLWalkingPenguinMovement.swift in Sources */,
 				21DFAA3C389A206B19099257 /* SLWalkingPenguinObjectBridge.swift in Sources */,
 				4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */,
+				7B150B4F3135E36D8F32D53A /* SaveFileMutator.swift in Sources */,
 				415220E18F364E269EAEE4EE /* SaveFileQueries.swift in Sources */,
 				3D8C6993DC34F356CD9F756D /* ScuttlebugEnemy.swift in Sources */,
 				46C0FB257866DD3500A55A24 /* ScuttlebugObjectBridge.swift in Sources */,
