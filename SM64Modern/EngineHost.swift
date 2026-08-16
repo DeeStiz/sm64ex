@@ -705,25 +705,58 @@ final class EngineHost {
         config.header.struct_size = UInt32(MemoryLayout<SM64ModernLifecycleConfigV1>.size)
         config.main_pool_size = 0
         config.fullscreen_mode = SM64_MODERN_FULLSCREEN_FORCE_OFF
-        // Headless migration gates opt into the same level script with a
-        // deterministic save-backed spawn, so the Peach intro cutscene cannot
-        // consume the entire bounded callback window.
-        let environment = ProcessInfo.processInfo.environment
-        config.skip_intro = environment["SM64_MODERN_AUTOMATED_GAMEPLAY"] != nil
-            || environment["SM64_MODERN_AUTOMATED_BOBOMB"] != nil ? 1 : 0
 
         let paths: HostPaths
         do {
             paths = try HostPaths.resolve()
             try withUnsafeMutableBytes(of: &config.game_directory) { try Self.copyCString(paths.gameDirectory, into: $0) }
             try withUnsafeMutableBytes(of: &config.save_directory) { try Self.copyCString(paths.saveDirectory, into: $0) }
-            try withUnsafeMutableBytes(of: &config.config_file) { try Self.copyCString("sm64-modern-config.txt", into: $0) }
+            try withUnsafeMutableBytes(of: &config.config_file) { try Self.copyCString(SM64ModernConfigurationRuntime.fileName, into: $0) }
             try withUnsafeMutableBytes(of: &config.window_title) { try Self.copyCString("SM64 Modern", into: $0) }
             engineLogger.notice("host_paths_resolved")
         } catch {
             engineLogger.error("host_path_error \(error.localizedDescription, privacy: .private)")
             return SM64_MODERN_STATUS_PLATFORM_ERROR
         }
+
+        let configuration: SM64ModernConfigurationLoadResult
+        do {
+            configuration = try SM64ModernConfigurationRuntime.load(
+                from: SM64ModernConfigurationRuntime.fileURL(saveDirectory: paths.saveDirectory)
+            )
+        } catch {
+            engineLogger.error(
+                "configuration_load_failed error=\(error.localizedDescription, privacy: .public)"
+            )
+            return SM64_MODERN_STATUS_PLATFORM_ERROR
+        }
+        if configuration.didRepair {
+            engineLogger.warning(
+                "configuration_repaired keys=\(configuration.repairedKeys.joined(separator: ","), privacy: .public) malformed_lines=\(configuration.malformedLines.map(String.init).joined(separator: ","), privacy: .public) persisted=\(configuration.repairPersisted, privacy: .public)"
+            )
+        }
+        if !configuration.unknownKeys.isEmpty {
+            engineLogger.notice(
+                "configuration_unknown_keys keys=\(configuration.unknownKeys.joined(separator: ","), privacy: .public)"
+            )
+        }
+        if let repairPersistenceError = configuration.repairPersistenceError {
+            engineLogger.error(
+                "configuration_repair_persist_failed error=\(repairPersistenceError, privacy: .public)"
+            )
+        }
+
+        // Headless migration gates opt into the same level script with a
+        // deterministic save-backed spawn, so the Peach intro cutscene cannot
+        // consume the entire bounded callback window. Configuration is read
+        // before the C lifecycle starts; C remains the compatibility consumer.
+        let environment = ProcessInfo.processInfo.environment
+        config.fullscreen_mode = configuration.configuration.window.fullscreen
+            ? SM64_MODERN_FULLSCREEN_FORCE_ON
+            : SM64_MODERN_FULLSCREEN_FORCE_OFF
+        config.skip_intro = configuration.configuration.skipIntro
+            || environment["SM64_MODERN_AUTOMATED_GAMEPLAY"] != nil
+            || environment["SM64_MODERN_AUTOMATED_BOBOMB"] != nil ? 1 : 0
 
         var platform = SM64ModernPlatformApiV1()
         platform.header.abi_version = SM64_MODERN_ABI_VERSION_1

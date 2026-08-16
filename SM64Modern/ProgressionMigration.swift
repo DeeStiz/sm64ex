@@ -72,24 +72,18 @@ final class SwiftProgressionMigrationService {
 
     func initialize() throws {
         assertOwnerThread()
-        if let snapshot = readSnapshot(fileIndex: runtime.saveFileIndex) {
-            try adapter.commit(
-                saveFileIndex: runtime.saveFileIndex,
-                save: snapshot.save, menu: snapshot.menu,
-                ownerThreadToken: ownerThreadToken
-            )
-            runtime.adoptPersistedSnapshots(
-                save: snapshot.save, menu: snapshot.menu
-            )
-            try beginReplayArtifact(save: snapshot.save, menu: snapshot.menu)
-        } else {
-            let loaded = try adapter.reload(
-                saveFileIndex: runtime.saveFileIndex,
-                ownerThreadToken: ownerThreadToken
-            )
-            runtime.adoptPersistedSnapshots(save: loaded.save, menu: loaded.menu)
-            try beginReplayArtifact(save: loaded.save, menu: loaded.menu)
-        }
+        // C's save buffer is zeroed before lifecycle initialization and the
+        // normalization helper deliberately synthesizes a valid checksum from
+        // its fields. Reading it here would therefore mistake an uninitialized
+        // buffer for a durable save and seed Swift with zeroed menu ages. Let
+        // C perform its real load/repair first; its post-load migration event
+        // will reconcile the shadow image on the owner thread.
+        let loaded = try adapter.load(
+            saveFileIndex: runtime.saveFileIndex,
+            ownerThreadToken: ownerThreadToken
+        )
+        runtime.adoptPersistedSnapshots(save: loaded.save, menu: loaded.menu)
+        try beginReplayArtifact(save: loaded.save, menu: loaded.menu)
     }
 
     func makeAPI() -> SM64ModernProgressionMigrationApiV1 {
@@ -266,12 +260,19 @@ final class SwiftProgressionMigrationService {
                 expected = (result.save, result.menu)
             }
 
-            guard let cSnapshot = readSnapshot(
-                fileIndex: Int(event.save_file_index)
-            ), SM64SaveFileCodec.encode(cSnapshot.save)
-                == SM64SaveFileCodec.encode(expected.save),
-                SM64MenuDataCodec.encode(cSnapshot.menu)
-                == SM64MenuDataCodec.encode(expected.menu) else {
+            let cSnapshot = readSnapshot(fileIndex: Int(event.save_file_index))
+            let cSaveBytes = cSnapshot.map { SM64SaveFileCodec.encode($0.save) }
+            let expectedSaveBytes = SM64SaveFileCodec.encode(expected.save)
+            let cMenuBytes = cSnapshot.map { SM64MenuDataCodec.encode($0.menu) }
+            let expectedMenuBytes = SM64MenuDataCodec.encode(expected.menu)
+            guard let cSaveBytes, let cMenuBytes,
+                  cSaveBytes == expectedSaveBytes,
+                  cMenuBytes == expectedMenuBytes else {
+                let cSaveHash = cSaveBytes.map { self.hash(bytes: $0) } ?? 0
+                let cMenuHash = cMenuBytes.map { self.hash(bytes: $0) } ?? 0
+                progressionMigrationLogger.error(
+                    "mutation_payload_mismatch file=\(event.save_file_index, privacy: .public) kind=\(event.mutation_kind, privacy: .public) operation=\(event.mutation_operation, privacy: .public) c_save_hash=\(cSaveHash, privacy: .public) expected_save_hash=\(self.hash(bytes: expectedSaveBytes), privacy: .public) c_menu_hash=\(cMenuHash, privacy: .public) expected_menu_hash=\(self.hash(bytes: expectedMenuBytes), privacy: .public) c_ages=\(cSnapshot?.menu.coinScoreAges ?? [], privacy: .public) expected_ages=\(expected.menu.coinScoreAges, privacy: .public)"
+                )
                 return fail(
                     SM64_MODERN_STATUS_PARITY_DIVERGED,
                     message: "mutation_payload_replay"
