@@ -2,6 +2,22 @@
 
 ## Current Milestone
 
+- M22ai registers the existing Snowman Land walking penguin owner bridge in
+  the shared `SM64BehaviorDispatchBridge`. The general-actor route advances its
+  value movement reducer with collision/world movement explicitly disabled at
+  this seam, preserving action/timer/animation state and generation-safe
+  records. Thirty-route Swift/C fingerprint `0x873098740d637636`, standalone
+  SL walking penguin object-bridge fingerprint `0xaabb92f23fd8451a`, behavior
+  manifest fingerprint `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner
+  routes, and 461 explicit `unmigrated_c_adapter` rows are the accounting
+  boundary. Focused dispatch/SL walking penguin contracts, native Debug target
+  `/tmp/sm64-modern-m22ai-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full
+  collision/world movement and presentation consumers, remaining adapters, and
+  live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ai.md`.
+
 - M22ah registers the existing King Bob-omb owner bridge in the shared
   `SM64BehaviorDispatchBridge`. The general-actor route advances the
   initialize/intro reducer and returns the owner-thread boss-music presentation

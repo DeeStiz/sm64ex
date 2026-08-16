@@ -725,6 +725,41 @@ private func hashKingBobombDispatch(
     return hash
 }
 
+private func hashSLWalkingPenguinDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.slWalkingPenguinEffects.count))
+    for effect in tick.slWalkingPenguinEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.action)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.currentStep)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.currentStepTimer)))
+        hash = hashU64(hash, UInt64(effect.forwardVelocity.bitPattern))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.animation)))
+        hash = hashU64(hash, UInt64(effect.animationSpeed.bitPattern))
+        hash = hashU64(hash, UInt64(UInt16(bitPattern: effect.angleVelocityYaw)))
+        hash = hashU64(hash, UInt64(UInt16(bitPattern: effect.moveYaw)))
+        hash = hashU64(hash, effect.completedTurn ? 1 : 0)
+        hash = hashU64(hash, effect.collision == nil ? 0 : 1)
+        hash = hashU64(hash, effect.movement == nil ? 0 : 1)
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1158,6 +1193,25 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             "King Bob-omb owner presentation is explicit"
         )
         fingerprint = hashKingBobombDispatch(fingerprint, kingTick)
+
+        let penguinEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let penguinBridge = SM64BehaviorDispatchBridge()
+        let penguin = try penguinBridge.spawnSLWalkingPenguin(
+            in: penguinEngine,
+            position: SM64ObjectVector3(x: 600, y: 12, z: -40),
+            moveYaw: 0x2000
+        )
+        let penguinTick = penguinBridge.tick(state: penguinEngine)
+        require(penguinTick.events.map(\.route) == [.slWalkingPenguin], "SL walking penguin route dispatch")
+        require(penguinTick.scheduler.updated.map(\.traceSubject) == [1], "SL walking penguin callback ordering")
+        require(
+            penguinTick.slWalkingPenguinEffects.count == 1
+                && penguinTick.slWalkingPenguinEffects.first?.objectID == penguin
+                && penguinTick.slWalkingPenguinEffects.first?.collision == nil
+                && penguinTick.slWalkingPenguinEffects.first?.movement == nil,
+            "SL walking penguin value route is preserved"
+        )
+        fingerprint = hashSLWalkingPenguinDispatch(fingerprint, penguinTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

@@ -69,8 +69,10 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/KingBobombCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/KingBobombHomeMovement.swift" \
   "$PROJECT_ROOT/SM64Modern/KingBobombObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinMovement.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooObjectBridge.swift" \

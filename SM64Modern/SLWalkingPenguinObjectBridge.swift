@@ -114,6 +114,29 @@ final class SM64SLWalkingPenguinObjectBridge {
         return true
     }
 
+    /// Starts one externally-owned scheduler tick for shared dispatch.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+    }
+
+    /// Advances one penguin from the shared scheduler callback without
+    /// creating a nested scheduler update or enabling collision movement.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard states[id] != nil else { return false }
+        update(id: id, pool: pool, collisionWorld: nil, advanceMovement: false)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil { remove(id) }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -121,7 +144,7 @@ final class SM64SLWalkingPenguinObjectBridge {
         collisionWorld: SM64SurfaceCollisionWorld? = nil,
         advanceMovement: Bool = false
     ) -> SM64SLWalkingPenguinSchedulerTickResult {
-        effectLog.removeAll(keepingCapacity: true)
+        beginExternalTick()
         let schedulerResult = scheduler.update(
             state: engineState,
             advanceNativeDynamics: advanceNativeDynamics
@@ -133,12 +156,7 @@ final class SM64SLWalkingPenguinObjectBridge {
                 advanceMovement: advanceMovement
             )
         }
-        for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64SLWalkingPenguinSchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog
