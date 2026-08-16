@@ -52,6 +52,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/GoombaObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SpinyEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/SpinyObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SnufitEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/SnufitObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_behavior_dispatch_bridge_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke"
 SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke)"

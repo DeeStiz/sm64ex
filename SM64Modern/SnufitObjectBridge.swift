@@ -180,6 +180,33 @@ final class SM64SnufitObjectBridge {
         return true
     }
 
+    /// Clears per-tick owner-thread effects before an external shared
+    /// dispatcher invokes `updateInline` for each Snufit or bullet identity.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Advances one Snufit-family callback without starting a nested scheduler
+    /// pass. The enclosing dispatcher remains authoritative for list order.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard (snufits[id] != nil || bullets[id] != nil), pool.record(for: id) != nil else {
+            return false
+        }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    /// Removes a Snufit or bullet shadow after scheduler unload or reset.
+    func remove(_ id: SM64ObjectID) {
+        snufits.removeValue(forKey: id)
+        bullets.removeValue(forKey: id)
+        snufitInputs.removeValue(forKey: id)
+        bulletInputs.removeValue(forKey: id)
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -188,24 +215,16 @@ final class SM64SnufitObjectBridge {
     ) -> SM64SnufitSchedulerTickResult {
         snufitInputs = frameSnufitInputs
         bulletInputs = frameBulletInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, pool: pool)
+            _ = self?.updateInline(id, pool: pool)
         }
         for id in schedulerResult.unloaded {
-            snufits.removeValue(forKey: id)
-            bullets.removeValue(forKey: id)
-            snufitInputs.removeValue(forKey: id)
-            bulletInputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in registeredIDs where engineState.objects.record(for: id) == nil {
-            snufits.removeValue(forKey: id)
-            bullets.removeValue(forKey: id)
-            snufitInputs.removeValue(forKey: id)
-            bulletInputs.removeValue(forKey: id)
+            remove(id)
         }
         return SM64SnufitSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
