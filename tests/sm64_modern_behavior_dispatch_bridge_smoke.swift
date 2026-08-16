@@ -2051,6 +2051,14 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             "Tuxie's mother value/owner route is preserved"
         )
         fingerprint = hashTuxiesMotherDispatch(fingerprint, tuxiesTick)
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64FlyGuyObjectBridge.flameBehaviorIdentity) == .flyGuy,
+            "Fly Guy flame identity shares the owner route"
+        )
+        fingerprint = hashU64(
+            fingerprint,
+            UInt64(SM64BehaviorDispatchBridge.route(for: SM64FlyGuyObjectBridge.flameBehaviorIdentity).rawValue)
+        )
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

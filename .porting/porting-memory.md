@@ -2,6 +2,23 @@
 
 ## Current Milestone
 
+- M22av registers Fly Guy's transient flame identity in the existing Fly Guy
+  owner route. `bhvFlyGuy` and `bhvFlyguyFlame` now share the bridge that owns
+  flame state, parent linkage, generation-safe deletion, and the standalone
+  flame reducer; no second child scheduler is introduced. Strict Swift/C
+  forty-two-route identity fingerprint `0xe2b0ee534039fb99`, standalone Fly
+  Guy owner fingerprint `0x2fbf98eca64a5496`, behavior manifest fingerprint
+  `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461
+  explicit `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Fly Guy contracts, native Debug target
+  `/tmp/sm64-modern-m22av-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix
+  (`/tmp/sm64-modern-m22av-final-matrix.log`), `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full flame
+  presentation/collision consumers, remaining adapters, and live parity remain
+  open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22av.md`.
+
 - M22au registers the existing Tuxie's-mother owner bridge in the shared
   general-actor `SM64BehaviorDispatchBridge` for `bhvTuxiesMother`. The route
   preserves the mother action/subaction reducer, generation-safe record

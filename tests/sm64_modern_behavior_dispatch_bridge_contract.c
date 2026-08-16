@@ -1193,6 +1193,9 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // deleted
     fingerprint = hash_u64(fingerprint, 0); // rejected
 
+    // Fly Guy's existing owner bridge also owns its transient flame identity.
+    fingerprint = hash_u64(fingerprint, 9); // shared Fly Guy route
+
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);
     printf("SM64 Modern behavior dispatch bridge C contract passed\n");
