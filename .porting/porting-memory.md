@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M22i makes `SM64BehaviorDispatchBridge` the default object callback of
+  `SM64ModernSwiftEngineContext.step()`. Initialization and shutdown reset
+  route registrations, every Swift tick retains the shared dispatch receipt,
+  and the live-route oracle/promotion scripts compile the same dispatcher
+  dependency set. Mixed-route fingerprint 0x9445d688831ca6c7, behavior
+  manifest fingerprint 0x9bb2863444c51d6d, 534 rows, 73 Swift value/owner
+  routes, and 461 explicit `unmigrated_c_adapter` rows are the accounting
+  boundary. Engine-runtime/live-route contracts, regenerated native Debug
+  build target /tmp/sm64-modern-m22i-build.log, full 206-script matrix,
+  `git diff --check`, and zero unchecked-Sendable audit are required evidence.
+  Unknown identities remain fail-closed while route breadth is expanded.
+  Handoff: .porting/porting-handoff-full-swift-twin-M22i.md.
 - M22h adds the first shared behavior-identity dispatch pass. One owner-thread
   scheduler selects the proven decorative-pendulum and respawner routes,
   preserves live default-list insertion order, and records unknown child

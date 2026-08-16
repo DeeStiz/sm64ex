@@ -144,11 +144,19 @@ enum SM64ModernEngineRuntimeSmoke {
             in: .generalActor,
             behaviorIdentity: 0x44
         )
+        let pendulum = try! swiftShell.swiftContext.behaviorDispatch.spawnPendulum(
+            in: swiftShell.swiftContext.state,
+            position: SM64ObjectVector3(x: 10, y: 20, z: 30),
+            faceRoll: 100
+        )
         precondition(swiftShell.swiftContext.state.objects.contains(actor))
+        precondition(swiftShell.swiftContext.state.objects.contains(pendulum))
         precondition(swiftShell.step() == 0)
         precondition(swiftShell.lastSwiftTick?.tick == 1)
         precondition(swiftShell.lastSwiftTick?.frame == 1)
-        precondition(swiftShell.lastSwiftTick?.objectCount == 1)
+        precondition(swiftShell.lastSwiftTick?.objectCount == 2)
+        precondition(swiftShell.swiftContext.lastBehaviorDispatch?.events.map(\.route) == [.unmigrated, .decorativePendulum])
+        precondition(swiftShell.swiftContext.lastBehaviorDispatch?.decorativePendulumEffects.first?.objectID == pendulum)
         precondition(swiftShell.swiftContext.state.globals.frame == 1)
         precondition(swiftShell.requestStop(reason: 199) == 8)
         precondition(swiftShell.phase == .stopping)

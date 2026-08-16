@@ -88,7 +88,7 @@ typealias SM64ModernSwiftTraceSink = (SM64OracleTraceRecord) -> SM64ModernStatus
 /// migrated actor bridges.
 final class SM64ModernSwiftEngineContext {
     let state: SM64SwiftEngineState
-    private let scheduler: SM64ObjectScheduler
+    let behaviorDispatch: SM64BehaviorDispatchBridge
     private let initialProgression: SM64ProgressionRuntime
     private let traceSink: SM64ModernSwiftTraceSink?
     private var inputNormalizer = SM64ControllerInputNormalizer()
@@ -104,6 +104,7 @@ final class SM64ModernSwiftEngineContext {
     private(set) var lastInputReceipt: SM64ModernSwiftInputReceipt?
     private(set) var lastMarioInputReceipt: SM64ModernSwiftMarioInputReceipt?
     private(set) var lastMarioActionReceipt: SM64ModernSwiftMarioActionReceipt?
+    private(set) var lastBehaviorDispatch: SM64BehaviorDispatchTickResult?
     private(set) var traceRecords: [SM64OracleTraceRecord] = []
     private(set) var lastTraceRecord: SM64OracleTraceRecord?
     private(set) var traceStatus: SM64ModernStatus = 0
@@ -116,7 +117,7 @@ final class SM64ModernSwiftEngineContext {
         traceSink: SM64ModernSwiftTraceSink? = nil
     ) {
         self.state = SM64SwiftEngineState(objectCapacity: objectCapacity)
-        self.scheduler = scheduler
+        self.behaviorDispatch = SM64BehaviorDispatchBridge(scheduler: scheduler)
         self.initialProgression = progression
         self.progression = progression
         self.traceSink = traceSink
@@ -125,6 +126,7 @@ final class SM64ModernSwiftEngineContext {
     func initialize(levelNumber: Int16 = 1, areaIndex: Int16 = 0) -> Bool {
         guard phase == .cold else { return false }
         state.beginLevel(levelNumber: levelNumber, areaIndex: areaIndex)
+        behaviorDispatch.reset()
         progression = initialProgression
         inputNormalizer = SM64ControllerInputNormalizer()
         framesSinceA = 0
@@ -136,6 +138,7 @@ final class SM64ModernSwiftEngineContext {
         lastInputReceipt = nil
         lastMarioInputReceipt = nil
         lastMarioActionReceipt = nil
+        lastBehaviorDispatch = nil
         traceRecords.removeAll(keepingCapacity: true)
         lastTraceRecord = nil
         traceStatus = 0
@@ -311,7 +314,9 @@ final class SM64ModernSwiftEngineContext {
 
     func step() -> SM64ModernSwiftEngineTickReceipt? {
         guard phase == .initialized else { return nil }
-        let result = scheduler.update(state: state) { _, _ in }
+        let dispatch = behaviorDispatch.tick(state: state)
+        lastBehaviorDispatch = dispatch
+        let result = dispatch.scheduler
         tickCount &+= 1
         let receipt = SM64ModernSwiftEngineTickReceipt(
             tick: tickCount,
@@ -354,6 +359,8 @@ final class SM64ModernSwiftEngineContext {
         lastInputReceipt = nil
         lastMarioInputReceipt = nil
         lastMarioActionReceipt = nil
+        behaviorDispatch.reset()
+        lastBehaviorDispatch = nil
         traceRecords.removeAll(keepingCapacity: true)
         lastTraceRecord = nil
         traceStatus = 0

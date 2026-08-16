@@ -41,6 +41,14 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/MarioAction.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioActionCancels.swift" \
   "$PROJECT_ROOT/SM64Modern/OracleTrace.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompRelease.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
+  "$PROJECT_ROOT/SM64Modern/Respawner.swift" \
+  "$PROJECT_ROOT/SM64Modern/RespawnerObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/DecorativePendulumBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/DecorativePendulumObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/BehaviorDispatchBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_live_route_oracle_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-live-route-oracle-smoke"

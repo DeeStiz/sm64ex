@@ -2,7 +2,7 @@
 
 ## Status
 
-M22h is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M22i is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -392,6 +392,15 @@ silently invoking a C-shaped fallback. Its mixed-route Swift/C fingerprint is
 `0x9445d688831ca6c7`; the focused dispatch contract, regenerated native Debug
 build, 206-script matrix, `git diff --check`, and zero unchecked-Sendable audit
 pass. This is a two-route dispatch seam, not whole-engine behavior closure.
+M22i makes that dispatch seam the default callback of
+`SM64ModernSwiftEngineContext.step()`. Engine lifecycle initialization and
+shutdown now reset route registrations, each Swift tick retains the shared
+dispatch receipt, and the live-route oracle/promotion scripts compile the same
+dispatcher dependencies. The engine-runtime integration fingerprint remains
+covered by the mixed-route contract `0x9445d688831ca6c7`; native Debug,
+206-script matrix, `git diff --check`, and zero unchecked-Sendable audit pass.
+The context still deliberately reports unknown identities as unmigrated while
+the remaining routes are ported.
 M22e replaces the `bhvRespawner` C callback with a pointer-free Swift value
 kernel and owner bridge. It preserves the source outside-radius gate,
 single-spawn/deactivation ordering, behavior-parameter transfer, transform
@@ -1295,7 +1304,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M22f: live Yoshi respawner scheduler integration | Yoshi's source-authored respawner is allocated in the default list, dispatched by the live scheduler in C list order, spawns the replacement Yoshi in the same traversal, transfers behavior/parameter/transform fields, and retires both source and respawner safely. | Complete locally — strict Swift 6/C Yoshi owner fingerprint `0x0d985a32a8a93715`, behavior manifest fingerprint `0xf8bbfcbc86b888d9`, 534 rows (72 Swift value/owner, 462 explicit C adapters), focused Swift/C ordering contract, regenerated native Debug build (`/tmp/sm64-modern-m22f-build.log`), 204-script matrix (runs=204 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-level behavior dispatch, the remaining 462 adapters, and parity remain |
 | M22g: live decorative pendulum owner route | The existing decorative-pendulum value kernel is attached to a generation-safe `OBJ_LIST_DEFAULT` owner bridge, preserves initialization/update-gfx state, advances the source fixed-point roll, and delivers the big-clock sound intent. | Complete locally — strict Swift 6/C owner fingerprint `0xb45d1c83aa454dc3`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused Swift/C owner contract, regenerated Xcode sources/native Debug build (`/tmp/sm64-modern-m22g-build.log`), 205-script matrix (runs=205 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-level behavior dispatch, the remaining 461 adapters, and parity remain |
 | M22h: shared behavior-identity dispatch seam | A single owner-thread scheduler selects the proven decorative-pendulum and respawner routes by behavior identity, preserves live default-list insertion order, and records unknown children explicitly as unmigrated. | Complete locally — strict Swift 6/C mixed-route fingerprint `0x9445d688831ca6c7`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused dispatch contract, regenerated Xcode sources/native Debug build (`/tmp/sm64-modern-m22h-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine dispatch, the remaining 461 adapters, and parity remain |
-| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22h close deterministic identity accounting, three live value/owner routes, and a shared two-route dispatch seam with 534 rows, 73 known Swift value/owner routes, and 461 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
+| M22i: Swift engine context dispatch authority | `SM64ModernSwiftEngineContext.step()` uses the shared behavior-identity dispatcher by default, retains dispatch receipts, and resets route registrations across lifecycle boundaries; direct live-route oracle builds use the same dependency set. | Complete locally — strict Swift 6/C engine-runtime integration, mixed-route fingerprint `0x9445d688831ca6c7`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), engine-runtime and live-route/promotion contracts, regenerated native Debug build (`/tmp/sm64-modern-m22i-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine route breadth, the remaining 461 adapters, and parity remain |
+| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22i close deterministic identity accounting, three live value/owner routes, a shared two-route dispatch seam, and Swift engine-context dispatch authority with 534 rows, 73 known Swift value/owner routes, and 461 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |

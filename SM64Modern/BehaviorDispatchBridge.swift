@@ -47,6 +47,14 @@ final class SM64BehaviorDispatchBridge {
         }
     }
 
+    func reset() {
+        eventLog.removeAll(keepingCapacity: true)
+        for id in decorativePendulum.registeredIDs { decorativePendulum.remove(id) }
+        for id in respawner.registeredIDs { respawner.remove(id) }
+        decorativePendulum.beginExternalTick()
+        respawner.beginExternalTick()
+    }
+
     @discardableResult
     func spawnPendulum(
         in engineState: SM64SwiftEngineState,
