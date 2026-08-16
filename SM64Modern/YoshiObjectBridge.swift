@@ -49,11 +49,12 @@ final class SM64YoshiObjectBridge {
 
     init(
         scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
-        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter(),
+        respawnerBridge: SM64RespawnerObjectBridge? = nil
     ) {
         self.scheduler = scheduler
         self.effectRouter = effectRouter
-        self.respawnerBridge = SM64RespawnerObjectBridge(scheduler: scheduler)
+        self.respawnerBridge = respawnerBridge ?? SM64RespawnerObjectBridge(scheduler: scheduler)
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -131,16 +132,58 @@ final class SM64YoshiObjectBridge {
         return true
     }
 
+    /// Clears per-tick owner receipts and the shared respawner bridge before
+    /// the behavior dispatcher traverses Yoshi and respawner identities.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+        respawnerBridge.beginExternalTick()
+    }
+
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        state engineState: SM64SwiftEngineState,
+        pool: SM64ObjectPool
+    ) -> Bool {
+        guard pool.record(for: id) != nil else { return false }
+        if respawnerBridge.contains(id) {
+            let distanceToMario = pool.record(for: id)?.distanceToMario
+                ?? .greatestFiniteMagnitude
+            _ = respawnerBridge.updateInline(
+                id,
+                input: SM64RespawnerTickInput(distanceToMario: distanceToMario),
+                pool: pool
+            )
+            return true
+        }
+        guard states[id] != nil else { return false }
+        update(id: id, engineState: engineState, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        environments.removeValue(forKey: id)
+        respawnerBridge.remove(id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil { remove(id) }
+        for id in respawnerBridge.registeredIDs where pool.record(for: id) == nil {
+            respawnerBridge.remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
         environments frameEnvironments: [SM64ObjectID: SM64YoshiEnvironment] = [:]
     ) -> SM64YoshiSchedulerTickResult {
         environments = frameEnvironments
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
-        respawnerBridge.beginExternalTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self else { return }
@@ -156,18 +199,7 @@ final class SM64YoshiObjectBridge {
                 self.update(id: id, engineState: engineState, pool: pool)
             }
         }
-        for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-            respawnerBridge.remove(id)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-        }
-        for id in respawnerBridge.registeredIDs where engineState.objects.record(for: id) == nil {
-            respawnerBridge.remove(id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64YoshiSchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog,

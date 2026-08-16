@@ -2,6 +2,23 @@
 
 ## Current Milestone
 
+- M22as registers the existing Yoshi owner bridge in the shared general-actor
+  `SM64BehaviorDispatchBridge` and injects the dispatcher’s respawner bridge
+  into Yoshi’s owner seam. The route preserves idle/talk/progression state,
+  generation-safe delivery, and respawner identity continuity while save,
+  camera/dialog, audio, and reward consumers remain typed external seams.
+  Forty-route Swift/C fingerprint `0x018984c3be1aad9b`, standalone Yoshi
+  fingerprint `0x0d985a32a8a93715`, behavior manifest fingerprint
+  `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Yoshi contracts, native Debug target
+  `/tmp/sm64-modern-m22as-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix (`/tmp/sm64-modern-m22as-final-matrix.log`),
+  `git diff --check`, and zero unchecked-Sendable audit pass are the evidence
+  boundary. Full save/camera/dialog/audio/reward consumers, remaining adapters,
+  and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22as.md`.
+
 - M22ar registers the existing racing-penguin owner bridge in the shared
   general-actor/surface `SM64BehaviorDispatchBridge`. The route preserves
   parent-to-finish-line and shortcut child allocation, source list ordering,

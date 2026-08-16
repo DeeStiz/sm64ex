@@ -105,6 +105,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/RacingPenguinPath.swift" \
   "$PROJECT_ROOT/SM64Modern/RacingPenguinRaceChildren.swift" \
   "$PROJECT_ROOT/SM64Modern/RacingPenguinObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/YoshiBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/YoshiObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooObjectBridge.swift" \

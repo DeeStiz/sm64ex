@@ -40,6 +40,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case eyerok = 36
     case mrI = 37
     case racingPenguin = 38
+    case yoshi = 39
     case unmigrated = 255
 }
 
@@ -125,6 +126,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let mrIDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let racingPenguinEffects: [SM64RacingPenguinObjectEffect]
     let racingPenguinDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let yoshiEffects: [SM64YoshiObjectEffect]
+    let yoshiDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -171,12 +174,14 @@ final class SM64BehaviorDispatchBridge {
     let eyerok: SM64EyerokObjectBridge
     let mrI: SM64MrIObjectBridge
     let racingPenguin: SM64RacingPenguinObjectBridge
+    let yoshi: SM64YoshiObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
         self.scheduler = scheduler
         self.decorativePendulum = SM64DecorativePendulumObjectBridge(scheduler: scheduler)
-        self.respawner = SM64RespawnerObjectBridge(scheduler: scheduler)
+        let sharedRespawner = SM64RespawnerObjectBridge(scheduler: scheduler)
+        self.respawner = sharedRespawner
         self.amp = SM64AmpObjectBridge(scheduler: scheduler)
         self.boo = SM64BooObjectBridge(scheduler: scheduler)
         self.bobomb = SM64BobombObjectBridge(scheduler: scheduler)
@@ -215,6 +220,7 @@ final class SM64BehaviorDispatchBridge {
         self.eyerok = SM64EyerokObjectBridge(scheduler: scheduler)
         self.mrI = SM64MrIObjectBridge(scheduler: scheduler)
         self.racingPenguin = SM64RacingPenguinObjectBridge(scheduler: scheduler)
+        self.yoshi = SM64YoshiObjectBridge(scheduler: scheduler, respawnerBridge: sharedRespawner)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -324,6 +330,8 @@ final class SM64BehaviorDispatchBridge {
              SM64RacingPenguinObjectBridge.shortcutBehaviorIdentity,
              SM64RacingPenguinObjectBridge.smokeBehaviorIdentity:
             return .racingPenguin
+        case SM64YoshiObjectBridge.defaultBehaviorIdentity:
+            return .yoshi
         default:
             return .unmigrated
         }
@@ -370,6 +378,7 @@ final class SM64BehaviorDispatchBridge {
         for id in eyerok.registeredIDs { eyerok.remove(id) }
         for id in mrI.registeredIDs { mrI.remove(id) }
         for id in racingPenguin.registeredIDs { racingPenguin.remove(id) }
+        for id in yoshi.registeredIDs { yoshi.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -409,6 +418,7 @@ final class SM64BehaviorDispatchBridge {
         eyerok.beginExternalTick()
         mrI.beginExternalTick()
         racingPenguin.beginExternalTick()
+        yoshi.beginExternalTick()
     }
 
     @discardableResult
@@ -1211,6 +1221,25 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnYoshi(
+        in engineState: SM64SwiftEngineState,
+        action: Int32 = SM64YoshiBehavior.idleAction,
+        position: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 3_174, z: -5_625),
+        moveYaw: Int16 = 0,
+        model: UInt32 = SM64YoshiObjectBridge.defaultModel,
+        behaviorIdentity: UInt64 = SM64YoshiObjectBridge.defaultBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try yoshi.spawnYoshi(
+            in: engineState,
+            action: action,
+            position: position,
+            moveYaw: moveYaw,
+            model: model,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -1250,6 +1279,7 @@ final class SM64BehaviorDispatchBridge {
         eyerok.beginExternalTick()
         mrI.beginExternalTick()
         racingPenguin.beginExternalTick(state: engineState)
+        yoshi.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -1348,6 +1378,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.mrI.updateInline(id, pool: pool)
             case .racingPenguin:
                 _ = self.racingPenguin.updateInline(id, pool: pool)
+            case .yoshi:
+                _ = self.yoshi.updateInline(id, state: engineState, pool: pool)
             case .unmigrated:
                 break
             }
@@ -1395,6 +1427,7 @@ final class SM64BehaviorDispatchBridge {
             eyerok.remove(id)
             mrI.remove(id)
             racingPenguin.remove(id, pool: engineState.objects)
+            yoshi.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -1474,6 +1507,7 @@ final class SM64BehaviorDispatchBridge {
         eyerok.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         mrI.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         racingPenguin.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        yoshi.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -1550,7 +1584,9 @@ final class SM64BehaviorDispatchBridge {
             mrIEffects: mrI.effectLog,
             mrIDeliveries: mrI.deliveryLog,
             racingPenguinEffects: racingPenguin.effectLog,
-            racingPenguinDeliveries: racingPenguin.deliveryLog
+            racingPenguinDeliveries: racingPenguin.deliveryLog,
+            yoshiEffects: yoshi.effectLog,
+            yoshiDeliveries: yoshi.deliveryLog
         )
     }
 }

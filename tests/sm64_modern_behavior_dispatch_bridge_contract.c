@@ -56,6 +56,7 @@
 #define MRI_BODY_BEHAVIOR UINT64_C(0x6268765f6d7262)
 #define MRI_PARTICLE_BEHAVIOR UINT64_C(0x6268765f6d7270)
 #define RACING_PENGUIN_BEHAVIOR UINT64_C(0x6268765f727063)
+#define YOSHI_BEHAVIOR UINT64_C(0x6268765f797368)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -1066,6 +1067,48 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // no race children
     fingerprint = hash_u64(fingerprint, 0); // no spawned children
     fingerprint = hash_u64(fingerprint, 0); // no presented effects
+    fingerprint = hash_u64(fingerprint, 1); // delivery receipts
+    fingerprint = hash_u64(fingerprint, 0); // delivered
+    fingerprint = hash_u64(fingerprint, 0); // presented
+    fingerprint = hash_u64(fingerprint, 0); // spawned
+    fingerprint = hash_u64(fingerprint, 0); // deleted
+    fingerprint = hash_u64(fingerprint, 0); // rejected
+
+    // Isolated shared-dispatch Yoshi parent route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t yoshi_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, yoshi_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, YOSHI_BEHAVIOR, 39);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // idle action
+    fingerprint = hash_u64(fingerprint, 0); // timer
+    fingerprint = hash_u64(fingerprint, 0); // animation
+    fingerprint = hash_u64(fingerprint, 0); // dialog ID
+    fingerprint = hash_u64(fingerprint, 0); // dialog requested
+    fingerprint = hash_u64(fingerprint, 0); // active time stop
+    fingerprint = hash_u64(fingerprint, 0); // clear time stop
+    fingerprint = hash_u64(fingerprint, 0); // clear interaction
+    fingerprint = hash_u64(fingerprint, 0); // walk sound
+    fingerprint = hash_u64(fingerprint, 0); // puzzle jingle
+    fingerprint = hash_u64(fingerprint, 0); // alert sound
+    fingerprint = hash_u64(fingerprint, 0); // extra life sound
+    fingerprint = hash_u64(fingerprint, 0); // lives delta
+    fingerprint = hash_u64(fingerprint, 0); // special triple jump
+    fingerprint = hash_u64(fingerprint, 0); // camera request
+    fingerprint = hash_u64(fingerprint, 0); // respawner requested
+    fingerprint = hash_u64(fingerprint, 0); // deactivated
+    fingerprint = hash_u64(fingerprint, 0); // spawned respawners
+    fingerprint = hash_u64(fingerprint, 0); // presented effects
     fingerprint = hash_u64(fingerprint, 1); // delivery receipts
     fingerprint = hash_u64(fingerprint, 0); // delivered
     fingerprint = hash_u64(fingerprint, 0); // presented

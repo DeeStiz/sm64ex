@@ -1147,6 +1147,58 @@ private func hashRacingPenguinDispatch(
     return hash
 }
 
+private func hashYoshiDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.yoshiEffects.count))
+    for effect in tick.yoshiEffects {
+        let output = effect.output
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.state.action)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.state.timer)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.animation)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.dialogID)))
+        hash = hashU64(hash, output.dialogRequested ? 1 : 0)
+        hash = hashU64(hash, output.activeTimeStop ? 1 : 0)
+        hash = hashU64(hash, output.clearTimeStop ? 1 : 0)
+        hash = hashU64(hash, output.clearInteraction ? 1 : 0)
+        hash = hashU64(hash, output.playWalkSound ? 1 : 0)
+        hash = hashU64(hash, output.playPuzzleJingle ? 1 : 0)
+        hash = hashU64(hash, output.playAlertSound ? 1 : 0)
+        hash = hashU64(hash, output.playExtraLifeSound ? 1 : 0)
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.livesDelta)))
+        hash = hashU64(hash, output.specialTripleJump ? 1 : 0)
+        hash = hashU64(hash, UInt64(bitPattern: Int64(output.cameraRequest)))
+        hash = hashU64(hash, output.respawnerRequested ? 1 : 0)
+        hash = hashU64(hash, output.deactivated ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.spawnedRespawners.count))
+        hash = hashU64(hash, UInt64(effect.presentedEffects.count))
+    }
+    hash = hashU64(hash, UInt64(tick.yoshiDeliveries.count))
+    for delivery in tick.yoshiDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1842,6 +1894,23 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(racingTick.racingPenguinDeliveries.count == 1, "Racing-penguin owner delivery is explicit")
         fingerprint = hashRacingPenguinDispatch(fingerprint, racingTick)
+
+        let yoshiEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let yoshiBridge = SM64BehaviorDispatchBridge()
+        let yoshi = try yoshiBridge.spawnYoshi(in: yoshiEngine)
+        let yoshiTick = yoshiBridge.tick(state: yoshiEngine)
+        require(SM64BehaviorDispatchBridge.route(for: SM64YoshiObjectBridge.defaultBehaviorIdentity) == .yoshi, "Yoshi identity route")
+        require(yoshiTick.events.map(\.route) == [.yoshi], "Yoshi route dispatch")
+        require(yoshiTick.scheduler.updated.map(\.traceSubject) == [1], "Yoshi callback ordering")
+        require(
+            yoshiTick.yoshiEffects.count == 1
+                && yoshiTick.yoshiEffects[0].objectID == yoshi
+                && yoshiTick.yoshiEffects[0].output.state.action == SM64YoshiBehavior.idleAction
+                && yoshiTick.yoshiEffects[0].output.deactivated == false,
+            "Yoshi value/owner route is preserved"
+        )
+        require(yoshiTick.yoshiDeliveries.count == 1, "Yoshi owner delivery is explicit")
+        fingerprint = hashYoshiDispatch(fingerprint, yoshiTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")
