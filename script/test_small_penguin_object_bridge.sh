@@ -15,12 +15,17 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ObjectPool.swift" \
   "$PROJECT_ROOT/SM64Modern/MemoryArena.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectTransform.swift" \
+  "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
+  "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineState.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectScheduler.swift" \
   "$PROJECT_ROOT/SM64Modern/ChainChompRelease.swift" \
   "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
   "$PROJECT_ROOT/SM64Modern/SmallPenguinBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinMovement.swift" \
+  "$PROJECT_ROOT/SM64Modern/SmallPenguinMovement.swift" \
   "$PROJECT_ROOT/SM64Modern/SmallPenguinObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_small_penguin_object_bridge_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-small-penguin-object-bridge-smoke"

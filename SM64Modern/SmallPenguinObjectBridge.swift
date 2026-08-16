@@ -3,6 +3,8 @@ import Foundation
 struct SM64SmallPenguinObjectEffect: Equatable, Sendable {
     let objectID: SM64ObjectID
     let output: SM64SmallPenguinOutput
+    let collision: SM64SmallPenguinCollisionResult?
+    let movement: SM64SmallPenguinMovementResult?
     let presentedEffects: [SM64OwnerThreadEffectIntent]
 }
 
@@ -55,6 +57,7 @@ final class SM64SmallPenguinObjectBridge {
         in engineState: SM64SwiftEngineState,
         position: SM64ObjectVector3 = .zero,
         moveYaw: Int16 = 0,
+        wallHitboxRadius: Float = 0,
         model: UInt32 = SM64SmallPenguinObjectBridge.defaultModel,
         behaviorIdentity: UInt64 = SM64SmallPenguinObjectBridge.defaultBehaviorIdentity
     ) throws -> SM64ObjectID {
@@ -63,7 +66,13 @@ final class SM64SmallPenguinObjectBridge {
             model: model,
             behaviorIdentity: behaviorIdentity
         )
-        guard attach(id, position: position, moveYaw: moveYaw, in: engineState.objects) else {
+        guard attach(
+            id,
+            position: position,
+            moveYaw: moveYaw,
+            wallHitboxRadius: wallHitboxRadius,
+            in: engineState.objects
+        ) else {
             _ = engineState.objects.despawn(id)
             preconditionFailure("newly spawned small penguin could not attach")
         }
@@ -75,6 +84,7 @@ final class SM64SmallPenguinObjectBridge {
         _ id: SM64ObjectID,
         position: SM64ObjectVector3 = .zero,
         moveYaw: Int16 = 0,
+        wallHitboxRadius: Float = 0,
         in pool: SM64ObjectPool
     ) -> Bool {
         guard pool.record(for: id) != nil else { return false }
@@ -82,7 +92,20 @@ final class SM64SmallPenguinObjectBridge {
         state.moveYaw = moveYaw
         states[id] = state
         environments[id] = SM64SmallPenguinInput()
-        synchronize(id: id, state: state, position: position, output: nil, previousAction: state.action, pool: pool)
+        _ = pool.mutate(id) { record in
+            record.homePosition = position
+            record.wallHitboxRadius = wallHitboxRadius
+        }
+        synchronize(
+            id: id,
+            state: state,
+            position: position,
+            output: nil,
+            collision: nil,
+            movement: nil,
+            previousAction: state.action,
+            pool: pool
+        )
         return true
     }
 
@@ -96,14 +119,21 @@ final class SM64SmallPenguinObjectBridge {
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
-        environments frameEnvironments: [SM64ObjectID: SM64SmallPenguinInput] = [:]
+        environments frameEnvironments: [SM64ObjectID: SM64SmallPenguinInput] = [:],
+        collisionWorld: SM64SurfaceCollisionWorld? = nil,
+        advanceMovement: Bool = false
     ) -> SM64SmallPenguinSchedulerTickResult {
         environments = frameEnvironments
         effectLog.removeAll(keepingCapacity: true)
         deliveryLog.removeAll(keepingCapacity: true)
         effectRouter.beginTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, pool: pool)
+            self?.update(
+                id: id,
+                pool: pool,
+                collisionWorld: collisionWorld,
+                advanceMovement: advanceMovement
+            )
         }
         for id in schedulerResult.unloaded {
             states.removeValue(forKey: id)
@@ -120,7 +150,12 @@ final class SM64SmallPenguinObjectBridge {
         )
     }
 
-    private func update(id: SM64ObjectID, pool: SM64ObjectPool) {
+    private func update(
+        id: SM64ObjectID,
+        pool: SM64ObjectPool,
+        collisionWorld: SM64SurfaceCollisionWorld?,
+        advanceMovement: Bool
+    ) {
         guard var state = states[id], let record = pool.record(for: id) else { return }
         let previousAction = state.action
         var input = environments[id] ?? defaultEnvironment(for: record)
@@ -142,20 +177,29 @@ final class SM64SmallPenguinObjectBridge {
             randomUnknown104: input.randomUnknown104,
             heldState: input.heldState
         )
+        let physicsEnabled = advanceMovement && collisionWorld != nil
+            && state.heldState == SM64SmallPenguinBehavior.heldFree
+        let collision = physicsEnabled ? collisionWorld.flatMap { world in
+            SM64SmallPenguinCollision.resolve(
+                SM64SmallPenguinCollisionInput(
+                    position: record.position,
+                    moveYaw: state.moveYaw,
+                    wallHitboxRadius: record.wallHitboxRadius,
+                    previousMoveFlags: record.moveFlags,
+                    world: world
+                )
+            )
+        } : nil
         let output = SM64SmallPenguinBehavior.update(input, state: state)
         state = output.state
         states[id] = state
 
+        var behaviorPosition = collision?.position ?? record.position
         if output.resetHome {
-            _ = pool.mutate(id) { object in
-                object.position = object.homePosition
-            }
+            behaviorPosition = record.homePosition
         }
         if output.copiedToMario {
-            _ = pool.mutate(id) { object in
-                object.position = input.marioPosition
-                object.gfxPosition = SM64ObjectVector3.hiddenGfxOrigin
-            }
+            behaviorPosition = input.marioPosition
         }
         if output.setSmallPenguinBehavior {
             _ = pool.mutate(id) { object in
@@ -178,15 +222,41 @@ final class SM64SmallPenguinObjectBridge {
         if output.playHeldYellSound {
             effectRouter.enqueue(objectID: id, kind: .sound, value: Self.heldYellSoundValue)
         }
+
+        let candidatePosition: SM64ObjectVector3
+        if physicsEnabled && state.heldState == SM64SmallPenguinBehavior.heldFree {
+            candidatePosition = SM64ObjectVector3(
+                x: behaviorPosition.x + SM64CanonicalTrig.sins(state.moveYaw) * state.forwardVelocity,
+                y: behaviorPosition.y,
+                z: behaviorPosition.z + SM64CanonicalTrig.coss(state.moveYaw) * state.forwardVelocity
+            )
+        } else {
+            candidatePosition = behaviorPosition
+        }
+        let movement = physicsEnabled ? movementResult(
+            record: record,
+            startPosition: behaviorPosition,
+            candidatePosition: candidatePosition,
+            previousMoveFlags: collision?.moveFlags ?? record.moveFlags,
+            forwardVelocity: state.forwardVelocity,
+            moveYaw: state.moveYaw,
+            collisionWorld: collisionWorld
+        ) : nil
+        if let movement {
+            state.forwardVelocity = movement.forwardVelocity
+            states[id] = state
+        }
+
         let delivery = effectRouter.deliver(to: pool)
         deliveryLog.append(delivery)
 
-        let position = pool.record(for: id)?.position ?? record.position
         synchronize(
             id: id,
             state: state,
-            position: position,
+            position: movement?.position ?? candidatePosition,
             output: output,
+            collision: collision,
+            movement: movement,
             previousAction: previousAction,
             pool: pool
         )
@@ -194,7 +264,56 @@ final class SM64SmallPenguinObjectBridge {
             SM64SmallPenguinObjectEffect(
                 objectID: id,
                 output: output,
+                collision: collision,
+                movement: movement,
                 presentedEffects: delivery.presented
+            )
+        )
+    }
+
+    private func movementResult(
+        record: SM64ObjectRecord,
+        startPosition: SM64ObjectVector3,
+        candidatePosition: SM64ObjectVector3,
+        previousMoveFlags: UInt32,
+        forwardVelocity: Float,
+        moveYaw: Int16,
+        collisionWorld: SM64SurfaceCollisionWorld?
+    ) -> SM64SmallPenguinMovementResult? {
+        guard let collisionWorld else { return nil }
+        let intendedFloor = collisionWorld.findFloor(
+            x: candidatePosition.x,
+            y: record.position.y,
+            z: candidatePosition.z
+        )
+        let intendedRoom: Int8 = intendedFloor.surfaceID.flatMap {
+            collisionWorld.surface(withID: $0)?.room
+        } ?? 0
+        return SM64SmallPenguinMovement.resolve(
+            SM64SmallPenguinMovementInput(
+                startPosition: startPosition,
+                candidatePosition: candidatePosition,
+                velocityY: record.velocity.y,
+                forwardVelocity: forwardVelocity,
+                moveYaw: moveYaw,
+                floorHeight: record.floorHeight,
+                floorRoom: Int8(truncatingIfNeeded: record.floorRoom),
+                objectRoom: Int8(truncatingIfNeeded: record.room),
+                moveFlags: previousMoveFlags,
+                gravity: -4,
+                bounciness: -0.5,
+                dragStrength: 0,
+                buoyancy: 2,
+                nativeStepScale: 1,
+                intendedFloorHeight: intendedFloor.height,
+                intendedFloorNormalY: intendedFloor.normalY ?? 0,
+                intendedFloorRoom: intendedRoom,
+                intendedFloorExists: intendedFloor.surfaceID != nil,
+                waterLevel: collisionWorld.findWaterLevel(
+                    x: candidatePosition.x,
+                    z: candidatePosition.z
+                ),
+                activeFarAway: false
             )
         )
     }
@@ -215,6 +334,8 @@ final class SM64SmallPenguinObjectBridge {
         state: SM64SmallPenguinState,
         position: SM64ObjectVector3,
         output: SM64SmallPenguinOutput?,
+        collision: SM64SmallPenguinCollisionResult?,
+        movement: SM64SmallPenguinMovementResult?,
         previousAction: Int32,
         pool: SM64ObjectPool
     ) {
@@ -223,6 +344,19 @@ final class SM64SmallPenguinObjectBridge {
                 SM64ObjectScheduler.objectFlagBuildTransform |
                 SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
             record.position = position
+            if output?.copiedToMario == true {
+                record.gfxPosition = SM64ObjectVector3.hiddenGfxOrigin
+            }
+            if let collision {
+                record.floorHeight = collision.floorHeight
+                record.floorType = collision.floorType
+                record.moveFlags = collision.moveFlags
+            }
+            if let movement {
+                record.velocity = movement.velocity
+                record.forwardVelocity = movement.forwardVelocity
+                record.moveFlags = movement.moveFlags
+            }
             record.forwardVelocity = state.forwardVelocity
             record.moveAngles.yaw = Int32(state.moveYaw)
             record.faceAngles.yaw = Int32(state.moveYaw)
