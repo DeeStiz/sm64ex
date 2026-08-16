@@ -2,7 +2,7 @@
 
 ## Status
 
-M20o is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M20p is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -915,7 +915,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M20m: small-penguin behavior route | Swift reproduces the six free actions, randomized idle thresholds, mother-follow handoff, dive/recover timing, held/thrown/dropped branches, far-away home reset, walking/dive/yell sound decisions, and action/timer state without C object pointers. | Complete locally — strict Swift 6/C value fingerprint `0x9638684db48d51c6`, 169-script matrix (`runs=169 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; broader collision/movement and scene/geo integration remain |
 | M20n: small-penguin owner-thread bridge | Swift attaches the small-penguin kernel to generation-safe object IDs, publishes action/timer/held/transform state, handles held Mario placement and baby-to-small behavior identity changes, routes transient sound intents through the owner-thread sink, and retires cleanly at scheduler unload. | Complete locally — strict Swift 6/C owner-thread fingerprint `0x23028a8ee48f283b`, 169-script matrix (`runs=169 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; broader collision/movement/effect identity and remaining NPC/puzzle families remain |
 | M20o: small-penguin collision/movement owner route | Swift applies the C-order floor/wall prepass before the six-action kernel, reuses the qualified `cur_obj_move_standard(-78)` scalar route, publishes floor identity/height/move flags/velocity, preserves the home transform, and fences held-state physics on the same tick as the C `switch (oHeldState)` branch. | Complete locally — strict Swift 6/C owner-bridge fingerprint `0x28aab1645e2754e8`, focused value/owner/movement contracts, 170-script matrix (`runs=170 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m20o-recheck-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; broader trajectory selection, effect identity, geo integration, and remaining NPC/puzzle families remain |
-| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20o close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie/small-penguin slice; broader collision/movement integration, path selection for every other reachable trajectory, dialog/effect/audio identity, remaining NPCs, puzzles, secrets, and rewards remain |
+| M20p: Tuxie mother geo eye switch | Swift reproduces `geo_switch_tuxie_mother_eyes`: run gating, 50-frame blink cases 0–2, behavior-identity matching, strict forward-velocity angry case 3 override, and preservation of the previous graph switch case when not running. | Complete locally — strict Swift 6/C fingerprint `0x4b5a7e6b3afb43a3`, focused contract, regenerated native source inclusion, `git diff --check`, and zero unchecked-Sendable audit pass; graph-node presentation wiring and remaining NPC/puzzle families remain |
+| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20p close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie/small-penguin/geo slice; broader collision/movement integration, path selection for every other reachable trajectory, dialog/effect/audio identity, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1111,7 +1112,9 @@ replayable trace, and the platform evidence listed in its exit gate.
    M20o closes the small-penguin C-order floor/wall prepass and qualified
    `cur_obj_move_standard(-78)` route, publishes floor/velocity/move flags,
    preserves home position, and fences held-state physics on the transition
-   tick.
+   tick. M20p ports Tuxie's mother's geo eye switch with run gating,
+   50-frame blink cases, behavior identity matching, and the strict moving
+   angry-eye override.
    Finish broader collision/movement integration, path selection for every
    other reachable trajectory, and effect identity before owner-wiring the
    remaining NPC families.
