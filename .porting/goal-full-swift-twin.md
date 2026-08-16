@@ -2,7 +2,7 @@
 
 ## Status
 
-M20l is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M20n is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -912,7 +912,9 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M20j: racing-penguin effect ownership | Swift routes racing-penguin rough-slide/walking/pounding audio, camera shake, smoke retirement, final dialog presentation, and the fixed-course star spawn through the owner-thread effect sink with source-authored child transforms and a Swift/C delivery contract. | Complete locally — effect fingerprint `0x7234f7283978c656`, 165-script matrix (`runs=165 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; broader effect identity/audio mixing, other trajectories, dialog integration, and remaining NPC/puzzle families remain |
 | M20k: Tuxie's mother value route | Swift reproduces Tuxie's mother follow/carry/chase actions, dialog gates and IDs, held-child linkage, the original drop-immediately interaction mask and clear bug boundary, walking/yell effects, and the fixed CCM reward-star target. | Complete locally — strict Swift 6/C value fingerprint `0x37983b7c17d00110`, 166-script matrix (`runs=166 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; owner object wiring, small-penguin behavior, and remaining NPC/puzzle families remain |
 | M20l: Tuxie's mother owner-thread bridge | Swift attaches the mother kernel to generation-safe mother/child object IDs, routes dialog/audio/star intents through the shared owner-thread sink, synchronizes behavior/interaction/transform records, preserves the CCM star source/home target, and retires the owned child at the scheduler boundary. | Complete locally — strict Swift 6/C owner-thread fingerprint `0xbe32e199efb473f8`, 167-script matrix (`runs=167 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; the standalone small-penguin behavior route, broader dialog/effect integration, and remaining NPC/puzzle families remain |
-| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20l close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie slice; standalone small-penguin behavior, path selection for every other reachable trajectory, broader effect/audio identity, dialog integration, remaining NPCs, puzzles, secrets, and rewards remain |
+| M20m: small-penguin behavior route | Swift reproduces the six free actions, randomized idle thresholds, mother-follow handoff, dive/recover timing, held/thrown/dropped branches, far-away home reset, walking/dive/yell sound decisions, and action/timer state without C object pointers. | Complete locally — strict Swift 6/C value fingerprint `0x9638684db48d51c6`, 169-script matrix (`runs=169 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; broader collision/movement and scene/geo integration remain |
+| M20n: small-penguin owner-thread bridge | Swift attaches the small-penguin kernel to generation-safe object IDs, publishes action/timer/held/transform state, handles held Mario placement and baby-to-small behavior identity changes, routes transient sound intents through the owner-thread sink, and retires cleanly at scheduler unload. | Complete locally — strict Swift 6/C owner-thread fingerprint `0x23028a8ee48f283b`, 169-script matrix (`runs=169 failures=0`), regenerated native Debug build, `git diff --check`, and zero unchecked-Sendable audit pass; broader collision/movement/effect identity and remaining NPC/puzzle families remain |
+| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20n close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie/small-penguin slice; broader collision/movement integration, path selection for every other reachable trajectory, dialog/effect/audio identity, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1100,9 +1102,14 @@ replayable trace, and the platform evidence listed in its exit gate.
    attaches that kernel to generation-safe mother/child object records,
    routes dialog/audio/star intents through the shared owner-thread sink,
    synchronizes the object fields, and retires the owned child at unload.
-   Finish the standalone small-penguin behavior route, path selection for
-   every other reachable trajectory, and broader effect identity before
-   owner-wiring the remaining NPC families.
+   M20m ports the standalone small-penguin six-action/free-and-held route,
+   including random thresholds, dive/recover timing, mother follow handoff,
+   and sound decisions. M20n attaches that kernel to generation-safe object
+   records, publishes held placement and behavior identity changes, routes
+   sound intents through the owner-thread sink, and proves unload cleanup.
+   Finish broader collision/movement integration, path selection for every
+   other reachable trajectory, and effect identity before owner-wiring the
+   remaining NPC families.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and
