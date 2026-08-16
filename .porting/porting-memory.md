@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M22z registers the existing `bhvEnemyLakitu` owner bridge in the shared
+  `SM64BehaviorDispatchBridge` and reuses the shared Spiny owner for its
+  same-frame child. The spawner-list route runs before surface/general actors,
+  preserves parent/previous-object linkage and relative transforms, and applies
+  child-to-parent count bookkeeping at the owner boundary. Twenty-route
+  Swift/C fingerprint 0xcc8bfca9af4c557b, standalone Enemy Lakitu fingerprint
+  0xb2fd32a3d8fda71f, behavior manifest fingerprint 0x9bb2863444c51d6d, 534
+  rows, 73 Swift value/owner routes, and 461 explicit `unmigrated_c_adapter`
+  rows are the accounting boundary. Focused dispatch contract, native Debug
+  build target /tmp/sm64-modern-m22z-build.log, full 206-script matrix,
+  `git diff --check`, and zero unchecked-Sendable audit pass are the evidence
+  boundary. Whole-engine route breadth, the remaining adapters, and live parity
+  remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22z.md.
 - M22y registers the existing `bhvBully` owner bridge for small and big
   variants in the shared `SM64BehaviorDispatchBridge`. The general-actor route
   preserves source-order variant dispatch, chase/patrol state, generation-safe

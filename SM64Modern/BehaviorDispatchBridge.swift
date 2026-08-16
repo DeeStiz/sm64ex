@@ -20,6 +20,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case chuckya = 16
     case skeeter = 17
     case bully = 18
+    case enemyLakitu = 19
     case unmigrated = 255
 }
 
@@ -70,6 +71,7 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let skeeterDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let bullyEffects: [SM64BullyObjectEffectRecord]
     let bullyDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let enemyLakituEffects: [SM64EnemyLakituObjectEffectRecord]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -96,6 +98,7 @@ final class SM64BehaviorDispatchBridge {
     let chuckya: SM64ChuckyaObjectBridge
     let skeeter: SM64SkeeterObjectBridge
     let bully: SM64BullyObjectBridge
+    let enemyLakitu: SM64EnemyLakituObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -112,13 +115,15 @@ final class SM64BehaviorDispatchBridge {
         self.flyGuy = SM64FlyGuyObjectBridge(scheduler: scheduler)
         self.bulletBill = SM64BulletBillObjectBridge(scheduler: scheduler)
         self.goomba = SM64GoombaObjectBridge(scheduler: scheduler)
-        self.spiny = SM64SpinyObjectBridge(scheduler: scheduler)
+        let sharedSpiny = SM64SpinyObjectBridge(scheduler: scheduler)
+        self.spiny = sharedSpiny
         self.snufit = SM64SnufitObjectBridge(scheduler: scheduler)
         self.whomp = SM64WhompObjectBridge(scheduler: scheduler)
         self.heaveHo = SM64HeaveHoObjectBridge(scheduler: scheduler)
         self.chuckya = SM64ChuckyaObjectBridge(scheduler: scheduler)
         self.skeeter = SM64SkeeterObjectBridge(scheduler: scheduler)
         self.bully = SM64BullyObjectBridge(scheduler: scheduler)
+        self.enemyLakitu = SM64EnemyLakituObjectBridge(scheduler: scheduler, spinyBridge: sharedSpiny)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -169,6 +174,8 @@ final class SM64BehaviorDispatchBridge {
              SM64BullyObjectBridge.bridgeBehaviorIdentity,
              SM64BullyObjectBridge.coinBehaviorIdentity:
             return .bully
+        case SM64EnemyLakituObjectBridge.defaultBehaviorIdentity:
+            return .enemyLakitu
         default:
             return .unmigrated
         }
@@ -195,6 +202,7 @@ final class SM64BehaviorDispatchBridge {
         for id in chuckya.registeredIDs { chuckya.remove(id) }
         for id in skeeter.registeredIDs { skeeter.remove(id) }
         for id in bully.registeredIDs { bully.remove(id) }
+        for id in enemyLakitu.registeredIDs { enemyLakitu.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -207,13 +215,13 @@ final class SM64BehaviorDispatchBridge {
         flyGuy.beginExternalTick()
         bulletBill.beginExternalTick()
         goomba.beginExternalTick()
-        spiny.beginExternalTick()
         snufit.beginExternalTick()
         whomp.beginExternalTick()
         heaveHo.beginExternalTick()
         chuckya.beginExternalTick()
         skeeter.beginExternalTick()
         bully.beginExternalTick()
+        enemyLakitu.beginExternalTick()
     }
 
     @discardableResult
@@ -564,6 +572,21 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnEnemyLakitu(
+        in engineState: SM64SwiftEngineState,
+        model: UInt32 = SM64EnemyLakituObjectBridge.defaultLakituModel,
+        behaviorIdentity: UInt64 = SM64EnemyLakituObjectBridge.defaultBehaviorIdentity,
+        drawingDistance: Float = 4_000
+    ) throws -> SM64ObjectID {
+        try enemyLakitu.spawnLakitu(
+            in: engineState,
+            model: model,
+            behaviorIdentity: behaviorIdentity,
+            drawingDistance: drawingDistance
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -578,13 +601,13 @@ final class SM64BehaviorDispatchBridge {
         flyGuy.beginExternalTick()
         bulletBill.beginExternalTick()
         goomba.beginExternalTick()
-        spiny.beginExternalTick()
         snufit.beginExternalTick()
         whomp.beginExternalTick()
         heaveHo.beginExternalTick()
         chuckya.beginExternalTick()
         skeeter.beginExternalTick(globalFrame: engineState.globals.frame)
         bully.beginExternalTick()
+        enemyLakitu.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -639,10 +662,14 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.skeeter.updateInline(id, pool: pool)
             case .bully:
                 _ = self.bully.updateInline(id, pool: pool)
+            case .enemyLakitu:
+                _ = self.enemyLakitu.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
         }
+
+        enemyLakitu.finalizeExternalTick(pool: engineState.objects)
 
         for id in schedulerResult.unloaded {
             decorativePendulum.remove(id)
@@ -664,6 +691,7 @@ final class SM64BehaviorDispatchBridge {
             chuckya.remove(id)
             skeeter.remove(id)
             bully.remove(id)
+            enemyLakitu.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -722,6 +750,7 @@ final class SM64BehaviorDispatchBridge {
         for id in bully.registeredIDs where engineState.objects.record(for: id) == nil {
             bully.remove(id)
         }
+        enemyLakitu.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -763,7 +792,8 @@ final class SM64BehaviorDispatchBridge {
             skeeterEffects: skeeter.effectLog,
             skeeterDeliveries: skeeter.deliveryLog,
             bullyEffects: bully.effectLog,
-            bullyDeliveries: bully.deliveryLog
+            bullyDeliveries: bully.deliveryLog,
+            enemyLakituEffects: enemyLakitu.effectLog
         )
     }
 }

@@ -38,6 +38,17 @@ final class SM64EnemyLakituObjectBridge {
         self.spinyBridge = SM64SpinyObjectBridge(scheduler: scheduler)
     }
 
+    /// Allows the shared behavior dispatcher to reuse the one Spiny owner
+    /// bridge for both standalone Spiny objects and Lakitu-spawned children.
+    /// The default keeps the historical standalone composite behavior intact.
+    init(
+        scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
+        spinyBridge: SM64SpinyObjectBridge
+    ) {
+        self.scheduler = scheduler
+        self.spinyBridge = spinyBridge
+    }
+
     var registeredIDs: [SM64ObjectID] {
         states.keys.sorted { lhs, rhs in
             if lhs.slot != rhs.slot { return lhs.slot < rhs.slot }
@@ -55,6 +66,56 @@ final class SM64EnemyLakituObjectBridge {
 
     func spinyState(for id: SM64ObjectID) -> SM64SpinyState? {
         spinyBridge.state(for: id)
+    }
+
+    func contains(_ id: SM64ObjectID) -> Bool {
+        states[id] != nil
+    }
+
+    func containsSpiny(_ id: SM64ObjectID) -> Bool {
+        spinyBridge.contains(id)
+    }
+
+    /// Clears the composite's owner-thread logs before a shared scheduler pass.
+    /// The injected Spiny bridge is reset here so direct and Lakitu children
+    /// contribute to one deterministic effect stream.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        spinyBridge.beginExternalTick()
+    }
+
+    /// Advances one Lakitu or Lakitu-owned Spiny callback without nesting a
+    /// scheduler traversal. The shared dispatcher remains list-order authority.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        if states[id] != nil {
+            updateLakitu(id: id, pool: pool)
+            return true
+        }
+        guard spinyBridge.contains(id) else { return false }
+        return spinyBridge.updateInline(id, pool: pool)
+    }
+
+    /// Applies Spiny-to-Lakitu bookkeeping after all callbacks in the shared
+    /// scheduler pass have run, matching the standalone composite bridge.
+    func finalizeExternalTick(pool: SM64ObjectPool) {
+        for effect in spinyBridge.effectLog {
+            apply(spinyEffect: effect, pool: pool)
+        }
+    }
+
+    /// Removes only the Lakitu shadow. The shared Spiny owner handles child
+    /// shadow retirement so direct Spiny routes cannot be removed twice.
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in Array(states.keys) where pool.record(for: id) == nil {
+            remove(id)
+        }
     }
 
     /// Allocates a Lakitu in the spawner list and attaches its copied-POD
@@ -121,8 +182,7 @@ final class SM64EnemyLakituObjectBridge {
         for (id, input) in spinyInputs {
             _ = spinyBridge.setInput(input, for: id)
         }
-        effectLog.removeAll(keepingCapacity: true)
-        spinyBridge.resetEffectLog()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self else { return }
@@ -136,19 +196,10 @@ final class SM64EnemyLakituObjectBridge {
         // A Spiny can decrement its Lakitu's count while the Lakitu callback
         // has already run. Apply that owner-thread bookkeeping after the live
         // callback sequence but before snapshots leave the engine thread.
-        for effect in spinyBridge.effectLog {
-            apply(spinyEffect: effect, pool: engineState.objects)
-        }
+        finalizeExternalTick(pool: engineState.objects)
 
         let spinyEffects = spinyBridge.effectLog
-        for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         spinyBridge.prune(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64EnemyLakituSchedulerTickResult(
