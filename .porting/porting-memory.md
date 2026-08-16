@@ -2,6 +2,32 @@
 
 ## Current Milestone
 
+- M22k registers the existing `bhvBoo` owner bridge in the shared
+  `SM64BehaviorDispatchBridge`. The general-actor route dispatches Amp and Boo
+  in source list order before the default-list pendulum/respawner pass,
+  retains Boo opacity/tangibility/deletion state in generation-safe records,
+  and returns owner-thread deliveries without weakening unknown-child
+  fail-closed behavior. Four-route Swift/C fingerprint 0xace102e11ae86895,
+  behavior manifest fingerprint 0x9bb2863444c51d6d, 534 rows, 73 Swift
+  value/owner routes, and 461 explicit `unmigrated_c_adapter` rows are the
+  accounting boundary. Focused dispatch contract, native Debug build target
+  /tmp/sm64-modern-m22k-build.log, full 206-script matrix,
+  `git diff --check`, and zero unchecked-Sendable audit are required evidence.
+  Whole-engine route breadth, the remaining adapters, and live parity remain
+  open. Handoff: .porting/porting-handoff-full-swift-twin-M22k.md.
+- M22j registers the existing `bhvAmp` owner bridge in the shared
+  `SM64BehaviorDispatchBridge`. The general-actor route selects the fixed,
+  homing, or circling Amp family by exact behavior identity, preserves
+  cross-list scheduler ordering, synchronizes the generation-safe object
+  record, and returns an Amp effect record alongside the pendulum/respawner
+  receipts. Three-route Swift/C fingerprint 0xa464ccdf2c50b906, behavior
+  manifest fingerprint 0x9bb2863444c51d6d, 534 rows, 73 Swift value/owner
+  routes, and 461 explicit `unmigrated_c_adapter` rows are the accounting
+  boundary. Focused dispatch contract, native Debug build target
+  /tmp/sm64-modern-m22j-build.log, full 206-script matrix,
+  `git diff --check`, and zero unchecked-Sendable audit are required evidence.
+  Whole-engine route breadth, the remaining adapters, and live parity remain
+  open. Handoff: .porting/porting-handoff-full-swift-twin-M22j.md.
 - M22i makes `SM64BehaviorDispatchBridge` the default object callback of
   `SM64ModernSwiftEngineContext.step()`. Initialization and shutdown reset
   route registrations, every Swift tick retains the shared dispatch receipt,

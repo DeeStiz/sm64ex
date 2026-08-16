@@ -5,6 +5,8 @@
 #define FNV_PRIME UINT64_C(1099511628211)
 #define PENDULUM_BEHAVIOR UINT64_C(0x6268765f647065)
 #define RESPAWNER_BEHAVIOR UINT64_C(0x6268765f727370)
+#define AMP_BEHAVIOR UINT64_C(0x6268765f616d70)
+#define BOO_BEHAVIOR UINT64_C(0x6268765f626f6f)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -38,14 +40,16 @@ static uint64_t hash_tick(
 ) {
     hash = hash_u64(hash, frame);
     hash = hash_u64(hash, second_tick ? 2 : 3); // default-list count
-    hash = hash_u64(hash, second_tick ? 2 : 3); // object counter
-    hash = hash_u64(hash, second_tick ? 2 : 3); // dispatch events
+    hash = hash_u64(hash, second_tick ? 4 : 5); // object counter
+    hash = hash_u64(hash, second_tick ? 4 : 5); // dispatch events
+    hash = hash_event(hash, 2, AMP_BEHAVIOR, 2);
+    hash = hash_event(hash, 3, BOO_BEHAVIOR, 3);
     hash = hash_event(hash, 0, PENDULUM_BEHAVIOR, 0);
     if (second_tick) {
-        hash = hash_event(hash, 2, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 4, CHILD_BEHAVIOR, 255);
     } else {
         hash = hash_event(hash, 1, RESPAWNER_BEHAVIOR, 1);
-        hash = hash_event(hash, 2, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 4, CHILD_BEHAVIOR, 255);
     }
 
     hash = hash_u64(hash, 1); // pendulum effects
@@ -59,15 +63,31 @@ static uint64_t hash_tick(
     if (!second_tick) {
         hash = hash_id(hash, 1, 1);
         hash = hash_u64(hash, 3); // spawn + mark for deletion
-        hash = hash_id(hash, 2, 1);
+        hash = hash_id(hash, 4, 1);
         hash = hash_u64(hash, 1); // timer
         hash = hash_u64(hash, 1); // marked for deletion
     }
+    hash = hash_u64(hash, 1); // Amp effects
+    hash = hash_id(hash, 2, 1);
+    hash = hash_u64(hash, 2); // fixed kind
+    hash = hash_u64(hash, UINT64_C(513)); // animate + set hitbox
+    hash = hash_u64(hash, 2); // active action
+    hash = hash_u64(hash, 1); // tangible
+    hash = hash_u64(hash, 0); // visible
+
     hash = hash_u64(hash, second_tick ? 0 : 1); // respawner deliveries
     if (!second_tick) {
         hash = hash_u64(hash, 1); // deleted count
         hash = hash_id(hash, 1, 1);
     }
+
+    hash = hash_u64(hash, 1); // Boo effects
+    hash = hash_id(hash, 3, 1);
+    hash = hash_u64(hash, second_tick ? 23 : 3); // animate + chase [+ appear + oscillate]
+    hash = hash_u64(hash, 1); // chase action
+    hash = hash_u64(hash, 255); // opacity
+    hash = hash_u64(hash, 0); // visible
+    hash = hash_u64(hash, 0); // Boo deliveries
 
     hash = hash_u64(hash, UINT64_C(0x77));
     hash = hash_u64(hash, CHILD_BEHAVIOR);

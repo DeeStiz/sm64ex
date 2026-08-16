@@ -41,6 +41,10 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/DecorativePendulumBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/DecorativePendulumObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BehaviorDispatchBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/AmpEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/AmpObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/BooEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/BooObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_engine_runtime_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-engine-runtime-smoke"

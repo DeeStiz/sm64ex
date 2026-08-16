@@ -51,8 +51,30 @@ private func hashTick(
         hash = hashU64(hash, UInt64(effect.timer))
         hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
     }
+    hash = hashU64(hash, UInt64(tick.ampEffects.count))
+    for effect in tick.ampEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.action.rawValue))
+        hash = hashU64(hash, effect.tangible ? 1 : 0)
+        hash = hashU64(hash, effect.invisible ? 1 : 0)
+    }
     hash = hashU64(hash, UInt64(tick.respawnerDeliveries.count))
     for delivery in tick.respawnerDeliveries {
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        for id in delivery.deleted { hash = hashID(hash, id) }
+    }
+    hash = hashU64(hash, UInt64(tick.booEffects.count))
+    for effect in tick.booEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.action.rawValue))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.opacity)))
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.booDeliveries.count))
+    for delivery in tick.booDeliveries {
         hash = hashU64(hash, UInt64(delivery.deleted.count))
         for id in delivery.deleted { hash = hashID(hash, id) }
     }
@@ -92,27 +114,49 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             minSpawnDistance: 100,
             behaviorParams: 0x1234
         )
+        let amp = try bridge.spawnAmp(
+            in: engine,
+            kind: .fixed,
+            homeX: 100,
+            homeY: 200,
+            homeZ: 300
+        )
+        let boo = try bridge.spawnBoo(in: engine, homeX: 400, homeY: 500, homeZ: 600)
+        require(bridge.boo.setInput(
+            SM64BooTickInput(distanceToMario: 300, angleToMario: 0, marioFaceYaw: 0, randomValue: 3),
+            for: boo
+        ), "Boo dispatch input attaches")
 
         var fingerprint = fnvOffset
         var tick = bridge.tick(state: engine)
         require(tick.scheduler.listCounts[SM64ObjectList.default.rawValue] == 3, "mixed default routes preserve live list traversal")
-        require(tick.scheduler.updated == [pendulum, respawner, SM64ObjectID(slot: 2, generation: 1)], "child is visited after respawner")
-        require(tick.events.map(\.route) == [.decorativePendulum, .respawner, .unmigrated], "identity dispatch order")
+        require(tick.scheduler.objectCounter == 5, "mixed lists preserve object counter")
+        require(tick.scheduler.updated == [amp, boo, pendulum, respawner, SM64ObjectID(slot: 4, generation: 1)], "child is visited after respawner")
+        require(tick.events.map(\.route) == [.amp, .boo, .decorativePendulum, .respawner, .unmigrated], "identity dispatch order")
         require(tick.decorativePendulumEffects.first?.output.faceRoll == 124, "pendulum route executes")
         require(tick.respawnerEffects.first?.effects == [.spawnObject, .markForDeletion], "respawner route executes")
+        require(tick.ampEffects.first?.effects == [.animate, .setHitbox], "Amp route executes")
+        require(tick.ampEffects.first?.action == .active, "Amp state is synchronized")
+        require(tick.booEffects.first?.objectID == boo && tick.booEffects.first?.effects == [.animate, .chase], "Boo route executes")
+        require(tick.booEffects.first?.action == .chase, "Boo state is synchronized")
         require(tick.respawnerDeliveries.first?.deleted == [respawner], "respawner deletion routes through owner sink")
         guard let child = tick.respawnerEffects.first?.spawnedObject,
               let childRecord = engine.objects.record(for: child) else {
             preconditionFailure("dispatch respawner child missing")
         }
-        require(child == SM64ObjectID(slot: 2, generation: 1), "dispatch child generation is stable")
+        require(child == SM64ObjectID(slot: 4, generation: 1), "dispatch child generation is stable")
         require(childRecord.model == 0x77 && childRecord.behaviorParams == 0x1234, "dispatch child fields transfer")
         fingerprint = hashTick(fingerprint, tick, child: childRecord)
 
         tick = bridge.tick(state: engine)
         require(tick.scheduler.listCounts[SM64ObjectList.default.rawValue] == 2, "retired respawner leaves pendulum and child")
-        require(tick.events.map(\.route) == [.decorativePendulum, .unmigrated], "unknown child remains explicitly unmigrated")
+        require(tick.scheduler.objectCounter == 4, "Amp and Boo remain in the general actor list")
+        require(tick.events.map(\.route) == [.amp, .boo, .decorativePendulum, .unmigrated], "unknown child remains explicitly unmigrated")
         require(tick.respawnerEffects.isEmpty, "retired respawner is not dispatched again")
+        require(
+            tick.booEffects.first?.effects == [.animate, .chase, .appear, .oscillate],
+            "Boo persists across dispatch ticks effects=\(tick.booEffects.first?.effects.rawValue ?? 999)"
+        )
         fingerprint = hashTick(fingerprint, tick, child: childRecord)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))

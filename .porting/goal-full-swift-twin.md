@@ -2,7 +2,7 @@
 
 ## Status
 
-M22i is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M22k is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -401,6 +401,26 @@ covered by the mixed-route contract `0x9445d688831ca6c7`; native Debug,
 206-script matrix, `git diff --check`, and zero unchecked-Sendable audit pass.
 The context still deliberately reports unknown identities as unmigrated while
 the remaining routes are ported.
+M22j registers the existing `bhvAmp` owner bridge in that shared dispatcher.
+The general-actor route now selects the fixed, homing, or circling Amp family
+by exact behavior identity, preserves general-actor versus default-list
+ordering, synchronizes the generation-safe object record, and emits the Amp
+effect record before the existing pendulum/respawner deliveries. The mixed
+three-route Swift/C fingerprint is `0xa464ccdf2c50b906`; the behavior manifest
+remains 534 rows with 73 Swift value/owner routes and 461 explicit adapters.
+The focused dispatch contract, regenerated native Debug build, 206-script
+matrix, `git diff --check`, and zero unchecked-Sendable audit pass. This is a
+third live owner route, not whole-engine behavior closure or whole-game parity.
+M22k registers the existing `bhvBoo` owner bridge in the same table. The
+general-actor route now dispatches Amp and Boo in source list order before the
+default-list pendulum/respawner pass, retains Boo's generation-safe transform,
+opacity, tangibility, and deletion state, and records owner-thread deliveries
+without changing unknown-child fail-closed behavior. The mixed four-route
+Swift/C fingerprint is `0xace102e11ae86895`; the manifest remains 534 rows
+with 73 Swift value/owner routes and 461 explicit adapters. The focused
+dispatch contract, regenerated native Debug build, 206-script matrix,
+`git diff --check`, and zero unchecked-Sendable audit pass. This is a fourth
+live owner route, not whole-engine behavior closure or whole-game parity.
 M22e replaces the `bhvRespawner` C callback with a pointer-free Swift value
 kernel and owner bridge. It preserves the source outside-radius gate,
 single-spawn/deactivation ordering, behavior-parameter transfer, transform
@@ -1305,7 +1325,9 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M22g: live decorative pendulum owner route | The existing decorative-pendulum value kernel is attached to a generation-safe `OBJ_LIST_DEFAULT` owner bridge, preserves initialization/update-gfx state, advances the source fixed-point roll, and delivers the big-clock sound intent. | Complete locally — strict Swift 6/C owner fingerprint `0xb45d1c83aa454dc3`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused Swift/C owner contract, regenerated Xcode sources/native Debug build (`/tmp/sm64-modern-m22g-build.log`), 205-script matrix (runs=205 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-level behavior dispatch, the remaining 461 adapters, and parity remain |
 | M22h: shared behavior-identity dispatch seam | A single owner-thread scheduler selects the proven decorative-pendulum and respawner routes by behavior identity, preserves live default-list insertion order, and records unknown children explicitly as unmigrated. | Complete locally — strict Swift 6/C mixed-route fingerprint `0x9445d688831ca6c7`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused dispatch contract, regenerated Xcode sources/native Debug build (`/tmp/sm64-modern-m22h-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine dispatch, the remaining 461 adapters, and parity remain |
 | M22i: Swift engine context dispatch authority | `SM64ModernSwiftEngineContext.step()` uses the shared behavior-identity dispatcher by default, retains dispatch receipts, and resets route registrations across lifecycle boundaries; direct live-route oracle builds use the same dependency set. | Complete locally — strict Swift 6/C engine-runtime integration, mixed-route fingerprint `0x9445d688831ca6c7`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), engine-runtime and live-route/promotion contracts, regenerated native Debug build (`/tmp/sm64-modern-m22i-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine route breadth, the remaining 461 adapters, and parity remain |
-| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22i close deterministic identity accounting, three live value/owner routes, a shared two-route dispatch seam, and Swift engine-context dispatch authority with 534 rows, 73 known Swift value/owner routes, and 461 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
+| M22j: shared Amp behavior dispatch route | `SM64BehaviorDispatchBridge` registers the existing `bhvAmp` owner bridge, dispatches the general-actor Amp family by exact identity, preserves cross-list scheduler order, and returns a generation-safe Amp effect record alongside the pendulum/respawner receipts. | Complete locally — strict Swift 6/C three-route fingerprint `0xa464ccdf2c50b906`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused dispatch contract, regenerated native Debug build (`/tmp/sm64-modern-m22j-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine route breadth, the remaining 461 adapters, and parity remain |
+| M22k: shared Boo behavior dispatch route | `SM64BehaviorDispatchBridge` registers the existing `bhvBoo` owner bridge, dispatches the general-actor Boo route in source order with Amp, preserves opacity/tangibility/deletion state, and returns owner-thread Boo effects and deliveries alongside the existing routes. | Complete locally — strict Swift 6/C four-route fingerprint `0xace102e11ae86895`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused dispatch contract, regenerated native Debug build (`/tmp/sm64-modern-m22k-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine route breadth, the remaining 461 adapters, and parity remain |
+| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22k close deterministic identity accounting, four live value/owner routes, a shared four-route dispatch seam, and Swift engine-context dispatch authority with 534 rows, 73 known Swift value/owner routes, and 461 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |
