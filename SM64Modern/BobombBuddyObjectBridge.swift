@@ -145,27 +145,51 @@ final class SM64BobombBuddyObjectBridge {
         return true
     }
 
+    /// Clears per-tick effects before a shared scheduler pass. The engine
+    /// context remains the sole list-traversal owner.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Advances one Bob-omb Buddy in the enclosing scheduler without nesting
+    /// another object-list traversal.
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        state engineState: SM64SwiftEngineState,
+        pool: SM64ObjectPool
+    ) -> Bool {
+        guard pool.record(for: id) != nil, states[id] != nil else { return false }
+        update(id: id, engineState: engineState, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        environments.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
         environments frameEnvironments: [SM64ObjectID: SM64BobombBuddyEnvironment] = [:]
     ) -> SM64BobombBuddySchedulerTickResult {
         environments = frameEnvironments
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, engineState: engineState, pool: pool)
+            _ = self?.updateInline(id, state: engineState, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64BobombBuddySchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog,

@@ -2,6 +2,22 @@
 
 ## Current Milestone
 
+- M22ae registers the existing Bob-omb Buddy owner bridge and its exact buddy
+  and cannon-closed behavior identities in the shared
+  `SM64BehaviorDispatchBridge`. The general-actor route advances the value
+  reducer in shared scheduler order and returns owner-thread sound/dialog/
+  camera/time-stop delivery receipts. Twenty-five-route Swift/C fingerprint
+  `0x9e95baecbd610899`, standalone Bob-omb Buddy fingerprint
+  `0xba317f5f6079097e`, behavior manifest fingerprint
+  `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Bob-omb Buddy contracts, native Debug target
+  `/tmp/sm64-modern-m22ae-build.log`, full shebang-corrected 206-script matrix,
+  `git diff --check`, and zero unchecked-Sendable audit pass are the evidence
+  boundary. Real dialog/camera/audio/collision/progression consumers,
+  remaining adapters, and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ae.md`.
+
 - M22ad registers the existing Scuttlebug owner bridge and both exact behavior
   identities in the shared `SM64BehaviorDispatchBridge`. The spawner-list route
   creates and dispatches its general-actor child in the same live traversal,

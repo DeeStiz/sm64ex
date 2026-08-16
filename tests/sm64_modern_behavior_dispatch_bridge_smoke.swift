@@ -538,6 +538,61 @@ private func hashScuttlebugDispatch(
     return hash
 }
 
+private func hashBobombBuddyDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.bobombBuddyEffects.count))
+    for effect in tick.bobombBuddyEffects {
+        hash = hashID(hash, effect.objectID)
+        let state = effect.output.state
+        hash = hashU64(hash, UInt64(bitPattern: Int64(state.action)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(state.role)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(state.cannonStatus)))
+        hash = hashU64(hash, state.hasTalked ? 1 : 0)
+        hash = hashU64(hash, UInt64(UInt16(bitPattern: state.moveYaw)))
+        hash = hashU64(hash, UInt64(state.blinkTimer))
+        hash = hashU64(hash, effect.output.playWalkingSound ? 1 : 0)
+        hash = hashU64(hash, effect.output.playReadSignSound ? 1 : 0)
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.output.dialogID)))
+        hash = hashU64(hash, effect.output.dialogRequested ? 1 : 0)
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.output.cameraRequest)))
+        hash = hashU64(hash, effect.output.activeTimeStop ? 1 : 0)
+        hash = hashU64(hash, effect.output.clearTimeStop ? 1 : 0)
+        hash = hashU64(hash, effect.output.clearInteraction ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.output.visibilityDistance.bitPattern))
+        if let cannon = effect.nearestCannonID {
+            hash = hashU64(hash, 1)
+            hash = hashID(hash, cannon)
+        } else {
+            hash = hashU64(hash, 0)
+        }
+        hash = hashU64(hash, UInt64(effect.presentedEffects.count))
+    }
+    hash = hashU64(hash, UInt64(tick.bobombBuddyDeliveries.count))
+    for delivery in tick.bobombBuddyDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -885,6 +940,16 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(scuttlebugTick.scuttlebugDeliveries.isEmpty, "Scuttlebug spawn route has no deletion delivery")
         fingerprint = hashScuttlebugDispatch(fingerprint, scuttlebugTick)
+
+        let buddyEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let buddyBridge = SM64BehaviorDispatchBridge()
+        _ = try buddyBridge.spawnBobombBuddy(in: buddyEngine)
+        let buddyTick = buddyBridge.tick(state: buddyEngine)
+        require(buddyTick.events.map(\.route) == [.bobombBuddy], "Bob-omb Buddy route dispatch")
+        require(buddyTick.scheduler.updated.map(\.traceSubject) == [1], "Bob-omb Buddy callback ordering")
+        require(buddyTick.bobombBuddyEffects.count == 1, "Bob-omb Buddy effect is recorded")
+        require(buddyTick.bobombBuddyDeliveries.count == 1 && buddyTick.bobombBuddyDeliveries.first?.presented.isEmpty == true, "Bob-omb Buddy empty owner delivery is explicit")
+        fingerprint = hashBobombBuddyDispatch(fingerprint, buddyTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

@@ -35,6 +35,7 @@
 #define POKEY_BODY_BEHAVIOR UINT64_C(0x6268765f7062)
 #define SCUTTLEBUG_SPAWNER_BEHAVIOR UINT64_C(0x6268765f736273)
 #define SCUTTLEBUG_BEHAVIOR UINT64_C(0x6268765f736275)
+#define BOBOMB_BUDDY_BEHAVIOR UINT64_C(0x6268765f626262)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -544,6 +545,46 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // no child
     fingerprint = hash_u64(fingerprint, 0); // not marked
     fingerprint = hash_u64(fingerprint, 0); // deliveries
+
+    // Isolated shared-dispatch Bob-omb Buddy owner route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t buddy_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, buddy_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, BOBOMB_BUDDY_BEHAVIOR, 24);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // action
+    fingerprint = hash_u64(fingerprint, 0); // role
+    fingerprint = hash_u64(fingerprint, 0); // cannon status
+    fingerprint = hash_u64(fingerprint, 0); // has talked
+    fingerprint = hash_u64(fingerprint, 0); // move yaw
+    fingerprint = hash_u64(fingerprint, 0); // blink timer
+    fingerprint = hash_u64(fingerprint, 0); // walking sound
+    fingerprint = hash_u64(fingerprint, 0); // sign sound
+    fingerprint = hash_u64(fingerprint, 0); // dialog id
+    fingerprint = hash_u64(fingerprint, 0); // dialog requested
+    fingerprint = hash_u64(fingerprint, 0); // camera request
+    fingerprint = hash_u64(fingerprint, 0); // active time stop
+    fingerprint = hash_u64(fingerprint, 0); // clear time stop
+    fingerprint = hash_u64(fingerprint, 0); // clear interaction
+    fingerprint = hash_u64(fingerprint, UINT64_C(0x453b8000)); // visibility distance
+    fingerprint = hash_u64(fingerprint, 0); // no nearest cannon
+    fingerprint = hash_u64(fingerprint, 0); // no presented effects
+    fingerprint = hash_u64(fingerprint, 1); // deliveries
+    fingerprint = hash_u64(fingerprint, 0); // delivered
+    fingerprint = hash_u64(fingerprint, 0); // presented
+    fingerprint = hash_u64(fingerprint, 0); // spawned
+    fingerprint = hash_u64(fingerprint, 0); // deleted
+    fingerprint = hash_u64(fingerprint, 0); // rejected
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);
