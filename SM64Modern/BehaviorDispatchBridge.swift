@@ -15,6 +15,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case goomba = 11
     case spiny = 12
     case snufit = 13
+    case whomp = 14
     case unmigrated = 255
 }
 
@@ -55,6 +56,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let spinyDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let snufitEffects: [SM64SnufitObjectEffectRecord]
     let snufitDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let whompEffects: [SM64WhompObjectEffectRecord]
+    let whompDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -76,6 +79,7 @@ final class SM64BehaviorDispatchBridge {
     let goomba: SM64GoombaObjectBridge
     let spiny: SM64SpinyObjectBridge
     let snufit: SM64SnufitObjectBridge
+    let whomp: SM64WhompObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -94,6 +98,7 @@ final class SM64BehaviorDispatchBridge {
         self.goomba = SM64GoombaObjectBridge(scheduler: scheduler)
         self.spiny = SM64SpinyObjectBridge(scheduler: scheduler)
         self.snufit = SM64SnufitObjectBridge(scheduler: scheduler)
+        self.whomp = SM64WhompObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -128,6 +133,8 @@ final class SM64BehaviorDispatchBridge {
         case SM64SnufitObjectBridge.defaultSnufitBehaviorIdentity,
              SM64SnufitObjectBridge.defaultBulletBehaviorIdentity:
             return .snufit
+        case SM64WhompObjectBridge.defaultBehaviorIdentity:
+            return .whomp
         default:
             return .unmigrated
         }
@@ -149,6 +156,7 @@ final class SM64BehaviorDispatchBridge {
         for id in goomba.registeredIDs { goomba.remove(id) }
         for id in spiny.registeredIDs { spiny.remove(id) }
         for id in snufit.registeredIDs { snufit.remove(id) }
+        for id in whomp.registeredIDs { whomp.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -163,6 +171,7 @@ final class SM64BehaviorDispatchBridge {
         goomba.beginExternalTick()
         spiny.beginExternalTick()
         snufit.beginExternalTick()
+        whomp.beginExternalTick()
     }
 
     @discardableResult
@@ -418,6 +427,27 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnWhomp(
+        in engineState: SM64SwiftEngineState,
+        size: SM64WhompSize = .normal,
+        homeX: Float = 0,
+        homeY: Float = 0,
+        homeZ: Float = 0,
+        moveYaw: Int16 = 0,
+        action: SM64WhompAction = .initialize
+    ) throws -> SM64ObjectID {
+        try whomp.spawnWhomp(
+            in: engineState,
+            size: size,
+            homeX: homeX,
+            homeY: homeY,
+            homeZ: homeZ,
+            moveYaw: moveYaw,
+            action: action
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -434,6 +464,7 @@ final class SM64BehaviorDispatchBridge {
         goomba.beginExternalTick()
         spiny.beginExternalTick()
         snufit.beginExternalTick()
+        whomp.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -478,6 +509,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.spiny.updateInline(id, pool: pool)
             case .snufit:
                 _ = self.snufit.updateInline(id, pool: pool)
+            case .whomp:
+                _ = self.whomp.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -498,6 +531,7 @@ final class SM64BehaviorDispatchBridge {
             goomba.remove(id)
             spiny.remove(id)
             snufit.remove(id)
+            whomp.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -541,6 +575,9 @@ final class SM64BehaviorDispatchBridge {
         for id in snufit.registeredIDs where engineState.objects.record(for: id) == nil {
             snufit.remove(id)
         }
+        for id in whomp.registeredIDs where engineState.objects.record(for: id) == nil {
+            whomp.remove(id)
+        }
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -572,7 +609,9 @@ final class SM64BehaviorDispatchBridge {
             spinyEffects: spiny.effectLog,
             spinyDeliveries: spiny.deliveryLog,
             snufitEffects: snufit.effectLog,
-            snufitDeliveries: snufit.deliveryLog
+            snufitDeliveries: snufit.deliveryLog,
+            whompEffects: whomp.effectLog,
+            whompDeliveries: whomp.deliveryLog
         )
     }
 }

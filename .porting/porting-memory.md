@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M22v registers the existing `bhvWhomp` owner bridge in the shared
+  `SM64BehaviorDispatchBridge`. The surface-list route runs before the
+  general-actor routes in the shared scheduler, preserves initialize/reset-home
+  state and explicit owner-thread delivery, and leaves optional collision,
+  boss presentation, and reward-star consumers behind their existing seams.
+  Fifteen-route Swift/C fingerprint 0x439f38bbc24dc402, standalone Whomp
+  fingerprint 0x672073b350af199a, behavior manifest fingerprint
+  0x9bb2863444c51d6d, 534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused dispatch
+  contract, native Debug build target /tmp/sm64-modern-m22v-build.log, full
+  206-script matrix, `git diff --check`, and zero unchecked-Sendable audit
+  pass are the evidence boundary. Whole-engine route breadth, the remaining
+  adapters, and live parity remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22v.md.
 - M22u registers the existing `bhvSnufit` owner bridge in the shared
   `SM64BehaviorDispatchBridge`. The general-actor route dispatches Amp, Boo,
   Bob-omb, Bird, Swoop, Piranha Plant, Big Boo, Fly Guy, Bullet Bill, Goomba,

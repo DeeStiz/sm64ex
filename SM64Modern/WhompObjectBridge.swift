@@ -136,6 +136,36 @@ final class SM64WhompObjectBridge {
         return true
     }
 
+    /// Starts a tick owned by the shared behavior dispatcher. The bridge's
+    /// private scheduler is intentionally bypassed in that mode; the shared
+    /// scheduler remains the sole list-traversal authority.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Updates one Whomp from the shared scheduler without nesting another
+    /// scheduler pass or enabling the optional surface-physics consumer.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard states[id] != nil, pool.record(for: id) != nil else { return false }
+        update(
+            id: id,
+            pool: pool,
+            collisionWorld: nil,
+            advanceMovement: false,
+            presentBossEffects: false,
+            spawnRewardStar: false
+        )
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -146,9 +176,7 @@ final class SM64WhompObjectBridge {
         spawnRewardStar: Bool = false
     ) -> SM64WhompSchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(
@@ -161,12 +189,10 @@ final class SM64WhompObjectBridge {
             )
         }
         for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         return SM64WhompSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
