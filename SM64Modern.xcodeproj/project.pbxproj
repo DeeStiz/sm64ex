@@ -36,6 +36,7 @@
 		1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */ = {isa = PBXBuildFile; fileRef = 399C03F347FC9A4D23DFECFD /* OracleTrace.swift */; };
 		161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */; };
 		1656D9B55126D41EB7138D99 /* BullyEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B512E26120B9CF2080159F3C /* BullyEnemy.swift */; };
+		1909473243D91352E673CFF1 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2F94BADC5F5B17ADE8F57D9 /* Configuration.swift */; };
 		1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */; };
 		1A66522702AC1BD6CFBB4D7A /* Respawner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B5A4BCF4A5081A0ACFFA15 /* Respawner.swift */; };
 		1A9C263F2C7FC79C4A63A501 /* TTCRotatingSolidBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 214588F2B3DD80568BE38D36 /* TTCRotatingSolidBehavior.swift */; };
@@ -394,6 +395,7 @@
 		A1B59B269230B9E7A9B9EDFF /* SnufitEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnufitEnemy.swift; sourceTree = "<group>"; };
 		A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FixedStepScheduler.swift; sourceTree = "<group>"; };
 		A25BB84567898B7DD0F01721 /* MemoryArena.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MemoryArena.swift; sourceTree = "<group>"; };
+		A2F94BADC5F5B17ADE8F57D9 /* Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Configuration.swift; sourceTree = "<group>"; };
 		A324AE8C019E9D59ECC1D057 /* MarioGroundSpeed.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGroundSpeed.swift; sourceTree = "<group>"; };
 		A4B9263B0BC8B2ECBC71F7DC /* SpinyEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinyEnemy.swift; sourceTree = "<group>"; };
 		A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = AppleAudioRing.c; sourceTree = "<group>"; };
@@ -546,6 +548,7 @@
 				8972955B5A5B93E0345EE4EB /* ChuckyaObjectBridge.swift */,
 				B4872879FF660BB19A8FB4AC /* CoinScoreAges.swift */,
 				ADEBABA4A2D4F82877B3BB8A /* CollisionMesh.swift */,
+				A2F94BADC5F5B17ADE8F57D9 /* Configuration.swift */,
 				F3F0AEF5342F3B329237DD66 /* ContentPack.swift */,
 				8A6630058727A186889977A1 /* ContentPackRuntime.swift */,
 				87414B6C37E5673C98429C04 /* DecorativePendulumBehavior.swift */,
@@ -881,6 +884,7 @@
 				F9A793CA3048B14A9BE9DA03 /* ChuckyaObjectBridge.swift in Sources */,
 				AA0B49BED7B13B398A2731F6 /* CoinScoreAges.swift in Sources */,
 				B9245CF366E36C7CE74E6B46 /* CollisionMesh.swift in Sources */,
+				1909473243D91352E673CFF1 /* Configuration.swift in Sources */,
 				B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */,
 				90B7F9D7BD419562B6E7A2F8 /* ContentPackRuntime.swift in Sources */,
 				BD144231679BF45B1B35259B /* DecorativePendulumBehavior.swift in Sources */,
