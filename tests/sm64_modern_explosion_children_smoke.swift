@@ -48,13 +48,14 @@ enum SM64ModernExplosionChildrenSmoke {
             parentPosition: SM64ObjectVector3(x: 10, y: 20, z: 30),
             input: SM64ExplosionBubbleSpawnInput(
                 positionOffset: SM64ObjectVector3(x: 1, y: 2, z: 3),
+                microOffset: SM64ObjectVector3(x: 4, y: 0, z: -2),
                 expansionRateX: 0x900,
                 expansionRateY: 0xA00,
                 initialTimer: 4,
                 velocityY: 6
             )
         )
-        require(bubble.position == SM64ObjectVector3(x: 11, y: 22, z: 33), "bubble spawn position")
+        require(bubble.position == SM64ObjectVector3(x: 15, y: 22, z: 31), "bubble spawn position")
         require(bubble.scale == SM64ObjectVector3(x: 2, y: 2, z: 1), "bubble initial scale")
         let bubbleDelay = SM64ExplosionChildrenKernel.tickBubble(
             SM64ExplosionBubbleTickInput(waterLevel: 1_000),

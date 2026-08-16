@@ -2,6 +2,7 @@ import Foundation
 
 struct SM64ExplosionBubbleSpawnInput: Equatable, Sendable {
     let positionOffset: SM64ObjectVector3
+    let microOffset: SM64ObjectVector3
     let expansionRateX: Int32
     let expansionRateY: Int32
     let initialTimer: UInt32
@@ -9,12 +10,14 @@ struct SM64ExplosionBubbleSpawnInput: Equatable, Sendable {
 
     init(
         positionOffset: SM64ObjectVector3 = .zero,
+        microOffset: SM64ObjectVector3 = .zero,
         expansionRateX: Int32 = 0x800,
         expansionRateY: Int32 = 0x800,
         initialTimer: UInt32 = 0,
         velocityY: Float = 4
     ) {
         self.positionOffset = positionOffset
+        self.microOffset = microOffset
         self.expansionRateX = expansionRateX
         self.expansionRateY = expansionRateY
         self.initialTimer = initialTimer
@@ -116,9 +119,9 @@ enum SM64ExplosionChildrenKernel {
     ) -> SM64ExplosionBubbleState {
         SM64ExplosionBubbleState(
             position: SM64ObjectVector3(
-                x: parentPosition.x + input.positionOffset.x,
-                y: parentPosition.y + input.positionOffset.y,
-                z: parentPosition.z + input.positionOffset.z
+                x: parentPosition.x + input.positionOffset.x + input.microOffset.x,
+                y: parentPosition.y + input.positionOffset.y + input.microOffset.y,
+                z: parentPosition.z + input.positionOffset.z + input.microOffset.z
             ),
             input: input
         )

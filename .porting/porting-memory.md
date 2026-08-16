@@ -2,17 +2,26 @@
 
 ## Current Milestone
 
-- M22a adds the fail-closed behavior coverage manifest. The deterministic Swift
-  tool emits one canonical row for each of the 534 reachable behavior
-  identity/source pairs, maps 41 known Swift value/owner routes, and records
-  the remaining 493 behaviors as explicit `unmigrated_c_adapter` rows with an
-  owner and reason. Manifest fingerprint 0xe4c60a906497e192, script
-  script/test_behavior_manifest.sh, full matrix runs=203 failures=0, and
-  regenerated native Debug build target /tmp/sm64-modern-m22a-build.log are
-  the evidence boundary. This is coverage accounting, not rewrite closure:
-  all 493 C adapters still require migration or a separately approved
-  compatibility exception, followed by live behavior execution and parity
-  shards. Handoff: .porting/porting-handoff-full-swift-twin-M22a.md.
+- M22b makes the `bhvBobombExplosionBubble3600` child seam explicit. The
+  explosion-child value kernel accepts a deterministic micro-offset, the
+  owner bridge preserves it in the spawned bubble record, and the fail-closed
+  behavior manifest maps that route to `ExplosionObjectBridge`. Child
+  fingerprint 0x03fdfa6ee829478b remains stable; manifest fingerprint is
+  0xaa7628249ad5adf3 for 534 rows, 42 Swift value/owner routes, and 492
+  explicit `unmigrated_c_adapter` rows. Focused Swift/C contracts,
+  script/test_explosion_children.sh, script/test_behavior_manifest.sh, full
+  matrix runs=203 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m22b-build.log are the evidence boundary. This is one
+  explicit behavior seam, not rewrite closure: all 492 adapters still require
+  migration or a separately approved compatibility exception, followed by
+  live behavior execution and parity shards. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22b.md.
+- M22a added the fail-closed behavior coverage manifest. The deterministic
+  Swift tool emits one canonical row for each of the 534 reachable behavior
+  identity/source pairs; M22b updates the accounting to 42 known Swift routes
+  and 492 explicit adapters. The prior manifest fingerprint was
+  0xe4c60a906497e192; the current contract is 0xaa7628249ad5adf3. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22a.md.
 - M21z migrates the shared explosion water-bubble and ground-smoke child
   behaviors. Swift allocates the source 40-child bubble route or ground-smoke
   child in the owner bridge, preserves model/behavior identities, explicit
