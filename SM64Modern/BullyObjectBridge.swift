@@ -11,6 +11,8 @@ struct SM64BullyObjectEffectRecord: Equatable, Sendable {
     let bridgePosition: SM64ObjectVector3?
     let spawnedChildren: [SM64ObjectID]
     let presentedEffects: [SM64OwnerThreadEffectIntent]
+    let collision: SM64BullyCollisionResult?
+    let movement: SM64BullyMovementResult?
 }
 
 struct SM64BullySchedulerTickResult: Equatable, Sendable {
@@ -30,11 +32,13 @@ final class SM64BullyObjectBridge {
     static let bridgeBehaviorIdentity: UInt64 = 0x6268_765F_6C6C62
     static let coinModel: UInt32 = SM64OwnerThreadEffectRouter.coinModel
     static let coinBehaviorIdentity: UInt64 = SM64OwnerThreadEffectRouter.coinBehaviorIdentity
+    static let defaultWallHitboxRadius: Float = SM64BullyCollision.wallHitboxRadius
 
     private let scheduler: SM64ObjectScheduler
     private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64BullyState] = [:]
     private var inputs: [SM64ObjectID: SM64BullyTickInput] = [:]
+    private var minionParents: [SM64ObjectID: SM64ObjectID] = [:]
     private(set) var effectLog: [SM64BullyObjectEffectRecord] = []
     private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
@@ -55,6 +59,15 @@ final class SM64BullyObjectBridge {
 
     func state(for id: SM64ObjectID) -> SM64BullyState? {
         states[id]
+    }
+
+    func minionIDs(for parentID: SM64ObjectID) -> [SM64ObjectID] {
+        minionParents.compactMap { child, parent in
+            parent == parentID ? child : nil
+        }.sorted { lhs, rhs in
+            if lhs.slot != rhs.slot { return lhs.slot < rhs.slot }
+            return lhs.generation < rhs.generation
+        }
     }
 
     @discardableResult
@@ -101,6 +114,41 @@ final class SM64BullyObjectBridge {
     }
 
     @discardableResult
+    func spawnBigBullyWithMinions(
+        in engineState: SM64SwiftEngineState,
+        homeX: Float = 3_700,
+        homeY: Float = 600,
+        homeZ: Float = -5_500
+    ) throws -> SM64ObjectID {
+        let parentID = try spawnBully(
+            in: engineState,
+            size: .big,
+            subtype: .generic,
+            homeX: homeX,
+            homeY: homeY,
+            homeZ: homeZ,
+            action: .inactive
+        )
+        let minionPositions = [
+            SM64ObjectVector3(x: 4_454, y: 307, z: -5_426),
+            SM64ObjectVector3(x: 3_840, y: 307, z: -6_041),
+            SM64ObjectVector3(x: 3_226, y: 307, z: -5_426)
+        ]
+        for position in minionPositions {
+            let childID = try spawnBully(
+                in: engineState,
+                size: .small,
+                subtype: .minion,
+                homeX: position.x,
+                homeY: position.y,
+                homeZ: position.z
+            )
+            minionParents[childID] = parentID
+        }
+        return parentID
+    }
+
+    @discardableResult
     func attach(
         _ id: SM64ObjectID,
         size: SM64BullySize,
@@ -139,6 +187,8 @@ final class SM64BullyObjectBridge {
     func tick(
         state engineState: SM64SwiftEngineState,
         inputs frameInputs: [SM64ObjectID: SM64BullyTickInput] = [:],
+        collisionWorld: SM64SurfaceCollisionWorld? = nil,
+        advanceMovement: Bool = false,
         presentEffects: Bool = false,
         spawnRewards: Bool = false,
         spawnBridge: Bool = false
@@ -151,6 +201,8 @@ final class SM64BullyObjectBridge {
             self?.update(
                 id: id,
                 pool: pool,
+                collisionWorld: collisionWorld,
+                advanceMovement: advanceMovement,
                 presentEffects: presentEffects,
                 spawnRewards: spawnRewards,
                 spawnBridge: spawnBridge
@@ -159,10 +211,12 @@ final class SM64BullyObjectBridge {
         for id in schedulerResult.unloaded {
             states.removeValue(forKey: id)
             inputs.removeValue(forKey: id)
+            minionParents.removeValue(forKey: id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
             states.removeValue(forKey: id)
             inputs.removeValue(forKey: id)
+            minionParents.removeValue(forKey: id)
         }
         return SM64BullySchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
@@ -170,16 +224,129 @@ final class SM64BullyObjectBridge {
     private func update(
         id: SM64ObjectID,
         pool: SM64ObjectPool,
+        collisionWorld: SM64SurfaceCollisionWorld?,
+        advanceMovement: Bool,
         presentEffects: Bool,
         spawnRewards: Bool,
         spawnBridge: Bool
     ) {
         guard var bully = states[id], let record = pool.record(for: id) else { return }
         let previousAction = bully.action
-        let input = inputs[id] ?? defaultInput(for: record)
+        let physicsEnabled = advanceMovement
+            && collisionWorld != nil
+            && bully.action != .inactive
+            && bully.action != .lavaDeath
+            && bully.action != .deathPlaneDeath
+        let collision = physicsEnabled
+            ? collisionWorld.flatMap { world in
+                SM64BullyCollision.resolve(
+                    SM64BullyCollisionInput(
+                        position: record.position,
+                        moveYaw: bully.moveYaw,
+                        wallHitboxRadius: record.wallHitboxRadius,
+                        previousMoveFlags: record.moveFlags,
+                        world: world
+                    )
+                )
+            }
+            : nil
+        var input = inputs[id] ?? defaultInput(for: record)
+        if bully.size == .big, bully.action == .inactive {
+            input.minionCount = bully.knockbackCounter
+        }
+        input.movementHandledExternally = physicsEnabled
         let result = SM64BullyKernel.tick(input, state: &bully)
+        if bully.subtype == .minion,
+           result.effects.contains(.markForDeletion),
+           let parentID = minionParents[id],
+           var parent = states[parentID] {
+            parent.knockbackCounter = min(parent.knockbackCounter &+ 1, 3)
+            states[parentID] = parent
+        }
+        let movement: SM64BullyMovementResult?
+        if physicsEnabled, let world = collisionWorld {
+            let basePosition = collision?.position ?? record.position
+            let actionPosition = SM64ObjectVector3(
+                x: basePosition.x,
+                y: bully.positionY,
+                z: basePosition.z
+            )
+            let candidatePosition = SM64ObjectVector3(
+                x: actionPosition.x
+                    + SM64CanonicalTrig.sins(bully.moveYaw) * bully.forwardVelocity,
+                y: actionPosition.y,
+                z: actionPosition.z
+                    + SM64CanonicalTrig.coss(bully.moveYaw) * bully.forwardVelocity
+            )
+            let floor = collision ?? SM64BullyCollision.resolve(
+                SM64BullyCollisionInput(
+                    position: actionPosition,
+                    moveYaw: bully.moveYaw,
+                    wallHitboxRadius: record.wallHitboxRadius,
+                    previousMoveFlags: record.moveFlags,
+                    world: world
+                )
+            )
+            let intendedFloor = world.findFloor(
+                x: candidatePosition.x,
+                y: candidatePosition.y,
+                z: candidatePosition.z
+            )
+            let intendedRoom: Int8 = intendedFloor.surfaceID.flatMap {
+                world.surface(withID: $0)?.room
+            } ?? 0
+            movement = SM64BullyCollision.move(
+                SM64BullyMovementInput(
+                    startPosition: actionPosition,
+                    candidatePosition: candidatePosition,
+                    velocityY: bully.velocityY,
+                    forwardVelocity: bully.forwardVelocity,
+                    moveYaw: bully.moveYaw,
+                    floorHeight: floor?.floorHeight ?? record.floorHeight,
+                    floorRoom: floor?.floorRoom ?? Int8(truncatingIfNeeded: record.floorRoom),
+                    objectRoom: Int8(truncatingIfNeeded: record.room),
+                    floorNormalX: floor?.floorNormalX ?? 0,
+                    floorNormalY: floor?.floorNormalY ?? 1,
+                    floorNormalZ: floor?.floorNormalZ ?? 0,
+                    moveFlags: floor?.moveFlags ?? record.moveFlags,
+                    collisionFlags: floor?.collisionFlags ?? 0,
+                    gravity: bully.size == .small
+                        ? SM64BullyCollision.smallGravity
+                        : SM64BullyCollision.bigGravity,
+                    friction: bully.size == .small
+                        ? SM64BullyCollision.smallFriction
+                        : SM64BullyCollision.bigFriction,
+                    buoyancy: SM64BullyCollision.buoyancy,
+                    intendedFloorHeight: intendedFloor.height,
+                    intendedFloorNormalY: intendedFloor.normalY ?? 0,
+                    intendedFloorRoom: intendedRoom,
+                    intendedFloorExists: intendedFloor.surfaceID != nil,
+                    waterLevel: world.findWaterLevel(
+                        x: candidatePosition.x,
+                        z: candidatePosition.z
+                    )
+                )
+            )
+        } else {
+            movement = nil
+        }
+        if let movement {
+            bully.positionX = movement.position.x
+            bully.positionY = movement.position.y
+            bully.positionZ = movement.position.z
+            bully.velocityY = movement.velocity.y
+            bully.forwardVelocity = movement.forwardVelocity
+            bully.collisionFlag = movement.collisionFlags
+        }
         states[id] = bully
-        synchronizeRecord(id: id, state: bully, pool: pool, previousAction: previousAction)
+        synchronizeRecord(
+            id: id,
+            state: bully,
+            pool: pool,
+            previousAction: previousAction,
+            collision: collision,
+            movement: movement
+        )
         var spawnedChildren: [SM64ObjectID] = []
         if spawnRewards, let coinPosition = result.coinPosition,
            let coin = try? pool.spawn(
@@ -243,6 +410,9 @@ final class SM64BullyObjectBridge {
             if result.effects.contains(.star) {
                 effectRouter.enqueue(objectID: id, kind: .star, value: 1)
             }
+            if result.effects.contains(.music) {
+                effectRouter.enqueue(objectID: id, kind: .music, value: 1)
+            }
         }
         if bully.markedForDeletion {
             effectRouter.enqueue(objectID: id, kind: .markForDeletion)
@@ -260,7 +430,9 @@ final class SM64BullyObjectBridge {
                 starPosition: result.starPosition,
                 bridgePosition: result.bridgePosition,
                 spawnedChildren: spawnedChildren,
-                presentedEffects: delivery.presented
+                presentedEffects: delivery.presented,
+                collision: collision,
+                movement: movement
             )
         )
     }
@@ -283,7 +455,9 @@ final class SM64BullyObjectBridge {
         id: SM64ObjectID,
         state: SM64BullyState,
         pool: SM64ObjectPool,
-        previousAction: SM64BullyAction
+        previousAction: SM64BullyAction,
+        collision: SM64BullyCollisionResult? = nil,
+        movement: SM64BullyMovementResult? = nil
     ) {
         _ = pool.mutate(id) { record in
             record.objectFlags |=
@@ -310,6 +484,25 @@ final class SM64BullyObjectBridge {
             record.hurtboxRadius = state.hitbox.hurtboxRadius
             record.hurtboxHeight = state.hitbox.hurtboxHeight
             record.damageOrCoinValue = Int32(state.hitbox.damageOrCoinValue)
+            record.wallHitboxRadius = Self.defaultWallHitboxRadius
+            record.gravity = state.size == .small
+                ? SM64BullyCollision.smallGravity
+                : SM64BullyCollision.bigGravity
+            record.buoyancy = SM64BullyCollision.buoyancy
+            if let collision {
+                record.floorHeight = collision.floorHeight
+                record.floorType = collision.floorType
+                record.floorRoom = Int16(collision.floorRoom)
+                record.moveFlags = collision.moveFlags
+            }
+            if let movement {
+                record.position = movement.position
+                record.velocity = movement.velocity
+                record.forwardVelocity = movement.forwardVelocity
+                record.moveFlags = movement.moveFlags
+            } else {
+                record.velocity.y = state.velocityY
+            }
         }
     }
 }

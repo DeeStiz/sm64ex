@@ -99,6 +99,8 @@ struct SM64BullyTickInput: Equatable, Sendable {
     var marioCollisionAngle: Int16
     var floorCollisionFlags: UInt32
     var marioY: Float
+    var minionCount: Int16
+    var movementHandledExternally: Bool
 
     init(
         angleToMario: Int16 = 0,
@@ -107,7 +109,9 @@ struct SM64BullyTickInput: Equatable, Sendable {
         interacted: Bool = false,
         marioCollisionAngle: Int16 = 0,
         floorCollisionFlags: UInt32 = 1,
-        marioY: Float = 0
+        marioY: Float = 0,
+        minionCount: Int16 = 0,
+        movementHandledExternally: Bool = false
     ) {
         self.angleToMario = angleToMario
         self.distanceFromHome = distanceFromHome
@@ -116,6 +120,8 @@ struct SM64BullyTickInput: Equatable, Sendable {
         self.marioCollisionAngle = marioCollisionAngle
         self.floorCollisionFlags = floorCollisionFlags
         self.marioY = marioY
+        self.minionCount = minionCount
+        self.movementHandledExternally = movementHandledExternally
     }
 }
 
@@ -139,6 +145,7 @@ struct SM64BullyEffect: OptionSet, Equatable, Sendable {
     static let sound = Self(rawValue: 1 << 12)
     static let cameraShake = Self(rawValue: 1 << 13)
     static let spawnBridge = Self(rawValue: 1 << 14)
+    static let music = Self(rawValue: 1 << 15)
 }
 
 struct SM64BullyTickResult: Equatable, Sendable {
@@ -179,7 +186,7 @@ enum SM64BullyKernel {
                 state.action = .chase
                 effects.insert(.chase)
             }
-            step(&state)
+            if !input.movementHandledExternally { step(&state) }
             effects.insert(.patrol)
         case .chase:
             if state.timer < 10 {
@@ -197,7 +204,7 @@ enum SM64BullyKernel {
             } else {
                 effects.insert(.chase)
             }
-            step(&state)
+            if !input.movementHandledExternally { step(&state) }
         case .knockback:
             if state.forwardVelocity < 10 && state.velocityY == 0 {
                 state.forwardVelocity = 1
@@ -213,7 +220,7 @@ enum SM64BullyKernel {
                 state.knockbackCounter = 0
                 effects.insert(.chase)
             }
-            step(&state)
+            if !input.movementHandledExternally { step(&state) }
             effects.insert(.knockback)
         case .backUp:
             if state.timer == 0 {
@@ -229,11 +236,15 @@ enum SM64BullyKernel {
             } else {
                 effects.insert(.backUp)
             }
-            step(&state)
+            if !input.movementHandledExternally { step(&state) }
         case .inactive:
             state.forwardVelocity = 0
+            if state.size == .big, input.minionCount == 3, state.timer >= 91 {
+                state.action = .activateAndFall
+                effects.insert(.music)
+            }
         case .activateAndFall:
-            step(&state)
+            if !input.movementHandledExternally { step(&state) }
             if input.floorCollisionFlags & 0x9 == 0x9 {
                 state.action = .patrol
                 effects.insert(.patrol)

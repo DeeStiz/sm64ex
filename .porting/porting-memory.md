@@ -2,6 +2,29 @@
 
 ## Current Milestone
 
+- M21s adds an opt-in Bully immutable-world `object_step` seam. The owner
+  bridge executes the source action before wall/floor admission and scalar
+  movement, preserving wall/floor identity, gravity, friction, bounce/no-Y
+  flags, in-air state, and generation-safe record publication for small and big
+  variants. Focused strict Swift/C fingerprint 0x8039a949790099fc, script
+  script/test_bully_movement.sh, full matrix runs=195 failures=0, and
+  regenerated native Debug build target /tmp/sm64-modern-m21s-build.log are the
+  evidence boundary. Production collision mesh authority, water/steep-floor
+  breadth, Bowser arenas, durable reward progression, and device/visual/human
+  acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21s.md.
+- M21r adds the Big Bully-with-minions owner seam. Swift creates the three
+  source-positioned minion children with generation-safe parent identity,
+  propagates minion death to the parent's knockout counter, and reproduces the
+  91-frame puzzle-jingle gate into `activateAndFall`, tangible/visible
+  activation, landing, and owner-thread music/sound/shake/particle delivery.
+  Focused strict Swift/C fingerprint 0x4ff3b69000b7c356, script
+  script/test_bully_minion_owner.sh, full matrix runs=194 failures=0, and the
+  regenerated native Debug build target
+  /tmp/sm64-modern-m21s-build.log are the evidence boundary. Broad minion
+  interaction, authoritative collision movement, Bowser arenas, durable reward
+  progression, and device/visual/human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21r.md.
 - M21q extends the Bully owner bridge for Chief Chilly and the Big Bully
   reward path. The value kernel preserves source coin/star/LLL-tumbling-bridge
   coordinates plus activation sound/shake/mist effects; the owner boundary

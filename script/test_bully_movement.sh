@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-bully-object-bridge-smoke"
+BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-bully-movement"
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
@@ -26,22 +26,22 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BullyCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BullyEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BullyObjectBridge.swift" \
-  "$PROJECT_ROOT/tests/sm64_modern_bully_object_bridge_smoke.swift" \
-  -o "$BUILD_ROOT/sm64-modern-bully-object-bridge-smoke"
+  "$PROJECT_ROOT/tests/sm64_modern_bully_movement_smoke.swift" \
+  -o "$BUILD_ROOT/sm64-modern-bully-movement-smoke"
 
-SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-bully-object-bridge-smoke)"
+SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-bully-movement-smoke)"
 printf '%s\n' "$SWIFT_OUTPUT"
 
 xcrun clang -std=c11 \
-  "$PROJECT_ROOT/tests/sm64_modern_bully_object_bridge_contract.c" \
-  -o "$BUILD_ROOT/sm64-modern-bully-object-bridge-contract"
-C_OUTPUT="$($BUILD_ROOT/sm64-modern-bully-object-bridge-contract)"
+  "$PROJECT_ROOT/tests/sm64_modern_bully_movement_contract.c" \
+  -o "$BUILD_ROOT/sm64-modern-bully-movement-contract"
+C_OUTPUT="$($BUILD_ROOT/sm64-modern-bully-movement-contract)"
 printf '%s\n' "$C_OUTPUT"
 
-SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^bullyObjectBridgeFingerprint=//p')"
-C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^bullyObjectBridgeFingerprint=//p')"
+SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^bullyMovementFingerprint=//p')"
+C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^bullyMovementFingerprint=//p')"
 [[ -n "$SWIFT_FINGERPRINT" && "$SWIFT_FINGERPRINT" == "$C_FINGERPRINT" ]] || {
-  echo "Swift/C Bully object bridge fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
+  echo "Swift/C Bully movement fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
   exit 1
 }
-printf '%s\n' "SM64 Modern Bully object bridge C contract matched"
+printf '%s\n' "SM64 Modern Bully movement C contract matched"
