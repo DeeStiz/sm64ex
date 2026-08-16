@@ -102,6 +102,19 @@ enum SM64ModernEngineAuthorityStore {
         )
     }
 
+    /// Resolves against an injected defaults domain so menu/settings tests and
+    /// future SwiftUI surfaces never need to mutate the process-wide standard
+    /// defaults while proving restart-required selection behavior.
+    static func resolve(
+        defaults: UserDefaults,
+        environment: [String: String] = ProcessInfo.processInfo.environment
+    ) -> SM64ModernEngineAuthoritySelection {
+        resolve(
+            environment: environment,
+            persistedValue: defaults.string(forKey: defaultsKey)
+        )
+    }
+
     static func persist(
         _ authority: SM64ModernEngineAuthority,
         defaults: UserDefaults = .standard

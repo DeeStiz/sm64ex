@@ -10,6 +10,32 @@ struct SM64ModernConfiguration: Equatable, Sendable {
     static let defaultWindowWidth: UInt32 = 640
     static let defaultWindowHeight: UInt32 = 480
     static let maxVolume: UInt32 = 127
+    static let swiftOnlyKeys: Set<String> = [
+        "precache",
+        "bettercam_enable",
+        "bettercam_analog",
+        "bettercam_mouse_look",
+        "bettercam_invertx",
+        "bettercam_inverty",
+        "bettercam_xsens",
+        "bettercam_ysens",
+        "bettercam_aggression",
+        "bettercam_pan_level",
+        "bettercam_degrade",
+        "hud",
+        "discordrpc_enable",
+        "language",
+        "legal_rom_accepted",
+        "cheats_enable",
+        "cheat_moon_jump",
+        "cheat_god_mode",
+        "cheat_infinite_lives",
+        "cheat_super_speed",
+        "cheat_responsive",
+        "cheat_exit_anywhere",
+        "cheat_huge_mario",
+        "cheat_tiny_mario"
+    ]
 
     enum Binding: String, CaseIterable, Hashable, Sendable {
         case a = "key_a"
@@ -447,6 +473,30 @@ struct SM64ModernConfiguration: Equatable, Sendable {
             "cheat_tiny_mario \(cheats.tinyMario ? "true" : "false")"
         ]
         return lines.joined(separator: "\n") + "\n"
+    }
+
+    /// Applies only settings that the C config writer does not guarantee to
+    /// preserve. Legacy window/audio/binding values continue to come from the
+    /// primary file so a C menu edit cannot be overwritten by a stale Swift
+    /// sidecar.
+    func applyingSwiftOnly(from source: Self) -> Self {
+        var merged = self
+        merged.precacheResources = source.precacheResources
+        merged.camera = source.camera
+        merged.hudEnabled = source.hudEnabled
+        merged.discordRPCEnabled = source.discordRPCEnabled
+        merged.language = source.language
+        merged.legalROMAccepted = source.legalROMAccepted
+        merged.cheats = source.cheats
+        return merged
+    }
+
+    static func containsSwiftOnlyKey(in text: String) -> Bool {
+        text.split(separator: "\n", omittingEmptySubsequences: false).contains { rawLine in
+            let tokens = rawLine.split(whereSeparator: { $0.isWhitespace })
+            guard let key = tokens.first, !key.hasPrefix("#") else { return false }
+            return swiftOnlyKeys.contains(String(key))
+        }
     }
 
     /// Stable FNV-1a fingerprint for cross-language contract tests and trace

@@ -48,6 +48,27 @@ enum SM64ModernEngineAuthoritySmoke {
         precondition(invalidPersisted.isValid)
         precondition(!invalidPersisted.requiresLaunchFailure)
 
+        let suiteName = "sm64-modern-engine-authority-\(UUID().uuidString)"
+        let injectedDefaults = UserDefaults(suiteName: suiteName)!
+        defer { injectedDefaults.removePersistentDomain(forName: suiteName) }
+        SM64ModernEngineAuthorityStore.persist(.cCompatibility, defaults: injectedDefaults)
+        let injectedSelection = SM64ModernEngineAuthorityStore.resolve(
+            defaults: injectedDefaults,
+            environment: [:]
+        )
+        precondition(injectedSelection.authority == .cCompatibility)
+        precondition(injectedSelection.source == .persistedSetting)
+        precondition(injectedSelection.requiresRestart(comparedTo: .swift))
+
+        injectedDefaults.set("invalid", forKey: SM64ModernEngineAuthorityStore.defaultsKey)
+        let repairedSelection = SM64ModernEngineAuthorityStore.resolve(
+            defaults: injectedDefaults,
+            environment: [:]
+        )
+        precondition(repairedSelection.authority == .swift)
+        precondition(repairedSelection.invalidValue == "invalid")
+        precondition(repairedSelection.isValid)
+
         print("SM64 Modern engine authority smoke passed")
     }
 }
