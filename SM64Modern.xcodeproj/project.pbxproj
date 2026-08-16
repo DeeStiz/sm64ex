@@ -15,6 +15,7 @@
 		04B42C7E626E4B4A86900489 /* CameraBehindKernel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BB8AD4D4F0B6D98AEBEEA9D /* CameraBehindKernel.swift */; };
 		0518B1301B06ABB7F0FD2988 /* SwoopObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8731782AE37E88BE8805B85C /* SwoopObjectBridge.swift */; };
 		05C7748C41262271E1CF7228 /* AmpEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3C10ED5253A613435EC7D /* AmpEnemy.swift */; };
+		05CC503F0BCBA41BCF6B2473 /* KingBobombHomeMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F26292793C5D9DA113D00B7 /* KingBobombHomeMovement.swift */; };
 		06B21ABCF7AFF06DB919000C /* TTCMovingBarBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804D686AFFB6AA968F51DEE /* TTCMovingBarBehavior.swift */; };
 		08F7D30BD0D76407E02ED406 /* MoneybagObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6490BF062BC1F8E0961D2B4 /* MoneybagObjectBridge.swift */; };
 		09C260568C8A5ECD27002AC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */; };
@@ -237,6 +238,7 @@
 		1DE7AE7AC1D8F6731FE45B3C /* WaterBombObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterBombObjectBridge.swift; sourceTree = "<group>"; };
 		1E51884DE493C98BC81B06D2 /* ProgressionPersistence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionPersistence.swift; sourceTree = "<group>"; };
 		1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OracleTraceSession.swift; sourceTree = "<group>"; };
+		1F26292793C5D9DA113D00B7 /* KingBobombHomeMovement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingBobombHomeMovement.swift; sourceTree = "<group>"; };
 		214588F2B3DD80568BE38D36 /* TTCRotatingSolidBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCRotatingSolidBehavior.swift; sourceTree = "<group>"; };
 		21635A888B1CF4C5B13766F6 /* YoshiBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoshiBehavior.swift; sourceTree = "<group>"; };
 		2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptContentRuntime.swift; sourceTree = "<group>"; };
@@ -505,6 +507,7 @@
 				34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */,
 				6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */,
 				10AAD085B7A7F0D27BEC7FE2 /* KingBobombCollision.swift */,
+				1F26292793C5D9DA113D00B7 /* KingBobombHomeMovement.swift */,
 				89E04BA8076B6B4EC9BEA57D /* KingBobombObjectBridge.swift */,
 				5EBCDC28A1DADF92929BD72A /* KoopaShell.swift */,
 				BAB7D9714A5D0EEB844F6E3A /* KoopaShellObjectBridge.swift */,
@@ -812,6 +815,7 @@
 				ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */,
 				719A899A4EB08E524438CFD3 /* KingBobombBehavior.swift in Sources */,
 				C4F2DF30B2F22A044509F0FF /* KingBobombCollision.swift in Sources */,
+				05CC503F0BCBA41BCF6B2473 /* KingBobombHomeMovement.swift in Sources */,
 				E8C1689E9E20F1D6F8F051A3 /* KingBobombObjectBridge.swift in Sources */,
 				DA4DF9B4F9D992BFE4FFAD06 /* KoopaShell.swift in Sources */,
 				E6EB1E83D40B684FD3B7426A /* KoopaShellObjectBridge.swift in Sources */,

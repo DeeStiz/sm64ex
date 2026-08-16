@@ -25,6 +25,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinMovement.swift" \
   "$PROJECT_ROOT/SM64Modern/KingBobombCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/KingBobombHomeMovement.swift" \
   "$PROJECT_ROOT/SM64Modern/KingBobombObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_king_bobomb_object_movement_bridge_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-king-bobomb-object-movement-bridge-smoke"

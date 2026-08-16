@@ -13,6 +13,7 @@ struct SM64KingBobombObjectEffect: Equatable, Sendable {
     let output: SM64KingBobombOutput
     let collision: SM64KingBobombCollisionResult?
     let movement: SM64KingBobombMovementResult?
+    let homeArcStart: SM64KingBobombHomeArcStart?
     let presentedEffects: [SM64OwnerThreadEffectIntent]
 }
 
@@ -62,6 +63,7 @@ final class SM64KingBobombObjectBridge {
         homeY: Float = 0,
         positionY: Float? = nil,
         position: SM64ObjectVector3? = nil,
+        homePosition: SM64ObjectVector3? = nil,
         wallHitboxRadius: Float = SM64KingBobombObjectBridge.defaultWallHitboxRadius,
         action: Int32 = SM64KingBobombBehavior.initializeAction,
         model: UInt32 = SM64KingBobombObjectBridge.defaultModel,
@@ -78,6 +80,7 @@ final class SM64KingBobombObjectBridge {
             homeY: homeY,
             positionY: positionY,
             position: position,
+            homePosition: homePosition,
             wallHitboxRadius: wallHitboxRadius,
             action: action,
             in: engineState.objects
@@ -94,6 +97,7 @@ final class SM64KingBobombObjectBridge {
         homeY: Float = 0,
         positionY: Float? = nil,
         position: SM64ObjectVector3? = nil,
+        homePosition: SM64ObjectVector3? = nil,
         wallHitboxRadius: Float = SM64KingBobombObjectBridge.defaultWallHitboxRadius,
         action: Int32 = SM64KingBobombBehavior.initializeAction,
         in pool: SM64ObjectPool
@@ -104,7 +108,12 @@ final class SM64KingBobombObjectBridge {
             y: positionY ?? homeY,
             z: 0
         )
-        var state = SM64KingBobombState(homeY: homeY, positionY: initialPosition.y, moveYaw: 0)
+        let resolvedHome = homePosition ?? SM64ObjectVector3(
+            x: initialPosition.x,
+            y: homeY,
+            z: initialPosition.z
+        )
+        var state = SM64KingBobombState(homeY: resolvedHome.y, positionY: initialPosition.y, moveYaw: 0)
         state.action = action
         states[id] = state
         environments[id] = SM64KingBobombEnvironment(
@@ -112,11 +121,7 @@ final class SM64KingBobombObjectBridge {
         )
         _ = pool.mutate(id) { record in
             record.position = initialPosition
-            record.homePosition = SM64ObjectVector3(
-                x: initialPosition.x,
-                y: homeY,
-                z: initialPosition.z
-            )
+            record.homePosition = resolvedHome
             record.wallHitboxRadius = wallHitboxRadius
             record.gravity = state.gravity
             record.dragStrength = 10
@@ -212,17 +217,44 @@ final class SM64KingBobombObjectBridge {
                 z: behaviorPosition.z + SM64CanonicalTrig.coss(oldState.moveYaw) * oldState.forwardVelocity
             )
             : behaviorPosition
-        let movement = physicsEnabled && !oldState.usingHomeMovement ? movementResult(
-            record: record,
-            startPosition: behaviorPosition,
-            candidatePosition: candidatePosition,
-            floorHeight: collision?.floorHeight ?? record.floorHeight,
-            floorRoom: collision?.floorRoom ?? Int8(truncatingIfNeeded: record.floorRoom),
-            previousMoveFlags: collision?.moveFlags ?? record.moveFlags,
-            forwardVelocity: oldState.forwardVelocity,
-            moveYaw: oldState.moveYaw,
-            collisionWorld: collisionWorld
-        ) : nil
+        let homeStep = physicsEnabled && oldState.usingHomeMovement
+            ? SM64KingBobombHomeMovement.step(
+                SM64KingBobombHomeArcStepInput(
+                    position: behaviorPosition,
+                    moveYaw: oldState.moveYaw,
+                    forwardVelocity: oldState.forwardVelocity,
+                    velocityY: oldState.velocityY,
+                    gravity: oldState.gravity,
+                    nativeStepScale: 1
+                )
+            )
+            : nil
+        let movement: SM64KingBobombMovementResult?
+        if let homeStep {
+            movement = SM64KingBobombMovementResult(
+                position: homeStep.position,
+                velocity: homeStep.velocity,
+                forwardVelocity: oldState.forwardVelocity,
+                moveFlags: collision?.moveFlags ?? record.moveFlags,
+                hitEdge: false,
+                landed: false,
+                onGround: false
+            )
+        } else if physicsEnabled && !oldState.usingHomeMovement {
+            movement = movementResult(
+                record: record,
+                startPosition: behaviorPosition,
+                candidatePosition: candidatePosition,
+                floorHeight: collision?.floorHeight ?? record.floorHeight,
+                floorRoom: collision?.floorRoom ?? Int8(truncatingIfNeeded: record.floorRoom),
+                previousMoveFlags: collision?.moveFlags ?? record.moveFlags,
+                forwardVelocity: oldState.forwardVelocity,
+                moveYaw: oldState.moveYaw,
+                collisionWorld: collisionWorld
+            )
+        } else {
+            movement = nil
+        }
         var behaviorState = oldState
         if let movement {
             behaviorState.velocityY = movement.velocity.y
@@ -233,12 +265,48 @@ final class SM64KingBobombObjectBridge {
         if let collision {
             behaviorInput.landed = collision.moveFlags & SM64KingBobombCollision.landed != 0
             behaviorInput.onGround = collision.moveFlags & SM64KingBobombCollision.onGround != 0
+            behaviorInput.atHome = behaviorInput.atHome
+                || abs(behaviorPosition.y - oldState.homeY) < 0.001
         }
         if let movement {
             behaviorInput.landed = movement.landed
             behaviorInput.onGround = movement.onGround
         }
-        let output = SM64KingBobombBehavior.update(behaviorInput, state: behaviorState)
+        var output = SM64KingBobombBehavior.update(behaviorInput, state: behaviorState)
+        let homeArcStart: SM64KingBobombHomeArcStart?
+        if oldState.action == SM64KingBobombBehavior.returnHomeAction,
+           oldState.subAction == 0,
+           output.state.subAction == 1,
+           output.state.usingHomeMovement {
+            homeArcStart = SM64KingBobombHomeMovement.start(
+                SM64KingBobombHomeArcInput(
+                    currentPosition: movement?.position ?? behaviorPosition,
+                    homePosition: record.homePosition,
+                    initialVelocityY: 100,
+                    gravity: -4
+                )
+            )
+            if let homeArcStart {
+                var state = output.state
+                state.moveYaw = homeArcStart.moveYaw
+                state.forwardVelocity = homeArcStart.forwardVelocity
+                state.velocityY = homeArcStart.velocityY
+                state.gravity = homeArcStart.gravity
+                output = SM64KingBobombOutput(
+                    state: state,
+                    animation: output.animation,
+                    dialogID: output.dialogID,
+                    dialogRequested: output.dialogRequested,
+                    effects: output.effects,
+                    soundValues: output.soundValues,
+                    soundSpawnerValues: output.soundSpawnerValues,
+                    cameraShake: output.cameraShake,
+                    starPosition: output.starPosition
+                )
+            }
+        } else {
+            homeArcStart = nil
+        }
         states[id] = output.state
         _ = pool.mutate(id) { $0.heldState = UInt32(input.heldState.rawValue) }
         synchronizeRecord(
@@ -294,6 +362,7 @@ final class SM64KingBobombObjectBridge {
                 output: output,
                 collision: collision,
                 movement: movement,
+                homeArcStart: homeArcStart,
                 presentedEffects: delivery.presented
             )
         )

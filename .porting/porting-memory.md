@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21e closes the bounded King Bob-omb return-home trajectory seam. The owner
+  route matches `arc_to_goal_pos`'s 49-frame launch setup and advances with
+  the source no-terminal-velocity `cur_obj_move_using_fvel_and_gravity`
+  helper while preserving copied floor/wall facts and home transforms.
+  Focused strict Swift/C home-motion fingerprint
+  `0x1640c0cb197a0aa5`, script `script/test_king_bobomb_home_movement.sh`,
+  expanded matrix target `runs=181 failures=0`, and regenerated native Debug
+  build target `/tmp/sm64-modern-m21e-build.log` are the evidence boundary.
+  Arena/camera ownership, reward persistence, real presentation, remaining
+  bosses, and device/visual/human acceptance remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M21e.md`.
+
 - M21d makes the King Bob-omb collision world an explicit opt-in owner-thread
   input. The bridge executes wall/floor prepass, standard movement, then the
   action kernel; publishes copied floor/wall/velocity/move-flag results into
