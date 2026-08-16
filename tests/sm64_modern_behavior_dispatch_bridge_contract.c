@@ -1197,6 +1197,8 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 9); // shared Fly Guy route
     // Bowser's distinct mine-flame identity now shares its owner route.
     fingerprint = hash_u64(fingerprint, 40); // shared Bowser-bomb route
+    // Big Boo's bridge-owned static staircase child shares the parent route.
+    fingerprint = hash_u64(fingerprint, 8); // shared Big Boo route
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

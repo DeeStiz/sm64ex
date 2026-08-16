@@ -251,7 +251,8 @@ final class SM64BehaviorDispatchBridge {
             return .swoop
         case SM64PiranhaPlantObjectBridge.defaultBehaviorIdentity:
             return .piranhaPlant
-        case SM64BigBooObjectBridge.defaultBehaviorIdentity:
+        case SM64BigBooObjectBridge.defaultBehaviorIdentity,
+             SM64BigBooObjectBridge.staircaseBehaviorIdentity:
             return .bigBoo
         case SM64FlyGuyObjectBridge.defaultBehaviorIdentity,
              SM64FlyGuyObjectBridge.flameBehaviorIdentity:

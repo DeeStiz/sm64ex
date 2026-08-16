@@ -2,6 +2,22 @@
 
 ## Current Milestone
 
+- M22ax registers Big Boo's bridge-owned static staircase identity in the
+  existing Big Boo parent route. The shared table records the staircase child
+  under the same owner route that allocates its three level-list records and
+  source transforms, without inventing a second child scheduler. Strict
+  Swift/C forty-two-route identity fingerprint `0x6e434328de50d0f9`, behavior
+  manifest fingerprint `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner
+  routes, and 461 explicit `unmigrated_c_adapter` rows are the accounting
+  boundary. Focused dispatch/Big Boo contracts, native Debug target
+  `/tmp/sm64-modern-m22ax-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix
+  (`/tmp/sm64-modern-m22ax-final-matrix.log`), `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full staircase
+  collision/presentation consumers, remaining adapters, and live parity remain
+  open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ax.md`.
+
 - M22aw registers the distinct Bowser mine-flame identity
   `bhvBowserBombExplosion` in the existing Bowser-bomb owner route. The bridge
   owns its explosion timer/scale/animation reducer, same-frame smoke
