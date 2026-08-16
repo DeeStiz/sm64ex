@@ -2,12 +2,13 @@
 
 ## Status
 
-M23b is the latest validated persistence slice layered on M34a/M33f/M22bc;
-Swift now exposes the C-compatible save-file query surface for file existence,
-star/cannon flags, course/total star counts, cap placement, coin-score lookup,
-and age-based maximum-score tie breaks. M23a's atomic recovery repair and
-legacy-image upgrade remain in force, and the query surface has an independent
-Swift/C fingerprint. M22 remains behavior-coverage work in progress: the
+M23c is the latest validated persistence slice layered on M34a/M33f/M22bc;
+the owner-thread EEPROM adapter now implements C-order save-file copy and
+erase, including destination high-score-age touching, signed zero-save
+replacement, menu preservation, and atomic primary/backup writes. M23a's
+recovery repair and M23b's pure query surface remain in force, with an
+independent Swift/C mutation fingerprint. M22 remains behavior-coverage work
+in progress: the
 latest bounded gameplay slice is M22bc. M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
@@ -1829,6 +1830,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | In progress — M23a closes C-compatible EEPROM repair and legacy-image upgrade; save mutation breadth, byte-identity replay, and complete C↔Swift authority closure remain |
 | M23a: Atomic EEPROM recovery repair | `SM64OwnerThreadEEPROMAdapter.load` now repairs a single invalid primary/backup copy, wipes and rewrites both copies on dual corruption, and upgrades a valid legacy 176-byte bundle to the normalized 512-byte image on the owner thread. | Complete locally — Swift/C EEPROM fingerprints `0x3fac91b6c0a1f3cd`, focused legacy-upgrade and post-repair assertions, persistence regression, `git diff --check`; full save mutation/option/restart parity remains |
 | M23b: C-compatible save-file query surface | `SM64SaveFileQueries` mirrors file existence, secret/course star flags, cannon indexing, course/total counts, cap-position gating, coin-score reads, and `save_file_get_max_coin_score` age tie-breaks as pure Swift values. | Complete locally — Swift/C query fingerprint `0x5562efafd48db61c`, focused Swift 6/C contract, regenerated native Debug build, complete 206-script matrix, strict-concurrency audit, and `git diff --check`; save mutations, options, and full authority replay remain |
+| M23c: Owner-thread save copy/erase mutations | `SM64OwnerThreadEEPROMAdapter.copy` and `.erase` mirror `save_file_copy`/`save_file_erase`: touch destination high-score ages first, then copy or clear the SaveFile and atomically persist both save copies plus the shared menu pair. | Complete locally — Swift/C mutation fingerprint `0x33186d5894562d7b`, focused mutation contract plus M23a/M23b regressions, regenerated native Debug build, complete 208-script matrix, strict-concurrency audit, and `git diff --check`; flag/star/cannon/cap/sound mutators and full authority replay remain |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |
 | M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | Not started |
@@ -2113,6 +2115,11 @@ replayable trace, and the platform evidence listed in its exit gate.
    and age-based maximum-score tie break in a pure `Sendable` API. Its exit
    gate is an independent Swift/C fingerprint over all four slots and the
    shared menu ages; no query may read C globals or silently broaden an index.
+   M23c adds the first owner-thread save mutators: `copy` and `erase` touch
+   destination high-score ages before replacing the destination SaveFile,
+   preserve menu sound/filler bytes, recompute signatures, and atomically write
+   both copies. The exit gate compares the complete 512-byte image after each
+   operation against an independent C contract.
 2. **M24 configuration and cheats.** Port defaults, bindings, camera
    settings, audio/video options, language, legal-ROM settings, cheats, and
    invalid-value recovery. Keep engine authority immutable after launch and

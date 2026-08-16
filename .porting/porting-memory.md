@@ -2,6 +2,14 @@
 
 ## Current Milestone
 
+- M23c adds owner-thread `SM64OwnerThreadEEPROMAdapter.copy` and `.erase`
+  equivalents for C `save_file_copy`/`save_file_erase`. They touch destination
+  high-score ages in source order, preserve menu sound/filler bytes, recompute
+  signatures, and atomically persist both save copies plus the shared menu
+  pair. Swift/C complete-image fingerprint `0x33186d5894562d7b`; focused
+  mutation contract and M23a/M23b regressions pass. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M23c.md`.
+
 - M23b adds `SM64SaveFileQueries`, a pure Swift 6/C-compatible read-only
   surface for file existence, secret/course star flags, cannon indexing,
   course/total star counts, cap placement, coin-score reads, and the

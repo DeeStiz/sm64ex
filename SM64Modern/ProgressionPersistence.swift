@@ -325,6 +325,76 @@ final class SM64OwnerThreadEEPROMAdapter: Sendable {
         try Data(image.bytes).write(to: imageURL, options: .atomic)
     }
 
+    /// C `save_file_erase`: touch the destination file's high-score ages,
+    /// clear its complete SaveFile payload, and persist both save copies plus
+    /// the shared menu pair in one owner-thread atomic image replacement.
+    func erase(
+        saveFileIndex: Int,
+        ownerThreadToken: UInt64
+    ) throws {
+        assertOwnerThread(ownerThreadToken)
+        try validate(saveFileIndex: saveFileIndex)
+        _ = try load(
+            saveFileIndex: saveFileIndex,
+            ownerThreadToken: ownerThreadToken
+        )
+        var image = try readImage() ?? .empty()
+        let menu = try menuSnapshot(from: image)
+        let aged = SM64CoinScoreAgeReducer.touchAll(
+            fileIndex: saveFileIndex,
+            state: SM64CoinScoreAgeState(ages: menu.coinScoreAges)
+        ) ?? SM64CoinScoreAgeState(ages: menu.coinScoreAges)
+        let nextMenu = SM64MenuDataSnapshot(
+            coinScoreAges: aged.ages,
+            soundMode: menu.soundMode,
+            filler: menu.filler
+        )
+        let emptySave = SM64SaveFileCodec.encode(SM64SaveFileSnapshot())
+        image.savePrimary[saveFileIndex] = emptySave
+        image.saveBackup[saveFileIndex] = emptySave
+        let menuBytes = SM64MenuDataCodec.encode(nextMenu)
+        image.menuPrimary = menuBytes
+        image.menuBackup = menuBytes
+        try writeImage(image)
+    }
+
+    /// C `save_file_copy`: age the destination's coin-score entries before
+    /// copying the source SaveFile into both destination copies.
+    func copy(
+        saveFileIndex sourceSaveFileIndex: Int,
+        to destinationSaveFileIndex: Int,
+        ownerThreadToken: UInt64
+    ) throws {
+        assertOwnerThread(ownerThreadToken)
+        try validate(saveFileIndex: sourceSaveFileIndex)
+        try validate(saveFileIndex: destinationSaveFileIndex)
+        _ = try load(
+            saveFileIndex: destinationSaveFileIndex,
+            ownerThreadToken: ownerThreadToken
+        )
+        var image = try readImage() ?? .empty()
+        let source = SM64SaveFileCodec.decode(
+            image.savePrimary[sourceSaveFileIndex]
+        ) ?? SM64SaveFileSnapshot()
+        let menu = try menuSnapshot(from: image)
+        let aged = SM64CoinScoreAgeReducer.touchAll(
+            fileIndex: destinationSaveFileIndex,
+            state: SM64CoinScoreAgeState(ages: menu.coinScoreAges)
+        ) ?? SM64CoinScoreAgeState(ages: menu.coinScoreAges)
+        let nextMenu = SM64MenuDataSnapshot(
+            coinScoreAges: aged.ages,
+            soundMode: menu.soundMode,
+            filler: menu.filler
+        )
+        let saveBytes = SM64SaveFileCodec.encode(source)
+        image.savePrimary[destinationSaveFileIndex] = saveBytes
+        image.saveBackup[destinationSaveFileIndex] = saveBytes
+        let menuBytes = SM64MenuDataCodec.encode(nextMenu)
+        image.menuPrimary = menuBytes
+        image.menuBackup = menuBytes
+        try writeImage(image)
+    }
+
     func load(
         saveFileIndex: Int,
         ownerThreadToken: UInt64
@@ -455,6 +525,19 @@ final class SM64OwnerThreadEEPROMAdapter: Sendable {
 
     private func writeImage(_ image: SM64PersistenceImage) throws {
         try Data(image.bytes).write(to: imageURL, options: .atomic)
+    }
+
+    private func validate(saveFileIndex: Int) throws {
+        guard (0..<SM64PersistenceImage.fileCount).contains(saveFileIndex) else {
+            throw SM64PersistenceAdapterError.invalidSaveFileIndex
+        }
+    }
+
+    private func menuSnapshot(
+        from image: SM64PersistenceImage
+    ) throws -> SM64MenuDataSnapshot {
+        SM64MenuDataCodec.decode(image.menuPrimary)
+            ?? SM64MenuDataSnapshot()
     }
 
     private func assertOwnerThread(_ token: UInt64) {
