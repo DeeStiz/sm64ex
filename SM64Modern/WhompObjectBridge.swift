@@ -7,6 +7,8 @@ struct SM64WhompObjectEffectRecord: Equatable, Sendable {
     let effects: SM64WhompEffect
     let health: Int16
     let markedForDeletion: Bool
+    let collision: SM64WhompCollisionResult?
+    let movement: SM64WhompMovementResult?
     let spawnedChildren: [SM64ObjectID]
     let presentedEffects: [SM64OwnerThreadEffectIntent]
 }
@@ -29,6 +31,11 @@ final class SM64WhompObjectBridge {
     static let starModel: UInt32 = 0x7A // MODEL_STAR
     static let starBehaviorIdentity: UInt64 = 0x6268_765F_73746E
     static let kingWhompStarPosition = SM64ObjectVector3(x: 180, y: 3_880, z: 340)
+    static let defaultWallHitboxRadius: Float = 0
+    static let sourceGravity: Float = SM64WhompCollision.gravity
+    static let sourceBounciness: Float = SM64WhompCollision.bounciness
+    static let sourceDragStrength: Float = SM64WhompCollision.dragStrength
+    static let sourceBuoyancy: Float = SM64WhompCollision.buoyancy
 
     private let scheduler: SM64ObjectScheduler
     private let effectRouter: SM64OwnerThreadEffectRouter
@@ -63,6 +70,7 @@ final class SM64WhompObjectBridge {
         homeZ: Float = 0,
         moveYaw: Int16 = 0,
         action: SM64WhompAction = .initialize,
+        wallHitboxRadius: Float = SM64WhompObjectBridge.defaultWallHitboxRadius,
         model: UInt32 = SM64WhompObjectBridge.defaultModel,
         behaviorIdentity: UInt64 = SM64WhompObjectBridge.defaultBehaviorIdentity
     ) throws -> SM64ObjectID {
@@ -79,6 +87,7 @@ final class SM64WhompObjectBridge {
             homeZ: homeZ,
             moveYaw: moveYaw,
             action: action,
+            wallHitboxRadius: wallHitboxRadius,
             in: engineState.objects
         ) else {
             _ = engineState.objects.despawn(id)
@@ -96,6 +105,7 @@ final class SM64WhompObjectBridge {
         homeZ: Float = 0,
         moveYaw: Int16 = 0,
         action: SM64WhompAction = .initialize,
+        wallHitboxRadius: Float = SM64WhompObjectBridge.defaultWallHitboxRadius,
         in pool: SM64ObjectPool
     ) -> Bool {
         guard pool.record(for: id) != nil else { return false }
@@ -109,7 +119,13 @@ final class SM64WhompObjectBridge {
         state.action = action
         states[id] = state
         inputs[id] = SM64WhompTickInput()
-        synchronizeRecord(id: id, state: state, pool: pool, previousAction: state.action)
+        synchronizeRecord(
+            id: id,
+            state: state,
+            pool: pool,
+            previousAction: state.action,
+            wallHitboxRadius: wallHitboxRadius
+        )
         return true
     }
 
@@ -124,6 +140,8 @@ final class SM64WhompObjectBridge {
     func tick(
         state engineState: SM64SwiftEngineState,
         inputs frameInputs: [SM64ObjectID: SM64WhompTickInput] = [:],
+        collisionWorld: SM64SurfaceCollisionWorld? = nil,
+        advanceMovement: Bool = false,
         presentBossEffects: Bool = false,
         spawnRewardStar: Bool = false
     ) -> SM64WhompSchedulerTickResult {
@@ -136,6 +154,8 @@ final class SM64WhompObjectBridge {
             self?.update(
                 id: id,
                 pool: pool,
+                collisionWorld: collisionWorld,
+                advanceMovement: advanceMovement,
                 presentBossEffects: presentBossEffects,
                 spawnRewardStar: spawnRewardStar
             )
@@ -154,15 +174,114 @@ final class SM64WhompObjectBridge {
     private func update(
         id: SM64ObjectID,
         pool: SM64ObjectPool,
+        collisionWorld: SM64SurfaceCollisionWorld?,
+        advanceMovement: Bool,
         presentBossEffects: Bool,
         spawnRewardStar: Bool
     ) {
         guard var whomp = states[id], pool.record(for: id) != nil else { return }
         let previousAction = whomp.action
-        let input = inputs[id] ?? defaultInput(for: id, pool: pool)
-        let result = SM64WhompKernel.tick(input, state: &whomp)
+        guard let record = pool.record(for: id) else { return }
+        let physicsEnabled = advanceMovement && collisionWorld != nil
+        let collision = physicsEnabled
+            ? collisionWorld.flatMap { world in
+                SM64WhompCollision.resolve(
+                    SM64WhompCollisionInput(
+                        position: record.position,
+                        moveYaw: whomp.moveYaw,
+                        forwardVelocity: whomp.forwardVelocity,
+                        wallHitboxRadius: record.wallHitboxRadius,
+                        previousMoveFlags: record.moveFlags,
+                        world: world
+                    )
+                )
+            }
+            : nil
+        var input = inputs[id] ?? defaultInput(for: id, pool: pool)
+        if let collision {
+            input.landed = collision.moveFlags & SM64WhompCollision.landed != 0
+            input.onGround = collision.moveFlags & SM64WhompCollision.onGround != 0
+            input.movementHandledExternally = true
+        }
+        let actionResult = SM64WhompKernel.tick(input, state: &whomp)
+        var movement: SM64WhompMovementResult?
+        if physicsEnabled, let world = collisionWorld {
+            let basePosition = collision?.position ?? record.position
+            let actionPosition = SM64ObjectVector3(
+                x: basePosition.x,
+                y: whomp.positionY,
+                z: basePosition.z
+            )
+            let candidatePosition = SM64ObjectVector3(
+                x: actionPosition.x
+                    + SM64CanonicalTrig.sins(whomp.moveYaw) * whomp.forwardVelocity,
+                y: actionPosition.y,
+                z: actionPosition.z
+                    + SM64CanonicalTrig.coss(whomp.moveYaw) * whomp.forwardVelocity
+            )
+            let floor = collision ?? SM64WhompCollision.resolve(
+                SM64WhompCollisionInput(
+                    position: actionPosition,
+                    moveYaw: whomp.moveYaw,
+                    forwardVelocity: whomp.forwardVelocity,
+                    wallHitboxRadius: record.wallHitboxRadius,
+                    previousMoveFlags: record.moveFlags,
+                    world: world
+                )
+            )
+            let intendedFloor = world.findFloor(
+                x: candidatePosition.x,
+                y: candidatePosition.y,
+                z: candidatePosition.z
+            )
+            let intendedRoom: Int8 = intendedFloor.surfaceID.flatMap {
+                world.surface(withID: $0)?.room
+            } ?? 0
+            movement = SM64WhompCollision.move(
+                SM64WhompMovementInput(
+                    startPosition: actionPosition,
+                    candidatePosition: candidatePosition,
+                    velocityY: whomp.velocityY,
+                    forwardVelocity: whomp.forwardVelocity,
+                    moveYaw: whomp.moveYaw,
+                    floorHeight: floor?.floorHeight ?? record.floorHeight,
+                    floorRoom: floor?.floorRoom ?? Int8(truncatingIfNeeded: record.floorRoom),
+                    objectRoom: Int8(truncatingIfNeeded: record.room),
+                    moveFlags: floor?.moveFlags ?? record.moveFlags,
+                    gravity: Self.sourceGravity,
+                    bounciness: Self.sourceBounciness,
+                    dragStrength: Self.sourceDragStrength,
+                    buoyancy: Self.sourceBuoyancy,
+                    nativeStepScale: 1,
+                    intendedFloorHeight: intendedFloor.height,
+                    intendedFloorNormalY: intendedFloor.normalY ?? 0,
+                    intendedFloorRoom: intendedRoom,
+                    intendedFloorExists: intendedFloor.surfaceID != nil,
+                    waterLevel: world.findWaterLevel(
+                        x: candidatePosition.x,
+                        z: candidatePosition.z
+                    ),
+                    activeFarAway: false
+                )
+            )
+            if let movement {
+                whomp.positionX = movement.position.x
+                whomp.positionY = movement.position.y
+                whomp.positionZ = movement.position.z
+                whomp.velocityY = movement.velocity.y
+                whomp.forwardVelocity = movement.forwardVelocity
+            }
+        }
+        let result = SM64WhompTickResult(state: whomp, effects: actionResult.effects)
         states[id] = whomp
-        synchronizeRecord(id: id, state: whomp, pool: pool, previousAction: previousAction)
+        synchronizeRecord(
+            id: id,
+            state: whomp,
+            pool: pool,
+            previousAction: previousAction,
+            collision: collision,
+            movement: movement
+        )
         var spawnedChildren: [SM64ObjectID] = []
         if spawnRewardStar,
            whomp.size == .king,
@@ -245,6 +364,8 @@ final class SM64WhompObjectBridge {
                 effects: result.effects,
                 health: whomp.health,
                 markedForDeletion: whomp.markedForDeletion,
+                collision: collision,
+                movement: movement,
                 spawnedChildren: spawnedChildren,
                 presentedEffects: delivery.presented
             )
@@ -274,7 +395,10 @@ final class SM64WhompObjectBridge {
         id: SM64ObjectID,
         state: SM64WhompState,
         pool: SM64ObjectPool,
-        previousAction: SM64WhompAction
+        previousAction: SM64WhompAction,
+        wallHitboxRadius: Float? = nil,
+        collision: SM64WhompCollisionResult? = nil,
+        movement: SM64WhompMovementResult? = nil
     ) {
         _ = pool.mutate(id) { record in
             record.objectFlags |=
@@ -301,9 +425,24 @@ final class SM64WhompObjectBridge {
             record.damageOrCoinValue = Int32(state.hitbox.damageOrCoinValue)
             record.hitboxRadius = state.hitbox.radius
             record.hitboxHeight = state.hitbox.height
-            record.wallHitboxRadius = 0
-            record.gravity = -400
-            record.buoyancy = 200
+            if let wallHitboxRadius { record.wallHitboxRadius = wallHitboxRadius }
+            record.gravity = Self.sourceGravity
+            record.buoyancy = Self.sourceBuoyancy
+            record.dragStrength = Self.sourceDragStrength
+            if let collision {
+                record.floorHeight = collision.floorHeight
+                record.floorType = collision.floorType
+                record.floorRoom = Int16(collision.floorRoom)
+                record.moveFlags = collision.moveFlags
+            }
+            if let movement {
+                record.position = movement.position
+                record.velocity = movement.velocity
+                record.forwardVelocity = movement.forwardVelocity
+                record.moveFlags = movement.moveFlags
+            } else {
+                record.velocity.y = state.velocityY
+            }
         }
     }
 }

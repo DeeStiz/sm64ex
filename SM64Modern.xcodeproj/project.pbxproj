@@ -156,6 +156,7 @@
 		AF40398B5A629439B358BCB6 /* SurfacePartition.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0A48044C7446A27CC2578D5 /* SurfacePartition.swift */; };
 		B188BC254D2FE77844ADEE0F /* MemoryArena.swift in Sources */ = {isa = PBXBuildFile; fileRef = A25BB84567898B7DD0F01721 /* MemoryArena.swift */; };
 		B34928D4906D68E5F50AD5E0 /* MarioInputFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4C0CFFDA8636E0474D01D970 /* MarioInputFrame.swift */; };
+		B457DCA7778D53AE4A1CDEF6 /* WhompCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2432224068DC648CF7B5E075 /* WhompCollision.swift */; };
 		B4686DF5DFEC2DA43F411A67 /* ContentPack.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3F0AEF5342F3B329237DD66 /* ContentPack.swift */; };
 		B4EB45CA367DED1BF59D3D99 /* RotatingPlatformBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = F28F9F86BA8486D9F6BB005C /* RotatingPlatformBehavior.swift */; };
 		B5333ED03F4E4EB691D052B7 /* MarioBrakingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = C23B165EA0ECBB7202A73BB8 /* MarioBrakingAction.swift */; };
@@ -242,6 +243,7 @@
 		214588F2B3DD80568BE38D36 /* TTCRotatingSolidBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCRotatingSolidBehavior.swift; sourceTree = "<group>"; };
 		21635A888B1CF4C5B13766F6 /* YoshiBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoshiBehavior.swift; sourceTree = "<group>"; };
 		2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScriptContentRuntime.swift; sourceTree = "<group>"; };
+		2432224068DC648CF7B5E075 /* WhompCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhompCollision.swift; sourceTree = "<group>"; };
 		2502E53A81CD7DB8511D1D97 /* LevelScriptContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScriptContentRuntime.swift; sourceTree = "<group>"; };
 		26195252708283AFB936E392 /* GameplayParity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameplayParity.swift; sourceTree = "<group>"; };
 		287F32D28BA6DAF70AE72591 /* SLWalkingPenguinBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinBehavior.swift; sourceTree = "<group>"; };
@@ -636,6 +638,7 @@
 				841FB989A9A3D6C38F573C2C /* TuxiesMotherObjectBridge.swift */,
 				3272FC72F5FA191847C8D57B /* WaterBomb.swift */,
 				1DE7AE7AC1D8F6731FE45B3C /* WaterBombObjectBridge.swift */,
+				2432224068DC648CF7B5E075 /* WhompCollision.swift */,
 				466600A4978BF6E07A6465C6 /* WhompEnemy.swift */,
 				189D1521FD7CFA3D234A28F6 /* WhompObjectBridge.swift */,
 				21635A888B1CF4C5B13766F6 /* YoshiBehavior.swift */,
@@ -942,6 +945,7 @@
 				7D4DC059653506AF1994A0FE /* TuxiesMotherObjectBridge.swift in Sources */,
 				C64BB4E43DA2868B1767C6E3 /* WaterBomb.swift in Sources */,
 				C4A4E51360A88FDFC1106CEA /* WaterBombObjectBridge.swift in Sources */,
+				B457DCA7778D53AE4A1CDEF6 /* WhompCollision.swift in Sources */,
 				F3119272F792799B5D608AF1 /* WhompEnemy.swift in Sources */,
 				5C1840210026D9416120F870 /* WhompObjectBridge.swift in Sources */,
 				5C4BFBD421D7D3B422C7571A /* YoshiBehavior.swift in Sources */,

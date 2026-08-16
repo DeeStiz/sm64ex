@@ -19,6 +19,11 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ChainChompRelease.swift" \
   "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
+  "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
+  "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinMovement.swift" \
+  "$PROJECT_ROOT/SM64Modern/WhompCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/WhompEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/WhompObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_whomp_object_bridge_smoke.swift" \

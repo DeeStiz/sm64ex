@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-whomp-boss-owner"
+PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-whomp-object-movement-bridge"
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
-  -parse-as-library \
-  -swift-version 6 \
+  -parse-as-library -swift-version 6 \
   -Xfrontend -strict-concurrency=complete \
   -module-cache-path "$BUILD_ROOT/module-cache" \
   "$PROJECT_ROOT/SM64Modern/ObjectPool.swift" \
@@ -27,21 +26,21 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/WhompCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/WhompEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/WhompObjectBridge.swift" \
-  "$PROJECT_ROOT/tests/sm64_modern_whomp_boss_owner_smoke.swift" \
-  -o "$BUILD_ROOT/sm64-modern-whomp-boss-owner-smoke"
-SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-whomp-boss-owner-smoke)"
+  "$PROJECT_ROOT/tests/sm64_modern_whomp_object_movement_bridge_smoke.swift" \
+  -o "$BUILD_ROOT/sm64-modern-whomp-object-movement-bridge-smoke"
+SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-whomp-object-movement-bridge-smoke)"
 printf '%s\n' "$SWIFT_OUTPUT"
 
 xcrun clang -std=c11 \
-  "$PROJECT_ROOT/tests/sm64_modern_whomp_boss_owner_contract.c" \
-  -o "$BUILD_ROOT/sm64-modern-whomp-boss-owner-contract"
-C_OUTPUT="$($BUILD_ROOT/sm64-modern-whomp-boss-owner-contract)"
+  "$PROJECT_ROOT/tests/sm64_modern_whomp_object_movement_bridge_contract.c" \
+  -o "$BUILD_ROOT/sm64-modern-whomp-object-movement-bridge-contract"
+C_OUTPUT="$($BUILD_ROOT/sm64-modern-whomp-object-movement-bridge-contract)"
 printf '%s\n' "$C_OUTPUT"
 
-SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^whompBossOwnerFingerprint=//p')"
-C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^whompBossOwnerFingerprint=//p')"
+SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^whompObjectMovementBridgeFingerprint=//p')"
+C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^whompObjectMovementBridgeFingerprint=//p')"
 [[ -n "$SWIFT_FINGERPRINT" && "$SWIFT_FINGERPRINT" == "$C_FINGERPRINT" ]] || {
-  echo "Swift/C Whomp King owner fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
+  echo "Swift/C Whomp owner movement fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
   exit 1
 }
-printf '%s\n' "SM64 Modern Whomp King owner C contract matched"
+printf '%s\n' "SM64 Modern Whomp owner collision/movement C contract matched"

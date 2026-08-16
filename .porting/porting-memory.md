@@ -2,6 +2,21 @@
 
 ## Current Milestone
 
+- M21i makes the Whomp owner bridge consume the immutable surface world behind
+  an explicit movement gate. The owner tick now executes the source order of
+  floor/wall prepass, Whomp action, and `cur_obj_move_standard(-20)`, applies
+  the source `SET_OBJ_PHYSICS` constants (gravity -4, bounciness -0.5, drag 0,
+  buoyancy 2), and publishes copied collision/movement facts into the
+  generation-safe record. Focused strict Swift/C fingerprint
+  0xf5bc6ef25b45cfac, script
+  script/test_whomp_object_movement_bridge.sh, full matrix
+  runs=185 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21i-build.log are the evidence boundary. The focused
+  value/owner gates remain fingerprint-stable; broad collision data, durable
+  progression/save mutation, real camera/cutscene consumption, and
+  device/visual/human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21i.md.
+
 - M21h extends the Whomp owner bridge for the King Whomp path. Explicit
   presentation and reward gates now deliver source sound, boss music,
   CAMERA_MODE_BOSS_FIGHT, particles, shake, and star intents; the reward path

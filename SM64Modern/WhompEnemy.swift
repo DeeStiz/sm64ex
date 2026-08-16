@@ -96,6 +96,10 @@ struct SM64WhompTickInput: Equatable, Sendable {
     var animationNearEnd: Bool
     var marioSquished: Bool
     var dialogComplete: Bool
+    /// When true, the owner bridge applies the source-order movement pass
+    /// after the action function. The default keeps the bounded value kernel
+    /// behavior and its existing differential fingerprint unchanged.
+    var movementHandledExternally: Bool
 
     init(
         distanceToMario: Float = 10_000,
@@ -108,7 +112,8 @@ struct SM64WhompTickInput: Equatable, Sendable {
         onGround: Bool = false,
         animationNearEnd: Bool = false,
         marioSquished: Bool = false,
-        dialogComplete: Bool = false
+        dialogComplete: Bool = false,
+        movementHandledExternally: Bool = false
     ) {
         self.distanceToMario = distanceToMario
         self.angleToMario = angleToMario
@@ -121,6 +126,7 @@ struct SM64WhompTickInput: Equatable, Sendable {
         self.animationNearEnd = animationNearEnd
         self.marioSquished = marioSquished
         self.dialogComplete = dialogComplete
+        self.movementHandledExternally = movementHandledExternally
     }
 }
 
@@ -213,7 +219,7 @@ enum SM64WhompKernel {
                 }
                 effects.insert(.chase)
             }
-            advance(&state)
+            if !input.movementHandledExternally { advance(&state) }
 
         case .turn:
             state.forwardVelocity = 3
@@ -239,7 +245,7 @@ enum SM64WhompKernel {
                 effects.insert(.stopBossMusic)
             }
             effects.insert(.turn)
-            advance(&state)
+            if !input.movementHandledExternally { advance(&state) }
 
         case .pound:
             state.forwardVelocity = 0
@@ -263,8 +269,10 @@ enum SM64WhompKernel {
                 }
             }
             effects.insert(.fall)
-            state.positionY += state.velocityY
-            state.velocityY -= 4
+            if !input.movementHandledExternally {
+                state.positionY += state.velocityY
+                state.velocityY -= 4
+            }
 
         case .landed:
             if state.subAction == 0 && input.landed {
@@ -342,7 +350,7 @@ enum SM64WhompKernel {
                 }
             }
             effects.insert(.returnHome)
-            advance(&state)
+            if !input.movementHandledExternally { advance(&state) }
 
         case .death:
             if state.size == .king {
