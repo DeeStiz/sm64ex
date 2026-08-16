@@ -31,6 +31,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case bouncingFireball = 27
     case kingBobomb = 28
     case slWalkingPenguin = 29
+    case smallPenguin = 30
     case unmigrated = 255
 }
 
@@ -99,6 +100,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let kingBobombEffects: [SM64KingBobombObjectEffect]
     let kingBobombDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let slWalkingPenguinEffects: [SM64SLWalkingPenguinObjectEffect]
+    let smallPenguinEffects: [SM64SmallPenguinObjectEffect]
+    let smallPenguinDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -136,6 +139,7 @@ final class SM64BehaviorDispatchBridge {
     let bouncingFireball: SM64BouncingFireballObjectBridge
     let kingBobomb: SM64KingBobombObjectBridge
     let slWalkingPenguin: SM64SLWalkingPenguinObjectBridge
+    let smallPenguin: SM64SmallPenguinObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -171,6 +175,7 @@ final class SM64BehaviorDispatchBridge {
         self.bouncingFireball = SM64BouncingFireballObjectBridge(scheduler: scheduler)
         self.kingBobomb = SM64KingBobombObjectBridge(scheduler: scheduler)
         self.slWalkingPenguin = SM64SLWalkingPenguinObjectBridge(scheduler: scheduler)
+        self.smallPenguin = SM64SmallPenguinObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -249,6 +254,9 @@ final class SM64BehaviorDispatchBridge {
             return .kingBobomb
         case SM64SLWalkingPenguinObjectBridge.defaultBehaviorIdentity:
             return .slWalkingPenguin
+        case SM64SmallPenguinObjectBridge.defaultBehaviorIdentity,
+             SM64SmallPenguinObjectBridge.babyBehaviorIdentity:
+            return .smallPenguin
         default:
             return .unmigrated
         }
@@ -286,6 +294,7 @@ final class SM64BehaviorDispatchBridge {
         for id in bouncingFireball.registeredIDs { bouncingFireball.remove(id) }
         for id in kingBobomb.registeredIDs { kingBobomb.remove(id) }
         for id in slWalkingPenguin.registeredIDs { slWalkingPenguin.remove(id) }
+        for id in smallPenguin.registeredIDs { smallPenguin.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -316,6 +325,7 @@ final class SM64BehaviorDispatchBridge {
         bouncingFireball.beginExternalTick()
         kingBobomb.beginExternalTick()
         slWalkingPenguin.beginExternalTick()
+        smallPenguin.beginExternalTick()
     }
 
     @discardableResult
@@ -896,6 +906,25 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnSmallPenguin(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        moveYaw: Int16 = 0,
+        wallHitboxRadius: Float = 0,
+        model: UInt32 = SM64SmallPenguinObjectBridge.defaultModel,
+        behaviorIdentity: UInt64 = SM64SmallPenguinObjectBridge.defaultBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try smallPenguin.spawnPenguin(
+            in: engineState,
+            position: position,
+            moveYaw: moveYaw,
+            wallHitboxRadius: wallHitboxRadius,
+            model: model,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -926,6 +955,7 @@ final class SM64BehaviorDispatchBridge {
         bouncingFireball.beginExternalTick()
         kingBobomb.beginExternalTick()
         slWalkingPenguin.beginExternalTick()
+        smallPenguin.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -1006,6 +1036,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.kingBobomb.updateInline(id, state: engineState, pool: pool)
             case .slWalkingPenguin:
                 _ = self.slWalkingPenguin.updateInline(id, pool: pool)
+            case .smallPenguin:
+                _ = self.smallPenguin.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -1044,6 +1076,7 @@ final class SM64BehaviorDispatchBridge {
             bouncingFireball.remove(id)
             kingBobomb.remove(id)
             slWalkingPenguin.remove(id)
+            smallPenguin.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -1114,6 +1147,7 @@ final class SM64BehaviorDispatchBridge {
         bouncingFireball.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         kingBobomb.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         slWalkingPenguin.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        smallPenguin.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -1173,7 +1207,9 @@ final class SM64BehaviorDispatchBridge {
             bouncingFireballEffects: bouncingFireball.effectLog,
             kingBobombEffects: kingBobomb.effectLog,
             kingBobombDeliveries: kingBobomb.deliveryLog,
-            slWalkingPenguinEffects: slWalkingPenguin.effectLog
+            slWalkingPenguinEffects: slWalkingPenguin.effectLog,
+            smallPenguinEffects: smallPenguin.effectLog,
+            smallPenguinDeliveries: smallPenguin.deliveryLog
         )
     }
 }

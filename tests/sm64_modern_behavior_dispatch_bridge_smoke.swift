@@ -760,6 +760,63 @@ private func hashSLWalkingPenguinDispatch(
     return hash
 }
 
+private func hashSmallPenguinDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.smallPenguinEffects.count))
+    for effect in tick.smallPenguinEffects {
+        hash = hashID(hash, effect.objectID)
+        let state = effect.output.state
+        hash = hashU64(hash, UInt64(bitPattern: Int64(state.action)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(state.timer)))
+        hash = hashU64(hash, UInt64(UInt16(bitPattern: state.moveYaw)))
+        hash = hashU64(hash, UInt64(state.forwardVelocity.bitPattern))
+        hash = hashU64(hash, UInt64(state.unknown104.bitPattern))
+        hash = hashU64(hash, UInt64(state.unknown108.bitPattern))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(state.unknown110)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(state.diveReturnAction)))
+        hash = hashU64(hash, UInt64(state.linkFlag))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(state.animation)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(state.heldState)))
+        hash = hashU64(hash, UInt64(UInt16(bitPattern: effect.output.angleVelocityYaw)))
+        hash = hashU64(hash, effect.output.resetHome ? 1 : 0)
+        hash = hashU64(hash, effect.output.playWalkingSound ? 1 : 0)
+        hash = hashU64(hash, effect.output.playDiveSound ? 1 : 0)
+        hash = hashU64(hash, effect.output.playHeldYellSound ? 1 : 0)
+        hash = hashU64(hash, effect.output.unrenderHeldObject ? 1 : 0)
+        hash = hashU64(hash, effect.output.copiedToMario ? 1 : 0)
+        hash = hashU64(hash, effect.output.setSmallPenguinBehavior ? 1 : 0)
+        hash = hashU64(hash, effect.output.thrown ? 1 : 0)
+        hash = hashU64(hash, effect.output.dropped ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.presentedEffects.count))
+        hash = hashU64(hash, effect.collision == nil ? 0 : 1)
+        hash = hashU64(hash, effect.movement == nil ? 0 : 1)
+    }
+    hash = hashU64(hash, UInt64(tick.smallPenguinDeliveries.count))
+    for delivery in tick.smallPenguinDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1212,6 +1269,31 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             "SL walking penguin value route is preserved"
         )
         fingerprint = hashSLWalkingPenguinDispatch(fingerprint, penguinTick)
+
+        let smallEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let smallBridge = SM64BehaviorDispatchBridge()
+        let smallPenguin = try smallBridge.spawnSmallPenguin(in: smallEngine)
+        _ = smallEngine.objects.mutate(smallPenguin) { record in
+            record.soundStateID = 1
+        }
+        let smallTick = smallBridge.tick(state: smallEngine)
+        require(smallTick.events.map(\.route) == [.smallPenguin], "small penguin route dispatch")
+        require(smallTick.scheduler.updated.map(\.traceSubject) == [1], "small penguin callback ordering")
+        require(
+            smallTick.smallPenguinEffects.count == 1
+                && smallTick.smallPenguinEffects.first?.objectID == smallPenguin
+                && smallTick.smallPenguinEffects.first?.output.state.action == SM64SmallPenguinBehavior.idleAction
+                && smallTick.smallPenguinEffects.first?.output.state.timer == 1
+                && smallTick.smallPenguinEffects.first?.output.state.animation == SM64SmallPenguinBehavior.idleAnimation
+                && smallTick.smallPenguinEffects.first?.presentedEffects.isEmpty == true,
+            "small penguin value route is preserved"
+        )
+        require(
+            smallTick.smallPenguinDeliveries.count == 1
+                && smallTick.smallPenguinDeliveries.first?.delivered.isEmpty == true,
+            "small penguin owner delivery is explicit"
+        )
+        fingerprint = hashSmallPenguinDispatch(fingerprint, smallTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

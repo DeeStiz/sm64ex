@@ -116,6 +116,37 @@ final class SM64SmallPenguinObjectBridge {
         return true
     }
 
+    /// Starts a shared-dispatch tick without running the standalone scheduler.
+    /// The behavior-dispatch owner calls this once before traversing the live
+    /// object lists so effect sequence numbers remain deterministic.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        pool: SM64ObjectPool
+    ) -> Bool {
+        guard states[id] != nil, pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool, collisionWorld: nil, advanceMovement: false)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        environments.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in Array(states.keys) where pool.record(for: id) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -124,9 +155,7 @@ final class SM64SmallPenguinObjectBridge {
         advanceMovement: Bool = false
     ) -> SM64SmallPenguinSchedulerTickResult {
         environments = frameEnvironments
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(
                 id: id,
@@ -135,14 +164,7 @@ final class SM64SmallPenguinObjectBridge {
                 advanceMovement: advanceMovement
             )
         }
-        for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            environments.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64SmallPenguinSchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog,

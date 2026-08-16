@@ -57,6 +57,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinMovement.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SmallPenguinBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/SmallPenguinMovement.swift" \
+  "$PROJECT_ROOT/SM64Modern/SmallPenguinObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \

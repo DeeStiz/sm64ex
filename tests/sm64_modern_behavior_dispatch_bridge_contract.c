@@ -42,6 +42,7 @@
 #define BOUNCING_FIREBALL_FLAME_BEHAVIOR UINT64_C(0x6268765f62666c6d)
 #define KING_BOBOMB_BEHAVIOR UINT64_C(0x6268765f6b626d)
 #define SL_WALKING_PENGUIN_BEHAVIOR UINT64_C(0x6268765f736c70)
+#define SMALL_PENGUIN_BEHAVIOR UINT64_C(0x6268765f73706e)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -730,6 +731,53 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // no completed turn
     fingerprint = hash_u64(fingerprint, 0); // no collision
     fingerprint = hash_u64(fingerprint, 0); // no movement
+
+    // Isolated shared-dispatch small penguin route.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t small_penguin_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, small_penguin_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 1); // object counter
+    fingerprint = hash_u64(fingerprint, 1); // updated count
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 1); // events
+    fingerprint = hash_event(fingerprint, 0, SMALL_PENGUIN_BEHAVIOR, 30);
+    fingerprint = hash_u64(fingerprint, 1); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // action
+    fingerprint = hash_u64(fingerprint, 1); // timer
+    fingerprint = hash_u64(fingerprint, 0); // move yaw
+    fingerprint = hash_u64(fingerprint, 0); // forward velocity
+    fingerprint = hash_u64(fingerprint, 0); // unknown104
+    fingerprint = hash_u64(fingerprint, 0); // unknown108
+    fingerprint = hash_u64(fingerprint, 0); // unknown110
+    fingerprint = hash_u64(fingerprint, 0); // dive return action
+    fingerprint = hash_u64(fingerprint, 0); // link flag
+    fingerprint = hash_u64(fingerprint, 3); // idle animation
+    fingerprint = hash_u64(fingerprint, 0); // held state
+    fingerprint = hash_u64(fingerprint, 0); // angle velocity yaw
+    fingerprint = hash_u64(fingerprint, 0); // no reset home
+    fingerprint = hash_u64(fingerprint, 0); // no walking sound
+    fingerprint = hash_u64(fingerprint, 0); // no dive sound
+    fingerprint = hash_u64(fingerprint, 0); // no held yell
+    fingerprint = hash_u64(fingerprint, 0); // no unrender
+    fingerprint = hash_u64(fingerprint, 0); // no copy
+    fingerprint = hash_u64(fingerprint, 0); // no behavior switch
+    fingerprint = hash_u64(fingerprint, 0); // no throw
+    fingerprint = hash_u64(fingerprint, 0); // no drop
+    fingerprint = hash_u64(fingerprint, 0); // no presented effects
+    fingerprint = hash_u64(fingerprint, 0); // no collision
+    fingerprint = hash_u64(fingerprint, 0); // no movement
+    fingerprint = hash_u64(fingerprint, 1); // deliveries
+    fingerprint = hash_u64(fingerprint, 0); // delivered
+    fingerprint = hash_u64(fingerprint, 0); // presented
+    fingerprint = hash_u64(fingerprint, 0); // spawned
+    fingerprint = hash_u64(fingerprint, 0); // deleted
+    fingerprint = hash_u64(fingerprint, 0); // rejected
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);
