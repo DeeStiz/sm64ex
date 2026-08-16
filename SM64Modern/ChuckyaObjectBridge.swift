@@ -115,31 +115,50 @@ final class SM64ChuckyaObjectBridge {
         return true
     }
 
+    /// Starts a tick owned by the shared behavior dispatcher. The bridge's
+    /// private scheduler is intentionally bypassed in that mode.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Updates one Chuckya parent or anchor child without nesting another
+    /// scheduler pass.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard (states[id] != nil || anchors[id] != nil), pool.record(for: id) != nil else {
+            return false
+        }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        anchors.removeValue(forKey: id)
+        parentForAnchor.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
         inputs frameInputs: [SM64ObjectID: SM64ChuckyaTickInput] = [:]
     ) -> SM64ChuckyaSchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
         for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            anchors.removeValue(forKey: id)
-            parentForAnchor.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(anchors.keys) where engineState.objects.record(for: id) == nil {
-            anchors.removeValue(forKey: id)
-            parentForAnchor.removeValue(forKey: id)
+            remove(id)
         }
         return SM64ChuckyaSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }

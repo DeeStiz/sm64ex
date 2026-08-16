@@ -2,12 +2,13 @@
 
 ## Current Milestone
 
-- M22w registers the existing `bhvHeaveHo` owner bridge and throw-child
-  identity in the shared `SM64BehaviorDispatchBridge`. The general-actor route
-  preserves parent/child list ordering, submerged/tangible/hidden state, and
-  pointer-free throw consumption with explicit owner-thread delivery.
-  Sixteen-route Swift/C fingerprint 0x60a85f947da2a12, standalone Heave Ho
-  fingerprint 0x9c4a7443f2c09281, behavior manifest fingerprint
+- M22w registers the existing `bhvHeaveHo` and `bhvChuckya` owner bridges plus
+  their throw/anchor child identities in the shared `SM64BehaviorDispatchBridge`.
+  The general-actor route preserves parent/child list ordering,
+  submerged/tangible/hidden state, and pointer-free throw consumption with
+  explicit owner-thread delivery. Seventeen-route Swift/C fingerprint
+  0xff2841bbbfbe7db0, standalone Heave Ho fingerprint 0x9c4a7443f2c09281,
+  standalone Chuckya fingerprint 0x1c7a7a54fd31996a, behavior manifest fingerprint
   0x9bb2863444c51d6d, 534 rows, 73 Swift value/owner routes, and 461 explicit
   `unmigrated_c_adapter` rows are the accounting boundary. Focused dispatch
   contract, native Debug build target /tmp/sm64-modern-m22w-build.log, full

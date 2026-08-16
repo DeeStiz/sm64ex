@@ -2,30 +2,35 @@
 
 ## Scope
 
-M22w registers the existing `bhvHeaveHo` owner bridge and its stable throw
-child identity in the shared `SM64BehaviorDispatchBridge`. The general-actor
-route updates the Heave Ho parent and child in source list order, preserves
-submerged/tangible/hidden state, and keeps throw consumption in a pointer-free
-value child state. Unknown identities remain fail-closed.
+M22w registers the existing `bhvHeaveHo` and `bhvChuckya` owner bridges plus
+their stable throw/anchor child identities in the shared
+`SM64BehaviorDispatchBridge`. The general-actor route updates each parent and
+child in source list order, preserves submerged/tangible/hidden state, and
+keeps throw consumption in pointer-free value child state. Unknown identities
+remain fail-closed.
 
-This closes a sixteenth live owner route only. The focused fixture exercises a
-submerged parent and its throw child and verifies cross-list ordering. The
-standalone differential remains the authority for wind-up/chase/throw branches;
+This closes a seventeenth live owner route only. The focused fixture exercises
+a submerged Heave Ho parent and throw child plus a Chuckya parent and anchor,
+and verifies cross-list ordering. The standalone differentials remain the
+authority for wind-up/chase/throw and patrol/grab/release branches;
 real collision, camera/audio, renderer, progression/save consumers, remaining
 adapters, and whole-game parity remain open.
 
 ## Evidence
 
-- `script/test_behavior_dispatch_bridge.sh` — strict Swift/C sixteen-route
-  fingerprint `0x60a85f947da2a12`; Heave Ho and throw-child identities are
-  dispatched after Snufit, with parent/child ordering and transient respawner
-  and Bob-omb children explicitly preserved.
+- `script/test_behavior_dispatch_bridge.sh` — strict Swift/C seventeen-route
+  fingerprint `0xff2841bbbfbe7db0`; Heave Ho/throw-child and Chuckya/anchor
+  identities are dispatched after Snufit, with parent/child ordering and
+  transient respawner and Bob-omb children explicitly preserved.
 - `script/test_heave_ho_object_bridge.sh` — standalone Heave Ho parent/throw
   child fingerprint `0x9c4a7443f2c09281`; value-kernel and owner differential
   remain matched.
+- `script/test_chuckya_object_bridge.sh` — standalone Chuckya parent/anchor
+  fingerprint `0x1c7a7a54fd31996a`; value-kernel and owner differential remain
+  matched.
 - `script/test_engine_runtime.sh`, `script/test_live_route_oracle.sh`, and
   `script/test_live_route_promotion.sh` — Swift 6 engine-context and schema-4
-  live-route contracts pass with the Heave Ho dependency set.
+  live-route contracts pass with the Heave Ho and Chuckya dependency set.
 - `script/test_behavior_manifest.sh` — fingerprint
   `0x9bb2863444c51d6d`; 534 rows, 73 `swift_value_owner` routes, and 461
   `unmigrated_c_adapter` rows.
