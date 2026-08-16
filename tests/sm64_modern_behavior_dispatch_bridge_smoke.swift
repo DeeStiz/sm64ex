@@ -971,6 +971,49 @@ private func hashMoneybagDispatch(
     return hash
 }
 
+private func hashWaterBombDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.waterBombEffects.count))
+    for effect in tick.waterBombEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        if let action = effect.action {
+            hash = hashU64(hash, 1)
+            hash = hashU64(hash, UInt64(action.rawValue))
+        } else {
+            hash = hashU64(hash, 0)
+        }
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.waterBombDeliveries.count))
+    for delivery in tick.waterBombDeliveries {
+        hash = hashU64(hash, UInt64(delivery.delivered.count))
+        hash = hashU64(hash, UInt64(delivery.presented.count))
+        hash = hashU64(hash, UInt64(delivery.spawned.count))
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        hash = hashU64(hash, UInt64(delivery.rejected.count))
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1536,6 +1579,59 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(moneybagTick.moneybagDeliveries.isEmpty, "Moneybag initial death has no delivery")
         fingerprint = hashMoneybagDispatch(fingerprint, moneybagTick)
+
+        let waterBombEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let waterBombBridge = SM64BehaviorDispatchBridge()
+        let waterBombSpawner = try waterBombBridge.spawnWaterBombSpawner(
+            in: waterBombEngine,
+            positionX: 0,
+            positionY: 0,
+            positionZ: 0,
+            radiusParameter: 0
+        )
+        require(
+            waterBombBridge.waterBomb.setSpawnerInput(
+                SM64WaterBombSpawnerTickInput(
+                    marioX: 100,
+                    marioY: 80,
+                    marioZ: 40,
+                    marioForwardVelocity: 5,
+                    marioMoveYaw: 0x1000,
+                    randomDelay: 7
+                ),
+                for: waterBombSpawner
+            ),
+            "Water-bomb spawner input attaches"
+        )
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64WaterBombObjectBridge.defaultBombBehaviorIdentity) == .waterBomb
+                && SM64BehaviorDispatchBridge.route(for: SM64WaterBombObjectBridge.defaultShadowBehaviorIdentity) == .waterBomb,
+            "Water-bomb child identities share the owner route"
+        )
+        let waterBombTick = waterBombBridge.tick(state: waterBombEngine)
+        require(
+            waterBombTick.events.map(\.route) == [.waterBomb, .waterBomb, .waterBomb],
+            "Water-bomb family route dispatch"
+        )
+        require(
+            waterBombTick.scheduler.updated.map(\.traceSubject) == [1, 2, 3],
+            "Water-bomb callback ordering"
+        )
+        require(
+            waterBombTick.waterBombEffects.count == 3
+                && waterBombTick.waterBombEffects[0].kind == .spawner
+                && waterBombTick.waterBombEffects[0].effects == [.animate, .spawnBomb]
+                && waterBombTick.waterBombEffects[0].spawnedChildren.count == 2
+                && waterBombTick.waterBombEffects[1].kind == .bomb
+                && waterBombTick.waterBombEffects[1].action == .drop
+                && waterBombTick.waterBombEffects[1].effects == [.animate, .landingSound]
+                && waterBombTick.waterBombEffects[2].kind == .shadow
+                && waterBombTick.waterBombEffects[2].action == .drop
+                && waterBombTick.waterBombEffects[2].effects == [.animate],
+            "Water-bomb value/owner route is preserved"
+        )
+        require(waterBombTick.waterBombDeliveries.isEmpty, "Water-bomb initial family has no delivery")
+        fingerprint = hashWaterBombDispatch(fingerprint, waterBombTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

@@ -85,6 +85,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ExplosionObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/MoneybagEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/MoneybagObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/WaterBomb.swift" \
+  "$PROJECT_ROOT/SM64Modern/WaterBombObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooObjectBridge.swift" \

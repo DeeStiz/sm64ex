@@ -2,6 +2,24 @@
 
 ## Current Milestone
 
+- M22ao registers the existing Water Bomb spawner, bomb, and parent-relative
+  shadow identities in the shared general-actor dispatch table. The same-frame
+  route preserves spawner-to-bomb/shadow allocation order, falling-bomb action
+  state, shadow follow state, and generation-safe owner delivery; the source
+  shadow identity aliases the spawner identity and remains fail-closed through
+  the same route. Thirty-six-route Swift/C fingerprint
+  `0xc7b2a0dd41f3eda3`, standalone Water Bomb fingerprint
+  `0x2c7546919aa992ae`, behavior manifest fingerprint `0x9bb2863444c51d6d`,
+  534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Water Bomb contracts, native Debug target
+  `/tmp/sm64-modern-m22ao-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full
+  collision/water/audio/presentation consumers, remaining adapters, and live
+  parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ao.md`.
+
 - M22an registers the existing Moneybag owner bridge for both the visible
   general-actor and hidden level-list identities in the shared
   `SM64BehaviorDispatchBridge`. The route preserves death/appear state,

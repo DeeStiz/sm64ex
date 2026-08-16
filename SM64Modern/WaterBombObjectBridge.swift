@@ -203,6 +203,35 @@ final class SM64WaterBombObjectBridge {
         return true
     }
 
+    /// Starts a shared-dispatch tick without running the standalone scheduler.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard registeredIDs.contains(id), pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        spawners.removeValue(forKey: id)
+        bombs.removeValue(forKey: id)
+        shadows.removeValue(forKey: id)
+        spawnerInputs.removeValue(forKey: id)
+        bombInputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -211,32 +240,13 @@ final class SM64WaterBombObjectBridge {
     ) -> SM64WaterBombSchedulerTickResult {
         spawnerInputs = frameSpawnerInputs
         bombInputs = frameBombInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
 
-        for id in schedulerResult.unloaded {
-            spawners.removeValue(forKey: id)
-            bombs.removeValue(forKey: id)
-            shadows.removeValue(forKey: id)
-            spawnerInputs.removeValue(forKey: id)
-            bombInputs.removeValue(forKey: id)
-        }
-        for id in Array(spawners.keys) where engineState.objects.record(for: id) == nil {
-            spawners.removeValue(forKey: id)
-            spawnerInputs.removeValue(forKey: id)
-        }
-        for id in Array(bombs.keys) where engineState.objects.record(for: id) == nil {
-            bombs.removeValue(forKey: id)
-            bombInputs.removeValue(forKey: id)
-        }
-        for id in Array(shadows.keys) where engineState.objects.record(for: id) == nil {
-            shadows.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64WaterBombSchedulerTickResult(
             scheduler: schedulerResult,

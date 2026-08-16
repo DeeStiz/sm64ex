@@ -47,6 +47,9 @@
 #define BOWSER_KEY_CUTSCENE_COURSE_EXIT UINT64_C(0x6268765f6b637865)
 #define EXPLOSION_BEHAVIOR UINT64_C(0x6268765f657870)
 #define MONEYBAG_BEHAVIOR UINT64_C(0x6268765f6d6f6e)
+#define WATER_BOMB_SPAWNER_BEHAVIOR UINT64_C(0x6268765f776273)
+#define WATER_BOMB_BEHAVIOR UINT64_C(0x6268765f77626d)
+#define WATER_BOMB_SHADOW_BEHAVIOR UINT64_C(0x6268765f776273)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -888,6 +891,47 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, 0); // visible moneybag
     fingerprint = hash_u64(fingerprint, 5); // death action
     fingerprint = hash_u64(fingerprint, 16); // death effect
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_u64(fingerprint, 0); // no deliveries
+
+    // Isolated shared-dispatch water-bomb spawner, bomb, and shadow family.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t water_bomb_counts[13] = {
+        0, 0, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, water_bomb_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 3); // object counter
+    fingerprint = hash_u64(fingerprint, 3); // updated count
+    for (uint64_t id = 0; id < 3; ++id) fingerprint = hash_id(fingerprint, id, 1);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 3); // events
+    fingerprint = hash_event(fingerprint, 0, WATER_BOMB_SPAWNER_BEHAVIOR, 35);
+    fingerprint = hash_event(fingerprint, 1, WATER_BOMB_BEHAVIOR, 35);
+    fingerprint = hash_event(fingerprint, 2, WATER_BOMB_SHADOW_BEHAVIOR, 35);
+    fingerprint = hash_u64(fingerprint, 3); // effects
+    fingerprint = hash_id(fingerprint, 0, 1);
+    fingerprint = hash_u64(fingerprint, 0); // spawner kind
+    fingerprint = hash_u64(fingerprint, 3); // animate + spawn bomb
+    fingerprint = hash_u64(fingerprint, 0); // no action
+    fingerprint = hash_u64(fingerprint, 2); // bomb and shadow children
+    fingerprint = hash_id(fingerprint, 1, 1);
+    fingerprint = hash_id(fingerprint, 2, 1);
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_id(fingerprint, 1, 1);
+    fingerprint = hash_u64(fingerprint, 1); // bomb kind
+    fingerprint = hash_u64(fingerprint, 5); // animate + landing sound
+    fingerprint = hash_u64(fingerprint, 1); // action present
+    fingerprint = hash_u64(fingerprint, 2); // drop action
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_id(fingerprint, 2, 1);
+    fingerprint = hash_u64(fingerprint, 2); // shadow kind
+    fingerprint = hash_u64(fingerprint, 1); // animate
+    fingerprint = hash_u64(fingerprint, 1); // action present
+    fingerprint = hash_u64(fingerprint, 2); // parent drop action
     fingerprint = hash_u64(fingerprint, 0); // no children
     fingerprint = hash_u64(fingerprint, 0); // not marked
     fingerprint = hash_u64(fingerprint, 0); // no deliveries
