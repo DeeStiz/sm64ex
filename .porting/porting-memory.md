@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M22n registers the existing `bhvSwoop` owner bridge in the shared
+  `SM64BehaviorDispatchBridge`. The general-actor route dispatches Amp, Boo,
+  Bob-omb, Bird, and Swoop in source list order, preserves Swoop's
+  animate/idle state and generation-safe records, and keeps the Bob-omb smoke
+  and respawner replacement children explicitly unmigrated. Seven-route
+  Swift/C fingerprint 0xb093af8af4cfa2d5, behavior manifest fingerprint
+  0x9bb2863444c51d6d, 534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused dispatch
+  contract, native Debug build target /tmp/sm64-modern-m22n-build.log, full
+  206-script matrix, `git diff --check`, and zero unchecked-Sendable audit are
+  required evidence. Whole-engine route breadth, the remaining adapters, and
+  live parity remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22n.md.
 - M22m registers the existing `bhvBird` owner bridge in spawned-flight mode
   inside the shared `SM64BehaviorDispatchBridge`. The general-actor route
   dispatches Amp, Boo, Bob-omb, and Bird in source list order, preserves Bird
