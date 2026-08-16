@@ -2,12 +2,12 @@
 
 ## Status
 
-M23a is the latest validated persistence slice layered on M34a/M33f/M22bc;
-the normalized Swift EEPROM adapter now performs C-compatible one-bad-copy
-repair, wipes and rewrites both copies when both signatures fail, and upgrades
-the legacy 176-byte bundle to the 512-byte image on first owner-thread load.
-The repair path is atomic, owner-thread-gated, and covered by Swift/C
-post-recovery assertions. M22 remains behavior-coverage work in progress: the
+M23b is the latest validated persistence slice layered on M34a/M33f/M22bc;
+Swift now exposes the C-compatible save-file query surface for file existence,
+star/cannon flags, course/total star counts, cap placement, coin-score lookup,
+and age-based maximum-score tie breaks. M23a's atomic recovery repair and
+legacy-image upgrade remain in force, and the query surface has an independent
+Swift/C fingerprint. M22 remains behavior-coverage work in progress: the
 latest bounded gameplay slice is M22bc. M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
@@ -1828,6 +1828,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22bc close deterministic identity accounting, forty-two live value/owner routes plus the Fly Guy flame, Bowser mine-flame, Big Boo staircase, Tuxie terminal-child, Heave Ho throw-child, Pokey body-part, and Bob-omb Buddy cannon-role identities, a shared forty-two-route dispatch seam, and Swift engine-context dispatch authority with 534 rows, 81 known Swift value/owner routes, and 453 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | In progress — M23a closes C-compatible EEPROM repair and legacy-image upgrade; save mutation breadth, byte-identity replay, and complete C↔Swift authority closure remain |
 | M23a: Atomic EEPROM recovery repair | `SM64OwnerThreadEEPROMAdapter.load` now repairs a single invalid primary/backup copy, wipes and rewrites both copies on dual corruption, and upgrades a valid legacy 176-byte bundle to the normalized 512-byte image on the owner thread. | Complete locally — Swift/C EEPROM fingerprints `0x3fac91b6c0a1f3cd`, focused legacy-upgrade and post-repair assertions, persistence regression, `git diff --check`; full save mutation/option/restart parity remains |
+| M23b: C-compatible save-file query surface | `SM64SaveFileQueries` mirrors file existence, secret/course star flags, cannon indexing, course/total counts, cap-position gating, coin-score reads, and `save_file_get_max_coin_score` age tie-breaks as pure Swift values. | Complete locally — Swift/C query fingerprint `0x5562efafd48db61c`, focused Swift 6/C contract, regenerated native Debug build, complete 206-script matrix, strict-concurrency audit, and `git diff --check`; save mutations, options, and full authority replay remain |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |
 | M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | Not started |
@@ -2107,6 +2108,11 @@ replayable trace, and the platform evidence listed in its exit gate.
    focused exit gate requires post-recovery bytes to verify in both Swift and
    an independent C repair contract, while the remaining save mutations,
    options, restart selector, and full bidirectional replay stay open.
+   M23b adds the read-only query seam before mutators: preserve C's secret-star
+   sentinel, one-based cannon lookup, star-count range, cap-on-ground gate,
+   and age-based maximum-score tie break in a pure `Sendable` API. Its exit
+   gate is an independent Swift/C fingerprint over all four slots and the
+   shared menu ages; no query may read C globals or silently broaden an index.
 2. **M24 configuration and cheats.** Port defaults, bindings, camera
    settings, audio/video options, language, legal-ROM settings, cheats, and
    invalid-value recovery. Keep engine authority immutable after launch and

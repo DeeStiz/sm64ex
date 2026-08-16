@@ -2,6 +2,15 @@
 
 ## Current Milestone
 
+- M23b adds `SM64SaveFileQueries`, a pure Swift 6/C-compatible read-only
+  surface for file existence, secret/course star flags, cannon indexing,
+  course/total star counts, cap placement, coin-score reads, and the
+  age-based maximum-score tie break. Swift/C query fingerprint
+  `0x5562efafd48db61c`; focused query contract, M23a recovery regressions, and
+  the full 206-script matrix pass. Save mutators, options, and full authority
+  replay remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M23b.md`.
+
 - M23a closes the first normalized-EEPROM recovery gap. The owner-thread Swift
   adapter now atomically repairs a single invalid primary/backup copy, wipes
   and rewrites both copies on dual corruption, and upgrades a valid legacy
