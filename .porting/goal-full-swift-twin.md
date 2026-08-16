@@ -2,7 +2,7 @@
 
 ## Status
 
-M21s is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M21t is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -244,6 +244,16 @@ smoke, expanded 195-script matrix, regenerated native Debug build,
 `git diff --check`, and zero unchecked-Sendable audit pass are the evidence
 boundary. Production collision mesh authority, water/steep-floor breadth,
 Bowser arenas, durable reward progression, and device/visual/human acceptance
+remain open.
+M21t adds a pointer-free Bowser shockwave value/owner seam. Swift reproduces
+the expanding ring scale, three-frame opacity cadence, late fade, strict
+Mario-distance interaction windows, deletion fence, and owner-thread Mario
+interaction bit while preserving generation-safe scheduler unload. Its strict
+Swift 6/C fingerprint is `0x4dbf62c6e6d1688d`; the focused shockwave smoke,
+expanded 196-script matrix, regenerated native Debug build, `git diff --check`,
+and zero unchecked-Sendable audit pass are the evidence boundary. The full
+Bowser controller and arena routes, authoritative collision/presentation
+consumers, durable reward transitions, and device/visual/human acceptance
 remain open.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
@@ -1120,7 +1130,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M21q: Chief Chilly/Bully reward and presentation owner seam | Swift preserves the Bully source coin/star/LLL-tumbling-bridge reward coordinates and activation sound/shake/mist effects, then gates generation-safe reward/bridge child materialization and owner-thread sound, particle, camera-shake, and star delivery. | Complete locally — strict Swift 6/C fingerprint `0x027f2dfcec799615`, focused reward/presentation contract, 193-script matrix (runs=193 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21q-build.log`), git diff --check, and zero unchecked-Sendable audit pass; minion-parent countdown breadth, authoritative collision movement, Bowser arenas, durable reward persistence, and human/device acceptance remain |
 | M21r: Big Bully minion parent owner seam | Swift creates the three source-positioned minion children with generation-safe parent identity, propagates minion deaths to the parent knockout counter, and gates the 91-frame puzzle-jingle/activate-and-fall/tangible landing route through the owner sink. | Complete locally — strict Swift 6/C fingerprint `0x4ff3b69000b7c356`, focused minion-owner contract, 194-script matrix (runs=194 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21s-build.log`), git diff --check, and zero unchecked-Sendable audit pass; broad minion interaction, authoritative collision movement, Bowser arenas, durable reward progression, and human/device acceptance remain |
 | M21s: Bully immutable-world movement bridge | Swift executes the source Bully action before an opt-in wall/floor admission and `object_step`-style scalar movement, preserving floor/wall identity, gravity, friction, bounce/no-Y flags, in-air state, and generation-safe record publication for small and big variants. | Complete locally — strict Swift 6/C fingerprint `0x8039a949790099fc`, focused movement contract, 195-script matrix (runs=195 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21s-build.log`), git diff --check, and zero unchecked-Sendable audit pass; production collision mesh authority, water/steep-floor breadth, Bowser arenas, durable reward progression, and human/device acceptance remain |
-| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21s close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, Big Boo value/owner/effect/collision/movement seams, and Eyerok boss/hand value/owner/collision/movement seams plus Chief Chilly/Bully reward/presentation/minion/movement; broad collision authority, Bully minion-parent/movement breadth, durable reward persistence, real camera/cutscene/audio wiring, Chief Chilly, Bowser arenas, reward/music transitions, and deterministic boss-phase shards remain |
+| M21t: Bowser shockwave value/owner seam | Swift reproduces the expanding/fading Bowser shockwave, strict Mario ring interaction windows, owner-thread interaction bit, and generation-safe deletion/unload route. | Complete locally — strict Swift 6/C fingerprint `0x4dbf62c6e6d1688d`, focused shockwave contract, 196-script matrix (runs=196 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21t-build.log`), git diff --check, and zero unchecked-Sendable audit pass; full Bowser controller/arenas, authoritative collision and presentation consumers, durable reward/music transitions, and human/device acceptance remain |
+| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21t close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, Big Boo value/owner/effect/collision/movement seams, Eyerok boss/hand value/owner/collision/movement seams, Chief Chilly/Bully reward/presentation/minion/movement seams, and the Bowser shockwave value/owner seam; broad collision authority, durable reward persistence, real camera/cutscene/audio wiring, Chief Chilly breadth, full Bowser controllers/arenas, reward/music transitions, and deterministic boss-phase shards remain |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
@@ -1368,10 +1379,13 @@ replayable trace, and the platform evidence listed in its exit gate.
    opt-in immutable-world floor/wall prepass and source `-20` movement route
    for Whomp. M21j adds the Big Boo value route and M21k attaches its owner and
    effect seam, M21l attaches the immutable-world collision/movement route,
-   and M21m adds the Eyerok boss controller. Finish broader collision/movement
-   integration, path selection for every other reachable trajectory, and
-   effect identity before
-   owner-wiring the remaining NPC families.
+   and M21m adds the Eyerok boss controller. M21n–M21p add the Eyerok hand
+   action, owner, and immutable-world movement seams. M21q–M21s add Chief
+   Chilly/Bully reward, minion-parent, and immutable-world movement seams.
+   M21t adds the Bowser shockwave value/owner seam. Finish broader
+   collision/movement integration, path selection for every other reachable
+   trajectory, full Bowser/Chief Chilly controller breadth, and effect
+   identity before closing the boss phase.
 5. **M21 bosses and arenas.** Port King Bob-omb, Whomp King, Big Boo,
    Eyerok, Chief Chilly, Bowser arenas, sub-bosses, arena camera rules,
    damage windows, boss music, reward stars, warp/ending transitions, and

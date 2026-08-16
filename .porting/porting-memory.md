@@ -2,6 +2,17 @@
 
 ## Current Milestone
 
+- M21t adds a pointer-free Bowser shockwave value/owner seam. Swift
+  reproduces the expanding ring scale, three-frame opacity cadence, late fade,
+  strict Mario-distance interaction windows, deletion fence, and owner-thread
+  Mario interaction bit while preserving generation-safe scheduler unload.
+  Focused strict Swift/C fingerprint 0x4dbf62c6e6d1688d, script
+  script/test_bowser_shockwave.sh, full matrix runs=196 failures=0, and
+  regenerated native Debug build target /tmp/sm64-modern-m21t-build.log are
+  the evidence boundary. Full Bowser controller/arena routes, authoritative
+  collision/presentation consumers, durable reward/music transitions, and
+  device/visual/human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21t.md.
 - M21s adds an opt-in Bully immutable-world `object_step` seam. The owner
   bridge executes the source action before wall/floor admission and scalar
   movement, preserving wall/floor identity, gravity, friction, bounce/no-Y

@@ -117,6 +117,8 @@
 		86873A7F75CAAF78C48A991F /* GeoLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34836A16DABAFE021C624BDF /* GeoLayout.swift */; };
 		8890816E4404396A10B3AEBD /* CameraPrimitives.swift in Sources */ = {isa = PBXBuildFile; fileRef = 635680A88C033EBD3EDB337C /* CameraPrimitives.swift */; };
 		89F94D81CF952EF5180F927B /* SwoopEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106B51D9CC6C878D9C69F33F /* SwoopEnemy.swift */; };
+		8B39EE65AFE88631047099E2 /* BowserShockWaveObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E11D52133743C33476F7C744 /* BowserShockWaveObjectBridge.swift */; };
+		8BBC062591E99F1CF48973CB /* BowserShockWave.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2EACF5C30D1F0023F354876 /* BowserShockWave.swift */; };
 		8CD39743040501EE125066B3 /* MarioSlideVariants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00F6C1413CC0CD0ED1403F51 /* MarioSlideVariants.swift */; };
 		8DA16E20D293AB90891F6FB7 /* TTCElevatorBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = A033C381FC3DFA4B705E97C8 /* TTCElevatorBehavior.swift */; };
 		8F0287C04E3BF3452E17B97B /* PiranhaPlantObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3353EA4B05B2088E0941DEB /* PiranhaPlantObjectBridge.swift */; };
@@ -415,6 +417,7 @@
 		DA7BD1F16923ABC44B644C96 /* MarioGroundStep.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGroundStep.swift; sourceTree = "<group>"; };
 		E0D4C3FC8AC2456B981C1640 /* BouncingFireballObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BouncingFireballObjectBridge.swift; sourceTree = "<group>"; };
 		E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoLayoutContentRuntime.swift; sourceTree = "<group>"; };
+		E11D52133743C33476F7C744 /* BowserShockWaveObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserShockWaveObjectBridge.swift; sourceTree = "<group>"; };
 		E2C9C1CEC9C0000598706A91 /* MarioSlope.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSlope.swift; sourceTree = "<group>"; };
 		E3353EA4B05B2088E0941DEB /* PiranhaPlantObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PiranhaPlantObjectBridge.swift; sourceTree = "<group>"; };
 		E37C0994C353B61075C5EBCA /* ElevatorBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ElevatorBehavior.swift; sourceTree = "<group>"; };
@@ -435,6 +438,7 @@
 		F201059126BC066BFF28F447 /* ProgressionState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProgressionState.swift; sourceTree = "<group>"; };
 		F27F167DF12FDB9DEDC9F64F /* SkeeterEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeeterEnemy.swift; sourceTree = "<group>"; };
 		F28F9F86BA8486D9F6BB005C /* RotatingPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatingPlatformBehavior.swift; sourceTree = "<group>"; };
+		F2EACF5C30D1F0023F354876 /* BowserShockWave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserShockWave.swift; sourceTree = "<group>"; };
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
 		F5BB9631CE7A07A55B9BDBCF /* MarioCommonAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCommonAirAction.swift; sourceTree = "<group>"; };
 		F767E8095D423258E7165E3E /* BigBooCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigBooCollision.swift; sourceTree = "<group>"; };
@@ -475,6 +479,8 @@
 				E96CEA38FA4BFC38D3E850B6 /* BooObjectBridge.swift */,
 				0320CB55118E41AB1705469F /* BouncingFireball.swift */,
 				E0D4C3FC8AC2456B981C1640 /* BouncingFireballObjectBridge.swift */,
+				F2EACF5C30D1F0023F354876 /* BowserShockWave.swift */,
+				E11D52133743C33476F7C744 /* BowserShockWaveObjectBridge.swift */,
 				3B2DFA1C27E45B1D51C0A506 /* BulletBill.swift */,
 				EA95695B8D532F2B761602DE /* BulletBillObjectBridge.swift */,
 				24C9D886AC56F8C60AC536FF /* BullyCollision.swift */,
@@ -792,6 +798,8 @@
 				AACD57508B2998F2000A2232 /* BooObjectBridge.swift in Sources */,
 				98F4DF77445264C24B3326CC /* BouncingFireball.swift in Sources */,
 				3D3D38C8A3F908CCFF0C6E7D /* BouncingFireballObjectBridge.swift in Sources */,
+				8BBC062591E99F1CF48973CB /* BowserShockWave.swift in Sources */,
+				8B39EE65AFE88631047099E2 /* BowserShockWaveObjectBridge.swift in Sources */,
 				E1AE2DF359A0296B0EAA7E67 /* BulletBill.swift in Sources */,
 				E9D87E92CAED2015676448A6 /* BulletBillObjectBridge.swift in Sources */,
 				F637D3DD313F56B0EE8F7DDA /* BullyCollision.swift in Sources */,
