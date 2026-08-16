@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21o binds the Eyerok boss and hand values to generation-safe owner records.
+  The bridge creates source-model hand children in scheduler order, syncs
+  transforms/hitbox identity/action/health/timing, feeds child parent-counter
+  mutations back to the boss, and routes typed boss/hand effects through the
+  owner sink. Focused strict Swift/C owner fingerprint
+  0xcc5a9ee16597604f, script script/test_eyerok_object_bridge.sh, full matrix
+  target runs=191 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21o-build.log are the evidence boundary. Immutable-world
+  collision/movement, real presentation consumers, durable reward progression,
+  Chief Chilly/Bowser breadth, and device/visual/human acceptance remain open.
+  Handoff: .porting/porting-handoff-full-swift-twin-M21o.md.
+
 - M21n adds the pointer-free Eyerok hand action table. It preserves sleep/wake,
   idle/open/eye/close/retreat, Mario targeting and smash/fist branches,
   double-pound selection/launch, attack/recover/become-active/death phases,

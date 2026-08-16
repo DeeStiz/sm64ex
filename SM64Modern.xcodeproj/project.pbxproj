@@ -138,6 +138,7 @@
 		9F843A73A64A5646F34206E5 /* BirdObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E497FB3B17788DCEA3B3261F /* BirdObjectBridge.swift */; };
 		A03388793B2976FA562FE712 /* AppMain.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5723E1972C2FF3BB21E3A5B /* AppMain.swift */; };
 		A18B1A302FC1B7FEACB64ABB /* MarioFinishTurningAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D8C59955994453AFE524C2A /* MarioFinishTurningAction.swift */; };
+		A34CE5852F8DBDEEF67172EC /* EyerokObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEE1BA8181B84E4081506EA1 /* EyerokObjectBridge.swift */; };
 		A62D4EA3D1C0656EDD52DF8E /* ChainChompReleaseObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58360E4172E21635622C429F /* ChainChompReleaseObjectBridge.swift */; };
 		A7501784CDB204083C9F308D /* MarioSteepJump.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6F47456E9B2F4A650F55D12 /* MarioSteepJump.swift */; };
 		A87A6ECEEE1590A786D5241E /* MarioGroundStep.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA7BD1F16923ABC44B644C96 /* MarioGroundStep.swift */; };
@@ -397,6 +398,7 @@
 		CC510DADD4B2F20AC7EA6B5A /* ScuttlebugObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScuttlebugObjectBridge.swift; sourceTree = "<group>"; };
 		CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowLiftBehavior.swift; sourceTree = "<group>"; };
 		CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCUpExit.swift; sourceTree = "<group>"; };
+		CEE1BA8181B84E4081506EA1 /* EyerokObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyerokObjectBridge.swift; sourceTree = "<group>"; };
 		D3CC8538BA0A2A1F3C291572 /* ObjectScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectScheduler.swift; sourceTree = "<group>"; };
 		D4426C0597C4FF50EA28B2FE /* MarioPoleHangingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioPoleHangingAction.swift; sourceTree = "<group>"; };
 		D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectTransform.swift; sourceTree = "<group>"; };
@@ -507,6 +509,7 @@
 				BB40062F0B74B53B43A517BA /* EngineState.swift */,
 				9EA80AEA8F534EA712E1C090 /* EyerokBoss.swift */,
 				225D73054770EC25DC64D2C0 /* EyerokHand.swift */,
+				CEE1BA8181B84E4081506EA1 /* EyerokObjectBridge.swift */,
 				A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */,
 				05D35EE8DC4AB3016AB7352A /* FlyGuyEnemy.swift */,
 				59206E9C56FA9ADDE5FD3301 /* FlyGuyObjectBridge.swift */,
@@ -821,6 +824,7 @@
 				8F2434A3E57287185819D685 /* EngineState.swift in Sources */,
 				AABD8C2EDF09336DC5C998EC /* EyerokBoss.swift in Sources */,
 				D0031C8BC47031BF22FCFA00 /* EyerokHand.swift in Sources */,
+				A34CE5852F8DBDEEF67172EC /* EyerokObjectBridge.swift in Sources */,
 				ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */,
 				F635692396D181B8EEE8464A /* FlyGuyEnemy.swift in Sources */,
 				9931F629C3ED5181495396D9 /* FlyGuyObjectBridge.swift in Sources */,
