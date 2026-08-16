@@ -94,6 +94,7 @@ struct SM64BehaviorCoverageManifestTool {
         "bhvRacingPenguin": ("RacingPenguinObjectBridge", "racing penguin path/owner route"),
         "bhvPenguinRaceFinishLine": ("RacingPenguinObjectBridge", "racing penguin finish-line child route"),
         "bhvPenguinRaceShortcutCheck": ("RacingPenguinObjectBridge", "racing penguin shortcut child route"),
+        "bhvRespawner": ("RespawnerObjectBridge", "respawner value/owner route"),
         "bhvSmallBully": ("BullyObjectBridge", "Bully small variant owner route"),
         "bhvSmallChillBully": ("BullyObjectBridge", "Chief Chilly small-bully owner route"),
         "bhvScuttlebug": ("ScuttlebugObjectBridge", "Scuttlebug value/owner route"),

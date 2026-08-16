@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M22e replaces the `bhvRespawner` C callback with a pointer-free Swift
+  value/owner route. It preserves the outside-radius gate, one-shot spawn and
+  deactivation ordering, model/behavior/parameter/transform transfer, and
+  generation-safe retirement. Strict Swift/C respawner fingerprint
+  0x601bae83c1bd4083, behavior manifest fingerprint 0xf8bbfcbc86b888d9,
+  534 rows, 72 Swift value/owner routes, and 462 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Xcode source
+  regeneration, native Debug build target /tmp/sm64-modern-m22e-build.log,
+  focused contracts, full matrix runs=204 failures=0, git diff --check, and
+  zero unchecked-Sendable audit passed. Live level integration and parity are
+  still open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22e.md.
 - M22d extends exact behavior identity reconciliation to already-modeled
   transient and child owners: bouncing fireball/flame, Fly Guy flame, Chain
   Chomp segment/gate, Chuckya anchored Mario, enemy Lakitu, Goomba triplet
