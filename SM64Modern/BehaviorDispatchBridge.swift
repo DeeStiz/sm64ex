@@ -344,6 +344,7 @@ final class SM64BehaviorDispatchBridge {
         case SM64YoshiObjectBridge.defaultBehaviorIdentity:
             return .yoshi
         case SM64BowserBombObjectBridge.bombBehaviorIdentity,
+             SM64BowserBombObjectBridge.explosionBehaviorIdentity,
              SM64BowserBombObjectBridge.smokeBehaviorIdentity:
             return .bowserBomb
         case SM64TuxiesMotherObjectBridge.defaultMotherBehaviorIdentity:

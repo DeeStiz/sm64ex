@@ -2059,6 +2059,14 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             fingerprint,
             UInt64(SM64BehaviorDispatchBridge.route(for: SM64FlyGuyObjectBridge.flameBehaviorIdentity).rawValue)
         )
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64BowserBombObjectBridge.explosionBehaviorIdentity) == .bowserBomb,
+            "Bowser mine-flame identity shares the Bowser-bomb route"
+        )
+        fingerprint = hashU64(
+            fingerprint,
+            UInt64(SM64BehaviorDispatchBridge.route(for: SM64BowserBombObjectBridge.explosionBehaviorIdentity).rawValue)
+        )
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

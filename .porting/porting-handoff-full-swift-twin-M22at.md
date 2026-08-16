@@ -6,10 +6,9 @@ M22at registers the existing Bowser-bomb owner bridge in the shared
 `SM64BehaviorDispatchBridge` for the bomb and smoke behavior identities. The
 general-actor route preserves bomb state, same-frame flame/spawn requests,
 smoke identity, and generation-safe owner delivery. The source explosion
-identity intentionally remains on the generic explosion route because the
-canonical identity aliases that route; this is an explicit dispatch seam, not
-a duplicate owner. Collision, camera/audio, and presentation consumers remain
-typed external boundaries.
+identity remained an explicit unregistered seam; the collision-spawned generic
+explosion identity stayed on the generic explosion route. Collision,
+camera/audio, and presentation consumers remain typed external boundaries.
 
 This closes the Bowser-bomb and smoke identity dispatch slice only. The focused
 shared fixture exercises the bomb callback and smoke route identity; the
@@ -23,8 +22,8 @@ known Swift value/owner identities and 461 explicit
 
 - `script/test_behavior_dispatch_bridge.sh` — strict Swift/C forty-one-route
   fingerprint `0x5224e91ce4f4e6fe`; Bowser bomb dispatches through the shared
-  route, preserves the bomb effect, and leaves the canonical explosion alias
-  on the generic explosion route.
+  route, preserves the bomb effect, and leaves the distinct mine-flame identity
+  explicitly unregistered at this milestone.
 - `script/test_bowser_bomb.sh` — standalone Swift/C Bowser-bomb fingerprint
   `0x1570ecd9d93c5b41`; bomb ticking, flame request, smoke identity, and
   generation-safe owner cleanup remain matched.
@@ -48,9 +47,9 @@ known Swift value/owner identities and 461 explicit
    child bridges still own separate scheduler shadows.
 2. Migrate the remaining 461 reachable adapters/transient children, or record
    an explicitly approved compatibility exception for each one.
-3. Complete Bowser bomb/explosion/smoke collision, presentation, and arena
-   consumers before claiming full gameplay parity; preserve the explicit
-   generic-explosion identity alias until a single canonical owner is proven.
+3. Register the distinct Bowser mine-flame identity, then complete Bowser
+   bomb/explosion/smoke collision, presentation, and arena consumers before
+   claiming full gameplay parity.
 4. Continue M23–M35: save/configuration/HUD/front-end, audio, display-list
    translation, Goddard, whole-engine authority, strict parity-shard
    qualification, Metal 4 production validation, and release/human gates.

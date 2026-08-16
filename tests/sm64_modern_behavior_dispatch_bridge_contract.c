@@ -1195,6 +1195,8 @@ int main(void) {
 
     // Fly Guy's existing owner bridge also owns its transient flame identity.
     fingerprint = hash_u64(fingerprint, 9); // shared Fly Guy route
+    // Bowser's distinct mine-flame identity now shares its owner route.
+    fingerprint = hash_u64(fingerprint, 40); // shared Bowser-bomb route
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

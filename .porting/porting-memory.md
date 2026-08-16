@@ -2,6 +2,24 @@
 
 ## Current Milestone
 
+- M22aw registers the distinct Bowser mine-flame identity
+  `bhvBowserBombExplosion` in the existing Bowser-bomb owner route. The bridge
+  owns its explosion timer/scale/animation reducer, same-frame smoke
+  allocation, and generation-safe child cleanup; the collision-spawned generic
+  `bhvExplosion` identity remains on the generic explosion route. Strict
+  Swift/C forty-two-route identity fingerprint `0xfb78737bee799bd1`, standalone
+  Bowser bomb fingerprint `0x1570ecd9d93c5b41`, behavior manifest fingerprint
+  `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461
+  explicit `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/Bowser mine-flame contracts, native Debug target
+  `/tmp/sm64-modern-m22aw-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix
+  (`/tmp/sm64-modern-m22aw-final-matrix.log`), `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full mine-flame/
+  smoke collision/presentation consumers, remaining adapters, and live parity
+  remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22aw.md`.
+
 - M22av registers Fly Guy's transient flame identity in the existing Fly Guy
   owner route. `bhvFlyGuy` and `bhvFlyguyFlame` now share the bridge that owns
   flame state, parent linkage, generation-safe deletion, and the standalone
@@ -43,9 +61,10 @@
   general-actor `SM64BehaviorDispatchBridge` for the bomb and smoke identities.
   The route preserves bomb state, same-frame flame/spawn requests, smoke
   identity, and generation-safe delivery receipts. The source explosion
-  identity aliases the generic explosion route and remains an explicit seam;
-  collision, camera/audio, and presentation consumers are still typed external
-  boundaries. Forty-one-route Swift/C fingerprint
+  distinct Bowser mine-flame identity remains an explicit unregistered seam;
+  the collision-spawned generic explosion stays on the generic explosion route,
+  and collision, camera/audio, and presentation consumers are still typed
+  external boundaries. Forty-one-route Swift/C fingerprint
   `0x5224e91ce4f4e6fe`, standalone Bowser bomb fingerprint
   `0x1570ecd9d93c5b41`, behavior manifest fingerprint
   `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and 461
