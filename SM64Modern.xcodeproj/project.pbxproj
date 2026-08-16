@@ -97,6 +97,7 @@
 		6ECAFD9E539A164C43EBA731 /* HeaveHoEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80B185797853434E28E3A2F /* HeaveHoEnemy.swift */; };
 		6F0CEB028BA8FC9031A4859C /* CameraCutscene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F9BA67FD54486573E891D8 /* CameraCutscene.swift */; };
 		71832214A0EA82FFBAE64390 /* BobombEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F74F1DC90A46BBEF7D28FE /* BobombEnemy.swift */; };
+		719A899A4EB08E524438CFD3 /* KingBobombBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */; };
 		74F6B3961402E9A06DBC362B /* MarioWhirlpoolAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E9E5A575E124235D4817C6 /* MarioWhirlpoolAction.swift */; };
 		77C353336E88DAB6B5B3896D /* TTCPendulumBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */; };
 		794F70AFB48B7D7AA1B13D15 /* TuxiesMotherEyes.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80D7D687104873CF663B8AB /* TuxiesMotherEyes.swift */; };
@@ -304,6 +305,7 @@
 		6BB36E00504555CA75EF4FF5 /* MarioPunchSequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioPunchSequence.swift; sourceTree = "<group>"; };
 		6DCD830F49B84A59E9E77430 /* MarioSliding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSliding.swift; sourceTree = "<group>"; };
 		6E37008029F2850C83A1AFF0 /* PlatformCollisionRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformCollisionRegistry.swift; sourceTree = "<group>"; };
+		6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingBobombBehavior.swift; sourceTree = "<group>"; };
 		6EF73C0EA06595D96E31445A /* MarioWaterInteractionAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWaterInteractionAction.swift; sourceTree = "<group>"; };
 		7152A9F5156A7D703C8708CE /* SwingPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwingPlatformBehavior.swift; sourceTree = "<group>"; };
 		724F73EC282345F4551FC1BF /* CameraInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraInput.swift; sourceTree = "<group>"; };
@@ -497,6 +499,7 @@
 				D80B185797853434E28E3A2F /* HeaveHoEnemy.swift */,
 				3B50BE71193A3FEA1F2989D6 /* HeaveHoObjectBridge.swift */,
 				34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */,
+				6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */,
 				5EBCDC28A1DADF92929BD72A /* KoopaShell.swift */,
 				BAB7D9714A5D0EEB844F6E3A /* KoopaShellObjectBridge.swift */,
 				AC89F10EF988BEB5D9624D69 /* LevelScript.swift */,
@@ -801,6 +804,7 @@
 				6ECAFD9E539A164C43EBA731 /* HeaveHoEnemy.swift in Sources */,
 				4C4E1312ABA85E0E64E74747 /* HeaveHoObjectBridge.swift in Sources */,
 				ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */,
+				719A899A4EB08E524438CFD3 /* KingBobombBehavior.swift in Sources */,
 				DA4DF9B4F9D992BFE4FFAD06 /* KoopaShell.swift in Sources */,
 				E6EB1E83D40B684FD3B7426A /* KoopaShellObjectBridge.swift in Sources */,
 				59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */,

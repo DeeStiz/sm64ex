@@ -2,6 +2,16 @@
 
 ## Current Milestone
 
+- M21a adds the King Bob-omb value route after M20u: source action values
+  `0`–`8`, intro/return dialogs, grab escape, throw damage, return-home and
+  defeat phases, boss-music stop timing, defeat star effects, and all four
+  `HELD_*` branches. Focused Swift/C fingerprint
+  `0xa15d577dbb4d9afc`; the regenerated native Debug build and full matrix
+  `runs=177 failures=0` now pass (`/tmp/sm64-modern-m21a-build.log`,
+  `/tmp/sm64-modern-m21a-final-matrix.log`). Owner/collision/arena wiring is
+  the next implementation gate. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M21a.md`.
+
 - M20u supersedes the older M20r current-slice line below: Yoshi now has a
   generation-safe owner/effect bridge with dialog/time-stop cleanup,
   life/walking/alert/camera/deletion intents, source-authored respawner
