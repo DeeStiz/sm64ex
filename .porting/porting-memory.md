@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M22w registers the existing `bhvHeaveHo` owner bridge and throw-child
+  identity in the shared `SM64BehaviorDispatchBridge`. The general-actor route
+  preserves parent/child list ordering, submerged/tangible/hidden state, and
+  pointer-free throw consumption with explicit owner-thread delivery.
+  Sixteen-route Swift/C fingerprint 0x60a85f947da2a12, standalone Heave Ho
+  fingerprint 0x9c4a7443f2c09281, behavior manifest fingerprint
+  0x9bb2863444c51d6d, 534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused dispatch
+  contract, native Debug build target /tmp/sm64-modern-m22w-build.log, full
+  206-script matrix, `git diff --check`, and zero unchecked-Sendable audit
+  pass are the evidence boundary. Whole-engine route breadth, the remaining
+  adapters, and live parity remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22w.md.
 - M22v registers the existing `bhvWhomp` owner bridge in the shared
   `SM64BehaviorDispatchBridge`. The surface-list route runs before the
   general-actor routes in the shared scheduler, preserves initialize/reset-home

@@ -57,6 +57,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/WhompCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/WhompEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/WhompObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/HeaveHoEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/HeaveHoObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_behavior_dispatch_bridge_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke"
 SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke)"

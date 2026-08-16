@@ -19,6 +19,8 @@
 #define SPINY_BEHAVIOR UINT64_C(0x6268765f7370696e)
 #define SNUFIT_BEHAVIOR UINT64_C(0x6268765f736e66)
 #define WHOMP_BEHAVIOR UINT64_C(0x6268765f77686d)
+#define HEAVE_HO_BEHAVIOR UINT64_C(0x6268765f68686f)
+#define HEAVE_HO_CHILD_BEHAVIOR UINT64_C(0x6268765f686874)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -52,8 +54,8 @@ static uint64_t hash_tick(
 ) {
     hash = hash_u64(hash, frame);
     hash = hash_u64(hash, second_tick ? 2 : 3); // default-list count
-    hash = hash_u64(hash, second_tick ? 15 : 17); // object counter
-    hash = hash_u64(hash, second_tick ? 15 : 17); // dispatch events
+    hash = hash_u64(hash, second_tick ? 17 : 19); // object counter
+    hash = hash_u64(hash, second_tick ? 17 : 19); // dispatch events
     hash = hash_event(hash, 14, WHOMP_BEHAVIOR, 14);
     hash = hash_event(hash, 2, AMP_BEHAVIOR, 2);
     hash = hash_event(hash, 3, BOO_BEHAVIOR, 3);
@@ -67,13 +69,15 @@ static uint64_t hash_tick(
     hash = hash_event(hash, 11, GOOMBA_BEHAVIOR, 11);
     hash = hash_event(hash, 12, SPINY_BEHAVIOR, 12);
     hash = hash_event(hash, 13, SNUFIT_BEHAVIOR, 13);
+    hash = hash_event(hash, 15, HEAVE_HO_BEHAVIOR, 15);
+    hash = hash_event(hash, 16, HEAVE_HO_CHILD_BEHAVIOR, 15);
     hash = hash_event(hash, 0, PENDULUM_BEHAVIOR, 0);
     if (second_tick) {
-        hash = hash_event(hash, 16, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 18, CHILD_BEHAVIOR, 255);
     } else {
         hash = hash_event(hash, 1, RESPAWNER_BEHAVIOR, 1);
-        hash = hash_event(hash, 16, CHILD_BEHAVIOR, 255);
-        hash = hash_event(hash, 15, BOBOMB_SMOKE_BEHAVIOR, 255);
+        hash = hash_event(hash, 18, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 17, BOBOMB_SMOKE_BEHAVIOR, 255);
     }
 
     hash = hash_u64(hash, 1); // pendulum effects
@@ -87,7 +91,7 @@ static uint64_t hash_tick(
     if (!second_tick) {
         hash = hash_id(hash, 1, 1);
         hash = hash_u64(hash, 3); // spawn + mark for deletion
-        hash = hash_id(hash, 16, 1);
+        hash = hash_id(hash, 18, 1);
         hash = hash_u64(hash, 1); // timer
         hash = hash_u64(hash, 1); // marked for deletion
     }
@@ -121,13 +125,13 @@ static uint64_t hash_tick(
     hash = hash_u64(hash, second_tick ? 36 : 44); // chase + fuse state
     hash = hash_u64(hash, second_tick ? 0 : 1); // spawned children
     if (!second_tick) {
-        hash = hash_id(hash, 15, 1);
+        hash = hash_id(hash, 17, 1);
     }
     hash = hash_u64(hash, 0); // not marked for deletion
     hash = hash_u64(hash, second_tick ? 0 : 1); // Bob-omb deliveries
     if (!second_tick) {
         hash = hash_u64(hash, 1); // deleted count
-        hash = hash_id(hash, 15, 1);
+        hash = hash_id(hash, 17, 1);
     }
 
     hash = hash_u64(hash, 1); // Bird effects
@@ -228,6 +232,23 @@ static uint64_t hash_tick(
     hash = hash_u64(hash, 0); // no presented effects
     hash = hash_u64(hash, 1); // Whomp deliveries
     hash = hash_u64(hash, 0); // no deleted objects
+
+    hash = hash_u64(hash, 2); // Heave Ho parent and throw child effects
+    hash = hash_id(hash, 15, 1);
+    hash = hash_u64(hash, 0); // Heave Ho parent kind
+    hash = hash_u64(hash, 12); // intangible + hide
+    hash = hash_u64(hash, 1); // submerged action is present
+    hash = hash_u64(hash, 0); // submerged action
+    hash = hash_u64(hash, 1); // free held state is present
+    hash = hash_u64(hash, 0); // free held state
+    hash = hash_u64(hash, 0); // no throw consumption
+    hash = hash_id(hash, 16, 1);
+    hash = hash_u64(hash, 1); // throw child kind
+    hash = hash_u64(hash, 0); // no child effects
+    hash = hash_u64(hash, 0); // no child action
+    hash = hash_u64(hash, 0); // no child held state
+    hash = hash_u64(hash, 0); // no throw consumption
+    hash = hash_u64(hash, 0); // no Heave Ho deliveries
 
     hash = hash_u64(hash, UINT64_C(0x77));
     hash = hash_u64(hash, CHILD_BEHAVIOR);

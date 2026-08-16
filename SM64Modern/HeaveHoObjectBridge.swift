@@ -119,31 +119,50 @@ final class SM64HeaveHoObjectBridge {
         return true
     }
 
+    /// Starts a tick owned by the shared behavior dispatcher. The bridge's
+    /// private scheduler is intentionally bypassed in that mode.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Updates one Heave Ho parent or throw child without nesting another
+    /// scheduler pass.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard (states[id] != nil || throwChildren[id] != nil), pool.record(for: id) != nil else {
+            return false
+        }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        throwChildren.removeValue(forKey: id)
+        parentForChild.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
         inputs frameInputs: [SM64ObjectID: SM64HeaveHoTickInput] = [:]
     ) -> SM64HeaveHoSchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
         for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            throwChildren.removeValue(forKey: id)
-            parentForChild.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(throwChildren.keys) where engineState.objects.record(for: id) == nil {
-            throwChildren.removeValue(forKey: id)
-            parentForChild.removeValue(forKey: id)
+            remove(id)
         }
         return SM64HeaveHoSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }

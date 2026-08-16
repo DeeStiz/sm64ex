@@ -79,6 +79,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/WhompCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/WhompEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/WhompObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/HeaveHoEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/HeaveHoObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_live_route_oracle_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-live-route-oracle-smoke"
