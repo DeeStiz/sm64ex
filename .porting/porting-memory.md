@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21x adds the shared pointer-free `bhvExplosion` value and owner bridge.
+  Swift preserves source initialization sound/camera-shake intents, the
+  destructive damage hitbox, opacity fade, scale/animation cadence, timer-nine
+  water-bubble versus ground-smoke child route, and generation-safe
+  owner-thread deletion. Focused strict Swift/C fingerprint
+  0x29e3dc6674824f4a, script script/test_explosion.sh, full matrix
+  runs=200 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21x-build.log are the evidence boundary. Bowser's
+  explicit request still needs wiring into this shared consumer; bubble/smoke
+  child behaviors, full Bowser controller/arena authority, durable reward/warp
+  transitions, and device/visual/human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21x.md.
 - M21w adds the Bowser bomb trigger, flame-explosion, and smoke lifetime
   seam. Swift preserves Mario-hit versus mine-hit ordering, explicit generic
   explosion requests, owner-thread sound/camera-shake intents,
