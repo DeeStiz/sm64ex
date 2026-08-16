@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M22ac registers the existing Pokey owner bridge and five body-part
+  identities in the shared `SM64BehaviorDispatchBridge`. The general-actor
+  route allocates the parent and body parts during one live traversal,
+  preserves parent counters/body indices, and keeps deletion cleanup on the
+  owner thread. Twenty-three-route Swift/C fingerprint
+  `0xa49eac378862bfbc`, standalone Pokey fingerprint `0x0dc81376f8b50092`,
+  behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows, 73 Swift
+  value/owner routes, and 461 explicit `unmigrated_c_adapter` rows are the
+  accounting boundary. Focused dispatch/Pokey contracts, native Debug target
+  `/tmp/sm64-modern-m22ac-build.log`, full shebang-corrected 206-script
+  matrix, `git diff --check`, and zero unchecked-Sendable audit pass are the
+  evidence boundary. Pokey collision/attack/replenish/presentation, the
+  remaining adapters, and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ac.md`.
 - M22ab registers Chain Chomp's wooden-post and breakable-gate surface
   identities in the shared `SM64BehaviorDispatchBridge`. The surface route
   runs before the general-actor parent, preserves release/gate effect records

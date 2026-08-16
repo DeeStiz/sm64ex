@@ -121,6 +121,41 @@ final class SM64PokeyObjectBridge {
         return true
     }
 
+    /// Clears per-tick effects before a shared scheduler pass. Body-part
+    /// defaults use the enclosing engine frame, never a nested scheduler.
+    func beginExternalTick(globalFrame: UInt64? = nil) {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+        if let globalFrame {
+            currentFrame = globalFrame &+ 1
+        }
+    }
+
+    /// Advances one Pokey parent or body part without nesting another list
+    /// traversal; the shared dispatcher remains list-order authority.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard pool.record(for: id) != nil,
+              parents[id] != nil || bodies[id] != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        parents.removeValue(forKey: id)
+        bodies.removeValue(forKey: id)
+        parentInputs.removeValue(forKey: id)
+        bodyInputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -129,27 +164,11 @@ final class SM64PokeyObjectBridge {
     ) -> SM64PokeySchedulerTickResult {
         parentInputs = frameInputs
         bodyInputs = frameBodyInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
-        currentFrame = engineState.globals.frame &+ 1
+        beginExternalTick(globalFrame: engineState.globals.frame)
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            parents.removeValue(forKey: id)
-            bodies.removeValue(forKey: id)
-            parentInputs.removeValue(forKey: id)
-            bodyInputs.removeValue(forKey: id)
-        }
-        for id in Array(parents.keys) where engineState.objects.record(for: id) == nil {
-            parents.removeValue(forKey: id)
-            parentInputs.removeValue(forKey: id)
-        }
-        for id in Array(bodies.keys) where engineState.objects.record(for: id) == nil {
-            bodies.removeValue(forKey: id)
-            bodyInputs.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64PokeySchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
 

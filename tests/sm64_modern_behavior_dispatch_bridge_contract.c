@@ -31,6 +31,8 @@
 #define CHAIN_CHOMP_SEGMENT_BEHAVIOR UINT64_C(0x6268765f63687367)
 #define CHAIN_CHOMP_POST_BEHAVIOR UINT64_C(0x6268765f77707374)
 #define CHAIN_CHOMP_GATE_BEHAVIOR UINT64_C(0x6268765f67617465)
+#define POKEY_BEHAVIOR UINT64_C(0x6268765f706f6b)
+#define POKEY_BODY_BEHAVIOR UINT64_C(0x6268765f7062)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -463,6 +465,50 @@ int main(void) {
         fingerprint = hash_u64(fingerprint, 0); // not marked
     }
     fingerprint = hash_u64(fingerprint, 0); // Chain Chomp deliveries
+
+    // Isolated shared-dispatch Pokey parent plus five body parts allocated
+    // during the same general-actor traversal.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t pokey_counts[13] = {
+        0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, pokey_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 6); // object counter
+    fingerprint = hash_u64(fingerprint, 6); // updated count
+    for (uint64_t id = 1; id <= 6; ++id) fingerprint = hash_u64(fingerprint, id);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 6); // events
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, POKEY_BEHAVIOR);
+    fingerprint = hash_u64(fingerprint, 22);
+    for (uint64_t id = 2; id <= 6; ++id) {
+        fingerprint = hash_u64(fingerprint, id);
+        fingerprint = hash_u64(fingerprint, POKEY_BODY_BEHAVIOR);
+        fingerprint = hash_u64(fingerprint, 22);
+    }
+    fingerprint = hash_u64(fingerprint, 6); // effects
+    fingerprint = hash_u64(fingerprint, 1); // parent trace subject
+    fingerprint = hash_u64(fingerprint, 0); // parent kind
+    fingerprint = hash_u64(fingerprint, 255); // parent body index
+    fingerprint = hash_u64(fingerprint, 7); // animate + spawn + wander
+    fingerprint = hash_u64(fingerprint, 5); // five spawned parts
+    for (uint64_t id = 2; id <= 6; ++id) fingerprint = hash_u64(fingerprint, id);
+    fingerprint = hash_u64(fingerprint, 5); // alive parts
+    fingerprint = hash_u64(fingerprint, UINT64_C(0x3f800000));
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    for (uint64_t index = 0; index < 5; ++index) {
+        fingerprint = hash_u64(fingerprint, index + 2); // body trace subject
+        fingerprint = hash_u64(fingerprint, 1); // body kind
+        fingerprint = hash_u64(fingerprint, index);
+        fingerprint = hash_u64(fingerprint, 1); // animate
+        fingerprint = hash_u64(fingerprint, 0); // no children
+        fingerprint = hash_u64(fingerprint, 5); // alive parts
+        fingerprint = hash_u64(fingerprint, UINT64_C(0x3f800000));
+        fingerprint = hash_u64(fingerprint, 0); // not marked
+    }
+    fingerprint = hash_u64(fingerprint, 0); // deliveries
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

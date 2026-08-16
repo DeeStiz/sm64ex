@@ -461,6 +461,43 @@ private func hashChainReleaseDispatch(
     return hash
 }
 
+private func hashPokeyDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashU64(hash, UInt64(id.traceSubject)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashU64(hash, UInt64(id.traceSubject)) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashU64(hash, UInt64(event.objectID.traceSubject))
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.pokeyEffects.count))
+    for effect in tick.pokeyEffects {
+        hash = hashU64(hash, UInt64(effect.objectID.traceSubject))
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(UInt8(bitPattern: effect.bodyIndex)))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedParts.count))
+        for id in effect.spawnedParts { hash = hashU64(hash, UInt64(id.traceSubject)) }
+        hash = hashU64(hash, UInt64(effect.numAliveBodyParts))
+        hash = hashU64(hash, UInt64(effect.scale.bitPattern))
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.pokeyDeliveries.count))
+    for delivery in tick.pokeyDeliveries {
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        for id in delivery.deleted { hash = hashU64(hash, UInt64(id.traceSubject)) }
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -744,6 +781,35 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(releaseTick.chainChompEffects.count == 6, "Chain Chomp parent still allocates its segments")
         fingerprint = hashChainReleaseDispatch(fingerprint, releaseTick)
+
+        let pokeyEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let pokeyBridge = SM64BehaviorDispatchBridge()
+        let pokey = try pokeyBridge.spawnPokey(in: pokeyEngine, homeX: 30, homeY: 100, homeZ: -20)
+        require(pokeyBridge.pokey.setParentInput(
+            SM64PokeyParentTickInput(distanceToMario: 1_000), for: pokey
+        ), "Pokey parent input attaches")
+        let pokeyTick = pokeyBridge.tick(state: pokeyEngine)
+        require(
+            pokeyTick.events.map(\.route) == Array(repeating: .pokey, count: 6),
+            "Pokey parent and body parts dispatch"
+        )
+        require(
+            pokeyTick.scheduler.updated.map(\.traceSubject) == [1, 2, 3, 4, 5, 6],
+            "Pokey body parts follow parent"
+        )
+        require(pokeyTick.pokeyEffects.count == 6, "Pokey route allocates five body parts")
+        require(
+            pokeyTick.pokeyEffects.first?.kind == .parent
+                && pokeyTick.pokeyEffects.first?.effects == [.animate, .spawnParts, .wander]
+                && pokeyTick.pokeyEffects.first?.spawnedParts.map(\.traceSubject) == [2, 3, 4, 5, 6],
+            "Pokey parent allocation effect is preserved"
+        )
+        require(
+            pokeyTick.pokeyEffects.dropFirst().allSatisfy { $0.kind == .bodyPart && $0.effects == [.animate] },
+            "Pokey body parts animate in source order"
+        )
+        require(pokeyTick.pokeyDeliveries.isEmpty, "Pokey spawn route has no deletion delivery")
+        fingerprint = hashPokeyDispatch(fingerprint, pokeyTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")
