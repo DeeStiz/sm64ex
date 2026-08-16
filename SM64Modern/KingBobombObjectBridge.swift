@@ -11,6 +11,8 @@ struct SM64KingBobombEnvironment: Equatable, Sendable {
 struct SM64KingBobombObjectEffect: Equatable, Sendable {
     let objectID: SM64ObjectID
     let output: SM64KingBobombOutput
+    let collision: SM64KingBobombCollisionResult?
+    let movement: SM64KingBobombMovementResult?
     let presentedEffects: [SM64OwnerThreadEffectIntent]
 }
 
@@ -26,6 +28,7 @@ struct SM64KingBobombSchedulerTickResult: Equatable, Sendable {
 final class SM64KingBobombObjectBridge {
     static let defaultBehaviorIdentity: UInt64 = 0x6268_765F_6B626D
     static let defaultModel: UInt32 = 0x56 // MODEL_KING_BOBOMB
+    static let defaultWallHitboxRadius: Float = 30
     static let interactionSubtypeGrabsMario: UInt32 = 0x0000_0004
     static let starEffectValue: Int32 = 1
 
@@ -58,6 +61,8 @@ final class SM64KingBobombObjectBridge {
         in engineState: SM64SwiftEngineState,
         homeY: Float = 0,
         positionY: Float? = nil,
+        position: SM64ObjectVector3? = nil,
+        wallHitboxRadius: Float = SM64KingBobombObjectBridge.defaultWallHitboxRadius,
         action: Int32 = SM64KingBobombBehavior.initializeAction,
         model: UInt32 = SM64KingBobombObjectBridge.defaultModel,
         behaviorIdentity: UInt64 = SM64KingBobombObjectBridge.defaultBehaviorIdentity
@@ -72,6 +77,8 @@ final class SM64KingBobombObjectBridge {
             id,
             homeY: homeY,
             positionY: positionY,
+            position: position,
+            wallHitboxRadius: wallHitboxRadius,
             action: action,
             in: engineState.objects
         ) else {
@@ -86,22 +93,46 @@ final class SM64KingBobombObjectBridge {
         _ id: SM64ObjectID,
         homeY: Float = 0,
         positionY: Float? = nil,
+        position: SM64ObjectVector3? = nil,
+        wallHitboxRadius: Float = SM64KingBobombObjectBridge.defaultWallHitboxRadius,
         action: Int32 = SM64KingBobombBehavior.initializeAction,
         in pool: SM64ObjectPool
     ) -> Bool {
         guard pool.record(for: id) != nil else { return false }
-        var state = SM64KingBobombState(homeY: homeY, positionY: positionY, moveYaw: 0)
+        let initialPosition = position ?? SM64ObjectVector3(
+            x: 0,
+            y: positionY ?? homeY,
+            z: 0
+        )
+        var state = SM64KingBobombState(homeY: homeY, positionY: initialPosition.y, moveYaw: 0)
         state.action = action
         states[id] = state
         environments[id] = SM64KingBobombEnvironment(
             input: SM64KingBobombInput(positionY: state.positionY)
         )
         _ = pool.mutate(id) { record in
-            record.position.y = state.positionY
-            record.homePosition.y = homeY
+            record.position = initialPosition
+            record.homePosition = SM64ObjectVector3(
+                x: initialPosition.x,
+                y: homeY,
+                z: initialPosition.z
+            )
+            record.wallHitboxRadius = wallHitboxRadius
+            record.gravity = state.gravity
+            record.dragStrength = 10
+            record.buoyancy = 2
             record.activeFlags |= SM64ObjectPool.activeFlagActive
         }
-        synchronizeRecord(id: id, state: state, pool: pool, previousAction: action, animation: 0)
+        synchronizeRecord(
+            id: id,
+            state: state,
+            position: initialPosition,
+            collision: nil,
+            movement: nil,
+            pool: pool,
+            previousAction: action,
+            animation: 0
+        )
         return true
     }
 
@@ -115,7 +146,9 @@ final class SM64KingBobombObjectBridge {
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
-        environments frameEnvironments: [SM64ObjectID: SM64KingBobombEnvironment] = [:]
+        environments frameEnvironments: [SM64ObjectID: SM64KingBobombEnvironment] = [:],
+        collisionWorld: SM64SurfaceCollisionWorld? = nil,
+        advanceMovement: Bool = false
     ) -> SM64KingBobombSchedulerTickResult {
         environments = frameEnvironments
         effectLog.removeAll(keepingCapacity: true)
@@ -123,7 +156,13 @@ final class SM64KingBobombObjectBridge {
         effectRouter.beginTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, engineState: engineState, pool: pool)
+            self?.update(
+                id: id,
+                engineState: engineState,
+                pool: pool,
+                collisionWorld: collisionWorld,
+                advanceMovement: advanceMovement
+            )
         }
         for id in schedulerResult.unloaded {
             states.removeValue(forKey: id)
@@ -143,17 +182,75 @@ final class SM64KingBobombObjectBridge {
     private func update(
         id: SM64ObjectID,
         engineState: SM64SwiftEngineState,
-        pool: SM64ObjectPool
+        pool: SM64ObjectPool,
+        collisionWorld: SM64SurfaceCollisionWorld?,
+        advanceMovement: Bool
     ) {
         guard let oldState = states[id], let record = pool.record(for: id) else { return }
         let input = environments[id]?.input ?? defaultInput(for: oldState, record: record)
         let previousAction = oldState.action
-        let output = SM64KingBobombBehavior.update(input, state: oldState)
+        let physicsEnabled = advanceMovement
+            && collisionWorld != nil
+            && input.heldState == .free
+        let collision = physicsEnabled ? collisionWorld.flatMap { world in
+            SM64KingBobombCollision.resolve(
+                SM64KingBobombCollisionInput(
+                    position: record.position,
+                    moveYaw: oldState.moveYaw,
+                    forwardVelocity: oldState.forwardVelocity,
+                    wallHitboxRadius: record.wallHitboxRadius,
+                    previousMoveFlags: record.moveFlags,
+                    world: world
+                )
+            )
+        } : nil
+        let behaviorPosition = collision?.position ?? record.position
+        let candidatePosition = physicsEnabled
+            ? SM64ObjectVector3(
+                x: behaviorPosition.x + SM64CanonicalTrig.sins(oldState.moveYaw) * oldState.forwardVelocity,
+                y: behaviorPosition.y,
+                z: behaviorPosition.z + SM64CanonicalTrig.coss(oldState.moveYaw) * oldState.forwardVelocity
+            )
+            : behaviorPosition
+        let movement = physicsEnabled && !oldState.usingHomeMovement ? movementResult(
+            record: record,
+            startPosition: behaviorPosition,
+            candidatePosition: candidatePosition,
+            floorHeight: collision?.floorHeight ?? record.floorHeight,
+            floorRoom: collision?.floorRoom ?? Int8(truncatingIfNeeded: record.floorRoom),
+            previousMoveFlags: collision?.moveFlags ?? record.moveFlags,
+            forwardVelocity: oldState.forwardVelocity,
+            moveYaw: oldState.moveYaw,
+            collisionWorld: collisionWorld
+        ) : nil
+        var behaviorState = oldState
+        if let movement {
+            behaviorState.velocityY = movement.velocity.y
+            behaviorState.forwardVelocity = movement.forwardVelocity
+        }
+        var behaviorInput = input
+        behaviorInput.positionY = movement?.position.y ?? behaviorPosition.y
+        if let collision {
+            behaviorInput.landed = collision.moveFlags & SM64KingBobombCollision.landed != 0
+            behaviorInput.onGround = collision.moveFlags & SM64KingBobombCollision.onGround != 0
+        }
+        if let movement {
+            behaviorInput.landed = movement.landed
+            behaviorInput.onGround = movement.onGround
+        }
+        let output = SM64KingBobombBehavior.update(behaviorInput, state: behaviorState)
         states[id] = output.state
         _ = pool.mutate(id) { $0.heldState = UInt32(input.heldState.rawValue) }
         synchronizeRecord(
             id: id,
             state: output.state,
+            position: SM64ObjectVector3(
+                x: movement?.position.x ?? candidatePosition.x,
+                y: output.state.positionY,
+                z: movement?.position.z ?? candidatePosition.z
+            ),
+            collision: collision,
+            movement: movement,
             pool: pool,
             previousAction: previousAction,
             animation: output.animation,
@@ -195,10 +292,60 @@ final class SM64KingBobombObjectBridge {
             SM64KingBobombObjectEffect(
                 objectID: id,
                 output: output,
+                collision: collision,
+                movement: movement,
                 presentedEffects: delivery.presented
             )
         )
         _ = engineState.setCurrentObject(nil)
+    }
+
+    private func movementResult(
+        record: SM64ObjectRecord,
+        startPosition: SM64ObjectVector3,
+        candidatePosition: SM64ObjectVector3,
+        floorHeight: Float,
+        floorRoom: Int8,
+        previousMoveFlags: UInt32,
+        forwardVelocity: Float,
+        moveYaw: Int16,
+        collisionWorld: SM64SurfaceCollisionWorld?
+    ) -> SM64KingBobombMovementResult? {
+        guard let collisionWorld else { return nil }
+        let intendedFloor = collisionWorld.findFloor(
+            x: candidatePosition.x,
+            y: record.position.y,
+            z: candidatePosition.z
+        )
+        let intendedRoom: Int8 = intendedFloor.surfaceID.flatMap {
+            collisionWorld.surface(withID: $0)?.room
+        } ?? 0
+        return SM64KingBobombCollision.move(
+            SM64KingBobombMovementInput(
+                startPosition: startPosition,
+                candidatePosition: candidatePosition,
+                velocityY: record.velocity.y,
+                forwardVelocity: forwardVelocity,
+                moveYaw: moveYaw,
+                floorHeight: floorHeight,
+                floorRoom: floorRoom,
+                objectRoom: Int8(truncatingIfNeeded: record.room),
+                moveFlags: previousMoveFlags,
+                gravity: record.gravity == 0 ? -4 : record.gravity,
+                bounciness: -0.5,
+                dragStrength: record.dragStrength == 0 ? 10 : record.dragStrength,
+                buoyancy: record.buoyancy == 0 ? 2 : record.buoyancy,
+                nativeStepScale: 1,
+                intendedFloorHeight: intendedFloor.height,
+                intendedFloorNormalY: intendedFloor.normalY ?? 0,
+                intendedFloorRoom: intendedRoom,
+                intendedFloorExists: intendedFloor.surfaceID != nil,
+                waterLevel: collisionWorld.findWaterLevel(
+                    x: candidatePosition.x,
+                    z: candidatePosition.z
+                )
+            )
+        )
     }
 
     private func defaultInput(
@@ -223,6 +370,9 @@ final class SM64KingBobombObjectBridge {
     private func synchronizeRecord(
         id: SM64ObjectID,
         state: SM64KingBobombState,
+        position: SM64ObjectVector3,
+        collision: SM64KingBobombCollisionResult?,
+        movement: SM64KingBobombMovementResult?,
         pool: SM64ObjectPool,
         previousAction: Int32,
         animation: Int32,
@@ -232,7 +382,7 @@ final class SM64KingBobombObjectBridge {
             record.objectFlags |=
                 SM64ObjectScheduler.objectFlagBuildTransform |
                 SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
-            record.position.y = state.positionY
+            record.position = position
             record.homePosition.y = state.homeY
             record.forwardVelocity = state.forwardVelocity
             record.velocity.y = state.velocityY
@@ -252,7 +402,18 @@ final class SM64KingBobombObjectBridge {
             record.graphFlags = state.hidden ? record.graphFlags | 0x10 : record.graphFlags & ~0x10
             record.drawingDistance = 5_000
             record.gravity = state.gravity
-            record.buoyancy = 0
+            record.buoyancy = 2
+            record.dragStrength = 10
+            if let collision {
+                record.floorHeight = collision.floorHeight
+                record.floorType = collision.floorType
+                record.floorRoom = Int16(collision.floorRoom)
+                record.moveFlags = collision.moveFlags
+            }
+            if let movement {
+                record.velocity = movement.velocity
+                record.moveFlags = movement.moveFlags
+            }
             if clearInteraction { record.interactionStatus = 0 }
         }
     }

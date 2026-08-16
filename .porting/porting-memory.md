@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M21d makes the King Bob-omb collision world an explicit opt-in owner-thread
+  input. The bridge executes wall/floor prepass, standard movement, then the
+  action kernel; publishes copied floor/wall/velocity/move-flag results into
+  the generation-safe object record; and fences held-state physics. Focused
+  strict Swift/C owner-collision fingerprint
+  `0xeb8e1c6bee295d67`, script
+  `script/test_king_bobomb_object_movement_bridge.sh`, full matrix
+  `runs=180 failures=0` (`/tmp/sm64-modern-m21d-final-matrix.log`), and
+  regenerated native Debug build (`/tmp/sm64-modern-m21d-build.log`) are the
+  target evidence for this slice. Home arc movement, arena/camera ownership,
+  reward persistence, real presentation, and other boss families remain open.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M21d.md`.
+
 - M21c adds the King Bob-omb floor/wall collision and
   `cur_obj_move_standard(-78)` value seam: 10-unit wall probe, wall-facing
   and 60-degree steep-floor flags, floor identity/type/room/normal, C-order
@@ -11,9 +24,9 @@
   matrix `runs=179 failures=0` (`/tmp/sm64-modern-m21c-final-matrix.log`),
   regenerated native Debug build (`/tmp/sm64-modern-m21c-build.log`),
   `git diff --check`, and zero unchecked-Sendable audit pass. The collision
-  world is not yet live gameplay authority; owner adoption, arena/camera,
-  reward, presentation, and other boss families remain open. Handoff:
-  `.porting/porting-handoff-full-swift-twin-M21c.md`.
+  world was not yet live gameplay authority at this boundary; owner adoption,
+  arena/camera, reward, presentation, and other boss families remained open.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M21c.md`.
 
 - M21b attaches the King Bob-omb value route to generation-safe owner records
   and the live 13-list scheduler. It synchronizes action/subaction/health,
