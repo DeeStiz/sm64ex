@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M21n adds the pointer-free Eyerok hand action table. It preserves sleep/wake,
+  idle/open/eye/close/retreat, Mario targeting and smash/fist branches,
+  double-pound selection/launch, attack/recover/become-active/death phases,
+  parent hand counters, source timing/animation state, and effect intents.
+  Focused strict Swift/C fingerprint 0xa2df4cef8e96223c, script
+  script/test_eyerok_hand.sh, full matrix target runs=190 failures=0, and
+  regenerated native Debug build target
+  /tmp/sm64-modern-m21n-build.log are the evidence boundary. Generation-safe
+  hand owner records, immutable-world collision/movement, real presentation,
+  durable reward persistence, Chief Chilly/Bowser breadth, and device/visual/
+  human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21n.md.
+
 - M21m adds the pointer-free Eyerok boss controller. It preserves the five
   source boss actions, hand-spawn transforms/models, wake/music/intro-dialog
   gates, Mario-relative hand selection and double-pound target clamp, defeat

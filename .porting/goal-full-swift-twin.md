@@ -2,7 +2,7 @@
 
 ## Status
 
-M21m is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M21n is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -183,6 +183,17 @@ fingerprint is `0x581005e57751119e`; the focused value smoke, expanded
 audit pass. Eyerok hand behavior/owner records, collision movement, real
 camera/audio/dialog consumers, durable reward persistence, and device/visual/
 human acceptance remain open.
+M21n adds the pointer-free Eyerok hand action table. It preserves sleep/wake,
+idle/open/eye/close/retreat, Mario targeting and smash/fist branches,
+double-pound selection/launch, attack/recover/become-active/death phases,
+parent hand counters, source animation/timing state, and sound/camera/mist/
+death effect intents. Its strict Swift/C fingerprint is
+`0xa2df4cef8e96223c`; the focused value smoke, expanded 190-script matrix,
+regenerated native Debug build, and zero unchecked-Sendable audit pass are the
+evidence boundary. Generation-safe hand owner records, immutable-world
+collision/movement, real camera/audio/dialog/renderer consumers, durable reward
+progression, Chief Chilly/Bowser breadth, and device/visual/human acceptance
+remain open.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
 `beginCommandBuffer`, while the existing queue-level residency, explicit
@@ -1052,7 +1063,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M21k: Big Boo owner/effect bridge | Swift binds Big Boo variants to generation-safe object records, routes source effects through the owner sink, creates the Ghost Hunt staircase children, and materializes source-identity reward stars with explicit gates. | Complete locally — strict Swift 6/C fingerprint `0x5ed0307ffc507ba4`, focused owner contract, 187-script matrix (runs=187 failures=0), regenerated native Debug build (/tmp/sm64-modern-m21k-build.log), git diff --check, and zero unchecked-Sendable audit pass; collision movement, progression/save, real presentation, and boss-family breadth remain |
 | M21l: Big Boo owner collision/movement bridge | Swift executes Big Boo against an immutable surface world in source order, applies the source wall radius plus drag/buoyancy constants, and publishes copied floor/wall/movement facts into the generation-safe record. | Complete locally — strict Swift 6/C fingerprint `0xeab6afaa926f3d57`, focused owner movement contract, 188-script matrix (runs=188 failures=0), regenerated native Debug build (/tmp/sm64-modern-m21l-build.log), git diff --check, and zero unchecked-Sendable audit pass; broad collision data, progression/save, real presentation, and boss-family breadth remain |
 | M21m: Eyerok boss value route | Swift reproduces Eyerok's five boss actions, hand-spawn transforms, wake/music/intro dialog gates, Mario-relative hand selection and double-pound target clamp, defeat dialog/star route, and music-stop/deletion timing as a pointer-free value contract. | Complete locally — strict Swift 6/C fingerprint `0x581005e57751119e`, focused value contract, 189-script matrix (runs=189 failures=0), regenerated native Debug build (/tmp/sm64-modern-m21m-build.log), git diff --check, and zero unchecked-Sendable audit pass; hand behavior/owner records, collision movement, real presentation, and reward persistence remain |
-| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21m close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, Big Boo value/owner/effect/collision/movement seams, and the Eyerok boss controller; broad collision authority, durable reward persistence, real camera/cutscene/audio wiring, Eyerok hands, Chief Chilly, Bowser arenas, reward/music transitions, and deterministic boss-phase shards remain |
+| M21n: Eyerok hand value route | Swift reproduces the hand action table, sleep/wake and targeting, eye/attack/recovery/death phases, double-pound setup/launch, parent hand counters, source timing/animation state, and effect intents as a pointer-free value contract. | Complete locally — strict Swift 6/C fingerprint `0xa2df4cef8e96223c`, focused value contract, 190-script matrix (runs=190 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21n-build.log`), git diff --check, and zero unchecked-Sendable audit pass; generation-safe owner records, collision movement, real presentation, durable reward persistence, Chief Chilly/Bowser breadth, and human/device acceptance remain |
+| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21n close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, Big Boo value/owner/effect/collision/movement seams, and Eyerok boss plus hand value routes; broad collision authority, durable reward persistence, real camera/cutscene/audio wiring, Eyerok hand owner/collision seams, Chief Chilly, Bowser arenas, reward/music transitions, and deterministic boss-phase shards remain |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
