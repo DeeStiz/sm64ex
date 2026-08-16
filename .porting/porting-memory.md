@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M22m registers the existing `bhvBird` owner bridge in spawned-flight mode
+  inside the shared `SM64BehaviorDispatchBridge`. The general-actor route
+  dispatches Amp, Boo, Bob-omb, and Bird in source list order, preserves Bird
+  reveal/flight state and generation-safe records, and keeps the Bob-omb smoke
+  and respawner children explicitly unmigrated. Six-route Swift/C fingerprint
+  0xdf0ba83813a05993, behavior manifest fingerprint 0x9bb2863444c51d6d, 534
+  rows, 73 Swift value/owner routes, and 461 explicit `unmigrated_c_adapter`
+  rows are the accounting boundary. Focused dispatch contract, native Debug
+  build target /tmp/sm64-modern-m22m-build.log, full 206-script matrix,
+  `git diff --check`, and zero unchecked-Sendable audit are required evidence.
+  Whole-engine route breadth, the remaining adapters, and live parity remain
+  open. Handoff: .porting/porting-handoff-full-swift-twin-M22m.md.
 - M22l registers the existing `bhvBobomb` owner bridge in the shared
   `SM64BehaviorDispatchBridge`. The general-actor route dispatches Amp, Boo,
   and Bob-omb in source list order, preserves Bob-omb fuse/chase state,
