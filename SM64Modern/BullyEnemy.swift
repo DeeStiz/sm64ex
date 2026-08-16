@@ -136,11 +136,17 @@ struct SM64BullyEffect: OptionSet, Equatable, Sendable {
     static let markForDeletion = Self(rawValue: 1 << 9)
     static let tangible = Self(rawValue: 1 << 10)
     static let intangible = Self(rawValue: 1 << 11)
+    static let sound = Self(rawValue: 1 << 12)
+    static let cameraShake = Self(rawValue: 1 << 13)
+    static let spawnBridge = Self(rawValue: 1 << 14)
 }
 
 struct SM64BullyTickResult: Equatable, Sendable {
     let state: SM64BullyState
     let effects: SM64BullyEffect
+    let coinPosition: SM64ObjectVector3?
+    let starPosition: SM64ObjectVector3?
+    let bridgePosition: SM64ObjectVector3?
 }
 
 enum SM64BullyKernel {
@@ -149,6 +155,9 @@ enum SM64BullyKernel {
         state: inout SM64BullyState
     ) -> SM64BullyTickResult {
         var effects: SM64BullyEffect = [.animate]
+        var coinPosition: SM64ObjectVector3?
+        var starPosition: SM64ObjectVector3?
+        var bridgePosition: SM64ObjectVector3?
         state.previousX = state.positionX
         state.previousY = state.positionY
         state.previousZ = state.positionZ
@@ -229,6 +238,9 @@ enum SM64BullyKernel {
                 state.action = .patrol
                 effects.insert(.patrol)
             }
+            if input.floorCollisionFlags & 1 != 0 {
+                effects.insert([.sound, .cameraShake, .mist])
+            }
             state.invisible = false
             state.tangible = true
             effects.insert(.tangible)
@@ -237,8 +249,20 @@ enum SM64BullyKernel {
                 effects.insert(.mist)
                 if state.size == .small {
                     effects.insert(.coin)
+                    coinPosition = SM64ObjectVector3(
+                        x: state.positionX,
+                        y: state.positionY + 310,
+                        z: state.positionZ
+                    )
                 } else {
                     effects.insert(.star)
+                    starPosition = state.subtype == .chill
+                        ? SM64ObjectVector3(x: 130, y: 1_600, z: -4_335)
+                        : SM64ObjectVector3(x: 0, y: 950, z: -6_800)
+                    if state.subtype != .chill {
+                        effects.insert(.spawnBridge)
+                        bridgePosition = SM64ObjectVector3(x: 0, y: 154, z: -5_631)
+                    }
                 }
                 state.markedForDeletion = true
                 effects.insert(.markForDeletion)
@@ -249,7 +273,13 @@ enum SM64BullyKernel {
         }
 
         if state.timer < 0x3FFF_FFFF { state.timer &+= 1 }
-        return SM64BullyTickResult(state: state, effects: effects)
+        return SM64BullyTickResult(
+            state: state,
+            effects: effects,
+            coinPosition: coinPosition,
+            starPosition: starPosition,
+            bridgePosition: bridgePosition
+        )
     }
 
     private static func step(_ state: inout SM64BullyState) {

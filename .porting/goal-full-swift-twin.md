@@ -2,7 +2,7 @@
 
 ## Status
 
-M21p is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M21q is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -215,6 +215,16 @@ fingerprint is `0xf15dddce9a7dae42`; the focused movement smoke, expanded
 unchecked-Sendable audit pass are the evidence boundary. A real authoritative
 collision mesh, presentation consumers, durable reward progression, Chief
 Chilly/Bowser breadth, and device/visual/human acceptance remain open.
+M21q extends the Bully owner bridge for Chief Chilly and the Big Bully reward
+path. The value kernel now preserves source coin/star/LLL-tumbling-bridge
+coordinates and activation sound/shake/mist intents; the owner boundary can
+explicitly materialize generation-safe reward and bridge children and route
+sound, particle, camera-shake, and star intents. Its strict Swift 6/C
+fingerprint is `0x027f2dfcec799615`; the focused reward/presentation smoke, the
+expanded 193-script matrix, regenerated native Debug build, `git diff --check`,
+and zero unchecked-Sendable audit pass are the evidence boundary. Minion-parent
+countdown breadth, authoritative collision movement, Bowser arenas, durable
+reward persistence, and device/visual/human acceptance remain open.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
 `beginCommandBuffer`, while the existing queue-level residency, explicit
@@ -1087,7 +1097,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M21n: Eyerok hand value route | Swift reproduces the hand action table, sleep/wake and targeting, eye/attack/recovery/death phases, double-pound setup/launch, parent hand counters, source timing/animation state, and effect intents as a pointer-free value contract. | Complete locally — strict Swift 6/C fingerprint `0xa2df4cef8e96223c`, focused value contract, 190-script matrix (runs=190 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21n-build.log`), git diff --check, and zero unchecked-Sendable audit pass; generation-safe owner records, collision movement, real presentation, durable reward persistence, Chief Chilly/Bowser breadth, and human/device acceptance remain |
 | M21o: Eyerok boss/hand owner bridge | Swift binds the Eyerok boss and hands to generation-safe parent/child records, creates source-model children in scheduler order, synchronizes transforms/hitbox/action/health/timing, feeds hand counters back to the boss, and routes typed boss/hand intents through the owner sink. | Complete locally — strict Swift 6/C owner fingerprint `0xcc5a9ee16597604f`, focused owner contract, 191-script matrix (runs=191 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21o-build.log`), git diff --check, and zero unchecked-Sendable audit pass; immutable-world collision/movement, real presentation consumers, durable reward persistence, Chief Chilly/Bowser breadth, and human/device acceptance remain |
 | M21p: Eyerok hand collision/movement bridge | Swift executes the Eyerok hand's opt-in immutable-world floor/wall prepass before the action kernel, applies `cur_obj_move_standard(-78)` with source gravity/physics constants, and publishes copied collision/movement facts into the generation-safe owner record. | Complete locally — strict Swift 6/C fingerprint `0xf15dddce9a7dae42`, focused movement contract, 192-script matrix (runs=192 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21p-build.log`), git diff --check, and zero unchecked-Sendable audit pass; authoritative collision mesh coverage, real presentation consumers, durable reward persistence, Chief Chilly/Bowser breadth, and human/device acceptance remain |
-| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21p close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, Big Boo value/owner/effect/collision/movement seams, and Eyerok boss/hand value/owner/collision/movement seams; broad collision authority, durable reward persistence, real camera/cutscene/audio wiring, Chief Chilly, Bowser arenas, reward/music transitions, and deterministic boss-phase shards remain |
+| M21q: Chief Chilly/Bully reward and presentation owner seam | Swift preserves the Bully source coin/star/LLL-tumbling-bridge reward coordinates and activation sound/shake/mist effects, then gates generation-safe reward/bridge child materialization and owner-thread sound, particle, camera-shake, and star delivery. | Complete locally — strict Swift 6/C fingerprint `0x027f2dfcec799615`, focused reward/presentation contract, 193-script matrix (runs=193 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21q-build.log`), git diff --check, and zero unchecked-Sendable audit pass; minion-parent countdown breadth, authoritative collision movement, Bowser arenas, durable reward persistence, and human/device acceptance remain |
+| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21q close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, Big Boo value/owner/effect/collision/movement seams, and Eyerok boss/hand value/owner/collision/movement seams plus Chief Chilly/Bully reward/presentation; broad collision authority and Bully minion-parent breadth, durable reward persistence, real camera/cutscene/audio wiring, Chief Chilly, Bowser arenas, reward/music transitions, and deterministic boss-phase shards remain |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |

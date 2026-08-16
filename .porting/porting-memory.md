@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21q extends the Bully owner bridge for Chief Chilly and the Big Bully
+  reward path. The value kernel preserves source coin/star/LLL-tumbling-bridge
+  coordinates plus activation sound/shake/mist effects; the owner boundary
+  gates generation-safe coin/star/bridge children and owner-thread sound,
+  particle, camera-shake, and star delivery. Focused strict Swift/C fingerprint
+  0x027f2dfcec799615, script
+  script/test_bully_reward_presentation.sh, full matrix runs=193 failures=0,
+  and regenerated native Debug build target
+  /tmp/sm64-modern-m21q-build.log are the evidence boundary. Minion-parent
+  countdown breadth, authoritative collision movement, Bowser arenas, durable
+  reward progression, and device/visual/human acceptance remain open.
+  Handoff: .porting/porting-handoff-full-swift-twin-M21q.md.
 - M21p adds an opt-in Eyerok hand immutable-world collision/movement
   seam. The owner bridge performs the source floor/wall prepass before the
   action kernel, then applies `cur_obj_move_standard(-78)` with Eyerok
