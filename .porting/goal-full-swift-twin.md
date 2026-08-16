@@ -2,7 +2,7 @@
 
 ## Status
 
-M20t is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M20u is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -66,6 +66,12 @@ row. The implementation still
 reports an explicit C-domain bridge for unmigrated gameplay/content, so M31 is
 not closed. The complete bridge deletion audit remains empty, the corrected
 136-script matrix passes, and the regenerated native Debug build succeeds.
+M20u is the latest bounded gameplay proof: the Yoshi owner bridge now binds
+the value kernel to generation-safe object records, shared effect delivery,
+dialog time-stop cleanup, source-authored respawner creation, and scheduler
+retirement. Its independent Swift/C owner fingerprint is
+`0xc62592c8da944321`; this remains a route proof, not whole-game parity or
+evidence that progression/save or real presentation owners are finished.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
 `beginCommandBuffer`, while the existing queue-level residency, explicit
@@ -920,7 +926,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M20r: Bob-omb Buddy value route | Swift reproduces Bob-omb Buddy idle/turn/talk actions, symmetric yaw admission, interaction transition, advice dialog completion, cannon unopened/opening/opened/stop phases, course-specific dialog IDs, prepare-cannon camera intent, visibility, blink input, and time-stop/interaction cleanup intents using the source-authored C action values `0/2/3`. | Complete locally — strict Swift 6/C fingerprint `0xdc0f36c0b93e7920`, focused contract, `git diff --check`, and zero unchecked-Sendable audit pass; owner-thread object/effect wiring and remaining NPC/puzzle families remain |
 | M20s: Bob-omb Buddy owner/effect bridge | Swift attaches the value route to generation-safe object IDs, derives live nearest-cannon existence from the object pool, synchronizes C action/role/cannon/visibility/NPC fields, routes walking/read-sign/dialog/prepare-cannon intents through the owner-thread sink, applies dialog time-stop flags, clears interaction status, and retires at scheduler unload. | Complete locally — strict Swift 6/C owner-bridge fingerprint `0xba317f5f6079097e`, value fingerprint `0xdc0f36c0b93e7920`, focused contracts, 174-script matrix (`runs=174 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m20s-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; real camera/dialog/audio owners, cannon persistence, and remaining NPC/puzzle families remain |
 | M20t: Yoshi value route | Swift reproduces Yoshi's source-authored seven-action state machine, 120-star/dead gate, four-home selection table and canonical turning, NPC dialog/time-stop handoff, present/lives cadence, roof jump/finish despawn, respawner request, and credits action. | Complete locally — strict Swift 6/C fingerprint `0xbefae53394f56ace`, focused contract, 175-script matrix (`runs=175 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m20t-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; owner object/effect/save wiring and remaining NPC/puzzle families remain |
-| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20t close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie/small-penguin/geo/Bob-omb Buddy/Yoshi slice; broader collision/movement integration, path selection for every other reachable trajectory, dialog/effect/audio identity, remaining NPCs, puzzles, secrets, and rewards remain |
+| M20u: Yoshi owner/effect bridge | Swift attaches Yoshi to generation-safe owner records, routes dialog/life/audio/camera/deletion intents, applies dialog time-stop cleanup, creates source-authored respawners, synchronizes roof/credits transforms, and retires deactivated records at the scheduler boundary. | Complete locally — strict Swift 6/C owner fingerprint `0xc62592c8da944321`, focused Swift/C owner contract, 176-script matrix (`runs=176 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m20u-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; progression/save consumers, real camera/dialog/audio presentation, broader NPC/puzzle families, and human/device acceptance remain |
+| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20u close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie/small-penguin/geo/Bob-omb Buddy/Yoshi slice; broader collision/movement integration, path selection for every other reachable trajectory, dialog/effect/audio identity, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1132,6 +1139,15 @@ replayable trace, and the platform evidence listed in its exit gate.
    M20t ports Yoshi's seven source action values, save/dead gate, castle-roof
    home table, dialog/present/lives branch, roof jump/finish despawn, and
    credits transition as a value-only route.
+   M20u attaches that route to generation-safe owner records and the live
+   scheduler. It routes the source-authored dialog, life-sound, walking,
+   alert, camera, and deletion intents through the shared owner-thread sink;
+   applies and clears dialog time-stop flags; synchronizes action, transform,
+   NPC, physics, and credits fields; creates the typed respawner record on a
+   roof failure; and proves generation-safe unload/reuse with a Swift/C owner
+   fingerprint. The bridge publishes `livesDelta` and respawner intent as
+   effects; progression/save mutation and real presentation owners remain
+   explicit downstream consumers.
    Finish broader collision/movement integration, path selection for every
    other reachable trajectory, and effect identity before owner-wiring the
    remaining NPC families.

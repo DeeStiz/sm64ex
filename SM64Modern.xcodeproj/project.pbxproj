@@ -60,6 +60,7 @@
 		36EB85680A608DBA2BC30633 /* CameraGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83C823492EEFDF9990E00996 /* CameraGeometry.swift */; };
 		3836963C80D7739E6B29B4E8 /* SLWalkingPenguinCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 14C3AD2F912846687082EA12 /* SLWalkingPenguinCollision.swift */; };
 		395E4FCD7396D3046C2A7A2F /* MarioGroundKnockbackAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497B887A768C172EC3ED7A98 /* MarioGroundKnockbackAction.swift */; };
+		3997D68E2D9AFC2C870CBD04 /* YoshiObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458C487DE63B424A8C00DA51 /* YoshiObjectBridge.swift */; };
 		3A185680189903BB0AA43307 /* GeoLayoutContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */; };
 		3BC4C0E9319AF629A5330E7E /* SeesawPlatformBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4789FFED823D9EAAB8F54ACB /* SeesawPlatformBehavior.swift */; };
 		3D3D38C8A3F908CCFF0C6E7D /* BouncingFireballObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0D4C3FC8AC2456B981C1640 /* BouncingFireballObjectBridge.swift */; };
@@ -267,6 +268,7 @@
 		411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		419DC71930B2E4EE76B0E18E /* GameplayTick.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameplayTick.swift; sourceTree = "<group>"; };
 		44193C66533F87518241D742 /* MarioTwirlingWaterAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioTwirlingWaterAction.swift; sourceTree = "<group>"; };
+		458C487DE63B424A8C00DA51 /* YoshiObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YoshiObjectBridge.swift; sourceTree = "<group>"; };
 		466600A4978BF6E07A6465C6 /* WhompEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhompEnemy.swift; sourceTree = "<group>"; };
 		4789FFED823D9EAAB8F54ACB /* SeesawPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SeesawPlatformBehavior.swift; sourceTree = "<group>"; };
 		49737667D24AE6AEA3374B3E /* EnemyLakitu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EnemyLakitu.swift; sourceTree = "<group>"; };
@@ -625,6 +627,7 @@
 				466600A4978BF6E07A6465C6 /* WhompEnemy.swift */,
 				189D1521FD7CFA3D234A28F6 /* WhompObjectBridge.swift */,
 				21635A888B1CF4C5B13766F6 /* YoshiBehavior.swift */,
+				458C487DE63B424A8C00DA51 /* YoshiObjectBridge.swift */,
 			);
 			path = SM64Modern;
 			sourceTree = "<group>";
@@ -926,6 +929,7 @@
 				F3119272F792799B5D608AF1 /* WhompEnemy.swift in Sources */,
 				5C1840210026D9416120F870 /* WhompObjectBridge.swift in Sources */,
 				5C4BFBD421D7D3B422C7571A /* YoshiBehavior.swift in Sources */,
+				3997D68E2D9AFC2C870CBD04 /* YoshiObjectBridge.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
