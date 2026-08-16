@@ -21,6 +21,7 @@ struct SM64TuxiesMotherEnvironment: Equatable, Sendable {
     let angleToMario: Int16
     let soundStateID: Int32
     let animationFrameOne: Bool
+    let globalTimer: UInt64
 
     init(
         motherBehaviorParam: UInt8 = 1,
@@ -35,7 +36,8 @@ struct SM64TuxiesMotherEnvironment: Equatable, Sendable {
         dialogResult: Int32 = 0,
         angleToMario: Int16 = 0,
         soundStateID: Int32 = 1,
-        animationFrameOne: Bool = false
+        animationFrameOne: Bool = false,
+        globalTimer: UInt64 = 0
     ) {
         self.motherBehaviorParam = motherBehaviorParam
         self.childBehaviorParam = childBehaviorParam
@@ -50,6 +52,7 @@ struct SM64TuxiesMotherEnvironment: Equatable, Sendable {
         self.angleToMario = angleToMario
         self.soundStateID = soundStateID
         self.animationFrameOne = animationFrameOne
+        self.globalTimer = globalTimer
     }
 }
 
@@ -57,6 +60,7 @@ struct SM64TuxiesMotherObjectEffect: Equatable, Sendable {
     let objectID: SM64ObjectID
     let childID: SM64ObjectID?
     let output: SM64TuxiesMotherOutput
+    let eyesSelectedCase: Int32
     let spawnedChildren: [SM64ObjectID]
     let presentedEffects: [SM64OwnerThreadEffectIntent]
 }
@@ -237,6 +241,14 @@ final class SM64TuxiesMotherObjectBridge {
         state.subAction = output.subAction
         state.moveYaw = output.moveYaw
         states[id] = state
+        let eyes = SM64TuxiesMotherEyes.update(
+            SM64TuxiesMotherEyesInput(
+                globalTimer: environment.globalTimer,
+                objectBehaviorIdentity: record.behaviorIdentity,
+                motherBehaviorIdentity: Self.defaultMotherBehaviorIdentity,
+                forwardVelocity: output.forwardVelocity
+            )
+        )
 
         var spawnedChildren: [SM64ObjectID] = []
         if let childID = state.childID, pool.record(for: childID) != nil {
@@ -316,6 +328,7 @@ final class SM64TuxiesMotherObjectBridge {
                 objectID: id,
                 childID: state.childID,
                 output: output,
+                eyesSelectedCase: eyes.selectedCase,
                 spawnedChildren: spawnedChildren,
                 presentedEffects: delivery.presented
             )
@@ -342,7 +355,8 @@ final class SM64TuxiesMotherObjectBridge {
             dialogResult: Int32(record.dialogResponse),
             angleToMario: Int16(truncatingIfNeeded: record.angleToMario),
             soundStateID: record.soundStateID,
-            animationFrameOne: false
+            animationFrameOne: false,
+            globalTimer: 0
         )
     }
 
