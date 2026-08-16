@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-progression-runtime-smoke"
+BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-progression-save-mutation-runtime-smoke"
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc -parse-as-library -swift-version 6 \
@@ -18,21 +18,21 @@ xcrun swiftc -parse-as-library -swift-version 6 \
   "$PROJECT_ROOT/SM64Modern/SaveFileMutator.swift" \
   "$PROJECT_ROOT/SM64Modern/ProgressionPersistence.swift" \
   "$PROJECT_ROOT/SM64Modern/ProgressionRuntime.swift" \
-  "$PROJECT_ROOT/tests/sm64_modern_progression_runtime_smoke.swift" \
-  -o "$BUILD_ROOT/sm64-modern-progression-runtime-smoke"
-SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-progression-runtime-smoke)"
+  "$PROJECT_ROOT/tests/sm64_modern_progression_save_mutation_runtime_smoke.swift" \
+  -o "$BUILD_ROOT/sm64-modern-progression-save-mutation-runtime-smoke"
+SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-progression-save-mutation-runtime-smoke)"
 printf '%s\n' "$SWIFT_OUTPUT"
 
 xcrun clang -std=c11 \
-  "$PROJECT_ROOT/tests/sm64_modern_progression_runtime_contract.c" \
-  -o "$BUILD_ROOT/sm64-modern-progression-runtime-contract"
-C_OUTPUT="$($BUILD_ROOT/sm64-modern-progression-runtime-contract)"
+  "$PROJECT_ROOT/tests/sm64_modern_progression_save_mutation_runtime_contract.c" \
+  -o "$BUILD_ROOT/sm64-modern-progression-save-mutation-runtime-contract"
+C_OUTPUT="$($BUILD_ROOT/sm64-modern-progression-save-mutation-runtime-contract)"
 printf '%s\n' "$C_OUTPUT"
 
-SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^progressionRuntimeFingerprint=//p')"
-C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^progressionRuntimeFingerprint=//p')"
+SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^progressionSaveMutationRuntimeFingerprint=//p')"
+C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^progressionSaveMutationRuntimeFingerprint=//p')"
 [[ -n "$SWIFT_FINGERPRINT" && "$SWIFT_FINGERPRINT" == "$C_FINGERPRINT" ]] || {
-  echo "Swift/C progression-runtime fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
+  echo "Swift/C progression save-mutation runtime fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
   exit 1
 }
-printf '%s\n' "SM64 Modern progression-runtime C contract matched"
+printf '%s\n' "SM64 Modern progression save-mutation runtime C contract matched"

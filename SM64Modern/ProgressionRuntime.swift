@@ -140,6 +140,7 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
             y: Float(save.capPosition.y),
             z: Float(save.capPosition.z)
         )
+        progression.capLocation = Self.capLocation(for: save.flags)
         progression.saveModified = false
         menuAges = SM64CoinScoreAgeState(
             ages: menu.coinScoreAges, modified: false
@@ -162,6 +163,105 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
             return false
         }
         progression.courseNumber = Int16(number)
+        return true
+    }
+
+    /// Owner-thread save mutation boundary. The caller supplies the same
+    /// legacy-domain admission decision used by the C save helpers; a
+    /// rejected tick must not change value state or dirty bits.
+    @discardableResult
+    mutating func setSaveFlags(
+        _ flags: UInt32,
+        legacyDomainAdvances: Bool = true
+    ) -> Bool {
+        guard legacyDomainAdvances else { return false }
+        adoptSaveMutation(SM64SaveFileMutator.setFlags(flags, in: saveSnapshot()))
+        return true
+    }
+
+    @discardableResult
+    mutating func clearSaveFlags(
+        _ flags: UInt32,
+        legacyDomainAdvances: Bool = true
+    ) -> Bool {
+        guard legacyDomainAdvances else { return false }
+        adoptSaveMutation(SM64SaveFileMutator.clearFlags(flags, in: saveSnapshot()))
+        return true
+    }
+
+    @discardableResult
+    mutating func setSaveStarFlags(
+        _ starFlags: UInt32,
+        courseIndex: Int,
+        legacyDomainAdvances: Bool = true
+    ) -> Bool {
+        guard legacyDomainAdvances,
+              let save = SM64SaveFileMutator.setStarFlags(
+                starFlags, courseIndex: courseIndex, in: saveSnapshot()
+              ) else { return false }
+        adoptSaveMutation(save)
+        return true
+    }
+
+    @discardableResult
+    mutating func setSaveCannonUnlocked(
+        legacyDomainAdvances: Bool = true
+    ) -> Bool {
+        guard legacyDomainAdvances,
+              let save = SM64SaveFileMutator.setCannonUnlocked(
+                currentCourseNumber: Int(progression.courseNumber),
+                in: saveSnapshot()
+              ) else { return false }
+        adoptSaveMutation(save)
+        return true
+    }
+
+    @discardableResult
+    mutating func setSaveCapPosition(
+        level: UInt8,
+        area: UInt8,
+        position: SM64SaveInt16Vector3,
+        legacyDomainAdvances: Bool = true
+    ) -> Bool {
+        guard legacyDomainAdvances else { return false }
+        let save = SM64SaveFileMutator.setCapPosition(
+            level: level, area: area, position: position, in: saveSnapshot()
+        )
+        adoptSaveMutation(save)
+        return true
+    }
+
+    /// Returns `.none` for an admitted move with an unknown level and `nil`
+    /// when the C helper would not run because the domain is paused or the
+    /// saved cap is not on the ground.
+    @discardableResult
+    mutating func moveSaveCapToDefaultLocation(
+        level: UInt8,
+        legacyDomainAdvances: Bool = true
+    ) -> SM64ProgressionCapLocation? {
+        guard legacyDomainAdvances else { return nil }
+        let save = saveSnapshot()
+        guard save.flags & SM64SaveFileMutator.capOnGroundFlag != 0 else {
+            return nil
+        }
+        let result = SM64SaveFileMutator.moveCapToDefaultLocation(
+            level: level, in: save
+        )
+        adoptSaveMutation(result.save)
+        return result.location
+    }
+
+    @discardableResult
+    mutating func setSaveSoundMode(
+        _ mode: UInt16,
+        legacyDomainAdvances: Bool = true
+    ) -> Bool {
+        guard legacyDomainAdvances else { return false }
+        let next = SM64SaveFileMutator.setSoundMode(mode, in: menuSnapshot())
+        soundMode = next.soundMode
+        // C marks the shared menu block dirty even when the value is equal;
+        // the commit boundary clears this bit only after durable replacement.
+        menuAges.modified = true
         return true
     }
 
@@ -197,6 +297,7 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
             y: Float(loaded.save.capPosition.y),
             z: Float(loaded.save.capPosition.z)
         )
+        progression.capLocation = Self.capLocation(for: loaded.save.flags)
         progression.saveModified = false
         menuAges = SM64CoinScoreAgeState(
             ages: loaded.menu.coinScoreAges, modified: false
@@ -209,6 +310,34 @@ struct SM64ProgressionRuntime: Equatable, Sendable {
     private var courseIndex: Int? {
         let index = Int(progression.courseNumber) - 1
         return (0..<SM64ProgressionState.stageCount).contains(index) ? index : nil
+    }
+
+    private mutating func adoptSaveMutation(_ save: SM64SaveFileSnapshot) {
+        progression.flags = save.flags & 0x00FF_FFFF
+        progression.secretStars = UInt8((save.flags >> 24) & 0x7F)
+        progression.courseStars = save.courseStars
+        progression.courseCoinScores = save.courseCoinScores
+        progression.capLevel = save.capLevel
+        progression.capArea = save.capArea
+        progression.capPosition = .init(
+            x: Float(save.capPosition.x),
+            y: Float(save.capPosition.y),
+            z: Float(save.capPosition.z)
+        )
+        progression.capLocation = Self.capLocation(for: save.flags)
+        progression.saveModified = true
+    }
+
+    private static func capLocation(
+        for flags: UInt32
+    ) -> SM64ProgressionCapLocation {
+        if flags & SM64SaveFileMutator.capOnGroundFlag != 0 { return .ground }
+        if flags & SM64SaveFileMutator.capOnKleptoFlag != 0 { return .klepto }
+        if flags & SM64SaveFileMutator.capOnUkikiFlag != 0 { return .ukiki }
+        if flags & SM64SaveFileMutator.capOnMrBlizzardFlag != 0 {
+            return .mrBlizzard
+        }
+        return .none
     }
 
     private func courseScore(for state: SM64ProgressionState) -> Int16 {

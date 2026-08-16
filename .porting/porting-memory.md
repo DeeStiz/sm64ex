@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M23e integrates `SM64SaveFileMutator` into the owner-thread
+  `SM64ProgressionRuntime`. Flag/star/cannon/cap/cap-relocation/sound calls
+  now accept the legacy-domain admission decision, paused calls are strict
+  no-ops, admitted setters dirty the save or shared menu block in C order,
+  cap-location state is restored from persisted flags, and `commitIfNeeded`
+  clears dirtiness only after atomic replacement. Swift/C runtime fingerprint
+  `0x837f4055094f2508`; focused runtime contract plus M23a–M23d regressions,
+  regenerated native Debug build, complete 210-script matrix
+  (`runs=210 failures=0`), `git diff --check`, and zero unchecked-Sendable
+  audit pass. Normalized EEPROM owner wiring, restart-selector parity, and
+  full save authority replay remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M23e.md`.
+
 - M23d adds the pure Swift 6 `SM64SaveFileMutator` kernel for C flag,
   star, cannon, cap-position, cap-relocation, and sound-mode mutations. It
   preserves C's secret-star sentinel, one-based cannon indexing, file-exists

@@ -22,6 +22,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ProgressionActors.swift" \
   "$PROJECT_ROOT/SM64Modern/SaveFileCodec.swift" \
   "$PROJECT_ROOT/SM64Modern/CoinScoreAges.swift" \
+  "$PROJECT_ROOT/SM64Modern/SaveFileMutator.swift" \
   "$PROJECT_ROOT/SM64Modern/ProgressionPersistence.swift" \
   "$PROJECT_ROOT/SM64Modern/ProgressionRuntime.swift" \
   "$PROJECT_ROOT/SM64Modern/InputCore.swift" \
