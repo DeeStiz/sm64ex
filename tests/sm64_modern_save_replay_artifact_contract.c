@@ -4,7 +4,7 @@
 
 #define MAGIC UINT32_C(0x50524D53)
 #define HEADER_SIZE 64
-#define RECORD_SIZE 128
+#define RECORD_SIZE 176
 #define RECORD_COUNT 3
 #define FNV_OFFSET UINT64_C(1469598103934665603)
 #define FNV_PRIME UINT64_C(1099511628211)
@@ -95,7 +95,7 @@ static int verify_artifact(const uint8_t *bytes, size_t size) {
     for (size_t index = 0; index < RECORD_COUNT; ++index) {
         const size_t offset = HEADER_SIZE + index * RECORD_SIZE;
         if (get32(bytes, offset) != 1 || get32(bytes, offset + 4) != RECORD_SIZE
-            || get64(bytes, offset + 112) != hash_bytes(bytes + offset, 112)) {
+            || get64(bytes, offset + 144) != hash_bytes(bytes + offset, 144)) {
             return 0;
         }
     }
@@ -124,7 +124,7 @@ int main(int argc, char **argv) {
     for (size_t index = 0; index < RECORD_COUNT; ++index) {
         const size_t offset = HEADER_SIZE + index * RECORD_SIZE;
         put32(bytes, offset + 24, index == 2 ? 1 : 2);
-        put64(bytes, offset + 112, hash_bytes(bytes + offset, 112));
+        put64(bytes, offset + 144, hash_bytes(bytes + offset, 144));
     }
     put64(bytes, 48, hash_bytes(bytes, 48));
     put64(bytes, 56, hash_artifact(bytes));

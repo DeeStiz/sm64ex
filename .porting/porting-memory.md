@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M23i makes the durable save shadow replay executable. The fixed-width record
+  now carries every operand needed to replay flags, course/star, cap, sound,
+  source-slot, and recovery operations against a fresh normalized EEPROM image;
+  before/after save/menu hashes, image hashes, and canonical record/header
+  hashes must match, and tampered records fail before any write. Focused
+  operand-complete artifact fingerprint `0x0ab6d5b2827a9435`, C-authored
+  round-trip `0xb7120f3045b8cbbb`, fresh-image corruption/mutation/persist/
+  reload execution fingerprint `0x23b4cdd9dd948b53`, regenerated native Debug
+  build, complete 213-script matrix (`runs=213 failures=0`),
+  `git diff --check`, and zero unchecked-Sendable audit pass. Full live
+  corruption-branch capture and production Swift save authority remain open.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M23i.md`.
+
 - M23h makes save shadow replay durable while preserving the restart-required
   authority boundary. `SM64SaveReplayArtifact` is a fixed-width, canonical
   hash-checked file whose header records Swift/C authority and restart metadata;

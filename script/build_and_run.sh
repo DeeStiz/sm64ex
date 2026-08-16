@@ -41,6 +41,7 @@ else
   "$PROJECT_ROOT/script/test_timebase_audit.sh"
   "$PROJECT_ROOT/script/test_engine_authority.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
+  "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
   "$PROJECT_ROOT/script/test_content_pack.sh"
   "$PROJECT_ROOT/script/test_oracle_trace.sh"

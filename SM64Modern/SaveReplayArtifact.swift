@@ -32,7 +32,7 @@ enum SM64SaveReplayOperation: UInt32, Equatable, Sendable {
 /// independent C reader. Hashes are over encoded save/menu bytes, so replay
 /// qualification never depends on Swift value layout or pointer identity.
 struct SM64SaveReplayRecord: Equatable, Sendable {
-    static let encodedSize = 128
+    static let encodedSize = 176
 
     let sequence: UInt64
     let simulationTick: UInt64
@@ -42,6 +42,15 @@ struct SM64SaveReplayRecord: Equatable, Sendable {
     let mutationKind: UInt32
     let mutationOperation: UInt32
     let sourceFileIndex: UInt32
+    let mutationFlags: UInt32
+    let mutationCourseIndex: UInt32
+    let mutationStarFlags: Int32
+    let mutationLevel: UInt32
+    let mutationArea: UInt32
+    let mutationCapX: Int32
+    let mutationCapY: Int32
+    let mutationCapZ: Int32
+    let mutationSoundMode: UInt32
     let saveRecoveryDecision: UInt32
     let menuRecoveryDecision: UInt32
     let status: UInt32
@@ -53,7 +62,7 @@ struct SM64SaveReplayRecord: Equatable, Sendable {
 
     var canonicalHash: UInt64 {
         SM64SaveReplayHash.bytes(
-            Data(encoded(includeCanonical: false).prefix(112))
+            Data(encoded(includeCanonical: false).prefix(144))
         )
     }
 
@@ -77,13 +86,24 @@ struct SM64SaveReplayRecord: Equatable, Sendable {
         data.appendLE(menuRecoveryDecision)
         data.appendLE(status)
         data.appendLE(UInt32(0))
+        data.appendLE(mutationFlags)
+        data.appendLE(mutationCourseIndex)
+        data.appendLE(UInt32(bitPattern: mutationStarFlags))
+        data.appendLE(mutationLevel)
+        data.appendLE(mutationArea)
+        data.appendLE(UInt32(bitPattern: mutationCapX))
+        data.appendLE(UInt32(bitPattern: mutationCapY))
+        data.appendLE(UInt32(bitPattern: mutationCapZ))
+        data.appendLE(mutationSoundMode)
+        data.appendLE(UInt32(0))
         data.appendLE(beforeSaveHash)
         data.appendLE(beforeMenuHash)
         data.appendLE(afterSaveHash)
         data.appendLE(afterMenuHash)
         data.appendLE(imageHash)
-        data.appendLE(UInt64(0))
         data.appendLE(includeCanonical ? canonicalHash : UInt64(0))
+        data.appendLE(UInt64(0))
+        data.appendLE(UInt64(0))
         data.appendLE(UInt64(0))
         precondition(data.count == Self.encodedSize)
         return data
@@ -94,9 +114,10 @@ struct SM64SaveReplayRecord: Equatable, Sendable {
             throw SM64SaveReplayArtifactError.truncated
         }
         var cursor = SM64SaveReplayCursor(data)
-        guard try cursor.readUInt32() == 1,
-              try cursor.readUInt32() == UInt32(encodedSize) else {
-            throw SM64SaveReplayArtifactError.invalidRecordSize(try cursor.peekUInt32())
+        let recordVersion = try cursor.readUInt32()
+        let recordSize = try cursor.readUInt32()
+        guard recordVersion == 1, recordSize == UInt32(encodedSize) else {
+            throw SM64SaveReplayArtifactError.invalidRecordSize(recordSize)
         }
         let sequence = try cursor.readUInt64()
         let simulationTick = try cursor.readUInt64()
@@ -107,26 +128,54 @@ struct SM64SaveReplayRecord: Equatable, Sendable {
         ) else {
             throw SM64SaveReplayArtifactError.nonCanonicalRecord(sequence)
         }
+        let saveFileIndex = try cursor.readUInt32()
+        let mutationKind = try cursor.readUInt32()
+        let mutationOperation = try cursor.readUInt32()
+        let sourceFileIndex = try cursor.readUInt32()
+        let saveRecoveryDecision = try cursor.readUInt32()
+        let menuRecoveryDecision = try cursor.readUInt32()
+        let status = try cursor.readUInt32()
+        _ = try cursor.readUInt32()
+        let mutationFlags = try cursor.readUInt32()
+        let mutationCourseIndex = try cursor.readUInt32()
+        let mutationStarFlags = Int32(bitPattern: try cursor.readUInt32())
+        let mutationLevel = try cursor.readUInt32()
+        let mutationArea = try cursor.readUInt32()
+        let mutationCapX = Int32(bitPattern: try cursor.readUInt32())
+        let mutationCapY = Int32(bitPattern: try cursor.readUInt32())
+        let mutationCapZ = Int32(bitPattern: try cursor.readUInt32())
+        let mutationSoundMode = try cursor.readUInt32()
+        _ = try cursor.readUInt32()
         let record = Self(
             sequence: sequence,
             simulationTick: simulationTick,
             direction: direction,
             operation: operation,
-            saveFileIndex: try cursor.readUInt32(),
-            mutationKind: try cursor.readUInt32(),
-            mutationOperation: try cursor.readUInt32(),
-            sourceFileIndex: try cursor.readUInt32(),
-            saveRecoveryDecision: try cursor.readUInt32(),
-            menuRecoveryDecision: try cursor.readUInt32(),
-            status: try cursor.readUInt32(),
-            beforeSaveHash: try cursor.readUInt64(afterReserved: true),
+            saveFileIndex: saveFileIndex,
+            mutationKind: mutationKind,
+            mutationOperation: mutationOperation,
+            sourceFileIndex: sourceFileIndex,
+            mutationFlags: mutationFlags,
+            mutationCourseIndex: mutationCourseIndex,
+            mutationStarFlags: mutationStarFlags,
+            mutationLevel: mutationLevel,
+            mutationArea: mutationArea,
+            mutationCapX: mutationCapX,
+            mutationCapY: mutationCapY,
+            mutationCapZ: mutationCapZ,
+            mutationSoundMode: mutationSoundMode,
+            saveRecoveryDecision: saveRecoveryDecision,
+            menuRecoveryDecision: menuRecoveryDecision,
+            status: status,
+            beforeSaveHash: try cursor.readUInt64(),
             beforeMenuHash: try cursor.readUInt64(),
             afterSaveHash: try cursor.readUInt64(),
             afterMenuHash: try cursor.readUInt64(),
             imageHash: try cursor.readUInt64()
         )
-        _ = try cursor.readUInt64()
         let storedHash = try cursor.readUInt64()
+        _ = try cursor.readUInt64()
+        _ = try cursor.readUInt64()
         _ = try cursor.readUInt64()
         guard storedHash == record.canonicalHash else {
             throw SM64SaveReplayArtifactError.nonCanonicalRecord(sequence)
@@ -338,14 +387,7 @@ private struct SM64SaveReplayCursor {
         }
     }
 
-    mutating func peekUInt32() throws -> UInt32 {
-        let saved = offset
-        defer { offset = saved }
-        return try readUInt32()
-    }
-
-    mutating func readUInt64(afterReserved: Bool = false) throws -> UInt64 {
-        if afterReserved { _ = try readUInt32() }
+    mutating func readUInt64() throws -> UInt64 {
         let bytes = try read(8)
         return bytes.enumerated().reduce(UInt64(0)) {
             $0 | UInt64($1.element) << UInt64($1.offset * 8)

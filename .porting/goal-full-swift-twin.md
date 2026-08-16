@@ -2,14 +2,17 @@
 
 ## Status
 
-M23h is the latest validated persistence slice layered on M34a/M33f/M22bc;
-save replay is now durable in a fixed-width, authority-tagged artifact with
-per-operation hashes, recovery decisions, canonical header/record checks, and
-an independent C writer/reader round trip. M23g's exact C mutation payload ABI
-and Swift normalized shadow replay, M23f's recovery-before-mutation boundary,
-M23e's owner-thread admission/dirty boundary, M23d's value kernel, and M23c's
-copy/erase operations remain in force, with independent Swift/C fingerprints.
-M22 remains behavior-coverage work in progress: the
+M23i is the latest validated persistence slice layered on M34a/M33f/M22bc;
+the durable replay record now carries every mutation operand needed for a
+standalone fresh-image replay—flags, course/star, cap, sound, source slot, and
+recovery decisions—plus canonical per-record/header/artifact hashes. A fresh
+normalized image replays persisted mutation, corruption-repair, persist, and
+reload records with byte-identical hashes. M23h's authority-tagged artifact,
+M23g's exact C mutation payload ABI and Swift normalized shadow replay, M23f's
+recovery-before-mutation boundary, M23e's owner-thread admission/dirty
+boundary, M23d's value kernel, and M23c's copy/erase operations remain in
+force, with independent Swift/C fingerprints. M22 remains behavior-coverage
+work in progress: the
 latest bounded gameplay slice is M22bc. M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
@@ -1836,7 +1839,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M23e: Owner-thread save mutation admission and dirty integration | `SM64ProgressionRuntime` now routes flag/star/cannon/cap/cap-relocation/sound calls through `SM64SaveFileMutator`, rejects paused legacy-domain calls without changing state, marks save/menu dirty exactly at admitted C boundaries, propagates cap-location state, and clears dirty bits only after atomic commit. | Complete locally — Swift/C runtime fingerprint `0x837f4055094f2508`, focused runtime contract plus M23a–M23d regressions, regenerated native Debug build (`/tmp/sm64-modern-m23e-build.log`), complete 210-script matrix (`/tmp/sm64-modern-m23e-final-matrix-rerun.log`, runs=210 failures=0), strict-concurrency audit, and `git diff --check`; normalized EEPROM owner wiring, restart-selector parity, full replay, and authority closure remain |
 | M23f: Normalized EEPROM mutation replay | `SM64OwnerThreadEEPROMAdapter.apply` recovers the whole image before applying each C-compatible mutation, preserves menu filler/ages, writes both copies atomically, fails closed for invalid moves, and supports normalized `SM64ProgressionRuntime.commitIfNeeded`. | Complete locally — Swift/C replay fingerprint `0x12990736c21cd899`, focused normalized replay plus M23a–M23e regressions, regenerated native Debug build (`/tmp/sm64-modern-m23f-build.log`), complete 211-script matrix (`/tmp/sm64-modern-m23f-final-matrix.log`, runs=211 failures=0), strict-concurrency audit, and `git diff --check`; migration-event authority, restart-selector parity, full bidirectional replay, and authority closure remain |
 | M23g: Save mutation event payload and shadow replay | `SM64ModernProgressionEventV1` carries mutation operation, source slot, flags, course/star operands, cap coordinates, and sound mode; C save helpers emit them, Swift seeds the normalized image from C, replays each payload, compares post-event bytes, and latches parity divergence. | Complete locally — migration payload contract fingerprint `0x5f56c0c4d6b0e8b1`, focused C payload assertions plus M23a–M23f regressions, regenerated native Debug build (`/tmp/sm64-modern-m23g-build.log`), complete 211-script matrix (`/tmp/sm64-modern-m23g-final-matrix-final.log`, runs=211 failures=0), strict-concurrency audit, and `git diff --check`; restart-selector authority, persistent bidirectional replay artifacts, and production Swift save authority remain |
-| M23h: Restart-selector authority and durable save replay artifact | Save replay records are fixed-width and canonical-hash checked across process boundaries; headers preserve selected Swift/C authority and restart metadata, records carry C↔Swift direction, mutation/recovery operands, before/after save/menu hashes, and image hashes, and the live migration service writes the artifact only under the explicit `SM64_MODERN_SAVE_REPLAY_ARTIFACT` opt-in. | Complete locally — Swift artifact fingerprint `0x4a47663d9439c6cc`, C-authored round-trip fingerprint `0xb07a9ba133b53d34`, selector restart contract, regenerated native Debug build (`/tmp/sm64-modern-m23h-build.log`), complete 212-script matrix (`/tmp/sm64-modern-m23h-final-matrix.log`, runs=212 failures=0), strict-concurrency audit, and `git diff --check`; replaying every live corruption/mutation branch from persisted artifacts and production Swift save authority remain |
+| M23h: Restart-selector authority and durable save replay artifact | Save replay records are fixed-width and canonical-hash checked across process boundaries; headers preserve selected Swift/C authority and restart metadata, records carry C↔Swift direction, mutation/recovery metadata, before/after save/menu hashes, and image hashes, and the live migration service writes the artifact only under the explicit `SM64_MODERN_SAVE_REPLAY_ARTIFACT` opt-in. | Complete locally — initial artifact/selector contract and C-authored round trip (`/tmp/sm64-modern-m23h-build.log`, `/tmp/sm64-modern-m23h-final-matrix.log`, runs=212 failures=0); M23i widens the record with all replay operands and executes persisted recovery/mutation replay |
+| M23i: Operand-complete persisted save replay | The replay schema carries flags, course/star, cap, sound, source-slot, and recovery operands; a fresh normalized EEPROM image replays mutation, one-bad-copy repair, persist, and reload records, verifies before/after byte hashes, rejects tamper, and preserves authority/restart metadata. | Complete locally — operand-complete Swift artifact fingerprint `0x0ab6d5b2827a9435`, C-authored round-trip `0xb7120f3045b8cbbb`, fresh-image execution fingerprint `0x23b4cdd9dd948b53`, regenerated native Debug build (`/tmp/sm64-modern-m23i-build.log`), complete 213-script matrix (`/tmp/sm64-modern-m23i-final-matrix.log`, runs=213 failures=0), strict-concurrency audit, and `git diff --check`; full live artifact capture for every corruption branch and production Swift save authority remain |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |
 | M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | Not started |
@@ -2165,6 +2169,13 @@ replayable trace, and the platform evidence listed in its exit gate.
    persist, load, reload, and recovery boundaries only when
    `SM64_MODERN_SAVE_REPLAY_ARTIFACT` is set. Full persisted corruption-route
    replay and production Swift save authority remain open.
+   M23i makes the persisted record executable rather than hash-only: every
+   mutation operand is serialized, a fresh normalized EEPROM image replays
+   flags, stars, cap coordinates, one-bad-copy repair, persist, and reload,
+   and each before/after save/menu hash must match. The executor also rejects a
+   tampered record before any write. The live app still keeps artifact capture
+   opt-in, and production Swift save authority remains gated on full live
+   corruption-branch capture plus restart-selector C compatibility.
 2. **M24 configuration and cheats.** Port defaults, bindings, camera
    settings, audio/video options, language, legal-ROM settings, cheats, and
    invalid-value recovery. Keep engine authority immutable after launch and
