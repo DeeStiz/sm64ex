@@ -18,6 +18,8 @@ enum SM64ModernEngineAuthoritySmoke {
         precondition(persistedSelection.authority == .cCompatibility)
         precondition(persistedSelection.source == .persistedSetting)
         precondition(persistedSelection.isValid)
+        precondition(persistedSelection.requiresRestart(comparedTo: .swift))
+        precondition(!persistedSelection.requiresRestart(comparedTo: .cCompatibility))
 
         let overrideSelection = SM64ModernEngineAuthorityStore.resolve(
             environment: [SM64ModernEngineAuthorityStore.environmentKey: "swift"],

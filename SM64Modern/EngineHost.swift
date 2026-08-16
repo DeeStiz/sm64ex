@@ -749,7 +749,8 @@ final class EngineHost {
             do {
                 let service = try SwiftProgressionMigrationService(
                     saveDirectory: paths.saveDirectory,
-                    ownerThreadToken: engineThreadIdentifier
+                    ownerThreadToken: engineThreadIdentifier,
+                    authority: engineAuthority
                 )
                 try service.initialize()
                 var migration = service.makeAPI()

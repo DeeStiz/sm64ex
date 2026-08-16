@@ -160,7 +160,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
             showEngineAuthorityRestartNotice(
                 message: "The SM64_MODERN_ENGINE environment override is active. Remove it before restarting for the saved authority to take effect."
             )
-        } else if authority != authoritySelection.authority {
+        } else if SM64ModernEngineAuthoritySelection.requiresRestart(
+            selectedAuthority: authority,
+            activeAuthority: authoritySelection.authority
+        ) {
             showEngineAuthorityRestartNotice(
                 message: "Engine authority saved as \(authority.displayName). Restart SM64 Modern to apply it."
             )

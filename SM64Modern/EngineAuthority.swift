@@ -44,6 +44,17 @@ struct SM64ModernEngineAuthoritySelection: Sendable {
     var requiresLaunchFailure: Bool {
         invalidValue != nil && source == .environmentOverride
     }
+
+    func requiresRestart(comparedTo activeAuthority: SM64ModernEngineAuthority) -> Bool {
+        authority != activeAuthority
+    }
+
+    static func requiresRestart(
+        selectedAuthority: SM64ModernEngineAuthority,
+        activeAuthority: SM64ModernEngineAuthority
+    ) -> Bool {
+        selectedAuthority != activeAuthority
+    }
 }
 
 enum SM64ModernEngineAuthorityStore {

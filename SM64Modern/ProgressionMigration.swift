@@ -36,13 +36,28 @@ final class SwiftProgressionMigrationService {
     private let adapter: SM64OwnerThreadEEPROMAdapter
     private let ownerThreadToken: UInt64
     private let ownerThreadIdentity: UInt64
+    private let engineAuthority: SM64ModernEngineAuthority
+    private let replayArtifactURL: URL?
     private var runtime: SM64ProgressionRuntime
     private var eventCount: UInt64 = 0
     private var lastError: SM64ModernStatus = SM64_MODERN_STATUS_OK
+    private var replayLedger: SM64SaveReplayLedger?
 
-    init(saveDirectory: String, ownerThreadToken: UInt64) throws {
+    init(
+        saveDirectory: String,
+        ownerThreadToken: UInt64,
+        authority: SM64ModernEngineAuthority = .swift
+    ) throws {
         self.ownerThreadToken = ownerThreadToken
         self.ownerThreadIdentity = Self.currentThreadIdentity()
+        self.engineAuthority = authority
+        if let path = ProcessInfo.processInfo.environment[
+            "SM64_MODERN_SAVE_REPLAY_ARTIFACT"
+        ], !path.isEmpty {
+            self.replayArtifactURL = URL(fileURLWithPath: path)
+        } else {
+            self.replayArtifactURL = nil
+        }
         self.adapter = try SM64OwnerThreadEEPROMAdapter(
             rootURL: URL(fileURLWithPath: saveDirectory)
                 .appendingPathComponent("swift-progression", isDirectory: true),
@@ -62,12 +77,14 @@ final class SwiftProgressionMigrationService {
             runtime.adoptPersistedSnapshots(
                 save: snapshot.save, menu: snapshot.menu
             )
+            try beginReplayArtifact(save: snapshot.save, menu: snapshot.menu)
         } else {
             let loaded = try adapter.reload(
                 saveFileIndex: runtime.saveFileIndex,
                 ownerThreadToken: ownerThreadToken
             )
             runtime.adoptPersistedSnapshots(save: loaded.save, menu: loaded.menu)
+            try beginReplayArtifact(save: loaded.save, menu: loaded.menu)
         }
     }
 
@@ -190,6 +207,10 @@ final class SwiftProgressionMigrationService {
         }
 
         do {
+            let before = try adapter.load(
+                saveFileIndex: Int(event.save_file_index),
+                ownerThreadToken: ownerThreadToken
+            )
             let expected: (save: SM64SaveFileSnapshot, menu: SM64MenuDataSnapshot)
             switch event.mutation_kind {
             case SM64_MODERN_PROGRESSION_SAVE_MUTATION_ERASE:
@@ -254,6 +275,14 @@ final class SwiftProgressionMigrationService {
             }
             runtime.adoptPersistedSnapshots(
                 save: expected.save, menu: expected.menu
+            )
+            try appendReplay(
+                event: event,
+                operation: .mutation,
+                before: (before.save, before.menu),
+                after: expected,
+                saveRecoveryDecision: UInt32(before.saveDecision.rawValue),
+                menuRecoveryDecision: UInt32(before.menuDecision.rawValue)
             )
             recordOracle(
                 event: event,
@@ -326,10 +355,22 @@ final class SwiftProgressionMigrationService {
         }
         runtime.adoptPersistedSnapshots(save: snapshot.save, menu: snapshot.menu)
         do {
+            let before = try adapter.load(
+                saveFileIndex: Int(event.save_file_index),
+                ownerThreadToken: ownerThreadToken
+            )
             try adapter.commit(
                 saveFileIndex: Int(event.save_file_index),
                 save: snapshot.save, menu: snapshot.menu,
                 ownerThreadToken: ownerThreadToken
+            )
+            try appendReplay(
+                event: event,
+                operation: .persist,
+                before: (before.save, before.menu),
+                after: (snapshot.save, snapshot.menu),
+                saveRecoveryDecision: UInt32(before.saveDecision.rawValue),
+                menuRecoveryDecision: UInt32(before.menuDecision.rawValue)
             )
         } catch {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "persist")
@@ -343,10 +384,24 @@ final class SwiftProgressionMigrationService {
         }
         runtime.adoptPersistedSnapshots(save: snapshot.save, menu: snapshot.menu)
         do {
+            let before = try adapter.load(
+                saveFileIndex: Int(event.save_file_index),
+                ownerThreadToken: ownerThreadToken
+            )
             try adapter.commit(
                 saveFileIndex: Int(event.save_file_index),
                 save: snapshot.save, menu: snapshot.menu,
                 ownerThreadToken: ownerThreadToken
+            )
+            try appendReplay(
+                event: event,
+                operation: event.event_kind
+                    == SM64_MODERN_PROGRESSION_EVENT_SAVE_RELOAD
+                    ? .reload : .load,
+                before: (before.save, before.menu),
+                after: (snapshot.save, snapshot.menu),
+                saveRecoveryDecision: UInt32(before.saveDecision.rawValue),
+                menuRecoveryDecision: UInt32(before.menuDecision.rawValue)
             )
         } catch {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "reload")
@@ -401,6 +456,61 @@ final class SwiftProgressionMigrationService {
         return SM64_MODERN_STATUS_OK
     }
 
+    private func beginReplayArtifact(
+        save: SM64SaveFileSnapshot,
+        menu: SM64MenuDataSnapshot
+    ) throws {
+        guard replayArtifactURL != nil, replayLedger == nil else { return }
+        let imageHash = hash(image: (save, menu))
+        replayLedger = SM64SaveReplayLedger(
+            authority: engineAuthority,
+            initialImageHash: imageHash
+        )
+        let event = SM64ModernProgressionEventV1()
+        try appendReplay(
+            event: event,
+            operation: .initialize,
+            before: (save, menu),
+            after: (save, menu)
+        )
+    }
+
+    private func appendReplay(
+        event: SM64ModernProgressionEventV1,
+        operation: SM64SaveReplayOperation,
+        before: (save: SM64SaveFileSnapshot, menu: SM64MenuDataSnapshot),
+        after: (save: SM64SaveFileSnapshot, menu: SM64MenuDataSnapshot),
+        saveRecoveryDecision: UInt32 = 0,
+        menuRecoveryDecision: UInt32 = 0,
+        direction: SM64SaveReplayDirection = .cToSwift,
+        status: UInt32 = 0
+    ) throws {
+        guard let replayArtifactURL, var replayLedger else { return }
+        let record = SM64SaveReplayRecord(
+            sequence: eventCount,
+            simulationTick: event.simulation_tick,
+            direction: direction,
+            operation: operation,
+            saveFileIndex: event.save_file_index,
+            mutationKind: event.mutation_kind,
+            mutationOperation: event.mutation_operation,
+            sourceFileIndex: event.mutation_source_file_index,
+            saveRecoveryDecision: saveRecoveryDecision,
+            menuRecoveryDecision: menuRecoveryDecision,
+            status: status,
+            beforeSaveHash: hash(bytes: SM64SaveFileCodec.encode(before.save)),
+            beforeMenuHash: hash(bytes: SM64MenuDataCodec.encode(before.menu)),
+            afterSaveHash: hash(bytes: SM64SaveFileCodec.encode(after.save)),
+            afterMenuHash: hash(bytes: SM64MenuDataCodec.encode(after.menu)),
+            imageHash: hash(image: after)
+        )
+        replayLedger.append(record)
+        try replayLedger.artifact(finalImageHash: record.imageHash).write(
+            to: replayArtifactURL
+        )
+        self.replayLedger = replayLedger
+    }
+
     private func recordOracle(
         event: SM64ModernProgressionEventV1,
         recordKind: SM64ModernOracleTraceRecordKind = SM64_MODERN_ORACLE_RECORD_EVENT,
@@ -437,6 +547,13 @@ final class SwiftProgressionMigrationService {
         bytes.reduce(SM64OracleTraceHash.offset) { hash, byte in
             (hash ^ UInt64(byte)) &* SM64OracleTraceHash.prime
         }
+    }
+
+    private func hash(
+        image: (save: SM64SaveFileSnapshot, menu: SM64MenuDataSnapshot)
+    ) -> UInt64 {
+        hash(bytes: SM64SaveFileCodec.encode(image.save)
+            + SM64MenuDataCodec.encode(image.menu))
     }
 
     private func fail(_ status: SM64ModernStatus, message: String) -> SM64ModernStatus {

@@ -2,6 +2,21 @@
 
 ## Current Milestone
 
+- M23h makes save shadow replay durable while preserving the restart-required
+  authority boundary. `SM64SaveReplayArtifact` is a fixed-width, canonical
+  hash-checked file whose header records Swift/C authority and restart metadata;
+  records carry C-to-Swift or Swift-to-C direction, mutation/recovery operands,
+  before/after save/menu hashes, and whole-image hashes. The live migration
+  service writes initialize, mutation, persist, load, reload, and recovery
+  records only when `SM64_MODERN_SAVE_REPLAY_ARTIFACT` is explicitly set, so
+  cap-position callbacks do not cause normal-play disk traffic. Swift artifact
+  fingerprint `0x4a47663d9439c6cc`; independent C verification and C-authored
+  compatibility artifact round trip `0xb07a9ba133b53d34`; selector restart
+  contract, regenerated native Debug build, complete 212-script matrix
+  (`runs=212 failures=0`), `git diff --check`, and zero unchecked-Sendable audit
+  pass. Persisted corruption-route replay and production Swift save authority
+  remain open. Handoff: `.porting/porting-handoff-full-swift-twin-M23h.md`.
+
 - M23g extends `SM64ModernProgressionEventV1` with exact save mutation
   operands: set/clear operation, source slot, flags, course/star indices,
   cannon course, cap level/area/coordinates, and sound mode. C save helpers
