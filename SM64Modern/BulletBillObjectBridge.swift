@@ -48,6 +48,34 @@ final class SM64BulletBillObjectBridge {
         states[id]
     }
 
+    func contains(_ id: SM64ObjectID) -> Bool {
+        states[id] != nil
+    }
+
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        input: SM64BulletBillTickInput? = nil,
+        pool: SM64ObjectPool
+    ) -> SM64BulletBillObjectEffectRecord? {
+        guard states[id] != nil else { return nil }
+        if let input { inputs[id] = input }
+        let count = effectLog.count
+        update(id: id, pool: pool)
+        return effectLog.count > count ? effectLog.last : nil
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+    }
+
     @discardableResult
     func spawnBulletBill(
         in engineState: SM64SwiftEngineState,
@@ -97,21 +125,17 @@ final class SM64BulletBillObjectBridge {
         inputs frameInputs: [SM64ObjectID: SM64BulletBillTickInput] = [:]
     ) -> SM64BulletBillSchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, pool: pool)
+            _ = self?.updateInline(id, pool: pool)
         }
 
         for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
 
         return SM64BulletBillSchedulerTickResult(
