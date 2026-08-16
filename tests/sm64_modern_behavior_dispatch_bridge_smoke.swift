@@ -191,6 +191,35 @@ private func hashTick(
         hash = hashU64(hash, UInt64(delivery.deleted.count))
         for id in delivery.deleted { hash = hashID(hash, id) }
     }
+    hash = hashU64(hash, UInt64(tick.goombaEffects.count))
+    for effect in tick.goombaEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.attackHandler.rawValue))
+        hash = hashU64(hash, effect.attackDropsBlueCoin ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.action.rawValue))
+        hash = hashU64(hash, UInt64(effect.deathSound.rawValue))
+        hash = hashU64(hash, UInt64(effect.numLootCoins))
+        hash = hashU64(hash, effect.respawnMarked ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.goombaRespawnRequests.count))
+    for request in tick.goombaRespawnRequests {
+        hash = hashID(hash, request.sourceID)
+        if let parent = request.parentID {
+            hash = hashU64(hash, 1)
+            hash = hashID(hash, parent)
+        } else {
+            hash = hashU64(hash, 0)
+        }
+        hash = hashU64(hash, UInt64(request.tripletFlag ?? 0xff))
+        hash = hashU64(hash, UInt64(request.parentMask))
+        hash = hashU64(hash, UInt64(request.respawnBit))
+    }
+    hash = hashU64(hash, UInt64(tick.goombaDeliveries.count))
+    for delivery in tick.goombaDeliveries {
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        for id in delivery.deleted { hash = hashID(hash, id) }
+    }
     if let child {
         hash = hashU64(hash, UInt64(child.model))
         hash = hashU64(hash, child.behaviorIdentity)
@@ -258,13 +287,18 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         let bigBoo = try bridge.spawnBigBoo(in: engine)
         let flyGuy = try bridge.spawnFlyGuy(in: engine)
         let bulletBill = try bridge.spawnBulletBill(in: engine)
+        let goomba = try bridge.spawnGoomba(in: engine, size: .regular, moveAngleYaw: 0x100)
+        require(bridge.goomba.setInput(
+            SM64GoombaTickInput(distanceToMario: 1_000, randomU16: 1),
+            for: goomba
+        ), "Goomba dispatch input attaches")
 
         var fingerprint = fnvOffset
         var tick = bridge.tick(state: engine)
         require(tick.scheduler.listCounts[SM64ObjectList.default.rawValue] == 3, "mixed default routes preserve live list traversal")
-        require(tick.scheduler.objectCounter == 13, "mixed lists preserve object counter")
-        require(tick.scheduler.updated == [amp, boo, bobomb, bird, swoop, piranhaPlant, bigBoo, flyGuy, bulletBill, pendulum, respawner, SM64ObjectID(slot: 12, generation: 1), SM64ObjectID(slot: 11, generation: 1)], "children are visited in live list order")
-        require(tick.events.map(\.route) == [.amp, .boo, .bobomb, .bird, .swoop, .piranhaPlant, .bigBoo, .flyGuy, .bulletBill, .decorativePendulum, .respawner, .unmigrated, .unmigrated], "identity dispatch order")
+        require(tick.scheduler.objectCounter == 14, "mixed lists preserve object counter")
+        require(tick.scheduler.updated == [amp, boo, bobomb, bird, swoop, piranhaPlant, bigBoo, flyGuy, bulletBill, goomba, pendulum, respawner, SM64ObjectID(slot: 13, generation: 1), SM64ObjectID(slot: 12, generation: 1)], "children are visited in live list order")
+        require(tick.events.map(\.route) == [.amp, .boo, .bobomb, .bird, .swoop, .piranhaPlant, .bigBoo, .flyGuy, .bulletBill, .goomba, .decorativePendulum, .respawner, .unmigrated, .unmigrated], "identity dispatch order")
         require(tick.decorativePendulumEffects.first?.output.faceRoll == 124, "pendulum route executes")
         require(tick.respawnerEffects.first?.effects == [.spawnObject, .markForDeletion], "respawner route executes")
         require(tick.ampEffects.first?.effects == [.animate, .setHitbox], "Amp route executes")
@@ -273,7 +307,7 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(tick.booEffects.first?.action == .chase, "Boo state is synchronized")
         require(tick.bobombEffects.first?.objectID == bobomb && tick.bobombEffects.first?.effects == [.fuseSmoke, .fuseLit, .chase], "Bob-omb route executes")
         require(tick.bobombEffects.first?.action == .chase, "Bob-omb state is synchronized")
-        require(tick.bobombEffects.first?.spawnedChildren == [SM64ObjectID(slot: 11, generation: 1)], "Bob-omb smoke child is visible")
+        require(tick.bobombEffects.first?.spawnedChildren == [SM64ObjectID(slot: 12, generation: 1)], "Bob-omb smoke child is visible")
         require(tick.birdEffects.first?.objectID == bird && tick.birdEffects.first?.effects == [.animate, .reveal, .flight], "Bird route executes")
         require(tick.birdEffects.first?.action == .fly, "Bird state is synchronized")
         require(tick.swoopEffects.first?.objectID == swoop && tick.swoopEffects.first?.effects == [.animate], "Swoop route executes")
@@ -289,19 +323,22 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(tick.bulletBillEffects.first?.objectID == bulletBill && tick.bulletBillEffects.first?.effects == [.animate, .resetToHome, .tangible], "Bullet Bill route executes")
         require(tick.bulletBillEffects.first?.action == .waiting, "Bullet Bill state is synchronized")
         require(tick.bulletBillEffects.first?.spawnedSmoke == nil && tick.bulletBillDeliveries.isEmpty, "Bullet Bill reset has no smoke delivery")
+        require(tick.goombaEffects.first?.objectID == goomba && tick.goombaEffects.first?.effects == [.animate], "Goomba route executes")
+        require(tick.goombaEffects.first?.action == .walk && tick.goombaEffects.first?.attackHandler == .nop, "Goomba state is synchronized")
+        require(tick.goombaRespawnRequests.isEmpty && tick.goombaDeliveries.isEmpty, "Goomba idle route has no respawn delivery")
         require(tick.respawnerDeliveries.first?.deleted == [respawner], "respawner deletion routes through owner sink")
         guard let child = tick.respawnerEffects.first?.spawnedObject,
               let childRecord = engine.objects.record(for: child) else {
             preconditionFailure("dispatch respawner child missing")
         }
-        require(child == SM64ObjectID(slot: 12, generation: 1), "dispatch child generation is stable")
+        require(child == SM64ObjectID(slot: 13, generation: 1), "dispatch child generation is stable")
         require(childRecord.model == 0x77 && childRecord.behaviorParams == 0x1234, "dispatch child fields transfer")
         fingerprint = hashTick(fingerprint, tick, child: childRecord)
 
         tick = bridge.tick(state: engine)
         require(tick.scheduler.listCounts[SM64ObjectList.default.rawValue] == 2, "retired respawner leaves pendulum and child")
-        require(tick.scheduler.objectCounter == 11, "Amp, Boo, Bob-omb, Bird, Swoop, Piranha Plant, Big Boo, Fly Guy, and Bullet Bill remain in the general actor list")
-        require(tick.events.map(\.route) == [.amp, .boo, .bobomb, .bird, .swoop, .piranhaPlant, .bigBoo, .flyGuy, .bulletBill, .decorativePendulum, .unmigrated], "unknown child remains explicitly unmigrated")
+        require(tick.scheduler.objectCounter == 12, "Goomba remains in the general actor list")
+        require(tick.events.map(\.route) == [.amp, .boo, .bobomb, .bird, .swoop, .piranhaPlant, .bigBoo, .flyGuy, .bulletBill, .goomba, .decorativePendulum, .unmigrated], "unknown child remains explicitly unmigrated")
         require(tick.respawnerEffects.isEmpty, "retired respawner is not dispatched again")
         require(
             tick.booEffects.first?.effects == [.animate, .chase, .appear, .oscillate],
@@ -317,6 +354,8 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(tick.flyGuyDeliveries.isEmpty, "Fly Guy delivery remains empty across dispatch ticks")
         require(tick.bulletBillEffects.first?.effects == [.animate], "Bullet Bill persists across dispatch ticks")
         require(tick.bulletBillEffects.first?.action == .waiting && tick.bulletBillDeliveries.isEmpty, "Bullet Bill waiting state persists")
+        require(tick.goombaEffects.first?.effects == [.animate], "Goomba persists across dispatch ticks")
+        require(tick.goombaEffects.first?.action == .walk && tick.goombaRespawnRequests.isEmpty, "Goomba walk state persists")
         fingerprint = hashTick(fingerprint, tick, child: childRecord)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))

@@ -80,7 +80,7 @@ final class SM64GoombaObjectBridge {
     }
 
     var registeredIDs: [SM64ObjectID] {
-        states.keys.sorted { lhs, rhs in
+        Set(states.keys).union(spawners.keys).sorted { lhs, rhs in
             if lhs.slot != rhs.slot { return lhs.slot < rhs.slot }
             return lhs.generation < rhs.generation
         }
@@ -193,15 +193,41 @@ final class SM64GoombaObjectBridge {
 
     @discardableResult
     func detach(_ id: SM64ObjectID, from pool: SM64ObjectPool? = nil) -> Bool {
-        let removed = states.removeValue(forKey: id) != nil
-        inputs.removeValue(forKey: id)
-        memberships.removeValue(forKey: id)
-        spawners.removeValue(forKey: id)
-        spawnerInputs.removeValue(forKey: id)
+        let removed = registeredIDs.contains(id)
+        remove(id)
         if let pool, pool.record(for: id) != nil {
             _ = pool.despawn(id)
         }
         return removed
+    }
+
+    /// Clears per-tick owner-thread effects before an external shared
+    /// dispatcher invokes `updateInline` for each live Goomba identity.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        respawnRequests.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Advances exactly one Goomba or triplet-spawner callback without
+    /// starting a nested scheduler traversal. The shared behavior dispatcher
+    /// owns list order and frame bookkeeping.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    /// Drops the owner-thread shadow for an unloaded or externally retired
+    /// object without touching the scheduler's object pool.
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+        memberships.removeValue(forKey: id)
+        spawners.removeValue(forKey: id)
+        spawnerInputs.removeValue(forKey: id)
     }
 
     @discardableResult
@@ -229,10 +255,7 @@ final class SM64GoombaObjectBridge {
     ) -> SM64GoombaSchedulerTickResult {
         inputs = frameInputs
         spawnerInputs = frameSpawnerInputs
-        effectLog.removeAll(keepingCapacity: true)
-        respawnRequests.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
