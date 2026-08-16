@@ -54,6 +54,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/SpinyObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/EnemyLakitu.swift" \
   "$PROJECT_ROOT/SM64Modern/EnemyLakituObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/ChainChompObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SnufitEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/SnufitObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/WhompCollision.swift" \

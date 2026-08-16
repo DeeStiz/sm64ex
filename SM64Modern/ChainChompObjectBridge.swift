@@ -96,31 +96,55 @@ final class SM64ChainChompObjectBridge {
         return true
     }
 
+    /// Clears per-tick effects before a shared scheduler pass.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Advances one Chain Chomp parent or segment without nesting a scheduler
+    /// traversal. The enclosing dispatcher remains list-order authority.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard pool.record(for: id) != nil,
+              states[id] != nil || segmentIndex[id] != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    /// Removes a parent/segment shadow after scheduler unload or reset.
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+        segmentIndex.removeValue(forKey: id)
+        segmentsForParent.removeValue(forKey: id)
+        for parent in Array(segmentsForParent.keys) {
+            segmentsForParent[parent]?.removeAll { $0 == id }
+        }
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil {
+            remove(id)
+        }
+        for parent in Array(segmentsForParent.keys) {
+            segmentsForParent[parent]?.removeAll { pool.record(for: $0) == nil }
+        }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
         inputs frameInputs: [SM64ObjectID: SM64ChainChompTickInput] = [:]
     ) -> SM64ChainChompSchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             self?.update(id: id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-            segmentIndex.removeValue(forKey: id)
-        }
-        for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
-            segmentsForParent.removeValue(forKey: id)
-        }
-        for parent in Array(segmentsForParent.keys) {
-            segmentsForParent[parent]?.removeAll { engineState.objects.record(for: $0) == nil }
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64ChainChompSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
 

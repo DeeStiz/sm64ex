@@ -21,6 +21,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case skeeter = 17
     case bully = 18
     case enemyLakitu = 19
+    case chainChomp = 20
     case unmigrated = 255
 }
 
@@ -72,6 +73,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let bullyEffects: [SM64BullyObjectEffectRecord]
     let bullyDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let enemyLakituEffects: [SM64EnemyLakituObjectEffectRecord]
+    let chainChompEffects: [SM64ChainChompObjectEffectRecord]
+    let chainChompDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -99,6 +102,7 @@ final class SM64BehaviorDispatchBridge {
     let skeeter: SM64SkeeterObjectBridge
     let bully: SM64BullyObjectBridge
     let enemyLakitu: SM64EnemyLakituObjectBridge
+    let chainChomp: SM64ChainChompObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -124,6 +128,7 @@ final class SM64BehaviorDispatchBridge {
         self.skeeter = SM64SkeeterObjectBridge(scheduler: scheduler)
         self.bully = SM64BullyObjectBridge(scheduler: scheduler)
         self.enemyLakitu = SM64EnemyLakituObjectBridge(scheduler: scheduler, spinyBridge: sharedSpiny)
+        self.chainChomp = SM64ChainChompObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -176,6 +181,9 @@ final class SM64BehaviorDispatchBridge {
             return .bully
         case SM64EnemyLakituObjectBridge.defaultBehaviorIdentity:
             return .enemyLakitu
+        case SM64ChainChompObjectBridge.defaultBehaviorIdentity,
+             SM64ChainChompObjectBridge.segmentBehaviorIdentity:
+            return .chainChomp
         default:
             return .unmigrated
         }
@@ -203,6 +211,7 @@ final class SM64BehaviorDispatchBridge {
         for id in skeeter.registeredIDs { skeeter.remove(id) }
         for id in bully.registeredIDs { bully.remove(id) }
         for id in enemyLakitu.registeredIDs { enemyLakitu.remove(id) }
+        for id in chainChomp.registeredIDs { chainChomp.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -222,6 +231,7 @@ final class SM64BehaviorDispatchBridge {
         skeeter.beginExternalTick()
         bully.beginExternalTick()
         enemyLakitu.beginExternalTick()
+        chainChomp.beginExternalTick()
     }
 
     @discardableResult
@@ -587,6 +597,23 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnChainChomp(
+        in engineState: SM64SwiftEngineState,
+        homeX: Float = 0,
+        homeY: Float = 0,
+        homeZ: Float = 0,
+        moveYaw: Int16 = 0
+    ) throws -> SM64ObjectID {
+        try chainChomp.spawnChainChomp(
+            in: engineState,
+            homeX: homeX,
+            homeY: homeY,
+            homeZ: homeZ,
+            moveYaw: moveYaw
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -608,6 +635,7 @@ final class SM64BehaviorDispatchBridge {
         skeeter.beginExternalTick(globalFrame: engineState.globals.frame)
         bully.beginExternalTick()
         enemyLakitu.beginExternalTick()
+        chainChomp.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -664,6 +692,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.bully.updateInline(id, pool: pool)
             case .enemyLakitu:
                 _ = self.enemyLakitu.updateInline(id, pool: pool)
+            case .chainChomp:
+                _ = self.chainChomp.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -692,6 +722,7 @@ final class SM64BehaviorDispatchBridge {
             skeeter.remove(id)
             bully.remove(id)
             enemyLakitu.remove(id)
+            chainChomp.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -751,6 +782,7 @@ final class SM64BehaviorDispatchBridge {
             bully.remove(id)
         }
         enemyLakitu.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        chainChomp.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -793,7 +825,9 @@ final class SM64BehaviorDispatchBridge {
             skeeterDeliveries: skeeter.deliveryLog,
             bullyEffects: bully.effectLog,
             bullyDeliveries: bully.deliveryLog,
-            enemyLakituEffects: enemyLakitu.effectLog
+            enemyLakituEffects: enemyLakitu.effectLog,
+            chainChompEffects: chainChomp.effectLog,
+            chainChompDeliveries: chainChomp.deliveryLog
         )
     }
 }

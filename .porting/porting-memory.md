@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M22aa registers the existing Chain Chomp owner bridge and five metallic
+  segment identities in the shared `SM64BehaviorDispatchBridge`. The
+  general-actor route allocates the parent and all segments during one live
+  traversal, preserves parent-relative segment records, and keeps unload
+  delivery on the owner thread. Twenty-one-route Swift/C fingerprint
+  0xc0f2496d23f9991c, standalone Chain Chomp fingerprint 0x89d7ec70d95560c8,
+  behavior manifest fingerprint 0x9bb2863444c51d6d, 534 rows, 73 Swift
+  value/owner routes, and 461 explicit `unmigrated_c_adapter` rows are the
+  accounting boundary. Focused dispatch contract, native Debug build target
+  /tmp/sm64-modern-m22aa-build.log, full 206-script matrix, `git diff --check`,
+  and zero unchecked-Sendable audit pass are the evidence boundary.
+  Whole-engine route breadth, the remaining adapters, and live parity remain
+  open. Handoff: .porting/porting-handoff-full-swift-twin-M22aa.md.
 - M22z registers the existing `bhvEnemyLakitu` owner bridge in the shared
   `SM64BehaviorDispatchBridge` and reuses the shared Spiny owner for its
   same-frame child. The spawner-list route runs before surface/general actors,

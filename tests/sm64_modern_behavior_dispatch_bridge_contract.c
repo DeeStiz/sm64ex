@@ -27,6 +27,8 @@
 #define SKEETER_WAVE_BEHAVIOR UINT64_C(0x6268765f736b77)
 #define BULLY_BEHAVIOR UINT64_C(0x6268765f62756c)
 #define ENEMY_LAKITU_BEHAVIOR UINT64_C(0x6268765f6c616b)
+#define CHAIN_CHOMP_BEHAVIOR UINT64_C(0x6268765f63686d70)
+#define CHAIN_CHOMP_SEGMENT_BEHAVIOR UINT64_C(0x6268765f63687367)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -357,6 +359,45 @@ int main(void) {
     uint64_t fingerprint = FNV_OFFSET;
     fingerprint = hash_tick(fingerprint, 1, 0);
     fingerprint = hash_tick(fingerprint, 2, 1);
+
+    // Isolated shared-dispatch Chain Chomp parent plus five live segments.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t chain_counts[13] = {
+        0, 0, 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, chain_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 6); // object counter
+    fingerprint = hash_u64(fingerprint, 6); // updated count
+    for (uint64_t id = 1; id <= 6; ++id) fingerprint = hash_u64(fingerprint, id);
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 6); // events
+    fingerprint = hash_u64(fingerprint, 1);
+    fingerprint = hash_u64(fingerprint, CHAIN_CHOMP_BEHAVIOR);
+    fingerprint = hash_u64(fingerprint, 20);
+    for (uint64_t id = 2; id <= 6; ++id) {
+        fingerprint = hash_u64(fingerprint, id);
+        fingerprint = hash_u64(fingerprint, CHAIN_CHOMP_SEGMENT_BEHAVIOR);
+        fingerprint = hash_u64(fingerprint, 20);
+    }
+    fingerprint = hash_u64(fingerprint, 6); // effects
+    fingerprint = hash_u64(fingerprint, 1); // parent trace subject
+    fingerprint = hash_u64(fingerprint, 0); // chomp kind
+    fingerprint = hash_u64(fingerprint, 255); // parent index
+    fingerprint = hash_u64(fingerprint, 7); // animate + allocate + turn
+    fingerprint = hash_u64(fingerprint, 1); // move action
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    for (uint64_t index = 0; index < 5; ++index) {
+        fingerprint = hash_u64(fingerprint, index + 2); // segment trace subject
+        fingerprint = hash_u64(fingerprint, 1); // segment kind
+        fingerprint = hash_u64(fingerprint, index);
+        fingerprint = hash_u64(fingerprint, 1); // animate
+        fingerprint = hash_u64(fingerprint, 255); // no action
+        fingerprint = hash_u64(fingerprint, 0); // not marked
+    }
+    fingerprint = hash_u64(fingerprint, 0); // deliveries
+
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);
     printf("SM64 Modern behavior dispatch bridge C contract passed\n");

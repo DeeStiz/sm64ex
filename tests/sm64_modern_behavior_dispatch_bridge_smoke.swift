@@ -381,6 +381,40 @@ private func hashTick(
     return hash
 }
 
+private func hashChainDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashU64(hash, UInt64(id.traceSubject)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashU64(hash, UInt64(id.traceSubject)) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashU64(hash, UInt64(event.objectID.traceSubject))
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.chainChompEffects.count))
+    for effect in tick.chainChompEffects {
+        hash = hashU64(hash, UInt64(effect.objectID.traceSubject))
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.index))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.action?.rawValue ?? 255))
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.chainChompDeliveries.count))
+    for delivery in tick.chainChompDeliveries {
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        for id in delivery.deleted { hash = hashU64(hash, UInt64(id.traceSubject)) }
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -601,6 +635,22 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(tick.bullyEffects.map(\.objectID) == [smallBully, bigBully] && tick.bullyEffects.allSatisfy { $0.effects == [.animate, .chase] }, "Bully chase state persists")
         require(tick.bullyDeliveries.count == 2 && tick.bullyDeliveries.allSatisfy { $0.deleted.isEmpty }, "Bully delivery remains explicit")
         fingerprint = hashTick(fingerprint, tick, child: childRecord)
+
+        let chainEngine = SM64SwiftEngineState(objectCapacity: 16)
+        let chainBridge = SM64BehaviorDispatchBridge()
+        let chain = try chainBridge.spawnChainChomp(in: chainEngine, homeX: 5, homeY: 200, homeZ: 15)
+        require(chainBridge.chainChomp.setInput(
+            SM64ChainChompTickInput(distanceToMario: 200, angleToMario: 0),
+            for: chain
+        ), "Chain Chomp dispatch input attaches")
+        let chainTick = chainBridge.tick(state: chainEngine)
+        require(chainTick.events.map(\.route) == [.chainChomp, .chainChomp, .chainChomp, .chainChomp, .chainChomp, .chainChomp], "Chain Chomp parent and segments dispatch")
+        require(chainTick.scheduler.updated.map(\.traceSubject) == [1, 2, 3, 4, 5, 6], "Chain Chomp segments follow parent")
+        require(chainTick.chainChompEffects.count == 6 && chainTick.chainChompEffects.first?.kind == .chomp, "Chain Chomp route allocates five segments")
+        require(chainTick.chainChompEffects.first?.effects == [.animate, .allocateChain, .turn], "Chain Chomp allocation effect is preserved")
+        require(chainTick.chainChompEffects.dropFirst().allSatisfy { $0.kind == .segment && $0.effects == [.animate] }, "Chain Chomp segment effects are synchronized")
+        require(chainTick.chainChompDeliveries.isEmpty, "Chain Chomp idle route has no delivery")
+        fingerprint = hashChainDispatch(fingerprint, chainTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")
