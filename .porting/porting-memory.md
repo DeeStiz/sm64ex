@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M22bb closes the matching manifest/accounting gap for two child declarations
+  already handled by live owner routes. `bhvHeaveHoThrowMario` maps to
+  `HeaveHoObjectBridge`, and `bhvPokeyBodyPart` maps to `PokeyObjectBridge`;
+  neither mapping invents a scheduler or changes shared dispatch behavior.
+  Strict Swift/C manifest fingerprint `0x103cb984bb585a21`, 534 rows, 80
+  `swift_value_owner` routes, and 454 explicit `unmigrated_c_adapter` rows
+  are the accounting boundary. The focused manifest contract, regenerated
+  native Debug build, complete 206-script matrix, live oracle/promotion,
+  `git diff --check`, and zero unchecked-Sendable audit are the evidence
+  boundary. Full throw/body collision, presentation, whole-engine execution,
+  and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22bb.md`.
+
 - M22ba registers Tuxie's terminal child identities in the existing mother
   owner route. `bhvPenguinBaby` and `bhvUnused20E0` are source `BREAK()`
   terminal behaviors reached through the mother's held-child state machine;
