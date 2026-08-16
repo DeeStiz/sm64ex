@@ -35,6 +35,9 @@ struct SM64BobombBuddySchedulerTickResult: Equatable, Sendable {
 final class SM64BobombBuddyObjectBridge {
     static let defaultBehaviorIdentity: UInt64 = 0x6268_765F_6262_62
     static let defaultModel: UInt32 = 0xC3 // MODEL_BOBOMB_BUDDY
+    /// `bhvBobombBuddyOpensCannon` uses the same native loop as the ordinary
+    /// Buddy but enters it with the source cannon-role bit set.
+    static let opensCannonBehaviorIdentity: UInt64 = 0x6268_765F_6262_63
     static let cannonClosedBehaviorIdentity: UInt64 = 0x6268_765F_63636C
     static let walkingSoundValue: Int32 = Int32(bitPattern: 0x5027_0081)
     static let readSignSoundValue: Int32 = Int32(bitPattern: 0x045B_FF81)

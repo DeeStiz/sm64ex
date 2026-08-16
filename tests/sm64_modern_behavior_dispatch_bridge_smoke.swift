@@ -2091,6 +2091,14 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             fingerprint,
             UInt64(SM64BehaviorDispatchBridge.route(for: SM64TuxiesMotherObjectBridge.babyChildBehaviorIdentity).rawValue)
         )
+        require(
+            SM64BehaviorDispatchBridge.route(for: SM64BobombBuddyObjectBridge.opensCannonBehaviorIdentity) == .bobombBuddy,
+            "Bob-omb Buddy cannon-role identity shares the owner route"
+        )
+        fingerprint = hashU64(
+            fingerprint,
+            UInt64(SM64BehaviorDispatchBridge.route(for: SM64BobombBuddyObjectBridge.opensCannonBehaviorIdentity).rawValue)
+        )
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

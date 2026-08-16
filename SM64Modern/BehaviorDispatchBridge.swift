@@ -298,6 +298,7 @@ final class SM64BehaviorDispatchBridge {
              SM64ScuttlebugObjectBridge.defaultBugBehaviorIdentity:
             return .scuttlebug
         case SM64BobombBuddyObjectBridge.defaultBehaviorIdentity,
+             SM64BobombBuddyObjectBridge.opensCannonBehaviorIdentity,
              SM64BobombBuddyObjectBridge.cannonClosedBehaviorIdentity:
             return .bobombBuddy
         case SM64BowserShockWaveObjectBridge.defaultBehaviorIdentity:

@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M22bc registers the source `bhvBobombBuddyOpensCannon` variant in the
+  existing Bob-omb Buddy owner route. The bridge carries the source
+  cannon-role bit in value state, so this identity reuses the proven
+  dialog/cannon owner without a second scheduler. Strict Swift/C dispatch
+  fingerprint `0x681ceb2358bf2e21`, manifest fingerprint
+  `0x6c4d82af10c767ba`, 534 rows, 81 `swift_value_owner` routes, and 453
+  explicit `unmigrated_c_adapter` rows are the accounting boundary. Focused
+  dispatch/manifest contracts, regenerated native Debug build, complete 206-
+  script matrix, live oracle/promotion, `git diff --check`, and zero
+  unchecked-Sendable audit are the evidence boundary. Full cannon-role
+  collision, dialog/camera/audio presentation, whole-engine execution, and
+  live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22bc.md`.
+
 - M22bb closes the matching manifest/accounting gap for two child declarations
   already handled by live owner routes. `bhvHeaveHoThrowMario` maps to
   `HeaveHoObjectBridge`, and `bhvPokeyBodyPart` maps to `PokeyObjectBridge`;

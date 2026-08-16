@@ -1202,6 +1202,8 @@ int main(void) {
     // Tuxie's terminal child behaviors share the mother owner route.
     fingerprint = hash_u64(fingerprint, 41); // unused-child terminal route
     fingerprint = hash_u64(fingerprint, 41); // baby-child terminal route
+    // The cannon-role Bob-omb Buddy variant shares the Buddy owner route.
+    fingerprint = hash_u64(fingerprint, 24);
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);

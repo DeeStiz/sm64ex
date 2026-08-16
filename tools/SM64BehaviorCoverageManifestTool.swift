@@ -50,6 +50,7 @@ struct SM64BehaviorCoverageManifestTool {
         "bhvBouncingFireballFlame": ("BouncingFireballObjectBridge", "bouncing fireball flame child route"),
         "bhvBobomb": ("BobombObjectBridge", "Bob-omb value/owner route"),
         "bhvBobombBuddy": ("BobombBuddyObjectBridge", "dialog/cannon owner route"),
+        "bhvBobombBuddyOpensCannon": ("BobombBuddyObjectBridge", "cannon-role Bob-omb Buddy owner route"),
         "bhvBobombBullyDeathSmoke": ("ExplosionObjectBridge", "shared ground-smoke child route"),
         "bhvBobombExplosionBubble": ("ExplosionObjectBridge", "shared water-bubble child route"),
         "bhvBobombExplosionBubble3600": ("ExplosionObjectBridge", "embedded bubble3600 deterministic jitter route"),
