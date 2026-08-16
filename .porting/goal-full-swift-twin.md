@@ -2,7 +2,7 @@
 
 ## Status
 
-M20r is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M20s is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -917,8 +917,9 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M20o: small-penguin collision/movement owner route | Swift applies the C-order floor/wall prepass before the six-action kernel, reuses the qualified `cur_obj_move_standard(-78)` scalar route, publishes floor identity/height/move flags/velocity, preserves the home transform, and fences held-state physics on the same tick as the C `switch (oHeldState)` branch. | Complete locally — strict Swift 6/C owner-bridge fingerprint `0x28aab1645e2754e8`, focused value/owner/movement contracts, 170-script matrix (`runs=170 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m20o-recheck-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; broader trajectory selection, effect identity, geo integration, and remaining NPC/puzzle families remain |
 | M20p: Tuxie mother geo eye switch | Swift reproduces `geo_switch_tuxie_mother_eyes`: run gating, 50-frame blink cases 0–2, behavior-identity matching, strict forward-velocity angry case 3 override, and preservation of the previous graph switch case when not running. | Complete locally — strict Swift 6/C fingerprint `0x4b5a7e6b3afb43a3`, focused contract, regenerated native source inclusion, `git diff --check`, and zero unchecked-Sendable audit pass; graph-node presentation wiring and remaining NPC/puzzle families remain |
 | M20q: Tuxie mother geo eyes owner bridge | Swift feeds global timer, behavior identity, and post-behavior forward velocity through the owner-thread mother bridge, publishes the selected graph eye case in the effect record, and proves the moving angry-eye override through the generation-safe route. | Complete locally — strict Swift 6/C owner-bridge fingerprint `0xfbaf45212b54a77d`, focused value/owner contracts, generated native source inclusion, `git diff --check`, and zero unchecked-Sendable audit pass; renderer graph-node application and remaining NPC/puzzle families remain |
-| M20r: Bob-omb Buddy value route | Swift reproduces Bob-omb Buddy idle/turn/talk actions, symmetric yaw admission, interaction transition, advice dialog completion, cannon unopened/opening/opened/stop phases, course-specific dialog IDs, prepare-cannon camera intent, visibility, blink input, and time-stop/interaction cleanup intents. | Complete locally — strict Swift 6/C fingerprint `0xbdc39c57cfcefbfc`, focused contract, `git diff --check`, and zero unchecked-Sendable audit pass; owner-thread object/effect wiring and remaining NPC/puzzle families remain |
-| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20r close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie/small-penguin/geo/Bob-omb Buddy slice; broader collision/movement integration, path selection for every other reachable trajectory, dialog/effect/audio identity, remaining NPCs, puzzles, secrets, and rewards remain |
+| M20r: Bob-omb Buddy value route | Swift reproduces Bob-omb Buddy idle/turn/talk actions, symmetric yaw admission, interaction transition, advice dialog completion, cannon unopened/opening/opened/stop phases, course-specific dialog IDs, prepare-cannon camera intent, visibility, blink input, and time-stop/interaction cleanup intents using the source-authored C action values `0/2/3`. | Complete locally — strict Swift 6/C fingerprint `0xdc0f36c0b93e7920`, focused contract, `git diff --check`, and zero unchecked-Sendable audit pass; owner-thread object/effect wiring and remaining NPC/puzzle families remain |
+| M20s: Bob-omb Buddy owner/effect bridge | Swift attaches the value route to generation-safe object IDs, derives live nearest-cannon existence from the object pool, synchronizes C action/role/cannon/visibility/NPC fields, routes walking/read-sign/dialog/prepare-cannon intents through the owner-thread sink, applies dialog time-stop flags, clears interaction status, and retires at scheduler unload. | Complete locally — strict Swift 6/C owner-bridge fingerprint `0xba317f5f6079097e`, value fingerprint `0xdc0f36c0b93e7920`, focused contracts, 174-script matrix (`runs=174 failures=0`), regenerated native Debug build (`/tmp/sm64-modern-m20s-build.log`), `git diff --check`, and zero unchecked-Sendable audit pass; real camera/dialog/audio owners, cannon persistence, and remaining NPC/puzzle families remain |
+| M20: NPCs, races, and puzzles | NPCs, races, puzzle controllers, secrets, and course-specific interaction systems match C. | In progress — M20a–M20s close the first value-plus-object collision/race/movement/child/path/data/effect/Tuxie/small-penguin/geo/Bob-omb Buddy slice; broader collision/movement integration, path selection for every other reachable trajectory, dialog/effect/audio identity, remaining NPCs, puzzles, secrets, and rewards remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | Not started |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
@@ -1122,6 +1123,11 @@ replayable trace, and the platform evidence listed in its exit gate.
    M20r ports Bob-omb Buddy's idle/turn/talk state machine, advice and cannon
    dialog phases, cutscene camera intent, visibility, blink input, and
    time-stop/interaction cleanup.
+   M20s attaches that route to generation-safe owner records, validates the
+   live nearest-cannon ID, synchronizes the source-authored action values and
+   NPC fields, routes sound/dialog/prepare-cannon intents through the shared
+   sink, applies and clears dialog time-stop state, and retires the buddy at
+   scheduler unload.
    Finish broader collision/movement integration, path selection for every
    other reachable trajectory, and effect identity before owner-wiring the
    remaining NPC families.

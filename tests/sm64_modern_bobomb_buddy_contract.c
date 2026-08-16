@@ -48,11 +48,11 @@ int main(void) {
     uint64_t fingerprint = FNV_OFFSET;
     struct State state = { 0, 0, 0, 0, 0, 0 };
     struct Output output = base(state, 11);
-    output.state.action = 1; output.state.yaw = 0x140; output.walking = 1; output.sign = 1;
+    output.state.action = 2; output.state.yaw = 0x140; output.walking = 1; output.sign = 1;
     fingerprint = hash_output(fingerprint, &output); state = output.state;
     output = base(state, 12); output.state.yaw = 0x1140; output.walking = 1; output.sign = 1;
     fingerprint = hash_output(fingerprint, &output); state = output.state;
-    output = base(state, 13); output.state.action = 2; output.state.yaw = 0x2000; output.sign = 0;
+    output = base(state, 13); output.state.action = 3; output.state.yaw = 0x2000; output.sign = 0;
     fingerprint = hash_output(fingerprint, &output); state = output.state;
 
     state.role = 0;
@@ -61,7 +61,7 @@ int main(void) {
     output.clear_time = 1; output.clear_interaction = 1;
     fingerprint = hash_output(fingerprint, &output);
 
-    state = (struct State) { 2, 1, 0, 0, 0, 0 };
+    state = (struct State) { 3, 1, 0, 0, 0, 0 };
     output = base(state, 0); output.dialog = 4; output.requested = 1; output.active = 1;
     output.state.cannon = 1;
     fingerprint = hash_output(fingerprint, &output); state = output.state;

@@ -18,7 +18,7 @@ struct SM64BobombBuddyInput: Equatable, Sendable {
     let adviceDialogResult: Int32
     let adviceDialogID: Int32
     let cannonFirstDialogResult: Int32
-    let nearestCannonExists: Bool
+    var nearestCannonExists: Bool
     let cannonCutsceneResult: Int32
     let cannonSecondDialogResult: Int32
     let courseIsBob: Bool
@@ -74,8 +74,8 @@ struct SM64BobombBuddyOutput: Equatable, Sendable {
 /// returns typed intents for the owner-thread bridge.
 enum SM64BobombBuddyBehavior {
     static let idleAction: Int32 = 0
-    static let turnToTalkAction: Int32 = 1
-    static let talkAction: Int32 = 2
+    static let turnToTalkAction: Int32 = 2
+    static let talkAction: Int32 = 3
 
     static let adviceRole: Int32 = 0
     static let cannonRole: Int32 = 1
