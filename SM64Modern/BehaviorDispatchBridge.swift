@@ -5,6 +5,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case respawner = 1
     case amp = 2
     case boo = 3
+    case bobomb = 4
     case unmigrated = 255
 }
 
@@ -24,6 +25,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let ampEffects: [SM64AmpObjectEffectRecord]
     let booEffects: [SM64BooObjectEffectRecord]
     let booDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let bobombEffects: [SM64BobombObjectEffectRecord]
+    let bobombDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -35,6 +38,7 @@ final class SM64BehaviorDispatchBridge {
     let respawner: SM64RespawnerObjectBridge
     let amp: SM64AmpObjectBridge
     let boo: SM64BooObjectBridge
+    let bobomb: SM64BobombObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -43,6 +47,7 @@ final class SM64BehaviorDispatchBridge {
         self.respawner = SM64RespawnerObjectBridge(scheduler: scheduler)
         self.amp = SM64AmpObjectBridge(scheduler: scheduler)
         self.boo = SM64BooObjectBridge(scheduler: scheduler)
+        self.bobomb = SM64BobombObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -55,6 +60,8 @@ final class SM64BehaviorDispatchBridge {
             return .amp
         case SM64BooObjectBridge.defaultBehaviorIdentity:
             return .boo
+        case SM64BobombObjectBridge.defaultBehaviorIdentity:
+            return .bobomb
         default:
             return .unmigrated
         }
@@ -66,10 +73,12 @@ final class SM64BehaviorDispatchBridge {
         for id in respawner.registeredIDs { respawner.remove(id) }
         for id in amp.registeredIDs { amp.remove(id) }
         for id in boo.registeredIDs { boo.remove(id) }
+        for id in bobomb.registeredIDs { bobomb.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
         boo.beginExternalTick()
+        bobomb.beginExternalTick()
     }
 
     @discardableResult
@@ -145,12 +154,32 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnBobomb(
+        in engineState: SM64SwiftEngineState,
+        homeX: Float = 0,
+        homeY: Float = 0,
+        homeZ: Float = 0,
+        floorHeight: Float = 0,
+        moveYaw: Int16 = 0
+    ) throws -> SM64ObjectID {
+        try bobomb.spawnBobomb(
+            in: engineState,
+            homeX: homeX,
+            homeY: homeY,
+            homeZ: homeZ,
+            floorHeight: floorHeight,
+            moveYaw: moveYaw
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
         boo.beginExternalTick()
+        bobomb.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -175,6 +204,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.amp.updateInline(id, pool: pool)
             case .boo:
                 _ = self.boo.updateInline(id, pool: pool)
+            case .bobomb:
+                _ = self.bobomb.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -185,6 +216,7 @@ final class SM64BehaviorDispatchBridge {
             respawner.remove(id)
             amp.remove(id)
             boo.remove(id)
+            bobomb.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -198,6 +230,9 @@ final class SM64BehaviorDispatchBridge {
         for id in boo.registeredIDs where engineState.objects.record(for: id) == nil {
             boo.remove(id)
         }
+        for id in bobomb.registeredIDs where engineState.objects.record(for: id) == nil {
+            bobomb.remove(id)
+        }
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -208,7 +243,9 @@ final class SM64BehaviorDispatchBridge {
             respawnerDeliveries: respawner.deliveryLog,
             ampEffects: amp.effectLog,
             booEffects: boo.effectLog,
-            booDeliveries: boo.deliveryLog
+            booDeliveries: boo.deliveryLog,
+            bobombEffects: bobomb.effectLog,
+            bobombDeliveries: bobomb.deliveryLog
         )
     }
 }

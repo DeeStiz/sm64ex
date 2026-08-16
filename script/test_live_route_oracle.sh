@@ -53,6 +53,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/AmpObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BooEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BooObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/BobombEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/BobombObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_live_route_oracle_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-live-route-oracle-smoke"

@@ -78,6 +78,22 @@ private func hashTick(
         hash = hashU64(hash, UInt64(delivery.deleted.count))
         for id in delivery.deleted { hash = hashID(hash, id) }
     }
+    hash = hashU64(hash, UInt64(tick.bobombEffects.count))
+    for effect in tick.bobombEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.subtype.rawValue))
+        hash = hashU64(hash, UInt64(effect.heldState.rawValue))
+        hash = hashU64(hash, UInt64(effect.action.rawValue))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.bobombDeliveries.count))
+    for delivery in tick.bobombDeliveries {
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        for id in delivery.deleted { hash = hashID(hash, id) }
+    }
     if let child {
         hash = hashU64(hash, UInt64(child.model))
         hash = hashU64(hash, child.behaviorIdentity)
@@ -126,37 +142,46 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             SM64BooTickInput(distanceToMario: 300, angleToMario: 0, marioFaceYaw: 0, randomValue: 3),
             for: boo
         ), "Boo dispatch input attaches")
+        let bobomb = try bridge.spawnBobomb(in: engine, homeY: 700)
+        require(bridge.bobomb.setInput(
+            SM64BobombTickInput(distanceFromHome: 0, facingTowardMario: true),
+            for: bobomb
+        ), "Bob-omb dispatch input attaches")
 
         var fingerprint = fnvOffset
         var tick = bridge.tick(state: engine)
         require(tick.scheduler.listCounts[SM64ObjectList.default.rawValue] == 3, "mixed default routes preserve live list traversal")
-        require(tick.scheduler.objectCounter == 5, "mixed lists preserve object counter")
-        require(tick.scheduler.updated == [amp, boo, pendulum, respawner, SM64ObjectID(slot: 4, generation: 1)], "child is visited after respawner")
-        require(tick.events.map(\.route) == [.amp, .boo, .decorativePendulum, .respawner, .unmigrated], "identity dispatch order")
+        require(tick.scheduler.objectCounter == 7, "mixed lists preserve object counter actual=\(tick.scheduler.objectCounter) counts=\(tick.scheduler.listCounts)")
+        require(tick.scheduler.updated == [amp, boo, bobomb, pendulum, respawner, SM64ObjectID(slot: 6, generation: 1), SM64ObjectID(slot: 5, generation: 1)], "children are visited in live list order")
+        require(tick.events.map(\.route) == [.amp, .boo, .bobomb, .decorativePendulum, .respawner, .unmigrated, .unmigrated], "identity dispatch order")
         require(tick.decorativePendulumEffects.first?.output.faceRoll == 124, "pendulum route executes")
         require(tick.respawnerEffects.first?.effects == [.spawnObject, .markForDeletion], "respawner route executes")
         require(tick.ampEffects.first?.effects == [.animate, .setHitbox], "Amp route executes")
         require(tick.ampEffects.first?.action == .active, "Amp state is synchronized")
         require(tick.booEffects.first?.objectID == boo && tick.booEffects.first?.effects == [.animate, .chase], "Boo route executes")
         require(tick.booEffects.first?.action == .chase, "Boo state is synchronized")
+        require(tick.bobombEffects.first?.objectID == bobomb && tick.bobombEffects.first?.effects == [.fuseSmoke, .fuseLit, .chase], "Bob-omb route executes")
+        require(tick.bobombEffects.first?.action == .chase, "Bob-omb state is synchronized")
+        require(tick.bobombEffects.first?.spawnedChildren == [SM64ObjectID(slot: 5, generation: 1)], "Bob-omb smoke child is visible")
         require(tick.respawnerDeliveries.first?.deleted == [respawner], "respawner deletion routes through owner sink")
         guard let child = tick.respawnerEffects.first?.spawnedObject,
               let childRecord = engine.objects.record(for: child) else {
             preconditionFailure("dispatch respawner child missing")
         }
-        require(child == SM64ObjectID(slot: 4, generation: 1), "dispatch child generation is stable")
+        require(child == SM64ObjectID(slot: 6, generation: 1), "dispatch child generation is stable")
         require(childRecord.model == 0x77 && childRecord.behaviorParams == 0x1234, "dispatch child fields transfer")
         fingerprint = hashTick(fingerprint, tick, child: childRecord)
 
         tick = bridge.tick(state: engine)
         require(tick.scheduler.listCounts[SM64ObjectList.default.rawValue] == 2, "retired respawner leaves pendulum and child")
-        require(tick.scheduler.objectCounter == 4, "Amp and Boo remain in the general actor list")
-        require(tick.events.map(\.route) == [.amp, .boo, .decorativePendulum, .unmigrated], "unknown child remains explicitly unmigrated")
+        require(tick.scheduler.objectCounter == 5, "Amp, Boo, and Bob-omb remain in the general actor list")
+        require(tick.events.map(\.route) == [.amp, .boo, .bobomb, .decorativePendulum, .unmigrated], "unknown child remains explicitly unmigrated")
         require(tick.respawnerEffects.isEmpty, "retired respawner is not dispatched again")
         require(
             tick.booEffects.first?.effects == [.animate, .chase, .appear, .oscillate],
             "Boo persists across dispatch ticks effects=\(tick.booEffects.first?.effects.rawValue ?? 999)"
         )
+        require(tick.bobombEffects.first?.effects == [.fuseLit, .chase], "Bob-omb persists across dispatch ticks")
         fingerprint = hashTick(fingerprint, tick, child: childRecord)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
