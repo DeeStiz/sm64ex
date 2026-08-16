@@ -87,6 +87,7 @@
 		5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */; };
 		5C1840210026D9416120F870 /* WhompObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189D1521FD7CFA3D234A28F6 /* WhompObjectBridge.swift */; };
 		5C4BFBD421D7D3B422C7571A /* YoshiBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21635A888B1CF4C5B13766F6 /* YoshiBehavior.swift */; };
+		5FA7C5538908D1A4DED23710 /* BigBooObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA6EF56FF4DC7CC2039DAF91 /* BigBooObjectBridge.swift */; };
 		6321601F8F550EE3305561A4 /* BobombBuddyBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E4F781D55FAEFF9757C3F1 /* BobombBuddyBehavior.swift */; };
 		637DB55CFFCA4EDF63A29B58 /* CameraInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724F73EC282345F4551FC1BF /* CameraInput.swift */; };
 		65F4BEF23300074C1E392842 /* MarioShellAirAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820DE3AD7B88D2679E91FFF4 /* MarioShellAirAction.swift */; };
@@ -376,6 +377,7 @@
 		B93DAAFB0FF6CAB909448BA5 /* MarioGeometryInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGeometryInput.swift; sourceTree = "<group>"; };
 		B96E5AD86B3742196A22A436 /* CameraModeCallbacks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeCallbacks.swift; sourceTree = "<group>"; };
 		B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftGameplay.swift; sourceTree = "<group>"; };
+		BA6EF56FF4DC7CC2039DAF91 /* BigBooObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigBooObjectBridge.swift; sourceTree = "<group>"; };
 		BAB7D9714A5D0EEB844F6E3A /* KoopaShellObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoopaShellObjectBridge.swift; sourceTree = "<group>"; };
 		BB40062F0B74B53B43A517BA /* EngineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineState.swift; sourceTree = "<group>"; };
 		BC4936117FA9E8B6E655D4A3 /* SmallPenguinBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallPenguinBehavior.swift; sourceTree = "<group>"; };
@@ -449,6 +451,7 @@
 				2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */,
 				B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */,
 				E4F2302F1BDE312495444C39 /* BigBooEnemy.swift */,
+				BA6EF56FF4DC7CC2039DAF91 /* BigBooObjectBridge.swift */,
 				FC5B24277AF249CA2DFC7FD6 /* BirdEnemy.swift */,
 				E497FB3B17788DCEA3B3261F /* BirdObjectBridge.swift */,
 				B3E4F781D55FAEFF9757C3F1 /* BobombBuddyBehavior.swift */,
@@ -759,6 +762,7 @@
 				161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */,
 				0251DEA438C860732FDBE0C1 /* BehaviorScriptVM.swift in Sources */,
 				B5C0B662E0729E2A61D81CAA /* BigBooEnemy.swift in Sources */,
+				5FA7C5538908D1A4DED23710 /* BigBooObjectBridge.swift in Sources */,
 				23438691E437DAAAC9B38229 /* BirdEnemy.swift in Sources */,
 				9F843A73A64A5646F34206E5 /* BirdObjectBridge.swift in Sources */,
 				6321601F8F550EE3305561A4 /* BobombBuddyBehavior.swift in Sources */,

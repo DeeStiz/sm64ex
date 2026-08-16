@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21k attaches Big Boo to a generation-safe owner/effect bridge. Explicit
+  owner gates route source mist, shake, sound, star, and deletion intents;
+  Ghost Hunt materializes three source staircase children and every variant
+  can create its source-identity reward star while preserving parent
+  generation/list order. Focused strict Swift/C fingerprint
+  0x5ed0307ffc507ba4, script script/test_big_boo_object_bridge.sh, full matrix
+  runs=187 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21k-build.log are the evidence boundary. Collision
+  movement, durable progression/save mutation, real camera/audio/renderer
+  consumers, and device/visual/human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21k.md.
+
 - M21j adds a pointer-free Big Boo value route for Ghost Hunt,
   Merry-Go-Round, and Balcony variants. The kernel preserves the five-minion
   activation gate, health-dependent chase tuning, bounce/nonlethal/lethal hit
