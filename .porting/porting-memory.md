@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21w adds the Bowser bomb trigger, flame-explosion, and smoke lifetime
+  seam. Swift preserves Mario-hit versus mine-hit ordering, explicit generic
+  explosion requests, owner-thread sound/camera-shake intents,
+  generation-safe flame/smoke children, deterministic smoke placement inputs,
+  opacity/scale timing, and scheduler retirement. Focused strict Swift/C
+  fingerprint 0x1570ecd9d93c5b41, script script/test_bowser_bomb.sh, full
+  matrix runs=199 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21w-build.log are the evidence boundary. The shared
+  generic explosion behavior, full Bowser controller/arena authority,
+  collision consumers, durable reward/warp transitions, and device/visual/
+  human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21w.md.
 - M21v adds both Bowser key cutscene value/owner routes. Swift reproduces the
   unlock-door and course-exit piecewise scale curves, animation selection,
   timer-based deletion fences, and generation-safe level-list retirement.

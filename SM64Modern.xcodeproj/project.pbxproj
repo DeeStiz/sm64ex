@@ -78,6 +78,7 @@
 		45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */; };
 		46C0FB257866DD3500A55A24 /* ScuttlebugObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC510DADD4B2F20AC7EA6B5A /* ScuttlebugObjectBridge.swift */; };
 		4884168F507866FFA19942CB /* SmallPenguinBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC4936117FA9E8B6E655D4A3 /* SmallPenguinBehavior.swift */; };
+		48A7CF2EE7888C2CDEDA840B /* BowserBomb.swift in Sources */ = {isa = PBXBuildFile; fileRef = D10D16F6441E50DC22CC6823 /* BowserBomb.swift */; };
 		495557CCCBBCB01107A119F3 /* ProgressionPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E51884DE493C98BC81B06D2 /* ProgressionPersistence.swift */; };
 		4C4E1312ABA85E0E64E74747 /* HeaveHoObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B50BE71193A3FEA1F2989D6 /* HeaveHoObjectBridge.swift */; };
 		4CF3DED116CEE6FBE9D53438 /* CameraCUpTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FDEF637017419435B14C766 /* CameraCUpTransition.swift */; };
@@ -184,6 +185,7 @@
 		C4F2DF30B2F22A044509F0FF /* KingBobombCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10AAD085B7A7F0D27BEC7FE2 /* KingBobombCollision.swift */; };
 		C51FA8AC1BCC4AEACB3EF387 /* RacingPenguinRaceChildren.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C87D408A2A3E729C89C36C3 /* RacingPenguinRaceChildren.swift */; };
 		C64BB4E43DA2868B1767C6E3 /* WaterBomb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3272FC72F5FA191847C8D57B /* WaterBomb.swift */; };
+		C6EC4D5B17FBC422D366A6CF /* BowserBombObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFAE8C134704B3D631D3234 /* BowserBombObjectBridge.swift */; };
 		C86EE2726C8C3CB1AF7C47FC /* MarioSubmergedAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D50D50CB46C2409DDCA4E62E /* MarioSubmergedAction.swift */; };
 		C924667F20ADE7CC0CD84049 /* CameraModeCallbacks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96E5AD86B3742196A22A436 /* CameraModeCallbacks.swift */; };
 		CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386378DD6ECB9F78AC003073 /* MetalRenderer.swift */; };
@@ -413,6 +415,7 @@
 		CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowLiftBehavior.swift; sourceTree = "<group>"; };
 		CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCUpExit.swift; sourceTree = "<group>"; };
 		CEE1BA8181B84E4081506EA1 /* EyerokObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyerokObjectBridge.swift; sourceTree = "<group>"; };
+		D10D16F6441E50DC22CC6823 /* BowserBomb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserBomb.swift; sourceTree = "<group>"; };
 		D3CC8538BA0A2A1F3C291572 /* ObjectScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectScheduler.swift; sourceTree = "<group>"; };
 		D4426C0597C4FF50EA28B2FE /* MarioPoleHangingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioPoleHangingAction.swift; sourceTree = "<group>"; };
 		D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectTransform.swift; sourceTree = "<group>"; };
@@ -455,6 +458,7 @@
 		FC5B24277AF249CA2DFC7FD6 /* BirdEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirdEnemy.swift; sourceTree = "<group>"; };
 		FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCPendulumBehavior.swift; sourceTree = "<group>"; };
 		FFB7DD2B8D112A3511DF6EBF /* TTCSpinnerBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCSpinnerBehavior.swift; sourceTree = "<group>"; };
+		FFFAE8C134704B3D631D3234 /* BowserBombObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserBombObjectBridge.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -487,6 +491,8 @@
 				E96CEA38FA4BFC38D3E850B6 /* BooObjectBridge.swift */,
 				0320CB55118E41AB1705469F /* BouncingFireball.swift */,
 				E0D4C3FC8AC2456B981C1640 /* BouncingFireballObjectBridge.swift */,
+				D10D16F6441E50DC22CC6823 /* BowserBomb.swift */,
+				FFFAE8C134704B3D631D3234 /* BowserBombObjectBridge.swift */,
 				884DACAF76A66E2ACF25162B /* BowserKey.swift */,
 				009071A5D0995E6F7BAC520C /* BowserKeyCutscene.swift */,
 				C36A9EE3635D87C47B73C196 /* BowserKeyCutsceneObjectBridge.swift */,
@@ -810,6 +816,8 @@
 				AACD57508B2998F2000A2232 /* BooObjectBridge.swift in Sources */,
 				98F4DF77445264C24B3326CC /* BouncingFireball.swift in Sources */,
 				3D3D38C8A3F908CCFF0C6E7D /* BouncingFireballObjectBridge.swift in Sources */,
+				48A7CF2EE7888C2CDEDA840B /* BowserBomb.swift in Sources */,
+				C6EC4D5B17FBC422D366A6CF /* BowserBombObjectBridge.swift in Sources */,
 				528D3B2C102405B8655DD87A /* BowserKey.swift in Sources */,
 				3ECF85968D1BEC4BF3B5E5CB /* BowserKeyCutscene.swift in Sources */,
 				2FC48E42DEA5BAB2EE80899A /* BowserKeyCutsceneObjectBridge.swift in Sources */,
