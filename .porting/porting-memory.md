@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M22az records two more parent-owned child identities in the fail-closed
+  behavior manifest: `bhvCannonClosed` maps to `BobombBuddyObjectBridge` and
+  `bhvLllTumblingBridge` maps to `BullyObjectBridge`. Both already resolve
+  through shared owner dispatch and do not create child schedulers. The
+  inventory remains 534 rows with 76 `swift_value_owner` routes and 458
+  explicit `unmigrated_c_adapter` rows; Swift/C manifest fingerprint is
+  `0x90c89a83cab41760`. The focused manifest contract, regenerated native
+  Debug build, complete 206-script matrix, live oracle/promotion,
+  `git diff --check`, and zero unchecked-Sendable audit are the evidence
+  boundary. Cannon/bridge collision/presentation consumers, remaining
+  adapters, whole-engine execution, and live parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22az.md`.
+
 - M22ay closes the matching behavior-manifest accounting seam for M22ax. The
   reachable `bhvBooBossSpawnedBridge` identity now maps to
   `BigBooObjectBridge`, aligning the fail-closed inventory with the existing
