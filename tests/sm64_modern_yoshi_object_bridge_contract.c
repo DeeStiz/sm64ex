@@ -283,8 +283,9 @@ int main(void) {
     const struct ID id01 = { 1, 0, 1 };
     const struct ID id02 = { 1, 0, 2 };
     const struct ID id03 = { 1, 0, 3 };
-    const struct ID id04 = { 1, 0, 4 };
+    const struct ID id04 = { 1, 1, 2 };
     const struct ID id11 = { 1, 1, 1 };
+    const struct ID id21 = { 1, 2, 1 };
     const struct ID no_id = { 0, 0, 0 };
 
     struct State state = initial_state();
@@ -367,24 +368,18 @@ int main(void) {
     struct Effect e6 = { id03, output, spawned11, 1, no_intents, 0 };
     struct ID updated03[] = { id03 };
     struct ID unloaded03[] = { id03 };
-    struct Record r11 = {
-        .present = 1, .id = id11, .object_list = 11, .active_flags = 257, .object_flags = 32,
-        .action = 0, .previous_action = 0, .timer = 0, .behavior_params = 0,
-        .behavior_params_2nd_byte = 0, .interaction_subtype = 0,
-        .drawing_distance = 3000.0f, .gravity = 0.0f, .friction = 0.0f, .buoyancy = 0.0f,
-        .position_x = 0.0f, .position_y = 3174.0f, .position_z = -5625.0f,
-        .home_x = 0.0f, .home_z = -5625.0f, .respawn_info_type = 1,
-        .respawn_info_identity = UINT64_C(0x6268765f797368)
-    };
-    struct Record records6[] = { nil_record, r11 };
-    struct Tick t6 = make_tick(6, general_counts, 1, updated03, 1, no_ids, 0, unloaded03, 1, &e6, 1, &d6, 1, records6, 2);
+    static const uint64_t default_and_general_counts_t6[13] = { 0, 0, 0, 0, 1, 0, 0, 0, 2, 0, 0, 0, 0 };
+    struct ID updated06[] = { id03, id11, id21 };
+    struct ID unloaded06[] = { id03, id11 };
+    struct Record records6[] = { nil_record, nil_record };
+    struct Tick t6 = make_tick(6, default_and_general_counts_t6, 3, updated06, 3, no_ids, 0, unloaded06, 2, &e6, 1, &d6, 1, records6, 2);
     fingerprint = hash_tick(fingerprint, &t6);
 
     state = (struct State) { 10, 0, 0, -1798.0f, -3644.0f, 0, 0, 0.0f, 0.0f, 0 };
     output = make_output(state, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
     struct Effect e7 = { id04, output, no_ids, 0, no_intents, 0 };
     struct Delivery d7 = delivery(no_intents, 0, no_intents, 0, no_ids, 0, no_ids, 0);
-    struct ID updated07[] = { id11, id04 };
+    struct ID updated07[] = { id04, id21 };
     struct Record r7 = {
         .present = 1, .id = id04, .object_list = 4, .active_flags = 257, .object_flags = 33,
         .action = 10, .previous_action = 0, .timer = 0, .behavior_params = 0,
@@ -393,8 +388,18 @@ int main(void) {
         .position_x = -1798.0f, .position_y = 3174.0f, .position_z = -3644.0f,
         .home_x = -1798.0f, .home_z = -3644.0f, .respawn_info_type = 0, .respawn_info_identity = 0
     };
-    struct Record records7[] = { r7, r11 };
-    struct Tick t7 = make_tick(7, spawner_and_general_counts, 1, updated07, 2, no_ids, 0, no_ids, 0, &e7, 1, &d7, 1, records7, 2);
+    struct Record r21 = {
+        .present = 1, .id = id21, .object_list = 8, .active_flags = 257, .object_flags = 33,
+        .action = 0, .previous_action = 0, .timer = 0, .behavior_params = 0,
+        .behavior_params_2nd_byte = 0, .interaction_subtype = 0,
+        .drawing_distance = 4000.0f, .gravity = 0.0f, .friction = 0.0f, .buoyancy = 0.0f,
+        .position_x = 0.0f, .position_y = 3174.0f, .position_z = -5625.0f,
+        .home_x = 0.0f, .home_z = -5625.0f, .respawn_info_type = 0,
+        .respawn_info_identity = 0
+    };
+    static const uint64_t default_and_general_counts_t7[13] = { 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0 };
+    struct Record records7[] = { r7, r21 };
+    struct Tick t7 = make_tick(7, default_and_general_counts_t7, 2, updated07, 2, no_ids, 0, no_ids, 0, &e7, 1, &d7, 1, records7, 2);
     fingerprint = hash_tick(fingerprint, &t7);
 
     printf("yoshiObjectBridgeFingerprint=0x%016llx\n", (unsigned long long) fingerprint);

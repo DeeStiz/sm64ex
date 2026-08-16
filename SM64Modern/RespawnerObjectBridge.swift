@@ -45,6 +45,35 @@ final class SM64RespawnerObjectBridge {
 
     func state(for id: SM64ObjectID) -> SM64RespawnerState? { states[id] }
 
+    func contains(_ id: SM64ObjectID) -> Bool {
+        states[id] != nil
+    }
+
+    /// Prepares the bridge for an owner scheduler that is already traversing
+    /// the object lists. This keeps respawner callbacks in the caller's list
+    /// order instead of running a second scheduler pass.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        input: SM64RespawnerTickInput? = nil,
+        pool: SM64ObjectPool
+    ) -> SM64RespawnerObjectEffectRecord? {
+        guard states[id] != nil else { return nil }
+        if let input { inputs[id] = input }
+        return update(id: id, pool: pool)
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+    }
+
     @discardableResult
     func spawnRespawner(
         in engineState: SM64SwiftEngineState,
@@ -121,19 +150,15 @@ final class SM64RespawnerObjectBridge {
         inputs frameInputs: [SM64ObjectID: SM64RespawnerTickInput] = [:]
     ) -> SM64RespawnerSchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, pool: pool)
+            _ = self?.update(id: id, pool: pool)
         }
         for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         return SM64RespawnerSchedulerTickResult(
             scheduler: schedulerResult,
@@ -142,8 +167,9 @@ final class SM64RespawnerObjectBridge {
         )
     }
 
-    private func update(id: SM64ObjectID, pool: SM64ObjectPool) {
-        guard var respawner = states[id], let record = pool.record(for: id) else { return }
+    @discardableResult
+    private func update(id: SM64ObjectID, pool: SM64ObjectPool) -> SM64RespawnerObjectEffectRecord? {
+        guard var respawner = states[id], let record = pool.record(for: id) else { return nil }
         let result = SM64RespawnerKernel.tick(
             inputs[id] ?? SM64RespawnerTickInput(),
             state: &respawner
@@ -169,14 +195,14 @@ final class SM64RespawnerObjectBridge {
             effectRouter.enqueue(objectID: id, kind: .markForDeletion)
             deliveryLog.append(effectRouter.deliver(to: pool))
         }
-        effectLog.append(
-            SM64RespawnerObjectEffectRecord(
-                objectID: id,
-                effects: result.effects,
-                spawnedObject: spawnedObject,
-                timer: respawner.timer,
-                markedForDeletion: respawner.markedForDeletion
-            )
+        let effect = SM64RespawnerObjectEffectRecord(
+            objectID: id,
+            effects: result.effects,
+            spawnedObject: spawnedObject,
+            timer: respawner.timer,
+            markedForDeletion: respawner.markedForDeletion
         )
+        effectLog.append(effect)
+        return effect
     }
 }

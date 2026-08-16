@@ -20,6 +20,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ChainChompRelease.swift" \
   "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
+  "$PROJECT_ROOT/SM64Modern/Respawner.swift" \
+  "$PROJECT_ROOT/SM64Modern/RespawnerObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/YoshiBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/YoshiObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_yoshi_object_bridge_smoke.swift" \

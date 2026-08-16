@@ -230,24 +230,30 @@ enum SM64ModernYoshiObjectBridgeSmoke {
         )])
         let respawner = tick.effects.first?.spawnedRespawners.first
         require(respawner != nil, "roof failure spawns respawner")
-        require(tick.scheduler.unloaded == [respawnSource], "roof failure unloads source")
+        require(tick.scheduler.unloaded == [respawnSource, respawner!], "roof failure orders source and respawner unload")
         require(respawner?.slot == 1 && respawner?.generation == 1, "respawner has stable second slot")
-        require(engine.objects.record(for: respawner!)?.respawnInfoType == 1, "respawner type is authored")
+        require(tick.respawnerEffects.count == 1, "respawner callback executes in default-list order")
+        guard let respawnerEffect = tick.respawnerEffects.first,
+              let respawnedYoshi = respawnerEffect.spawnedObject else {
+            preconditionFailure("respawner child is missing")
+        }
+        require(tick.respawnerDeliveries.first?.deleted == [respawner!], "respawner owner deletion is delivered")
+        require(engine.objects.record(for: respawnedYoshi)?.behaviorIdentity == SM64YoshiObjectBridge.defaultBehaviorIdentity, "respawned behavior identity transfers")
+        require(engine.objects.record(for: respawnedYoshi)?.position == SM64ObjectVector3(x: 0, y: 3_174, z: -5_625), "respawned transform transfers")
         fingerprint = hashTick(fingerprint, tick, records: [
             engine.objects.record(for: respawnSource),
             engine.objects.record(for: respawner!)
         ])
 
         let credits = try bridge.spawnYoshi(in: engine)
-        require(credits.generation == 4, "source slot generation advances")
+        require(credits.slot == 1 && credits.generation == 2, "respawner slot generation advances")
         tick = bridge.tick(state: engine, environments: [credits: environment(endingCameraEvent: true)])
         require(bridge.state(for: credits)?.action == SM64YoshiBehavior.creditsAction, "ending event enters credits")
         require(engine.objects.record(for: credits)?.position == SM64ObjectVector3(x: -1_798, y: 3_174, z: -3_644), "credits position is owner synchronized")
         fingerprint = hashTick(fingerprint, tick, records: [
             engine.objects.record(for: credits),
-            engine.objects.record(for: respawner!)
+            engine.objects.record(for: respawnedYoshi)
         ])
-
         print(String(format: "yoshiObjectBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern Yoshi object bridge smoke passed")
     }

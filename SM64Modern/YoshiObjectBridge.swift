@@ -21,6 +21,8 @@ struct SM64YoshiSchedulerTickResult: Equatable, Sendable {
     let scheduler: SM64ObjectSchedulerTickResult
     let effects: [SM64YoshiObjectEffect]
     let deliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let respawnerEffects: [SM64RespawnerObjectEffectRecord]
+    let respawnerDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// Owner-thread bridge for `bhv_yoshi_loop`. It keeps object IDs and mutable
@@ -39,6 +41,7 @@ final class SM64YoshiObjectBridge {
 
     private let scheduler: SM64ObjectScheduler
     private let effectRouter: SM64OwnerThreadEffectRouter
+    private let respawnerBridge: SM64RespawnerObjectBridge
     private var states: [SM64ObjectID: SM64YoshiState] = [:]
     private var environments: [SM64ObjectID: SM64YoshiEnvironment] = [:]
     private(set) var effectLog: [SM64YoshiObjectEffect] = []
@@ -50,6 +53,7 @@ final class SM64YoshiObjectBridge {
     ) {
         self.scheduler = scheduler
         self.effectRouter = effectRouter
+        self.respawnerBridge = SM64RespawnerObjectBridge(scheduler: scheduler)
     }
 
     var registeredIDs: [SM64ObjectID] {
@@ -136,22 +140,40 @@ final class SM64YoshiObjectBridge {
         effectLog.removeAll(keepingCapacity: true)
         deliveryLog.removeAll(keepingCapacity: true)
         effectRouter.beginTick()
+        respawnerBridge.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, engineState: engineState, pool: pool)
+            guard let self else { return }
+            if self.respawnerBridge.contains(id) {
+                let distanceToMario = pool.record(for: id)?.distanceToMario
+                    ?? .greatestFiniteMagnitude
+                _ = self.respawnerBridge.updateInline(
+                    id,
+                    input: SM64RespawnerTickInput(distanceToMario: distanceToMario),
+                    pool: pool
+                )
+            } else {
+                self.update(id: id, engineState: engineState, pool: pool)
+            }
         }
         for id in schedulerResult.unloaded {
             states.removeValue(forKey: id)
             environments.removeValue(forKey: id)
+            respawnerBridge.remove(id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
             states.removeValue(forKey: id)
             environments.removeValue(forKey: id)
         }
+        for id in respawnerBridge.registeredIDs where engineState.objects.record(for: id) == nil {
+            respawnerBridge.remove(id)
+        }
         return SM64YoshiSchedulerTickResult(
             scheduler: schedulerResult,
             effects: effectLog,
-            deliveries: deliveryLog
+            deliveries: deliveryLog,
+            respawnerEffects: respawnerBridge.effectLog,
+            respawnerDeliveries: respawnerBridge.deliveryLog
         )
     }
 
@@ -189,21 +211,26 @@ final class SM64YoshiObjectBridge {
 
         var spawnedRespawners: [SM64ObjectID] = []
         if output.respawnerRequested,
+           let source = pool.record(for: id),
            let respawner = try? pool.spawn(
-               in: .spawner,
+               in: .default,
                model: Self.defaultModel,
                behaviorIdentity: Self.respawnerBehaviorIdentity,
                drawingDistance: 3_000
            ) {
-            let source = pool.record(for: id)
-            _ = pool.mutate(respawner) { record in
-                record.position = source?.position ?? .zero
-                record.homePosition = source?.homePosition ?? .zero
-                record.respawnInfoType = 1
-                record.respawnInfoIdentity = Self.defaultBehaviorIdentity
-                record.objectFlags |= SM64ObjectScheduler.objectFlagBuildTransform
+            if respawnerBridge.attach(
+                respawner,
+                position: source.position,
+                modelToRespawn: Self.defaultModel,
+                behaviorToRespawn: Self.defaultBehaviorIdentity,
+                minSpawnDistance: 3_000,
+                behaviorParams: source.behaviorParams,
+                in: pool
+            ) {
+                spawnedRespawners.append(respawner)
+            } else {
+                _ = pool.despawn(respawner)
             }
-            spawnedRespawners.append(respawner)
         }
 
         if output.playWalkSound {

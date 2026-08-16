@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M22f integrates `SM64RespawnerObjectBridge` into the live Yoshi owner
+  scheduler. The respawner is allocated in the source `OBJ_LIST_DEFAULT`
+  list, visited after Yoshi during the same scheduler traversal, spawns the
+  replacement Yoshi in that traversal, transfers model/behavior/parameter/
+  transform fields, and retires the source and respawner through generation-
+  safe owner deliveries. Strict Swift/C Yoshi owner fingerprint
+  0x0d985a32a8a93715, behavior manifest fingerprint 0xf8bbfcbc86b888d9,
+  534 rows, 72 Swift value/owner routes, and 462 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused ordering
+  contract, native Debug build target /tmp/sm64-modern-m22f-build.log, full
+  204-script matrix, `git diff --check`, and zero unchecked-Sendable audit
+  are required evidence. Whole-level behavior dispatch, the remaining
+  adapters, and live parity are still open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22f.md.
 - M22e replaces the `bhvRespawner` C callback with a pointer-free Swift
   value/owner route. It preserves the outside-radius gate, one-shot spawn and
   deactivation ordering, model/behavior/parameter/transform transfer, and
