@@ -91,6 +91,42 @@ final class SM64BouncingFireballObjectBridge {
     }
 
     @discardableResult
+    func spawnFlame(
+        in engineState: SM64SwiftEngineState,
+        parent: SM64ObjectID? = nil,
+        position: SM64ObjectVector3 = .zero
+    ) throws -> SM64ObjectID {
+        let id = try engineState.spawnObject(
+            in: .generalActor,
+            model: Self.flameModel,
+            behaviorIdentity: Self.flameBehaviorIdentity,
+            parent: parent
+        )
+        guard attachFlame(id, position: position, in: engineState.objects) else {
+            _ = engineState.objects.despawn(id)
+            preconditionFailure("newly spawned bouncing fireball flame could not attach")
+        }
+        return id
+    }
+
+    @discardableResult
+    func attachFlame(
+        _ id: SM64ObjectID,
+        position: SM64ObjectVector3 = .zero,
+        in pool: SM64ObjectPool
+    ) -> Bool {
+        guard pool.record(for: id) != nil else { return false }
+        flameStates[id] = SM64BouncingFireballFlameState()
+        flameInputs[id] = SM64BouncingFireballFlameTickInput()
+        _ = pool.mutate(id) { record in
+            record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+            record.position = position
+            record.interactionType = 1
+        }
+        return true
+    }
+
+    @discardableResult
     func setInput(_ input: SM64BouncingFireballTickInput, for id: SM64ObjectID) -> Bool {
         guard fireballStates[id] != nil else { return false }
         fireballInputs[id] = input
@@ -104,6 +140,41 @@ final class SM64BouncingFireballObjectBridge {
         return true
     }
 
+    /// Starts one externally-owned scheduler tick. The shared behavior
+    /// dispatcher uses this boundary so the fireball bridge can participate in
+    /// the engine traversal without creating a nested scheduler update.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Advances one object from the shared scheduler's current callback.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        if fireballStates[id] != nil {
+            updateFireball(id: id, pool: pool)
+            return true
+        }
+        if flameStates[id] != nil {
+            updateFlame(id: id, pool: pool)
+            return true
+        }
+        return false
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        fireballStates.removeValue(forKey: id)
+        fireballInputs.removeValue(forKey: id)
+        flameStates.removeValue(forKey: id)
+        flameInputs.removeValue(forKey: id)
+    }
+
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) {
+        for id in unloaded { remove(id) }
+        for id in registeredIDs where pool.record(for: id) == nil { remove(id) }
+    }
+
     @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
@@ -112,23 +183,11 @@ final class SM64BouncingFireballObjectBridge {
     ) -> SM64BouncingFireballSchedulerTickResult {
         for (id, input) in frameInputs { fireballInputs[id] = input }
         for (id, input) in frameFlameInputs { flameInputs[id] = input }
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            guard let self else { return }
-            if self.fireballStates[id] != nil {
-                self.updateFireball(id: id, pool: pool)
-            } else if self.flameStates[id] != nil {
-                self.updateFlame(id: id, pool: pool)
-            }
+            _ = self?.updateInline(id, pool: pool)
         }
-        for id in schedulerResult.unloaded {
-            fireballStates.removeValue(forKey: id)
-            fireballInputs.removeValue(forKey: id)
-            flameStates.removeValue(forKey: id)
-            flameInputs.removeValue(forKey: id)
-        }
+        pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         return SM64BouncingFireballSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
 

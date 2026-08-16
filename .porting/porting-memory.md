@@ -2,6 +2,22 @@
 
 ## Current Milestone
 
+- M22ag registers the existing Bouncing Fireball parent and flame behavior
+  identities in the shared `SM64BehaviorDispatchBridge`. The flame's
+  general-actor route runs before the parent's default-list route, preserving
+  cross-list scheduler order, value effects, and generation-safe records.
+  Twenty-eight-route Swift/C fingerprint `0xeba65f4903d8f9f4`, standalone
+  Bouncing Fireball fingerprint `0x6ad7b0bf4304989e`, behavior manifest
+  fingerprint `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and
+  461 explicit `unmigrated_c_adapter` rows are the accounting boundary.
+  Focused dispatch/Bouncing Fireball contracts, native Debug target
+  `/tmp/sm64-modern-m22ag-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full
+  collision/presentation consumers, remaining adapters, and live parity remain
+  open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22ag.md`.
+
 - M22af registers the existing Bowser shockwave and Bowser key owner bridges
   in the shared `SM64BehaviorDispatchBridge`. The general-actor and level-list
   routes advance both reducers in one owner-thread traversal, preserving

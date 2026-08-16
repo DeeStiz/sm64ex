@@ -28,6 +28,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case bobombBuddy = 24
     case bowserShockWave = 25
     case bowserKey = 26
+    case bouncingFireball = 27
     case unmigrated = 255
 }
 
@@ -92,6 +93,7 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let bobombBuddyDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let bowserShockWaveEffects: [SM64BowserShockWaveObjectEffectRecord]
     let bowserKeyEffects: [SM64BowserKeyObjectEffectRecord]
+    let bouncingFireballEffects: [SM64BouncingFireballObjectEffectRecord]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -126,6 +128,7 @@ final class SM64BehaviorDispatchBridge {
     let bobombBuddy: SM64BobombBuddyObjectBridge
     let bowserShockWave: SM64BowserShockWaveObjectBridge
     let bowserKey: SM64BowserKeyObjectBridge
+    let bouncingFireball: SM64BouncingFireballObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -158,6 +161,7 @@ final class SM64BehaviorDispatchBridge {
         self.bobombBuddy = SM64BobombBuddyObjectBridge(scheduler: scheduler)
         self.bowserShockWave = SM64BowserShockWaveObjectBridge(scheduler: scheduler)
         self.bowserKey = SM64BowserKeyObjectBridge(scheduler: scheduler)
+        self.bouncingFireball = SM64BouncingFireballObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -229,6 +233,9 @@ final class SM64BehaviorDispatchBridge {
             return .bowserShockWave
         case SM64BowserKeyObjectBridge.defaultBehaviorIdentity:
             return .bowserKey
+        case SM64BouncingFireballObjectBridge.fireballBehaviorIdentity,
+             SM64BouncingFireballObjectBridge.flameBehaviorIdentity:
+            return .bouncingFireball
         default:
             return .unmigrated
         }
@@ -263,6 +270,7 @@ final class SM64BehaviorDispatchBridge {
         for id in bobombBuddy.registeredIDs { bobombBuddy.remove(id) }
         for id in bowserShockWave.registeredIDs { bowserShockWave.remove(id) }
         for id in bowserKey.registeredIDs { bowserKey.remove(id) }
+        for id in bouncingFireball.registeredIDs { bouncingFireball.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -290,6 +298,7 @@ final class SM64BehaviorDispatchBridge {
         bowserShockWave.beginExternalTick()
         bowserKey.beginExternalTick()
         bowserKey.beginExternalTick()
+        bouncingFireball.beginExternalTick()
     }
 
     @discardableResult
@@ -800,6 +809,32 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnBouncingFireball(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        behaviorIdentity: UInt64 = SM64BouncingFireballObjectBridge.fireballBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try bouncingFireball.spawnFireball(
+            in: engineState,
+            position: position,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
+    func spawnBouncingFireballFlame(
+        in engineState: SM64SwiftEngineState,
+        parent: SM64ObjectID? = nil,
+        position: SM64ObjectVector3 = .zero
+    ) throws -> SM64ObjectID {
+        try bouncingFireball.spawnFlame(
+            in: engineState,
+            parent: parent,
+            position: position
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -827,6 +862,7 @@ final class SM64BehaviorDispatchBridge {
         scuttlebug.beginExternalTick()
         bobombBuddy.beginExternalTick()
         bowserShockWave.beginExternalTick()
+        bouncingFireball.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -901,6 +937,8 @@ final class SM64BehaviorDispatchBridge {
                 )
             case .bowserKey:
                 _ = self.bowserKey.updateInline(id, pool: pool)
+            case .bouncingFireball:
+                _ = self.bouncingFireball.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -936,6 +974,7 @@ final class SM64BehaviorDispatchBridge {
             bobombBuddy.remove(id)
             bowserShockWave.remove(id)
             bowserKey.remove(id)
+            bouncingFireball.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -1003,6 +1042,7 @@ final class SM64BehaviorDispatchBridge {
         bobombBuddy.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         bowserShockWave.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         bowserKey.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        bouncingFireball.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -1058,7 +1098,8 @@ final class SM64BehaviorDispatchBridge {
             bobombBuddyEffects: bobombBuddy.effectLog,
             bobombBuddyDeliveries: bobombBuddy.deliveryLog,
             bowserShockWaveEffects: bowserShockWave.effectLog,
-            bowserKeyEffects: bowserKey.effectLog
+            bowserKeyEffects: bowserKey.effectLog,
+            bouncingFireballEffects: bouncingFireball.effectLog
         )
     }
 }

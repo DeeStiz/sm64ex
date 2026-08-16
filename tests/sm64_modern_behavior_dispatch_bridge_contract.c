@@ -38,6 +38,8 @@
 #define BOBOMB_BUDDY_BEHAVIOR UINT64_C(0x6268765f626262)
 #define BOWSER_SHOCK_WAVE_BEHAVIOR UINT64_C(0x6268765f627377)
 #define BOWSER_KEY_BEHAVIOR UINT64_C(0x6268765f6b6579)
+#define BOUNCING_FIREBALL_BEHAVIOR UINT64_C(0x6268765f62666972)
+#define BOUNCING_FIREBALL_FLAME_BEHAVIOR UINT64_C(0x6268765f62666c6d)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -635,6 +637,40 @@ int main(void) {
     fingerprint = hash_u64(fingerprint, UINT64_C(0xffffffffffffc000)); // face roll
     fingerprint = hash_u64(fingerprint, UINT64_C(0x43250000)); // graph Y offset
     fingerprint = hash_u64(fingerprint, 0); // not tangible
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+
+    // Isolated shared-dispatch Bouncing Fireball parent/flame routes. The
+    // flame is in the general-actor list and the parent is in the default
+    // list, preserving the scheduler's cross-list order.
+    fingerprint = hash_u64(fingerprint, 1); // scheduler frame
+    static const uint64_t fireball_counts[13] = {
+        0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0
+    };
+    for (unsigned index = 0; index < 13; ++index) {
+        fingerprint = hash_u64(fingerprint, fireball_counts[index]);
+    }
+    fingerprint = hash_u64(fingerprint, 2); // object counter
+    fingerprint = hash_u64(fingerprint, 2); // updated count
+    fingerprint = hash_id(fingerprint, 1, 1); // flame
+    fingerprint = hash_id(fingerprint, 0, 1); // parent
+    fingerprint = hash_u64(fingerprint, 0); // unloaded count
+    fingerprint = hash_u64(fingerprint, 2); // events
+    fingerprint = hash_event(fingerprint, 1, BOUNCING_FIREBALL_FLAME_BEHAVIOR, 27);
+    fingerprint = hash_event(fingerprint, 0, BOUNCING_FIREBALL_BEHAVIOR, 27);
+    fingerprint = hash_u64(fingerprint, 2); // effects
+    fingerprint = hash_id(fingerprint, 1, 1); // flame
+    fingerprint = hash_u64(fingerprint, 1); // kind
+    fingerprint = hash_u64(fingerprint, 0); // action
+    fingerprint = hash_u64(fingerprint, 64); // move
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, UINT64_C(0x3f800000)); // scale
+    fingerprint = hash_u64(fingerprint, 0); // not marked
+    fingerprint = hash_id(fingerprint, 0, 1); // parent
+    fingerprint = hash_u64(fingerprint, 0); // kind
+    fingerprint = hash_u64(fingerprint, 0); // action
+    fingerprint = hash_u64(fingerprint, 64); // move
+    fingerprint = hash_u64(fingerprint, 0); // no children
+    fingerprint = hash_u64(fingerprint, 0); // scale
     fingerprint = hash_u64(fingerprint, 0); // not marked
 
     printf("behaviorDispatchBridgeFingerprint=0x%016llx\n",

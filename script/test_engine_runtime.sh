@@ -63,6 +63,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BowserShockWaveObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BowserKey.swift" \
   "$PROJECT_ROOT/SM64Modern/BowserKeyObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/BouncingFireball.swift" \
+  "$PROJECT_ROOT/SM64Modern/BouncingFireballObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinMovement.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \

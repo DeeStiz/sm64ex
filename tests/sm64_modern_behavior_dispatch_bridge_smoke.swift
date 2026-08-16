@@ -656,6 +656,37 @@ private func hashBowserKeyDispatch(
     return hash
 }
 
+private func hashBouncingFireballDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.bouncingFireballEffects.count))
+    for effect in tick.bouncingFireballEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.action))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedChildren.count))
+        for child in effect.spawnedChildren { hash = hashID(hash, child) }
+        hash = hashU64(hash, UInt64(effect.flameScale.bitPattern))
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1039,6 +1070,29 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
             "Bowser key effect is recorded"
         )
         fingerprint = hashBowserKeyDispatch(fingerprint, keyTick)
+
+        let fireballEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let fireballBridge = SM64BehaviorDispatchBridge()
+        let fireball = try fireballBridge.spawnBouncingFireball(in: fireballEngine)
+        let fireballFlame = try fireballBridge.spawnBouncingFireballFlame(in: fireballEngine)
+        let fireballTick = fireballBridge.tick(state: fireballEngine)
+        require(
+            fireballTick.events.map(\.route) == [.bouncingFireball, .bouncingFireball],
+            "Bouncing fireball parent and flame dispatch"
+        )
+        require(
+            fireballTick.scheduler.updated.map(\.traceSubject) == [2, 1],
+            "Bouncing fireball child follows parent"
+        )
+        require(
+            fireballTick.bouncingFireballEffects.count == 2
+                && fireballTick.bouncingFireballEffects.first?.objectID == fireballFlame
+                && fireballTick.bouncingFireballEffects.first?.kind == .flame
+                && fireballTick.bouncingFireballEffects.last?.objectID == fireball
+                && fireballTick.bouncingFireballEffects.last?.kind == .fireball,
+            "Bouncing fireball parent/flame effects are preserved"
+        )
+        fingerprint = hashBouncingFireballDispatch(fingerprint, fireballTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")
