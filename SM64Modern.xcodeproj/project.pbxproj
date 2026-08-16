@@ -21,6 +21,7 @@
 		09C260568C8A5ECD27002AC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */; };
 		0B293D835010C91F6939BB5C /* RacingPenguinPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4840C223F4AFD7C0B36D74C /* RacingPenguinPath.swift */; };
 		0C110C47F377370F18974E8D /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D0D54E90FAC1BCA5C415EC5 /* GameViewController.swift */; };
+		0C59B5B913619FF9CDA6DBD7 /* EyerokHandCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F48AE6A57785362E4038147 /* EyerokHandCollision.swift */; };
 		0FAB9AF89873C70EE4547AB5 /* ProgressionRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 322C784FFE351A6135FA2ECE /* ProgressionRuntime.swift */; };
 		0FB0244A4299B42C2708E41F /* MrIEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85BFB8BBA80617F7A115E9E6 /* MrIEnemy.swift */; };
 		0FF51E99A1537E8C64BD9839 /* MarioStationaryAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D4FC5292003781121076585 /* MarioStationaryAction.swift */; };
@@ -324,6 +325,7 @@
 		7152A9F5156A7D703C8708CE /* SwingPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwingPlatformBehavior.swift; sourceTree = "<group>"; };
 		724F73EC282345F4551FC1BF /* CameraInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraInput.swift; sourceTree = "<group>"; };
 		7316D473A3C5C7E718C32B2E /* AppleAudioRing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioRing.h; sourceTree = "<group>"; };
+		7F48AE6A57785362E4038147 /* EyerokHandCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyerokHandCollision.swift; sourceTree = "<group>"; };
 		813A2CE9C713D16BC9943257 /* MoneybagEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneybagEnemy.swift; sourceTree = "<group>"; };
 		8188A093887424248B602C01 /* MarioAirMovementAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioAirMovementAction.swift; sourceTree = "<group>"; };
 		820DE3AD7B88D2679E91FFF4 /* MarioShellAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioShellAirAction.swift; sourceTree = "<group>"; };
@@ -509,6 +511,7 @@
 				BB40062F0B74B53B43A517BA /* EngineState.swift */,
 				9EA80AEA8F534EA712E1C090 /* EyerokBoss.swift */,
 				225D73054770EC25DC64D2C0 /* EyerokHand.swift */,
+				7F48AE6A57785362E4038147 /* EyerokHandCollision.swift */,
 				CEE1BA8181B84E4081506EA1 /* EyerokObjectBridge.swift */,
 				A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */,
 				05D35EE8DC4AB3016AB7352A /* FlyGuyEnemy.swift */,
@@ -824,6 +827,7 @@
 				8F2434A3E57287185819D685 /* EngineState.swift in Sources */,
 				AABD8C2EDF09336DC5C998EC /* EyerokBoss.swift in Sources */,
 				D0031C8BC47031BF22FCFA00 /* EyerokHand.swift in Sources */,
+				0C59B5B913619FF9CDA6DBD7 /* EyerokHandCollision.swift in Sources */,
 				A34CE5852F8DBDEEF67172EC /* EyerokObjectBridge.swift in Sources */,
 				ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */,
 				F635692396D181B8EEE8464A /* FlyGuyEnemy.swift in Sources */,

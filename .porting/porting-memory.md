@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M21p adds an opt-in Eyerok hand immutable-world collision/movement
+  seam. The owner bridge performs the source floor/wall prepass before the
+  action kernel, then applies `cur_obj_move_standard(-78)` with Eyerok
+  gravity/physics constants and publishes floor identity/room/flags, wall
+  admission, movement vectors, and generation-safe record state. Focused strict
+  Swift/C fingerprint 0xf15dddce9a7dae42, script
+  script/test_eyerok_hand_movement_bridge.sh, full matrix runs=192 failures=0,
+  and regenerated native Debug build target
+  /tmp/sm64-modern-m21p-build.log are the evidence boundary. The current
+  fixture proves the immutable-world seam only; authoritative collision mesh
+  coverage, real presentation consumers, durable reward progression, Chief
+  Chilly/Bowser breadth, and device/visual/human acceptance remain open.
+  Handoff: .porting/porting-handoff-full-swift-twin-M21p.md.
 - M21o binds the Eyerok boss and hand values to generation-safe owner records.
   The bridge creates source-model hand children in scheduler order, syncs
   transforms/hitbox identity/action/health/timing, feeds child parent-counter

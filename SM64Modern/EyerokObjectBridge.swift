@@ -15,6 +15,8 @@ struct SM64EyerokObjectEffectRecord: Equatable, Sendable {
     let bossEffects: SM64EyerokBossEffect
     let handEffects: SM64EyerokHandEffect
     let starPosition: SM64ObjectVector3?
+    let collision: SM64EyerokHandCollisionResult?
+    let movement: SM64EyerokHandMovementResult?
     let spawnedChildren: [SM64ObjectID]
     let presentedEffects: [SM64OwnerThreadEffectIntent]
 }
@@ -36,6 +38,7 @@ final class SM64EyerokObjectBridge {
     static let starModel: UInt32 = 0x7A // MODEL_STAR
     static let starBehaviorIdentity: UInt64 = 0x6268_765F_73746E
     static let handHitboxInteractType: UInt32 = 1 << 15 // INTERACT_BOUNCE_TOP
+    static let defaultWallHitboxRadius: Float = SM64EyerokHandCollision.wallHitboxRadius
     static let handHitboxRadius: Float = 150
     static let handHitboxHeight: Float = 100
     static let handHurtboxRadius: Float = 1
@@ -156,6 +159,8 @@ final class SM64EyerokObjectBridge {
         state engineState: SM64SwiftEngineState,
         bossInputs frameBossInputs: [SM64ObjectID: SM64EyerokBossInput] = [:],
         handInputs frameHandInputs: [SM64ObjectID: SM64EyerokHandInput] = [:],
+        collisionWorld: SM64SurfaceCollisionWorld? = nil,
+        advanceMovement: Bool = false,
         presentEffects: Bool = false,
         spawnRewardStar: Bool = false
     ) -> SM64EyerokSchedulerTickResult {
@@ -175,7 +180,13 @@ final class SM64EyerokObjectBridge {
                     spawnRewardStar: spawnRewardStar
                 )
             } else if self.handStates[id] != nil {
-                self.updateHand(id: id, pool: pool, presentEffects: presentEffects)
+                self.updateHand(
+                    id: id,
+                    pool: pool,
+                    collisionWorld: collisionWorld,
+                    advanceMovement: advanceMovement,
+                    presentEffects: presentEffects
+                )
             }
         }
 
@@ -280,17 +291,45 @@ final class SM64EyerokObjectBridge {
                 bossEffects: result.effects,
                 handEffects: [],
                 starPosition: result.starPosition,
+                collision: nil,
+                movement: nil,
                 spawnedChildren: spawnedChildren,
                 presentedEffects: delivery.presented
             )
         )
     }
 
-    private func updateHand(id: SM64ObjectID, pool: SM64ObjectPool, presentEffects: Bool) {
+    private func updateHand(
+        id: SM64ObjectID,
+        pool: SM64ObjectPool,
+        collisionWorld: SM64SurfaceCollisionWorld?,
+        advanceMovement: Bool,
+        presentEffects: Bool
+    ) {
         guard var hand = handStates[id], let parentID = handParents[id],
-              var boss = bossStates[parentID], pool.record(for: id) != nil else { return }
+              var boss = bossStates[parentID], let record = pool.record(for: id) else { return }
         let previousAction = hand.action
+        let physicsEnabled = advanceMovement && collisionWorld != nil && hand.action != .sleep
+        let collision = physicsEnabled
+            ? collisionWorld.flatMap { world in
+                SM64EyerokHandCollision.resolve(
+                    SM64EyerokHandCollisionInput(
+                        position: record.position,
+                        moveYaw: hand.moveYaw,
+                        forwardVelocity: hand.forwardVelocity,
+                        wallHitboxRadius: record.wallHitboxRadius,
+                        previousMoveFlags: record.moveFlags,
+                        world: world
+                    )
+                )
+            }
+            : nil
         var input = handInputs[id] ?? defaultHandInput(for: id, pool: pool)
+        if let collision {
+            input.onGround = collision.moveFlags & SM64EyerokHandCollision.onGround != 0
+            input.hitEdge = input.hitEdge || collision.moveFlags & SM64EyerokHandCollision.hitEdge != 0
+            input.hitWall = input.hitWall || collision.hitWall
+        }
         input.parentAction = boss.action
         input.parentNumHands = boss.numHands
         input.parentActiveHand = boss.activeHand
@@ -303,13 +342,91 @@ final class SM64EyerokObjectBridge {
         input.parentPositionZ = boss.positionZ
 
         let result = SM64EyerokHandKernel.tick(input, state: &hand)
+        let movement: SM64EyerokHandMovementResult?
+        if physicsEnabled, let world = collisionWorld {
+            let basePosition = collision?.position ?? record.position
+            let actionPosition = SM64ObjectVector3(
+                x: basePosition.x,
+                y: hand.positionY,
+                z: basePosition.z
+            )
+            let candidatePosition = SM64ObjectVector3(
+                x: actionPosition.x
+                    + SM64CanonicalTrig.sins(hand.moveYaw) * hand.forwardVelocity,
+                y: actionPosition.y,
+                z: actionPosition.z
+                    + SM64CanonicalTrig.coss(hand.moveYaw) * hand.forwardVelocity
+            )
+            let floor = collision ?? SM64EyerokHandCollision.resolve(
+                SM64EyerokHandCollisionInput(
+                    position: actionPosition,
+                    moveYaw: hand.moveYaw,
+                    forwardVelocity: hand.forwardVelocity,
+                    wallHitboxRadius: record.wallHitboxRadius,
+                    previousMoveFlags: record.moveFlags,
+                    world: world
+                )
+            )
+            let intendedFloor = world.findFloor(
+                x: candidatePosition.x,
+                y: candidatePosition.y,
+                z: candidatePosition.z
+            )
+            let intendedRoom: Int8 = intendedFloor.surfaceID.flatMap {
+                world.surface(withID: $0)?.room
+            } ?? 0
+            movement = SM64EyerokHandCollision.move(
+                SM64EyerokHandMovementInput(
+                    startPosition: actionPosition,
+                    candidatePosition: candidatePosition,
+                    velocityY: hand.velocityY,
+                    forwardVelocity: hand.forwardVelocity,
+                    moveYaw: hand.moveYaw,
+                    floorHeight: floor?.floorHeight ?? record.floorHeight,
+                    floorRoom: floor?.floorRoom ?? Int8(truncatingIfNeeded: record.floorRoom),
+                    objectRoom: Int8(truncatingIfNeeded: record.room),
+                    moveFlags: floor?.moveFlags ?? record.moveFlags,
+                    gravity: hand.gravity,
+                    bounciness: SM64EyerokHandCollision.bounciness,
+                    dragStrength: SM64EyerokHandCollision.dragStrength,
+                    buoyancy: SM64EyerokHandCollision.buoyancy,
+                    nativeStepScale: 1,
+                    intendedFloorHeight: intendedFloor.height,
+                    intendedFloorNormalY: intendedFloor.normalY ?? 0,
+                    intendedFloorRoom: intendedRoom,
+                    intendedFloorExists: intendedFloor.surfaceID != nil,
+                    waterLevel: world.findWaterLevel(
+                        x: candidatePosition.x,
+                        z: candidatePosition.z
+                    ),
+                    activeFarAway: false
+                )
+            )
+        } else {
+            movement = nil
+        }
+        if let movement {
+            hand.positionX = movement.position.x
+            hand.positionY = movement.position.y
+            hand.positionZ = movement.position.z
+            hand.velocityY = movement.velocity.y
+            hand.forwardVelocity = movement.forwardVelocity
+            hand.moveFlags = movement.moveFlags
+        }
         boss.numHands = result.parentNumHands
         boss.activeHand = result.parentActiveHand
         boss.busyHand = result.parentBusyHand
         bossStates[parentID] = boss
         handStates[id] = hand
         synchronizeBossRecord(id: parentID, state: boss, pool: pool, previousAction: boss.action)
-        synchronizeHandRecord(id: id, state: hand, pool: pool, previousAction: previousAction)
+        synchronizeHandRecord(
+            id: id,
+            state: hand,
+            pool: pool,
+            previousAction: previousAction,
+            collision: collision,
+            movement: movement
+        )
 
         if presentEffects { enqueueHandEffects(id: id, result: result) }
         let delivery = effectRouter.deliver(to: pool)
@@ -325,6 +442,8 @@ final class SM64EyerokObjectBridge {
                 bossEffects: [],
                 handEffects: result.effects,
                 starPosition: nil,
+                collision: collision,
+                movement: movement,
                 spawnedChildren: [],
                 presentedEffects: delivery.presented
             )
@@ -419,7 +538,9 @@ final class SM64EyerokObjectBridge {
         id: SM64ObjectID,
         state: SM64EyerokHandState,
         pool: SM64ObjectPool,
-        previousAction: SM64EyerokHandAction
+        previousAction: SM64EyerokHandAction,
+        collision: SM64EyerokHandCollisionResult? = nil,
+        movement: SM64EyerokHandMovementResult? = nil
     ) {
         _ = pool.mutate(id) { record in
             record.objectFlags |=
@@ -446,6 +567,21 @@ final class SM64EyerokObjectBridge {
             record.hurtboxRadius = Self.handHurtboxRadius
             record.hurtboxHeight = Self.handHurtboxHeight
             record.floorType = Int16(truncatingIfNeeded: state.collisionMode)
+            record.wallHitboxRadius = Self.defaultWallHitboxRadius
+            if let collision {
+                record.floorHeight = collision.floorHeight
+                record.floorType = collision.floorType
+                record.floorRoom = Int16(collision.floorRoom)
+                record.moveFlags = collision.moveFlags
+            }
+            if let movement {
+                record.position = movement.position
+                record.velocity = movement.velocity
+                record.forwardVelocity = movement.forwardVelocity
+                record.moveFlags = movement.moveFlags
+            } else {
+                record.velocity.y = state.velocityY
+            }
         }
     }
 
