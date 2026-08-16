@@ -2,7 +2,7 @@
 
 ## Status
 
-M22o is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M22p is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -460,6 +460,16 @@ remains 534 rows with 73 Swift value/owner routes and 461 explicit adapters.
 The focused dispatch contract, regenerated native Debug build, 206-script
 matrix, `git diff --check`, and zero unchecked-Sendable audit pass. This is an
 eighth live owner route, not whole-engine behavior closure or whole-game parity.
+M22p registers the existing `bhvBigBoo` owner bridge in the shared dispatch
+table. The general-actor route now dispatches Amp, Boo, Bob-omb, Bird, Swoop,
+Piranha Plant, and Big Boo in source list order, preserves Big Boo's
+initialize/hidden state and generation-safe owner delivery, and keeps the
+Bob-omb smoke and respawner replacement children explicitly unmigrated. The
+mixed nine-route Swift/C fingerprint is `0x0e1c5da8803fbcd9`; the manifest
+remains 534 rows with 73 Swift value/owner routes and 461 explicit adapters.
+The focused dispatch contract, regenerated native Debug build, 206-script
+matrix, `git diff --check`, and zero unchecked-Sendable audit pass. This is a
+ninth live owner route, not whole-engine behavior closure or whole-game parity.
 M22e replaces the `bhvRespawner` C callback with a pointer-free Swift value
 kernel and owner bridge. It preserves the source outside-radius gate,
 single-spawn/deactivation ordering, behavior-parameter transfer, transform
@@ -1370,7 +1380,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M22m: shared Bird behavior dispatch route | `SM64BehaviorDispatchBridge` registers the existing `bhvBird` owner bridge in spawned-flight mode, dispatches it after Amp/Boo/Bob-omb in the general-actor list, preserves reveal/flight state, and keeps transient compatibility children explicitly unmigrated. | Complete locally — strict Swift 6/C six-route fingerprint `0xdf0ba83813a05993`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused dispatch contract, regenerated native Debug build (`/tmp/sm64-modern-m22m-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine route breadth, the remaining 461 adapters, and parity remain |
 | M22n: shared Swoop behavior dispatch route | `SM64BehaviorDispatchBridge` registers the existing `bhvSwoop` owner bridge, dispatches Swoop after Amp/Boo/Bob-omb/Bird in the general-actor list, preserves animate/idle state, and keeps transient compatibility children explicitly unmigrated. | Complete locally — strict Swift 6/C seven-route fingerprint `0xb093af8af4cfa2d5`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused dispatch contract, regenerated native Debug build (`/tmp/sm64-modern-m22n-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine route breadth, the remaining 461 adapters, and parity remain |
 | M22o: shared Piranha Plant behavior dispatch route | `SM64BehaviorDispatchBridge` registers the existing `bhvPiranhaPlant` owner bridge, dispatches Piranha Plant after Amp/Boo/Bob-omb/Bird/Swoop in the general-actor list, preserves idle/sleeping/tangible state, and keeps transient compatibility children explicitly unmigrated. | Complete locally — strict Swift 6/C eight-route fingerprint `0x3232102d6c9b1483`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused dispatch contract, regenerated native Debug build (`/tmp/sm64-modern-m22o-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine route breadth, the remaining 461 adapters, and parity remain |
-| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22o close deterministic identity accounting, eight live value/owner routes, a shared eight-route dispatch seam, and Swift engine-context dispatch authority with 534 rows, 73 known Swift value/owner routes, and 461 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
+| M22p: shared Big Boo behavior dispatch route | `SM64BehaviorDispatchBridge` registers the existing `bhvBigBoo` owner bridge, dispatches Big Boo after Amp/Boo/Bob-omb/Bird/Swoop/Piranha Plant in the general-actor list, preserves initialize/hidden state and owner delivery, and keeps transient compatibility children explicitly unmigrated. | Complete locally — strict Swift 6/C nine-route fingerprint `0x0e1c5da8803fbcd9`, behavior manifest fingerprint `0x9bb2863444c51d6d`, 534 rows (73 Swift value/owner, 461 explicit C adapters), focused dispatch contract, regenerated native Debug build (`/tmp/sm64-modern-m22p-build.log`), 206-script matrix (runs=206 failures=0), git diff --check, and zero unchecked-Sendable audit pass; whole-engine route breadth, the remaining 461 adapters, and parity remain |
+| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22p close deterministic identity accounting, nine live value/owner routes, a shared nine-route dispatch seam, and Swift engine-context dispatch authority with 534 rows, 73 known Swift value/owner routes, and 461 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by complete live behavior VM/object execution and parity shards |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |

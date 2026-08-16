@@ -37,6 +37,13 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/SwoopObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/PiranhaPlant.swift" \
   "$PROJECT_ROOT/SM64Modern/PiranhaPlantObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
+  "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinMovement.swift" \
+  "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/BigBooObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_behavior_dispatch_bridge_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke"
 SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke)"

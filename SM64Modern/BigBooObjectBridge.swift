@@ -54,6 +54,42 @@ final class SM64BigBooObjectBridge {
 
     func state(for id: SM64ObjectID) -> SM64BigBooState? { states[id] }
 
+    func contains(_ id: SM64ObjectID) -> Bool {
+        states[id] != nil
+    }
+
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    @discardableResult
+    func updateInline(
+        _ id: SM64ObjectID,
+        input: SM64BigBooTickInput? = nil,
+        pool: SM64ObjectPool
+    ) -> SM64BigBooObjectEffectRecord? {
+        guard states[id] != nil else { return nil }
+        if let input { inputs[id] = input }
+        let count = effectLog.count
+        update(
+            id: id,
+            pool: pool,
+            collisionWorld: nil,
+            advanceMovement: false,
+            presentBossEffects: false,
+            spawnRewardStar: false,
+            spawnBridgeChildren: false
+        )
+        return effectLog.count > count ? effectLog.last : nil
+    }
+
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+    }
+
     @discardableResult
     func setState(_ state: SM64BigBooState, for id: SM64ObjectID, in pool: SM64ObjectPool) -> Bool {
         guard pool.record(for: id) != nil else { return false }
@@ -140,28 +176,30 @@ final class SM64BigBooObjectBridge {
         spawnBridgeChildren: Bool = false
     ) -> SM64BigBooSchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(
-                id: id,
-                pool: pool,
-                collisionWorld: collisionWorld,
-                advanceMovement: advanceMovement,
-                presentBossEffects: presentBossEffects,
-                spawnRewardStar: spawnRewardStar,
-                spawnBridgeChildren: spawnBridgeChildren
-            )
+            guard let self else { return }
+            if collisionWorld == nil && !advanceMovement && !presentBossEffects &&
+                !spawnRewardStar && !spawnBridgeChildren {
+                _ = self.updateInline(id, pool: pool)
+            } else {
+                self.update(
+                    id: id,
+                    pool: pool,
+                    collisionWorld: collisionWorld,
+                    advanceMovement: advanceMovement,
+                    presentBossEffects: presentBossEffects,
+                    spawnRewardStar: spawnRewardStar,
+                    spawnBridgeChildren: spawnBridgeChildren
+                )
+            }
         }
         for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         return SM64BigBooSchedulerTickResult(scheduler: schedulerResult, effects: effectLog)
     }
