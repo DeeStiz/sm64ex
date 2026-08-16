@@ -35,6 +35,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BirdObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SwoopEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/SwoopObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/PiranhaPlant.swift" \
+  "$PROJECT_ROOT/SM64Modern/PiranhaPlantObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_behavior_dispatch_bridge_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke"
 SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-behavior-dispatch-bridge-smoke)"

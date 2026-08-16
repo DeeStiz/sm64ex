@@ -51,6 +51,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BirdObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SwoopEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/SwoopObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/PiranhaPlant.swift" \
+  "$PROJECT_ROOT/SM64Modern/PiranhaPlantObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_engine_runtime_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-engine-runtime-smoke"

@@ -11,6 +11,7 @@
 #define BOBOMB_SMOKE_BEHAVIOR UINT64_C(0x6268765f736d6b)
 #define BIRD_BEHAVIOR UINT64_C(0x6268765f626972)
 #define SWOOP_BEHAVIOR UINT64_C(0x6268765f73776f)
+#define PIRANHA_PLANT_BEHAVIOR UINT64_C(0x6268765f70706c)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -44,20 +45,21 @@ static uint64_t hash_tick(
 ) {
     hash = hash_u64(hash, frame);
     hash = hash_u64(hash, second_tick ? 2 : 3); // default-list count
-    hash = hash_u64(hash, second_tick ? 7 : 9); // object counter
-    hash = hash_u64(hash, second_tick ? 7 : 9); // dispatch events
+    hash = hash_u64(hash, second_tick ? 8 : 10); // object counter
+    hash = hash_u64(hash, second_tick ? 8 : 10); // dispatch events
     hash = hash_event(hash, 2, AMP_BEHAVIOR, 2);
     hash = hash_event(hash, 3, BOO_BEHAVIOR, 3);
     hash = hash_event(hash, 4, BOBOMB_BEHAVIOR, 4);
     hash = hash_event(hash, 5, BIRD_BEHAVIOR, 5);
     hash = hash_event(hash, 6, SWOOP_BEHAVIOR, 6);
+    hash = hash_event(hash, 7, PIRANHA_PLANT_BEHAVIOR, 7);
     hash = hash_event(hash, 0, PENDULUM_BEHAVIOR, 0);
     if (second_tick) {
-        hash = hash_event(hash, 8, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 9, CHILD_BEHAVIOR, 255);
     } else {
         hash = hash_event(hash, 1, RESPAWNER_BEHAVIOR, 1);
-        hash = hash_event(hash, 8, CHILD_BEHAVIOR, 255);
-        hash = hash_event(hash, 7, BOBOMB_SMOKE_BEHAVIOR, 255);
+        hash = hash_event(hash, 9, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 8, BOBOMB_SMOKE_BEHAVIOR, 255);
     }
 
     hash = hash_u64(hash, 1); // pendulum effects
@@ -71,7 +73,7 @@ static uint64_t hash_tick(
     if (!second_tick) {
         hash = hash_id(hash, 1, 1);
         hash = hash_u64(hash, 3); // spawn + mark for deletion
-        hash = hash_id(hash, 8, 1);
+        hash = hash_id(hash, 9, 1);
         hash = hash_u64(hash, 1); // timer
         hash = hash_u64(hash, 1); // marked for deletion
     }
@@ -105,13 +107,13 @@ static uint64_t hash_tick(
     hash = hash_u64(hash, second_tick ? 36 : 44); // chase + fuse state
     hash = hash_u64(hash, second_tick ? 0 : 1); // spawned children
     if (!second_tick) {
-        hash = hash_id(hash, 7, 1);
+        hash = hash_id(hash, 8, 1);
     }
     hash = hash_u64(hash, 0); // not marked for deletion
     hash = hash_u64(hash, second_tick ? 0 : 1); // Bob-omb deliveries
     if (!second_tick) {
         hash = hash_u64(hash, 1); // deleted count
-        hash = hash_id(hash, 7, 1);
+        hash = hash_id(hash, 8, 1);
     }
 
     hash = hash_u64(hash, 1); // Bird effects
@@ -129,6 +131,14 @@ static uint64_t hash_tick(
     hash = hash_u64(hash, 0); // idle action
     hash = hash_u64(hash, 0); // not marked for deletion
     hash = hash_u64(hash, 0); // Swoop deliveries
+
+    hash = hash_u64(hash, 1); // Piranha Plant effects
+    hash = hash_id(hash, 7, 1);
+    hash = hash_u64(hash, 0); // idle action
+    hash = hash_u64(hash, UINT64_C(40961)); // shown + idle + intangible
+    hash = hash_u64(hash, 0); // spawned children
+    hash = hash_u64(hash, 0); // not marked for deletion
+    hash = hash_u64(hash, 0); // Piranha Plant deliveries
 
     hash = hash_u64(hash, UINT64_C(0x77));
     hash = hash_u64(hash, CHILD_BEHAVIOR);
