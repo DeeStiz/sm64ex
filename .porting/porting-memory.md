@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M22d extends exact behavior identity reconciliation to already-modeled
+  transient and child owners: bouncing fireball/flame, Fly Guy flame, Chain
+  Chomp segment/gate, Chuckya anchored Mario, enemy Lakitu, Goomba triplet
+  spawner, underwater Koopa shell, hidden Moneybag coin, racing-penguin
+  finish/shortcut children, Skeeter wave, and water-bomb shadow. Manifest
+  fingerprint 0x2f7887e32de75f61, 534 rows, 71 Swift value/owner routes, and
+  463 explicit `unmigrated_c_adapter` rows are the accounting boundary.
+  Focused script/test_behavior_manifest.sh, full matrix runs=203 failures=0,
+  regenerated native Debug build target /tmp/sm64-modern-m22d-build.log, git
+  diff --check, and zero unchecked-Sendable audit remain the evidence
+  boundary. Live execution and parity are still open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22d.md.
 - M22c reconciles exact reachable behavior declarations with existing Swift
   owner bridges. The manifest now maps Homing/Circling Amp, Ghost
   Hunt/Merry-Go-Round/Balcony Big Boo, small/big/Chief Chilly Bully including

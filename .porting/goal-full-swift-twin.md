@@ -2,7 +2,7 @@
 
 ## Status
 
-M22b is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M22d is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -353,6 +353,18 @@ M22c reconciles exact reachable behavior declarations with owner bridges that
  matrix, regenerated native Debug build, `git diff --check`, and zero
  unchecked-Sendable audit remain the evidence boundary. Live route execution,
  parity shards, and the remaining 477 adapters are still open.
+M22d extends the same exact-identity reconciliation to existing transient and
+child owners: bouncing fireball/flame, Fly Guy flame, Chain Chomp segment and
+gate, Chuckya's anchored-Mario child, enemy Lakitu, Goomba triplet spawner,
+underwater Koopa shell, hidden Moneybag coin, racing-penguin finish/shortcut
+children, Skeeter wave, and water-bomb shadow. The fail-closed manifest now
+records 71 Swift value/owner routes and 463 explicit `unmigrated_c_adapter`
+rows across the same 534 reachable pairs, fingerprint
+`0x2f7887e32de75f61`. This is identity accounting over already-modeled
+owners, not runtime parity proof: live route execution, real behavior
+dispatch, and the remaining 463 adapters remain open. Focused contracts, the
+203-script matrix, regenerated native Debug build, `git diff --check`, and
+zero unchecked-Sendable audit are the evidence boundary.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
 `beginCommandBuffer`, while the existing queue-level residency, explicit
@@ -1239,7 +1251,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M22a: fail-closed behavior coverage manifest | Swift generates one canonical row per reachable behavior identity/source pair, maps known Swift value/owner routes, and explicitly records every remaining C-only adapter with owner and reason; duplicate, omission, and unknown mapping states fail closed. | Complete locally — manifest fingerprint `0xe4c60a906497e192`, 534 rows (41 Swift value/owner, 493 explicit C adapters), focused Swift/C contract, 203-script matrix (runs=203 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m22a-build.log`), git diff --check, and zero unchecked-Sendable audit pass; eliminating all 493 adapters and proving live route execution remain |
 | M22b: Bob-omb bubble3600 deterministic child route | Swift makes the `bhvBobombExplosionBubble3600` jitter seam an explicit value input and owner route, preserving deterministic placement while keeping the child kernel pointer-free and generation-safe. | Complete locally — child fingerprint `0x03fdfa6ee829478b`, behavior manifest fingerprint `0xaa7628249ad5adf3`, 534 rows (42 Swift value/owner, 492 explicit C adapters), focused Swift/C contracts, 203-script matrix (runs=203 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m22b-build.log`), git diff --check, and zero unchecked-Sendable audit pass; eliminating the remaining 492 adapters and proving live route execution remain |
 | M22c: exact variant and child behavior identity reconciliation | Swift's existing owner bridges receive the exact reachable Amp, Big Boo, Bully/Chief Chilly, Eyerok, Mr. I, Snufit, and Whomp behavior declarations instead of leaving those already-supported routes in the C adapter bucket. | Complete locally — manifest fingerprint `0xde447c5b375461c6`, 534 rows (57 Swift value/owner, 477 explicit C adapters), focused Swift/C contract, 203-script matrix (runs=203 failures=0), regenerated native Debug build, git diff --check, and zero unchecked-Sendable audit pass; live route execution and eliminating the remaining 477 adapters remain |
-| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22c close the deterministic manifest/accounting boundary with 534 rows, 57 known Swift value/owner routes, and 477 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by live behavior VM/object execution and parity shards |
+| M22d: transient and child behavior identity reconciliation | Swift's existing fireball, Fly Guy, Chain Chomp, Chuckya, Lakitu, Goomba, Koopa, Moneybag, racing-penguin, Skeeter, and water-bomb owners receive their exact reachable child/variant declarations. | Complete locally — manifest fingerprint `0x2f7887e32de75f61`, 534 rows (71 Swift value/owner, 463 explicit C adapters), focused Swift/C contract, 203-script matrix (runs=203 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m22d-build.log`), git diff --check, and zero unchecked-Sendable audit pass; live route execution, real dispatch, and eliminating the remaining 463 adapters remain |
+| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a–M22d close deterministic identity accounting with 534 rows, 71 known Swift value/owner routes, and 463 explicit unmigrated adapters; all adapters still require live Swift migration or an approved compatibility exception, followed by live behavior VM/object execution and parity shards |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |
