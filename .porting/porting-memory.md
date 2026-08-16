@@ -2,6 +2,18 @@
 
 ## Current Milestone
 
+- M21g adds an opt-in owner-thread defeat reward boundary for King Bob-omb.
+  The bridge materializes one generation-safe MODEL_STAR child in the level
+  list at (2000, 4500, -4500), preserves parentage and source behavior
+  identity, and emits the shared star presentation intent. Focused strict
+  Swift/C fingerprint 0x49cb52405765e2d1, script
+  script/test_king_bobomb_reward_star.sh, full matrix
+  runs=183 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21g-build.log are the evidence boundary. Durable
+  progression/save mutation, star behavior execution, and device/visual/human
+  acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21g.md.
+
 - M21f adds an opt-in owner-thread arena camera-focus presentation intent for
   the King Bob-omb intro. The shared router keeps boss music before
   `cameraFocus`, and the intent carries `CAMERA_MODE_BOSS_FIGHT` (`11`) without

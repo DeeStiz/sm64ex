@@ -14,6 +14,7 @@ struct SM64KingBobombObjectEffect: Equatable, Sendable {
     let collision: SM64KingBobombCollisionResult?
     let movement: SM64KingBobombMovementResult?
     let homeArcStart: SM64KingBobombHomeArcStart?
+    let spawnedChildren: [SM64ObjectID]
     let presentedEffects: [SM64OwnerThreadEffectIntent]
 }
 
@@ -32,6 +33,8 @@ final class SM64KingBobombObjectBridge {
     static let defaultWallHitboxRadius: Float = 30
     static let interactionSubtypeGrabsMario: UInt32 = 0x0000_0004
     static let bossCameraModeValue: Int32 = 11 // CAMERA_MODE_BOSS_FIGHT
+    static let starModel: UInt32 = 0x7A // MODEL_STAR
+    static let starBehaviorIdentity: UInt64 = 0x6268_765F_73746E
     static let starEffectValue: Int32 = 1
 
     private let scheduler: SM64ObjectScheduler
@@ -155,7 +158,8 @@ final class SM64KingBobombObjectBridge {
         environments frameEnvironments: [SM64ObjectID: SM64KingBobombEnvironment] = [:],
         collisionWorld: SM64SurfaceCollisionWorld? = nil,
         advanceMovement: Bool = false,
-        presentArenaCamera: Bool = false
+        presentArenaCamera: Bool = false,
+        spawnRewardStar: Bool = false
     ) -> SM64KingBobombSchedulerTickResult {
         environments = frameEnvironments
         effectLog.removeAll(keepingCapacity: true)
@@ -169,7 +173,8 @@ final class SM64KingBobombObjectBridge {
                 pool: pool,
                 collisionWorld: collisionWorld,
                 advanceMovement: advanceMovement,
-                presentArenaCamera: presentArenaCamera
+                presentArenaCamera: presentArenaCamera,
+                spawnRewardStar: spawnRewardStar
             )
         }
         for id in schedulerResult.unloaded {
@@ -193,7 +198,8 @@ final class SM64KingBobombObjectBridge {
         pool: SM64ObjectPool,
         collisionWorld: SM64SurfaceCollisionWorld?,
         advanceMovement: Bool,
-        presentArenaCamera: Bool
+        presentArenaCamera: Bool,
+        spawnRewardStar: Bool
     ) {
         guard let oldState = states[id], let record = pool.record(for: id) else { return }
         let input = environments[id]?.input ?? defaultInput(for: oldState, record: record)
@@ -335,6 +341,30 @@ final class SM64KingBobombObjectBridge {
         for sound in output.soundSpawnerValues {
             effectRouter.enqueue(objectID: id, kind: .sound, value: sound, auxiliary: 1)
         }
+        var spawnedChildren: [SM64ObjectID] = []
+        if spawnRewardStar,
+           let starPosition = output.starPosition,
+           let star = try? pool.spawn(
+               in: .level,
+               model: Self.starModel,
+               behaviorIdentity: Self.starBehaviorIdentity,
+               parent: id
+           ) {
+            let resolvedStarPosition = SM64ObjectVector3(
+                x: starPosition.x,
+                y: starPosition.y,
+                z: starPosition.z
+            )
+            _ = pool.mutate(star) { starRecord in
+                starRecord.objectFlags |=
+                    SM64ObjectScheduler.objectFlagBuildTransform |
+                    SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+                starRecord.position = resolvedStarPosition
+                starRecord.homePosition = resolvedStarPosition
+                starRecord.behaviorParams2ndByte = 0
+            }
+            spawnedChildren.append(star)
+        }
         if output.effects.contains(.bossMusic) {
             effectRouter.enqueue(objectID: id, kind: .music, value: 1)
         }
@@ -374,6 +404,7 @@ final class SM64KingBobombObjectBridge {
                 collision: collision,
                 movement: movement,
                 homeArcStart: homeArcStart,
+                spawnedChildren: spawnedChildren,
                 presentedEffects: delivery.presented
             )
         )
