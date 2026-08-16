@@ -2,7 +2,7 @@
 
 ## Status
 
-M21z is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M22a is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -314,8 +314,19 @@ M21z migrates the shared explosion child behaviors. Swift now allocates the
  `git diff --check`, and zero unchecked-Sendable audit pass are the evidence
  boundary. Water-splash behavior, Bowser's duplicate generic-child route
  unification, full Bowser controller/arena authority, collision consumers,
- durable reward/warp transitions, and device/visual/human acceptance remain
- open.
+durable reward/warp transitions, and device/visual/human acceptance remain
+open.
+M22a adds the fail-closed behavior coverage manifest. The deterministic Swift
+ tool emits one canonical row for each of the 534 reachable behavior
+ identity/source pairs, marks 41 known Swift value/owner routes, and records
+ the remaining 493 behaviors as explicit `unmigrated_c_adapter` rows with an
+ owner and reason. Its manifest fingerprint is
+ `0xe4c60a906497e192`; double generation, duplicate/unknown-state rejection,
+ the focused Swift/C contract, expanded 203-script matrix, regenerated native
+ Debug build, `git diff --check`, and zero unchecked-Sendable audit are the
+ evidence boundary. This is coverage accounting, not rewrite completion: all
+ 493 C adapters still require migration or a separately approved compatibility
+ exception.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
 `beginCommandBuffer`, while the existing queue-level residency, explicit
@@ -1199,7 +1210,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M21y: Bowser shared-explosion request integration | Swift routes the Mario-hit Bowser bomb request into the shared `bhvExplosion` owner consumer behind an explicit gate, preserving the source model/behavior identity, parent generation, sound/camera-shake presentation, same-scheduler update, and deterministic parent/child retirement while leaving mine flames unchanged. | Complete locally — strict Swift 6/C fingerprint `0x09ea3ea3033a8de3`, focused integration contract, 201-script matrix (runs=201 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21y-build.log`), git diff --check, and zero unchecked-Sendable audit pass; bubble/smoke child behaviors, full Bowser controller/arenas, collision consumers, durable reward/warp transitions, and human/device acceptance remain |
 | M21z: shared explosion bubble and ground-smoke children | Swift allocates the source water-bubble and ground-smoke children from the shared explosion owner bridge, preserving model/behavior identity, explicit random inputs, bubble scale/velocity/water-splash/deletion timing, ground-smoke offset/delay/dust lifetime, and generation-safe unload. | Complete locally — strict Swift 6/C fingerprint `0x03fdfa6ee829478b`, focused child contract, 202-script matrix (runs=202 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21z-build.log`), git diff --check, and zero unchecked-Sendable audit pass; water-splash behavior, Bowser generic-child route unification, full Bowser controller/arenas, collision consumers, durable reward/warp transitions, and human/device acceptance remain |
 | M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21z close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, Big Boo value/owner/effect/collision/movement seams, Eyerok boss/hand value/owner/collision/movement seams, Chief Chilly/Bully reward/presentation/minion/movement seams, Bowser shockwave/key/key-cutscene/bomb value/owner seams, bomb flame/smoke lifetime, the shared generic explosion value/owner seam, Bowser request integration, and shared explosion bubble/ground-smoke children; water-splash behavior, duplicate Bowser child-route unification, broad collision authority, durable reward persistence, real camera/cutscene/audio wiring, Chief Chilly breadth, full Bowser controllers/arenas, reward/music transitions, and deterministic boss-phase shards remain |
-| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
+| M22a: fail-closed behavior coverage manifest | Swift generates one canonical row per reachable behavior identity/source pair, maps known Swift value/owner routes, and explicitly records every remaining C-only adapter with owner and reason; duplicate, omission, and unknown mapping states fail closed. | Complete locally — manifest fingerprint `0xe4c60a906497e192`, 534 rows (41 Swift value/owner, 493 explicit C adapters), focused Swift/C contract, 203-script matrix (runs=203 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m22a-build.log`), git diff --check, and zero unchecked-Sendable audit pass; eliminating all 493 adapters and proving live route execution remain |
+| M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | In progress — M22a closes the deterministic manifest/accounting boundary with 534 rows, 41 known Swift value/owner routes, and 493 explicit unmigrated adapters; all adapters still require Swift migration or an approved compatibility exception, followed by live behavior VM/object execution and parity shards |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |

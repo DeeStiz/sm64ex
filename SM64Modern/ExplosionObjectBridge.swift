@@ -248,7 +248,7 @@ final class SM64ExplosionObjectBridge {
 
     private func updateBubble(id: SM64ObjectID, pool: SM64ObjectPool) {
         guard var bubble = bubbles[id], pool.record(for: id) != nil else { return }
-        let result = SM64ExplosionChildrenKernel.tickBubble(
+        _ = SM64ExplosionChildrenKernel.tickBubble(
             bubbleInputs[id] ?? SM64ExplosionBubbleTickInput(),
             state: &bubble
         )

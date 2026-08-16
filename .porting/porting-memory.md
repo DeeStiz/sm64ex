@@ -2,6 +2,17 @@
 
 ## Current Milestone
 
+- M22a adds the fail-closed behavior coverage manifest. The deterministic Swift
+  tool emits one canonical row for each of the 534 reachable behavior
+  identity/source pairs, maps 41 known Swift value/owner routes, and records
+  the remaining 493 behaviors as explicit `unmigrated_c_adapter` rows with an
+  owner and reason. Manifest fingerprint 0xe4c60a906497e192, script
+  script/test_behavior_manifest.sh, full matrix runs=203 failures=0, and
+  regenerated native Debug build target /tmp/sm64-modern-m22a-build.log are
+  the evidence boundary. This is coverage accounting, not rewrite closure:
+  all 493 C adapters still require migration or a separately approved
+  compatibility exception, followed by live behavior execution and parity
+  shards. Handoff: .porting/porting-handoff-full-swift-twin-M22a.md.
 - M21z migrates the shared explosion water-bubble and ground-smoke child
   behaviors. Swift allocates the source 40-child bubble route or ground-smoke
   child in the owner bridge, preserves model/behavior identities, explicit
