@@ -13,6 +13,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case flyGuy = 9
     case bulletBill = 10
     case goomba = 11
+    case spiny = 12
     case unmigrated = 255
 }
 
@@ -49,6 +50,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let goombaEffects: [SM64GoombaObjectEffectRecord]
     let goombaRespawnRequests: [SM64GoombaRespawnRequest]
     let goombaDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let spinyEffects: [SM64SpinyObjectEffectRecord]
+    let spinyDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -68,6 +71,7 @@ final class SM64BehaviorDispatchBridge {
     let flyGuy: SM64FlyGuyObjectBridge
     let bulletBill: SM64BulletBillObjectBridge
     let goomba: SM64GoombaObjectBridge
+    let spiny: SM64SpinyObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -84,6 +88,7 @@ final class SM64BehaviorDispatchBridge {
         self.flyGuy = SM64FlyGuyObjectBridge(scheduler: scheduler)
         self.bulletBill = SM64BulletBillObjectBridge(scheduler: scheduler)
         self.goomba = SM64GoombaObjectBridge(scheduler: scheduler)
+        self.spiny = SM64SpinyObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -113,6 +118,8 @@ final class SM64BehaviorDispatchBridge {
         case SM64GoombaObjectBridge.defaultBehaviorIdentity,
              SM64GoombaObjectBridge.defaultTripletSpawnerBehaviorIdentity:
             return .goomba
+        case SM64SpinyObjectBridge.defaultBehaviorIdentity:
+            return .spiny
         default:
             return .unmigrated
         }
@@ -132,6 +139,7 @@ final class SM64BehaviorDispatchBridge {
         for id in flyGuy.registeredIDs { flyGuy.remove(id) }
         for id in bulletBill.registeredIDs { bulletBill.remove(id) }
         for id in goomba.registeredIDs { goomba.remove(id) }
+        for id in spiny.registeredIDs { spiny.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -144,6 +152,7 @@ final class SM64BehaviorDispatchBridge {
         flyGuy.beginExternalTick()
         bulletBill.beginExternalTick()
         goomba.beginExternalTick()
+        spiny.beginExternalTick()
     }
 
     @discardableResult
@@ -369,6 +378,19 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnSpiny(
+        in engineState: SM64SwiftEngineState,
+        action: SM64SpinyAction = .walk,
+        parent: SM64ObjectID? = nil
+    ) throws -> SM64ObjectID {
+        try spiny.spawnSpiny(
+            in: engineState,
+            action: action,
+            parent: parent
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -383,6 +405,7 @@ final class SM64BehaviorDispatchBridge {
         flyGuy.beginExternalTick()
         bulletBill.beginExternalTick()
         goomba.beginExternalTick()
+        spiny.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -423,6 +446,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.bulletBill.updateInline(id, pool: pool)
             case .goomba:
                 _ = self.goomba.updateInline(id, pool: pool)
+            case .spiny:
+                _ = self.spiny.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -441,6 +466,7 @@ final class SM64BehaviorDispatchBridge {
             flyGuy.remove(id)
             bulletBill.remove(id)
             goomba.remove(id)
+            spiny.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -478,6 +504,9 @@ final class SM64BehaviorDispatchBridge {
         for id in goomba.registeredIDs where engineState.objects.record(for: id) == nil {
             goomba.remove(id)
         }
+        for id in spiny.registeredIDs where engineState.objects.record(for: id) == nil {
+            spiny.remove(id)
+        }
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -505,7 +534,9 @@ final class SM64BehaviorDispatchBridge {
             bulletBillDeliveries: bulletBill.deliveryLog,
             goombaEffects: goomba.effectLog,
             goombaRespawnRequests: goomba.respawnRequests,
-            goombaDeliveries: goomba.deliveryLog
+            goombaDeliveries: goomba.deliveryLog,
+            spinyEffects: spiny.effectLog,
+            spinyDeliveries: spiny.deliveryLog
         )
     }
 }

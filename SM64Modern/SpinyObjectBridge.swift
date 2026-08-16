@@ -55,6 +55,29 @@ final class SM64SpinyObjectBridge {
         effectLog.removeAll(keepingCapacity: true)
     }
 
+    /// Clears per-tick owner-thread effects before an external shared
+    /// dispatcher invokes `updateInline` for each live Spiny identity.
+    func beginExternalTick() {
+        effectLog.removeAll(keepingCapacity: true)
+        deliveryLog.removeAll(keepingCapacity: true)
+        effectRouter.beginTick()
+    }
+
+    /// Advances one Spiny callback without starting a nested scheduler pass.
+    /// The enclosing shared dispatcher remains authoritative for list order.
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, pool: SM64ObjectPool) -> Bool {
+        guard states[id] != nil, pool.record(for: id) != nil else { return false }
+        update(id: id, pool: pool)
+        return true
+    }
+
+    /// Removes the owner shadow after scheduler unload or an external reset.
+    func remove(_ id: SM64ObjectID) {
+        states.removeValue(forKey: id)
+        inputs.removeValue(forKey: id)
+    }
+
     /// Removes shadows after the scheduler's end-of-frame unload. This is
     /// separate from `tick` so a composite bridge can keep one scheduler pass
     /// for Lakitu and its newly appended Spiny child.
@@ -147,20 +170,16 @@ final class SM64SpinyObjectBridge {
         inputs frameInputs: [SM64ObjectID: SM64SpinyTickInput] = [:]
     ) -> SM64SpinySchedulerTickResult {
         inputs = frameInputs
-        effectLog.removeAll(keepingCapacity: true)
-        deliveryLog.removeAll(keepingCapacity: true)
-        effectRouter.beginTick()
+        beginExternalTick()
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
-            self?.update(id: id, pool: pool)
+            _ = self?.updateInline(id, pool: pool)
         }
 
         for id in schedulerResult.unloaded {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
-            states.removeValue(forKey: id)
-            inputs.removeValue(forKey: id)
+            remove(id)
         }
 
         return SM64SpinySchedulerTickResult(
