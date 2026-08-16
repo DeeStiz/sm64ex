@@ -855,6 +855,37 @@ private func hashKoopaShellDispatch(
     return hash
 }
 
+private func hashBowserKeyCutsceneDispatch(
+    _ initial: UInt64,
+    _ tick: SM64BehaviorDispatchTickResult
+) -> UInt64 {
+    var hash = hashU64(initial, tick.scheduler.frame)
+    for count in tick.scheduler.listCounts { hash = hashU64(hash, UInt64(count)) }
+    hash = hashU64(hash, UInt64(tick.scheduler.objectCounter))
+    hash = hashU64(hash, UInt64(tick.scheduler.updated.count))
+    for id in tick.scheduler.updated { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.scheduler.unloaded.count))
+    for id in tick.scheduler.unloaded { hash = hashID(hash, id) }
+    hash = hashU64(hash, UInt64(tick.events.count))
+    for event in tick.events {
+        hash = hashID(hash, event.objectID)
+        hash = hashU64(hash, event.behaviorIdentity)
+        hash = hashU64(hash, UInt64(event.route.rawValue))
+    }
+    hash = hashU64(hash, UInt64(tick.bowserKeyCutsceneEffects.count))
+    for effect in tick.bowserKeyCutsceneEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, UInt64(effect.kind.rawValue))
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.animationFrame)))
+        hash = hashU64(hash, UInt64(bitPattern: Int64(effect.animation)))
+        hash = hashU64(hash, UInt64(effect.scale.bitPattern))
+        hash = hashU64(hash, UInt64(effect.timer))
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    return hash
+}
+
 private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
     precondition(condition(), message)
 }
@@ -1355,6 +1386,24 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         )
         require(shellTick.koopaShellDeliveries.isEmpty, "Koopa shell idle route has no delivery")
         fingerprint = hashKoopaShellDispatch(fingerprint, shellTick)
+
+        let cutsceneEngine = SM64SwiftEngineState(objectCapacity: 8)
+        let cutsceneBridge = SM64BehaviorDispatchBridge()
+        let cutsceneKey = try cutsceneBridge.spawnBowserKeyCutscene(
+            kind: .courseExit,
+            in: cutsceneEngine,
+            position: SM64ObjectVector3(x: 4, y: 5, z: 6)
+        )
+        let cutsceneTick = cutsceneBridge.tick(state: cutsceneEngine)
+        require(cutsceneTick.events.map(\.route) == [.bowserKeyCutscene], "Bowser key cutscene route dispatch")
+        require(cutsceneTick.scheduler.updated.map(\.traceSubject) == [1], "Bowser key cutscene callback ordering")
+        require(
+            cutsceneTick.bowserKeyCutsceneEffects.count == 1
+                && cutsceneTick.bowserKeyCutsceneEffects.first?.objectID == cutsceneKey
+                && cutsceneTick.bowserKeyCutsceneEffects.first?.kind == .courseExit,
+            "Bowser key cutscene value route is preserved"
+        )
+        fingerprint = hashBowserKeyCutsceneDispatch(fingerprint, cutsceneTick)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))
         print("SM64 Modern behavior dispatch bridge smoke passed")

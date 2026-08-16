@@ -2,6 +2,23 @@
 
 ## Current Milestone
 
+- M22al registers the existing Bowser key cutscene owner bridge for both
+  unlock-door and course-exit identities in the shared
+  `SM64BehaviorDispatchBridge`. The level-list route preserves source
+  scale/animation/timer curves, marks the key for generation-safe end-of-frame
+  retirement, and leaves camera/dialog ownership outside this bounded object
+  seam. Thirty-three-route Swift/C fingerprint `0x51b2a75e575c8448`, standalone
+  Bowser key cutscene fingerprint `0x94f233de3ce2784f`, behavior manifest
+  fingerprint `0x9bb2863444c51d6d`, 534 rows, 73 Swift value/owner routes, and
+  461 explicit `unmigrated_c_adapter` rows are the accounting boundary.
+  Focused dispatch/Bowser key cutscene contracts, native Debug target
+  `/tmp/sm64-modern-m22al-build.log`, live oracle/promotion, full
+  shebang-corrected 206-script matrix, `git diff --check`, and zero
+  unchecked-Sendable audit pass are the evidence boundary. Full camera/dialog
+  presentation, progression/warp consumers, remaining adapters, and live
+  parity remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M22al.md`.
+
 - M22ak registers the existing Koopa shell owner bridge for both the level-list
   shell and underwater shell identities in the shared
   `SM64BehaviorDispatchBridge`. The general-actor route preserves the

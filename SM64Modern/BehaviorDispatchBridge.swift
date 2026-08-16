@@ -33,6 +33,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case slWalkingPenguin = 29
     case smallPenguin = 30
     case koopaShell = 31
+    case bowserKeyCutscene = 32
     case unmigrated = 255
 }
 
@@ -105,6 +106,7 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let smallPenguinDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let koopaShellEffects: [SM64KoopaShellObjectEffectRecord]
     let koopaShellDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let bowserKeyCutsceneEffects: [SM64BowserKeyCutsceneObjectEffectRecord]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -144,6 +146,7 @@ final class SM64BehaviorDispatchBridge {
     let slWalkingPenguin: SM64SLWalkingPenguinObjectBridge
     let smallPenguin: SM64SmallPenguinObjectBridge
     let koopaShell: SM64KoopaShellObjectBridge
+    let bowserKeyCutscene: SM64BowserKeyCutsceneObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -181,6 +184,7 @@ final class SM64BehaviorDispatchBridge {
         self.slWalkingPenguin = SM64SLWalkingPenguinObjectBridge(scheduler: scheduler)
         self.smallPenguin = SM64SmallPenguinObjectBridge(scheduler: scheduler)
         self.koopaShell = SM64KoopaShellObjectBridge(scheduler: scheduler)
+        self.bowserKeyCutscene = SM64BowserKeyCutsceneObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -265,6 +269,9 @@ final class SM64BehaviorDispatchBridge {
         case SM64KoopaShellObjectBridge.defaultShellBehaviorIdentity,
              SM64KoopaShellObjectBridge.defaultUnderwaterBehaviorIdentity:
             return .koopaShell
+        case SM64BowserKeyCutsceneObjectBridge.unlockDoorBehaviorIdentity,
+             SM64BowserKeyCutsceneObjectBridge.courseExitBehaviorIdentity:
+            return .bowserKeyCutscene
         default:
             return .unmigrated
         }
@@ -304,6 +311,7 @@ final class SM64BehaviorDispatchBridge {
         for id in slWalkingPenguin.registeredIDs { slWalkingPenguin.remove(id) }
         for id in smallPenguin.registeredIDs { smallPenguin.remove(id) }
         for id in koopaShell.registeredIDs { koopaShell.remove(id) }
+        for id in bowserKeyCutscene.registeredIDs { bowserKeyCutscene.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -336,6 +344,7 @@ final class SM64BehaviorDispatchBridge {
         slWalkingPenguin.beginExternalTick()
         smallPenguin.beginExternalTick()
         koopaShell.beginExternalTick()
+        bowserKeyCutscene.beginExternalTick()
     }
 
     @discardableResult
@@ -979,6 +988,21 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnBowserKeyCutscene(
+        kind: SM64BowserKeyCutsceneKind,
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        model: UInt32 = SM64BowserKeyCutsceneObjectBridge.defaultModel
+    ) throws -> SM64ObjectID {
+        try bowserKeyCutscene.spawn(
+            kind: kind,
+            in: engineState,
+            position: position,
+            model: model
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -1011,6 +1035,7 @@ final class SM64BehaviorDispatchBridge {
         slWalkingPenguin.beginExternalTick()
         smallPenguin.beginExternalTick()
         koopaShell.beginExternalTick()
+        bowserKeyCutscene.beginExternalTick()
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -1095,6 +1120,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.smallPenguin.updateInline(id, pool: pool)
             case .koopaShell:
                 _ = self.koopaShell.updateInline(id, pool: pool)
+            case .bowserKeyCutscene:
+                _ = self.bowserKeyCutscene.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -1135,6 +1162,7 @@ final class SM64BehaviorDispatchBridge {
             slWalkingPenguin.remove(id)
             smallPenguin.remove(id)
             koopaShell.remove(id)
+            bowserKeyCutscene.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -1207,6 +1235,7 @@ final class SM64BehaviorDispatchBridge {
         slWalkingPenguin.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         smallPenguin.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         koopaShell.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        bowserKeyCutscene.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -1270,7 +1299,8 @@ final class SM64BehaviorDispatchBridge {
             smallPenguinEffects: smallPenguin.effectLog,
             smallPenguinDeliveries: smallPenguin.deliveryLog,
             koopaShellEffects: koopaShell.effectLog,
-            koopaShellDeliveries: koopaShell.deliveryLog
+            koopaShellDeliveries: koopaShell.deliveryLog,
+            bowserKeyCutsceneEffects: bowserKeyCutscene.effectLog
         )
     }
 }
