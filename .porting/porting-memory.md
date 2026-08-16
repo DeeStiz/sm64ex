@@ -2,6 +2,16 @@
 
 ## Current Milestone
 
+- M21v adds both Bowser key cutscene value/owner routes. Swift reproduces the
+  unlock-door and course-exit piecewise scale curves, animation selection,
+  timer-based deletion fences, and generation-safe level-list retirement.
+  Focused strict Swift/C fingerprint 0x94f233de3ce2784f, script
+  script/test_bowser_key_cutscene.sh, full matrix runs=198 failures=0, and
+  regenerated native Debug build target /tmp/sm64-modern-m21v-build.log are
+  the evidence boundary. Camera/dialog orchestration, real cutscene
+  consumers, durable progression/warp transitions, and device/visual/human
+  acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21v.md.
 - M21u adds the Bowser key level-list value/owner seam. Swift reproduces
   source spin damping, launch velocity, landing/sparkle cadence, delayed
   `INTERACT_STAR_OR_KEY` hitbox activation, interaction clearing, and
