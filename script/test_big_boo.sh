@@ -13,7 +13,13 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/MemoryArena.swift" \
   "$PROJECT_ROOT/SM64Modern/GeneratedTrigTables.swift" \
   "$PROJECT_ROOT/SM64Modern/DeterministicPrimitives.swift" \
+  "$PROJECT_ROOT/SM64Modern/ObjectTransform.swift" \
+  "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
+  "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/SLWalkingPenguinMovement.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
+  "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_big_boo_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-big-boo-smoke"
 SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-big-boo-smoke)"

@@ -131,6 +131,7 @@
 		995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD8678B319AD274378179C /* MetalShaderCompiler.swift */; };
 		996E4A0BA2A27960F8BAC8AE /* MarioSlideAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B4722F19AD87EAD27684AF /* MarioSlideAction.swift */; };
 		9A73A38A6EE03FFA307C01AA /* CameraModeState.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE8B1473942F159FA54C7A8 /* CameraModeState.swift */; };
+		9A8928D28FF0A7E6676668EB /* BigBooCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = F767E8095D423258E7165E3E /* BigBooCollision.swift */; };
 		9CD18E75B979825159FFA3B8 /* PlatformDisplacement.swift in Sources */ = {isa = PBXBuildFile; fileRef = E9E6A3C4C6160016A676FD11 /* PlatformDisplacement.swift */; };
 		9EA44DFDFF3DBB57B23876D0 /* PlatformCollisionRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E37008029F2850C83A1AFF0 /* PlatformCollisionRegistry.swift */; };
 		9EE3212694962C332EC58184 /* MarioGrabbedTornadoAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEAB73816A053C9CDE0415E1 /* MarioGrabbedTornadoAction.swift */; };
@@ -426,6 +427,7 @@
 		F28F9F86BA8486D9F6BB005C /* RotatingPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatingPlatformBehavior.swift; sourceTree = "<group>"; };
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
 		F5BB9631CE7A07A55B9BDBCF /* MarioCommonAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCommonAirAction.swift; sourceTree = "<group>"; };
+		F767E8095D423258E7165E3E /* BigBooCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigBooCollision.swift; sourceTree = "<group>"; };
 		F804D686AFFB6AA968F51DEE /* TTCMovingBarBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCMovingBarBehavior.swift; sourceTree = "<group>"; };
 		FBADCC8D3A0FCE39EEF40AC3 /* TuxiesMotherBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuxiesMotherBehavior.swift; sourceTree = "<group>"; };
 		FC5B24277AF249CA2DFC7FD6 /* BirdEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirdEnemy.swift; sourceTree = "<group>"; };
@@ -450,6 +452,7 @@
 				D6B1983ADD652967A0372D10 /* BehaviorScript.swift */,
 				2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */,
 				B0D7787F2A6FB2DF940197F0 /* BehaviorScriptVM.swift */,
+				F767E8095D423258E7165E3E /* BigBooCollision.swift */,
 				E4F2302F1BDE312495444C39 /* BigBooEnemy.swift */,
 				BA6EF56FF4DC7CC2039DAF91 /* BigBooObjectBridge.swift */,
 				FC5B24277AF249CA2DFC7FD6 /* BirdEnemy.swift */,
@@ -761,6 +764,7 @@
 				FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */,
 				161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */,
 				0251DEA438C860732FDBE0C1 /* BehaviorScriptVM.swift in Sources */,
+				9A8928D28FF0A7E6676668EB /* BigBooCollision.swift in Sources */,
 				B5C0B662E0729E2A61D81CAA /* BigBooEnemy.swift in Sources */,
 				5FA7C5538908D1A4DED23710 /* BigBooObjectBridge.swift in Sources */,
 				23438691E437DAAAC9B38229 /* BirdEnemy.swift in Sources */,

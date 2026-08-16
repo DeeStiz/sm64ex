@@ -2,6 +2,20 @@
 
 ## Current Milestone
 
+- M21l makes the Big Boo owner bridge consume the immutable surface world
+  behind an explicit movement gate. The owner tick preserves source wall/floor
+  identity, executes the action-before-standard-movement order, applies the
+  source drag/buoyancy constants, and publishes copied collision/movement
+  facts into the generation-safe record. Focused strict Swift/C fingerprint
+  0xeab6afaa926f3d57, script
+  script/test_big_boo_object_movement_bridge.sh, full matrix target
+  runs=188 failures=0, and regenerated native Debug build target
+  /tmp/sm64-modern-m21l-build.log are the evidence boundary. Broad collision
+  data, durable progression/save mutation, real camera/audio/renderer
+  consumers, Eyerok/Chief Chilly/Bowser breadth, and device/visual/human
+  acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21l.md.
+
 - M21k attaches Big Boo to a generation-safe owner/effect bridge. Explicit
   owner gates route source mist, shake, sound, star, and deletion intents;
   Ghost Hunt materializes three source staircase children and every variant

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-big-boo-object-bridge"
+BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-big-boo-object-movement-bridge"
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
@@ -26,21 +26,21 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BigBooEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BigBooObjectBridge.swift" \
-  "$PROJECT_ROOT/tests/sm64_modern_big_boo_object_bridge_smoke.swift" \
-  -o "$BUILD_ROOT/sm64-modern-big-boo-object-bridge-smoke"
-SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-big-boo-object-bridge-smoke)"
+  "$PROJECT_ROOT/tests/sm64_modern_big_boo_object_movement_bridge_smoke.swift" \
+  -o "$BUILD_ROOT/sm64-modern-big-boo-object-movement-bridge-smoke"
+SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-big-boo-object-movement-bridge-smoke)"
 printf '%s\n' "$SWIFT_OUTPUT"
 
 xcrun clang -std=c11 \
-  "$PROJECT_ROOT/tests/sm64_modern_big_boo_object_bridge_contract.c" \
-  -o "$BUILD_ROOT/sm64-modern-big-boo-object-bridge-contract"
-C_OUTPUT="$($BUILD_ROOT/sm64-modern-big-boo-object-bridge-contract)"
+  "$PROJECT_ROOT/tests/sm64_modern_big_boo_object_movement_bridge_contract.c" \
+  -o "$BUILD_ROOT/sm64-modern-big-boo-object-movement-bridge-contract"
+C_OUTPUT="$($BUILD_ROOT/sm64-modern-big-boo-object-movement-bridge-contract)"
 printf '%s\n' "$C_OUTPUT"
 
-SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^bigBooObjectBridgeFingerprint=//p')"
-C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^bigBooObjectBridgeFingerprint=//p')"
+SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^bigBooObjectMovementBridgeFingerprint=//p')"
+C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^bigBooObjectMovementBridgeFingerprint=//p')"
 [[ -n "$SWIFT_FINGERPRINT" && "$SWIFT_FINGERPRINT" == "$C_FINGERPRINT" ]] || {
-  echo "Swift/C Big Boo owner fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
+  echo "Swift/C Big Boo owner movement fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
   exit 1
 }
-printf '%s\n' "SM64 Modern Big Boo owner bridge C contract matched"
+printf '%s\n' "SM64 Modern Big Boo owner collision/movement C contract matched"

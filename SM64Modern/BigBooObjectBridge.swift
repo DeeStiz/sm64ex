@@ -7,6 +7,8 @@ struct SM64BigBooObjectEffectRecord: Equatable, Sendable {
     let effects: SM64BigBooEffect
     let health: Int16
     let starPosition: SM64ObjectVector3?
+    let collision: SM64BigBooCollisionResult?
+    let movement: SM64BigBooMovementResult?
     let spawnedChildren: [SM64ObjectID]
     let presentedEffects: [SM64OwnerThreadEffectIntent]
 }
@@ -131,6 +133,8 @@ final class SM64BigBooObjectBridge {
     func tick(
         state engineState: SM64SwiftEngineState,
         inputs frameInputs: [SM64ObjectID: SM64BigBooTickInput] = [:],
+        collisionWorld: SM64SurfaceCollisionWorld? = nil,
+        advanceMovement: Bool = false,
         presentBossEffects: Bool = false,
         spawnRewardStar: Bool = false,
         spawnBridgeChildren: Bool = false
@@ -144,6 +148,8 @@ final class SM64BigBooObjectBridge {
             self?.update(
                 id: id,
                 pool: pool,
+                collisionWorld: collisionWorld,
+                advanceMovement: advanceMovement,
                 presentBossEffects: presentBossEffects,
                 spawnRewardStar: spawnRewardStar,
                 spawnBridgeChildren: spawnBridgeChildren
@@ -163,16 +169,119 @@ final class SM64BigBooObjectBridge {
     private func update(
         id: SM64ObjectID,
         pool: SM64ObjectPool,
+        collisionWorld: SM64SurfaceCollisionWorld?,
+        advanceMovement: Bool,
         presentBossEffects: Bool,
         spawnRewardStar: Bool,
         spawnBridgeChildren: Bool
     ) {
         guard var boo = states[id], pool.record(for: id) != nil else { return }
         let previousAction = boo.action
-        let input = inputs[id] ?? defaultInput(for: id, pool: pool)
-        let result = SM64BigBooKernel.tick(input, state: &boo)
+        guard let record = pool.record(for: id) else { return }
+        let physicsEnabled = advanceMovement && collisionWorld != nil
+        let collision = physicsEnabled
+            ? collisionWorld.flatMap { world in
+                SM64BigBooCollision.resolve(
+                    SM64BigBooCollisionInput(
+                        position: record.position,
+                        moveYaw: boo.moveYaw,
+                        forwardVelocity: boo.forwardVelocity,
+                        wallHitboxRadius: record.wallHitboxRadius,
+                        previousMoveFlags: record.moveFlags,
+                        world: world
+                    )
+                )
+            }
+            : nil
+        var input = inputs[id] ?? defaultInput(for: id, pool: pool)
+        if let collision {
+            input.hitWall = input.hitWall || collision.moveFlags & SM64BigBooCollision.hitWall != 0
+            input.movementHandledExternally = true
+        }
+        let actionResult = SM64BigBooKernel.tick(input, state: &boo)
+        var movement: SM64BigBooMovementResult?
+        if physicsEnabled, let world = collisionWorld {
+            let basePosition = collision?.position ?? record.position
+            let actionPosition = SM64ObjectVector3(
+                x: basePosition.x,
+                y: boo.positionY,
+                z: basePosition.z
+            )
+            let candidatePosition = SM64ObjectVector3(
+                x: actionPosition.x
+                    + SM64CanonicalTrig.sins(boo.moveYaw) * boo.forwardVelocity,
+                y: actionPosition.y,
+                z: actionPosition.z
+                    + SM64CanonicalTrig.coss(boo.moveYaw) * boo.forwardVelocity
+            )
+            let floor = collision ?? SM64BigBooCollision.resolve(
+                SM64BigBooCollisionInput(
+                    position: actionPosition,
+                    moveYaw: boo.moveYaw,
+                    forwardVelocity: boo.forwardVelocity,
+                    wallHitboxRadius: record.wallHitboxRadius,
+                    previousMoveFlags: record.moveFlags,
+                    world: world
+                )
+            )
+            let intendedFloor = world.findFloor(
+                x: candidatePosition.x,
+                y: candidatePosition.y,
+                z: candidatePosition.z
+            )
+            let intendedRoom: Int8 = intendedFloor.surfaceID.flatMap {
+                world.surface(withID: $0)?.room
+            } ?? 0
+            movement = SM64BigBooCollision.move(
+                SM64BigBooMovementInput(
+                    startPosition: actionPosition,
+                    candidatePosition: candidatePosition,
+                    velocityY: boo.velocityY,
+                    forwardVelocity: boo.forwardVelocity,
+                    moveYaw: boo.moveYaw,
+                    floorHeight: floor?.floorHeight ?? record.floorHeight,
+                    floorRoom: floor?.floorRoom ?? Int8(truncatingIfNeeded: record.floorRoom),
+                    objectRoom: Int8(truncatingIfNeeded: record.room),
+                    moveFlags: floor?.moveFlags ?? record.moveFlags,
+                    gravity: boo.gravity,
+                    bounciness: SM64BigBooCollision.bounciness,
+                    dragStrength: SM64BigBooCollision.dragStrength,
+                    buoyancy: SM64BigBooCollision.buoyancy,
+                    nativeStepScale: 1,
+                    intendedFloorHeight: intendedFloor.height,
+                    intendedFloorNormalY: intendedFloor.normalY ?? 0,
+                    intendedFloorRoom: intendedRoom,
+                    intendedFloorExists: intendedFloor.surfaceID != nil,
+                    waterLevel: world.findWaterLevel(
+                        x: candidatePosition.x,
+                        z: candidatePosition.z
+                    ),
+                    activeFarAway: false
+                )
+            )
+            if let movement {
+                boo.positionX = movement.position.x
+                boo.positionY = movement.position.y
+                boo.positionZ = movement.position.z
+                boo.velocityY = movement.velocity.y
+                boo.forwardVelocity = movement.forwardVelocity
+            }
+        }
+        let result = SM64BigBooTickResult(
+            state: boo,
+            effects: actionResult.effects,
+            starPosition: actionResult.starPosition,
+            bridgePosition: actionResult.bridgePosition
+        )
         states[id] = boo
-        synchronizeRecord(id: id, state: boo, pool: pool, previousAction: previousAction)
+        synchronizeRecord(
+            id: id,
+            state: boo,
+            pool: pool,
+            previousAction: previousAction,
+            collision: collision,
+            movement: movement
+        )
 
         var spawnedChildren: [SM64ObjectID] = []
         if spawnRewardStar,
@@ -242,6 +351,8 @@ final class SM64BigBooObjectBridge {
                 effects: result.effects,
                 health: boo.health,
                 starPosition: result.starPosition,
+                collision: collision,
+                movement: movement,
                 spawnedChildren: spawnedChildren,
                 presentedEffects: delivery.presented
             )
@@ -273,7 +384,9 @@ final class SM64BigBooObjectBridge {
         id: SM64ObjectID,
         state: SM64BigBooState,
         pool: SM64ObjectPool,
-        previousAction: SM64BigBooAction
+        previousAction: SM64BigBooAction,
+        collision: SM64BigBooCollisionResult? = nil,
+        movement: SM64BigBooMovementResult? = nil
     ) {
         _ = pool.mutate(id) { record in
             record.objectFlags |=
@@ -312,6 +425,20 @@ final class SM64BigBooObjectBridge {
             record.buoyancy = 2
             record.dragStrength = 10
             record.friction = 10
+            if let collision {
+                record.floorHeight = collision.floorHeight
+                record.floorType = collision.floorType
+                record.floorRoom = Int16(collision.floorRoom)
+                record.moveFlags = collision.moveFlags
+            }
+            if let movement {
+                record.position = movement.position
+                record.velocity = movement.velocity
+                record.forwardVelocity = movement.forwardVelocity
+                record.moveFlags = movement.moveFlags
+            } else {
+                record.velocity.y = state.velocityY
+            }
         }
     }
 }

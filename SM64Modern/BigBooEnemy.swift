@@ -114,6 +114,7 @@ struct SM64BigBooTickInput: Equatable, Sendable {
     var hitWall: Bool
     var shouldStop: Bool
     var randomValue: UInt32
+    var movementHandledExternally: Bool
 
     init(
         activeInRoom: Bool = true,
@@ -128,7 +129,8 @@ struct SM64BigBooTickInput: Equatable, Sendable {
         attackStatus: SM64BigBooAttackStatus = .none,
         hitWall: Bool = false,
         shouldStop: Bool = false,
-        randomValue: UInt32 = 0
+        randomValue: UInt32 = 0,
+        movementHandledExternally: Bool = false
     ) {
         self.activeInRoom = activeInRoom
         self.distanceToMario = distanceToMario
@@ -143,6 +145,7 @@ struct SM64BigBooTickInput: Equatable, Sendable {
         self.hitWall = hitWall
         self.shouldStop = shouldStop
         self.randomValue = randomValue
+        self.movementHandledExternally = movementHandledExternally
     }
 }
 
@@ -239,7 +242,7 @@ enum SM64BigBooKernel {
                 effects.insert([.attacked, .deathStart, .intangible, .sound])
             }
             if input.shouldStop { state.action = .initialize }
-            advance(&state)
+            if !input.movementHandledExternally { advance(&state) }
 
         case .bounced:
             stop(&state)
@@ -262,7 +265,7 @@ enum SM64BigBooKernel {
                 state.action = .chase
                 effects.insert([.tangible, .chase])
             }
-            advance(&state)
+            if !input.movementHandledExternally { advance(&state) }
 
         case .death:
             if state.timer == 0 {
@@ -285,7 +288,7 @@ enum SM64BigBooKernel {
                     state.action = .chase
                 }
             }
-            if state.action == .death { advance(&state) }
+            if state.action == .death && !input.movementHandledExternally { advance(&state) }
 
         case .postDeath:
             stop(&state)
