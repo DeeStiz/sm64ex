@@ -4,6 +4,7 @@ enum SM64BowserBombKind: UInt8, Equatable, Sendable {
     case bomb = 0
     case explosion = 1
     case smoke = 2
+    case genericExplosion = 3
 }
 
 struct SM64BowserBombSmokeSpawn: Equatable, Sendable {

@@ -22,8 +22,8 @@ struct SM64ExplosionSchedulerTickResult: Equatable, Sendable {
 /// Owner-thread bridge for `bhvExplosion`. Water bubbles and ground smoke are
 /// retained as typed child requests until their shared behaviors migrate.
 final class SM64ExplosionObjectBridge {
-    static let defaultModel: UInt32 = 0xCD // MODEL_EXPLOSION
-    static let defaultBehaviorIdentity: UInt64 = 0x6268_765F_657870
+    static let defaultModel: UInt32 = SM64ExplosionKernel.model
+    static let defaultBehaviorIdentity: UInt64 = SM64ExplosionKernel.behaviorIdentity
 
     private let scheduler: SM64ObjectScheduler
     private let effectRouter: SM64OwnerThreadEffectRouter

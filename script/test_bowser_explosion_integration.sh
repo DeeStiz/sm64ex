@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-bowser-bomb"
+BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-bowser-explosion-integration"
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
@@ -22,22 +22,22 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/Explosion.swift" \
   "$PROJECT_ROOT/SM64Modern/BowserBomb.swift" \
   "$PROJECT_ROOT/SM64Modern/BowserBombObjectBridge.swift" \
-  "$PROJECT_ROOT/tests/sm64_modern_bowser_bomb_smoke.swift" \
-  -o "$BUILD_ROOT/sm64-modern-bowser-bomb-smoke"
+  "$PROJECT_ROOT/tests/sm64_modern_bowser_explosion_integration_smoke.swift" \
+  -o "$BUILD_ROOT/smoke"
 
-SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-bowser-bomb-smoke)"
+SWIFT_OUTPUT="$($BUILD_ROOT/smoke)"
 printf '%s\n' "$SWIFT_OUTPUT"
 
 xcrun clang -std=c11 \
-  "$PROJECT_ROOT/tests/sm64_modern_bowser_bomb_contract.c" \
-  -o "$BUILD_ROOT/sm64-modern-bowser-bomb-contract"
-C_OUTPUT="$($BUILD_ROOT/sm64-modern-bowser-bomb-contract)"
+  "$PROJECT_ROOT/tests/sm64_modern_bowser_explosion_integration_contract.c" \
+  -o "$BUILD_ROOT/contract"
+C_OUTPUT="$($BUILD_ROOT/contract)"
 printf '%s\n' "$C_OUTPUT"
 
-SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^bowserBombFingerprint=//p')"
-C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^bowserBombFingerprint=//p')"
+SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^bowserExplosionIntegrationFingerprint=//p')"
+C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^bowserExplosionIntegrationFingerprint=//p')"
 [[ -n "$SWIFT_FINGERPRINT" && "$SWIFT_FINGERPRINT" == "$C_FINGERPRINT" ]] || {
-  echo "Swift/C Bowser bomb fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
+  echo "Swift/C Bowser explosion integration fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
   exit 1
 }
-printf '%s\n' "Swift/C Bowser bomb contract matched"
+printf '%s\n' "Swift/C Bowser explosion integration contract matched"

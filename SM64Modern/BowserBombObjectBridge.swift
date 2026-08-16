@@ -12,6 +12,9 @@ struct SM64BowserBombObjectEffectRecord: Equatable, Sendable {
     let animationState: Int32
     let presentedEffects: [SM64OwnerThreadEffectIntent]
     let markedForDeletion: Bool
+    let genericEffects: SM64ExplosionEffect?
+    let genericBubbleCount: Int32
+    let genericSpawnedSmoke: Bool
 }
 
 struct SM64BowserBombSchedulerTickResult: Equatable, Sendable {
@@ -20,9 +23,10 @@ struct SM64BowserBombSchedulerTickResult: Equatable, Sendable {
     let deliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
-/// Owner-thread bridge for the Bowser bomb, flame explosion, and smoke family.
-/// Generic Mario-hit explosion remains an explicit spawn request because its
-/// shared `bhvExplosion` consumer is a separate behavior migration.
+/// Owner-thread bridge for the Bowser bomb, flame explosion, smoke, and shared
+/// generic explosion family. Generic Mario-hit routing is opt-in so callers
+/// can qualify the new consumer without silently changing the historical
+/// request-only route.
 final class SM64BowserBombObjectBridge {
     static let bombModel: UInt32 = 0xB3 // MODEL_WATER_MINE
     static let flamesModel: UInt32 = 0x67 // MODEL_BOWSER_FLAMES
@@ -38,19 +42,25 @@ final class SM64BowserBombObjectBridge {
     private var explosions: [SM64ObjectID: SM64BowserBombExplosionState] = [:]
     private var explosionInputs: [SM64ObjectID: SM64BowserBombExplosionTickInput] = [:]
     private var smokes: [SM64ObjectID: SM64BowserBombSmokeState] = [:]
+    private var genericExplosions: [SM64ObjectID: SM64ExplosionState] = [:]
+    private var genericExplosionInputs: [SM64ObjectID: SM64ExplosionTickInput] = [:]
+    var routesGenericExplosionRequests: Bool
     private(set) var effectLog: [SM64BowserBombObjectEffectRecord] = []
     private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
     init(
         scheduler: SM64ObjectScheduler = SM64ObjectScheduler(),
-        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter()
+        effectRouter: SM64OwnerThreadEffectRouter = SM64OwnerThreadEffectRouter(),
+        routesGenericExplosionRequests: Bool = false
     ) {
         self.scheduler = scheduler
         self.effectRouter = effectRouter
+        self.routesGenericExplosionRequests = routesGenericExplosionRequests
     }
 
     var registeredIDs: [SM64ObjectID] {
-        (Array(bombs.keys) + Array(explosions.keys) + Array(smokes.keys)).sorted { lhs, rhs in
+        (Array(bombs.keys) + Array(explosions.keys) + Array(smokes.keys)
+            + Array(genericExplosions.keys)).sorted { lhs, rhs in
             if lhs.slot != rhs.slot { return lhs.slot < rhs.slot }
             return lhs.generation < rhs.generation
         }
@@ -59,6 +69,21 @@ final class SM64BowserBombObjectBridge {
     func bombState(for id: SM64ObjectID) -> SM64BowserBombState? { bombs[id] }
     func explosionState(for id: SM64ObjectID) -> SM64BowserBombExplosionState? { explosions[id] }
     func smokeState(for id: SM64ObjectID) -> SM64BowserBombSmokeState? { smokes[id] }
+    func genericExplosionState(for id: SM64ObjectID) -> SM64ExplosionState? {
+        genericExplosions[id]
+    }
+
+    @discardableResult
+    func setGenericExplosionState(
+        _ state: SM64ExplosionState,
+        for id: SM64ObjectID,
+        in pool: SM64ObjectPool
+    ) -> Bool {
+        guard genericExplosions[id] != nil, pool.record(for: id) != nil else { return false }
+        genericExplosions[id] = state
+        synchronizeGenericExplosion(id: id, state: state, pool: pool)
+        return true
+    }
 
     @discardableResult
     func spawnBomb(
@@ -116,6 +141,16 @@ final class SM64BowserBombObjectBridge {
     }
 
     @discardableResult
+    func setGenericExplosionInput(
+        _ input: SM64ExplosionTickInput,
+        for id: SM64ObjectID
+    ) -> Bool {
+        guard genericExplosions[id] != nil else { return false }
+        genericExplosionInputs[id] = input
+        return true
+    }
+
+    @discardableResult
     func spawnExplosion(
         in engineState: SM64SwiftEngineState,
         position: SM64ObjectVector3 = .zero,
@@ -130,6 +165,25 @@ final class SM64BowserBombObjectBridge {
         guard attachExplosion(id, position: position, in: engineState.objects) else {
             _ = engineState.objects.despawn(id)
             preconditionFailure("newly spawned Bowser bomb explosion could not attach")
+        }
+        return id
+    }
+
+    @discardableResult
+    func spawnGenericExplosion(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        parent: SM64ObjectID? = nil
+    ) throws -> SM64ObjectID {
+        let id = try engineState.spawnObject(
+            in: .destructive,
+            model: SM64ExplosionKernel.model,
+            behaviorIdentity: SM64ExplosionKernel.behaviorIdentity,
+            parent: parent
+        )
+        guard attachGenericExplosion(id, position: position, in: engineState.objects) else {
+            _ = engineState.objects.despawn(id)
+            preconditionFailure("newly spawned generic explosion could not attach")
         }
         return id
     }
@@ -156,13 +210,34 @@ final class SM64BowserBombObjectBridge {
     }
 
     @discardableResult
+    func attachGenericExplosion(
+        _ id: SM64ObjectID,
+        position: SM64ObjectVector3 = .zero,
+        in pool: SM64ObjectPool
+    ) -> Bool {
+        guard pool.record(for: id) != nil else { return false }
+        let state = SM64ExplosionState()
+        genericExplosions[id] = state
+        genericExplosionInputs[id] = SM64ExplosionTickInput()
+        _ = pool.mutate(id) { record in
+            record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+            record.position = position
+            record.homePosition = position
+        }
+        synchronizeGenericExplosion(id: id, state: state, pool: pool)
+        return true
+    }
+
+    @discardableResult
     func tick(
         state engineState: SM64SwiftEngineState,
         bombInputs frameBombInputs: [SM64ObjectID: SM64BowserBombTickInput] = [:],
-        explosionInputs frameExplosionInputs: [SM64ObjectID: SM64BowserBombExplosionTickInput] = [:]
+        explosionInputs frameExplosionInputs: [SM64ObjectID: SM64BowserBombExplosionTickInput] = [:],
+        genericExplosionInputs frameGenericExplosionInputs: [SM64ObjectID: SM64ExplosionTickInput] = [:]
     ) -> SM64BowserBombSchedulerTickResult {
         bombInputs = frameBombInputs
         explosionInputs = frameExplosionInputs
+        genericExplosionInputs = frameGenericExplosionInputs
         effectLog.removeAll(keepingCapacity: true)
         deliveryLog.removeAll(keepingCapacity: true)
         effectRouter.beginTick()
@@ -175,6 +250,8 @@ final class SM64BowserBombObjectBridge {
             explosions.removeValue(forKey: id)
             explosionInputs.removeValue(forKey: id)
             smokes.removeValue(forKey: id)
+            genericExplosions.removeValue(forKey: id)
+            genericExplosionInputs.removeValue(forKey: id)
         }
         for id in Array(bombs.keys) where engineState.objects.record(for: id) == nil {
             bombs.removeValue(forKey: id)
@@ -186,6 +263,10 @@ final class SM64BowserBombObjectBridge {
         }
         for id in Array(smokes.keys) where engineState.objects.record(for: id) == nil {
             smokes.removeValue(forKey: id)
+        }
+        for id in Array(genericExplosions.keys) where engineState.objects.record(for: id) == nil {
+            genericExplosions.removeValue(forKey: id)
+            genericExplosionInputs.removeValue(forKey: id)
         }
         return SM64BowserBombSchedulerTickResult(
             scheduler: schedulerResult,
@@ -199,6 +280,8 @@ final class SM64BowserBombObjectBridge {
             updateBomb(id: id, pool: pool)
         } else if explosions[id] != nil {
             updateExplosion(id: id, pool: pool)
+        } else if genericExplosions[id] != nil {
+            updateGenericExplosion(id: id, pool: pool)
         } else if smokes[id] != nil {
             updateSmoke(id: id, pool: pool)
         }
@@ -217,6 +300,23 @@ final class SM64BowserBombObjectBridge {
             }
         }
         var spawnedChildren: [SM64ObjectID] = []
+        if result.effects.contains(.spawnExplosion), routesGenericExplosionRequests,
+           let child = try? pool.spawn(
+               in: .destructive,
+               model: SM64ExplosionKernel.model,
+               behaviorIdentity: SM64ExplosionKernel.behaviorIdentity,
+               parent: id
+           ) {
+            genericExplosions[child] = SM64ExplosionState()
+            genericExplosionInputs[child] = SM64ExplosionTickInput()
+            synchronizeGenericExplosion(
+                id: child,
+                state: genericExplosions[child]!,
+                pool: pool,
+                position: record.position
+            )
+            spawnedChildren.append(child)
+        }
         if result.effects.contains(.spawnFlames),
            let child = try? pool.spawn(
                in: .default,
@@ -268,7 +368,10 @@ final class SM64BowserBombObjectBridge {
                 opacity: 255,
                 animationState: -1,
                 presentedEffects: presentedEffects,
-                markedForDeletion: state.markedForDeletion
+                markedForDeletion: state.markedForDeletion,
+                genericEffects: nil,
+                genericBubbleCount: 0,
+                genericSpawnedSmoke: false
             )
         )
     }
@@ -318,7 +421,59 @@ final class SM64BowserBombObjectBridge {
                 opacity: 255,
                 animationState: state.animationState,
                 presentedEffects: [],
-                markedForDeletion: state.markedForDeletion
+                markedForDeletion: state.markedForDeletion,
+                genericEffects: nil,
+                genericBubbleCount: 0,
+                genericSpawnedSmoke: false
+            )
+        )
+    }
+
+    private func updateGenericExplosion(id: SM64ObjectID, pool: SM64ObjectPool) {
+        guard var state = genericExplosions[id], pool.record(for: id) != nil else { return }
+        let result = SM64ExplosionKernel.tick(
+            genericExplosionInputs[id] ?? SM64ExplosionTickInput(),
+            state: &state
+        )
+        genericExplosions[id] = state
+        var presentedEffects: [SM64OwnerThreadEffectIntent] = []
+        if result.effects.contains(.sound) {
+            presentedEffects.append(effectRouter.enqueue(
+                objectID: id,
+                kind: .sound,
+                value: SM64ExplosionKernel.soundValue
+            ))
+        }
+        if result.effects.contains(.cameraShake) {
+            presentedEffects.append(effectRouter.enqueue(
+                objectID: id,
+                kind: .cameraShake,
+                value: SM64ExplosionKernel.environmentalShake
+            ))
+        }
+        if state.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+        }
+        if !effectRouter.pending.isEmpty {
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
+        synchronizeGenericExplosion(id: id, state: state, pool: pool)
+        effectLog.append(
+            SM64BowserBombObjectEffectRecord(
+                objectID: id,
+                kind: .genericExplosion,
+                effects: [],
+                spawnedChildren: [],
+                spawnedExplosionRequest: false,
+                timer: state.timer,
+                scale: state.scale,
+                opacity: state.opacity,
+                animationState: state.animationState,
+                presentedEffects: presentedEffects,
+                markedForDeletion: state.markedForDeletion,
+                genericEffects: result.effects,
+                genericBubbleCount: result.bubbleCount,
+                genericSpawnedSmoke: result.spawnedSmoke
             )
         )
     }
@@ -344,9 +499,36 @@ final class SM64BowserBombObjectBridge {
                 opacity: state.opacity,
                 animationState: state.animationState,
                 presentedEffects: [],
-                markedForDeletion: state.markedForDeletion
+                markedForDeletion: state.markedForDeletion,
+                genericEffects: nil,
+                genericBubbleCount: 0,
+                genericSpawnedSmoke: false
             )
         )
+    }
+
+    private func synchronizeGenericExplosion(
+        id: SM64ObjectID,
+        state: SM64ExplosionState,
+        pool: SM64ObjectPool,
+        position: SM64ObjectVector3? = nil
+    ) {
+        _ = pool.mutate(id) { record in
+            record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+            if let position { record.position = position }
+            record.scale = SM64ObjectVector3(x: state.scale, y: state.scale, z: state.scale)
+            record.opacity = state.opacity
+            record.animationState = state.animationState
+            record.timer = Int32(truncatingIfNeeded: state.timer)
+            record.hitboxRadius = SM64ExplosionKernel.hitboxRadius
+            record.hitboxHeight = SM64ExplosionKernel.hitboxHeight
+            record.hitboxDownOffset = SM64ExplosionKernel.hitboxDownOffset
+            record.damageOrCoinValue = SM64ExplosionKernel.damageOrCoinValue
+            record.interactionType = state.markedForDeletion
+                ? 0
+                : SM64ExplosionKernel.interactionType
+            record.intangibleTimer = 0
+        }
     }
 
     private func synchronizeBomb(

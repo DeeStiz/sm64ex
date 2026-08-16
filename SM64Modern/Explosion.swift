@@ -40,6 +40,8 @@ struct SM64ExplosionTickResult: Equatable, Sendable {
 
 /// Value translation of `bhv_explosion_init` and `bhv_explosion_loop`.
 enum SM64ExplosionKernel {
+    static let model: UInt32 = 0xCD // MODEL_EXPLOSION
+    static let behaviorIdentity: UInt64 = 0x6268_765F_657870
     static let soundValue: Int32 = Int32(bitPattern: 0x802E2081) // SOUND_GENERAL2_BOBOMB_EXPLOSION
     static let environmentalShake: Int32 = 1 // SHAKE_ENV_EXPLOSION
     static let interactionType: UInt32 = 1 << 3 // INTERACT_DAMAGE

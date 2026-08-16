@@ -2,7 +2,7 @@
 
 ## Status
 
-M21x is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
+M21y is the latest validated gameplay slice layered on M34a/M33f/M18am; M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -292,6 +292,18 @@ unchecked-Sendable audit pass are the evidence boundary. Wiring Bowser's
 explicit explosion request into this shared consumer, migrating bubble/smoke
 child behaviors, full Bowser controller/arena authority, durable reward/warp
 transitions, and device/visual/human acceptance remain open.
+M21y wires Bowser's Mario-hit request into that shared consumer behind an
+explicit owner-thread route gate. The same scheduler now allocates the shared
+destructive model/behavior as a generation-safe child, preserves the Bowser
+parent identity, presents the shared sound/camera-shake intents, and retires
+both parent and child deterministically while leaving the mine-flame route
+unchanged. Its strict Swift 6/C fingerprint is
+`0x09ea3ea3033a8de3`; the focused integration smoke, expanded 201-script
+matrix, regenerated native Debug build, `git diff --check`, and zero
+unchecked-Sendable audit pass are the evidence boundary. Bubble/smoke child
+consumers, full Bowser controller/arena authority, collision consumers,
+durable reward/warp transitions, and device/visual/human acceptance remain
+open.
 M34a hardens the Metal 4 renderer's reusable command-buffer boundary: every
 submission redeclares both the scene and CAMetalLayer residency sets after
 `beginCommandBuffer`, while the existing queue-level residency, explicit
@@ -1172,7 +1184,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M21v: Bowser key cutscene value/owner seams | Swift reproduces both unlock-door and course-exit key scale curves, animation selection, timer deletion, and generation-safe level-list retirement. | Complete locally — strict Swift 6/C fingerprint `0x94f233de3ce2784f`, focused cutscene contract, 198-script matrix (runs=198 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21v-build.log`), git diff --check, and zero unchecked-Sendable audit pass; camera/dialog orchestration, real cutscene consumers, durable progression/warp transitions, and human/device acceptance remain |
 | M21w: Bowser bomb trigger and explosion/smoke owner seam | Swift preserves Mario-hit versus mine-hit ordering, explicit generic-explosion requests, flame/smoke child allocation, sound/camera-shake intents, deterministic smoke placement, opacity/scale timing, and generation-safe unload. | Complete locally — strict Swift 6/C fingerprint `0x1570ecd9d93c5b41`, focused bomb contract, 199-script matrix (runs=199 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21w-build.log`), git diff --check, and zero unchecked-Sendable audit pass; shared explosion consumer integration, full Bowser controller/arenas, collision consumers, durable reward/warp transitions, and human/device acceptance remain |
 | M21x: shared generic explosion value/owner bridge | Swift reproduces `bhvExplosion` initialization and loop values: source sound/camera shake, destructive hitbox/damage, opacity fade, scale/animation cadence, timer-nine water bubbles versus ground smoke, and owner-thread deletion. | Complete locally — strict Swift 6/C fingerprint `0x29e3dc6674824f4a`, focused explosion contract, 200-script matrix (runs=200 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21x-build.log`), git diff --check, and zero unchecked-Sendable audit pass; Bowser request wiring, bubble/smoke child behaviors, full Bowser controller/arenas, durable reward/warp transitions, and human/device acceptance remain |
-| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21x close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, Big Boo value/owner/effect/collision/movement seams, Eyerok boss/hand value/owner/collision/movement seams, Chief Chilly/Bully reward/presentation/minion/movement seams, Bowser shockwave/key/key-cutscene/bomb value/owner seams, bomb flame/smoke lifetime, and the shared generic explosion value/owner seam; broad collision authority, Bowser request wiring, bubble/smoke child behaviors, durable reward persistence, real camera/cutscene/audio wiring, Chief Chilly breadth, full Bowser controllers/arenas, reward/music transitions, and deterministic boss-phase shards remain |
+| M21y: Bowser shared-explosion request integration | Swift routes the Mario-hit Bowser bomb request into the shared `bhvExplosion` owner consumer behind an explicit gate, preserving the source model/behavior identity, parent generation, sound/camera-shake presentation, same-scheduler update, and deterministic parent/child retirement while leaving mine flames unchanged. | Complete locally — strict Swift 6/C fingerprint `0x09ea3ea3033a8de3`, focused integration contract, 201-script matrix (runs=201 failures=0), regenerated native Debug build (`/tmp/sm64-modern-m21y-build.log`), git diff --check, and zero unchecked-Sendable audit pass; bubble/smoke child behaviors, full Bowser controller/arenas, collision consumers, durable reward/warp transitions, and human/device acceptance remain |
+| M21: Bosses and arenas | All bosses, arenas, rewards, cameras, music, and transitions match C. | In progress — M21a–M21y close the King Bob-omb value/owner/collision/home/camera/reward seams, Whomp effect/reward/collision/movement seams, Big Boo value/owner/effect/collision/movement seams, Eyerok boss/hand value/owner/collision/movement seams, Chief Chilly/Bully reward/presentation/minion/movement seams, Bowser shockwave/key/key-cutscene/bomb value/owner seams, bomb flame/smoke lifetime, the shared generic explosion value/owner seam, and Bowser request integration; broad collision authority, bubble/smoke child behaviors, durable reward persistence, real camera/cutscene/audio wiring, Chief Chilly breadth, full Bowser controllers/arenas, reward/music transitions, and deterministic boss-phase shards remain |
 | M22: Behavior coverage closure | Every reachable US behavior is mapped to Swift and no Swift-mode C-only behavior callback remains. | Not started |
 | M23: Save system | Swift save parsing, mutation, checksums, atomic persistence, recovery, and bidirectional C compatibility pass. | Not started |
 | M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | Not started |

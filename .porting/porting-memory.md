@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M21y wires Bowser's Mario-hit request into the shared `bhvExplosion` owner
+  consumer behind an explicit route gate. The same scheduler allocates the
+  shared destructive model/behavior as a generation-safe child, preserves the
+  Bowser parent identity, presents shared sound/camera-shake intents, and
+  retires parent and child deterministically while leaving mine flames
+  unchanged. Focused strict Swift/C fingerprint
+  0x09ea3ea3033a8de3, script
+  script/test_bowser_explosion_integration.sh, full matrix runs=201 failures=0,
+  and regenerated native Debug build target /tmp/sm64-modern-m21y-build.log
+  are the evidence boundary. Bubble/smoke child consumers, full Bowser
+  controller/arena authority, collision consumers, durable reward/warp
+  transitions, and device/visual/human acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21y.md.
 - M21x adds the shared pointer-free `bhvExplosion` value and owner bridge.
   Swift preserves source initialization sound/camera-shake intents, the
   destructive damage hitbox, opacity fade, scale/animation cadence, timer-nine
@@ -10,9 +23,9 @@
   0x29e3dc6674824f4a, script script/test_explosion.sh, full matrix
   runs=200 failures=0, and regenerated native Debug build target
   /tmp/sm64-modern-m21x-build.log are the evidence boundary. Bowser's
-  explicit request still needs wiring into this shared consumer; bubble/smoke
-  child behaviors, full Bowser controller/arena authority, durable reward/warp
-  transitions, and device/visual/human acceptance remain open. Handoff:
+  Bowser request integration is covered by M21y; bubble/smoke child behaviors,
+  full Bowser controller/arena authority, durable reward/warp transitions, and
+  device/visual/human acceptance remain open. Handoff:
   .porting/porting-handoff-full-swift-twin-M21x.md.
 - M21w adds the Bowser bomb trigger, flame-explosion, and smoke lifetime
   seam. Swift preserves Mario-hit versus mine-hit ordering, explicit generic
