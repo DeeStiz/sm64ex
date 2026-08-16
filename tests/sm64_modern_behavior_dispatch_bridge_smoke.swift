@@ -326,6 +326,23 @@ private func hashTick(
         hash = hashU64(hash, UInt64(delivery.deleted.count))
         for id in delivery.deleted { hash = hashID(hash, id) }
     }
+    hash = hashU64(hash, UInt64(tick.skeeterEffects.count))
+    for effect in tick.skeeterEffects {
+        hash = hashID(hash, effect.objectID)
+        hash = hashU64(hash, effect.isWave ? 1 : 0)
+        hash = hashU64(hash, UInt64(effect.effects.rawValue))
+        hash = hashU64(hash, UInt64(effect.action.rawValue))
+        hash = hashU64(hash, UInt64(effect.spawnedWaves.count))
+        for id in effect.spawnedWaves { hash = hashID(hash, id) }
+        hash = hashU64(hash, UInt64(effect.scale.bitPattern))
+        hash = hashU64(hash, UInt64(effect.animationState))
+        hash = hashU64(hash, effect.markedForDeletion ? 1 : 0)
+    }
+    hash = hashU64(hash, UInt64(tick.skeeterDeliveries.count))
+    for delivery in tick.skeeterDeliveries {
+        hash = hashU64(hash, UInt64(delivery.deleted.count))
+        for id in delivery.deleted { hash = hashID(hash, id) }
+    }
     if let child {
         hash = hashU64(hash, UInt64(child.model))
         hash = hashU64(hash, child.behaviorIdentity)
@@ -344,7 +361,7 @@ private func require(_ condition: @autoclosure () -> Bool, _ message: String) {
 @main
 enum SM64ModernBehaviorDispatchBridgeSmoke {
     static func main() throws {
-        let engine = SM64SwiftEngineState(objectCapacity: 24)
+        let engine = SM64SwiftEngineState(objectCapacity: 32)
         let bridge = SM64BehaviorDispatchBridge()
         let pendulum = try bridge.spawnPendulum(
             in: engine,
@@ -411,13 +428,18 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         let whomp = try bridge.spawnWhomp(in: engine)
         let heaveHo = try bridge.spawnHeaveHo(in: engine)
         let chuckya = try bridge.spawnChuckya(in: engine)
+        let skeeter = try bridge.spawnSkeeter(in: engine)
+        require(bridge.skeeter.setInput(
+            SM64SkeeterTickInput(moveFlags: SM64SkeeterKernel.atWaterSurfaceFlag),
+            for: skeeter
+        ), "Skeeter dispatch input attaches")
 
         var fingerprint = fnvOffset
         var tick = bridge.tick(state: engine)
         require(tick.scheduler.listCounts[SM64ObjectList.default.rawValue] == 3, "mixed default routes preserve live list traversal")
-        require(tick.scheduler.objectCounter == 21, "mixed lists preserve object counter")
-        require(tick.scheduler.updated == [whomp, amp, boo, bobomb, bird, swoop, piranhaPlant, bigBoo, flyGuy, bulletBill, goomba, spiny, snufit, heaveHo, SM64ObjectID(slot: 16, generation: 1), chuckya, SM64ObjectID(slot: 18, generation: 1), pendulum, respawner, SM64ObjectID(slot: 20, generation: 1), SM64ObjectID(slot: 19, generation: 1)], "children are visited in live list order")
-        require(tick.events.map(\.route) == [.whomp, .amp, .boo, .bobomb, .bird, .swoop, .piranhaPlant, .bigBoo, .flyGuy, .bulletBill, .goomba, .spiny, .snufit, .heaveHo, .heaveHo, .chuckya, .chuckya, .decorativePendulum, .respawner, .unmigrated, .unmigrated], "identity dispatch order")
+        require(tick.scheduler.objectCounter == 26, "mixed lists preserve object counter")
+        require(tick.scheduler.updated == [whomp, amp, boo, bobomb, bird, swoop, piranhaPlant, bigBoo, flyGuy, bulletBill, goomba, spiny, snufit, heaveHo, SM64ObjectID(slot: 16, generation: 1), chuckya, SM64ObjectID(slot: 18, generation: 1), skeeter, SM64ObjectID(slot: 21, generation: 1), SM64ObjectID(slot: 22, generation: 1), SM64ObjectID(slot: 23, generation: 1), SM64ObjectID(slot: 24, generation: 1), pendulum, respawner, SM64ObjectID(slot: 25, generation: 1), SM64ObjectID(slot: 20, generation: 1)], "children are visited in live list order")
+        require(tick.events.map(\.route) == [.whomp, .amp, .boo, .bobomb, .bird, .swoop, .piranhaPlant, .bigBoo, .flyGuy, .bulletBill, .goomba, .spiny, .snufit, .heaveHo, .heaveHo, .chuckya, .chuckya, .skeeter, .skeeter, .skeeter, .skeeter, .skeeter, .decorativePendulum, .respawner, .unmigrated, .unmigrated], "identity dispatch order")
         require(tick.whompEffects.first?.objectID == whomp && tick.whompEffects.first?.size == .normal, "Whomp route executes")
         require(tick.whompEffects.first?.action == .initialize && tick.whompEffects.first?.effects == [.animate, .resetHome], "Whomp state is synchronized")
         require(tick.whompEffects.first?.health == 1 && tick.whompEffects.first?.collision == nil && tick.whompEffects.first?.movement == nil, "Whomp shared route stays value-only")
@@ -432,6 +454,10 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(tick.chuckyaEffects.first?.effects == [.animate], "Chuckya patrol state is synchronized")
         require(tick.chuckyaEffects.last?.kind == .anchor && tick.chuckyaEffects.last?.effects.isEmpty == true, "Chuckya anchor route executes")
         require(tick.chuckyaDeliveries.isEmpty, "Chuckya idle route has no delivery")
+        require(tick.skeeterEffects.map(\.objectID) == [skeeter, SM64ObjectID(slot: 21, generation: 1), SM64ObjectID(slot: 22, generation: 1), SM64ObjectID(slot: 23, generation: 1), SM64ObjectID(slot: 24, generation: 1)], "Skeeter parent and waves dispatch")
+        require(tick.skeeterEffects.first?.effects == [.animate, .spawnWaves] && tick.skeeterEffects.first?.spawnedWaves.count == 4, "Skeeter wave route executes")
+        require(tick.skeeterEffects.dropFirst().allSatisfy { $0.isWave && $0.scale == 0.5 }, "Skeeter wave state is synchronized")
+        require(tick.skeeterDeliveries.isEmpty, "Skeeter idle route has no delivery")
         require(tick.decorativePendulumEffects.first?.output.faceRoll == 124, "pendulum route executes")
         require(tick.respawnerEffects.first?.effects == [.spawnObject, .markForDeletion], "respawner route executes")
         require(tick.ampEffects.first?.effects == [.animate, .setHitbox], "Amp route executes")
@@ -440,7 +466,7 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(tick.booEffects.first?.action == .chase, "Boo state is synchronized")
         require(tick.bobombEffects.first?.objectID == bobomb && tick.bobombEffects.first?.effects == [.fuseSmoke, .fuseLit, .chase], "Bob-omb route executes")
         require(tick.bobombEffects.first?.action == .chase, "Bob-omb state is synchronized")
-        require(tick.bobombEffects.first?.spawnedChildren == [SM64ObjectID(slot: 19, generation: 1)], "Bob-omb smoke child is visible")
+        require(tick.bobombEffects.first?.spawnedChildren == [SM64ObjectID(slot: 20, generation: 1)], "Bob-omb smoke child is visible")
         require(tick.birdEffects.first?.objectID == bird && tick.birdEffects.first?.effects == [.animate, .reveal, .flight], "Bird route executes")
         require(tick.birdEffects.first?.action == .fly, "Bird state is synchronized")
         require(tick.swoopEffects.first?.objectID == swoop && tick.swoopEffects.first?.effects == [.animate], "Swoop route executes")
@@ -470,14 +496,15 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
               let childRecord = engine.objects.record(for: child) else {
             preconditionFailure("dispatch respawner child missing")
         }
-        require(child == SM64ObjectID(slot: 20, generation: 1), "dispatch child generation is stable")
+        require(child == SM64ObjectID(slot: 25, generation: 1), "dispatch child generation is stable")
         require(childRecord.model == 0x77 && childRecord.behaviorParams == 0x1234, "dispatch child fields transfer")
         fingerprint = hashTick(fingerprint, tick, child: childRecord)
 
+        require(bridge.skeeter.setInput(SM64SkeeterTickInput(), for: skeeter), "Skeeter second-tick input attaches")
         tick = bridge.tick(state: engine)
         require(tick.scheduler.listCounts[SM64ObjectList.default.rawValue] == 2, "retired respawner leaves pendulum and child")
-        require(tick.scheduler.objectCounter == 19, "Whomp, Heave Ho, Chuckya, Goomba, Spiny, and Snufit remain in their owner lists")
-        require(tick.events.map(\.route) == [.whomp, .amp, .boo, .bobomb, .bird, .swoop, .piranhaPlant, .bigBoo, .flyGuy, .bulletBill, .goomba, .spiny, .snufit, .heaveHo, .heaveHo, .chuckya, .chuckya, .decorativePendulum, .unmigrated], "unknown child remains explicitly unmigrated")
+        require(tick.scheduler.objectCounter == 24, "Whomp, Heave Ho, Chuckya, Skeeter, Goomba, Spiny, and Snufit remain in their owner lists")
+        require(tick.events.map(\.route) == [.whomp, .amp, .boo, .bobomb, .bird, .swoop, .piranhaPlant, .bigBoo, .flyGuy, .bulletBill, .goomba, .spiny, .snufit, .heaveHo, .heaveHo, .chuckya, .chuckya, .skeeter, .skeeter, .skeeter, .skeeter, .skeeter, .decorativePendulum, .unmigrated], "unknown child remains explicitly unmigrated")
         require(tick.respawnerEffects.isEmpty, "retired respawner is not dispatched again")
         require(
             tick.booEffects.first?.effects == [.animate, .chase, .appear, .oscillate],
@@ -505,6 +532,8 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(tick.heaveHoEffects.first?.effects == [.intangible, .hide] && tick.heaveHoDeliveries.isEmpty, "Heave Ho submerged state persists")
         require(tick.chuckyaEffects.map(\.kind) == [.chuckya, .anchor], "Chuckya composite route persists across dispatch ticks")
         require(tick.chuckyaEffects.first?.effects == [.animate, .move] && tick.chuckyaDeliveries.isEmpty, "Chuckya patrol state persists")
+        require(tick.skeeterEffects.map(\.objectID) == [skeeter, SM64ObjectID(slot: 21, generation: 1), SM64ObjectID(slot: 22, generation: 1), SM64ObjectID(slot: 23, generation: 1), SM64ObjectID(slot: 24, generation: 1)], "Skeeter composite route persists across dispatch ticks")
+        require(tick.skeeterEffects.first?.effects == [.animate] && tick.skeeterEffects.dropFirst().allSatisfy { abs($0.scale - 0.2) < 0.0001 }, "Skeeter wave state persists")
         fingerprint = hashTick(fingerprint, tick, child: childRecord)
 
         print(String(format: "behaviorDispatchBridgeFingerprint=0x%016llx", fingerprint))

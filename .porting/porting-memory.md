@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M22x registers the existing `bhvSkeeter` owner bridge and water-wave child
+  identity in the shared `SM64BehaviorDispatchBridge`. The general-actor route
+  preserves parent/four-wave ordering, water-surface wave spawning, stable
+  relative child transforms, and explicit owner-thread deletion delivery.
+  Eighteen-route Swift/C fingerprint 0x15d862badc7d4b2c, standalone Skeeter
+  fingerprint 0x171e3016f6b728d2, behavior manifest fingerprint
+  0x9bb2863444c51d6d, 534 rows, 73 Swift value/owner routes, and 461 explicit
+  `unmigrated_c_adapter` rows are the accounting boundary. Focused dispatch
+  contract, native Debug build target /tmp/sm64-modern-m22x-build.log, full
+  206-script matrix, `git diff --check`, and zero unchecked-Sendable audit
+  pass are the evidence boundary. Whole-engine route breadth, the remaining
+  adapters, and live parity remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M22x.md.
 - M22w registers the existing `bhvHeaveHo` and `bhvChuckya` owner bridges plus
   their throw/anchor child identities in the shared `SM64BehaviorDispatchBridge`.
   The general-actor route preserves parent/child list ordering,

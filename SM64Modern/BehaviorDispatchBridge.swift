@@ -18,6 +18,7 @@ enum SM64BehaviorDispatchRoute: UInt8, Equatable, Sendable {
     case whomp = 14
     case heaveHo = 15
     case chuckya = 16
+    case skeeter = 17
     case unmigrated = 255
 }
 
@@ -64,6 +65,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let heaveHoDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let chuckyaEffects: [SM64ChuckyaObjectEffectRecord]
     let chuckyaDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let skeeterEffects: [SM64SkeeterObjectEffectRecord]
+    let skeeterDeliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
 /// First shared behavior-identity dispatch pass. It intentionally owns only
@@ -88,6 +91,7 @@ final class SM64BehaviorDispatchBridge {
     let whomp: SM64WhompObjectBridge
     let heaveHo: SM64HeaveHoObjectBridge
     let chuckya: SM64ChuckyaObjectBridge
+    let skeeter: SM64SkeeterObjectBridge
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -109,6 +113,7 @@ final class SM64BehaviorDispatchBridge {
         self.whomp = SM64WhompObjectBridge(scheduler: scheduler)
         self.heaveHo = SM64HeaveHoObjectBridge(scheduler: scheduler)
         self.chuckya = SM64ChuckyaObjectBridge(scheduler: scheduler)
+        self.skeeter = SM64SkeeterObjectBridge(scheduler: scheduler)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -151,6 +156,9 @@ final class SM64BehaviorDispatchBridge {
         case SM64ChuckyaObjectBridge.defaultBehaviorIdentity,
              SM64ChuckyaObjectBridge.anchorBehaviorIdentity:
             return .chuckya
+        case SM64SkeeterObjectBridge.defaultBehaviorIdentity,
+             SM64SkeeterObjectBridge.defaultWaveBehaviorIdentity:
+            return .skeeter
         default:
             return .unmigrated
         }
@@ -175,6 +183,7 @@ final class SM64BehaviorDispatchBridge {
         for id in whomp.registeredIDs { whomp.remove(id) }
         for id in heaveHo.registeredIDs { heaveHo.remove(id) }
         for id in chuckya.registeredIDs { chuckya.remove(id) }
+        for id in skeeter.registeredIDs { skeeter.remove(id) }
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -192,6 +201,7 @@ final class SM64BehaviorDispatchBridge {
         whomp.beginExternalTick()
         heaveHo.beginExternalTick()
         chuckya.beginExternalTick()
+        skeeter.beginExternalTick()
     }
 
     @discardableResult
@@ -502,6 +512,23 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnSkeeter(
+        in engineState: SM64SwiftEngineState,
+        homeX: Float = 0,
+        homeY: Float = 0,
+        homeZ: Float = 0,
+        moveYaw: Int16 = 0
+    ) throws -> SM64ObjectID {
+        try skeeter.spawnSkeeter(
+            in: engineState,
+            homeX: homeX,
+            homeY: homeY,
+            homeZ: homeZ,
+            moveYaw: moveYaw
+        )
+    }
+
+    @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
         decorativePendulum.beginExternalTick()
@@ -521,6 +548,7 @@ final class SM64BehaviorDispatchBridge {
         whomp.beginExternalTick()
         heaveHo.beginExternalTick()
         chuckya.beginExternalTick()
+        skeeter.beginExternalTick(globalFrame: engineState.globals.frame)
 
         let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
             guard let self, let record = pool.record(for: id) else { return }
@@ -571,6 +599,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.heaveHo.updateInline(id, pool: pool)
             case .chuckya:
                 _ = self.chuckya.updateInline(id, pool: pool)
+            case .skeeter:
+                _ = self.skeeter.updateInline(id, pool: pool)
             case .unmigrated:
                 break
             }
@@ -594,6 +624,7 @@ final class SM64BehaviorDispatchBridge {
             whomp.remove(id)
             heaveHo.remove(id)
             chuckya.remove(id)
+            skeeter.remove(id)
         }
         for id in decorativePendulum.registeredIDs where engineState.objects.record(for: id) == nil {
             decorativePendulum.remove(id)
@@ -646,6 +677,9 @@ final class SM64BehaviorDispatchBridge {
         for id in chuckya.registeredIDs where engineState.objects.record(for: id) == nil {
             chuckya.remove(id)
         }
+        for id in skeeter.registeredIDs where engineState.objects.record(for: id) == nil {
+            skeeter.remove(id)
+        }
 
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
@@ -683,7 +717,9 @@ final class SM64BehaviorDispatchBridge {
             heaveHoEffects: heaveHo.effectLog,
             heaveHoDeliveries: heaveHo.deliveryLog,
             chuckyaEffects: chuckya.effectLog,
-            chuckyaDeliveries: chuckya.deliveryLog
+            chuckyaDeliveries: chuckya.deliveryLog,
+            skeeterEffects: skeeter.effectLog,
+            skeeterDeliveries: skeeter.deliveryLog
         )
     }
 }

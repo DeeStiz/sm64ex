@@ -23,6 +23,8 @@
 #define HEAVE_HO_CHILD_BEHAVIOR UINT64_C(0x6268765f686874)
 #define CHUCKYA_BEHAVIOR UINT64_C(0x6268765f63686b)
 #define CHUCKYA_ANCHOR_BEHAVIOR UINT64_C(0x6268765f636861)
+#define SKEETER_BEHAVIOR UINT64_C(0x6268765f736b65)
+#define SKEETER_WAVE_BEHAVIOR UINT64_C(0x6268765f736b77)
 #define CHILD_BEHAVIOR UINT64_C(0x6268765f746573)
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
@@ -57,8 +59,8 @@ static uint64_t hash_tick(
 ) {
     hash = hash_u64(hash, frame);
     hash = hash_u64(hash, second_tick ? 2 : 3); // default-list count
-    hash = hash_u64(hash, second_tick ? 19 : 21); // object counter
-    hash = hash_u64(hash, second_tick ? 19 : 21); // dispatch events
+    hash = hash_u64(hash, second_tick ? 24 : 26); // object counter
+    hash = hash_u64(hash, second_tick ? 24 : 26); // dispatch events
     hash = hash_event(hash, 14, WHOMP_BEHAVIOR, 14);
     hash = hash_event(hash, 2, AMP_BEHAVIOR, 2);
     hash = hash_event(hash, 3, BOO_BEHAVIOR, 3);
@@ -76,13 +78,18 @@ static uint64_t hash_tick(
     hash = hash_event(hash, 16, HEAVE_HO_CHILD_BEHAVIOR, 15);
     hash = hash_event(hash, 17, CHUCKYA_BEHAVIOR, 16);
     hash = hash_event(hash, 18, CHUCKYA_ANCHOR_BEHAVIOR, 16);
+    hash = hash_event(hash, 19, SKEETER_BEHAVIOR, 17);
+    hash = hash_event(hash, 21, SKEETER_WAVE_BEHAVIOR, 17);
+    hash = hash_event(hash, 22, SKEETER_WAVE_BEHAVIOR, 17);
+    hash = hash_event(hash, 23, SKEETER_WAVE_BEHAVIOR, 17);
+    hash = hash_event(hash, 24, SKEETER_WAVE_BEHAVIOR, 17);
     hash = hash_event(hash, 0, PENDULUM_BEHAVIOR, 0);
     if (second_tick) {
-        hash = hash_event(hash, 20, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 25, CHILD_BEHAVIOR, 255);
     } else {
         hash = hash_event(hash, 1, RESPAWNER_BEHAVIOR, 1);
-        hash = hash_event(hash, 20, CHILD_BEHAVIOR, 255);
-        hash = hash_event(hash, 19, BOBOMB_SMOKE_BEHAVIOR, 255);
+        hash = hash_event(hash, 25, CHILD_BEHAVIOR, 255);
+        hash = hash_event(hash, 20, BOBOMB_SMOKE_BEHAVIOR, 255);
     }
 
     hash = hash_u64(hash, 1); // pendulum effects
@@ -96,7 +103,7 @@ static uint64_t hash_tick(
     if (!second_tick) {
         hash = hash_id(hash, 1, 1);
         hash = hash_u64(hash, 3); // spawn + mark for deletion
-        hash = hash_id(hash, 20, 1);
+        hash = hash_id(hash, 25, 1);
         hash = hash_u64(hash, 1); // timer
         hash = hash_u64(hash, 1); // marked for deletion
     }
@@ -130,13 +137,13 @@ static uint64_t hash_tick(
     hash = hash_u64(hash, second_tick ? 36 : 44); // chase + fuse state
     hash = hash_u64(hash, second_tick ? 0 : 1); // spawned children
     if (!second_tick) {
-        hash = hash_id(hash, 19, 1);
+        hash = hash_id(hash, 20, 1);
     }
     hash = hash_u64(hash, 0); // not marked for deletion
     hash = hash_u64(hash, second_tick ? 0 : 1); // Bob-omb deliveries
     if (!second_tick) {
         hash = hash_u64(hash, 1); // deleted count
-        hash = hash_id(hash, 19, 1);
+        hash = hash_id(hash, 20, 1);
     }
 
     hash = hash_u64(hash, 1); // Bird effects
@@ -273,6 +280,33 @@ static uint64_t hash_tick(
     hash = hash_u64(hash, 0); // no throw consumption
     hash = hash_u64(hash, 0); // not marked for deletion
     hash = hash_u64(hash, 0); // no Chuckya deliveries
+
+    hash = hash_u64(hash, 5); // Skeeter parent and four waves
+    hash = hash_id(hash, 19, 1);
+    hash = hash_u64(hash, 0); // parent, not wave
+    hash = hash_u64(hash, second_tick ? 1 : 3); // animate [+ spawn waves]
+    hash = hash_u64(hash, 0); // idle action
+    hash = hash_u64(hash, second_tick ? 0 : 4);
+    if (!second_tick) {
+        hash = hash_id(hash, 21, 1);
+        hash = hash_id(hash, 22, 1);
+        hash = hash_id(hash, 23, 1);
+        hash = hash_id(hash, 24, 1);
+    }
+    hash = hash_u64(hash, 0x3f800000U); // parent scale
+    hash = hash_u64(hash, 0); // parent animation
+    hash = hash_u64(hash, 0); // parent not marked
+    for (uint32_t id = 21; id <= 24; ++id) {
+        hash = hash_id(hash, id, 1);
+        hash = hash_u64(hash, 1); // wave
+        hash = hash_u64(hash, 0); // no effects
+        hash = hash_u64(hash, 0); // idle action
+        hash = hash_u64(hash, 0); // no children
+        hash = hash_u64(hash, second_tick ? 0x3e4cccccU : 0x3f000000U);
+        hash = hash_u64(hash, 0); // animation
+        hash = hash_u64(hash, 0); // not marked
+    }
+    hash = hash_u64(hash, 0); // no Skeeter deliveries
 
     hash = hash_u64(hash, UINT64_C(0x77));
     hash = hash_u64(hash, CHILD_BEHAVIOR);
