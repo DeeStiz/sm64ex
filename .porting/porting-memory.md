@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M21z migrates the shared explosion water-bubble and ground-smoke child
+  behaviors. Swift allocates the source 40-child bubble route or ground-smoke
+  child in the owner bridge, preserves model/behavior identities, explicit
+  random placement/rate inputs, bubble scale/velocity/water-splash/deletion
+  timing, ground-smoke offset/delay/dust lifetime, and generation-safe child
+  unload. Focused strict Swift/C fingerprint 0x03fdfa6ee829478b, script
+  script/test_explosion_children.sh, full matrix runs=202 failures=0, and
+  regenerated native Debug build target /tmp/sm64-modern-m21z-build.log are
+  the evidence boundary. Water-splash behavior, Bowser's duplicate generic
+  child route unification, full Bowser controller/arena authority, collision
+  consumers, durable reward/warp transitions, and device/visual/human
+  acceptance remain open. Handoff:
+  .porting/porting-handoff-full-swift-twin-M21z.md.
 - M21y wires Bowser's Mario-hit request into the shared `bhvExplosion` owner
   consumer behind an explicit route gate. The same scheduler allocates the
   shared destructive model/behavior as a generation-safe child, preserves the
@@ -23,9 +36,10 @@
   0x29e3dc6674824f4a, script script/test_explosion.sh, full matrix
   runs=200 failures=0, and regenerated native Debug build target
   /tmp/sm64-modern-m21x-build.log are the evidence boundary. Bowser's
-  Bowser request integration is covered by M21y; bubble/smoke child behaviors,
-  full Bowser controller/arena authority, durable reward/warp transitions, and
-  device/visual/human acceptance remain open. Handoff:
+  Bowser request integration is covered by M21y; shared bubble/smoke children
+  are covered by M21z, while full Bowser controller/arena authority, durable
+  reward/warp transitions, and device/visual/human acceptance remain open.
+  Handoff:
   .porting/porting-handoff-full-swift-twin-M21x.md.
 - M21w adds the Bowser bomb trigger, flame-explosion, and smoke lifetime
   seam. Swift preserves Mario-hit versus mine-hit ordering, explicit generic

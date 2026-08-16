@@ -135,6 +135,7 @@
 		956281711CE88DA51EC7508B /* MarioSlope.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C9C1CEC9C0000598706A91 /* MarioSlope.swift */; };
 		9627E9AE58999FC21A1D20C2 /* MarioDeceleratingSpeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6D8458E2279F08B24E32A53 /* MarioDeceleratingSpeed.swift */; };
 		98F4DF77445264C24B3326CC /* BouncingFireball.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0320CB55118E41AB1705469F /* BouncingFireball.swift */; };
+		9900BD6295E53DDDA9BCC07A /* ExplosionChildren.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFB93957F00E6F9173900F5F /* ExplosionChildren.swift */; };
 		9931F629C3ED5181495396D9 /* FlyGuyObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 59206E9C56FA9ADDE5FD3301 /* FlyGuyObjectBridge.swift */; };
 		995DFCE8380C66C51BF326CC /* MetalShaderCompiler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 97BD8678B319AD274378179C /* MetalShaderCompiler.swift */; };
 		996E4A0BA2A27960F8BAC8AE /* MarioSlideAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30B4722F19AD87EAD27684AF /* MarioSlideAction.swift */; };
@@ -419,6 +420,7 @@
 		CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowLiftBehavior.swift; sourceTree = "<group>"; };
 		CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCUpExit.swift; sourceTree = "<group>"; };
 		CEE1BA8181B84E4081506EA1 /* EyerokObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyerokObjectBridge.swift; sourceTree = "<group>"; };
+		CFB93957F00E6F9173900F5F /* ExplosionChildren.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplosionChildren.swift; sourceTree = "<group>"; };
 		D10D16F6441E50DC22CC6823 /* BowserBomb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserBomb.swift; sourceTree = "<group>"; };
 		D3CC8538BA0A2A1F3C291572 /* ObjectScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectScheduler.swift; sourceTree = "<group>"; };
 		D4426C0597C4FF50EA28B2FE /* MarioPoleHangingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioPoleHangingAction.swift; sourceTree = "<group>"; };
@@ -541,6 +543,7 @@
 				EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */,
 				BB40062F0B74B53B43A517BA /* EngineState.swift */,
 				B95E0FC4DBBB4274A6BB1E95 /* Explosion.swift */,
+				CFB93957F00E6F9173900F5F /* ExplosionChildren.swift */,
 				161FF132CEBCBEE1BC2A3217 /* ExplosionObjectBridge.swift */,
 				9EA80AEA8F534EA712E1C090 /* EyerokBoss.swift */,
 				225D73054770EC25DC64D2C0 /* EyerokHand.swift */,
@@ -868,6 +871,7 @@
 				1000A98A2958DA1238E20A6D /* EngineRuntime.swift in Sources */,
 				8F2434A3E57287185819D685 /* EngineState.swift in Sources */,
 				2601C8F6F3EC1D2127E8C901 /* Explosion.swift in Sources */,
+				9900BD6295E53DDDA9BCC07A /* ExplosionChildren.swift in Sources */,
 				B6C53D520C84D75F820C87EB /* ExplosionObjectBridge.swift in Sources */,
 				AABD8C2EDF09336DC5C998EC /* EyerokBoss.swift in Sources */,
 				D0031C8BC47031BF22FCFA00 /* EyerokHand.swift in Sources */,

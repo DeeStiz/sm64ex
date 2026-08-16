@@ -11,9 +11,17 @@ struct SM64ExplosionState: Equatable, Sendable {
 
 struct SM64ExplosionTickInput: Equatable, Sendable {
     let waterAbove: Bool
+    let bubbleSpawns: [SM64ExplosionBubbleSpawnInput]
+    let bubbleWaterLevel: Float
 
-    init(waterAbove: Bool = false) {
+    init(
+        waterAbove: Bool = false,
+        bubbleSpawns: [SM64ExplosionBubbleSpawnInput] = [],
+        bubbleWaterLevel: Float = .greatestFiniteMagnitude
+    ) {
         self.waterAbove = waterAbove
+        self.bubbleSpawns = bubbleSpawns
+        self.bubbleWaterLevel = bubbleWaterLevel
     }
 }
 

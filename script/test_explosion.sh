@@ -20,6 +20,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/ChainChompReleaseObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/OwnerThreadEffectRouter.swift" \
   "$PROJECT_ROOT/SM64Modern/Explosion.swift" \
+  "$PROJECT_ROOT/SM64Modern/ExplosionChildren.swift" \
   "$PROJECT_ROOT/SM64Modern/ExplosionObjectBridge.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_explosion_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-explosion-smoke"

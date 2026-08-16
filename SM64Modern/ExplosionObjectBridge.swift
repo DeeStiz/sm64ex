@@ -11,6 +11,7 @@ struct SM64ExplosionObjectEffectRecord: Equatable, Sendable {
     let animationState: Int32
     let presentedEffects: [SM64OwnerThreadEffectIntent]
     let markedForDeletion: Bool
+    let spawnedChildren: [SM64ObjectID]
 }
 
 struct SM64ExplosionSchedulerTickResult: Equatable, Sendable {
@@ -19,16 +20,23 @@ struct SM64ExplosionSchedulerTickResult: Equatable, Sendable {
     let deliveries: [SM64OwnerThreadEffectDeliveryResult]
 }
 
-/// Owner-thread bridge for `bhvExplosion`. Water bubbles and ground smoke are
-/// retained as typed child requests until their shared behaviors migrate.
+/// Owner-thread bridge for `bhvExplosion` and its water-bubble/ground-smoke
+/// children. Random placement/rates remain explicit value inputs.
 final class SM64ExplosionObjectBridge {
     static let defaultModel: UInt32 = SM64ExplosionKernel.model
     static let defaultBehaviorIdentity: UInt64 = SM64ExplosionKernel.behaviorIdentity
+    static let bubbleModel: UInt32 = 0xA4 // MODEL_WHITE_PARTICLE_SMALL
+    static let bubbleBehaviorIdentity: UInt64 = 0x6268_765F_627562
+    static let groundSmokeModel: UInt32 = 0x96 // MODEL_SMOKE
+    static let groundSmokeBehaviorIdentity: UInt64 = 0x6268_765F_64656D
 
     private let scheduler: SM64ObjectScheduler
     private let effectRouter: SM64OwnerThreadEffectRouter
     private var states: [SM64ObjectID: SM64ExplosionState] = [:]
     private var inputs: [SM64ObjectID: SM64ExplosionTickInput] = [:]
+    private var bubbles: [SM64ObjectID: SM64ExplosionBubbleState] = [:]
+    private var bubbleInputs: [SM64ObjectID: SM64ExplosionBubbleTickInput] = [:]
+    private var groundSmokes: [SM64ObjectID: SM64ExplosionGroundSmokeState] = [:]
     private(set) var effectLog: [SM64ExplosionObjectEffectRecord] = []
     private(set) var deliveryLog: [SM64OwnerThreadEffectDeliveryResult] = []
 
@@ -41,13 +49,17 @@ final class SM64ExplosionObjectBridge {
     }
 
     var registeredIDs: [SM64ObjectID] {
-        states.keys.sorted { lhs, rhs in
+        (Array(states.keys) + Array(bubbles.keys) + Array(groundSmokes.keys)).sorted { lhs, rhs in
             if lhs.slot != rhs.slot { return lhs.slot < rhs.slot }
             return lhs.generation < rhs.generation
         }
     }
 
     func state(for id: SM64ObjectID) -> SM64ExplosionState? { states[id] }
+    func bubbleState(for id: SM64ObjectID) -> SM64ExplosionBubbleState? { bubbles[id] }
+    func groundSmokeState(for id: SM64ObjectID) -> SM64ExplosionGroundSmokeState? {
+        groundSmokes[id]
+    }
 
     @discardableResult
     func setState(
@@ -121,10 +133,20 @@ final class SM64ExplosionObjectBridge {
         for id in schedulerResult.unloaded {
             states.removeValue(forKey: id)
             inputs.removeValue(forKey: id)
+            bubbles.removeValue(forKey: id)
+            bubbleInputs.removeValue(forKey: id)
+            groundSmokes.removeValue(forKey: id)
         }
         for id in Array(states.keys) where engineState.objects.record(for: id) == nil {
             states.removeValue(forKey: id)
             inputs.removeValue(forKey: id)
+        }
+        for id in Array(bubbles.keys) where engineState.objects.record(for: id) == nil {
+            bubbles.removeValue(forKey: id)
+            bubbleInputs.removeValue(forKey: id)
+        }
+        for id in Array(groundSmokes.keys) where engineState.objects.record(for: id) == nil {
+            groundSmokes.removeValue(forKey: id)
         }
         return SM64ExplosionSchedulerTickResult(
             scheduler: schedulerResult,
@@ -134,12 +156,56 @@ final class SM64ExplosionObjectBridge {
     }
 
     private func update(id: SM64ObjectID, pool: SM64ObjectPool) {
+        if states[id] != nil {
+            updateExplosion(id: id, pool: pool)
+        } else if bubbles[id] != nil {
+            updateBubble(id: id, pool: pool)
+        } else if groundSmokes[id] != nil {
+            updateGroundSmoke(id: id, pool: pool)
+        }
+    }
+
+    private func updateExplosion(id: SM64ObjectID, pool: SM64ObjectPool) {
         guard var explosion = states[id], let record = pool.record(for: id) else { return }
+        let input = inputs[id] ?? SM64ExplosionTickInput()
         let result = SM64ExplosionKernel.tick(
-            inputs[id] ?? SM64ExplosionTickInput(),
+            input,
             state: &explosion
         )
         states[id] = explosion
+        var spawnedChildren: [SM64ObjectID] = []
+        if result.effects.contains(.spawnBubbles) {
+            let seeds = Self.bubbleSeeds(input: input, count: Int(result.bubbleCount))
+            for seed in seeds {
+                guard let child = try? pool.spawn(
+                    in: .default,
+                    model: Self.bubbleModel,
+                    behaviorIdentity: Self.bubbleBehaviorIdentity,
+                    parent: id
+                ) else { continue }
+                bubbles[child] = SM64ExplosionChildrenKernel.makeBubble(
+                    parentPosition: record.position,
+                    input: seed
+                )
+                bubbleInputs[child] = SM64ExplosionBubbleTickInput(
+                    waterLevel: input.bubbleWaterLevel
+                )
+                synchronizeBubble(id: child, state: bubbles[child]!, pool: pool)
+                spawnedChildren.append(child)
+            }
+        } else if result.effects.contains(.spawnSmoke),
+                  let child = try? pool.spawn(
+                      in: .unimportant,
+                      model: Self.groundSmokeModel,
+                      behaviorIdentity: Self.groundSmokeBehaviorIdentity,
+                      parent: id
+                  ) {
+            groundSmokes[child] = SM64ExplosionChildrenKernel.makeGroundSmoke(
+                parentPosition: record.position
+            )
+            synchronizeGroundSmoke(id: child, state: groundSmokes[child]!, pool: pool)
+            spawnedChildren.append(child)
+        }
         var presentedEffects: [SM64OwnerThreadEffectIntent] = []
         if result.effects.contains(.sound) {
             presentedEffects.append(effectRouter.enqueue(
@@ -173,10 +239,129 @@ final class SM64ExplosionObjectBridge {
                 opacity: explosion.opacity,
                 animationState: explosion.animationState,
                 presentedEffects: presentedEffects,
-                markedForDeletion: explosion.markedForDeletion
+                markedForDeletion: explosion.markedForDeletion,
+                spawnedChildren: spawnedChildren
             )
         )
         _ = record
+    }
+
+    private func updateBubble(id: SM64ObjectID, pool: SM64ObjectPool) {
+        guard var bubble = bubbles[id], pool.record(for: id) != nil else { return }
+        let result = SM64ExplosionChildrenKernel.tickBubble(
+            bubbleInputs[id] ?? SM64ExplosionBubbleTickInput(),
+            state: &bubble
+        )
+        bubbles[id] = bubble
+        if bubble.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
+        synchronizeBubble(id: id, state: bubble, pool: pool)
+        effectLog.append(
+            SM64ExplosionObjectEffectRecord(
+                objectID: id,
+                effects: [],
+                bubbleCount: 0,
+                spawnedSmoke: false,
+                timer: bubble.timer,
+                scale: bubble.scale.x,
+                opacity: 255,
+                animationState: bubble.animationState,
+                presentedEffects: [],
+                markedForDeletion: bubble.markedForDeletion,
+                spawnedChildren: []
+            )
+        )
+    }
+
+    private func updateGroundSmoke(id: SM64ObjectID, pool: SM64ObjectPool) {
+        guard var smoke = groundSmokes[id], pool.record(for: id) != nil else { return }
+        let result = SM64ExplosionChildrenKernel.tickGroundSmoke(state: &smoke)
+        groundSmokes[id] = smoke
+        if smoke.markedForDeletion {
+            effectRouter.enqueue(objectID: id, kind: .markForDeletion)
+            deliveryLog.append(effectRouter.deliver(to: pool))
+        }
+        synchronizeGroundSmoke(id: id, state: smoke, pool: pool)
+        effectLog.append(
+            SM64ExplosionObjectEffectRecord(
+                objectID: id,
+                effects: [],
+                bubbleCount: 0,
+                spawnedSmoke: false,
+                timer: smoke.timer,
+                scale: smoke.scale,
+                opacity: 255,
+                animationState: smoke.animationState,
+                presentedEffects: [],
+                markedForDeletion: smoke.markedForDeletion,
+                spawnedChildren: []
+            )
+        )
+        _ = result
+    }
+
+    private static func bubbleSeeds(
+        input: SM64ExplosionTickInput,
+        count: Int
+    ) -> [SM64ExplosionBubbleSpawnInput] {
+        guard count > 0 else { return [] }
+        if input.bubbleSpawns.count >= count {
+            return Array(input.bubbleSpawns.prefix(count))
+        }
+        var seeds = input.bubbleSpawns
+        while seeds.count < count {
+            let index = seeds.count
+            let column = index % 8
+            let row = index / 8
+            seeds.append(
+                SM64ExplosionBubbleSpawnInput(
+                    positionOffset: SM64ObjectVector3(
+                        x: Float(column - 4) * 8,
+                        y: Float(row - 2) * 6,
+                        z: Float((index % 5) - 2) * 8
+                    ),
+                    expansionRateX: 0x800 + Int32(index * 17),
+                    expansionRateY: 0x800 + Int32(index * 23),
+                    initialTimer: UInt32(index % 10),
+                    velocityY: 4 + Float(index % 4)
+                )
+            )
+        }
+        return seeds
+    }
+
+    private func synchronizeBubble(
+        id: SM64ObjectID,
+        state: SM64ExplosionBubbleState,
+        pool: SM64ObjectPool
+    ) {
+        _ = pool.mutate(id) { record in
+            record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+            record.position = state.position
+            record.scale = state.scale
+            record.animationState = state.animationState
+            record.timer = Int32(truncatingIfNeeded: state.timer)
+            record.interactionType = 0
+            record.intangibleTimer = 1
+        }
+    }
+
+    private func synchronizeGroundSmoke(
+        id: SM64ObjectID,
+        state: SM64ExplosionGroundSmokeState,
+        pool: SM64ObjectPool
+    ) {
+        _ = pool.mutate(id) { record in
+            record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+            record.position = state.position
+            record.scale = SM64ObjectVector3(x: state.scale, y: state.scale, z: state.scale)
+            record.animationState = state.animationState
+            record.timer = Int32(truncatingIfNeeded: state.timer)
+            record.interactionType = 0
+            record.intangibleTimer = 1
+        }
     }
 
     private func synchronizeRecord(
