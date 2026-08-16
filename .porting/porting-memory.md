@@ -2,6 +2,15 @@
 
 ## Current Milestone
 
+- M23a closes the first normalized-EEPROM recovery gap. The owner-thread Swift
+  adapter now atomically repairs a single invalid primary/backup copy, wipes
+  and rewrites both copies on dual corruption, and upgrades a valid legacy
+  176-byte bundle to the 512-byte C-compatible image on first load. Swift/C
+  EEPROM fingerprint `0x3fac91b6c0a1f3cd`; focused legacy-upgrade and
+  post-repair assertions pass. Full save mutations, restart-selector parity,
+  and whole-engine authority remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M23a.md`.
+
 - M22bc registers the source `bhvBobombBuddyOpensCannon` variant in the
   existing Bob-omb Buddy owner route. The bridge carries the source
   cannon-role bit in value state, so this identity reuses the proven

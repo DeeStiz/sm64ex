@@ -277,9 +277,12 @@ struct SM64PersistenceImage: Equatable, Sendable {
 /// Owner-thread adapter for the complete normalized C EEPROM image.
 ///
 /// `commit` replaces the entire 512-byte image atomically, while `load` and
-/// `reload` select one save file against the shared menu slots. A legacy
-/// 176-byte M17 bundle is accepted once as slot zero and is upgraded on the
-/// next commit, making the bridge migration-safe without weakening checksums.
+/// `reload` select one save file against the shared menu slots. `load` also
+/// performs C-compatible one-bad-copy repair (or wipes both copies when both
+/// signatures fail) in the same atomic replacement boundary. A legacy
+/// 176-byte M17 bundle is accepted once as slot zero and upgraded on the first
+/// owner-thread load/commit, making the bridge migration-safe without
+/// weakening checksums.
 /// Immutable, sendable descriptor for the normalized EEPROM image. All file
 /// access remains owner-thread-only and is guarded by the engine token plus the
 /// construction pthread identity.
@@ -331,9 +334,57 @@ final class SM64OwnerThreadEEPROMAdapter: Sendable {
             throw SM64PersistenceAdapterError.invalidSaveFileIndex
         }
         let image = try readImage()
-        return recover(
-            image: image, saveFileIndex: saveFileIndex
+        let result = recover(image: image, saveFileIndex: saveFileIndex)
+        var repaired = image ?? .empty()
+        var needsWrite = image == nil
+        // C validates and repairs every save file during save_file_load_all,
+        // even though the caller later selects only one current file. Keep
+        // that whole-image behavior here so a background slot cannot remain
+        // corrupt merely because the selected index was healthy.
+        for index in 0..<SM64PersistenceImage.fileCount {
+            let saveRecovery = SM64SaveFileCodec.recover(
+                primary: repaired.savePrimary[index],
+                backup: repaired.saveBackup[index]
+            )
+            switch saveRecovery.decision {
+            case .usePrimary:
+                break
+            case .usePrimaryAndRewriteBackup, .useBackupAndRewritePrimary,
+                 .eraseAndRewriteBoth:
+                let selectedSave = saveRecovery.selected ?? SM64SaveFileSnapshot()
+                let bytes = SM64SaveFileCodec.encode(selectedSave)
+                repaired.savePrimary[index] = bytes
+                repaired.saveBackup[index] = bytes
+                needsWrite = true
+            }
+        }
+        let menuRecovery = SM64MenuDataCodec.recover(
+            primary: repaired.menuPrimary,
+            backup: repaired.menuBackup
         )
+        switch menuRecovery.decision {
+        case .usePrimary:
+            break
+        case .usePrimaryAndRewriteBackup, .useBackupAndRewritePrimary,
+             .wipeAndRewriteBoth:
+            let selectedMenu = menuRecovery.selected ?? SM64MenuDataSnapshot()
+            let bytes = SM64MenuDataCodec.encode(selectedMenu)
+            repaired.menuPrimary = bytes
+            repaired.menuBackup = bytes
+            needsWrite = true
+        }
+        // A legacy 176-byte bundle is read as slot zero by readImage(). Once
+        // the owner thread observes it, publish the normalized 512-byte C
+        // SaveBuffer image even when every legacy checksum was already valid.
+        // This is the same one-way upgrade boundary used by the native bridge.
+        let needsLegacyUpgrade = !FileManager.default.fileExists(
+            atPath: imageURL.path
+        ) && FileManager.default.fileExists(atPath: legacyBundleURL.path)
+        if needsLegacyUpgrade { needsWrite = true }
+        if needsWrite {
+            try writeImage(repaired)
+        }
+        return result
     }
 
     func reload(
@@ -400,6 +451,10 @@ final class SM64OwnerThreadEEPROMAdapter: Sendable {
             savePrimary: primary, saveBackup: backup,
             menuPrimary: legacy.menuPrimary, menuBackup: legacy.menuBackup
         )
+    }
+
+    private func writeImage(_ image: SM64PersistenceImage) throws {
+        try Data(image.bytes).write(to: imageURL, options: .atomic)
     }
 
     private func assertOwnerThread(_ token: UInt64) {

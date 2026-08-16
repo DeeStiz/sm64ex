@@ -93,6 +93,16 @@ enum SM64ModernProgressionEEPROMSmoke {
             saveFileIndex: 0, ownerThreadToken: token
         )
         precondition(legacyLoaded.save == save0 && legacyLoaded.menu == menu0)
+        precondition(FileManager.default.fileExists(atPath: adapter.imageURL.path))
+        let upgradedLegacy = SM64PersistenceImage.decode(
+            Array(try Data(contentsOf: adapter.imageURL))
+        )!
+        precondition(
+            upgradedLegacy.savePrimary[0] == SM64SaveFileCodec.encode(save0)
+                && upgradedLegacy.saveBackup[0] == SM64SaveFileCodec.encode(save0)
+                && upgradedLegacy.menuPrimary == SM64MenuDataCodec.encode(menu0)
+                && upgradedLegacy.menuBackup == SM64MenuDataCodec.encode(menu0)
+        )
         try adapter.commit(
             saveFileIndex: 0, save: save0, menu: menu0,
             ownerThreadToken: token
@@ -135,6 +145,13 @@ enum SM64ModernProgressionEEPROMSmoke {
             recovered.save == save2
                 && recovered.saveDecision == .useBackupAndRewritePrimary
         )
+        let repairedSaveImage = SM64PersistenceImage.decode(
+            Array(try Data(contentsOf: adapter.imageURL))
+        )!
+        precondition(
+            repairedSaveImage.savePrimary[2] == SM64SaveFileCodec.encode(save2)
+                && repairedSaveImage.saveBackup[2] == SM64SaveFileCodec.encode(save2)
+        )
         fingerprint = hash(fingerprint, bytes)
         fingerprint = hash(fingerprint, recovered)
 
@@ -148,6 +165,13 @@ enum SM64ModernProgressionEEPROMSmoke {
             menuRecovered.save == save0
                 && menuRecovered.menu == menu2
                 && menuRecovered.menuDecision == .useBackupAndRewritePrimary
+        )
+        let repairedMenuImage = SM64PersistenceImage.decode(
+            Array(try Data(contentsOf: adapter.imageURL))
+        )!
+        precondition(
+            repairedMenuImage.menuPrimary == SM64MenuDataCodec.encode(menu2)
+                && repairedMenuImage.menuBackup == SM64MenuDataCodec.encode(menu2)
         )
         fingerprint = hash(fingerprint, bytes)
         fingerprint = hash(fingerprint, menuRecovered)

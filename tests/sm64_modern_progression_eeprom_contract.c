@@ -128,6 +128,32 @@ static void expect(int condition, const char *message) {
     }
 }
 
+static void repair_pair(uint8_t *primary, uint8_t *backup, int count) {
+    const int primary_valid = count == SAVE_BYTES
+        ? valid_save(primary) : valid_menu(primary);
+    const int backup_valid = count == SAVE_BYTES
+        ? valid_save(backup) : valid_menu(backup);
+    if (primary_valid && !backup_valid) {
+        memcpy(backup, primary, (size_t) count);
+    } else if (!primary_valid && backup_valid) {
+        memcpy(primary, backup, (size_t) count);
+    } else if (!primary_valid && !backup_valid) {
+        memset(primary, 0, (size_t) count);
+        memset(backup, 0, (size_t) count);
+        if (count == MENU_BYTES) {
+            const uint32_t wiped[4] = {
+                UINT32_C(0x3FFFFFFF), UINT32_C(0x2AAAAAAA),
+                UINT32_C(0x15555555), UINT32_C(0)
+            };
+            encode_menu(primary, wiped, 0, 0);
+            memcpy(backup, primary, (size_t) count);
+        } else {
+            encode_save(primary, 0, 0, 0, 0, 0, 0, 0);
+            memcpy(backup, primary, (size_t) count);
+        }
+    }
+}
+
 int main(void) {
     uint8_t image[IMAGE_BYTES];
     uint8_t save0[SAVE_BYTES];
@@ -190,7 +216,6 @@ int main(void) {
     fingerprint = hash_bytes(fingerprint, image);
     fingerprint = hash_result(
         fingerprint, save2, menu2, 2, 0);
-
     image[SAVE_BYTES * FILE_COUNT * 2] ^= 1;
     expect(!valid_menu(image + SAVE_BYTES * FILE_COUNT * 2), "menu corruption");
     fingerprint = hash_bytes(fingerprint, image);
@@ -198,6 +223,26 @@ int main(void) {
         fingerprint, save0, menu2, 0, 2);
     fingerprint = hash_result(
         fingerprint, save2, menu2, 0, 0);
+
+    // The runtime repairs after recording the recovery decision. Keep the
+    // fingerprint stream above on the pre-repair image, then assert the
+    // post-load bytes match C's restore_*_data behavior.
+    repair_pair(
+        image + SAVE_BYTES * 2,
+        image + FILE_COUNT * SAVE_BYTES + SAVE_BYTES * 2,
+        SAVE_BYTES);
+    expect(valid_save(image + SAVE_BYTES * 2),
+           "slot two primary repaired");
+    expect(valid_save(image + FILE_COUNT * SAVE_BYTES + SAVE_BYTES * 2),
+           "slot two backup repaired");
+    repair_pair(
+        image + SAVE_BYTES * FILE_COUNT * 2,
+        image + SAVE_BYTES * FILE_COUNT * 2 + MENU_BYTES,
+        MENU_BYTES);
+    expect(valid_menu(image + SAVE_BYTES * FILE_COUNT * 2),
+           "menu primary repaired");
+    expect(valid_menu(image + SAVE_BYTES * FILE_COUNT * 2 + MENU_BYTES),
+           "menu backup repaired");
 
     printf("progressionEEPROMFingerprint=0x%016llx\n",
            (unsigned long long) fingerprint);
