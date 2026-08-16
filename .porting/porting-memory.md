@@ -2,6 +2,19 @@
 
 ## Current Milestone
 
+- M22ay closes the matching behavior-manifest accounting seam for M22ax. The
+  reachable `bhvBooBossSpawnedBridge` identity now maps to
+  `BigBooObjectBridge`, aligning the fail-closed inventory with the existing
+  parent-owned staircase dispatch route. The inventory remains 534 rows but
+  now reports 74 `swift_value_owner` routes and 460 explicit
+  `unmigrated_c_adapter` rows; Swift/C manifest fingerprint is
+  `0xcafe6a658d2f3342`. The focused manifest contract, regenerated native
+  Debug build, complete 206-script matrix, live oracle/promotion,
+  `git diff --check`, and zero unchecked-Sendable audit are the evidence
+  boundary. This is accounting closure only; staircase collision/presentation,
+  remaining adapters, whole-engine execution, and live parity remain open.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M22ay.md`.
+
 - M22ax registers Big Boo's bridge-owned static staircase identity in the
   existing Big Boo parent route. The shared table records the staircase child
   under the same owner route that allocates its three level-list records and
