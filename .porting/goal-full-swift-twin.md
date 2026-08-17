@@ -2,7 +2,7 @@
 
 ## Status
 
-M25a is the latest validated HUD value slice layered on M24d/M23j/M34a/M33f/M22bc;
+M25b is the latest validated HUD value/render-packet slice layered on M25a/M24d/M23j/M34a/M33f/M22bc;
 the durable replay record now carries every mutation operand needed for a
 standalone fresh-image replay—flags, course/star, cap, sound, source slot, and
 recovery decisions—plus canonical per-record/header/artifact hashes. A fresh
@@ -68,7 +68,18 @@ all compared against an independent C model. The HUD fingerprint is
 `/tmp/sm64-modern-m25a-verify.log`, and the complete 217-script matrix has
 `runs=217 failures=0`. This is intentionally a value-only boundary: no Swift
 HUD renderer, text packet, dialog owner, pause/menu state, or visual/human
-acceptance is claimed yet. M34a
+acceptance is claimed yet.
+M25b adds a pure Swift owner-thread-ready HUD render packet: C logical
+coordinates, aspect-aware left/right edges, JP/non-JP top rows, glyph IDs and
+12-pixel text advances, counter ordering, timer punctuation, and power-meter
+base/health geometry are compared against an independent C packet builder. The
+render fingerprint is `0xc086889d07474862`; the regenerated native Debug build
+and Metal 4/frame-one launch proof are in `/tmp/sm64-modern-m25b-verify.log`,
+and the complete 218-script matrix is recorded in
+`/tmp/sm64-modern-m25b-matrix-summary.log` (`runs=218 failures=0`). This
+remains a packet boundary only: no live HUD owner wiring, camera glyphs,
+dialog/pause state, Metal draw integration, screenshot comparison, or
+visual/human acceptance is claimed yet. M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -1904,6 +1915,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M24d: Swift cheat state and live responsive consumer | The owner thread applies all nine parsed flags through a versioned C compatibility ABI, Swift policy mirrors legacy enable/disable and responsive movement behavior, invalid flag values fail closed, and focused Swift/C evidence is retained. | Complete locally — policy fingerprint `0x0dab67376d3daab8d`; `script/test_cheats.sh` covers Swift/C policy plus ABI application, regenerated native Debug build (`/tmp/sm64-modern-m24d-build.log`, `BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24d-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 216-script matrix (`matrix_logs=216`, no failure markers), zero unchecked-Sendable audit, and `git diff --check`; remaining per-consumer toggles, live menu persistence/readback, and full configuration authority remain |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | In progress — M25a establishes value-only HUD flags/counters/timer/power transitions; renderer, text, dialogs, pause/menu authority, and visual parity remain |
 | M25a: HUD value projection and power-meter state | `SM64HUDProjection` and `SM64PowerMeterState` mirror the C display gates, 30 Hz timer math, flash suppression, health wedges, swimming emphasis, and legacy power-meter transition order as pure Swift values. | Complete locally — Swift/C fingerprint `0x1d0a1956d7a8121e`; `script/test_hud.sh`, regenerated native Debug build (`/tmp/sm64-modern-m25a-build.log`, `BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25a-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 217-script matrix (`runs=217 failures=0`), strict-concurrency audit, and `git diff --check`; no rendered HUD, text packet, dialog, pause/menu, or human visual acceptance yet |
+| M25b: HUD glyph/text and power-meter render packet | `SM64HUDRenderPacket` mirrors C logical layout, aspect-aware edge placement, glyph IDs/advances, timer punctuation, counter order, and power-meter base/health rectangles as immutable Swift values ready for an owner-thread renderer. | Complete locally — Swift/C fingerprint `0xc086889d07474862`; `script/test_hud_render.sh`, regenerated native Debug build (`BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25b-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 218-script matrix (`/tmp/sm64-modern-m25b-matrix-summary.log`, `runs=218 failures=0`), strict-concurrency audit, and `git diff --check`; live Metal draw integration remains |
 | M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | Not started |
 | M27: Audio sequencing/loading | Swift audio heap, banks, sequences, channels, layers, note allocation, and loading match pre-synthesis C traces. | Not started |
 | M28: Audio synthesis/effects | Swift synthesis, envelopes, resampling, reverb, mixing, music, and effects match 32-kHz PCM bit-for-bit. | Not started |
@@ -2269,10 +2281,12 @@ replayable trace, and the platform evidence listed in its exit gate.
    own owner-thread seams before full configuration authority cutover.
 3. **M25 HUD and dialogs.** M25a first ports the value-only power meter,
    display gates, counters, timer decomposition, flash behavior, and legacy
-   cadence as a Swift/C contract. Then port power-meter render packets, star/
-   coin/life counters, cap icons, pause menu, dialogs, text layout, timers,
-   fade state, and HUD camera status. Compare fixed-width layout/render packets
-   and dialog timing, not only strings.
+   cadence as a Swift/C contract. M25b adds immutable glyph/text and power-meter
+   render packets with C logical coordinates and aspect-aware placement. Then
+   wire those packets to the owner-thread Metal 4 renderer and port camera
+   glyphs, cap icons, pause menu, dialogs, text layout, timers, fade state, and
+   HUD camera status. Compare fixed-width layout/render packets and dialog
+   timing, not only strings.
 4. **M26 front end.** Port title, file select, course select, demos, loading,
    credits, ending, pause, and all transition/fade paths. Each screen must
    boot, accept input, persist choices, and shut down without a C engine

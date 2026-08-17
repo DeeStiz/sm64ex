@@ -17,6 +17,7 @@
 		05C7748C41262271E1CF7228 /* AmpEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = ACA3C10ED5253A613435EC7D /* AmpEnemy.swift */; };
 		05CC503F0BCBA41BCF6B2473 /* KingBobombHomeMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F26292793C5D9DA113D00B7 /* KingBobombHomeMovement.swift */; };
 		06B21ABCF7AFF06DB919000C /* TTCMovingBarBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = F804D686AFFB6AA968F51DEE /* TTCMovingBarBehavior.swift */; };
+		08766B6D783B2553499A16EF /* HUDRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6405CEA0AE7227D80C66CE6A /* HUDRender.swift */; };
 		08F7D30BD0D76407E02ED406 /* MoneybagObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6490BF062BC1F8E0961D2B4 /* MoneybagObjectBridge.swift */; };
 		09C260568C8A5ECD27002AC5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 411AC0D8F5B0500E2A6EBDB8 /* AppDelegate.swift */; };
 		0B293D835010C91F6939BB5C /* RacingPenguinPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4840C223F4AFD7C0B36D74C /* RacingPenguinPath.swift */; };
@@ -345,6 +346,7 @@
 		60F74F1DC90A46BBEF7D28FE /* BobombEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BobombEnemy.swift; sourceTree = "<group>"; };
 		6291FCF691572C0089D6194D /* EngineAuthority.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineAuthority.swift; sourceTree = "<group>"; };
 		635680A88C033EBD3EDB337C /* CameraPrimitives.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraPrimitives.swift; sourceTree = "<group>"; };
+		6405CEA0AE7227D80C66CE6A /* HUDRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HUDRender.swift; sourceTree = "<group>"; };
 		64D278BDD2C95F399F543A0B /* SnufitObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnufitObjectBridge.swift; sourceTree = "<group>"; };
 		667A1B033CC8327F1ED88206 /* SM64ModernDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SM64ModernDebug.entitlements; sourceTree = "<group>"; };
 		6934670448BD38B14CBF7984 /* DecorativePendulumObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DecorativePendulumObjectBridge.swift; sourceTree = "<group>"; };
@@ -591,6 +593,7 @@
 				D80B185797853434E28E3A2F /* HeaveHoEnemy.swift */,
 				3B50BE71193A3FEA1F2989D6 /* HeaveHoObjectBridge.swift */,
 				90ACE80CE09E44F0F0FC561C /* HUD.swift */,
+				6405CEA0AE7227D80C66CE6A /* HUDRender.swift */,
 				34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */,
 				6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */,
 				10AAD085B7A7F0D27BEC7FE2 /* KingBobombCollision.swift */,
@@ -928,6 +931,7 @@
 				6623355865D93A2C5631F1DF /* GoombaEnemy.swift in Sources */,
 				FB50ED38F05CFBC7C775F143 /* GoombaObjectBridge.swift in Sources */,
 				2ADE53186F0A30CC4B60A1E8 /* HUD.swift in Sources */,
+				08766B6D783B2553499A16EF /* HUDRender.swift in Sources */,
 				6ECAFD9E539A164C43EBA731 /* HeaveHoEnemy.swift in Sources */,
 				4C4E1312ABA85E0E64E74747 /* HeaveHoObjectBridge.swift in Sources */,
 				ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */,

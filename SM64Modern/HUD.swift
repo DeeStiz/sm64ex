@@ -106,6 +106,19 @@ struct SM64HUDProjection: Equatable, Sendable {
         let countersVisible = input.configHUD && input.flags != []
         let showStars = countersVisible && input.flags.contains(.starCount)
             && !(input.hudFlash && (input.globalTimer & 0x08) != 0)
+        let powerSnapshot: SM64PowerMeterSnapshot
+        if countersVisible && input.flags.contains(.cameraAndPower) {
+            powerSnapshot = powerMeter.step(
+                healthWedges: input.healthWedges,
+                flags: input.flags,
+                marioSwimming: input.marioSwimming,
+                advanceLegacyDomain: input.advanceLegacyDomain
+            )
+        } else {
+            powerSnapshot = powerMeter.currentSnapshot(
+                shownHealthWedges: input.healthWedges
+            )
+        }
         return Self(
             flags: input.flags,
             configHUD: input.configHUD,
@@ -121,12 +134,7 @@ struct SM64HUDProjection: Equatable, Sendable {
             showTimer: countersVisible && input.flags.contains(.timer),
             showStarMultiplier: showStars && input.stars < 100,
             timer: SM64HUDTimer(frames: input.timer),
-            powerMeter: powerMeter.step(
-                healthWedges: input.healthWedges,
-                flags: input.flags,
-                marioSwimming: input.marioSwimming,
-                advanceLegacyDomain: input.advanceLegacyDomain
-            )
+            powerMeter: powerSnapshot
         )
     }
 }
@@ -155,7 +163,7 @@ struct SM64PowerMeterState: Equatable, Sendable {
         advanceLegacyDomain: Bool
     ) -> SM64PowerMeterSnapshot {
         guard advanceLegacyDomain else {
-            return snapshot(shownHealthWedges: healthWedges)
+            return currentSnapshot(shownHealthWedges: healthWedges)
         }
 
         if animation != .hiding {
@@ -181,7 +189,7 @@ struct SM64PowerMeterState: Equatable, Sendable {
         if render {
             visibleTimer &+= 1
         }
-        return snapshot(shownHealthWedges: healthWedges, render: render)
+        return currentSnapshot(shownHealthWedges: healthWedges, render: render)
     }
 
     private mutating func handleActions(
@@ -241,7 +249,7 @@ struct SM64PowerMeterState: Equatable, Sendable {
         }
     }
 
-    private func snapshot(
+    func currentSnapshot(
         shownHealthWedges: Int16,
         render: Bool? = nil
     ) -> SM64PowerMeterSnapshot {
