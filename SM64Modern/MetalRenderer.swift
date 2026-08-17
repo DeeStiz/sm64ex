@@ -150,6 +150,8 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private let displayLink: CAMetalDisplayLink
     private var frameSlots: [FrameSlot] = []
     private var textures: [UInt32: TextureRecord] = [:]
+    private var marioFaceAdmissionPlan: SM64MarioFaceTextureUploadPlan?
+    private var marioFaceResidencyLogged = false
     private var residentTextureBindings: [UInt64: MetalTextureResidency] = [:]
     private var samplers: [MetalSamplerKey: any MTLSamplerState] = [:]
     private var depthStates: [DepthStateKey: any MTLDepthStencilState] = [:]
@@ -342,6 +344,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
                 )
             }
         }
+        marioFaceAdmissionPlan = plan
         return plan.receipt(residencyPending: true)
     }
 
@@ -486,8 +489,40 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         let requiredBytes = requiredTransientBytes(for: packet)
         try ensureTransientCapacity(requiredBytes, slot: slot)
         var cursor = 0
-        let frameTextureBindings = textureBindings(in: packet)
-        let uploads = try prepareUploads(frameTextureBindings, into: slot.transientBuffer, cursor: &cursor)
+        var frameTextureBindings = textureBindings(in: packet)
+        if let plan = marioFaceAdmissionPlan {
+            var seenGenerations = Set(frameTextureBindings.map(\.generation))
+            for entry in plan.entries {
+                guard let upload = textures[entry.textureID]?.upload,
+                      seenGenerations.insert(upload.generation).inserted else { continue }
+                frameTextureBindings.append(upload)
+            }
+        }
+        let preparedUploadResult = try prepareUploads(
+            frameTextureBindings, into: slot.transientBuffer, cursor: &cursor
+        )
+        let uploads = preparedUploadResult.uploads
+        if let plan = marioFaceAdmissionPlan,
+           !marioFaceResidencyLogged,
+           preparedUploadResult.residencyChanged {
+            let faceTextureIDs = Set(plan.entries.map(\.textureID))
+            let faceUploads = uploads
+                .filter { faceTextureIDs.contains($0.binding.textureID) }
+                .sorted { $0.binding.generation < $1.binding.generation }
+            if faceUploads.count == plan.entries.count {
+                let receipt = try SM64MarioFaceTextureResidencyReceiptBuilder.make(
+                    plan: plan,
+                    residentTextureIDs: faceUploads.map { $0.binding.textureID },
+                    residentGenerations: faceUploads.map { $0.binding.generation },
+                    sceneResidencyCommitted: true,
+                    sceneResidencyRequested: true
+                )
+                marioFaceResidencyLogged = true
+                metalLogger.notice(
+                    "mario_face_texture_resident route=\(receipt.route.rawValue) private_textures=\(receipt.privateTextureCount) generations=\(receipt.firstGeneration)-\(receipt.lastGeneration) residency_committed=\(receipt.sceneResidencyCommitted ? 1 : 0) residency_requested=\(receipt.sceneResidencyRequested ? 1 : 0) barrier_producer=blit_to_fragment visibility=device barrier_consumer=blit_to_fragment visibility=device fingerprint=\(receipt.fingerprint, privacy: .public)"
+                )
+            }
+        }
         let preparedDraws: [PreparedDraw]
         if let readyDraws = try prepareDraws(packet, into: slot.transientBuffer, cursor: &cursor) {
             preparedDraws = readyDraws
@@ -637,6 +672,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
 
     private func requiredTransientBytes(for packet: MetalScenePacket?) -> Int {
         var total = textureBindings(in: packet).reduce(0) { $0 + $1.pixels.count + 255 }
+        if let plan = marioFaceAdmissionPlan {
+            total += plan.entries.reduce(0) { $0 + Int($1.uploadByteCount) + 255 }
+        }
         if let packet {
             total += packet.vertices.count * MemoryLayout<Float>.size
             total += packet.draws.count * 512
@@ -663,7 +701,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         _ bindings: [MetalTextureUpload],
         into buffer: any MTLBuffer,
         cursor: inout Int
-    ) throws -> [PreparedUpload] {
+    ) throws -> (uploads: [PreparedUpload], residencyChanged: Bool) {
         var uploads: [PreparedUpload] = []
         var residencyChanged = false
         for upload in bindings.sorted(by: { $0.generation < $1.generation }) {
@@ -691,7 +729,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
             cursor += pixels.count
         }
         if residencyChanged { sceneResidency.commit() }
-        return uploads
+        return (uploads, residencyChanged)
     }
 
     private func prepareDraws(_ packet: MetalScenePacket?, into buffer: any MTLBuffer, cursor: inout Int) throws -> [PreparedDraw]? {
