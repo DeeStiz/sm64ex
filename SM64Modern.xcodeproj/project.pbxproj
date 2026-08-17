@@ -218,6 +218,7 @@
 		C64BB4E43DA2868B1767C6E3 /* WaterBomb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3272FC72F5FA191847C8D57B /* WaterBomb.swift */; };
 		C6EC4D5B17FBC422D366A6CF /* BowserBombObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = FFFAE8C134704B3D631D3234 /* BowserBombObjectBridge.swift */; };
 		C86EE2726C8C3CB1AF7C47FC /* MarioSubmergedAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = D50D50CB46C2409DDCA4E62E /* MarioSubmergedAction.swift */; };
+		C8C350D40B8A2CDB9F32CCC0 /* MarioFacePayloadBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BFB5B772461E752D2E1D5EB /* MarioFacePayloadBundle.swift */; };
 		C924667F20ADE7CC0CD84049 /* CameraModeCallbacks.swift in Sources */ = {isa = PBXBuildFile; fileRef = B96E5AD86B3742196A22A436 /* CameraModeCallbacks.swift */; };
 		CB3553C39D0C497999D86A31 /* MetalRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 386378DD6ECB9F78AC003073 /* MetalRenderer.swift */; };
 		CC673E4A5BBE9BBDEFEECA83 /* MarioWaterInteractionAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EF73C0EA06595D96E31445A /* MarioWaterInteractionAction.swift */; };
@@ -277,6 +278,7 @@
 		01C2DB40D32E69B4AFA3E55B /* SkeeterObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SkeeterObjectBridge.swift; sourceTree = "<group>"; };
 		0320CB55118E41AB1705469F /* BouncingFireball.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BouncingFireball.swift; sourceTree = "<group>"; };
 		05D35EE8DC4AB3016AB7352A /* FlyGuyEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlyGuyEnemy.swift; sourceTree = "<group>"; };
+		0BFB5B772461E752D2E1D5EB /* MarioFacePayloadBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioFacePayloadBundle.swift; sourceTree = "<group>"; };
 		0C50416E3A3BDC9F17816FA9 /* MarioInputCore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioInputCore.swift; sourceTree = "<group>"; };
 		0CB115FFD181E778F9AFE67C /* OwnerThreadEffectRouter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OwnerThreadEffectRouter.swift; sourceTree = "<group>"; };
 		0E8CE0F23C268072CA9D6E61 /* SpinyObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinyObjectBridge.swift; sourceTree = "<group>"; };
@@ -684,6 +686,7 @@
 				18BCD8D54CB3A587D58075A3 /* MarioFaceAnimation.swift */,
 				F614773BEB8721E80725416A /* MarioFaceAnimationPayload.swift */,
 				EFE158DC4F4D37ECB478F396 /* MarioFaceExpression.swift */,
+				0BFB5B772461E752D2E1D5EB /* MarioFacePayloadBundle.swift */,
 				A4E9946C93241D4FCF46A311 /* MarioFacePayloadInventory.swift */,
 				70A5733D4139CD88D7976A65 /* MarioFaceResourceManifest.swift */,
 				6262B2107E57DA4E72B46ECA /* MarioFaceResourceManifestCodec.swift */,
@@ -1048,6 +1051,7 @@
 				366C99299052D1E9906CEDC9 /* MarioFaceAnimation.swift in Sources */,
 				6054B80D65D1016DEF07B736 /* MarioFaceAnimationPayload.swift in Sources */,
 				D8F186F7F806DE7F777EB175 /* MarioFaceExpression.swift in Sources */,
+				C8C350D40B8A2CDB9F32CCC0 /* MarioFacePayloadBundle.swift in Sources */,
 				BCFD0B5D4F1C30CD6ABFEC55 /* MarioFacePayloadInventory.swift in Sources */,
 				ADF9CDE05AC2A15B5E73BA47 /* MarioFaceResourceManifest.swift in Sources */,
 				0000792BF14B5B419FE3451A /* MarioFaceResourceManifestCodec.swift in Sources */,
