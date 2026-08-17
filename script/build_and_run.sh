@@ -60,6 +60,7 @@ else
   "$PROJECT_ROOT/script/test_audio_mixer.sh"
   "$PROJECT_ROOT/script/test_audio_promotion.sh"
   "$PROJECT_ROOT/script/test_display_list_packet.sh"
+  "$PROJECT_ROOT/script/test_render_packet_capture.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
@@ -99,6 +100,9 @@ open_app() {
   )
   if [[ "${SM64_MODERN_AUDIO_PROMOTION:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_AUDIO_PROMOTION=1)
+  fi
+  if [[ "${SM64_MODERN_RENDER_PACKET_CAPTURE:-0}" == "1" ]]; then
+    open_arguments+=(--env SM64_MODERN_RENDER_PACKET_CAPTURE=1)
   fi
   /usr/bin/open -n "$APP_BUNDLE" "${open_arguments[@]}"
 }
@@ -224,6 +228,10 @@ case "$MODE" in
         grep -Fq "$expected" <<< "$runtime_log"
       done
       printf '%s\n' "$runtime_log" | grep -E 'swift_audio_promotion_(started|tick)'
+    fi
+    if [[ "${SM64_MODERN_RENDER_PACKET_CAPTURE:-0}" == "1" ]]; then
+      grep -Fq 'swift_render_packet_capture frame=1' <<< "$runtime_log"
+      printf '%s\n' "$runtime_log" | grep -E 'swift_render_packet_capture frame=1'
     fi
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do

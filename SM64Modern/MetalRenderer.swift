@@ -142,6 +142,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private let sceneResidency: any MTLResidencySet
     private let shaderCompiler: MetalShaderCompiler
     private let recorder = MetalSceneRecorder()
+    private var renderPacketCapture: SM64DisplayListRenderCapture?
     private let isOwnerThread: () -> Bool
     private let consumeDrawableSize: () -> CGSize?
     private let displayLink: CAMetalDisplayLink
@@ -190,6 +191,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         self.shaderCompiler = try MetalShaderCompiler(device: device)
         self.displayLink = CAMetalDisplayLink(metalLayer: layer)
         super.init()
+        if ProcessInfo.processInfo.environment["SM64_MODERN_RENDER_PACKET_CAPTURE"] == "1" {
+            renderPacketCapture = SM64DisplayListRenderCapture(batchInstalled: true)
+        }
 
         let argumentDescriptor = MTL4ArgumentTableDescriptor()
         argumentDescriptor.maxBufferBindCount = 2
@@ -248,6 +252,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
 
     func registerShader(id: UInt32, filteringMode: UInt32, inputCount: UInt32, textureMask: UInt32) -> SM64ModernStatus {
         recorder.registerShader(id: id, filteringMode: filteringMode, inputCount: inputCount, textureMask: textureMask)
+        renderPacketCapture?.registerShader()
         let opaqueKey = MetalShaderKey(
             shaderID: id,
             filteringMode: filteringMode,
@@ -267,13 +272,18 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         return SM64_MODERN_STATUS_OK
     }
 
-    func selectShader(_ id: UInt32) { recorder.selectShader(id) }
+    func selectShader(_ id: UInt32) {
+        recorder.selectShader(id)
+        renderPacketCapture?.selectShader(id)
+    }
     func createTexture(_ id: UInt32) -> SM64ModernStatus {
         if textures[id] == nil { textures[id] = TextureRecord(id: id) }
+        renderPacketCapture?.createTexture(id: id)
         return SM64_MODERN_STATUS_OK
     }
     func selectTexture(tile: UInt32, id: UInt32) {
         recorder.selectTexture(tile: tile, id: id)
+        renderPacketCapture?.selectTexture(tile: tile, id: id)
         if let sampler = textures[id]?.sampler {
             recorder.setSampler(tile: tile, linear: sampler.linear, wrapS: sampler.wrapS, wrapT: sampler.wrapT)
         }
@@ -304,8 +314,14 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     func setDepthTest(_ enabled: Bool) { recorder.setDepthTest(enabled) }
     func setDepthWrite(_ enabled: Bool) { recorder.setDepthWrite(enabled) }
     func setDecal(_ enabled: Bool) { recorder.setDecal(enabled) }
-    func setViewport(_ rect: MetalRect) { recorder.setViewport(rect) }
-    func setScissor(_ rect: MetalRect) { recorder.setScissor(rect) }
+    func setViewport(_ rect: MetalRect) {
+        recorder.setViewport(rect)
+        renderPacketCapture?.setViewport(x: rect.x, y: rect.y, width: rect.width, height: rect.height)
+    }
+    func setScissor(_ rect: MetalRect) {
+        recorder.setScissor(rect)
+        renderPacketCapture?.setScissor(x: rect.x, y: rect.y, width: rect.width, height: rect.height)
+    }
     func setAlphaBlend(_ enabled: Bool) { recorder.setAlphaBlend(enabled) }
 
     func draw(vertices: UnsafePointer<Float>?, floatCount: UInt32, triangleCount: UInt32) -> SM64ModernStatus {
@@ -320,18 +336,35 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         ) else {
             return SM64_MODERN_STATUS_INVALID_ARGUMENT
         }
+        renderPacketCapture?.draw(
+            shaderID: UInt32.max,
+            vertices: vertices,
+            floatCount: floatCount,
+            triangleCount: triangleCount
+        )
         return SM64_MODERN_STATUS_OK
     }
 
     func startSceneFrame() -> SM64ModernStatus {
         recorder.startFrame(width: Int(layer.drawableSize.width), height: Int(layer.drawableSize.height))
+        renderPacketCapture?.startFrame()
         return SM64_MODERN_STATUS_OK
     }
     func endSceneFrame() -> SM64ModernStatus {
         recorder.endFrame()
+        renderPacketCapture?.endFrame()
+        if let packet = renderPacketCapture?.packet(), packet.sequence == 1 || packet.sequence.isMultiple(of: 300) {
+            let summary = renderPacketCapture?.summary()
+            metalLogger.notice(
+                "swift_render_packet_capture frame=\(packet.sequence, privacy: .public) events=\(packet.events.count, privacy: .public) draws=\(summary?.draws ?? 0, privacy: .public) fingerprint=\(packet.fingerprint, privacy: .public)"
+            )
+        }
         return SM64_MODERN_STATUS_OK
     }
-    func finishScene() -> SM64ModernStatus { SM64_MODERN_STATUS_OK }
+    func finishScene() -> SM64ModernStatus {
+        renderPacketCapture?.finish(renderStatus: 0, batchStatus: 0)
+        return SM64_MODERN_STATUS_OK
+    }
 
     func dimensions() -> (UInt32, UInt32) {
         (UInt32(max(layer.drawableSize.width, 1)), UInt32(max(layer.drawableSize.height, 1)))
