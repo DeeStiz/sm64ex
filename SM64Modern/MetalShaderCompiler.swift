@@ -37,6 +37,7 @@ final class MetalShaderCompiler {
     private static let noiseOption: UInt32 = 1 << 27
     private static let marioFaceMaterialOption: UInt32 = 1 << 28
     private static let marioFaceTransformOption: UInt32 = 1 << 29
+    private static let marioFaceTextureOption: UInt32 = 1 << 30
 
     private static let archiveSchema = 1
     private static let rendererSchema = 2
@@ -252,7 +253,8 @@ final class MetalShaderCompiler {
 
     private static func vertexStride(for key: MetalShaderKey) -> Int {
         let alpha = key.shaderID & alphaOption != 0
-        let textured = key.textureMask != 0
+        let generatedMarioFaceTexture = key.shaderID & marioFaceTextureOption != 0
+        let textured = key.textureMask != 0 && !generatedMarioFaceTexture
         let fog = key.shaderID & fogOption != 0
         return 4 + (textured ? 2 : 0) + (fog ? 4 : 0) + Int(key.inputCount) * (alpha ? 4 : 3)
     }
@@ -264,7 +266,8 @@ final class MetalShaderCompiler {
         let noise = key.shaderID & noiseOption != 0
         let marioFaceMaterial = key.shaderID & marioFaceMaterialOption != 0
         let marioFaceTransform = key.shaderID & marioFaceTransformOption != 0
-        let useTexture0 = key.textureMask & 1 != 0
+        let marioFaceTexture = key.shaderID & marioFaceTextureOption != 0
+        let useTexture0 = key.textureMask & 1 != 0 || marioFaceTexture
         let useTexture1 = key.textureMask & 2 != 0
         let manualFilter = key.filteringMode == 2
         let inputWidth = alpha ? 4 : 3
@@ -274,8 +277,18 @@ final class MetalShaderCompiler {
             out.position = \(marioFaceTransform ? "uniforms.transform * " : "")float4(vertices[cursor], vertices[cursor + 1], vertices[cursor + 2], vertices[cursor + 3]);
             cursor += 4;
         """
-        if key.textureMask != 0 {
-            vertexAssignments += "\n    out.uv = float2(vertices[cursor], vertices[cursor + 1]);\n    cursor += 2;"
+        if key.textureMask != 0 || marioFaceTexture {
+            if marioFaceTexture {
+                // Goddard's G_TEXTURE_GEN face-shine pass derives spherical
+                // coordinates from the authored face normal. The source
+                // dynlist carries positions rather than a normal array, so
+                // the centered source position is the deterministic value
+                // boundary used here; the C draw-list gate still owns the
+                // authored texture ID/policy and every triangle ordering.
+                vertexAssignments += "\n    float3 sourceNormal = normalize(float3(vertices[cursor - 4], vertices[cursor - 3], vertices[cursor - 2]));\n    out.uv = sourceNormal.xy * 0.5 + 0.5;"
+            } else {
+                vertexAssignments += "\n    out.uv = float2(vertices[cursor], vertices[cursor + 1]);\n    cursor += 2;"
+            }
         }
         if fog {
             vertexAssignments += "\n    out.fog = float4(vertices[cursor], vertices[cursor + 1], vertices[cursor + 2], vertices[cursor + 3]);\n    cursor += 4;"
@@ -291,7 +304,7 @@ final class MetalShaderCompiler {
             vertexAssignments += "\n    out.materialID = materialIndices[vertexID];"
         }
 
-        let vertexFields = (key.textureMask != 0 ? "    float2 uv;\n" : "")
+        let vertexFields = (key.textureMask != 0 || marioFaceTexture ? "    float2 uv;\n" : "")
             + (fog ? "    float4 fog;\n" : "")
             + (0..<Int(key.inputCount)).map { "    float4 input\($0);\n" }.joined()
             + (marioFaceMaterial ? "    uint materialID [[flat]];\n" : "")
@@ -309,7 +322,9 @@ final class MetalShaderCompiler {
         }
 
         let rgbExpression = marioFaceMaterial
-            ? "materials[in.materialID].rgb"
+            ? (marioFaceTexture
+                ? "materials[in.materialID].rgb * texel0.rgb"
+                : "materials[in.materialID].rgb")
             : combinerExpression(shaderID: key.shaderID, alpha: false)
         let alphaExpression = alpha ? combinerExpression(shaderID: key.shaderID, alpha: true) : "1.0"
         let materialBinding = marioFaceMaterial

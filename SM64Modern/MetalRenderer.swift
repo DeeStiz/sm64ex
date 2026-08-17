@@ -136,6 +136,8 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         let vertexBuffer: (any MTLBuffer)?
         let indexBuffer: (any MTLBuffer)?
         let materialIndexBuffer: (any MTLBuffer)?
+        let texture: (any MTLTexture)?
+        let textureSampler: MetalSamplerKey?
         let vertexOffset: Int
         let uniformOffset: Int
         let materialBuffer: (any MTLBuffer)?
@@ -209,6 +211,16 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         textureMask: 0,
         alphaBlend: false
     )
+    // The source face-shine display list uses the IA8 32x32 texture with
+    // generated coordinates. Keep this as a separate key so the existing
+    // untextured source-geometry gate remains a valid fallback.
+    private static let marioFaceTexturedShaderKey = MetalShaderKey(
+        shaderID: 0x1000_0700,
+        filteringMode: 0,
+        inputCount: 1,
+        textureMask: 0,
+        alphaBlend: false
+    )
 
     private let device: any MTLDevice
     private let layer: CAMetalLayer
@@ -230,6 +242,8 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private var marioFaceGeometryResidency: MarioFaceGeometryResidency?
     private var marioFaceTransformPacket: SM64MarioFaceMetalTransformPacket?
     private var marioFaceSourceDrawLogged = false
+    private var marioFaceTextureDrawLogged = false
+    private let marioFaceTextureDrawEnabled: Bool
     private var residentTextureBindings: [UInt64: MetalTextureResidency] = [:]
     private var samplers: [MetalSamplerKey: any MTLSamplerState] = [:]
     private var depthStates: [DepthStateKey: any MTLDepthStencilState] = [:]
@@ -253,6 +267,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         self.isOwnerThread = isOwnerThread
         self.consumeDrawableSize = consumeDrawableSize
         let sourceGeometryEnabled = ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_DRAW"] == "1"
+        self.marioFaceTextureDrawEnabled = ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_TEXTURE_DRAW"] == "1"
         self.marioFaceSourceGeometry = nil
         self.marioFaceSourceVertexFloats = nil
         self.marioFaceTransformPacket = nil
@@ -277,6 +292,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         self.shaderCompiler = try MetalShaderCompiler(device: device)
         if sourceGeometryEnabled {
             shaderCompiler.prepareSynchronously(Self.marioFaceShaderKey)
+        }
+        if marioFaceTextureDrawEnabled {
+            shaderCompiler.prepareSynchronously(Self.marioFaceTexturedShaderKey)
         }
         self.displayLink = CAMetalDisplayLink(metalLayer: layer)
         super.init()
@@ -527,7 +545,11 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         marioFaceGeometryResidency = residency
         marioFaceTransformPacket = transform
         marioFaceSourceDrawLogged = false
+        marioFaceTextureDrawLogged = false
         shaderCompiler.prepare(Self.marioFaceShaderKey)
+        if marioFaceTextureDrawEnabled {
+            shaderCompiler.prepare(Self.marioFaceTexturedShaderKey)
+        }
         metalLogger.notice(
             "mario_face_geometry_admitted mesh=\(packet.meshID) vertices=\(packet.vertices.count) faces=\(packet.triangles.count) materials=\(packet.materials.count) vertex_bytes=\(vertexBytes.count) index_bytes=\(indexBytes.count) material_index_bytes=\(materialIndexBytes.count) material_bytes=\(materialBytes.count) transform_fingerprint=\(SM64MarioFaceMetalTransformFingerprint.packet(transform), privacy: .public) packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(packet), privacy: .public)"
         )
@@ -1095,15 +1117,18 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
               let transform = marioFaceTransformPacket else {
             return nil
         }
+        let shaderKey = marioFaceTextureDrawEnabled
+            ? Self.marioFaceTexturedShaderKey
+            : Self.marioFaceShaderKey
         let pipeline: MetalShaderCompiler.CompiledPipeline
         do {
-            pipeline = try shaderCompiler.pipeline(for: Self.marioFaceShaderKey)
+            pipeline = try shaderCompiler.pipeline(for: shaderKey)
         } catch MetalShaderCompilerError.pipelineNotReady {
             return nil
         }
         let expectedFloatCount = Int(geometry.faceWindowCount) * 3 * pipeline.vertexStride
         guard vertexFloats.count == expectedFloatCount else {
-            throw MetalRendererError.invalidDraw(shaderID: Self.marioFaceShaderKey.shaderID)
+            throw MetalRendererError.invalidDraw(shaderID: shaderKey.shaderID)
         }
         // The full source packet is admitted into private buffers and copied
         // by the preceding Metal 4 blit encoder.  Keep the transient path
@@ -1134,11 +1159,26 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
             count: uniformData.count
         )
         cursor += uniformData.count
+        let faceTexture: (any MTLTexture)?
+        let faceTextureSampler: MetalSamplerKey?
+        if marioFaceTextureDrawEnabled {
+            guard let upload = textures[0x300]?.upload,
+                  let residency = residentTextureBindings[upload.generation] else {
+                throw MetalRendererError.textureUnavailable(id: 0x300)
+            }
+            faceTexture = residency.texture
+            faceTextureSampler = textures[0x300]?.sampler
+        } else {
+            faceTexture = nil
+            faceTextureSampler = nil
+        }
         return PreparedMarioFaceDraw(
             pipeline: pipeline,
             vertexBuffer: vertexBuffer,
             indexBuffer: indexBuffer,
             materialIndexBuffer: residency.materialIndexBuffer,
+            texture: faceTexture,
+            textureSampler: faceTextureSampler,
             vertexOffset: vertexOffset,
             uniformOffset: uniformOffset,
             materialBuffer: materialBuffer,
@@ -1199,6 +1239,17 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         if let materialIndexBuffer = prepared.materialIndexBuffer {
             slot.argumentTable.setAddress(materialIndexBuffer.gpuAddress, index: 4)
         }
+        if marioFaceTextureDrawEnabled {
+            guard let texture = prepared.texture,
+                  let samplerKey = prepared.textureSampler else {
+                throw MetalRendererError.textureUnavailable(id: 0x300)
+            }
+            slot.argumentTable.setTexture(texture.gpuResourceID, index: 0)
+            slot.argumentTable.setSamplerState(
+                try sampler(for: samplerKey, filteringMode: Self.marioFaceTexturedShaderKey.filteringMode).gpuResourceID,
+                index: 0
+            )
+        }
         encoder.setArgumentTable(slot.argumentTable, stages: [.vertex, .fragment])
         encoder.drawPrimitives(
             primitiveType: .triangle,
@@ -1211,6 +1262,12 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
             marioFaceSourceDrawLogged = true
             metalLogger.notice(
                 "mario_face_mesh_draw route=2 mesh=\(geometry.meshID) source_path=dynlist_mario_face window_faces=\(geometry.faceWindowCount) source_faces=\(geometry.sourceFaceCount) source_vertices=\(geometry.sourceVertexCount) materials=\(geometry.sourceMaterialCount) encoder=isolated_render private_geometry=1 private_index_buffer=1 private_material_index_buffer=1 private_material_buffer=1 transform_schema=\(self.marioFaceTransformPacket?.schemaVersion ?? 0) transform_fingerprint=\(self.marioFaceTransformPacket.map(SM64MarioFaceMetalTransformFingerprint.packet) ?? 0, privacy: .public) packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(geometry), privacy: .public)"
+            )
+        }
+        if marioFaceTextureDrawEnabled, !marioFaceTextureDrawLogged {
+            marioFaceTextureDrawLogged = true
+            metalLogger.notice(
+                "mario_face_texture_draw texture_id=768 sampler=1 source_format=ia8 upload_format=rgba8 generated_coordinates=source_normal_xy private_texture=1 encoder=isolated_render"
             )
         }
     }

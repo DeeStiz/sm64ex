@@ -84,6 +84,7 @@ else
   "$PROJECT_ROOT/script/test_mario_face_texture_residency.sh"
   "$PROJECT_ROOT/script/test_mario_face_source_geometry.sh"
   "$PROJECT_ROOT/script/test_mario_face_metal_transform.sh"
+  "$PROJECT_ROOT/script/test_mario_face_draw_list.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
@@ -132,6 +133,9 @@ open_app() {
   fi
   if [[ "${SM64_MODERN_MARIO_FACE_DRAW:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_MARIO_FACE_DRAW=1)
+  fi
+  if [[ "${SM64_MODERN_MARIO_FACE_TEXTURE_DRAW:-0}" == "1" ]]; then
+    open_arguments+=(--env SM64_MODERN_MARIO_FACE_TEXTURE_DRAW=1)
   fi
   if [[ -n "${SM64_MODERN_RENDER_PACKET_PATH:-}" ]]; then
     open_arguments+=(--env SM64_MODERN_RENDER_PACKET_PATH="$SM64_MODERN_RENDER_PACKET_PATH")
@@ -289,6 +293,10 @@ case "$MODE" in
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_transform_admitted'
       grep -Eq 'mario_face_mesh_draw route=2 mesh=1 source_path=dynlist_mario_face window_faces=877 source_faces=877 source_vertices=440 materials=8 encoder=isolated_render private_geometry=1 private_index_buffer=1 private_material_index_buffer=1 private_material_buffer=1 transform_schema=1 transform_fingerprint=[0-9]+ packet_fingerprint=[0-9]+' <<< "$runtime_log"
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_mesh_draw'
+    fi
+    if [[ "${SM64_MODERN_MARIO_FACE_TEXTURE_DRAW:-0}" == "1" ]]; then
+      grep -Fq 'mario_face_texture_draw texture_id=768 sampler=1 source_format=ia8 upload_format=rgba8 generated_coordinates=source_normal_xy private_texture=1 encoder=isolated_render' <<< "$runtime_log"
+      printf '%s\n' "$runtime_log" | grep -E 'mario_face_texture_draw'
     fi
     # The bounded native host may have completed its own clean shutdown during
     # the verification sleep; quitting an already-stopped app is harmless.
