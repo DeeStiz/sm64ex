@@ -2,7 +2,7 @@
 
 ## Status
 
-M24d is the latest validated configuration/cheat slice layered on M23j/M34a/M33f/M22bc;
+M25a is the latest validated HUD value slice layered on M24d/M23j/M34a/M33f/M22bc;
 the durable replay record now carries every mutation operand needed for a
 standalone fresh-image replay—flags, course/star, cap, sound, source slot, and
 recovery decisions—plus canonical per-record/header/artifact hashes. A fresh
@@ -58,7 +58,17 @@ and C ABI smoke coverage. The cheat fingerprint is
 slice: remaining per-consumer toggles, menu persistence/readback, and full
 Swift authority are open. M22 remains behavior-coverage work in progress:
 the
-latest bounded gameplay slice is M22bc. M34a
+latest bounded gameplay slice is M22bc. M25a adds a standalone Swift 6 HUD
+projection and power-meter state machine: display flags, config gates,
+life/coin/star counters, 30 Hz timer decomposition, star flash suppression,
+health wedges, swimming emphasis, and the legacy deemphasize/hide cadence are
+all compared against an independent C model. The HUD fingerprint is
+`0x1d0a1956d7a8121e`; the regenerated native Debug build is
+`/tmp/sm64-modern-m25a-build.log`, the Metal 4/frame-one launch proof is
+`/tmp/sm64-modern-m25a-verify.log`, and the complete 217-script matrix has
+`runs=217 failures=0`. This is intentionally a value-only boundary: no Swift
+HUD renderer, text packet, dialog owner, pause/menu state, or visual/human
+acceptance is claimed yet. M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -1892,7 +1902,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M24b: Owner-thread configuration runtime and fresh-save recovery | The Swift schema loads before lifecycle start, atomically persists repaired legacy values, reports unknown/malformed input, projects fullscreen/skip-intro into the C lifecycle seam, and seeds progression from the durable Swift image so a zeroed pre-lifecycle C buffer cannot corrupt menu-age parity. | Complete locally — runtime fingerprint `0x1b0a9226b4babc19`; focused runtime/replay contracts, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24b-verify-fixed.log`), empty-save launch status 0, invalid-config repair launch status 0, complete 215-script matrix (`runs=215 failures=0`), strict-concurrency audit, and `git diff --check`; M24c carries optional settings and authority persistence |
 | M24c: Lossless optional configuration and restart authority | A Swift sidecar preserves camera/HUD/Discord/language/legal-ROM/cheat values across C's legacy config rewrite, legacy values remain primary, and injected UserDefaults resolution proves persisted authority selection, restart comparison, and invalid-value recovery without mutating global defaults. | Complete locally — runtime fingerprint `0x1b0a9226b4babc19`; sidecar/C-rewrite regression, authority smoke, regenerated native Debug build (`/tmp/sm64-modern-m24c-build.log`, `BUILD SUCCEEDED`), complete 215-script matrix (`runs=215 failures=0`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24c-verify.log`), strict-concurrency audit, and `git diff --check`; live cheat consumers and runtime Swift authority remain |
 | M24d: Swift cheat state and live responsive consumer | The owner thread applies all nine parsed flags through a versioned C compatibility ABI, Swift policy mirrors legacy enable/disable and responsive movement behavior, invalid flag values fail closed, and focused Swift/C evidence is retained. | Complete locally — policy fingerprint `0x0dab67376d3daab8d`; `script/test_cheats.sh` covers Swift/C policy plus ABI application, regenerated native Debug build (`/tmp/sm64-modern-m24d-build.log`, `BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24d-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 216-script matrix (`matrix_logs=216`, no failure markers), zero unchecked-Sendable audit, and `git diff --check`; remaining per-consumer toggles, live menu persistence/readback, and full configuration authority remain |
-| M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |
+| M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | In progress — M25a establishes value-only HUD flags/counters/timer/power transitions; renderer, text, dialogs, pause/menu authority, and visual parity remain |
+| M25a: HUD value projection and power-meter state | `SM64HUDProjection` and `SM64PowerMeterState` mirror the C display gates, 30 Hz timer math, flash suppression, health wedges, swimming emphasis, and legacy power-meter transition order as pure Swift values. | Complete locally — Swift/C fingerprint `0x1d0a1956d7a8121e`; `script/test_hud.sh`, regenerated native Debug build (`/tmp/sm64-modern-m25a-build.log`, `BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25a-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 217-script matrix (`runs=217 failures=0`), strict-concurrency audit, and `git diff --check`; no rendered HUD, text packet, dialog, pause/menu, or human visual acceptance yet |
 | M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | Not started |
 | M27: Audio sequencing/loading | Swift audio heap, banks, sequences, channels, layers, note allocation, and loading match pre-synthesis C traces. | Not started |
 | M28: Audio synthesis/effects | Swift synthesis, envelopes, resampling, reverb, mixing, music, and effects match 32-kHz PCM bit-for-bit. | Not started |
@@ -2256,10 +2267,12 @@ replayable trace, and the platform evidence listed in its exit gate.
    policy consumer; the remaining moon-jump, Mario-action, model-scale,
    exit-anywhere, and menu persistence/readback consumers still require their
    own owner-thread seams before full configuration authority cutover.
-3. **M25 HUD and dialogs.** Port power meter, star/coin/life counters, cap
-   icons, pause menu, dialogs, text layout, timers, fade state, and HUD
-   camera status. Compare fixed-width layout/render packets and dialog timing,
-   not only strings.
+3. **M25 HUD and dialogs.** M25a first ports the value-only power meter,
+   display gates, counters, timer decomposition, flash behavior, and legacy
+   cadence as a Swift/C contract. Then port power-meter render packets, star/
+   coin/life counters, cap icons, pause menu, dialogs, text layout, timers,
+   fade state, and HUD camera status. Compare fixed-width layout/render packets
+   and dialog timing, not only strings.
 4. **M26 front end.** Port title, file select, course select, demos, loading,
    credits, ending, pause, and all transition/fade paths. Each screen must
    boot, accept input, persist choices, and shut down without a C engine

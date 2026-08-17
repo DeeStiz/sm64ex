@@ -43,6 +43,7 @@ else
   "$PROJECT_ROOT/script/test_configuration.sh"
   "$PROJECT_ROOT/script/test_configuration_runtime.sh"
   "$PROJECT_ROOT/script/test_cheats.sh"
+  "$PROJECT_ROOT/script/test_hud.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
