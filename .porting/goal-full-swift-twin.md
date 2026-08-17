@@ -2,7 +2,21 @@
 
 ## Status
 
-M28e is the latest validated owner-thread audio promotion slice layered on
+M29a is the latest validated immutable display-list packet slice layered on
+M28e and the preceding owner-thread audio promotion work. Swift now classifies
+the complete F3DEX2/RDP opcode surface into copied command values, snapshots
+texture/combine/geometry/matrix/light/fog/scissor/image state, retains stable
+resource IDs without traversing C pointers, and records draw order plus explicit
+render-layer values in immutable scene packets. The independent C contract
+matches Swift at fingerprint `0xffe29115951a1723`; the focused contract is
+`script/test_display_list_packet.sh`, the regenerated native Debug build is
+`/tmp/sm64-modern-m29a-build.log`, and the native Metal 4/Apple M5 Max verify
+is `/tmp/sm64-modern-m29a-verify.log` (`BUILD SUCCEEDED`, frame 1, clean status
+0, `engine_thread_finished`, `application_stopped`). This is a packet/schema
+and pre-encoding parity boundary: live display-list capture, texture/ROM
+residency breadth, Metal encoder authority, screenshots, GPU captures, and
+visual/human acceptance remain open. M28e remains the latest validated
+owner-thread audio promotion slice layered on
 M28d/M28c/M28b/M28a/M27e/M26b/M26a/M25d/M25c/M25b/M25a/M24d/M23j/M34a/M33f/M22bc;
 the durable replay record now carries every mutation operand needed for a
 standalone fresh-image replay—flags, course/star, cap, sound, source slot, and
@@ -2082,7 +2096,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M28c: Loop-aware ADPCM stream/refill window | `SM64AudioADPCMStreamWindow` decodes copied 9-byte blocks with M28a predictor state, requests M27 short/long stream residency, restores copied loop history, fences malformed/unavailable blocks, and emits deterministic block/history/loop/finish events. | Complete locally — Swift/C fingerprint `0xd64002acff69ef29`; `script/test_audio_stream.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28c-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 230-script matrix (`/tmp/sm64-modern-m28c-full-matrix.log`, `runs=230 failures=0`), strict-concurrency audit, and `git diff --check`; mixer/effects/reverb, live audio route, and audible acceptance remain |
 | M28d: Mixer/effects and 32-kHz frame assembly | `SM64AudioMixer` performs stable music/effect priority ordering, saturating dry accumulation, optional Q15 reverb ring feedback/send, clipped-sample accounting, and deterministic interleaved 32-kHz stereo output. | Complete locally — Swift/C fingerprint `0x8ecc1809c3dd0384`; `script/test_audio_mixer.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28d-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 231-script matrix (`/tmp/sm64-modern-m28d-full-matrix.log`, `runs=231 failures=0`), strict-concurrency audit, and `git diff --check`; EngineHost promotion, realtime AVAudio, audible, and physical acceptance remain |
 | M28e: EngineHost owner-thread audio promotion envelope | `SM64AudioOwnerPromotion` admits one engine-owner token, advances M27 sequence/pool/residency/stream values, consumes M28 voice/mixer windows, records schema-4 trace/PCM receipts, and permanently fences a foreign token; `SM64_MODERN_AUDIO_PROMOTION=1` enables the route without replacing the AVAudio device leaf. | Complete locally — Swift/C receipt fingerprint `0xad10b198c66b2a49`; `script/test_audio_promotion.sh`, regenerated native Debug build, and gated `SM64_MODERN_AUDIO_PROMOTION=1 script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28e-verify.log`) prove Metal 4/Apple M5 Max frame 1, promotion tick/finish logs, clean status 0, 217 ticks, and `admission_failed=false`; exhaustive 232-script matrix (`/tmp/sm64-modern-m28e-full-matrix.log`, `runs=232 failures=0`), strict-concurrency audit, and `git diff --check`; AVAudio remains hardware-facing, so audible/device listening, PCM capture comparison, and human acceptance remain |
-| M29: Display-list translation | Swift produces immutable Metal scene packets identical to the C renderer bridge for every reachable command/state. | Not started |
+| M29: Display-list translation | Swift produces immutable Metal scene packets identical to the C renderer bridge for every reachable command/state. | In progress — M29a locks the copied command/state schema and C↔Swift aggregate fingerprint; live capture, Metal encoding, and reachable-content breadth remain |
+| M29a: Copied display-list command/state packet contract | `SM64DisplayListDecoder` classifies every F3DEX2/RDP opcode class, snapshots texture/combine/geometry/matrix/light/fog/scissor/image state, retains stable resource IDs without pointer traversal, and emits immutable draw order/render-layer packets with bounded unknown/truncation fencing. | Complete locally — Swift/C fingerprint `0xffe29115951a1723`; `script/test_display_list_packet.sh`, regenerated native Debug build (`/tmp/sm64-modern-m29a-build.log`, `BUILD SUCCEEDED`), and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m29a-verify.log`) pass Metal 4/Apple M5 Max frame 1, clean status 0, `engine_thread_finished`, and `application_stopped`; zero `@unchecked Sendable` declarations and `git diff --check`; live display-list capture, Metal encoder/resource-residency integration, screenshot/GPU evidence, and visual/human acceptance remain |
 | M30: Goddard/Mario face | Product-reachable Mario-face update, geometry, material, animation, and render paths run in Swift. | Not started |
 | M31: Whole-engine Swift authority | Swift completes title-to-gameplay, saves, audio, rendering, and shutdown with no engine/gameplay C callback; C selector remains equivalent. | Not started |
 | M31a: Swift lifecycle authority seam | Swift runtime owns lifecycle phases, invalid-order rejection, stop-request transition, failure fencing, and explicit C-domain bridge reporting while remaining domains migrate. | Complete locally — strict Swift 6 runtime smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; gameplay/content C bridge remains intentionally open |
@@ -2496,10 +2511,14 @@ replayable trace, and the platform evidence listed in its exit gate.
    fingerprints. Next compare longer C-vs-Swift PCM traces bit-for-bit over
    title/menu/gameplay windows, then keep AVAudio as the only audited
    realtime leaf shim until an audible/device gate is authorized.
-7. **M29 display-list translation.** Decode every reachable display-list
-   command into immutable Swift scene packets, including textures, combine
-   modes, geometry modes, matrices, lights, fog, and render-layer ordering.
-   Compare packet bytes and resource IDs before Metal encoding.
+7. **M29 display-list translation.** M29a now classifies the complete
+   F3DEX2/RDP opcode surface into copied, bounded Swift command values and
+   immutable state/draw snapshots, including textures, combine modes, geometry
+   modes, matrices, lights, fog, scissor/image state, and render-layer order;
+   its independent C fixture matches at `0xffe29115951a1723`. Next capture
+   real C renderer API frames into this packet boundary, compare packet bytes
+   and resource IDs before Metal encoding, then promote only after reachable
+   content, texture residency, and Metal validation are green.
 8. **M30 Goddard/Mario face.** Port face geometry, materials, animation,
    eye/mouth state, cap/skin variants, lighting, and product-reachable
    render callbacks. Verify front-end, gameplay, cutscene, and ending paths.

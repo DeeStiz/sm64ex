@@ -95,6 +95,7 @@
 		4DD69957A4DFA511CE06CC45 /* SaveFileCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3795DAA620146CD3735BB84B /* SaveFileCodec.swift */; };
 		4F406100A6DAE7D187C40023 /* AudioVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF775EACD62A0817607F3FD2 /* AudioVoice.swift */; };
 		528D3B2C102405B8655DD87A /* BowserKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 884DACAF76A66E2ACF25162B /* BowserKey.swift */; };
+		52BC67CCBD648B5CA8A6382D /* DisplayListPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7632CBC7249D1BF7505A9DB1 /* DisplayListPacket.swift */; };
 		532A683D2BF89220ADEB6D64 /* CameraFOV.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4ED5024BA5E198B6E29A4AF7 /* CameraFOV.swift */; };
 		53B872CB3B81DFEBF260C4C7 /* MarioGeometryInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93DAAFB0FF6CAB909448BA5 /* MarioGeometryInput.swift */; };
 		54BE2C1D3F624579927D2313 /* SLWalkingPenguinBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F32D28BA6DAF70AE72591 /* SLWalkingPenguinBehavior.swift */; };
@@ -379,6 +380,7 @@
 		7152A9F5156A7D703C8708CE /* SwingPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwingPlatformBehavior.swift; sourceTree = "<group>"; };
 		724F73EC282345F4551FC1BF /* CameraInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraInput.swift; sourceTree = "<group>"; };
 		7316D473A3C5C7E718C32B2E /* AppleAudioRing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioRing.h; sourceTree = "<group>"; };
+		7632CBC7249D1BF7505A9DB1 /* DisplayListPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayListPacket.swift; sourceTree = "<group>"; };
 		7E3067F20772683A08D2D750 /* AudioSequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSequence.swift; sourceTree = "<group>"; };
 		7F48AE6A57785362E4038147 /* EyerokHandCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyerokHandCollision.swift; sourceTree = "<group>"; };
 		813A2CE9C713D16BC9943257 /* MoneybagEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneybagEnemy.swift; sourceTree = "<group>"; };
@@ -606,6 +608,7 @@
 				3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */,
 				50D6FA91D973EDFF7DFF2BD0 /* Dialog.swift */,
 				F4620FA3702294FE08475ABC /* DialogText.swift */,
+				7632CBC7249D1BF7505A9DB1 /* DisplayListPacket.swift */,
 				E37C0994C353B61075C5EBCA /* ElevatorBehavior.swift */,
 				49737667D24AE6AEA3374B3E /* EnemyLakitu.swift */,
 				994D08C3E7FCF937245A9757 /* EnemyLakituObjectBridge.swift */,
@@ -961,6 +964,7 @@
 				11833E1637F8649E7554B9F6 /* DeterministicPrimitives.swift in Sources */,
 				5A32DB1215CB1BD2E96DC2A3 /* Dialog.swift in Sources */,
 				DBB35347BCD2DEDD18237821 /* DialogText.swift in Sources */,
+				52BC67CCBD648B5CA8A6382D /* DisplayListPacket.swift in Sources */,
 				205E67C2EEF8113A521111E0 /* ElevatorBehavior.swift in Sources */,
 				BFAC85948508CFC15B564EFE /* EnemyLakitu.swift in Sources */,
 				03FAB70D01EC36C629B7ACEE /* EnemyLakituObjectBridge.swift in Sources */,

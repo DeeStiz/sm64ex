@@ -59,6 +59,7 @@ else
   "$PROJECT_ROOT/script/test_audio_stream.sh"
   "$PROJECT_ROOT/script/test_audio_mixer.sh"
   "$PROJECT_ROOT/script/test_audio_promotion.sh"
+  "$PROJECT_ROOT/script/test_display_list_packet.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
