@@ -609,6 +609,64 @@ typedef struct SM64ModernCameraFOVOutputV1 {
     uint32_t reserved;
 } SM64ModernCameraFOVOutputV1;
 
+// Fixed-width cutscene spline snapshot. The C adapter supplies the four
+// control points at the current segment; Swift advances only the value state
+// and returns the evaluated point.
+typedef struct SM64ModernCameraCutsceneSplineInputV1 {
+    SM64ModernAbiHeader header;
+    int16_t segment;
+    float progress;
+    int8_t point0_index;
+    int8_t point1_index;
+    int8_t point2_index;
+    int8_t point3_index;
+    uint8_t point0_speed;
+    uint8_t point1_speed;
+    uint8_t point2_speed;
+    uint8_t point3_speed;
+    float point0[3];
+    float point1[3];
+    float point2[3];
+    float point3[3];
+    uint32_t reserved;
+} SM64ModernCameraCutsceneSplineInputV1;
+
+typedef struct SM64ModernCameraCutsceneSplineOutputV1 {
+    SM64ModernAbiHeader header;
+    float point[3];
+    int16_t segment;
+    float progress;
+    uint8_t finished;
+    uint8_t reserved0;
+    uint16_t reserved1;
+    uint32_t reserved;
+} SM64ModernCameraCutsceneSplineOutputV1;
+
+// Fixed-width per-shot cutscene clock snapshot. C still chooses and executes
+// the authored shot; Swift owns only timer/shot advancement and stop semantics.
+typedef struct SM64ModernCameraCutsceneClockInputV1 {
+    SM64ModernAbiHeader header;
+    int16_t cutscene;
+    int16_t shot;
+    int16_t timer;
+    int16_t shot_duration;
+    uint8_t cutscene_active;
+    uint8_t reserved0;
+    uint16_t reserved1;
+    uint32_t reserved;
+} SM64ModernCameraCutsceneClockInputV1;
+
+typedef struct SM64ModernCameraCutsceneClockOutputV1 {
+    SM64ModernAbiHeader header;
+    int16_t cutscene;
+    int16_t shot;
+    int16_t timer;
+    uint8_t stopped;
+    uint8_t advanced_shot;
+    uint16_t reserved0;
+    uint32_t reserved;
+} SM64ModernCameraCutsceneClockOutputV1;
+
 #define SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED (1u << 0)
 #define SM64_MODERN_CAMERA_CALLBACK_PANS_AHEAD (1u << 1)
 // Input geometry_flags bits. Optional values remain finite zeroes when the
@@ -640,6 +698,14 @@ typedef SM64ModernStatus (*SM64ModernCameraFOVEvaluateFn)(
     void *context,
     const SM64ModernCameraFOVInputV1 *input,
     SM64ModernCameraFOVOutputV1 *out_output);
+typedef SM64ModernStatus (*SM64ModernCameraCutsceneSplineEvaluateFn)(
+    void *context,
+    const SM64ModernCameraCutsceneSplineInputV1 *input,
+    SM64ModernCameraCutsceneSplineOutputV1 *out_output);
+typedef SM64ModernStatus (*SM64ModernCameraCutsceneClockEvaluateFn)(
+    void *context,
+    const SM64ModernCameraCutsceneClockInputV1 *input,
+    SM64ModernCameraCutsceneClockOutputV1 *out_output);
 
 typedef struct SM64ModernCameraMigrationApiV1 {
     SM64ModernAbiHeader header;
@@ -647,6 +713,8 @@ typedef struct SM64ModernCameraMigrationApiV1 {
     SM64ModernCameraUpdateFn update;
     SM64ModernCameraEvaluateFn evaluate;
     SM64ModernCameraFOVEvaluateFn evaluate_fov;
+    SM64ModernCameraCutsceneSplineEvaluateFn evaluate_cutscene_spline;
+    SM64ModernCameraCutsceneClockEvaluateFn evaluate_cutscene_clock;
 } SM64ModernCameraMigrationApiV1;
 
 // Optional gameplay-kernel extension. It is installed separately so the

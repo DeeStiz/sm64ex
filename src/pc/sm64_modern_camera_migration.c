@@ -229,3 +229,98 @@ SM64ModernStatus sm64_modern_camera_evaluate_fov(
     }
     return status;
 }
+
+SM64ModernStatus sm64_modern_camera_evaluate_cutscene_spline(
+    const SM64ModernCameraCutsceneSplineInputV1 *input,
+    SM64ModernCameraCutsceneSplineOutputV1 *out_output) {
+    if (!sMigrationInstalled || !sCameraAuthority) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+    if (!sMigration.evaluate_cutscene_spline) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY;
+    }
+    if (!input || !out_output
+        || !valid_header(&input->header, sizeof(*input))
+        || input->reserved != 0
+        || !finite_float(input->progress)
+        || !finite_vector(input->point0)
+        || !finite_vector(input->point1)
+        || !finite_vector(input->point2)
+        || !finite_vector(input->point3)) {
+        if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
+            sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+
+    memset(out_output, 0, sizeof(*out_output));
+    out_output->header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    out_output->header.struct_size = sizeof(*out_output);
+    const SM64ModernStatus status = sMigration.evaluate_cutscene_spline(
+        sMigration.context, input, out_output);
+    if (status == SM64_MODERN_STATUS_OK
+        && (!valid_header(&out_output->header, sizeof(*out_output))
+            || out_output->reserved0 != 0
+            || out_output->reserved1 != 0
+            || out_output->reserved != 0
+            || out_output->finished > 1
+            || !finite_vector(out_output->point)
+            || !finite_float(out_output->progress))) {
+        if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
+            sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (status != SM64_MODERN_STATUS_OK
+        && status != SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY
+        && sMigrationStatus == SM64_MODERN_STATUS_OK) {
+        sMigrationStatus = status;
+    }
+    return status;
+}
+
+SM64ModernStatus sm64_modern_camera_evaluate_cutscene_clock(
+    const SM64ModernCameraCutsceneClockInputV1 *input,
+    SM64ModernCameraCutsceneClockOutputV1 *out_output) {
+    if (!sMigrationInstalled || !sCameraAuthority) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+    if (!sMigration.evaluate_cutscene_clock) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY;
+    }
+    if (!input || !out_output
+        || !valid_header(&input->header, sizeof(*input))
+        || input->reserved0 != 0
+        || input->reserved1 != 0
+        || input->reserved != 0
+        || input->shot_duration < 0
+        || input->cutscene_active > 1) {
+        if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
+            sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+
+    memset(out_output, 0, sizeof(*out_output));
+    out_output->header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    out_output->header.struct_size = sizeof(*out_output);
+    const SM64ModernStatus status = sMigration.evaluate_cutscene_clock(
+        sMigration.context, input, out_output);
+    if (status == SM64_MODERN_STATUS_OK
+        && (!valid_header(&out_output->header, sizeof(*out_output))
+            || out_output->reserved0 != 0
+            || out_output->reserved != 0
+            || out_output->stopped > 1
+            || out_output->advanced_shot > 1)) {
+        if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
+            sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (status != SM64_MODERN_STATUS_OK
+        && status != SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY
+        && sMigrationStatus == SM64_MODERN_STATUS_OK) {
+        sMigrationStatus = status;
+    }
+    return status;
+}

@@ -16,6 +16,12 @@ SM64ModernStatus sm64_modern_camera_update(
 SM64ModernStatus sm64_modern_camera_evaluate(
     const SM64ModernCameraCallbackInputV1 *input,
     SM64ModernCameraCallbackOutputV1 *out_output);
+SM64ModernStatus sm64_modern_camera_evaluate_cutscene_spline(
+    const SM64ModernCameraCutsceneSplineInputV1 *input,
+    SM64ModernCameraCutsceneSplineOutputV1 *out_output);
+SM64ModernStatus sm64_modern_camera_evaluate_cutscene_clock(
+    const SM64ModernCameraCutsceneClockInputV1 *input,
+    SM64ModernCameraCutsceneClockOutputV1 *out_output);
 SM64ModernStatus sm64_modern_camera_set_authority(uint32_t enabled);
 uint32_t sm64_modern_camera_authority_active(void);
 

@@ -4283,6 +4283,42 @@ void evaluate_cubic_spline(f32 u, Vec3f Q, Vec3f a0, Vec3f a1, Vec3f a2, Vec3f a
  * the 4th CutsceneSplinePoint in the current segment away from spline[splineSegment] has an index of -1.
  */
 s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *splineSegment, f32 *progress) {
+    if (sm64_modern_camera_authority_active()
+        && p != NULL && spline != NULL
+        && splineSegment != NULL && progress != NULL) {
+        SM64ModernCameraCutsceneSplineInputV1 input = { 0 };
+        SM64ModernCameraCutsceneSplineOutputV1 output = { 0 };
+        const s16 baseSegment = *splineSegment < 0 ? 0 : *splineSegment;
+        const s32 canEvaluate = *splineSegment >= 0
+            && spline[baseSegment].index != -1
+            && spline[baseSegment + 1].index != -1
+            && spline[baseSegment + 2].index != -1;
+        input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+        input.header.struct_size = sizeof(input);
+        input.segment = 0;
+        input.progress = *progress;
+#define SNAPSHOT_SPLINE_POINT(slot) \
+        input.point##slot##_index = spline[baseSegment + slot].index; \
+        input.point##slot##_speed = spline[baseSegment + slot].speed; \
+        input.point##slot[0] = spline[baseSegment + slot].point[0]; \
+        input.point##slot[1] = spline[baseSegment + slot].point[1]; \
+        input.point##slot[2] = spline[baseSegment + slot].point[2]
+        SNAPSHOT_SPLINE_POINT(0);
+        SNAPSHOT_SPLINE_POINT(1);
+        SNAPSHOT_SPLINE_POINT(2);
+        SNAPSHOT_SPLINE_POINT(3);
+#undef SNAPSHOT_SPLINE_POINT
+        if (canEvaluate
+            && sm64_modern_camera_evaluate_cutscene_spline(
+                &input, &output) == SM64_MODERN_STATUS_OK) {
+            vec3f_copy(p, output.point);
+            *progress = output.progress;
+            *splineSegment = output.finished
+                ? 0 : (s16)(baseSegment + output.segment);
+            return output.finished != 0;
+        }
+    }
+
     s32 finished = 0;
     Vec3f controlPoints[4];
     s32 i = 0;
@@ -11995,22 +12031,43 @@ void play_cutscene(struct Camera *c) {
 
 #undef CUTSCENE
 
-    if ((cutsceneDuration != 0) && !(gCutsceneTimer & CUTSCENE_STOP)) {
-        //! @bug This should check for 0x7FFF (CUTSCENE_LOOP)
-        //! instead, cutscenes that last longer than 0x3FFF frames will never end on their own
-        if (gCutsceneTimer < 0x3FFF) {
-            gCutsceneTimer += 1;
-        }
-        //! Because gCutsceneTimer is often set to 0x7FFF (CUTSCENE_LOOP), this conditional can only
-        //! check for == due to overflow
-        if (gCutsceneTimer == cutsceneDuration) {
-            sCutsceneShot += 1;
+    {
+        SM64ModernCameraCutsceneClockInputV1 clockInput = { 0 };
+        SM64ModernCameraCutsceneClockOutputV1 clockOutput = { 0 };
+        clockInput.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+        clockInput.header.struct_size = sizeof(clockInput);
+        clockInput.cutscene = c->cutscene;
+        clockInput.shot = sCutsceneShot;
+        clockInput.timer = gCutsceneTimer;
+        clockInput.shot_duration = cutsceneDuration;
+        clockInput.cutscene_active = c->cutscene != 0;
+        const SM64ModernStatus clockStatus =
+            sm64_modern_camera_evaluate_cutscene_clock(
+                &clockInput, &clockOutput);
+        if (clockStatus == SM64_MODERN_STATUS_OK) {
+            sCutsceneShot = clockOutput.shot;
+            gCutsceneTimer = clockOutput.timer;
+            if (clockOutput.stopped) {
+                sMarioCamState->cameraEvent = 0;
+            }
+        } else if ((cutsceneDuration != 0)
+                   && !(gCutsceneTimer & CUTSCENE_STOP)) {
+            //! @bug This should check for 0x7FFF (CUTSCENE_LOOP)
+            //! instead, cutscenes that last longer than 0x3FFF frames will never end on their own
+            if (gCutsceneTimer < 0x3FFF) {
+                gCutsceneTimer += 1;
+            }
+            //! Because gCutsceneTimer is often set to 0x7FFF (CUTSCENE_LOOP), this conditional can only
+            //! check for == due to overflow
+            if (gCutsceneTimer == cutsceneDuration) {
+                sCutsceneShot += 1;
+                gCutsceneTimer = 0;
+            }
+        } else {
+            sMarioCamState->cameraEvent = 0;
+            sCutsceneShot = 0;
             gCutsceneTimer = 0;
         }
-    } else {
-        sMarioCamState->cameraEvent = 0;
-        sCutsceneShot = 0;
-        gCutsceneTimer = 0;
     }
 
     sAreaYawChange = 0;

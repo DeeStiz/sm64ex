@@ -8,6 +8,8 @@
 static unsigned gCallbackCount;
 static unsigned gEvaluateCount;
 static unsigned gFOVEvaluateCount;
+static unsigned gCutsceneSplineEvaluateCount;
+static unsigned gCutsceneClockEvaluateCount;
 static uint16_t gLastGeometryFlags;
 static float gLastFloorHeight;
 static float gLastSlopeFloorNormalZ;
@@ -87,6 +89,44 @@ static SM64ModernStatus evaluate_camera_fov(
     return SM64_MODERN_STATUS_OK;
 }
 
+static SM64ModernStatus evaluate_cutscene_spline(
+    void *context,
+    const SM64ModernCameraCutsceneSplineInputV1 *input,
+    SM64ModernCameraCutsceneSplineOutputV1 *output) {
+    if (context != (void *)(uintptr_t)0xCAFE || !input || !output) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    gCutsceneSplineEvaluateCount++;
+    output->point[0] = input->point1[0];
+    output->point[1] = input->point1[1];
+    output->point[2] = input->point1[2];
+    output->segment = input->segment + 1;
+    output->progress = 0.25f;
+    output->finished = 0;
+    output->reserved0 = 0;
+    output->reserved1 = 0;
+    output->reserved = 0;
+    return SM64_MODERN_STATUS_OK;
+}
+
+static SM64ModernStatus evaluate_cutscene_clock(
+    void *context,
+    const SM64ModernCameraCutsceneClockInputV1 *input,
+    SM64ModernCameraCutsceneClockOutputV1 *output) {
+    if (context != (void *)(uintptr_t)0xCAFE || !input || !output) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    gCutsceneClockEvaluateCount++;
+    output->cutscene = input->cutscene;
+    output->shot = input->shot + 1;
+    output->timer = 0;
+    output->stopped = 0;
+    output->advanced_shot = 1;
+    output->reserved0 = 0;
+    output->reserved = 0;
+    return SM64_MODERN_STATUS_OK;
+}
+
 static void expect(int condition, const char *message) {
     if (!condition) {
         fprintf(stderr, "camera migration smoke failed: %s\n", message);
@@ -103,6 +143,8 @@ int main(void) {
     api.update = update_camera;
     api.evaluate = evaluate_camera;
     api.evaluate_fov = evaluate_camera_fov;
+    api.evaluate_cutscene_spline = evaluate_cutscene_spline;
+    api.evaluate_cutscene_clock = evaluate_cutscene_clock;
 
     expect(sm64_modern_validate_camera_migration_api(&api)
                == SM64_MODERN_STATUS_OK, "valid api");
@@ -208,6 +250,55 @@ int main(void) {
                && fovOutput.fov_offset == 3.f
                && fovOutput.presented_fov == 49.f,
            "fov output");
+
+    SM64ModernCameraCutsceneSplineInputV1 splineInput;
+    SM64ModernCameraCutsceneSplineOutputV1 splineOutput;
+    memset(&splineInput, 0, sizeof(splineInput));
+    memset(&splineOutput, 0, sizeof(splineOutput));
+    splineInput.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    splineInput.header.struct_size = sizeof(splineInput);
+    splineInput.segment = 0;
+    splineInput.progress = 0.5f;
+    splineInput.point0_index = 0;
+    splineInput.point1_index = 1;
+    splineInput.point2_index = 2;
+    splineInput.point3_index = -1;
+    splineInput.point0[0] = 1.f;
+    splineInput.point1[0] = 2.f;
+    splineInput.point2[0] = 3.f;
+    splineInput.point3[0] = 4.f;
+    expect(sm64_modern_camera_evaluate_cutscene_spline(
+               &splineInput, &splineOutput)
+               == SM64_MODERN_STATUS_OK,
+           "cutscene spline evaluator");
+    expect(gCutsceneSplineEvaluateCount == 1
+               && splineOutput.point[0] == 2.f
+               && splineOutput.segment == 1
+               && splineOutput.progress == 0.25f
+               && splineOutput.finished == 0,
+           "cutscene spline output");
+
+    SM64ModernCameraCutsceneClockInputV1 clockInput;
+    SM64ModernCameraCutsceneClockOutputV1 clockOutput;
+    memset(&clockInput, 0, sizeof(clockInput));
+    memset(&clockOutput, 0, sizeof(clockOutput));
+    clockInput.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    clockInput.header.struct_size = sizeof(clockInput);
+    clockInput.cutscene = 3;
+    clockInput.shot = 2;
+    clockInput.timer = 3;
+    clockInput.shot_duration = 3;
+    clockInput.cutscene_active = 1;
+    expect(sm64_modern_camera_evaluate_cutscene_clock(
+               &clockInput, &clockOutput)
+               == SM64_MODERN_STATUS_OK,
+           "cutscene clock evaluator");
+    expect(gCutsceneClockEvaluateCount == 1
+               && clockOutput.cutscene == 3
+               && clockOutput.shot == 3
+               && clockOutput.timer == 0
+               && clockOutput.advanced_shot == 1,
+           "cutscene clock output");
 
     input.reserved = 1;
     expect(sm64_modern_camera_update(&input, &output)

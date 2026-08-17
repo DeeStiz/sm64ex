@@ -51,6 +51,30 @@ private let swiftCameraEvaluateFOV: @convention(c) (
     return service.evaluateFOV(input: input.pointee, output: output)
 }
 
+private let swiftCameraEvaluateCutsceneSpline: @convention(c) (
+    UnsafeMutableRawPointer?,
+    UnsafePointer<SM64ModernCameraCutsceneSplineInputV1>?,
+    UnsafeMutablePointer<SM64ModernCameraCutsceneSplineOutputV1>?
+) -> SM64ModernStatus = { context, input, output in
+    guard let service = cameraMigrationService(from: context),
+          let input, let output else {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT
+    }
+    return service.evaluateCutsceneSpline(input: input.pointee, output: output)
+}
+
+private let swiftCameraEvaluateCutsceneClock: @convention(c) (
+    UnsafeMutableRawPointer?,
+    UnsafePointer<SM64ModernCameraCutsceneClockInputV1>?,
+    UnsafeMutablePointer<SM64ModernCameraCutsceneClockOutputV1>?
+) -> SM64ModernStatus = { context, input, output in
+    guard let service = cameraMigrationService(from: context),
+          let input, let output else {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT
+    }
+    return service.evaluateCutsceneClock(input: input.pointee, output: output)
+}
+
 /// Owner-thread adapter for the value-only camera selection seam. The C
 /// camera still owns geometry, collision, cutscenes, and Lakitu presentation;
 /// this service owns the selection/angle flag transitions and their exact
@@ -62,6 +86,8 @@ final class SwiftCameraMigrationService {
     private var loggedCommands: Set<UInt32> = []
     private var loggedCallbackModes: Set<Int16> = []
     private var loggedFOVModes: Set<UInt8> = []
+    private var loggedCutsceneSpline = false
+    private var loggedCutsceneClock = false
     private var lastError: SM64ModernStatus = SM64_MODERN_STATUS_OK
 
     init(ownerThreadToken: UInt64) {
@@ -80,6 +106,8 @@ final class SwiftCameraMigrationService {
         api.update = swiftCameraUpdate
         api.evaluate = swiftCameraEvaluate
         api.evaluate_fov = swiftCameraEvaluateFOV
+        api.evaluate_cutscene_spline = swiftCameraEvaluateCutsceneSpline
+        api.evaluate_cutscene_clock = swiftCameraEvaluateCutsceneClock
         return api
     }
 
@@ -139,6 +167,124 @@ final class SwiftCameraMigrationService {
         if loggedFOVModes.insert(input.fov_func).inserted {
             cameraMigrationLogger.notice(
                 "swift_camera_fov mode=\(input.fov_func) fov=\(result.state.fov, privacy: .public) presented=\(result.presentedFOV, privacy: .public)"
+            )
+        }
+        return SM64_MODERN_STATUS_OK
+    }
+
+    func evaluateCutsceneSpline(
+        input: SM64ModernCameraCutsceneSplineInputV1,
+        output: UnsafeMutablePointer<SM64ModernCameraCutsceneSplineOutputV1>
+    ) -> SM64ModernStatus {
+        assertOwnerThread()
+        guard input.header.abi_version == SM64_MODERN_ABI_VERSION_1,
+              input.header.struct_size >= UInt32(
+                MemoryLayout<SM64ModernCameraCutsceneSplineInputV1>.size
+              ),
+              input.reserved == 0 else {
+            return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "cutscene_spline_input")
+        }
+
+        let points = [
+            SM64CameraCutsceneSplinePoint(
+                index: input.point0_index, speed: input.point0_speed,
+                point: SM64ObjectVector3(
+                    x: input.point0.0, y: input.point0.1, z: input.point0.2
+                )
+            ),
+            SM64CameraCutsceneSplinePoint(
+                index: input.point1_index, speed: input.point1_speed,
+                point: SM64ObjectVector3(
+                    x: input.point1.0, y: input.point1.1, z: input.point1.2
+                )
+            ),
+            SM64CameraCutsceneSplinePoint(
+                index: input.point2_index, speed: input.point2_speed,
+                point: SM64ObjectVector3(
+                    x: input.point2.0, y: input.point2.1, z: input.point2.2
+                )
+            ),
+            SM64CameraCutsceneSplinePoint(
+                index: input.point3_index, speed: input.point3_speed,
+                point: SM64ObjectVector3(
+                    x: input.point3.0, y: input.point3.1, z: input.point3.2
+                )
+            )
+        ]
+        guard let result = SM64CameraCutscene.movePointAlongSpline(
+            points: points,
+            state: SM64CameraCutsceneSplineState(
+                segment: input.segment, progress: input.progress
+            )
+        ) else {
+            return SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY
+        }
+
+        var next = SM64ModernCameraCutsceneSplineOutputV1()
+        next.header.abi_version = SM64_MODERN_ABI_VERSION_1
+        next.header.struct_size = UInt32(
+            MemoryLayout<SM64ModernCameraCutsceneSplineOutputV1>.size
+        )
+        next.point = (result.point.x, result.point.y, result.point.z)
+        next.segment = result.state.segment
+        next.progress = result.state.progress
+        next.finished = result.finished ? 1 : 0
+        next.reserved0 = 0
+        next.reserved1 = 0
+        next.reserved = 0
+        output.pointee = next
+        if !loggedCutsceneSpline {
+            loggedCutsceneSpline = true
+            cameraMigrationLogger.notice(
+                "swift_camera_cutscene_spline segment=\(result.state.segment) finished=\(result.finished)"
+            )
+        }
+        return SM64_MODERN_STATUS_OK
+    }
+
+    func evaluateCutsceneClock(
+        input: SM64ModernCameraCutsceneClockInputV1,
+        output: UnsafeMutablePointer<SM64ModernCameraCutsceneClockOutputV1>
+    ) -> SM64ModernStatus {
+        assertOwnerThread()
+        guard input.header.abi_version == SM64_MODERN_ABI_VERSION_1,
+              input.header.struct_size >= UInt32(
+                MemoryLayout<SM64ModernCameraCutsceneClockInputV1>.size
+              ),
+              input.reserved0 == 0,
+              input.reserved1 == 0,
+              input.reserved == 0 else {
+            return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "cutscene_clock_input")
+        }
+        guard let result = SM64CameraCutscene.advanceClock(
+            state: SM64CameraCutsceneClockState(
+                cutscene: input.cutscene,
+                shot: input.shot,
+                timer: input.timer
+            ),
+            shotDuration: input.shot_duration,
+            cutsceneStillActive: input.cutscene_active != 0
+        ) else {
+            return SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY
+        }
+
+        var next = SM64ModernCameraCutsceneClockOutputV1()
+        next.header.abi_version = SM64_MODERN_ABI_VERSION_1
+        next.header.struct_size = UInt32(
+            MemoryLayout<SM64ModernCameraCutsceneClockOutputV1>.size
+        )
+        next.cutscene = result.state.cutscene
+        next.shot = result.state.shot
+        next.timer = result.state.timer
+        next.stopped = result.stopped ? 1 : 0
+        next.advanced_shot = result.advancedShot ? 1 : 0
+        next.reserved0 = 0
+        next.reserved = 0
+        output.pointee = next
+        if !loggedCutsceneClock {
+            loggedCutsceneClock = true
+            cameraMigrationLogger.notice(
+                "swift_camera_cutscene_clock cutscene=\(input.cutscene) shot=\(result.state.shot) timer=\(result.state.timer)"
             )
         }
         return SM64_MODERN_STATUS_OK

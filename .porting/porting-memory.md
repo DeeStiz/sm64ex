@@ -2,6 +2,20 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31x promotes cutscene clock and spline state through the Swift camera
+  migration ABI. C snapshots the four control points at the current segment
+  and the active cutscene shot/timer; Swift owns cubic-spline evaluation,
+  progress/segment advancement, shot-duration rollover, and stop semantics,
+  while C retains authored shot selection/event bodies and camera pointers.
+  The existing standalone cutscene/FOV fingerprint remains
+  `0x0fa052c32482bd3a`; migration/spline, camera, runtime, native ABI, Swift 6
+  Debug build, and `git diff --check` pass. Signed launch
+  `/tmp/sm64-modern-m31x-live.log` reaches Metal 4 frame one, 360 fixed
+  steps, zero scheduler/audio drops, and status-0 shutdown; startup does not
+  enter an authored cutscene, so live spline/clock telemetry, visual parity,
+  physical feel, and human acceptance remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31x.md`.
+
 - M31w makes the water-surface camera transition (mode 8) deterministic.
   Swift now owns the explicit transition no-op: it preserves the supplied
   focus/position and returns the current relative yaw, while the normal
