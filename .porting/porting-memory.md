@@ -2,6 +2,13 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31i adds `lifecycle` to the Swift-owned authority ledger. The strict
+  runtime smoke, regenerated native Debug build, and gated verifier pass at
+  `/tmp/sm64-modern-m31i-build.log` and
+  `/tmp/sm64-modern-m31i-full-verify.log` (`verify_exit=0`); the live app
+  still honestly bridges audio, camera, frontend, rendering, and save
+  persistence to C. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31i.md`.
 - M31h makes Swift/C authority explicit with a closed value-only domain
   ledger. Every engine domain is assigned to Swift or the named
   `c_compatibility_bridge`; `SM64ModernSwiftEngineRuntime` rejects ledger

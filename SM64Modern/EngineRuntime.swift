@@ -21,6 +21,7 @@ struct SM64ModernSwiftEngineTickReceipt: Equatable, Sendable {
 }
 
 enum SM64ModernSwiftEngineDomain: String, CaseIterable, Equatable, Hashable, Sendable {
+    case lifecycle
     case state
     case objectScheduler
     case progression
@@ -38,7 +39,7 @@ struct SM64ModernSwiftEngineDomainReadiness: Equatable, Sendable {
     let swiftOwned: Set<SM64ModernSwiftEngineDomain>
 
     static let context = Self(swiftOwned: [
-        .state, .objectScheduler, .progression, .input, .marioInput, .marioAction
+        .lifecycle, .state, .objectScheduler, .progression, .input, .marioInput, .marioAction
     ])
 
     func isSwiftOwned(_ domain: SM64ModernSwiftEngineDomain) -> Bool {

@@ -90,6 +90,9 @@ enum SM64ModernEngineRuntimeSmoke {
             swiftShell.authorityLedger.owner(of: .state) == .swift
         )
         precondition(
+            swiftShell.authorityLedger.owner(of: .lifecycle) == .swift
+        )
+        precondition(
             swiftShell.authorityLedger.owner(of: .savePersistence)
                 == .cCompatibilityBridge
         )
