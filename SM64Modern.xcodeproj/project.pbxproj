@@ -233,6 +233,7 @@
 		E6EB1E83D40B684FD3B7426A /* KoopaShellObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAB7D9714A5D0EEB844F6E3A /* KoopaShellObjectBridge.swift */; };
 		E8C1689E9E20F1D6F8F051A3 /* KingBobombObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 89E04BA8076B6B4EC9BEA57D /* KingBobombObjectBridge.swift */; };
 		E9D87E92CAED2015676448A6 /* BulletBillObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA95695B8D532F2B761602DE /* BulletBillObjectBridge.swift */; };
+		EBD6920A5888FE34514D47BB /* AudioSynthesis.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66A4C16759D4C02C2973885 /* AudioSynthesis.swift */; };
 		ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */; };
 		EF3F4EC4818F96BA083A23B6 /* ProgressionActors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3F3E0A2388B47713DA5889 /* ProgressionActors.swift */; };
 		F0A42E68B7BDE5F90AC77823 /* FrontEnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C7DB01D913DFD52E6E0BBF /* FrontEnd.swift */; };
@@ -468,6 +469,7 @@
 		D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectTransform.swift; sourceTree = "<group>"; };
 		D50D50CB46C2409DDCA4E62E /* MarioSubmergedAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSubmergedAction.swift; sourceTree = "<group>"; };
 		D5723E1972C2FF3BB21E3A5B /* AppMain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppMain.swift; sourceTree = "<group>"; };
+		D66A4C16759D4C02C2973885 /* AudioSynthesis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSynthesis.swift; sourceTree = "<group>"; };
 		D6B1983ADD652967A0372D10 /* BehaviorScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorScript.swift; sourceTree = "<group>"; };
 		D80B185797853434E28E3A2F /* HeaveHoEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HeaveHoEnemy.swift; sourceTree = "<group>"; };
 		D80D7D687104873CF663B8AB /* TuxiesMotherEyes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuxiesMotherEyes.swift; sourceTree = "<group>"; };
@@ -529,6 +531,7 @@
 				E51CE2557B77FAF7731F3B79 /* AudioPools.swift */,
 				E031BF83D984334D480CF1AE /* AudioResidency.swift */,
 				7E3067F20772683A08D2D750 /* AudioSequence.swift */,
+				D66A4C16759D4C02C2973885 /* AudioSynthesis.swift */,
 				BA7D8015EB93979846FCCE8A /* AudioTrace.swift */,
 				4DDE26E083CE3C79E2FBCCDB /* BehaviorDispatchBridge.swift */,
 				D6B1983ADD652967A0372D10 /* BehaviorScript.swift */,
@@ -879,6 +882,7 @@
 				6CFFFE57D9A674C3022869C0 /* AudioPools.swift in Sources */,
 				0D78DE60017C40C08F8475DA /* AudioResidency.swift in Sources */,
 				F56A4EB70031FE139B3F31C8 /* AudioSequence.swift in Sources */,
+				EBD6920A5888FE34514D47BB /* AudioSynthesis.swift in Sources */,
 				7266996C07A9FA1676FAC4AE /* AudioTrace.swift in Sources */,
 				8AC19AB29646962A8EF430E1 /* BehaviorDispatchBridge.swift in Sources */,
 				FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */,

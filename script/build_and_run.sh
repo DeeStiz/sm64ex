@@ -54,6 +54,7 @@ else
   "$PROJECT_ROOT/script/test_audio_pools.sh"
   "$PROJECT_ROOT/script/test_audio_residency.sh"
   "$PROJECT_ROOT/script/test_audio_trace.sh"
+  "$PROJECT_ROOT/script/test_audio_synthesis.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
