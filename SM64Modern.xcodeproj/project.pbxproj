@@ -210,6 +210,7 @@
 		CF3A2F4EE5C0CD4A0C3AAF45 /* MarioGroundSpeed.swift in Sources */ = {isa = PBXBuildFile; fileRef = A324AE8C019E9D59ECC1D057 /* MarioGroundSpeed.swift */; };
 		CFF98EAAB1C2B379F37CB33B /* EngineAuthority.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6291FCF691572C0089D6194D /* EngineAuthority.swift */; };
 		D0031C8BC47031BF22FCFA00 /* EyerokHand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225D73054770EC25DC64D2C0 /* EyerokHand.swift */; };
+		D19D30E6B7A0A540B8C68BB4 /* FrontEndRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = C43519D037D79EF6DB35F980 /* FrontEndRender.swift */; };
 		D3919C39B72DEEB57976B4BA /* TuxiesMotherBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBADCC8D3A0FCE39EEF40AC3 /* TuxiesMotherBehavior.swift */; };
 		D65F07ACB7B0E4429D8D1086 /* ObjectSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */; };
 		D77819D0FD6CAB42ED53C410 /* ChuckyaEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDDABF519C9DA6F2577DA59 /* ChuckyaEnemy.swift */; };
@@ -441,6 +442,7 @@
 		C04B8FC7D6A5B7B768EA99CF /* MarioSwimmingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSwimmingAction.swift; sourceTree = "<group>"; };
 		C23B165EA0ECBB7202A73BB8 /* MarioBrakingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioBrakingAction.swift; sourceTree = "<group>"; };
 		C36A9EE3635D87C47B73C196 /* BowserKeyCutsceneObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserKeyCutsceneObjectBridge.swift; sourceTree = "<group>"; };
+		C43519D037D79EF6DB35F980 /* FrontEndRender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FrontEndRender.swift; sourceTree = "<group>"; };
 		C4840C223F4AFD7C0B36D74C /* RacingPenguinPath.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RacingPenguinPath.swift; sourceTree = "<group>"; };
 		C6F47456E9B2F4A650F55D12 /* MarioSteepJump.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSteepJump.swift; sourceTree = "<group>"; };
 		C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleInputService.swift; sourceTree = "<group>"; };
@@ -592,6 +594,7 @@
 				05D35EE8DC4AB3016AB7352A /* FlyGuyEnemy.swift */,
 				59206E9C56FA9ADDE5FD3301 /* FlyGuyObjectBridge.swift */,
 				86C7DB01D913DFD52E6E0BBF /* FrontEnd.swift */,
+				C43519D037D79EF6DB35F980 /* FrontEndRender.swift */,
 				26195252708283AFB936E392 /* GameplayParity.swift */,
 				419DC71930B2E4EE76B0E18E /* GameplayTick.swift */,
 				92C22E70845A716BECE93CE0 /* GameView.swift */,
@@ -936,6 +939,7 @@
 				F635692396D181B8EEE8464A /* FlyGuyEnemy.swift in Sources */,
 				9931F629C3ED5181495396D9 /* FlyGuyObjectBridge.swift in Sources */,
 				F0A42E68B7BDE5F90AC77823 /* FrontEnd.swift in Sources */,
+				D19D30E6B7A0A540B8C68BB4 /* FrontEndRender.swift in Sources */,
 				15156FB40A2F0FB896A7D6EC /* GameView.swift in Sources */,
 				0C110C47F377370F18974E8D /* GameViewController.swift in Sources */,
 				335A496DF3E28E597B73BE28 /* GameplayParity.swift in Sources */,
