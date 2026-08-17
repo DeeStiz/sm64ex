@@ -59,6 +59,7 @@ else
   "$PROJECT_ROOT/script/test_audio_stream.sh"
   "$PROJECT_ROOT/script/test_audio_mixer.sh"
   "$PROJECT_ROOT/script/test_audio_promotion.sh"
+  "$PROJECT_ROOT/script/test_audio_migration.sh"
   "$PROJECT_ROOT/script/test_display_list_packet.sh"
   "$PROJECT_ROOT/script/test_render_packet_capture.sh"
   "$PROJECT_ROOT/script/test_render_trace_adapter.sh"
@@ -268,6 +269,7 @@ case "$MODE" in
       'gameplay_bridge_installed abi=1 slices=mario_buttons,mario_ground_speed,bobomb_release' \
       'input_snapshot_started owner_main=false' \
       'audio_service_started input_hz=32000 format=s16_interleaved_stereo' \
+      'audio_sequence_bridge_installed abi=1 authority=swift pcm_authority=c' \
       'audio_enqueue_started blocks_per_native_step=1' \
       'audio_render_started' \
       'timebase_configured simulation_hz=60/1 legacy_hz=30/1 paired_ticks=2' \
@@ -323,6 +325,7 @@ case "$MODE" in
           --predicate "processIdentifier == $app_pid && subsystem == \"$BUNDLE_ID\"")"
         for expected in \
           'audio_service_stopped' \
+          'swift_audio_sequence_observer_finished' \
           'platform_shutdown' \
           'metal_shutdown_drained' \
           'engine_thread_finished status=0' \
@@ -334,7 +337,7 @@ case "$MODE" in
           printf '%s\n' "$shutdown_log" | grep -E 'swift_audio_promotion_finished'
         fi
         printf '%s\n' "$shutdown_log" \
-          | grep -E 'audio_service_stopped|metal_shutdown_drained|platform_shutdown|engine_thread_finished status=0|application_stopped'
+          | grep -E 'audio_service_stopped|swift_audio_sequence_observer_finished|metal_shutdown_drained|platform_shutdown|engine_thread_finished status=0|application_stopped'
         exit 0
       fi
       sleep 0.1

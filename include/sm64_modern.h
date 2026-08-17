@@ -717,6 +717,41 @@ typedef struct SM64ModernCameraMigrationApiV1 {
     SM64ModernCameraCutsceneClockEvaluateFn evaluate_cutscene_clock;
 } SM64ModernCameraMigrationApiV1;
 
+// Audio sequence migration is intentionally a value-only observer boundary.
+// The legacy C sequence player and device-facing PCM path remain compatible
+// owners until a later milestone proves full synthesis and audible parity;
+// this seam lets Swift consume the exact owner-thread sequence/queue events
+// without exposing sequence-player pointers or realtime audio state.
+typedef uint32_t SM64ModernAudioSequenceEvent;
+
+#define SM64_MODERN_AUDIO_SEQUENCE_EVENT_TICK 1u
+#define SM64_MODERN_AUDIO_SEQUENCE_EVENT_SEQUENCE 2u
+#define SM64_MODERN_AUDIO_SEQUENCE_EVENT_QUEUE 3u
+#define SM64_MODERN_AUDIO_SEQUENCE_EVENT_SECONDARY 4u
+#define SM64_MODERN_AUDIO_SEQUENCE_EVENT_FIRST \
+    SM64_MODERN_AUDIO_SEQUENCE_EVENT_TICK
+#define SM64_MODERN_AUDIO_SEQUENCE_EVENT_LAST \
+    SM64_MODERN_AUDIO_SEQUENCE_EVENT_SECONDARY
+
+typedef struct SM64ModernAudioSequenceEventV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    SM64ModernAudioSequenceEvent event_id;
+    uint32_t value_count;
+    uint64_t values[SM64_MODERN_ORACLE_TRACE_VALUE_CAPACITY];
+    uint32_t reserved;
+} SM64ModernAudioSequenceEventV1;
+
+typedef SM64ModernStatus (*SM64ModernAudioSequenceObserveFn)(
+    void *context,
+    const SM64ModernAudioSequenceEventV1 *event);
+
+typedef struct SM64ModernAudioMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernAudioSequenceObserveFn observe_sequence_event;
+} SM64ModernAudioMigrationApiV1;
+
 // Optional gameplay-kernel extension. It is installed separately so the
 // original migration table remains ABI-stable for existing hosts.
 typedef struct SM64ModernMarioGroundSpeedApiV1 {
@@ -1118,6 +1153,17 @@ SM64ModernStatus sm64_modern_camera_evaluate_fov(
     SM64ModernCameraFOVOutputV1 *out_output);
 SM64ModernStatus sm64_modern_camera_set_authority(uint32_t enabled);
 uint32_t sm64_modern_camera_authority_active(void);
+SM64ModernStatus sm64_modern_validate_audio_migration_api(
+    const SM64ModernAudioMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_audio_migration_api(
+    const SM64ModernAudioMigrationApiV1 *migration);
+void sm64_modern_uninstall_audio_migration_api(void);
+SM64ModernStatus sm64_modern_audio_migration_status(void);
+SM64ModernStatus sm64_modern_audio_observe_sequence_event(
+    uint32_t event_id,
+    uint64_t simulation_tick,
+    const uint64_t *values,
+    uint32_t value_count);
 SM64ModernStatus sm64_modern_validate_progression_migration_api(
     const SM64ModernProgressionMigrationApiV1 *migration);
 SM64ModernStatus sm64_modern_install_progression_migration_api(

@@ -244,6 +244,7 @@ final class EngineHost {
     private var automaticTerminationRequested = false
     private var inputService: AppleInputService?
     private var audioService: SM64ModernAppleAudioService?
+    private var audioMigrationService: SwiftAudioMigrationService?
     private var audioPromotion: SM64AudioOwnerPromotion?
     private var loggedAudioEnqueue = false
     private var loggedAudioRender = false
@@ -1184,6 +1185,31 @@ final class EngineHost {
             throw error
         }
         audioService = service
+        if engineAuthority == .swift {
+            let migrationService = SwiftAudioMigrationService(
+                ownerThreadToken: engineThreadIdentifier
+            )
+            var migration = migrationService.makeAPI()
+            let migrationStatus = sm64_modern_install_audio_migration_api(
+                &migration
+            )
+            guard migrationStatus == SM64_MODERN_STATUS_OK else {
+                service.stop()
+                audioService = nil
+                throw NSError(
+                    domain: "io.github.deestiz.sm64modern.Audio",
+                    code: Int(migrationStatus),
+                    userInfo: [
+                        NSLocalizedDescriptionKey:
+                            "Could not install the Swift audio sequence observer"
+                    ]
+                )
+            }
+            audioMigrationService = migrationService
+            audioLogger.notice(
+                "audio_sequence_bridge_installed abi=1 authority=swift pcm_authority=c"
+            )
+        }
         if ProcessInfo.processInfo.environment["SM64_MODERN_AUDIO_PROMOTION"] == "1" {
             let promotion = SM64AudioOwnerPromotion(ownerToken: engineThreadIdentifier)
             audioPromotion = promotion
@@ -1202,6 +1228,9 @@ final class EngineHost {
 
     fileprivate func shutdownAudioOnEngineThread() {
         precondition(isCurrentEngineThread)
+        let sequenceMigration = audioMigrationService
+        audioMigrationService = nil
+        sm64_modern_uninstall_audio_migration_api()
         let promotion = audioPromotion
         audioPromotion = nil
         if let audioService {
@@ -1216,6 +1245,12 @@ final class EngineHost {
         if let summary = promotion?.summary() {
             audioLogger.notice(
                 "swift_audio_promotion_finished ticks=\(summary.ticks, privacy: .public) records=\(summary.traceRecords, privacy: .public) pcm_frames=\(summary.pcmFrames, privacy: .public) fingerprint=\(summary.traceFingerprint, privacy: .public) admission_failed=\(summary.admissionFailed, privacy: .public)"
+            )
+        }
+        if let sequenceMigration {
+            let summary = sequenceMigration.summary()
+            audioLogger.notice(
+                "swift_audio_sequence_observer_finished events=\(summary.events, privacy: .public) ticks=\(summary.ticks, privacy: .public) queue=\(summary.queueCount, privacy: .public) fingerprint=\(summary.fingerprint, privacy: .public)"
             )
         }
     }

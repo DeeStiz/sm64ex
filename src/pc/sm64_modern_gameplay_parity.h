@@ -54,10 +54,14 @@ void sm64_modern_parity_record_script_event(uint32_t event_id,
                                             uint64_t subject_id,
                                             const uint64_t *values,
                                             uint32_t value_count);
-#define SM64_MODERN_ORACLE_AUDIO_EVENT_TICK 1u
-#define SM64_MODERN_ORACLE_AUDIO_EVENT_SEQUENCE 2u
-#define SM64_MODERN_ORACLE_AUDIO_EVENT_QUEUE 3u
-#define SM64_MODERN_ORACLE_AUDIO_EVENT_SECONDARY 4u
+#define SM64_MODERN_ORACLE_AUDIO_EVENT_TICK \
+    SM64_MODERN_AUDIO_SEQUENCE_EVENT_TICK
+#define SM64_MODERN_ORACLE_AUDIO_EVENT_SEQUENCE \
+    SM64_MODERN_AUDIO_SEQUENCE_EVENT_SEQUENCE
+#define SM64_MODERN_ORACLE_AUDIO_EVENT_QUEUE \
+    SM64_MODERN_AUDIO_SEQUENCE_EVENT_QUEUE
+#define SM64_MODERN_ORACLE_AUDIO_EVENT_SECONDARY \
+    SM64_MODERN_AUDIO_SEQUENCE_EVENT_SECONDARY
 void sm64_modern_parity_record_audio_sequence(uint32_t event_id,
                                               const uint64_t *values,
                                               uint32_t value_count);

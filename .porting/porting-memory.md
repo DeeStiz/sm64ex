@@ -2,6 +2,21 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31y adds the first live Swift audio boundary. C packages owner-thread tick,
+  sequence, queue, and secondary-sequence events into a fixed-width observer
+  ABI; Swift replays the six-entry background queue and player sequence state
+  as an owner-thread value model, rejects malformed events, and records a
+  stable boundary fingerprint. `script/test_audio_migration.sh` matches the
+  independent C contract at `0x175790b07cad64f`; existing audio sequence and
+  promotion contracts, native Swift 6 Debug build, and `git diff --check` pass.
+  Signed Apple M5 Max evidence is `/tmp/sm64-modern-m31y-runtime.log`:
+  `audio_sequence_bridge_installed authority=swift pcm_authority=c`, Metal 4
+  frame one, 140 observed events, 132 ticks, queue size 2, observer
+  fingerprint `16486630640083679715`, and status-0 shutdown. C remains the
+  sequence-synthesis, PCM, AVAudio, and audible/device authority; full audio
+  parity and physical listening remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31y.md`.
+
 - M31x promotes cutscene clock and spline state through the Swift camera
   migration ABI. C snapshots the four control points at the current segment
   and the active cutscene shot/timer; Swift owns cubic-spline evaluation,

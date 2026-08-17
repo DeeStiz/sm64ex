@@ -15,6 +15,7 @@
 #include "game/object_list_processor.h"
 #include "level_table.h"
 #include "object_fields.h"
+#include "sm64_modern_audio_migration.h"
 #include "sm64_modern_gameplay_migration.h"
 #include "sm64_modern_gameplay_parity.h"
 #include "sm64_modern_timebase.h"
@@ -1292,6 +1293,13 @@ void sm64_modern_parity_record_script_event(uint32_t event_id,
 void sm64_modern_parity_record_audio_sequence(uint32_t event_id,
                                               const uint64_t *values,
                                               uint32_t value_count) {
+    const SM64ModernStatus observer_status =
+        sm64_modern_audio_observe_sequence_event(
+            event_id, sSimulationTick, values, value_count);
+    if (observer_status != SM64_MODERN_STATUS_OK
+        && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = observer_status;
+    }
     if (!sm64_modern_oracle_trace_is_active()) {
         return;
     }
