@@ -2,6 +2,16 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31o promotes the direct slide/hoot transition callback (modes 9 and 15) to
+  the Swift camera evaluator. The existing Swift kernel owns face-yaw plus
+  offset, 800-unit placement, 125-unit offsets, 0x1555 pitch, and returned
+  Mario yaw; C keeps slide-floor/hoot smoothing, collision, C-button, and
+  Lakitu presentation. Camera geometry/callback/migration/state/runtime, ABI,
+  Debug build, and `git diff --check` gates pass; fresh launch
+  `/tmp/sm64-modern-m31o-live.log` reaches Swift selection, Metal frame one,
+  and status-0 shutdown without entering an authored slide/hoot transition.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M31o.md`.
+
 - M31n extends the pure camera evaluator to radial, outward-radial, and
   eight-direction modes. The C adapter snapshots floor/water/pole/slope facts
   with explicit geometry flags; Swift maps them to `SM64CameraHeightInput` and

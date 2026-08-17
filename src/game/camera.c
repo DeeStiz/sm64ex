@@ -2650,7 +2650,15 @@ void mode_spiral_stairs_camera(struct Camera *c) {
     c->nextYaw = update_spiral_stairs_camera(c, c->focus, c->pos);
 }
 
-s32 update_slide_or_0f_camera(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
+s32 update_slide_or_0f_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
+    s16 callbackYaw = 0;
+    u32 callbackFlags = 0;
+    if (sm64_modern_camera_evaluate_callback(
+            c, c != NULL ? (s16)c->mode : CAMERA_MODE_SLIDE_HOOT,
+            focus, pos, &callbackYaw, &callbackFlags)) {
+        return callbackYaw;
+    }
+
     s16 yaw = sMarioCamState->faceAngle[1] + sModeOffsetYaw + DEGREES(180);
 
     focus_on_mario(focus, pos, 125.f, 125.f, 800.f, 5461, yaw);
