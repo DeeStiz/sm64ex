@@ -283,6 +283,23 @@ typedef struct SM64ModernTimebaseSnapshotV1 {
     uint64_t fingerprint;
 } SM64ModernTimebaseSnapshotV1;
 
+// The Swift configuration owner applies the nine legacy runtime cheat flags
+// before lifecycle initialization. The core copies this scalar snapshot into
+// its compatibility CheatList; options-menu edits remain live C mutations
+// after this startup boundary.
+typedef struct SM64ModernCheatStateV1 {
+    SM64ModernAbiHeader header;
+    uint32_t enabled;
+    uint32_t moon_jump;
+    uint32_t god_mode;
+    uint32_t infinite_lives;
+    uint32_t super_speed;
+    uint32_t responsive;
+    uint32_t exit_anywhere;
+    uint32_t huge_mario;
+    uint32_t tiny_mario;
+} SM64ModernCheatStateV1;
+
 typedef SM64ModernStatus (*SM64ModernPlatformInitializeFn)(void *context, const char *window_title);
 typedef void (*SM64ModernPlatformShutdownFn)(void *context);
 typedef int32_t (*SM64ModernPlatformAudioBufferedFn)(void *context);
@@ -794,6 +811,8 @@ SM64ModernStatus sm64_modern_get_lifecycle_api(uint32_t requested_version,
 SM64ModernStatus sm64_modern_get_timebase_api(uint32_t requested_version,
                                               uint32_t output_size,
                                               SM64ModernTimebaseApiV1 *out_api);
+SM64ModernStatus sm64_modern_apply_cheat_state(
+    const SM64ModernCheatStateV1 *state);
 SM64ModernStatus sm64_modern_validate_platform_api(const SM64ModernPlatformApiV1 *platform);
 SM64ModernStatus sm64_modern_validate_input_api(const SM64ModernInputApiV1 *input);
 SM64ModernStatus sm64_modern_install_input_api(const SM64ModernInputApiV1 *input);

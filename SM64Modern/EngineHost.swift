@@ -746,6 +746,32 @@ final class EngineHost {
             )
         }
 
+        // Swift owns the parsed cheat configuration at startup, then applies
+        // the scalar snapshot into the legacy CheatList compatibility owner.
+        // The C options menu may still mutate those fields live after this
+        // boundary; gameplay callbacks observe that current C snapshot.
+        var cheatState = SM64ModernCheatStateV1()
+        cheatState.header.abi_version = SM64_MODERN_ABI_VERSION_1
+        cheatState.header.struct_size = UInt32(MemoryLayout<SM64ModernCheatStateV1>.size)
+        let cheats = configuration.configuration.cheats
+        cheatState.enabled = cheats.enabled ? 1 : 0
+        cheatState.moon_jump = cheats.moonJump ? 1 : 0
+        cheatState.god_mode = cheats.godMode ? 1 : 0
+        cheatState.infinite_lives = cheats.infiniteLives ? 1 : 0
+        cheatState.super_speed = cheats.superSpeed ? 1 : 0
+        cheatState.responsive = cheats.responsive ? 1 : 0
+        cheatState.exit_anywhere = cheats.exitAnywhere ? 1 : 0
+        cheatState.huge_mario = cheats.hugeMario ? 1 : 0
+        cheatState.tiny_mario = cheats.tinyMario ? 1 : 0
+        status = sm64_modern_apply_cheat_state(&cheatState)
+        guard status == SM64_MODERN_STATUS_OK else {
+            engineLogger.error("cheat_state_apply_failed status=\(status)")
+            return status
+        }
+        engineLogger.notice(
+            "cheat_state_applied enabled=\(cheatState.enabled) moon_jump=\(cheatState.moon_jump) god_mode=\(cheatState.god_mode) infinite_lives=\(cheatState.infinite_lives) super_speed=\(cheatState.super_speed) responsive=\(cheatState.responsive) exit_anywhere=\(cheatState.exit_anywhere) huge_mario=\(cheatState.huge_mario) tiny_mario=\(cheatState.tiny_mario)"
+        )
+
         // Headless migration gates opt into the same level script with a
         // deterministic save-backed spawn, so the Peach intro cutscene cannot
         // consume the entire bounded callback window. Configuration is read

@@ -62,6 +62,7 @@ struct SwiftGameplayEvidence {
     let marioButtonUpdates: UInt64
     let marioGroundSpeedUpdates: UInt64
     let bobombReleaseUpdates: UInt64
+    let cheatPolicyUpdates: UInt64
 
     func exercised(subsystem: SM64ModernGameplaySubsystem) -> Bool {
         switch subsystem {
@@ -103,6 +104,7 @@ final class SwiftGameplayService {
     private var marioButtonUpdates: UInt64 = 0
     private var marioGroundSpeedUpdates: UInt64 = 0
     private var bobombReleaseUpdates: UInt64 = 0
+    private var cheatPolicyUpdates: UInt64 = 0
     private var ownerThreadIdentity: UInt64?
 
     func resetEvidence() {
@@ -114,6 +116,7 @@ final class SwiftGameplayService {
         marioButtonUpdates = 0
         marioGroundSpeedUpdates = 0
         bobombReleaseUpdates = 0
+        cheatPolicyUpdates = 0
     }
 
     func evidence() -> SwiftGameplayEvidence {
@@ -121,7 +124,8 @@ final class SwiftGameplayService {
         return SwiftGameplayEvidence(
             marioButtonUpdates: marioButtonUpdates,
             marioGroundSpeedUpdates: marioGroundSpeedUpdates,
-            bobombReleaseUpdates: bobombReleaseUpdates
+            bobombReleaseUpdates: bobombReleaseUpdates,
+            cheatPolicyUpdates: cheatPolicyUpdates
         )
     }
 
@@ -192,6 +196,19 @@ final class SwiftGameplayService {
               input.cheats_enabled <= 1 else {
             return SM64_MODERN_STATUS_INVALID_ARGUMENT
         }
+        let cheatState = SM64CheatState(
+            legacyEnabled: input.cheats_enabled != 0,
+            responsive: input.responsive_cheat != 0
+        )
+        let responsiveMovement = SM64CheatPolicy.responsiveMovementEnabled(
+            for: cheatState
+        )
+        cheatPolicyUpdates += 1
+        if cheatPolicyUpdates == 1 {
+            swiftGameplayLogger.notice(
+                "swift_cheat_policy_exercised policy=responsive_movement enabled=\(cheatState.enabled, privacy: .public) responsive=\(cheatState.responsive, privacy: .public)"
+            )
+        }
         guard let speed = SM64MarioGroundSpeed.update(
             SM64MarioGroundSpeedInput(
                 intendedMagnitude: Float(bitPattern: input.intended_magnitude_bits),
@@ -201,8 +218,8 @@ final class SwiftGameplayService {
                 intendedYaw: input.intended_yaw,
                 faceYaw: input.face_yaw,
                 floorIsSlow: input.floor_is_slow != 0,
-                responsiveCheat: input.responsive_cheat != 0,
-                cheatsEnabled: input.cheats_enabled != 0
+                responsiveCheat: responsiveMovement,
+                cheatsEnabled: cheatState.enabled
             )
         ) else {
             return SM64_MODERN_STATUS_INVALID_ARGUMENT

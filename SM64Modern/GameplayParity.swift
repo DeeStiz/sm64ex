@@ -331,7 +331,7 @@ final class GameplayParityCoordinator {
         // thread while the evidence counters are still authoritative.
         let evidence = gameplayService.evidence()
         parityLogger.notice(
-            "swift_gameplay_evidence mario_buttons=\(evidence.marioButtonUpdates) mario_ground_speed=\(evidence.marioGroundSpeedUpdates) bobomb_release=\(evidence.bobombReleaseUpdates)"
+            "swift_gameplay_evidence mario_buttons=\(evidence.marioButtonUpdates) mario_ground_speed=\(evidence.marioGroundSpeedUpdates) bobomb_release=\(evidence.bobombReleaseUpdates) cheat_policy=\(evidence.cheatPolicyUpdates)"
         )
 
         for index in 0..<SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT {

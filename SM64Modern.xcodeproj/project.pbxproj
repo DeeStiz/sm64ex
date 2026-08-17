@@ -105,6 +105,7 @@
 		637DB55CFFCA4EDF63A29B58 /* CameraInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724F73EC282345F4551FC1BF /* CameraInput.swift */; };
 		65F4BEF23300074C1E392842 /* MarioShellAirAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820DE3AD7B88D2679E91FFF4 /* MarioShellAirAction.swift */; };
 		6623355865D93A2C5631F1DF /* GoombaEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 351FD4FF55CB608F105C75CD /* GoombaEnemy.swift */; };
+		663BC366E1E4805F7E8E984C /* Cheats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1618F54073FF985CBD0EF12E /* Cheats.swift */; };
 		6835A925361AE3096638249D /* MarioBurningGroundAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CFDEEEED1CA8A6F5DCE17A5 /* MarioBurningGroundAction.swift */; };
 		696004D36164301F6C01B251 /* OwnerThreadEffectRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CB115FFD181E778F9AFE67C /* OwnerThreadEffectRouter.swift */; };
 		6C8640CA9C5EE9B633AEB081 /* MarioState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96143C0812CD3AA2EE120132 /* MarioState.swift */; };
@@ -259,6 +260,7 @@
 		129A98B13AFB161495B1C646 /* LevelScriptVM.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LevelScriptVM.swift; sourceTree = "<group>"; };
 		135C103AE0705B71EBE54DC5 /* SurfaceCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SurfaceCollision.swift; sourceTree = "<group>"; };
 		14C3AD2F912846687082EA12 /* SLWalkingPenguinCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SLWalkingPenguinCollision.swift; sourceTree = "<group>"; };
+		1618F54073FF985CBD0EF12E /* Cheats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cheats.swift; sourceTree = "<group>"; };
 		161FF132CEBCBEE1BC2A3217 /* ExplosionObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExplosionObjectBridge.swift; sourceTree = "<group>"; };
 		17FF9C20F66B7B90ADA98EC0 /* MarioSlopeDeceleration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSlopeDeceleration.swift; sourceTree = "<group>"; };
 		186043B47AD790B3A117E4E5 /* BowserKeyObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserKeyObjectBridge.swift; sourceTree = "<group>"; };
@@ -546,6 +548,7 @@
 				1A4D0A85B420C44DA84C20A2 /* ChainChompObjectBridge.swift */,
 				B0C6C29EF4D3EDA95AE7DC1C /* ChainChompRelease.swift */,
 				58360E4172E21635622C429F /* ChainChompReleaseObjectBridge.swift */,
+				1618F54073FF985CBD0EF12E /* Cheats.swift */,
 				4DDDABF519C9DA6F2577DA59 /* ChuckyaEnemy.swift */,
 				8972955B5A5B93E0345EE4EB /* ChuckyaObjectBridge.swift */,
 				B4872879FF660BB19A8FB4AC /* CoinScoreAges.swift */,
@@ -883,6 +886,7 @@
 				266014B18206F0BBAEB3A8B9 /* ChainChompObjectBridge.swift in Sources */,
 				1D60D3C5D08D6CC2D9C827AB /* ChainChompRelease.swift in Sources */,
 				A62D4EA3D1C0656EDD52DF8E /* ChainChompReleaseObjectBridge.swift in Sources */,
+				663BC366E1E4805F7E8E984C /* Cheats.swift in Sources */,
 				D77819D0FD6CAB42ED53C410 /* ChuckyaEnemy.swift in Sources */,
 				F9A793CA3048B14A9BE9DA03 /* ChuckyaObjectBridge.swift in Sources */,
 				AA0B49BED7B13B398A2731F6 /* CoinScoreAges.swift in Sources */,

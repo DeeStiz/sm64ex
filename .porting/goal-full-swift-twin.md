@@ -2,7 +2,7 @@
 
 ## Status
 
-M24c is the latest validated configuration slice layered on M23j/M34a/M33f/M22bc;
+M24d is the latest validated configuration/cheat slice layered on M23j/M34a/M33f/M22bc;
 the durable replay record now carries every mutation operand needed for a
 standalone fresh-image replay—flags, course/star, cap, sound, source slot, and
 recovery decisions—plus canonical per-record/header/artifact hashes. A fresh
@@ -15,7 +15,8 @@ force, with independent Swift/C fingerprints. Non-mutation progression
 callbacks now update the normalized shadow at the same C boundary, and an
 explicit `SM64_MODERN_SAVE_AUTHORITY_TRIAL=1` mode logs the Swift shadow
 commit without changing the restart selector. M22 remains behavior-coverage
-M24a introduces the value-only Swift configuration schema for the legacy
+work in progress. M24a introduces the value-only Swift configuration schema
+for the legacy
 `configfile.c` names: centered-window/video defaults, all fourteen three-slot
 bindings, audio volumes, deadzone/rumble, optional BetterCamera/ExternalData/
 Discord settings, language/legal-ROM state, and the nine runtime cheat flags.
@@ -44,7 +45,18 @@ the runtime fingerprint remains `0x1b0a9226b4babc19`. The focused contracts,
 regenerated native Debug build (`/tmp/sm64-modern-m24c-build.log`), complete
 215-script matrix (`runs=215 failures=0`), and
 `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24c-verify.log`) pass.
-M24d must route cheats through live Swift consumers. M22 remains behavior-coverage work in progress:
+M24d adds an owner-thread `SM64ModernCheatStateV1` startup ABI: Swift applies
+all nine parsed cheat flags into the legacy `CheatList` before lifecycle
+initialization, while live C menu edits remain visible to compatibility
+callbacks. The Swift Mario ground-speed consumer routes the responsive-cheat
+decision through value-only `SM64CheatPolicy`, with independent Swift/C policy
+and C ABI smoke coverage. The cheat fingerprint is
+`0x0dab67376d3daab8d`; the regenerated native Debug build is
+`/tmp/sm64-modern-m24d-build.log`, the launch proof is
+`/tmp/sm64-modern-m24d-verify.log`, and the complete 216-script matrix has
+`matrix_logs=216` with no failure markers. M24d remains a bounded consumer
+slice: remaining per-consumer toggles, menu persistence/readback, and full
+Swift authority are open. M22 remains behavior-coverage work in progress:
 the
 latest bounded gameplay slice is M22bc. M34a
 remains the latest Metal 4 production checkpoint. The Swift runtime
@@ -1875,10 +1887,11 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M23h: Restart-selector authority and durable save replay artifact | Save replay records are fixed-width and canonical-hash checked across process boundaries; headers preserve selected Swift/C authority and restart metadata, records carry C↔Swift direction, mutation/recovery metadata, before/after save/menu hashes, and image hashes, and the live migration service writes the artifact only under the explicit `SM64_MODERN_SAVE_REPLAY_ARTIFACT` opt-in. | Complete locally — initial artifact/selector contract and C-authored round trip (`/tmp/sm64-modern-m23h-build.log`, `/tmp/sm64-modern-m23h-final-matrix.log`, runs=212 failures=0); M23i widens the record with all replay operands and executes persisted recovery/mutation replay |
 | M23i: Operand-complete persisted save replay | The replay schema carries flags, course/star, cap, sound, source-slot, and recovery operands; a fresh normalized EEPROM image replays mutation, one-bad-copy repair, persist, and reload records, verifies before/after byte hashes, rejects tamper, and preserves authority/restart metadata. | Complete locally — operand-complete Swift artifact fingerprint `0x0ab6d5b2827a9435`, C-authored round-trip `0xb7120f3045b8cbbb`, fresh-image execution fingerprint `0x23b4cdd9dd948b53`, regenerated native Debug build (`/tmp/sm64-modern-m23i-build.log`), complete 213-script matrix (`/tmp/sm64-modern-m23i-final-matrix.log`, runs=213 failures=0), strict-concurrency audit, and `git diff --check`; full live artifact capture for every corruption branch and production Swift save authority remain |
 | M23j: Live progression-boundary shadow and authority trial | Non-mutation progression callbacks commit the canonical C snapshot into the normalized Swift shadow and, when artifact capture is enabled, append the same before/after hashes; `SM64_MODERN_SAVE_AUTHORITY_TRIAL=1` emits an explicit owner-thread shadow-commit diagnostic while the restart-required selector remains unchanged. | Complete locally — operand-complete artifact `0x0ab6d5b2827a9435`, fresh-image replay `0x23b4cdd9dd948b53`, selector/restart contract, regenerated native Debug build (`/tmp/sm64-modern-m23j-build.log`), complete 213-script matrix (`/tmp/sm64-modern-m23j-final-matrix.log`, runs=213 failures=0), strict-concurrency audit, and `git diff --check`; physical/live artifact capture, full C↔Swift authority cutover, and production save ownership remain |
-| M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | In progress — M24a–M24c establish schema, recovery, owner-thread load, lifecycle projection, lossless optional-setting persistence, and restart selection; live cheat consumers and full C↔Swift cutover remain |
+| M24: Configuration and cheats | Existing options, bindings, camera settings, cheats, defaults, and invalid-value recovery match C. | In progress — M24a–M24d establish schema, recovery, owner-thread load, lifecycle projection, lossless optional-setting persistence, restart selection, startup application of all nine cheat flags, and one live Swift cheat consumer; remaining consumers, menu persistence/readback, and full C↔Swift cutover remain |
 | M24a: Swift/C configuration schema and recovery | `SM64ModernConfiguration` mirrors the legacy config names/defaults, all fourteen three-slot bindings, optional camera/audio/video settings, language/legal-ROM state, and nine cheat flags. Canonical legacy/modern encoders and strict recovery diagnostics prevent malformed values from overwriting valid state. | Complete locally — default `0xe97566b495c612e6`, rich `0x57efcccc2a91d528`, and recovery `0xb24dbd75b2ab63e4` fingerprints match independent C vectors; `script/test_configuration.sh`, regenerated native Debug build (`/tmp/sm64-modern-m24a-build.log`, `BUILD SUCCEEDED`), complete 214-script matrix (`runs=214 failures=0`), strict-concurrency audit, and `git diff --check`; runtime application and authority work moved to M24b/M24c |
 | M24b: Owner-thread configuration runtime and fresh-save recovery | The Swift schema loads before lifecycle start, atomically persists repaired legacy values, reports unknown/malformed input, projects fullscreen/skip-intro into the C lifecycle seam, and seeds progression from the durable Swift image so a zeroed pre-lifecycle C buffer cannot corrupt menu-age parity. | Complete locally — runtime fingerprint `0x1b0a9226b4babc19`; focused runtime/replay contracts, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24b-verify-fixed.log`), empty-save launch status 0, invalid-config repair launch status 0, complete 215-script matrix (`runs=215 failures=0`), strict-concurrency audit, and `git diff --check`; M24c carries optional settings and authority persistence |
 | M24c: Lossless optional configuration and restart authority | A Swift sidecar preserves camera/HUD/Discord/language/legal-ROM/cheat values across C's legacy config rewrite, legacy values remain primary, and injected UserDefaults resolution proves persisted authority selection, restart comparison, and invalid-value recovery without mutating global defaults. | Complete locally — runtime fingerprint `0x1b0a9226b4babc19`; sidecar/C-rewrite regression, authority smoke, regenerated native Debug build (`/tmp/sm64-modern-m24c-build.log`, `BUILD SUCCEEDED`), complete 215-script matrix (`runs=215 failures=0`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24c-verify.log`), strict-concurrency audit, and `git diff --check`; live cheat consumers and runtime Swift authority remain |
+| M24d: Swift cheat state and live responsive consumer | The owner thread applies all nine parsed flags through a versioned C compatibility ABI, Swift policy mirrors legacy enable/disable and responsive movement behavior, invalid flag values fail closed, and focused Swift/C evidence is retained. | Complete locally — policy fingerprint `0x0dab67376d3daab8d`; `script/test_cheats.sh` covers Swift/C policy plus ABI application, regenerated native Debug build (`/tmp/sm64-modern-m24d-build.log`, `BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24d-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 216-script matrix (`matrix_logs=216`, no failure markers), zero unchecked-Sendable audit, and `git diff --check`; remaining per-consumer toggles, live menu persistence/readback, and full configuration authority remain |
 | M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | Not started |
 | M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | Not started |
 | M27: Audio sequencing/loading | Swift audio heap, banks, sequences, channels, layers, note allocation, and loading match pre-synthesis C traces. | Not started |
@@ -2238,8 +2251,11 @@ replayable trace, and the platform evidence listed in its exit gate.
    sidecar and injected UserDefaults authority contract: legacy settings remain
    primary, optional Swift-only values survive C shutdown writes, persisted
    authority changes report restart-required state, and invalid environment
-   values fail closed. M24d still must route every cheat toggle through live
-   Swift consumers before any full configuration authority cutover.
+   values fail closed. M24d applies all nine startup flags through a versioned
+   C compatibility ABI and routes responsive movement through the live Swift
+   policy consumer; the remaining moon-jump, Mario-action, model-scale,
+   exit-anywhere, and menu persistence/readback consumers still require their
+   own owner-thread seams before full configuration authority cutover.
 3. **M25 HUD and dialogs.** Port power meter, star/coin/life counters, cap
    icons, pause menu, dialogs, text layout, timers, fade state, and HUD
    camera status. Compare fixed-width layout/render packets and dialog timing,
