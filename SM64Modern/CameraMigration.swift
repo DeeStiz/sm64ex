@@ -27,6 +27,18 @@ private let swiftCameraUpdate: @convention(c) (
     return service.update(input: input.pointee, output: output)
 }
 
+private let swiftCameraEvaluate: @convention(c) (
+    UnsafeMutableRawPointer?,
+    UnsafePointer<SM64ModernCameraCallbackInputV1>?,
+    UnsafeMutablePointer<SM64ModernCameraCallbackOutputV1>?
+) -> SM64ModernStatus = { context, input, output in
+    guard let service = cameraMigrationService(from: context),
+          let input, let output else {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT
+    }
+    return service.evaluate(input: input.pointee, output: output)
+}
+
 /// Owner-thread adapter for the value-only camera selection seam. The C
 /// camera still owns geometry, collision, cutscenes, and Lakitu presentation;
 /// this service owns the selection/angle flag transitions and their exact
@@ -36,6 +48,7 @@ final class SwiftCameraMigrationService {
     private let ownerThreadIdentity: UInt64
     private var eventCount: UInt64 = 0
     private var loggedCommands: Set<UInt32> = []
+    private var loggedCallbackModes: Set<Int16> = []
     private var lastError: SM64ModernStatus = SM64_MODERN_STATUS_OK
 
     init(ownerThreadToken: UInt64) {
@@ -52,7 +65,73 @@ final class SwiftCameraMigrationService {
         )
         api.context = Unmanaged.passUnretained(self).toOpaque()
         api.update = swiftCameraUpdate
+        api.evaluate = swiftCameraEvaluate
         return api
+    }
+
+    func evaluate(
+        input: SM64ModernCameraCallbackInputV1,
+        output: UnsafeMutablePointer<SM64ModernCameraCallbackOutputV1>
+    ) -> SM64ModernStatus {
+        assertOwnerThread()
+        guard input.header.abi_version == SM64_MODERN_ABI_VERSION_1,
+              input.header.struct_size >= UInt32(
+                MemoryLayout<SM64ModernCameraCallbackInputV1>.size
+              ),
+              input.reserved == 0 else {
+            return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "callback_input")
+        }
+
+        let callbackInput = SM64CameraCallbackInput(
+            mode: input.mode,
+            marioPosition: SM64ObjectVector3(
+                x: input.mario_position.0,
+                y: input.mario_position.1,
+                z: input.mario_position.2
+            ),
+            areaCenter: SM64ObjectVector3(
+                x: input.area_center.0,
+                y: input.area_center.1,
+                z: input.area_center.2
+            ),
+            faceYaw: input.face_yaw,
+            facePitch: input.face_pitch,
+            modeOffsetYaw: input.mode_offset_yaw,
+            lakituPitch: input.lakitu_pitch,
+            lakituDistance: input.lakitu_distance,
+            zoomDistance: input.zoom_distance,
+            eightDirectionBaseYaw: input.eight_direction_base_yaw,
+            eightDirectionYawOffset: input.eight_direction_yaw_offset,
+            cannonYOffset: input.cannon_y_offset
+        )
+        guard let result = SM64CameraModeCallbacks.evaluate(callbackInput) else {
+            return SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY
+        }
+
+        var next = SM64ModernCameraCallbackOutputV1()
+        next.header.abi_version = SM64_MODERN_ABI_VERSION_1
+        next.header.struct_size = UInt32(
+            MemoryLayout<SM64ModernCameraCallbackOutputV1>.size
+        )
+        next.focus = (result.focus.x, result.focus.y, result.focus.z)
+        next.position = (result.position.x, result.position.y, result.position.z)
+        next.camera_yaw = result.cameraYaw
+        next.returned_yaw = result.returnedYaw
+        next.area_yaw = result.areaYaw
+        next.pitch = result.pitch
+        next.distance = result.distance
+        next.flags = (result.outputsSwapped
+            ? SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED : 0)
+            | (result.panAhead ? SM64_MODERN_CAMERA_CALLBACK_PANS_AHEAD : 0)
+        next.reserved = 0
+        output.pointee = next
+
+        if loggedCallbackModes.insert(input.mode).inserted {
+            cameraMigrationLogger.notice(
+                "swift_camera_callback mode=\(input.mode) camera_yaw=\(result.cameraYaw) returned_yaw=\(result.returnedYaw) distance=\(result.distance, privacy: .public)"
+            )
+        }
+        return SM64_MODERN_STATUS_OK
     }
 
     func update(

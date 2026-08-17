@@ -2,6 +2,19 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31m extends the Swift camera boundary to pure callback values. The C camera
+  packages Mario/free-roam modes 4/7/16 and inside-cannon mode 10 into a finite
+  fixed-width evaluator ABI; Swift calls `SM64CameraModeCallbacks`, returns
+  semantic focus/position/yaw/pitch/distance, and C preserves cannon's swapped
+  pointer order while validating output and falling back for unsupported or
+  malformed callbacks. `script/test_camera_migration.sh` reports
+  `cameraMigrationFingerprint=0x9e3779b97f4a7d11`; callback-kernel,
+  camera-state/runtime, ABI, Debug build, and `git diff --check` gates pass.
+  The bounded signed launch reports Swift camera installation, Metal frame one,
+  and status-0 shutdown but does not enter modes 4/10, so live callback and
+  full geometry/cutscene breadth remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31m.md`.
+
 - M31l extends the Swift camera seam to `transition_next_state` and
   `transition_to_camera_mode`. The fixed-width camera ABI carries mode,
   previous-mode, transition-frame, movement flags, C-up/distance/yaw/pan state;

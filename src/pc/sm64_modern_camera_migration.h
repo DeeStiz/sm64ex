@@ -13,6 +13,9 @@ SM64ModernStatus sm64_modern_camera_migration_status(void);
 SM64ModernStatus sm64_modern_camera_update(
     const SM64ModernCameraStateV1 *input,
     SM64ModernCameraStateV1 *out_state);
+SM64ModernStatus sm64_modern_camera_evaluate(
+    const SM64ModernCameraCallbackInputV1 *input,
+    SM64ModernCameraCallbackOutputV1 *out_output);
 SM64ModernStatus sm64_modern_camera_set_authority(uint32_t enabled);
 uint32_t sm64_modern_camera_authority_active(void);
 

@@ -6,6 +6,7 @@
 #include "pc/sm64_modern_camera_migration.h"
 
 static unsigned gCallbackCount;
+static unsigned gEvaluateCount;
 
 static SM64ModernStatus update_camera(
     void *context,
@@ -30,6 +31,31 @@ static SM64ModernStatus update_camera(
     return SM64_MODERN_STATUS_OK;
 }
 
+static SM64ModernStatus evaluate_camera(
+    void *context,
+    const SM64ModernCameraCallbackInputV1 *input,
+    SM64ModernCameraCallbackOutputV1 *output) {
+    if (context != (void *)(uintptr_t)0xCAFE || !input || !output) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    gEvaluateCount++;
+    output->focus[0] = input->mario_position[0];
+    output->focus[1] = input->mario_position[1] + 125.f;
+    output->focus[2] = input->mario_position[2];
+    output->position[0] = input->mario_position[0] + 1.f;
+    output->position[1] = input->mario_position[1] + 2.f;
+    output->position[2] = input->mario_position[2] + 3.f;
+    output->camera_yaw = input->face_yaw;
+    output->returned_yaw = input->face_yaw;
+    output->area_yaw = input->mode_offset_yaw;
+    output->pitch = input->face_pitch;
+    output->distance = input->zoom_distance;
+    output->flags = input->mode == 10
+        ? SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED : 0;
+    output->reserved = 0;
+    return SM64_MODERN_STATUS_OK;
+}
+
 static void expect(int condition, const char *message) {
     if (!condition) {
         fprintf(stderr, "camera migration smoke failed: %s\n", message);
@@ -44,6 +70,7 @@ int main(void) {
     api.header.struct_size = sizeof(api);
     api.context = (void *)(uintptr_t)0xCAFE;
     api.update = update_camera;
+    api.evaluate = evaluate_camera;
 
     expect(sm64_modern_validate_camera_migration_api(&api)
                == SM64_MODERN_STATUS_OK, "valid api");
@@ -101,6 +128,28 @@ int main(void) {
     expect(gCallbackCount == 4 && output.result == 1,
            "mode-transition output");
 
+    SM64ModernCameraCallbackInputV1 callbackInput;
+    SM64ModernCameraCallbackOutputV1 callbackOutput;
+    memset(&callbackInput, 0, sizeof(callbackInput));
+    memset(&callbackOutput, 0, sizeof(callbackOutput));
+    callbackInput.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    callbackInput.header.struct_size = sizeof(callbackInput);
+    callbackInput.mode = 10;
+    callbackInput.face_yaw = 0x6000;
+    callbackInput.face_pitch = -0x1000;
+    callbackInput.mode_offset_yaw = 0x0100;
+    callbackInput.zoom_distance = 800.f;
+    callbackInput.mario_position[1] = 50.f;
+    expect(sm64_modern_camera_evaluate(&callbackInput, &callbackOutput)
+               == SM64_MODERN_STATUS_OK, "callback evaluator");
+    expect(gEvaluateCount == 1
+               && callbackOutput.header.abi_version == SM64_MODERN_ABI_VERSION_1
+               && callbackOutput.focus[1] == 175.f
+               && callbackOutput.position[0] == 1.f
+               && callbackOutput.flags
+                    == SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED,
+           "callback output");
+
     input.reserved = 1;
     expect(sm64_modern_camera_update(&input, &output)
                == SM64_MODERN_STATUS_INVALID_ARGUMENT, "reserved fence");
@@ -114,6 +163,7 @@ int main(void) {
 
     printf("cameraMigrationFingerprint=0x%016llx\n",
            (unsigned long long)(UINT64_C(0x9E3779B97F4A7C15)
-               ^ (uint64_t)gCallbackCount));
+               ^ (uint64_t)gCallbackCount
+               ^ ((uint64_t)gEvaluateCount << 8)));
     return 0;
 }

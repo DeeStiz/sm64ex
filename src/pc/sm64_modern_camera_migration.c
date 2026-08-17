@@ -1,4 +1,5 @@
 #include <stdbool.h>
+#include <math.h>
 #include <string.h>
 
 #include "sm64_modern.h"
@@ -12,6 +13,15 @@ static bool sCameraAuthority;
 static bool valid_header(const SM64ModernAbiHeader *header, uint32_t size) {
     return header && header->abi_version == SM64_MODERN_ABI_VERSION_1
         && header->struct_size >= size;
+}
+
+static bool finite_float(float value) {
+    return isfinite(value) != 0;
+}
+
+static bool finite_vector(const float values[3]) {
+    return finite_float(values[0]) && finite_float(values[1])
+        && finite_float(values[2]);
 }
 
 SM64ModernStatus sm64_modern_validate_camera_migration_api(
@@ -96,6 +106,56 @@ SM64ModernStatus sm64_modern_camera_update(
     const SM64ModernStatus status = sMigration.update(
         sMigration.context, input, out_state);
     if (status != SM64_MODERN_STATUS_OK
+        && sMigrationStatus == SM64_MODERN_STATUS_OK) {
+        sMigrationStatus = status;
+    }
+    return status;
+}
+
+SM64ModernStatus sm64_modern_camera_evaluate(
+    const SM64ModernCameraCallbackInputV1 *input,
+    SM64ModernCameraCallbackOutputV1 *out_output) {
+    if (!sMigrationInstalled || !sCameraAuthority) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+    if (!sMigration.evaluate) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY;
+    }
+    if (!input || !out_output
+        || !valid_header(&input->header, sizeof(*input))
+        || input->reserved != 0
+        || !finite_float(input->lakitu_distance)
+        || !finite_float(input->zoom_distance)
+        || !finite_float(input->cannon_y_offset)
+        || !finite_vector(input->mario_position)
+        || !finite_vector(input->area_center)) {
+        if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
+            sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+
+    memset(out_output, 0, sizeof(*out_output));
+    out_output->header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    out_output->header.struct_size = sizeof(*out_output);
+    const SM64ModernStatus status = sMigration.evaluate(
+        sMigration.context, input, out_output);
+    if (status == SM64_MODERN_STATUS_OK
+        && (!valid_header(&out_output->header, sizeof(*out_output))
+            || out_output->reserved != 0
+            || (out_output->flags
+                & ~(SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED
+                    | SM64_MODERN_CAMERA_CALLBACK_PANS_AHEAD)) != 0
+            || !finite_float(out_output->distance)
+            || !finite_vector(out_output->focus)
+            || !finite_vector(out_output->position))) {
+        if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
+            sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (status != SM64_MODERN_STATUS_OK
+        && status != SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY
         && sMigrationStatus == SM64_MODERN_STATUS_OK) {
         sMigrationStatus = status;
     }

@@ -483,15 +483,53 @@ typedef struct SM64ModernCameraStateV1 {
     uint32_t reserved;
 } SM64ModernCameraStateV1;
 
+typedef struct SM64ModernCameraCallbackInputV1 {
+    SM64ModernAbiHeader header;
+    int16_t mode;
+    int16_t face_yaw;
+    int16_t face_pitch;
+    int16_t mode_offset_yaw;
+    int16_t lakitu_pitch;
+    int16_t eight_direction_base_yaw;
+    int16_t eight_direction_yaw_offset;
+    float lakitu_distance;
+    float zoom_distance;
+    float cannon_y_offset;
+    float mario_position[3];
+    float area_center[3];
+    uint32_t reserved;
+} SM64ModernCameraCallbackInputV1;
+
+typedef struct SM64ModernCameraCallbackOutputV1 {
+    SM64ModernAbiHeader header;
+    float focus[3];
+    float position[3];
+    int16_t camera_yaw;
+    int16_t returned_yaw;
+    int16_t area_yaw;
+    int16_t pitch;
+    float distance;
+    uint32_t flags;
+    uint32_t reserved;
+} SM64ModernCameraCallbackOutputV1;
+
+#define SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED (1u << 0)
+#define SM64_MODERN_CAMERA_CALLBACK_PANS_AHEAD (1u << 1)
+
 typedef SM64ModernStatus (*SM64ModernCameraUpdateFn)(
     void *context,
     const SM64ModernCameraStateV1 *input,
     SM64ModernCameraStateV1 *out_state);
+typedef SM64ModernStatus (*SM64ModernCameraEvaluateFn)(
+    void *context,
+    const SM64ModernCameraCallbackInputV1 *input,
+    SM64ModernCameraCallbackOutputV1 *out_output);
 
 typedef struct SM64ModernCameraMigrationApiV1 {
     SM64ModernAbiHeader header;
     void *context;
     SM64ModernCameraUpdateFn update;
+    SM64ModernCameraEvaluateFn evaluate;
 } SM64ModernCameraMigrationApiV1;
 
 // Optional gameplay-kernel extension. It is installed separately so the
@@ -887,6 +925,9 @@ SM64ModernStatus sm64_modern_camera_migration_status(void);
 SM64ModernStatus sm64_modern_camera_update(
     const SM64ModernCameraStateV1 *input,
     SM64ModernCameraStateV1 *out_state);
+SM64ModernStatus sm64_modern_camera_evaluate(
+    const SM64ModernCameraCallbackInputV1 *input,
+    SM64ModernCameraCallbackOutputV1 *out_output);
 SM64ModernStatus sm64_modern_camera_set_authority(uint32_t enabled);
 uint32_t sm64_modern_camera_authority_active(void);
 SM64ModernStatus sm64_modern_validate_progression_migration_api(

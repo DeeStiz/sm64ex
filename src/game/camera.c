@@ -2041,6 +2041,54 @@ s32 nop_update_water_camera(UNUSED struct Camera *c, UNUSED Vec3f focus, UNUSED 
 }
 
 /**
+ * Evaluate a pure Swift camera callback and install its semantic outputs in
+ * the legacy pointer order expected by the C callback body. Unsupported
+ * modes deliberately fall back to the original C implementation.
+ */
+static s32 sm64_modern_camera_evaluate_callback(
+    struct Camera *camera, s16 mode, Vec3f focus, Vec3f pos, s16 *out_yaw) {
+    if (sMarioCamState == NULL || out_yaw == NULL) {
+        return FALSE;
+    }
+
+    SM64ModernCameraCallbackInputV1 input = { 0 };
+    SM64ModernCameraCallbackOutputV1 output = { 0 };
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.mode = mode;
+    input.face_yaw = sMarioCamState->faceAngle[1];
+    input.face_pitch = sMarioCamState->faceAngle[0];
+    input.mode_offset_yaw = sModeOffsetYaw;
+    input.lakitu_pitch = sLakituPitch;
+    input.lakitu_distance = sLakituDist;
+    input.zoom_distance = gCameraZoomDist;
+    input.cannon_y_offset = sCannonYOffset;
+    input.mario_position[0] = sMarioCamState->pos[0];
+    input.mario_position[1] = sMarioCamState->pos[1];
+    input.mario_position[2] = sMarioCamState->pos[2];
+    if (camera != NULL) {
+        input.area_center[0] = camera->areaCenX;
+        input.area_center[1] = camera->areaCenY;
+        input.area_center[2] = camera->areaCenZ;
+    }
+
+    if (sm64_modern_camera_evaluate(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return FALSE;
+    }
+
+    if (output.flags & SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED) {
+        vec3f_copy(focus, output.position);
+        vec3f_copy(pos, output.focus);
+    } else {
+        vec3f_copy(focus, output.focus);
+        vec3f_copy(pos, output.position);
+    }
+    *out_yaw = output.returned_yaw;
+    return TRUE;
+}
+
+/**
  * Exactly the same as BEHIND_MARIO
  */
 void mode_water_surface_camera(struct Camera *c) {
@@ -2050,7 +2098,13 @@ void mode_water_surface_camera(struct Camera *c) {
 /**
  * Used in sModeTransitions for CLOSE and FREE_ROAM mode
  */
-s32 update_mario_camera(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
+s32 update_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
+    s16 callbackYaw = 0;
+    if (sm64_modern_camera_evaluate_callback(
+            c, c != NULL ? (s16)c->mode : 0, focus, pos, &callbackYaw)) {
+        return callbackYaw;
+    }
+
     s16 yaw = sMarioCamState->faceAngle[1] + sModeOffsetYaw + DEGREES(180);
     focus_on_mario(focus, pos, 125.f, 125.f, gCameraZoomDist, 0x05B0, yaw);
 
@@ -2778,7 +2832,14 @@ s32 mode_c_up_camera(struct Camera *c) {
 /**
  * Used when Mario is in a cannon.
  */
-s32 update_in_cannon(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
+s32 update_in_cannon(struct Camera *c, Vec3f focus, Vec3f pos) {
+    s16 callbackYaw = 0;
+    if (sm64_modern_camera_evaluate_callback(
+            c, c != NULL ? (s16)c->mode : CAMERA_MODE_INSIDE_CANNON,
+            focus, pos, &callbackYaw)) {
+        return callbackYaw;
+    }
+
     focus_on_mario(pos, focus, 125.f + sCannonYOffset, 125.f, 800.f,
                                     sMarioCamState->faceAngle[0], sMarioCamState->faceAngle[1]);
     return sMarioCamState->faceAngle[1];
