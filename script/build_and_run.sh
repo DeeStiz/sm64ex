@@ -67,6 +67,7 @@ else
   "$PROJECT_ROOT/script/test_mario_face_animation.sh"
   "$PROJECT_ROOT/script/test_mario_face_animation_payload.sh"
   "$PROJECT_ROOT/script/test_mario_face_expression.sh"
+  "$PROJECT_ROOT/script/test_mario_face_resource_manifest.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"

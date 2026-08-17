@@ -188,6 +188,7 @@
 		ACC2FB1D1A49430F7673E036 /* MarioMovePunchAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 595FCD866921E9B396C8E841 /* MarioMovePunchAction.swift */; };
 		ACE960B8863E817C3755E7CE /* BullyObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = A04F268C62D7061D48BDE8CC /* BullyObjectBridge.swift */; };
 		ACF33B54247AD07A6CF477CA /* InputCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 34FC4CB5301D5EE8E3F19E37 /* InputCore.swift */; };
+		ADF9CDE05AC2A15B5E73BA47 /* MarioFaceResourceManifest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70A5733D4139CD88D7976A65 /* MarioFaceResourceManifest.swift */; };
 		AE1494F8689D5768D3874A69 /* SnufitEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1B59B269230B9E7A9B9EDFF /* SnufitEnemy.swift */; };
 		AE596370EA0B5CCE60572B0E /* ProgressionMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9549A37C181D287986F52525 /* ProgressionMigration.swift */; };
 		AF3674FF77CC4CD476294319 /* MarioTwirlingWaterAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44193C66533F87518241D742 /* MarioTwirlingWaterAction.swift */; };
@@ -383,6 +384,7 @@
 		6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingBobombBehavior.swift; sourceTree = "<group>"; };
 		6EF73C0EA06595D96E31445A /* MarioWaterInteractionAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWaterInteractionAction.swift; sourceTree = "<group>"; };
 		6FED187A5E0CCAF0E865A36D /* Audio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Audio.swift; sourceTree = "<group>"; };
+		70A5733D4139CD88D7976A65 /* MarioFaceResourceManifest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioFaceResourceManifest.swift; sourceTree = "<group>"; };
 		7152A9F5156A7D703C8708CE /* SwingPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwingPlatformBehavior.swift; sourceTree = "<group>"; };
 		724F73EC282345F4551FC1BF /* CameraInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraInput.swift; sourceTree = "<group>"; };
 		7316D473A3C5C7E718C32B2E /* AppleAudioRing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioRing.h; sourceTree = "<group>"; };
@@ -678,6 +680,7 @@
 				18BCD8D54CB3A587D58075A3 /* MarioFaceAnimation.swift */,
 				F614773BEB8721E80725416A /* MarioFaceAnimationPayload.swift */,
 				EFE158DC4F4D37ECB478F396 /* MarioFaceExpression.swift */,
+				70A5733D4139CD88D7976A65 /* MarioFaceResourceManifest.swift */,
 				9D8C59955994453AFE524C2A /* MarioFinishTurningAction.swift */,
 				B93DAAFB0FF6CAB909448BA5 /* MarioGeometryInput.swift */,
 				EEAB73816A053C9CDE0415E1 /* MarioGrabbedTornadoAction.swift */,
@@ -1039,6 +1042,7 @@
 				366C99299052D1E9906CEDC9 /* MarioFaceAnimation.swift in Sources */,
 				6054B80D65D1016DEF07B736 /* MarioFaceAnimationPayload.swift in Sources */,
 				D8F186F7F806DE7F777EB175 /* MarioFaceExpression.swift in Sources */,
+				ADF9CDE05AC2A15B5E73BA47 /* MarioFaceResourceManifest.swift in Sources */,
 				A18B1A302FC1B7FEACB64ABB /* MarioFinishTurningAction.swift in Sources */,
 				53B872CB3B81DFEBF260C4C7 /* MarioGeometryInput.swift in Sources */,
 				9EE3212694962C332EC58184 /* MarioGrabbedTornadoAction.swift in Sources */,
