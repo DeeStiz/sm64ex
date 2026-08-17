@@ -179,3 +179,53 @@ SM64ModernStatus sm64_modern_camera_evaluate(
     }
     return status;
 }
+
+SM64ModernStatus sm64_modern_camera_evaluate_fov(
+    const SM64ModernCameraFOVInputV1 *input,
+    SM64ModernCameraFOVOutputV1 *out_output) {
+    if (!sMigrationInstalled || !sCameraAuthority) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+    if (!sMigration.evaluate_fov) {
+        return SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY;
+    }
+    if (!input || !out_output
+        || !valid_header(&input->header, sizeof(*input))
+        || input->reserved0 != 0
+        || input->reserved != 0
+        || !finite_float(input->fov)
+        || !finite_float(input->fov_offset)
+        || !finite_float(input->shake_amplitude)
+        || input->shake_amplitude < 0.f) {
+        if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
+            sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+
+    memset(out_output, 0, sizeof(*out_output));
+    out_output->header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    out_output->header.struct_size = sizeof(*out_output);
+    const SM64ModernStatus status = sMigration.evaluate_fov(
+        sMigration.context, input, out_output);
+    if (status == SM64_MODERN_STATUS_OK
+        && (!valid_header(&out_output->header, sizeof(*out_output))
+            || out_output->reserved0 != 0
+            || out_output->reserved != 0
+            || !finite_float(out_output->fov)
+            || !finite_float(out_output->fov_offset)
+            || !finite_float(out_output->shake_amplitude)
+            || out_output->shake_amplitude < 0.f
+            || !finite_float(out_output->presented_fov))) {
+        if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
+            sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (status != SM64_MODERN_STATUS_OK
+        && status != SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY
+        && sMigrationStatus == SM64_MODERN_STATUS_OK) {
+        sMigrationStatus = status;
+    }
+    return status;
+}

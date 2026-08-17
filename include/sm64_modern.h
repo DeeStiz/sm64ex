@@ -532,6 +532,42 @@ typedef struct SM64ModernCameraCallbackOutputV1 {
     uint32_t reserved;
 } SM64ModernCameraCallbackOutputV1;
 
+// Value-only camera FOV/shake evaluation. The C graph callback owns the
+// perspective node and sleeping compatibility flag; Swift owns the finite
+// FOV function selection, approach, and shake-state update.
+typedef struct SM64ModernCameraFOVInputV1 {
+    SM64ModernAbiHeader header;
+    uint8_t fov_func;
+    uint8_t sleeping;
+    uint8_t fixed_mode;
+    uint8_t cutscene_active;
+    float fov;
+    float fov_offset;
+    float shake_amplitude;
+    int16_t shake_phase;
+    int16_t shake_speed;
+    int16_t decay;
+    uint16_t reserved0;
+    uint32_t reserved;
+} SM64ModernCameraFOVInputV1;
+
+typedef struct SM64ModernCameraFOVOutputV1 {
+    SM64ModernAbiHeader header;
+    uint8_t fov_func;
+    uint8_t sleeping;
+    uint8_t fixed_mode;
+    uint8_t cutscene_active;
+    float fov;
+    float fov_offset;
+    float shake_amplitude;
+    int16_t shake_phase;
+    int16_t shake_speed;
+    int16_t decay;
+    uint16_t reserved0;
+    float presented_fov;
+    uint32_t reserved;
+} SM64ModernCameraFOVOutputV1;
+
 #define SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED (1u << 0)
 #define SM64_MODERN_CAMERA_CALLBACK_PANS_AHEAD (1u << 1)
 // Input geometry_flags bits. Optional values remain finite zeroes when the
@@ -552,12 +588,17 @@ typedef SM64ModernStatus (*SM64ModernCameraEvaluateFn)(
     void *context,
     const SM64ModernCameraCallbackInputV1 *input,
     SM64ModernCameraCallbackOutputV1 *out_output);
+typedef SM64ModernStatus (*SM64ModernCameraFOVEvaluateFn)(
+    void *context,
+    const SM64ModernCameraFOVInputV1 *input,
+    SM64ModernCameraFOVOutputV1 *out_output);
 
 typedef struct SM64ModernCameraMigrationApiV1 {
     SM64ModernAbiHeader header;
     void *context;
     SM64ModernCameraUpdateFn update;
     SM64ModernCameraEvaluateFn evaluate;
+    SM64ModernCameraFOVEvaluateFn evaluate_fov;
 } SM64ModernCameraMigrationApiV1;
 
 // Optional gameplay-kernel extension. It is installed separately so the
@@ -956,6 +997,9 @@ SM64ModernStatus sm64_modern_camera_update(
 SM64ModernStatus sm64_modern_camera_evaluate(
     const SM64ModernCameraCallbackInputV1 *input,
     SM64ModernCameraCallbackOutputV1 *out_output);
+SM64ModernStatus sm64_modern_camera_evaluate_fov(
+    const SM64ModernCameraFOVInputV1 *input,
+    SM64ModernCameraFOVOutputV1 *out_output);
 SM64ModernStatus sm64_modern_camera_set_authority(uint32_t enabled);
 uint32_t sm64_modern_camera_authority_active(void);
 SM64ModernStatus sm64_modern_validate_progression_migration_api(

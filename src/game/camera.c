@@ -11888,6 +11888,50 @@ Gfx *geo_camera_fov(s32 callContext, struct GraphNode *g, UNUSED void *context) 
     u8 fovFunc = sFOVState.fovFunc;
 
     if (callContext == GEO_CONTEXT_RENDER) {
+        SM64ModernCameraFOVInputV1 fovInput;
+        SM64ModernCameraFOVOutputV1 fovOutput;
+        memset(&fovInput, 0, sizeof(fovInput));
+        memset(&fovOutput, 0, sizeof(fovOutput));
+        fovInput.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+        fovInput.header.struct_size = sizeof(fovInput);
+        fovInput.fov_func = fovFunc;
+        fovInput.sleeping = (marioState->action == ACT_SLEEPING
+                              || marioState->action == ACT_START_SLEEPING);
+        fovInput.fixed_mode = gCamera != NULL
+            && gCamera->mode == CAMERA_MODE_FIXED;
+        fovInput.cutscene_active = gCamera != NULL
+            && gCamera->cutscene != 0;
+        fovInput.fov = sFOVState.fov;
+        fovInput.fov_offset = sFOVState.fovOffset;
+        fovInput.shake_amplitude = sFOVState.shakeAmplitude;
+        fovInput.shake_phase = sFOVState.shakePhase;
+        fovInput.shake_speed = sFOVState.shakeSpeed;
+        fovInput.decay = sFOVState.decay;
+        if (sm64_modern_camera_evaluate_fov(&fovInput, &fovOutput)
+                == SM64_MODERN_STATUS_OK) {
+            sFOVState.fov = fovOutput.fov;
+            sFOVState.fovOffset = fovOutput.fov_offset;
+            sFOVState.shakeAmplitude = fovOutput.shake_amplitude;
+            sFOVState.shakePhase = fovOutput.shake_phase;
+            sFOVState.shakeSpeed = fovOutput.shake_speed;
+            sFOVState.decay = fovOutput.decay;
+            if (fovFunc == CAM_FOV_DEFAULT) {
+                if (fovInput.sleeping) {
+                    sStatusFlags |= CAM_FLAG_SLEEPING;
+                } else {
+                    sStatusFlags &= ~CAM_FLAG_SLEEPING;
+                }
+                sFOVState.unusedIsSleeping = 0;
+                if (gCamera != NULL
+                    && gCamera->cutscene == CUTSCENE_0F_UNUSED) {
+                    sFOVState.fov = 45.f;
+                    fovOutput.presented_fov = 45.f + sFOVState.fovOffset;
+                }
+            }
+            perspective->fov = fovOutput.presented_fov;
+            return NULL;
+        }
+
         switch (fovFunc) {
             case CAM_FOV_SET_45:
                 set_fov_45(marioState);

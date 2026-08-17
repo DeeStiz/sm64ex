@@ -2,6 +2,18 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31r promotes camera FOV/shake evaluation into the live Swift camera ABI.
+  Swift owns FOV function selection, set/approach modes, sleeping and BBH
+  targets, phase/decay, and the presented FOV; C keeps the perspective graph
+  node plus legacy sleeping and unused-cutscene compatibility flags. The
+  standalone contract remains `cameraCutsceneFOVFingerprint=0x0fa052c32482bd3a`;
+  migration/FOV, callback, geometry/state/runtime, ABI, Debug build, and
+  `git diff --check` gates pass. Signed launch
+  `/tmp/sm64-modern-m31r-live.log` logs `swift_camera_fov mode=2`, Metal 4
+  frame one, 360 fixed steps, zero scheduler/audio drops, and status 0
+  shutdown. Full camera route and physical/human acceptance remain open.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M31r.md`.
+
 - M31q promotes behind-Mario camera mode 3 to the Swift evaluator. The
   stateful kernel owns camera distance/pitch/yaw, Mario-mode and water/metal
   offsets, C-button yaw rotation, and the behind-Mario sound timer; C retains

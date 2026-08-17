@@ -7,6 +7,7 @@
 
 static unsigned gCallbackCount;
 static unsigned gEvaluateCount;
+static unsigned gFOVEvaluateCount;
 static uint16_t gLastGeometryFlags;
 static float gLastFloorHeight;
 static float gLastSlopeFloorNormalZ;
@@ -62,6 +63,30 @@ static SM64ModernStatus evaluate_camera(
     return SM64_MODERN_STATUS_OK;
 }
 
+static SM64ModernStatus evaluate_camera_fov(
+    void *context,
+    const SM64ModernCameraFOVInputV1 *input,
+    SM64ModernCameraFOVOutputV1 *output) {
+    if (context != (void *)(uintptr_t)0xCAFE || !input || !output) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    gFOVEvaluateCount++;
+    output->fov_func = input->fov_func;
+    output->sleeping = input->sleeping;
+    output->fixed_mode = input->fixed_mode;
+    output->cutscene_active = input->cutscene_active;
+    output->fov = input->fov + 1.f;
+    output->fov_offset = input->fov_offset + 2.f;
+    output->shake_amplitude = input->shake_amplitude;
+    output->shake_phase = input->shake_phase;
+    output->shake_speed = input->shake_speed;
+    output->decay = input->decay;
+    output->reserved0 = 0;
+    output->presented_fov = output->fov + output->fov_offset;
+    output->reserved = 0;
+    return SM64_MODERN_STATUS_OK;
+}
+
 static void expect(int condition, const char *message) {
     if (!condition) {
         fprintf(stderr, "camera migration smoke failed: %s\n", message);
@@ -77,6 +102,7 @@ int main(void) {
     api.context = (void *)(uintptr_t)0xCAFE;
     api.update = update_camera;
     api.evaluate = evaluate_camera;
+    api.evaluate_fov = evaluate_camera_fov;
 
     expect(sm64_modern_validate_camera_migration_api(&api)
                == SM64_MODERN_STATUS_OK, "valid api");
@@ -166,6 +192,22 @@ int main(void) {
                && gLastFloorHeight == 100.f
                && gLastSlopeFloorNormalZ == 0.5f,
            "callback geometry input");
+
+    SM64ModernCameraFOVInputV1 fovInput;
+    SM64ModernCameraFOVOutputV1 fovOutput;
+    memset(&fovInput, 0, sizeof(fovInput));
+    memset(&fovOutput, 0, sizeof(fovOutput));
+    fovInput.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    fovInput.header.struct_size = sizeof(fovInput);
+    fovInput.fov_func = 2;
+    fovInput.fov = 45.f;
+    fovInput.fov_offset = 1.f;
+    expect(sm64_modern_camera_evaluate_fov(&fovInput, &fovOutput)
+               == SM64_MODERN_STATUS_OK, "fov evaluator");
+    expect(gFOVEvaluateCount == 1 && fovOutput.fov == 46.f
+               && fovOutput.fov_offset == 3.f
+               && fovOutput.presented_fov == 49.f,
+           "fov output");
 
     input.reserved = 1;
     expect(sm64_modern_camera_update(&input, &output)

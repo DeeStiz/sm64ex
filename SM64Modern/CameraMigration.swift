@@ -39,6 +39,18 @@ private let swiftCameraEvaluate: @convention(c) (
     return service.evaluate(input: input.pointee, output: output)
 }
 
+private let swiftCameraEvaluateFOV: @convention(c) (
+    UnsafeMutableRawPointer?,
+    UnsafePointer<SM64ModernCameraFOVInputV1>?,
+    UnsafeMutablePointer<SM64ModernCameraFOVOutputV1>?
+) -> SM64ModernStatus = { context, input, output in
+    guard let service = cameraMigrationService(from: context),
+          let input, let output else {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT
+    }
+    return service.evaluateFOV(input: input.pointee, output: output)
+}
+
 /// Owner-thread adapter for the value-only camera selection seam. The C
 /// camera still owns geometry, collision, cutscenes, and Lakitu presentation;
 /// this service owns the selection/angle flag transitions and their exact
@@ -49,6 +61,7 @@ final class SwiftCameraMigrationService {
     private var eventCount: UInt64 = 0
     private var loggedCommands: Set<UInt32> = []
     private var loggedCallbackModes: Set<Int16> = []
+    private var loggedFOVModes: Set<UInt8> = []
     private var lastError: SM64ModernStatus = SM64_MODERN_STATUS_OK
 
     init(ownerThreadToken: UInt64) {
@@ -66,7 +79,69 @@ final class SwiftCameraMigrationService {
         api.context = Unmanaged.passUnretained(self).toOpaque()
         api.update = swiftCameraUpdate
         api.evaluate = swiftCameraEvaluate
+        api.evaluate_fov = swiftCameraEvaluateFOV
         return api
+    }
+
+    func evaluateFOV(
+        input: SM64ModernCameraFOVInputV1,
+        output: UnsafeMutablePointer<SM64ModernCameraFOVOutputV1>
+    ) -> SM64ModernStatus {
+        assertOwnerThread()
+        guard input.header.abi_version == SM64_MODERN_ABI_VERSION_1,
+              input.header.struct_size >= UInt32(
+                MemoryLayout<SM64ModernCameraFOVInputV1>.size
+              ),
+              input.reserved0 == 0,
+              input.reserved == 0 else {
+            return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "fov_input")
+        }
+
+        guard let result = SM64CameraFOV.update(
+            SM64CameraFOVInput(
+                state: SM64CameraFOVState(
+                    mode: Int16(input.fov_func),
+                    fov: input.fov,
+                    fovOffset: input.fov_offset,
+                    shakeAmplitude: input.shake_amplitude,
+                    shakePhase: input.shake_phase,
+                    shakeSpeed: input.shake_speed,
+                    decay: input.decay
+                ),
+                sleeping: input.sleeping != 0,
+                fixedMode: input.fixed_mode != 0,
+                cutsceneActive: input.cutscene_active != 0
+            )
+        ) else {
+            return SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY
+        }
+
+        var next = SM64ModernCameraFOVOutputV1()
+        next.header.abi_version = SM64_MODERN_ABI_VERSION_1
+        next.header.struct_size = UInt32(
+            MemoryLayout<SM64ModernCameraFOVOutputV1>.size
+        )
+        next.fov_func = input.fov_func
+        next.sleeping = input.sleeping
+        next.fixed_mode = input.fixed_mode
+        next.cutscene_active = input.cutscene_active
+        next.fov = result.state.fov
+        next.fov_offset = result.state.fovOffset
+        next.shake_amplitude = result.state.shakeAmplitude
+        next.shake_phase = result.state.shakePhase
+        next.shake_speed = result.state.shakeSpeed
+        next.decay = result.state.decay
+        next.presented_fov = result.presentedFOV
+        next.reserved0 = 0
+        next.reserved = 0
+        output.pointee = next
+
+        if loggedFOVModes.insert(input.fov_func).inserted {
+            cameraMigrationLogger.notice(
+                "swift_camera_fov mode=\(input.fov_func) fov=\(result.state.fov, privacy: .public) presented=\(result.presentedFOV, privacy: .public)"
+            )
+        }
+        return SM64_MODERN_STATUS_OK
     }
 
     func evaluate(
