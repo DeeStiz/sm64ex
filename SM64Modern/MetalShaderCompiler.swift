@@ -36,6 +36,7 @@ final class MetalShaderCompiler {
     private static let textureEdgeOption: UInt32 = 1 << 26
     private static let noiseOption: UInt32 = 1 << 27
     private static let marioFaceMaterialOption: UInt32 = 1 << 28
+    private static let marioFaceTransformOption: UInt32 = 1 << 29
 
     private static let archiveSchema = 1
     private static let rendererSchema = 2
@@ -262,6 +263,7 @@ final class MetalShaderCompiler {
         let textureEdge = key.shaderID & textureEdgeOption != 0
         let noise = key.shaderID & noiseOption != 0
         let marioFaceMaterial = key.shaderID & marioFaceMaterialOption != 0
+        let marioFaceTransform = key.shaderID & marioFaceTransformOption != 0
         let useTexture0 = key.textureMask & 1 != 0
         let useTexture1 = key.textureMask & 2 != 0
         let manualFilter = key.filteringMode == 2
@@ -269,7 +271,7 @@ final class MetalShaderCompiler {
 
         var vertexAssignments = """
             uint cursor = vertexID * \(vertexStride(for: key));
-            out.position = float4(vertices[cursor], vertices[cursor + 1], vertices[cursor + 2], vertices[cursor + 3]);
+            out.position = \(marioFaceTransform ? "uniforms.transform * " : "")float4(vertices[cursor], vertices[cursor + 1], vertices[cursor + 2], vertices[cursor + 3]);
             cursor += 4;
         """
         if key.textureMask != 0 {
@@ -285,10 +287,14 @@ final class MetalShaderCompiler {
                 vertexAssignments += "\n    out.input\(input) = float4(vertices[cursor], vertices[cursor + 1], vertices[cursor + 2], 1.0);\n    cursor += \(inputWidth);"
             }
         }
+        if marioFaceMaterial {
+            vertexAssignments += "\n    out.materialID = materialIndices[vertexID];"
+        }
 
         let vertexFields = (key.textureMask != 0 ? "    float2 uv;\n" : "")
             + (fog ? "    float4 fog;\n" : "")
             + (0..<Int(key.inputCount)).map { "    float4 input\($0);\n" }.joined()
+            + (marioFaceMaterial ? "    uint materialID [[flat]];\n" : "")
 
         var sampling = "    float4 texel0 = float4(1.0);\n    float4 texel1 = float4(1.0);"
         if useTexture0 {
@@ -302,7 +308,9 @@ final class MetalShaderCompiler {
                 : "\n    texel1 = texture1.sample(sampler1, in.uv);"
         }
 
-        let rgbExpression = combinerExpression(shaderID: key.shaderID, alpha: false)
+        let rgbExpression = marioFaceMaterial
+            ? "materials[in.materialID].rgb"
+            : combinerExpression(shaderID: key.shaderID, alpha: false)
         let alphaExpression = alpha ? combinerExpression(shaderID: key.shaderID, alpha: true) : "1.0"
         let materialBinding = marioFaceMaterial
             ? "            device const float4 *materials [[buffer(2)]],\n"
@@ -311,7 +319,16 @@ final class MetalShaderCompiler {
             ? "            device const ushort *sourceIndices [[buffer(3)]],\n"
             : ""
         let materialBindingUse = marioFaceMaterial
-            ? "            (void)materials;\n            (void)sourceIndices;\n"
+            ? "            (void)sourceIndices;\n"
+            : ""
+        let vertexUniformBinding = marioFaceTransform
+            ? ",\n            constant DrawUniforms &uniforms [[buffer(1)]]"
+            : ""
+        let vertexMaterialBinding = marioFaceMaterial
+            ? ",\n            device const ushort *materialIndices [[buffer(4)]]"
+            : ""
+        let marioFaceLighting = marioFaceTransform
+            ? "\n            float3 light = normalize(uniforms.lightDirection.xyz);\n            float intensity = 0.65 + 0.35 * max(dot(float3(0.0, 0.0, 1.0), light), 0.0);\n            color.rgb *= uniforms.lightColor.rgb * intensity;"
             : ""
         let filterHelper = manualFilter ? """
         float4 sample3Point(texture2d<float> texture, sampler state, float2 uv) {
@@ -347,7 +364,13 @@ final class MetalShaderCompiler {
         #include <metal_stdlib>
         using namespace metal;
 
-        struct DrawUniforms { uint frame; uint3 padding; };
+        struct DrawUniforms {
+            uint frame;
+            uint3 padding;
+            float4x4 transform;
+            float4 lightDirection;
+            float4 lightColor;
+        };
         struct VertexOut {
             float4 position [[position]];
         \(vertexFields)};
@@ -356,7 +379,7 @@ final class MetalShaderCompiler {
 
         vertex VertexOut sm64_vertex(
             uint vertexID [[vertex_id]],
-            device const float *vertices [[buffer(0)]]) {
+            device const float *vertices [[buffer(0)]]\(vertexUniformBinding)\(vertexMaterialBinding)) {
             VertexOut out;
             \(vertexAssignments)
             return out;
@@ -380,7 +403,7 @@ final class MetalShaderCompiler {
         \(sampling)
             float3 rgb = \(rgbExpression);
             float alpha = \(alphaExpression);
-            float4 color = float4(rgb, alpha);\(post)
+            float4 color = float4(rgb, alpha);\(post)\(marioFaceLighting)
             (void)texel0;
             (void)texel1;
             return color;

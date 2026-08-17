@@ -965,9 +965,22 @@ final class EngineHost {
         }
         let rootURL = URL(fileURLWithPath: gameDirectory, isDirectory: true).standardizedFileURL
         let packet = try SM64MarioFaceSourceGeometryProvider.load(rootURL: rootURL)
-        try renderer.admitMarioFaceSourceGeometry(packet)
+        guard let transform = SM64MarioFaceMetalTransformPacketBuilder.make(
+            routeID: .marioNormal,
+            animationFrameQ16: 1 << 16
+        ) else {
+            throw NSError(
+                domain: "io.github.deestiz.sm64modern.MarioFace",
+                code: Int(SM64_MODERN_STATUS_INVALID_STATE),
+                userInfo: [NSLocalizedDescriptionKey: "Mario-normal transform attachment was not resident"]
+            )
+        }
+        try renderer.admitMarioFaceSourceGeometry(packet, transform: transform)
         engineLogger.notice(
             "mario_face_geometry_source_admitted source_path=\(packet.sourcePath, privacy: .public) schema=\(packet.schemaVersion) vertices=\(packet.vertices.count) faces=\(packet.triangles.count) materials=\(packet.materials.count) source_digest=\(packet.sourceDigestWords.map { String($0, radix: 16) }.joined(separator: ":"), privacy: .public) packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(packet), privacy: .public)"
+        )
+        engineLogger.notice(
+            "mario_face_transform_admitted route=\(transform.routeID) schema=\(transform.schemaVersion) component=\(transform.animationComponentID) frame_q16=\(transform.animationFrameQ16) viewport=\(transform.viewportWidth)x\(transform.viewportHeight) transform_fingerprint=\(SM64MarioFaceMetalTransformFingerprint.packet(transform), privacy: .public)"
         )
     }
 
