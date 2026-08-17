@@ -14,6 +14,7 @@ struct SM64RenderPacketEvent: Equatable, Sendable {
 
 struct SM64RenderFramePacket: Equatable, Sendable {
     let sequence: UInt64
+    let recordSequenceStart: UInt32
     let events: [SM64RenderPacketEvent]
     let fingerprint: UInt64
 }
@@ -32,6 +33,142 @@ struct SM64RenderPacketTraceComparison: Equatable, Sendable {
     let actualCount: Int
 }
 
+enum SM64RenderPacketFileError: Error, Equatable {
+    case invalidMagic
+    case unsupportedVersion(UInt32)
+    case truncated
+    case invalidEventCount(UInt32)
+    case invalidValueCount(UInt32)
+    case fingerprintMismatch
+}
+
+/// A small pointer-free sidecar used by the M29 file-backed comparison gate.
+/// The file contains the most recently closed frame only; the C schema-4 trace
+/// remains the authoritative sequence/tick stream. The write is opt-in and
+/// bounded to one immutable frame, with no C or Metal pointer escaping.
+enum SM64RenderPacketFile {
+    private static let magic: UInt32 = 0x534D_5250 // "SMRP"
+    private static let version: UInt32 = 1
+    private static let maxEvents: UInt32 = 4_096
+
+    static func write(packet: SM64RenderFramePacket, to url: URL) throws {
+        guard packet.events.count <= Int(maxEvents) else {
+            throw SM64RenderPacketFileError.invalidEventCount(UInt32(packet.events.count))
+        }
+        var data = Data(capacity: 28 + packet.events.count * 72)
+        data.appendRenderLE(magic)
+        data.appendRenderLE(version)
+        data.appendRenderLE(packet.sequence)
+        data.appendRenderLE(UInt32(packet.events.count))
+        data.appendRenderLE(packet.recordSequenceStart)
+        for event in packet.events {
+            guard event.values.count <= 8 else {
+                throw SM64RenderPacketFileError.invalidValueCount(UInt32(event.values.count))
+            }
+            data.appendRenderLE(event.kind)
+            data.appendRenderLE(UInt32(event.values.count))
+            for index in 0..<8 {
+                data.appendRenderLE(index < event.values.count ? event.values[index] : 0)
+            }
+        }
+        data.appendRenderLE(packet.fingerprint)
+        try FileManager.default.createDirectory(
+            at: url.deletingLastPathComponent(),
+            withIntermediateDirectories: true
+        )
+        try data.write(to: url, options: .atomic)
+    }
+
+    static func read(from url: URL) throws -> SM64RenderFramePacket {
+        let data = try Data(contentsOf: url, options: .mappedIfSafe)
+        var cursor = RenderPacketCursor(data)
+        guard try cursor.readUInt32() == magic else {
+            throw SM64RenderPacketFileError.invalidMagic
+        }
+        let fileVersion = try cursor.readUInt32()
+        guard fileVersion == version else {
+            throw SM64RenderPacketFileError.unsupportedVersion(fileVersion)
+        }
+        let sequence = try cursor.readUInt64()
+        let eventCount = try cursor.readUInt32()
+        let recordSequenceStart = try cursor.readUInt32()
+        guard eventCount <= maxEvents else {
+            throw SM64RenderPacketFileError.invalidEventCount(eventCount)
+        }
+        var events: [SM64RenderPacketEvent] = []
+        events.reserveCapacity(Int(eventCount))
+        for _ in 0..<eventCount {
+            let kind = try cursor.readUInt32()
+            let valueCount = try cursor.readUInt32()
+            guard valueCount <= 8 else {
+                throw SM64RenderPacketFileError.invalidValueCount(valueCount)
+            }
+            let values = try (0..<8).map { _ in try cursor.readUInt64() }
+            events.append(SM64RenderPacketEvent(
+                kind: kind,
+                values: Array(values.prefix(Int(valueCount)))
+            ))
+        }
+        let fingerprint = try cursor.readUInt64()
+        guard cursor.isAtEnd else { throw SM64RenderPacketFileError.truncated }
+        let packet = SM64RenderFramePacket(
+            sequence: sequence,
+            recordSequenceStart: recordSequenceStart,
+            events: events,
+            fingerprint: SM64RenderPacketFingerprint.frame(sequence: sequence, events: events)
+        )
+        guard packet.fingerprint == fingerprint else {
+            throw SM64RenderPacketFileError.fingerprintMismatch
+        }
+        return packet
+    }
+}
+
+private extension Data {
+    mutating func appendRenderLE(_ value: UInt32) {
+        var littleEndian = value.littleEndian
+        Swift.withUnsafeBytes(of: &littleEndian) { append(contentsOf: $0) }
+    }
+
+    mutating func appendRenderLE(_ value: UInt64) {
+        var littleEndian = value.littleEndian
+        Swift.withUnsafeBytes(of: &littleEndian) { append(contentsOf: $0) }
+    }
+}
+
+private struct RenderPacketCursor {
+    private let data: Data
+    private var offset = 0
+
+    init(_ data: Data) { self.data = data }
+
+    var isAtEnd: Bool { offset == data.count }
+
+    mutating func readUInt32() throws -> UInt32 {
+        let bytes = try read(4)
+        return bytes.enumerated().reduce(UInt32(0)) { value, element in
+            value | (UInt32(element.element) << UInt32(element.offset * 8))
+        }
+    }
+
+    mutating func readUInt64() throws -> UInt64 {
+        let bytes = try read(8)
+        return bytes.enumerated().reduce(UInt64(0)) { value, element in
+            value | (UInt64(element.element) << UInt64(element.offset * 8))
+        }
+    }
+
+    private mutating func read(_ count: Int) throws -> [UInt8] {
+        guard offset + count <= data.count else {
+            throw SM64RenderPacketFileError.truncated
+        }
+        let start = data.index(data.startIndex, offsetBy: offset)
+        let end = data.index(start, offsetBy: count)
+        offset += count
+        return Array(data[start..<end])
+    }
+}
+
 enum SM64RenderOracleTraceAdapter {
     static let domain: UInt32 = 11
     static let recordKind: UInt32 = 7
@@ -46,7 +183,7 @@ enum SM64RenderOracleTraceAdapter {
                 domain: domain,
                 recordKind: recordKind,
                 recordID: UInt64(event.kind),
-                sequence: UInt32(index),
+                sequence: packet.recordSequenceStart &+ UInt32(index),
                 values: event.values
             )
         }
@@ -178,6 +315,8 @@ final class SM64DisplayListRenderCapture {
     private var viewport = SM64RenderCaptureRect(x: 0, y: 0, width: 1, height: 1)
     private var scissor = SM64RenderCaptureRect(x: 0, y: 0, width: 1, height: 1)
     private var frameSequence: UInt64 = 1
+    private var nextRecordSequence: UInt32 = 0
+    private var frameRecordSequenceStart: UInt32 = 0
     private var frameEvents: [SM64RenderPacketEvent] = []
     private var latestPacket: SM64RenderFramePacket?
     private var frameCount: UInt64 = 0
@@ -217,6 +356,7 @@ final class SM64DisplayListRenderCapture {
 
     func startFrame() {
         frameEvents.removeAll(keepingCapacity: true)
+        frameRecordSequenceStart = nextRecordSequence
         frameEvents.append(SM64RenderPacketEvent(
             kind: SM64RenderPacketEventKind.frameBegin,
             values: [
@@ -227,6 +367,7 @@ final class SM64DisplayListRenderCapture {
                 UInt64(currentTextureTile),
             ]
         ))
+        nextRecordSequence &+= 1
     }
 
     func draw(
@@ -253,6 +394,7 @@ final class SM64DisplayListRenderCapture {
                     ^ SM64RenderPacketFingerprint.rectHash(scissor),
             ]
         ))
+        nextRecordSequence &+= 1
         drawCount &+= 1
     }
 
@@ -267,9 +409,11 @@ final class SM64DisplayListRenderCapture {
                 UInt64(currentTextureTile),
             ]
         ))
+        nextRecordSequence &+= 1
         let events = frameEvents
         latestPacket = SM64RenderFramePacket(
             sequence: frameSequence,
+            recordSequenceStart: frameRecordSequenceStart,
             events: events,
             fingerprint: SM64RenderPacketFingerprint.frame(sequence: frameSequence, events: events)
         )
@@ -284,6 +428,7 @@ final class SM64DisplayListRenderCapture {
             UInt64(shaderProgramCount),
             UInt64(nextTextureID),
         ])
+        nextRecordSequence &+= 1
     }
 
     func packet() -> SM64RenderFramePacket? { latestPacket }

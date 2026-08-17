@@ -2,19 +2,23 @@
 
 ## Status
 
-M29c is the latest validated schema-4 render-record adapter layered on M29b,
-M29a, M28e, and the preceding rewrite work. Swift now converts captured frame
-events into domain-11/render-packet records with canonical hashes, round-trips
-the fixed 128-byte records, and reports the first differing record index. The
-independent C adapter matches Swift at trace fingerprint
-`0x55ad0c4378b828d5` with deliberate divergence index `1`; the focused contract
-is `script/test_render_trace_adapter.sh`, and the default native Metal 4 verify
-is `/tmp/sm64-modern-m29c-verify.log` (`BUILD SUCCEEDED`, frame 1, capture
-disabled by default, clean status 0, `engine_thread_finished`,
-`application_stopped`). This is a candidate trace/compare boundary: it has not
-yet consumed a C trace file or switched Metal authority. Full reachable-frame
-execution, resource/texture parity, screenshots, GPU captures, and
-visual/human acceptance remain open. M29b remains the latest validated
+M29d is the latest validated file-backed C↔Swift render comparison layered on
+M29c, M29b, M29a, M28e, and the preceding rewrite work. Swift now writes a
+bounded immutable sidecar for the latest closed frame, reads schema-4 C
+domain-11/render-packet records, selects the latest complete frame, and fails
+closed on missing, extra, reordered, mutated, or non-canonical records. The
+independent C file fixture matches the Swift sidecar, and the live Apple M5 Max
+one-tick capture matches at fingerprint `0xb295758c3331d40` with three records;
+the focused contracts are `script/test_render_file_comparison.sh` and
+`script/test_render_file_comparison_live.sh`. The regenerated native Debug
+build is `/tmp/sm64-modern-m29d-build.log`, the default verifier is
+`/tmp/sm64-modern-m29d-verify.log`, and the live file comparison is
+`/tmp/sm64-modern-m29d-live-verify.log` (`renderLiveTraceBytes=5448`,
+`renderLivePacketBytes=248`, `bounded_oracle_trace_run_complete steps=1`,
+`engine_thread_finished status=0 steps=1`, `application_stopped`). This is
+still a bounded file/record comparison: full reachable-frame execution,
+resource/texture parity, finish-record breadth, Metal authority, screenshots,
+GPU captures, and visual/human acceptance remain open. M29c remains the latest validated
 owner-thread render-packet capture slice layered on M29a, M28e, and the
 preceding rewrite work. The existing C renderer callback
 path now has a gated Swift oracle mirror: frame-begin/draw/frame-end values use
@@ -2125,10 +2129,11 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M28c: Loop-aware ADPCM stream/refill window | `SM64AudioADPCMStreamWindow` decodes copied 9-byte blocks with M28a predictor state, requests M27 short/long stream residency, restores copied loop history, fences malformed/unavailable blocks, and emits deterministic block/history/loop/finish events. | Complete locally — Swift/C fingerprint `0xd64002acff69ef29`; `script/test_audio_stream.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28c-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 230-script matrix (`/tmp/sm64-modern-m28c-full-matrix.log`, `runs=230 failures=0`), strict-concurrency audit, and `git diff --check`; mixer/effects/reverb, live audio route, and audible acceptance remain |
 | M28d: Mixer/effects and 32-kHz frame assembly | `SM64AudioMixer` performs stable music/effect priority ordering, saturating dry accumulation, optional Q15 reverb ring feedback/send, clipped-sample accounting, and deterministic interleaved 32-kHz stereo output. | Complete locally — Swift/C fingerprint `0x8ecc1809c3dd0384`; `script/test_audio_mixer.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28d-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 231-script matrix (`/tmp/sm64-modern-m28d-full-matrix.log`, `runs=231 failures=0`), strict-concurrency audit, and `git diff --check`; EngineHost promotion, realtime AVAudio, audible, and physical acceptance remain |
 | M28e: EngineHost owner-thread audio promotion envelope | `SM64AudioOwnerPromotion` admits one engine-owner token, advances M27 sequence/pool/residency/stream values, consumes M28 voice/mixer windows, records schema-4 trace/PCM receipts, and permanently fences a foreign token; `SM64_MODERN_AUDIO_PROMOTION=1` enables the route without replacing the AVAudio device leaf. | Complete locally — Swift/C receipt fingerprint `0xad10b198c66b2a49`; `script/test_audio_promotion.sh`, regenerated native Debug build, and gated `SM64_MODERN_AUDIO_PROMOTION=1 script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28e-verify.log`) prove Metal 4/Apple M5 Max frame 1, promotion tick/finish logs, clean status 0, 217 ticks, and `admission_failed=false`; exhaustive 232-script matrix (`/tmp/sm64-modern-m28e-full-matrix.log`, `runs=232 failures=0`), strict-concurrency audit, and `git diff --check`; AVAudio remains hardware-facing, so audible/device listening, PCM capture comparison, and human acceptance remain |
-| M29: Display-list translation | Swift produces immutable Metal scene packets identical to the C renderer bridge for every reachable command/state. | In progress — M29a locks the copied command/state schema and C↔Swift aggregate fingerprint; live capture, Metal encoding, and reachable-content breadth remain |
+| M29: Display-list translation | Swift produces immutable Metal scene packets identical to the C renderer bridge for every reachable command/state. | In progress — M29a–M29d now cover copied packets, owner capture, schema-4 adaptation, and bounded file-backed live comparison; reachable-content/resource breadth, finish-record closure, Metal encoding/authority, and visual/GPU evidence remain |
 | M29a: Copied display-list command/state packet contract | `SM64DisplayListDecoder` classifies every F3DEX2/RDP opcode class, snapshots texture/combine/geometry/matrix/light/fog/scissor/image state, retains stable resource IDs without pointer traversal, and emits immutable draw order/render-layer packets with bounded unknown/truncation fencing. | Complete locally — Swift/C fingerprint `0xffe29115951a1723`; `script/test_display_list_packet.sh`, regenerated native Debug build (`/tmp/sm64-modern-m29a-build.log`, `BUILD SUCCEEDED`), and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m29a-verify.log`) pass Metal 4/Apple M5 Max frame 1, clean status 0, `engine_thread_finished`, and `application_stopped`; zero `@unchecked Sendable` declarations and `git diff --check`; live display-list capture, Metal encoder/resource-residency integration, screenshot/GPU evidence, and visual/human acceptance remain |
 | M29b: Owner-thread C render-oracle packet capture | `SM64DisplayListRenderCapture` mirrors C frame-begin/draw/frame-end/finish records with fixed shader/texture counters, selected resource IDs, batch state, vertex/viewport/scissor hashes, and owner-thread immutable receipts; capture is gated and does not change default Metal authority. | Complete locally — Swift/C frame fingerprint `0x27011af4dff9d510` and finish fingerprint `0xeef8bcf4c617bd63`; `script/test_render_packet_capture.sh`, regenerated native Debug build (`/tmp/sm64-modern-m29b-build.log`, `BUILD SUCCEEDED`), and gated `SM64_MODERN_RENDER_PACKET_CAPTURE=1 script/build_and_run.sh --verify` (`/tmp/sm64-modern-m29b-verify.log`) pass Apple M5 Max Metal 4 frame 1 with `swift_render_packet_capture frame=1 events=3 draws=1`, clean status 0, `engine_thread_finished`, and `application_stopped`; default capture remains disabled, so full reachable-frame comparison, Metal authority, GPU/screenshot, and visual/human acceptance remain |
 | M29c: Schema-4 render trace adapter and first divergence | `SM64RenderOracleTraceAdapter` projects captured frame events into domain-11/render-packet records, preserves canonical 128-byte codecs, computes a stable aggregate, and returns the first differing record index on mutation or count mismatch. | Complete locally — Swift/C trace fingerprint `0x55ad0c4378b828d5` and deliberate first divergence `1`; `script/test_render_trace_adapter.sh`, corrected `script/build_and_run.sh` matrix, and default `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m29c-verify.log`) pass focused contracts, regenerated native Debug build (`BUILD SUCCEEDED`), Metal 4/Apple M5 Max frame 1, capture-disabled baseline, clean status 0, `engine_thread_finished`, and `application_stopped`; C trace-file comparison, reachable content/resource breadth, Metal authority, GPU/screenshot, and visual/human acceptance remain |
+| M29d: File-backed C↔Swift render comparison | `SM64RenderPacketFile` persists one bounded immutable Swift frame with the C render-domain sequence origin; the comparator selects the latest complete C schema-4 domain-11 frame, preserves its simulation tick, compares record IDs/values/order, and fails closed on malformed or divergent files. | Complete locally — independent C fixture contains two frames plus finish records and matches the Swift latest-frame sidecar at fingerprint `0xde2543519ff3c23f`; live Apple M5 Max one-tick C trace↔Swift packet match is `0xb295758c3331d40` with 3 records, trace/packet sizes 5448/248 bytes, and clean status-0 shutdown in `/tmp/sm64-modern-m29d-live-verify.log`; `script/test_render_file_comparison.sh`, `script/test_render_file_comparison_live.sh`, regenerated build `/tmp/sm64-modern-m29d-build.log`, default verifier `/tmp/sm64-modern-m29d-verify.log`, strict Swift 6, and `git diff --check` pass; multi-route/reachable resource breadth, finish-record closure, Metal authority, GPU/screenshot, and visual/human acceptance remain |
 | M30: Goddard/Mario face | Product-reachable Mario-face update, geometry, material, animation, and render paths run in Swift. | Not started |
 | M31: Whole-engine Swift authority | Swift completes title-to-gameplay, saves, audio, rendering, and shutdown with no engine/gameplay C callback; C selector remains equivalent. | Not started |
 | M31a: Swift lifecycle authority seam | Swift runtime owns lifecycle phases, invalid-order rejection, stop-request transition, failure fencing, and explicit C-domain bridge reporting while remaining domains migrate. | Complete locally — strict Swift 6 runtime smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; gameplay/content C bridge remains intentionally open |
@@ -2554,9 +2559,13 @@ replayable trace, and the platform evidence listed in its exit gate.
    M29c now projects those events into schema-4 domain-11/render-packet
    records, round-trips their 128-byte encoding, and reports first divergence
    at record `1` for a deliberate mutation; its independent C fingerprint is
-   `0x55ad0c4378b828d5`. Next consume C trace files, compare packet bytes and
-   resource IDs over reachable content before Metal encoding, then promote
-   only after texture residency and Metal validation are green.
+   `0x55ad0c4378b828d5`. M29d adds a fixed sidecar and latest-complete-frame
+   selector: the independent two-frame C file fixture matches at
+   `0xde2543519ff3c23f`,
+   and the live one-tick Apple M5 Max trace matches Swift at
+   `0xb295758c3331d40`. Next expand comparison across reachable content,
+   resource IDs, finish records, and route shards before Metal encoding, then
+   promote only after texture residency and Metal validation are green.
 8. **M30 Goddard/Mario face.** Port face geometry, materials, animation,
    eye/mouth state, cap/skin variants, lighting, and product-reachable
    render callbacks. Verify front-end, gameplay, cutscene, and ending paths.

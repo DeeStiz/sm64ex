@@ -353,6 +353,25 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     func endSceneFrame() -> SM64ModernStatus {
         recorder.endFrame()
         renderPacketCapture?.endFrame()
+        if let packet = renderPacketCapture?.packet() {
+            if let path = ProcessInfo.processInfo.environment["SM64_MODERN_RENDER_PACKET_PATH"],
+               !path.isEmpty {
+                do {
+                    try SM64RenderPacketFile.write(
+                        packet: packet,
+                        to: URL(fileURLWithPath: path).standardizedFileURL
+                    )
+                    if packet.sequence == 1 || packet.sequence.isMultiple(of: 300) {
+                        metalLogger.notice(
+                            "swift_render_packet_file sequence=\(packet.sequence, privacy: .public) events=\(packet.events.count, privacy: .public)"
+                        )
+                    }
+                } catch {
+                    metalLogger.error("swift_render_packet_file_failed error=io")
+                    return SM64_MODERN_STATUS_PLATFORM_ERROR
+                }
+            }
+        }
         if let packet = renderPacketCapture?.packet(), packet.sequence == 1 || packet.sequence.isMultiple(of: 300) {
             let summary = renderPacketCapture?.summary()
             metalLogger.notice(

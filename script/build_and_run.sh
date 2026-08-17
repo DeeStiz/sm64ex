@@ -62,6 +62,7 @@ else
   "$PROJECT_ROOT/script/test_display_list_packet.sh"
   "$PROJECT_ROOT/script/test_render_packet_capture.sh"
   "$PROJECT_ROOT/script/test_render_trace_adapter.sh"
+  "$PROJECT_ROOT/script/test_render_file_comparison.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
@@ -104,6 +105,18 @@ open_app() {
   fi
   if [[ "${SM64_MODERN_RENDER_PACKET_CAPTURE:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_RENDER_PACKET_CAPTURE=1)
+  fi
+  if [[ -n "${SM64_MODERN_RENDER_PACKET_PATH:-}" ]]; then
+    open_arguments+=(--env SM64_MODERN_RENDER_PACKET_PATH="$SM64_MODERN_RENDER_PACKET_PATH")
+  fi
+  if [[ -n "${SM64_MODERN_ORACLE_TRACE_MODE:-}" ]]; then
+    open_arguments+=(--env SM64_MODERN_ORACLE_TRACE_MODE="$SM64_MODERN_ORACLE_TRACE_MODE")
+  fi
+  if [[ -n "${SM64_MODERN_ORACLE_TRACE_PATH:-}" ]]; then
+    open_arguments+=(--env SM64_MODERN_ORACLE_TRACE_PATH="$SM64_MODERN_ORACLE_TRACE_PATH")
+  fi
+  if [[ -n "${SM64_MODERN_ORACLE_TRACE_TICKS:-}" ]]; then
+    open_arguments+=(--env SM64_MODERN_ORACLE_TRACE_TICKS="$SM64_MODERN_ORACLE_TRACE_TICKS")
   fi
   /usr/bin/open -n "$APP_BUNDLE" "${open_arguments[@]}"
 }
