@@ -66,6 +66,13 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
     let fixedGoalHeight: Float
     let fixedFocusFloorOffset: Float
     let fixedSmoothMovement: Bool
+    let bossSecondFocus: SM64ObjectVector3
+    let bossFocusDistance: Float
+    let bossAngleVelocity: Float
+    let bossYaw: Int16
+    let bossHeldState: Int16
+    let bossFloorHeight: Float?
+    let bossForceHeight: Bool
     let height: SM64CameraHeightInput?
     let slope: SM64CameraSlopeInput?
 
@@ -100,6 +107,13 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         fixedGoalHeight: Float = 0,
         fixedFocusFloorOffset: Float = 0,
         fixedSmoothMovement: Bool = false,
+        bossSecondFocus: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 0, z: 0),
+        bossFocusDistance: Float = 0,
+        bossAngleVelocity: Float = 0,
+        bossYaw: Int16 = 0,
+        bossHeldState: Int16 = 0,
+        bossFloorHeight: Float? = nil,
+        bossForceHeight: Bool = false,
         height: SM64CameraHeightInput? = nil,
         slope: SM64CameraSlopeInput? = nil
     ) {
@@ -133,6 +147,13 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         self.fixedGoalHeight = fixedGoalHeight
         self.fixedFocusFloorOffset = fixedFocusFloorOffset
         self.fixedSmoothMovement = fixedSmoothMovement
+        self.bossSecondFocus = bossSecondFocus
+        self.bossFocusDistance = bossFocusDistance
+        self.bossAngleVelocity = bossAngleVelocity
+        self.bossYaw = bossYaw
+        self.bossHeldState = bossHeldState
+        self.bossFloorHeight = bossFloorHeight
+        self.bossForceHeight = bossForceHeight
         self.height = height
         self.slope = slope
     }
@@ -155,7 +176,7 @@ struct SM64CameraCallbackResult: Equatable, Sendable {
 }
 
 /// Bounded-mode callback descriptors plus the callbacks whose C bodies are
-/// already reducible to immutable geometry. Parallel, boss, spiral, and water
+/// already reducible to immutable geometry. Parallel, spiral, and water
 /// callbacks deliberately return nil until their owner-thread path data and
 /// collision policy have their own Swift boundaries.
 enum SM64CameraModeCallbacks {
@@ -171,7 +192,7 @@ enum SM64CameraModeCallbacks {
         descriptor(8, .waterSurface, false, true, false, 800, 125, 125, 0x05B0, false, true),
         descriptor(9, .slideHoot, true, true, false, 800, 125, 125, 0x1555, true, false),
         descriptor(10, .insideCannon, true, true, true, 800, 125, 125, 0, true, false),
-        descriptor(11, .bossFight, false, true, false, 0, 0, 0, 0, false, false),
+        descriptor(11, .bossFight, true, true, false, 0, 0, 0, 0, false, false),
         descriptor(12, .parallelTracking, false, true, false, 0, 0, 0, 0, false, false),
         descriptor(13, .fixed, true, true, false, 0, 0, 0, 0, false, false),
         descriptor(14, .eightDirections, true, true, false, 1000, 125, 125, 0x05B0, false, true),
@@ -200,7 +221,11 @@ enum SM64CameraModeCallbacks {
               input.fixedFloorHeight?.isFinite ?? true,
               input.fixedCeilingHeight?.isFinite ?? true,
               input.fixedGoalHeight.isFinite,
-              input.fixedFocusFloorOffset.isFinite else { return nil }
+              input.fixedFocusFloorOffset.isFinite,
+              finite(input.bossSecondFocus),
+              input.bossFocusDistance.isFinite,
+              input.bossAngleVelocity.isFinite,
+              input.bossFloorHeight?.isFinite ?? true else { return nil }
 
         switch descriptor.callback {
         case .radial:
@@ -221,8 +246,9 @@ enum SM64CameraModeCallbacks {
             return behindMario(input, descriptor: descriptor)
         case .fixed:
             return fixed(input, descriptor: descriptor)
-        case .none, .waterSurface, .bossFight,
-             .parallelTracking, .spiralStairs:
+        case .bossFight:
+            return boss(input, descriptor: descriptor)
+        case .none, .waterSurface, .parallelTracking, .spiralStairs:
             return nil
         }
     }
@@ -435,6 +461,39 @@ enum SM64CameraModeCallbacks {
             returnedYaw: result.yaw,
             areaYaw: result.yaw,
             pitch: result.pitch,
+            distance: result.distance,
+            outputsSwapped: descriptor.outputsSwapped,
+            panAhead: descriptor.pansAhead,
+            sideButtonYaw: 0,
+            behindMarioSoundTimer: 0
+        )
+    }
+
+    private static func boss(
+        _ input: SM64CameraCallbackInput,
+        descriptor: SM64CameraModeCallbackDescriptor
+    ) -> SM64CameraCallbackResult? {
+        guard let result = SM64CameraBoss.update(
+            SM64CameraBossInput(
+                marioPosition: input.marioPosition,
+                secondFocus: input.bossSecondFocus,
+                focusDistance: input.bossFocusDistance,
+                yaw: input.bossYaw,
+                heldState: input.bossHeldState,
+                angleVelocity: input.bossAngleVelocity,
+                floorHeight: input.bossFloorHeight,
+                forceHeight: input.bossForceHeight,
+                lakituDistance: input.lakituDistance,
+                lakituPitch: input.lakituPitch
+            )
+        ) else { return nil }
+        return SM64CameraCallbackResult(
+            focus: result.focus,
+            position: result.position,
+            cameraYaw: result.yaw,
+            returnedYaw: result.yaw,
+            areaYaw: result.yaw,
+            pitch: 0x1000,
             distance: result.distance,
             outputsSwapped: descriptor.outputsSwapped,
             panAhead: descriptor.pansAhead,

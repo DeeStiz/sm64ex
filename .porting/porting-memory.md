@@ -2,6 +2,21 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31t promotes boss-fight camera mode 11 through the Swift evaluator. C
+  snapshots the second focus, held-object state, bounded focus distance,
+  arena-floor result, BBH height override, Mario angular velocity, and current
+  Lakitu zoom; Swift owns blended focus, held-object height response, arena
+  placement, and zoom offset while C retains object/surface lookup,
+  C-button/environmental-shake effects, `lakitu_zoom`, and presentation. The
+  callback fingerprint is `0x59e776a4ca33b198`; camera primitive/geometry/
+  callback/migration/state/runtime smokes, native ABI smoke, Swift 6 Debug
+  build, and `git diff --check` pass. Signed launch
+  `/tmp/sm64-modern-m31t-live.log` reaches Metal 4 frame one, 360 fixed steps,
+  zero scheduler/audio drops, and status-0 shutdown; no boss route is entered,
+  so authored-mode telemetry, full camera parity, physical feel, and human
+  acceptance remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31t.md`.
+
 - M31s promotes fixed-camera mode 13 through the live Swift camera
   evaluator. C snapshots the fixed anchor, area interpolation policy,
   floor/ceiling results, smooth flag, and focus-floor offset; Swift owns fixed

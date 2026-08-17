@@ -1640,6 +1640,32 @@ s32 update_boss_fight_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
         offset_rotated(secondFocus, sMarioCamState->pos, holdFocOffset, sMarioCamState->faceAngle);
     }
 
+    if (sm64_modern_camera_authority_active()) {
+        if (sCSideButtonYaw < 0) {
+            sModeOffsetYaw += 0x200;
+            if ((sCSideButtonYaw += 0x100) > 0) {
+                sCSideButtonYaw = 0;
+            }
+        }
+        if (sCSideButtonYaw > 0) {
+            sModeOffsetYaw -= 0x200;
+            if ((sCSideButtonYaw -= 0x100) < 0) {
+                sCSideButtonYaw = 0;
+            }
+        }
+        lakitu_zoom(focusDistance, 0x1800);
+        {
+            s16 callbackYaw = 0;
+            u32 callbackFlags = 0;
+            if (sm64_modern_camera_evaluate_callback(
+                    c, CAMERA_MODE_BOSS_FIGHT, focus, pos,
+                    &callbackYaw, &callbackFlags)) {
+                (void)callbackFlags;
+                return callbackYaw;
+            }
+        }
+    }
+
     // Set the camera focus to the average of Mario and secondFocus
     focus[0] = (sMarioCamState->pos[0] + secondFocus[0]) / 2.f;
     focus[1] = (sMarioCamState->pos[1] + secondFocus[1]) / 2.f + 125.f;
@@ -2181,6 +2207,8 @@ static s32 sm64_modern_camera_evaluate_callback(
         input.area_center[1] = camera->areaCenY;
         input.area_center[2] = camera->areaCenZ;
     }
+    vec3f_copy(input.camera_position, pos);
+    vec3f_copy(input.camera_focus, focus);
 
     if (mode == CAMERA_MODE_FIXED && camera != NULL) {
         f32 focusFloorOffset;
@@ -2250,6 +2278,80 @@ static s32 sm64_modern_camera_evaluate_callback(
             input.fixed_flags |=
                 SM64_MODERN_CAMERA_CALLBACK_FIXED_SMOOTH_MOVEMENT;
         }
+    }
+
+    if (mode == CAMERA_MODE_BOSS_FIGHT && camera != NULL) {
+        struct Object *boss = gSecondCameraFocus;
+        Vec3f secondFocus;
+        Vec3f bossFocus;
+        Vec3f bossPosition;
+        struct Surface *floor = NULL;
+        f32 focusDistance;
+        s16 heldState = 0;
+        s16 bossYaw = sModeOffsetYaw + DEGREES(45);
+
+        if (boss != NULL) {
+            object_pos_to_vec3f(secondFocus, boss);
+            heldState = boss->oHeldState;
+        } else {
+            secondFocus[0] = camera->areaCenX;
+            secondFocus[1] = sMarioCamState->pos[1];
+            secondFocus[2] = camera->areaCenZ;
+        }
+        focusDistance = calc_abs_dist(sMarioCamState->pos, secondFocus) * 1.6f;
+        if (focusDistance < 800.f) { focusDistance = 800.f; }
+        if (focusDistance > 5000.f) { focusDistance = 5000.f; }
+
+        if (heldState == 1) {
+            Vec3f holdFocOffset = { 0.f, -150.f, -125.f };
+            offset_rotated(
+                secondFocus, sMarioCamState->pos,
+                holdFocOffset, sMarioCamState->faceAngle);
+        }
+
+        bossFocus[0] = (sMarioCamState->pos[0] + secondFocus[0]) / 2.f;
+        bossFocus[1] = (sMarioCamState->pos[1] + secondFocus[1]) / 2.f + 100.f;
+        bossFocus[2] = (sMarioCamState->pos[2] + secondFocus[2]) / 2.f;
+        if (heldState == 1) {
+            bossFocus[1] += 300.f * sins(
+                (gMarioStates[0].angleVel[1] > 0.f)
+                    ? gMarioStates[0].angleVel[1]
+                    : -gMarioStates[0].angleVel[1]);
+        }
+        vec3f_set_dist_and_angle(
+            bossFocus, bossPosition, focusDistance, 0x1000, bossYaw);
+        bossPosition[1] = find_floor(
+            camera->areaCenX, 20000.f, camera->areaCenZ, &floor);
+        if (floor != NULL) {
+            const f32 nx = floor->normal.x;
+            const f32 ny = floor->normal.y;
+            const f32 nz = floor->normal.z;
+            const f32 oo = floor->originOffset;
+            bossPosition[1] = 300.f
+                - (nx * bossPosition[0] + nz * bossPosition[2] + oo) / ny;
+            switch (gCurrLevelArea) {
+                case AREA_BOB:
+                    bossPosition[1] += 125.f;
+                    // fall through: the source camera raises WF twice
+                case AREA_WF:
+                    bossPosition[1] += 125.f;
+                    break;
+            }
+            input.boss_flags |=
+                SM64_MODERN_CAMERA_CALLBACK_HAS_BOSS_FLOOR_HEIGHT;
+            input.boss_floor_height = bossPosition[1];
+        }
+        if (gCurrLevelNum == LEVEL_BBH) {
+            input.boss_flags |= SM64_MODERN_CAMERA_CALLBACK_BOSS_FORCE_HEIGHT;
+        }
+        input.boss_second_focus[0] = secondFocus[0];
+        input.boss_second_focus[1] = secondFocus[1];
+        input.boss_second_focus[2] = secondFocus[2];
+        input.boss_focus_distance = focusDistance;
+        input.boss_angle_velocity = gMarioStates[0].angleVel[1];
+        input.boss_yaw = bossYaw;
+        input.boss_held_state = heldState;
+        input.camera_yaw = bossYaw;
     }
 
     if (mode == CAMERA_MODE_RADIAL || mode == CAMERA_MODE_OUTWARD_RADIAL

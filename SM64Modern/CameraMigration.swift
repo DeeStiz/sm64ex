@@ -154,6 +154,7 @@ final class SwiftCameraMigrationService {
                 MemoryLayout<SM64ModernCameraCallbackInputV1>.size
               ),
               input.reserved1 == 0,
+              input.reserved2 == 0,
               input.reserved == 0 else {
             return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "callback_input")
         }
@@ -251,6 +252,20 @@ final class SwiftCameraMigrationService {
             fixedFocusFloorOffset: input.fixed_focus_floor_offset,
             fixedSmoothMovement: input.fixed_flags
                 & UInt16(SM64_MODERN_CAMERA_CALLBACK_FIXED_SMOOTH_MOVEMENT) != 0,
+            bossSecondFocus: SM64ObjectVector3(
+                x: input.boss_second_focus.0,
+                y: input.boss_second_focus.1,
+                z: input.boss_second_focus.2
+            ),
+            bossFocusDistance: input.boss_focus_distance,
+            bossAngleVelocity: input.boss_angle_velocity,
+            bossYaw: input.boss_yaw,
+            bossHeldState: input.boss_held_state,
+            bossFloorHeight: input.boss_flags
+                & UInt16(SM64_MODERN_CAMERA_CALLBACK_HAS_BOSS_FLOOR_HEIGHT) != 0
+                ? input.boss_floor_height : nil,
+            bossForceHeight: input.boss_flags
+                & UInt16(SM64_MODERN_CAMERA_CALLBACK_BOSS_FORCE_HEIGHT) != 0,
             height: height,
             slope: slope
         )

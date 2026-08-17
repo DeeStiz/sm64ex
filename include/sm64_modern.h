@@ -526,6 +526,17 @@ typedef struct SM64ModernCameraCallbackInputV1 {
     float fixed_focus_floor_offset;
     uint16_t fixed_flags;
     uint16_t reserved1;
+    // Boss-camera values are populated only for CAMERA_MODE_BOSS_FIGHT.
+    // The second focus and floor result are snapshots; object and surface
+    // pointers never cross the ABI.
+    float boss_second_focus[3];
+    float boss_focus_distance;
+    float boss_floor_height;
+    float boss_angle_velocity;
+    int16_t boss_yaw;
+    int16_t boss_held_state;
+    uint16_t boss_flags;
+    uint16_t reserved2;
     uint32_t reserved;
 } SM64ModernCameraCallbackInputV1;
 
@@ -592,6 +603,8 @@ typedef struct SM64ModernCameraFOVOutputV1 {
 #define SM64_MODERN_CAMERA_CALLBACK_HAS_FIXED_FLOOR (1u << 5)
 #define SM64_MODERN_CAMERA_CALLBACK_HAS_FIXED_CEILING (1u << 6)
 #define SM64_MODERN_CAMERA_CALLBACK_FIXED_SMOOTH_MOVEMENT (1u << 7)
+#define SM64_MODERN_CAMERA_CALLBACK_HAS_BOSS_FLOOR_HEIGHT (1u << 8)
+#define SM64_MODERN_CAMERA_CALLBACK_BOSS_FORCE_HEIGHT (1u << 9)
 #define SM64_MODERN_CAMERA_CALLBACK_MARIO_MODE_ACTIVE (1u << 0)
 #define SM64_MODERN_CAMERA_CALLBACK_WATER_OR_METAL_ACTION (1u << 1)
 
