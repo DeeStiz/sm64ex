@@ -2,7 +2,19 @@
 
 ## Status
 
-M29d is the latest validated file-backed C↔Swift render comparison layered on
+M30a is the latest validated bounded Goddard/Mario-face value slice. Swift now
+owns a pointer-free face geometry descriptor for the Goddard `mario_Face`
+shape (440 vertices, 877 faces, 8 materials, 22 component IDs and the 820/166
+animation banks) plus the product geo-switch decisions for blink cadence,
+eye-case overrides, hand variants, stand/run LOD, cap effect/on-off/wing
+visibility, alpha, and metal/noise material bits. The independent Swift/C
+contract matches at geometry fingerprint `0x8634af03a4d54872` and packet
+fingerprint `0xf9789f46417c7f7a` over 8 scenarios; the focused contract is
+`script/test_mario_face.sh`. This is a value/asset inventory boundary only:
+live Goddard animation data, face mesh/resource residency, lighting, camera
+orientation, Metal encoding, screenshots, and visual/human acceptance remain
+open. M29d remains the latest validated file-backed C↔Swift render comparison
+layered on
 M29c, M29b, M29a, M28e, and the preceding rewrite work. Swift now writes a
 bounded immutable sidecar for the latest closed frame, reads schema-4 C
 domain-11/render-packet records, selects the latest complete frame, and fails
@@ -2134,7 +2146,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M29b: Owner-thread C render-oracle packet capture | `SM64DisplayListRenderCapture` mirrors C frame-begin/draw/frame-end/finish records with fixed shader/texture counters, selected resource IDs, batch state, vertex/viewport/scissor hashes, and owner-thread immutable receipts; capture is gated and does not change default Metal authority. | Complete locally — Swift/C frame fingerprint `0x27011af4dff9d510` and finish fingerprint `0xeef8bcf4c617bd63`; `script/test_render_packet_capture.sh`, regenerated native Debug build (`/tmp/sm64-modern-m29b-build.log`, `BUILD SUCCEEDED`), and gated `SM64_MODERN_RENDER_PACKET_CAPTURE=1 script/build_and_run.sh --verify` (`/tmp/sm64-modern-m29b-verify.log`) pass Apple M5 Max Metal 4 frame 1 with `swift_render_packet_capture frame=1 events=3 draws=1`, clean status 0, `engine_thread_finished`, and `application_stopped`; default capture remains disabled, so full reachable-frame comparison, Metal authority, GPU/screenshot, and visual/human acceptance remain |
 | M29c: Schema-4 render trace adapter and first divergence | `SM64RenderOracleTraceAdapter` projects captured frame events into domain-11/render-packet records, preserves canonical 128-byte codecs, computes a stable aggregate, and returns the first differing record index on mutation or count mismatch. | Complete locally — Swift/C trace fingerprint `0x55ad0c4378b828d5` and deliberate first divergence `1`; `script/test_render_trace_adapter.sh`, corrected `script/build_and_run.sh` matrix, and default `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m29c-verify.log`) pass focused contracts, regenerated native Debug build (`BUILD SUCCEEDED`), Metal 4/Apple M5 Max frame 1, capture-disabled baseline, clean status 0, `engine_thread_finished`, and `application_stopped`; C trace-file comparison, reachable content/resource breadth, Metal authority, GPU/screenshot, and visual/human acceptance remain |
 | M29d: File-backed C↔Swift render comparison | `SM64RenderPacketFile` persists one bounded immutable Swift frame with the C render-domain sequence origin; the comparator selects the latest complete C schema-4 domain-11 frame, preserves its simulation tick, compares record IDs/values/order, and fails closed on malformed or divergent files. | Complete locally — independent C fixture contains two frames plus finish records and matches the Swift latest-frame sidecar at fingerprint `0xde2543519ff3c23f`; live Apple M5 Max one-tick C trace↔Swift packet match is `0xb295758c3331d40` with 3 records, trace/packet sizes 5448/248 bytes, and clean status-0 shutdown in `/tmp/sm64-modern-m29d-live-verify.log`; `script/test_render_file_comparison.sh`, `script/test_render_file_comparison_live.sh`, regenerated build `/tmp/sm64-modern-m29d-build.log`, default verifier `/tmp/sm64-modern-m29d-verify.log`, strict Swift 6, and `git diff --check` pass; multi-route/reachable resource breadth, finish-record closure, Metal authority, GPU/screenshot, and visual/human acceptance remain |
-| M30: Goddard/Mario face | Product-reachable Mario-face update, geometry, material, animation, and render paths run in Swift. | Not started |
+| M30: Goddard/Mario face | Product-reachable Mario-face update, geometry, material, animation, and render paths run in Swift. | In progress — M30a closes the pointer-free geometry inventory and geo-switch value packet; live animation/resource/lighting/render routes and front-end/gameplay/cutscene/ending shards remain |
+| M30a: Mario-face geometry and geo-switch value packet | `SM64MarioFace` mirrors Goddard's 440-vertex/877-face/8-material face shape inventory, stable component IDs, 820/166 animation bank dimensions, blink cadence, eye/hand/cap switches, stand/run selection, alpha, and metal/noise material modes as strict `Sendable` values. | Complete locally — Swift/C geometry fingerprint `0x8634af03a4d54872`, packet fingerprint `0xf9789f46417c7f7a`, and 8 scenario contract via `script/test_mario_face.sh`; default full verifier includes the focused contract, regenerated Debug build and Metal 4/frame-one clean shutdown remain to be refreshed after M30a; live Goddard animation data, resource residency, lighting/camera orientation, renderer authority, screenshot/GPU, and visual/human acceptance remain |
 | M31: Whole-engine Swift authority | Swift completes title-to-gameplay, saves, audio, rendering, and shutdown with no engine/gameplay C callback; C selector remains equivalent. | Not started |
 | M31a: Swift lifecycle authority seam | Swift runtime owns lifecycle phases, invalid-order rejection, stop-request transition, failure fencing, and explicit C-domain bridge reporting while remaining domains migrate. | Complete locally — strict Swift 6 runtime smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; gameplay/content C bridge remains intentionally open |
 | M31b: Swift engine context seam | Swift owns a real owner-thread engine context with level reset, state/object-pool/scheduler advancement, immutable tick receipts, stop/shutdown cleanup, and explicit lifecycle-domain wiring while C remains the fallback for unmigrated domains. | Complete locally — strict Swift 6 context smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; C gameplay/content fallback remains intentionally open |
@@ -2566,9 +2579,16 @@ replayable trace, and the platform evidence listed in its exit gate.
    `0xb295758c3331d40`. Next expand comparison across reachable content,
    resource IDs, finish records, and route shards before Metal encoding, then
    promote only after texture residency and Metal validation are green.
-8. **M30 Goddard/Mario face.** Port face geometry, materials, animation,
-   eye/mouth state, cap/skin variants, lighting, and product-reachable
-   render callbacks. Verify front-end, gameplay, cutscene, and ending paths.
+8. **M30 Goddard/Mario face.** M30a now captures the pointer-free Goddard
+   face-shape inventory (440 vertices, 877 faces, 8 materials, 22 stable
+   component IDs, and 820/166 animation banks) and mirrors the product
+   geo-switch decisions for blink/eye, hand, cap, LOD, alpha, and metal/noise
+   material state with an independent C contract. Next port the actual
+   animation channels and mouth/eyelid/eyebrow/mustache state, resolve face
+   mesh/material/lighting resources through the content pack, reproduce camera
+   orientation and cutscene overrides, and wire the render packet through
+   front-end, gameplay, cutscene, and ending shards before any face-renderer
+   authority cutover.
 9. **M31 whole-engine authority.** Wire title-to-shutdown through
    SwiftEngineRuntime by default. Prove no Swift-mode gameplay, save, audio,
    renderer, or shutdown path enters a C engine callback. Retain the C adapter

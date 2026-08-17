@@ -63,6 +63,7 @@ else
   "$PROJECT_ROOT/script/test_render_packet_capture.sh"
   "$PROJECT_ROOT/script/test_render_trace_adapter.sh"
   "$PROJECT_ROOT/script/test_render_file_comparison.sh"
+  "$PROJECT_ROOT/script/test_mario_face.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
