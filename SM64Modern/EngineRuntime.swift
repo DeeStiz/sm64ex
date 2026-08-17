@@ -39,7 +39,8 @@ struct SM64ModernSwiftEngineDomainReadiness: Equatable, Sendable {
     let swiftOwned: Set<SM64ModernSwiftEngineDomain>
 
     static let context = Self(swiftOwned: [
-        .lifecycle, .state, .objectScheduler, .progression, .input, .marioInput, .marioAction
+        .lifecycle, .state, .objectScheduler, .progression,
+        .savePersistence, .input, .marioInput, .marioAction
     ])
 
     func isSwiftOwned(_ domain: SM64ModernSwiftEngineDomain) -> Bool {
@@ -467,8 +468,10 @@ final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
     // remaining gameplay/content domains still run through the compatibility
     // adapter.
     // The implementation string intentionally names that boundary; it must
-    // not be mistaken for whole-engine Swift authority.
-    let implementation = "swift_lifecycle_owner_c_domain_bridge"
+    // not be mistaken for whole-engine Swift authority. Save persistence is
+    // now a real Swift-owned durable boundary even though C still consumes
+    // the normalized in-memory compatibility buffer.
+    let implementation = "swift_lifecycle_save_persistence_owner_c_domain_bridge"
 
     private let cFallback: SM64ModernEngineRuntime
     let swiftContext: SM64ModernSwiftEngineContext

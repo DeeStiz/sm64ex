@@ -355,6 +355,12 @@ final class SwiftProgressionMigrationService {
     }
 
     private func persist(event: SM64ModernProgressionEventV1) -> SM64ModernStatus {
+        let swiftPersistence = sm64_modern_progression_persistence_authority_active() != 0
+        if swiftPersistence {
+            progressionMigrationLogger.notice(
+                "swift_persistence_boundary operation=\(event.event_kind, privacy: .public) file=\(event.save_file_index, privacy: .public) c_durable_io=disabled"
+            )
+        }
         guard let snapshot = readSnapshot(fileIndex: Int(event.save_file_index)) else {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "persist_snapshot")
         }
@@ -377,6 +383,11 @@ final class SwiftProgressionMigrationService {
                 saveRecoveryDecision: UInt32(before.saveDecision.rawValue),
                 menuRecoveryDecision: UInt32(before.menuDecision.rawValue)
             )
+            if swiftPersistence {
+                progressionMigrationLogger.notice(
+                    "swift_persistence_boundary_applied operation=\(event.event_kind, privacy: .public) file=\(event.save_file_index, privacy: .public) c_snapshot=committed"
+                )
+            }
         } catch {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "persist")
         }
@@ -384,6 +395,9 @@ final class SwiftProgressionMigrationService {
     }
 
     private func reload(event: SM64ModernProgressionEventV1) -> SM64ModernStatus {
+        if sm64_modern_progression_persistence_authority_active() != 0 {
+            return loadFromSwiftPersistence(event: event)
+        }
         guard let snapshot = readSnapshot(fileIndex: Int(event.save_file_index)) else {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "reload_snapshot")
         }
@@ -412,6 +426,118 @@ final class SwiftProgressionMigrationService {
             return fail(SM64_MODERN_STATUS_PLATFORM_ERROR, message: "reload")
         }
         return recordSnapshot(event: event, flags: 1, captureReplay: false)
+    }
+
+    /// Swift-owned load/reload boundary.  C has already cleared or is about
+    /// to replace its compatibility buffer, so the durable image is recovered
+    /// by the owner-thread adapter and then copied into both C backup slots by
+    /// the narrow normalized-byte ABI.  No C EEPROM/text-save read is allowed
+    /// while the authority flag is active.
+    private func loadFromSwiftPersistence(
+        event: SM64ModernProgressionEventV1
+    ) -> SM64ModernStatus {
+        let fileIndex = Int(event.save_file_index)
+        progressionMigrationLogger.notice(
+            "swift_persistence_boundary operation=\(event.event_kind, privacy: .public) file=\(event.save_file_index, privacy: .public) c_durable_io=disabled"
+        )
+        do {
+            let before: SM64PersistenceLoadResult
+            let selected: SM64PersistenceLoadResult
+            if event.event_kind == SM64_MODERN_PROGRESSION_EVENT_SAVE_LOAD {
+                var loadedForEvent: SM64PersistenceLoadResult?
+                for index in 0..<SM64CoinScoreAgeState.fileCount {
+                    let loaded = try adapter.load(
+                        saveFileIndex: index,
+                        ownerThreadToken: ownerThreadToken
+                    )
+                    if index == fileIndex {
+                        loadedForEvent = loaded
+                    }
+                    try writeSnapshotToC(
+                        fileIndex: index,
+                        save: loaded.save,
+                        menu: loaded.menu
+                    )
+                }
+                guard let loadedForEvent else {
+                    return fail(
+                        SM64_MODERN_STATUS_INVALID_ARGUMENT,
+                        message: "load_save_file"
+                    )
+                }
+                before = loadedForEvent
+                selected = loadedForEvent
+            } else {
+                before = try adapter.load(
+                    saveFileIndex: fileIndex,
+                    ownerThreadToken: ownerThreadToken
+                )
+                selected = try adapter.reload(
+                    saveFileIndex: fileIndex,
+                    ownerThreadToken: ownerThreadToken
+                )
+                try writeSnapshotToC(
+                    fileIndex: fileIndex,
+                    save: selected.save,
+                    menu: selected.menu
+                )
+            }
+
+            runtime.adoptPersistedSnapshots(
+                save: selected.save, menu: selected.menu
+            )
+            try appendReplay(
+                event: event,
+                operation: event.event_kind
+                    == SM64_MODERN_PROGRESSION_EVENT_SAVE_RELOAD
+                    ? .reload : .load,
+                before: (before.save, before.menu),
+                after: (selected.save, selected.menu),
+                saveRecoveryDecision: UInt32(before.saveDecision.rawValue),
+                menuRecoveryDecision: UInt32(before.menuDecision.rawValue)
+            )
+            progressionMigrationLogger.notice(
+                "swift_persistence_boundary_applied operation=\(event.event_kind, privacy: .public) file=\(event.save_file_index, privacy: .public) c_snapshot=admitted"
+            )
+        } catch {
+            return fail(
+                SM64_MODERN_STATUS_PLATFORM_ERROR,
+                message: "swift_persistence_load"
+            )
+        }
+        return recordSnapshot(event: event, flags: 1, captureReplay: false)
+    }
+
+    private func writeSnapshotToC(
+        fileIndex: Int,
+        save: SM64SaveFileSnapshot,
+        menu: SM64MenuDataSnapshot
+    ) throws {
+        guard (0..<SM64CoinScoreAgeState.fileCount).contains(fileIndex) else {
+            throw NSError(
+                domain: "io.github.deestiz.sm64modern.ProgressionMigration",
+                code: Int(SM64_MODERN_STATUS_INVALID_ARGUMENT),
+                userInfo: [NSLocalizedDescriptionKey: "Invalid save file index"]
+            )
+        }
+        let saveBytes = SM64SaveFileCodec.encode(save)
+        let menuBytes = SM64MenuDataCodec.encode(menu)
+        let status = saveBytes.withUnsafeBufferPointer { saveBuffer in
+            menuBytes.withUnsafeBufferPointer { menuBuffer in
+                sm64_modern_progression_write_snapshot(
+                    UInt32(fileIndex), saveBuffer.baseAddress,
+                    UInt32(saveBuffer.count), menuBuffer.baseAddress,
+                    UInt32(menuBuffer.count)
+                )
+            }
+        }
+        guard status == SM64_MODERN_STATUS_OK else {
+            throw NSError(
+                domain: "io.github.deestiz.sm64modern.ProgressionMigration",
+                code: Int(status),
+                userInfo: [NSLocalizedDescriptionKey: "C snapshot admission failed"]
+            )
+        }
     }
 
     private func readSnapshot(fileIndex: Int) -> (

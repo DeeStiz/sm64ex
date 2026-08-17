@@ -53,6 +53,18 @@ int main(void) {
     expect(sm64_modern_progression_migration_status()
                == SM64_MODERN_STATUS_OK,
            "installed status");
+    expect(sm64_modern_progression_persistence_authority_active() == 0,
+           "persistence authority starts disabled");
+    expect(sm64_modern_progression_set_persistence_authority(1)
+               == SM64_MODERN_STATUS_OK,
+           "enable persistence authority");
+    expect(sm64_modern_progression_persistence_authority_active() == 1,
+           "persistence authority enabled");
+    expect(sm64_modern_progression_set_persistence_authority(0)
+               == SM64_MODERN_STATUS_OK,
+           "disable persistence authority");
+    expect(sm64_modern_progression_persistence_authority_active() == 0,
+           "persistence authority disabled");
 
     expect(sm64_modern_progression_record_event(
                SM64_MODERN_PROGRESSION_EVENT_LEVEL_REWARD,

@@ -8,6 +8,7 @@
 static SM64ModernProgressionMigrationApiV1 sMigration;
 static SM64ModernStatus sMigrationStatus = SM64_MODERN_STATUS_OK;
 static bool sMigrationInstalled;
+static bool sPersistenceAuthority;
 
 SM64ModernStatus sm64_modern_validate_progression_migration_api(
     const SM64ModernProgressionMigrationApiV1 *migration) {
@@ -36,6 +37,7 @@ SM64ModernStatus sm64_modern_install_progression_migration_api(
     }
     memcpy(&sMigration, migration, sizeof(sMigration));
     sMigrationInstalled = true;
+    sPersistenceAuthority = false;
     sMigrationStatus = SM64_MODERN_STATUS_OK;
     return SM64_MODERN_STATUS_OK;
 }
@@ -43,6 +45,7 @@ SM64ModernStatus sm64_modern_install_progression_migration_api(
 void sm64_modern_uninstall_progression_migration_api(void) {
     memset(&sMigration, 0, sizeof(sMigration));
     sMigrationInstalled = false;
+    sPersistenceAuthority = false;
     sMigrationStatus = SM64_MODERN_STATUS_OK;
 }
 
@@ -52,6 +55,19 @@ SM64ModernStatus sm64_modern_progression_migration_status(void) {
 
 SM64ModernStatus sm64_modern_progression_migration_active_status(void) {
     return sMigrationInstalled ? sMigrationStatus : SM64_MODERN_STATUS_OK;
+}
+
+SM64ModernStatus sm64_modern_progression_set_persistence_authority(
+    uint32_t enabled) {
+    if (!sMigrationInstalled) {
+        return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+    sPersistenceAuthority = enabled != 0;
+    return SM64_MODERN_STATUS_OK;
+}
+
+uint32_t sm64_modern_progression_persistence_authority_active(void) {
+    return sMigrationInstalled && sPersistenceAuthority ? 1u : 0u;
 }
 
 static SM64ModernStatus sm64_modern_progression_record_event_internal(

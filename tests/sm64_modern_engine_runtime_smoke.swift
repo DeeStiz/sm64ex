@@ -82,7 +82,10 @@ enum SM64ModernEngineRuntimeSmoke {
             cFallback: SM64ModernCEngineRuntimeAdapter(callbacks: swiftRecorder.callbacks)
         )
         precondition(swiftShell.authority == .swift)
-        precondition(swiftShell.implementation == "swift_lifecycle_owner_c_domain_bridge")
+        precondition(
+            swiftShell.implementation
+                == "swift_lifecycle_save_persistence_owner_c_domain_bridge"
+        )
         precondition(swiftShell.phase == .cold)
         precondition(swiftShell.authorityLedger.isPartitioned)
         precondition(swiftShell.authorityLedger.unassignedDomains.isEmpty)
@@ -94,11 +97,11 @@ enum SM64ModernEngineRuntimeSmoke {
         )
         precondition(
             swiftShell.authorityLedger.owner(of: .savePersistence)
-                == .cCompatibilityBridge
+                == .swift
         )
         precondition(
             swiftShell.authorityLedger.cCompatibilityBridgeDomains
-                == [.audio, .camera, .frontend, .rendering, .savePersistence]
+                == [.audio, .camera, .frontend, .rendering]
         )
         precondition(swiftShell.step() == 4)
         precondition(swiftShell.initialize() == 0)
@@ -111,7 +114,11 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.marioInput))
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.marioAction))
         precondition(!swiftShell.swiftContext.domainReadiness.isSwiftOwned(.audio))
-        precondition(swiftShell.swiftContext.domainReadiness.cFallbackRequired.contains(.savePersistence))
+        precondition(
+            !swiftShell.swiftContext.domainReadiness.cFallbackRequired.contains(
+                .savePersistence
+            )
+        )
         let heldInput = swiftShell.swiftContext.ingestInput(
             .init(buttons: 0x0001, rawStickX: 16, rawStickY: 0),
             advanceLegacyDomain: false

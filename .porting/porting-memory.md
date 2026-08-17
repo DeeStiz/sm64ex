@@ -2,6 +2,20 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31j promotes durable save persistence to Swift authority. The progression
+  migration flag disables C EEPROM/text-save I/O, Swift recovers all four
+  normalized slots and menu backups, and a checked C snapshot writer restores
+  the compatibility `SaveBuffer` on load/reload. Focused migration,
+  persistence, and strict runtime smokes pass; native Debug build is
+  `/tmp/sm64-modern-m31j-build-2.log`. A fresh Apple M5 Max launch reports
+  `persistence_authority=swift`, `swift_persistence_boundary operation=5
+  c_durable_io=disabled`, admitted snapshots, Metal frame one, and status-0
+  shutdown. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31j.md`. C in-memory gameplay
+  mutations, full save-menu mutation evidence, audio/camera/frontend/rendering
+  authority, M33 breadth, M34 visual/device gates, and M35 human/release gates
+  remain open.
+
 - M31i adds `lifecycle` to the Swift-owned authority ledger. The strict
   runtime smoke, regenerated native Debug build, and gated verifier pass at
   `/tmp/sm64-modern-m31i-build.log` and

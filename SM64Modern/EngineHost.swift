@@ -130,6 +130,7 @@ private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     guard let host = engineHost(from: context) else { return }
     assert(host.isCurrentEngineThread)
     host.shutdownAudioOnEngineThread()
+    _ = sm64_modern_progression_set_persistence_authority(0)
     sm64_modern_uninstall_progression_migration_api()
     sm64_modern_uninstall_gameplay_migration_api()
     sm64_modern_uninstall_input_api()
@@ -383,6 +384,7 @@ final class EngineHost {
 
         let initializeStatus = runtime.initialize()
         guard initializeStatus == SM64_MODERN_STATUS_OK else {
+            _ = sm64_modern_progression_set_persistence_authority(0)
             sm64_modern_uninstall_progression_migration_api()
             progressionMigrationService = nil
             finish(state: .failed, status: initializeStatus)
@@ -863,8 +865,15 @@ final class EngineHost {
                 guard status == SM64_MODERN_STATUS_OK else {
                     return status
                 }
+                status = sm64_modern_progression_set_persistence_authority(1)
+                guard status == SM64_MODERN_STATUS_OK else {
+                    sm64_modern_uninstall_progression_migration_api()
+                    return status
+                }
                 progressionMigrationService = service
-                engineLogger.notice("progression_bridge_installed abi=1 authority=swift")
+                engineLogger.notice(
+                    "progression_bridge_installed abi=1 authority=swift persistence_authority=swift"
+                )
             } catch {
                 engineLogger.error(
                     "progression_bridge_initialize_failed error=\(error.localizedDescription, privacy: .public)"
@@ -874,6 +883,7 @@ final class EngineHost {
         }
         status = self.lifecycle.initialize(&config, &platform)
         guard status == SM64_MODERN_STATUS_OK else {
+            _ = sm64_modern_progression_set_persistence_authority(0)
             sm64_modern_uninstall_progression_migration_api()
             progressionMigrationService = nil
             return status

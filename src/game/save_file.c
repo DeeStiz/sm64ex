@@ -237,6 +237,18 @@ static void sm64_modern_write_u32(u8 *destination, u32 value) {
     }
 }
 
+static u16 sm64_modern_read_u16(const u8 *source) {
+    return (u16) source[0] | (u16) source[1] << 8u;
+}
+
+static u32 sm64_modern_read_u32(const u8 *source) {
+    u32 value = 0;
+    for (u32 byte = 0; byte < 4u; ++byte) {
+        value |= (u32) source[byte] << (byte * 8u);
+    }
+    return value;
+}
+
 static void sm64_modern_encode_save_snapshot(
     const struct SaveFile *save, u8 *destination) {
     destination[0] = save->capLevel;
@@ -289,6 +301,62 @@ SM64ModernStatus sm64_modern_progression_read_snapshot(
     return SM64_MODERN_STATUS_OK;
 }
 
+SM64ModernStatus sm64_modern_progression_write_snapshot(
+    uint32_t save_file_index,
+    const uint8_t *save_bytes,
+    uint32_t save_capacity,
+    const uint8_t *menu_bytes,
+    uint32_t menu_capacity) {
+    if (save_file_index >= NUM_SAVE_FILES || !save_bytes || !menu_bytes
+        || save_capacity < SM64_MODERN_SAVE_FILE_BYTE_COUNT
+        || menu_capacity < SM64_MODERN_MENU_DATA_BYTE_COUNT) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+    if (sm64_modern_read_u16(save_bytes + 52u) != SAVE_FILE_MAGIC
+        || sm64_modern_read_u16(save_bytes + 54u)
+            != calc_checksum((u8 *) save_bytes, SM64_MODERN_SAVE_FILE_BYTE_COUNT)
+        || sm64_modern_read_u16(menu_bytes + 28u) != MENU_DATA_MAGIC
+        || sm64_modern_read_u16(menu_bytes + 30u)
+            != calc_checksum((u8 *) menu_bytes, SM64_MODERN_MENU_DATA_BYTE_COUNT)) {
+        return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+
+    struct SaveFile save;
+    bzero(&save, sizeof(save));
+    save.capLevel = save_bytes[0];
+    save.capArea = save_bytes[1];
+    save.capPos[0] = (s16) sm64_modern_read_u16(save_bytes + 2u);
+    save.capPos[1] = (s16) sm64_modern_read_u16(save_bytes + 4u);
+    save.capPos[2] = (s16) sm64_modern_read_u16(save_bytes + 6u);
+    save.flags = sm64_modern_read_u32(save_bytes + 8u);
+    bcopy(save_bytes + 12u, save.courseStars, COURSE_COUNT);
+    bcopy(save_bytes + 12u + COURSE_COUNT,
+          save.courseCoinScores, COURSE_STAGES_COUNT);
+    add_save_block_signature(&save, sizeof(save), SAVE_FILE_MAGIC);
+
+    struct MainMenuSaveData menu;
+    bzero(&menu, sizeof(menu));
+    for (u32 index = 0; index < NUM_SAVE_FILES; ++index) {
+        menu.coinScoreAges[index] = sm64_modern_read_u32(menu_bytes + index * 4u);
+    }
+    menu.soundMode = sm64_modern_read_u16(menu_bytes + 16u);
+#ifdef VERSION_EU
+    menu.language = sm64_modern_read_u16(menu_bytes + 18u);
+    bcopy(menu_bytes + 20u, menu.filler, sizeof(menu.filler));
+#else
+    bcopy(menu_bytes + 18u, menu.filler, sizeof(menu.filler));
+#endif
+    add_save_block_signature(&menu, sizeof(menu), MENU_DATA_MAGIC);
+
+    bcopy(&save, &gSaveBuffer.files[save_file_index][0], sizeof(save));
+    bcopy(&save, &gSaveBuffer.files[save_file_index][1], sizeof(save));
+    bcopy(&menu, &gSaveBuffer.menuData[0], sizeof(menu));
+    bcopy(&menu, &gSaveBuffer.menuData[1], sizeof(menu));
+    gSaveFileModified = FALSE;
+    gMainMenuDataModified = FALSE;
+    return SM64_MODERN_STATUS_OK;
+}
+
 /**
  * Copy main menu data from one backup slot to the other slot.
  */
@@ -313,8 +381,12 @@ static void save_main_menu_data(void) {
         // Back up data
         bcopy(&gSaveBuffer.menuData[0], &gSaveBuffer.menuData[1], sizeof(gSaveBuffer.menuData[1]));
 
-        // Write to EEPROM
-        write_eeprom_menudata(0, 2);
+        // Swift-owned persistence commits the normalized image through the
+        // migration callback.  C still maintains its backup slot so the
+        // in-memory compatibility consumer observes the same state.
+        if (!sm64_modern_progression_persistence_authority_active()) {
+            write_eeprom_menudata(0, 2);
+        }
 
         gMainMenuDataModified = FALSE;
     }
@@ -446,8 +518,12 @@ void save_file_do_save(s32 fileIndex) {
         bcopy(&gSaveBuffer.files[fileIndex][0], &gSaveBuffer.files[fileIndex][1],
               sizeof(gSaveBuffer.files[fileIndex][1]));
 
-        // Write to EEPROM
-        write_eeprom_savefile(fileIndex, 0, 2);
+        // Swift owns the durable image in Swift-authority mode.  Keep the C
+        // backup copy and checksum for gameplay compatibility, but do not let
+        // C perform a second durable write.
+        if (!sm64_modern_progression_persistence_authority_active()) {
+            write_eeprom_savefile(fileIndex, 0, 2);
+        }
         
         gSaveFileModified = FALSE;
     }
@@ -504,6 +580,18 @@ void save_file_load_all(void) {
     gSaveFileModified = FALSE;
 
     bzero(&gSaveBuffer, sizeof(gSaveBuffer));
+
+    if (sm64_modern_progression_persistence_authority_active()) {
+        // Swift loads and repairs the complete durable image, then writes the
+        // normalized slots back through sm64_modern_progression_write_snapshot.
+        // Do not touch the legacy EEPROM/text-save path in this mode.
+        const SM64ModernStatus status = sm64_modern_progression_record_event(
+            SM64_MODERN_PROGRESSION_EVENT_SAVE_LOAD,
+            0, 0, 0, -1, 0, 0, 0, 0);
+        record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_LOAD, 0);
+        (void) status;
+        return;
+    }
 
 #ifdef TEXTSAVES
     for (file = 0; file < NUM_SAVE_FILES; file++) {
@@ -562,6 +650,15 @@ void save_file_load_all(void) {
  * This is used after getting a game over.
  */
 void save_file_reload(void) {
+    if (sm64_modern_progression_persistence_authority_active()) {
+        const u32 fileIndex = (u32) (gCurrSaveFileNum > 0 ? gCurrSaveFileNum - 1 : 0);
+        const SM64ModernStatus status = sm64_modern_progression_record_event(
+            SM64_MODERN_PROGRESSION_EVENT_SAVE_RELOAD,
+            fileIndex, 0, 0, -1, 0, 0, 0, 0);
+        record_save_oracle_state(SM64_MODERN_ORACLE_SAVE_EVENT_RELOAD, fileIndex);
+        (void) status;
+        return;
+    }
     // Copy save file data from backup
     bcopy(&gSaveBuffer.files[gCurrSaveFileNum - 1][1], &gSaveBuffer.files[gCurrSaveFileNum - 1][0],
           sizeof(gSaveBuffer.files[gCurrSaveFileNum - 1][0]));
