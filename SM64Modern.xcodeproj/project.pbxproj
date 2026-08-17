@@ -239,6 +239,7 @@
 		F3924A69F245DCF391361490 /* ChainChompEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEB5BA3959D2F4ECAC2E0F25 /* ChainChompEnemy.swift */; };
 		F4AE316C577F3165D6FA6E7D /* SpinyObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E8CE0F23C268072CA9D6E61 /* SpinyObjectBridge.swift */; };
 		F54E76834ED4DE0BC05ECA90 /* CameraCUpExit.swift in Sources */ = {isa = PBXBuildFile; fileRef = CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */; };
+		F56A4EB70031FE139B3F31C8 /* AudioSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E3067F20772683A08D2D750 /* AudioSequence.swift */; };
 		F5E5450EBF04AB49D0A4B12F /* SLWalkingPenguinMovement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B233DE16CF1D57DB2E69846 /* SLWalkingPenguinMovement.swift */; };
 		F61977B2815412177D01918E /* GameplayTick.swift in Sources */ = {isa = PBXBuildFile; fileRef = 419DC71930B2E4EE76B0E18E /* GameplayTick.swift */; };
 		F635692396D181B8EEE8464A /* FlyGuyEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05D35EE8DC4AB3016AB7352A /* FlyGuyEnemy.swift */; };
@@ -369,6 +370,7 @@
 		7152A9F5156A7D703C8708CE /* SwingPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwingPlatformBehavior.swift; sourceTree = "<group>"; };
 		724F73EC282345F4551FC1BF /* CameraInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraInput.swift; sourceTree = "<group>"; };
 		7316D473A3C5C7E718C32B2E /* AppleAudioRing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioRing.h; sourceTree = "<group>"; };
+		7E3067F20772683A08D2D750 /* AudioSequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioSequence.swift; sourceTree = "<group>"; };
 		7F48AE6A57785362E4038147 /* EyerokHandCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EyerokHandCollision.swift; sourceTree = "<group>"; };
 		813A2CE9C713D16BC9943257 /* MoneybagEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoneybagEnemy.swift; sourceTree = "<group>"; };
 		8188A093887424248B602C01 /* MarioAirMovementAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioAirMovementAction.swift; sourceTree = "<group>"; };
@@ -518,6 +520,7 @@
 				D5723E1972C2FF3BB21E3A5B /* AppMain.swift */,
 				CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */,
 				6FED187A5E0CCAF0E865A36D /* Audio.swift */,
+				7E3067F20772683A08D2D750 /* AudioSequence.swift */,
 				4DDE26E083CE3C79E2FBCCDB /* BehaviorDispatchBridge.swift */,
 				D6B1983ADD652967A0372D10 /* BehaviorScript.swift */,
 				2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */,
@@ -864,6 +867,7 @@
 				45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */,
 				DD3A03E522F13B396092C761 /* ArrowLiftBehavior.swift in Sources */,
 				E1570F804670ACB1AD2469B0 /* Audio.swift in Sources */,
+				F56A4EB70031FE139B3F31C8 /* AudioSequence.swift in Sources */,
 				8AC19AB29646962A8EF430E1 /* BehaviorDispatchBridge.swift in Sources */,
 				FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */,
 				161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */,
