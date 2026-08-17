@@ -82,6 +82,7 @@ else
   "$PROJECT_ROOT/script/test_mario_face_texture_provider.sh"
   "$PROJECT_ROOT/script/test_mario_face_texture_upload_admission.sh"
   "$PROJECT_ROOT/script/test_mario_face_texture_residency.sh"
+  "$PROJECT_ROOT/script/test_mario_face_source_geometry.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
@@ -127,6 +128,9 @@ open_app() {
   fi
   if [[ "${SM64_MODERN_MARIO_FACE_TEXTURE_UPLOAD:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_MARIO_FACE_TEXTURE_UPLOAD=1)
+  fi
+  if [[ "${SM64_MODERN_MARIO_FACE_DRAW:-0}" == "1" ]]; then
+    open_arguments+=(--env SM64_MODERN_MARIO_FACE_DRAW=1)
   fi
   if [[ -n "${SM64_MODERN_RENDER_PACKET_PATH:-}" ]]; then
     open_arguments+=(--env SM64_MODERN_RENDER_PACKET_PATH="$SM64_MODERN_RENDER_PACKET_PATH")
@@ -274,6 +278,10 @@ case "$MODE" in
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_texture_upload_admitted'
       grep -Eq 'mario_face_texture_resident route=2 private_textures=3 generations=1-3 residency_committed=1 residency_requested=1 barrier_producer=blit_to_fragment visibility=device barrier_consumer=blit_to_fragment visibility=device fingerprint=[0-9]+' <<< "$runtime_log"
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_texture_resident'
+    fi
+    if [[ "${SM64_MODERN_MARIO_FACE_DRAW:-0}" == "1" ]]; then
+      grep -Eq 'mario_face_mesh_draw route=2 mesh=1 source_path=dynlist_mario_face window_faces=6 source_faces=877 source_vertices=440 material=0 encoder=isolated_render packet_fingerprint=[0-9]+' <<< "$runtime_log"
+      printf '%s\n' "$runtime_log" | grep -E 'mario_face_mesh_draw'
     fi
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do

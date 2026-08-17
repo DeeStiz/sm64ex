@@ -32,6 +32,7 @@ enum MetalRendererError: LocalizedError {
     case sharedEventUnavailable
     case residencySetUnavailable
     case renderEncoderUnavailable
+    case marioFaceRenderEncoderUnavailable
     case uploadEncoderUnavailable
     case textureUnavailable(id: UInt32)
     case marioFaceTextureUploadFailed(id: UInt32, status: SM64ModernStatus)
@@ -49,6 +50,7 @@ enum MetalRendererError: LocalizedError {
         case .sharedEventUnavailable: "Metal shared event creation failed"
         case .residencySetUnavailable: "Metal scene residency set creation failed"
         case .renderEncoderUnavailable: "Metal 4 scene render encoder creation failed"
+        case .marioFaceRenderEncoderUnavailable: "Metal 4 Mario-face isolated render encoder creation failed"
         case .uploadEncoderUnavailable: "Metal 4 texture upload encoder creation failed"
         case let .textureUnavailable(id): "Metal texture \(id) is not ready for drawing"
         case let .marioFaceTextureUploadFailed(id, status): "Mario-face texture \(id) upload admission failed with status \(status)"
@@ -127,6 +129,14 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         let texture1: (any MTLTexture)?
     }
 
+    private struct PreparedMarioFaceDraw {
+        let pipeline: MetalShaderCompiler.CompiledPipeline
+        let vertexOffset: Int
+        let uniformOffset: Int
+        let vertexCount: Int
+        let triangleCount: UInt32
+    }
+
     private struct DepthStateKey: Hashable {
         let test: Bool
         let write: Bool
@@ -136,6 +146,16 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private static let gpuWaitTimeoutMilliseconds: UInt64 = 5_000
     private static let initialTransientBytes = 4 * 1024 * 1024
     private static let clearColor = MTLClearColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
+    // Combiner d=I0 with one untextured RGB input.  This is an isolated
+    // debug pipeline key; the C display-list shader registry remains the
+    // authority for normal scene draws.
+    private static let marioFaceShaderKey = MetalShaderKey(
+        shaderID: 0x0000_0200,
+        filteringMode: 0,
+        inputCount: 1,
+        textureMask: 0,
+        alphaBlend: false
+    )
 
     private let device: any MTLDevice
     private let layer: CAMetalLayer
@@ -152,6 +172,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private var textures: [UInt32: TextureRecord] = [:]
     private var marioFaceAdmissionPlan: SM64MarioFaceTextureUploadPlan?
     private var marioFaceResidencyLogged = false
+    private let marioFaceSourceGeometry: SM64MarioFaceSourceMeshPacket?
+    private let marioFaceSourceVertexFloats: [Float]?
+    private var marioFaceSourceDrawLogged = false
     private var residentTextureBindings: [UInt64: MetalTextureResidency] = [:]
     private var samplers: [MetalSamplerKey: any MTLSamplerState] = [:]
     private var depthStates: [DepthStateKey: any MTLDepthStencilState] = [:]
@@ -174,6 +197,10 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         self.layer = layer
         self.isOwnerThread = isOwnerThread
         self.consumeDrawableSize = consumeDrawableSize
+        let sourceGeometryEnabled = ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_DRAW"] == "1"
+        let sourceGeometry = sourceGeometryEnabled ? SM64MarioFaceSourceGeometry.packet : nil
+        self.marioFaceSourceGeometry = sourceGeometry
+        self.marioFaceSourceVertexFloats = sourceGeometry?.debugMetalVertexFloats()
 
         let queueDescriptor = MTL4CommandQueueDescriptor()
         queueDescriptor.label = "SM64 Modern Present Queue"
@@ -193,6 +220,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         }
         self.sceneResidency = sceneResidency
         self.shaderCompiler = try MetalShaderCompiler(device: device)
+        if sourceGeometryEnabled {
+            shaderCompiler.prepare(Self.marioFaceShaderKey)
+        }
         self.displayLink = CAMetalDisplayLink(metalLayer: layer)
         super.init()
         if ProcessInfo.processInfo.environment["SM64_MODERN_RENDER_PACKET_CAPTURE"] == "1" {
@@ -523,6 +553,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
                 )
             }
         }
+        let preparedMarioFaceDraw = try prepareMarioFaceDraw(
+            into: slot.transientBuffer, cursor: &cursor
+        )
         let preparedDraws: [PreparedDraw]
         if let readyDraws = try prepareDraws(packet, into: slot.transientBuffer, cursor: &cursor) {
             preparedDraws = readyDraws
@@ -643,6 +676,14 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         }
         encoder.popDebugGroup()
         encoder.endEncoding()
+        if let preparedMarioFaceDraw {
+            try encodeMarioFaceDraw(
+                preparedMarioFaceDraw,
+                commandBuffer: commandBuffer,
+                colorTexture: colorTexture,
+                slot: slot
+            )
+        }
         commandBuffer.popDebugGroup()
         commandBuffer.endCommandBuffer()
 
@@ -674,6 +715,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         var total = textureBindings(in: packet).reduce(0) { $0 + $1.pixels.count + 255 }
         if let plan = marioFaceAdmissionPlan {
             total += plan.entries.reduce(0) { $0 + Int($1.uploadByteCount) + 255 }
+        }
+        if let marioFaceSourceVertexFloats {
+            total += marioFaceSourceVertexFloats.count * MemoryLayout<Float>.size + 255
         }
         if let packet {
             total += packet.vertices.count * MemoryLayout<Float>.size
@@ -783,6 +827,102 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
             return nil
         }
         return prepared
+    }
+
+    private func prepareMarioFaceDraw(
+        into buffer: any MTLBuffer,
+        cursor: inout Int
+    ) throws -> PreparedMarioFaceDraw? {
+        guard let geometry = marioFaceSourceGeometry,
+              let vertexFloats = marioFaceSourceVertexFloats else {
+            return nil
+        }
+        let pipeline: MetalShaderCompiler.CompiledPipeline
+        do {
+            pipeline = try shaderCompiler.pipeline(for: Self.marioFaceShaderKey)
+        } catch MetalShaderCompilerError.pipelineNotReady {
+            return nil
+        }
+        let expectedFloatCount = Int(geometry.faceWindowCount) * 3 * pipeline.vertexStride
+        guard vertexFloats.count == expectedFloatCount else {
+            throw MetalRendererError.invalidDraw(shaderID: Self.marioFaceShaderKey.shaderID)
+        }
+        cursor = aligned(cursor, to: 16)
+        let vertexOffset = cursor
+        let byteCount = vertexFloats.count * MemoryLayout<Float>.size
+        vertexFloats.withUnsafeBufferPointer { source in
+            buffer.contents().advanced(by: vertexOffset).copyMemory(
+                from: source.baseAddress!, byteCount: byteCount
+            )
+        }
+        cursor += byteCount
+        cursor = aligned(cursor, to: 16)
+        let uniformOffset = cursor
+        buffer.contents().advanced(by: uniformOffset)
+            .assumingMemoryBound(to: UInt32.self)
+            .initialize(repeating: 0, count: 4)
+        cursor += 16
+        return PreparedMarioFaceDraw(
+            pipeline: pipeline,
+            vertexOffset: vertexOffset,
+            uniformOffset: uniformOffset,
+            vertexCount: vertexFloats.count / pipeline.vertexStride,
+            triangleCount: geometry.faceWindowCount
+        )
+    }
+
+    private func encodeMarioFaceDraw(
+        _ prepared: PreparedMarioFaceDraw,
+        commandBuffer: any MTL4CommandBuffer,
+        colorTexture: any MTLTexture,
+        slot: FrameSlot
+    ) throws {
+        let pass = MTL4RenderPassDescriptor()
+        let color = pass.colorAttachments[0]
+        color?.texture = colorTexture
+        color?.loadAction = .load
+        color?.storeAction = .store
+        pass.renderTargetWidth = colorTexture.width
+        pass.renderTargetHeight = colorTexture.height
+        guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: pass) else {
+            throw MetalRendererError.marioFaceRenderEncoderUnavailable
+        }
+        encoder.label = "SM64 Modern Mario Face Source Window"
+        encoder.pushDebugGroup("Isolated Metal 4 source-backed Mario-face draw")
+        encoder.setRenderPipelineState(prepared.pipeline.state)
+        encoder.setDepthStencilState(try depthState(test: false, write: false))
+        encoder.setCullMode(.none)
+        encoder.setViewport(MTLViewport(
+            originX: 0,
+            originY: 0,
+            width: Double(colorTexture.width),
+            height: Double(colorTexture.height),
+            znear: 0,
+            zfar: 1
+        ))
+        encoder.setScissorRect(MTLScissorRect(
+            x: 0, y: 0, width: colorTexture.width, height: colorTexture.height
+        ))
+        slot.argumentTable.setAddress(
+            slot.transientBuffer.gpuAddress + UInt64(prepared.vertexOffset), index: 0
+        )
+        slot.argumentTable.setAddress(
+            slot.transientBuffer.gpuAddress + UInt64(prepared.uniformOffset), index: 1
+        )
+        encoder.setArgumentTable(slot.argumentTable, stages: [.vertex, .fragment])
+        encoder.drawPrimitives(
+            primitiveType: .triangle,
+            vertexStart: 0,
+            vertexCount: prepared.vertexCount
+        )
+        encoder.popDebugGroup()
+        encoder.endEncoding()
+        if !marioFaceSourceDrawLogged, let geometry = marioFaceSourceGeometry {
+            marioFaceSourceDrawLogged = true
+            metalLogger.notice(
+                "mario_face_mesh_draw route=2 mesh=\(geometry.meshID) source_path=dynlist_mario_face window_faces=\(geometry.faceWindowCount) source_faces=\(geometry.sourceFaceCount) source_vertices=\(geometry.sourceVertexCount) material=0 encoder=isolated_render packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(geometry), privacy: .public)"
+            )
+        }
     }
 
     private func ensureDepthTexture(for drawable: any MTLTexture, slot: FrameSlot) throws {
