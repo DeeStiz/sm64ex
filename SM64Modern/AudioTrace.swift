@@ -5,6 +5,7 @@ enum SM64AudioTraceSource: UInt8, Equatable, Sendable {
     case pool = 2
     case residency = 3
     case stream = 4
+    case pcm = 5
 }
 
 /// Owner-thread admission and schema-4 projection for the pre-synthesis audio

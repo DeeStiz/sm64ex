@@ -240,6 +240,7 @@ final class EngineHost {
     private var automaticTerminationRequested = false
     private var inputService: AppleInputService?
     private var audioService: SM64ModernAppleAudioService?
+    private var audioPromotion: SM64AudioOwnerPromotion?
     private var loggedAudioEnqueue = false
     private var loggedAudioRender = false
     private var metalConfiguration: MetalConfiguration?
@@ -509,6 +510,26 @@ final class EngineHost {
         }
 
         stepCount += 1
+        if var promotion = audioPromotion {
+            let receipt = promotion.tick(
+                ownerToken: engineThreadIdentifier,
+                simulationTick: stepCount
+            )
+            audioPromotion = promotion
+            if receipt.admissionFailed {
+                audioLogger.error(
+                    "swift_audio_promotion_admission_failed tick=\(self.stepCount, privacy: .public)"
+                )
+                engineRunStatus = SM64_MODERN_STATUS_INVALID_STATE
+                CFRunLoopStop(CFRunLoopGetCurrent())
+                return
+            }
+            if stepCount == 1 || stepCount.isMultiple(of: 300) {
+                audioLogger.notice(
+                    "swift_audio_promotion_tick tick=\(self.stepCount, privacy: .public) records=\(receipt.recordsAdded, privacy: .public) frame_count=\(receipt.frameCount, privacy: .public) clipped=\(receipt.clippedSamples, privacy: .public) fingerprint=\(receipt.frameFingerprint, privacy: .public)"
+                )
+            }
+        }
         logAudioRenderIfNeeded()
         sampleM9ProfileIfNeeded()
         if stepCount == 1 || stepCount.isMultiple(of: 300) {
@@ -930,6 +951,13 @@ final class EngineHost {
             throw error
         }
         audioService = service
+        if ProcessInfo.processInfo.environment["SM64_MODERN_AUDIO_PROMOTION"] == "1" {
+            let promotion = SM64AudioOwnerPromotion(ownerToken: engineThreadIdentifier)
+            audioPromotion = promotion
+            audioLogger.notice(
+                "swift_audio_promotion_started owner_token=\(self.engineThreadIdentifier, privacy: .public)"
+            )
+        }
         let status = service.audioStatus()
         audioLogger.notice(
             "audio_service_started input_hz=32000 format=s16_interleaved_stereo output_hz=\(status.output_sample_rate) output_channels=\(status.output_channel_count) capacity=\(status.capacity_frames) desired=\(status.desired_buffered_frames) backlog=\(status.backlog_ceiling_frames)"
@@ -941,14 +969,22 @@ final class EngineHost {
 
     fileprivate func shutdownAudioOnEngineThread() {
         precondition(isCurrentEngineThread)
-        guard let audioService else { return }
-        audioService.stop()
-        let status = audioService.audioStatus()
-        logM9ProfileAudioFinal(status.ring)
-        self.audioService = nil
-        audioLogger.notice(
-            "audio_service_stopped enqueued=\(status.ring.enqueued_frames) rendered=\(status.ring.rendered_frames) underrun=\(status.ring.underrun_frames) dropped=\(status.ring.dropped_frames) render_calls=\(status.ring.render_calls)"
-        )
+        let promotion = audioPromotion
+        audioPromotion = nil
+        if let audioService {
+            audioService.stop()
+            let status = audioService.audioStatus()
+            logM9ProfileAudioFinal(status.ring)
+            self.audioService = nil
+            audioLogger.notice(
+                "audio_service_stopped enqueued=\(status.ring.enqueued_frames) rendered=\(status.ring.rendered_frames) underrun=\(status.ring.underrun_frames) dropped=\(status.ring.dropped_frames) render_calls=\(status.ring.render_calls)"
+            )
+        }
+        if let summary = promotion?.summary() {
+            audioLogger.notice(
+                "swift_audio_promotion_finished ticks=\(summary.ticks, privacy: .public) records=\(summary.traceRecords, privacy: .public) pcm_frames=\(summary.pcmFrames, privacy: .public) fingerprint=\(summary.traceFingerprint, privacy: .public) admission_failed=\(summary.admissionFailed, privacy: .public)"
+            )
+        }
     }
 
     private func logM9ProfileAudioFinal(_ ring: SM64ModernAudioRingStats) {

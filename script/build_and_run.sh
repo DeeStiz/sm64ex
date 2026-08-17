@@ -58,6 +58,7 @@ else
   "$PROJECT_ROOT/script/test_audio_voice.sh"
   "$PROJECT_ROOT/script/test_audio_stream.sh"
   "$PROJECT_ROOT/script/test_audio_mixer.sh"
+  "$PROJECT_ROOT/script/test_audio_promotion.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
@@ -91,9 +92,14 @@ else
 fi
 
 open_app() {
-  /usr/bin/open -n "$APP_BUNDLE" \
-    --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+  local -a open_arguments=(
+    --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT"
     --env SM64_MODERN_SAVE_DIR="$DEFAULT_SAVE_ROOT"
+  )
+  if [[ "${SM64_MODERN_AUDIO_PROMOTION:-0}" == "1" ]]; then
+    open_arguments+=(--env SM64_MODERN_AUDIO_PROMOTION=1)
+  fi
+  /usr/bin/open -n "$APP_BUNDLE" "${open_arguments[@]}"
 }
 
 wait_for_app_pid() {
@@ -210,6 +216,14 @@ case "$MODE" in
     done
     printf '%s\n' "$runtime_log" \
       | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|gameplay_bridge_installed|input_snapshot_started|audio_service_started|audio_enqueue_started|audio_render_started|timebase_configured|fixed_step_scheduler_(started|status)|lifecycle_running|presentation_cadence|lifecycle_step count=1'
+    if [[ "${SM64_MODERN_AUDIO_PROMOTION:-0}" == "1" ]]; then
+      for expected in \
+        'swift_audio_promotion_started' \
+        'swift_audio_promotion_tick'; do
+        grep -Fq "$expected" <<< "$runtime_log"
+      done
+      printf '%s\n' "$runtime_log" | grep -E 'swift_audio_promotion_(started|tick)'
+    fi
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do
       if ! kill -0 "$app_pid" >/dev/null 2>&1; then
@@ -223,6 +237,10 @@ case "$MODE" in
           'application_stopped'; do
           grep -Fq "$expected" <<< "$shutdown_log"
         done
+        if [[ "${SM64_MODERN_AUDIO_PROMOTION:-0}" == "1" ]]; then
+          grep -Fq 'swift_audio_promotion_finished' <<< "$shutdown_log"
+          printf '%s\n' "$shutdown_log" | grep -E 'swift_audio_promotion_finished'
+        fi
         printf '%s\n' "$shutdown_log" \
           | grep -E 'audio_service_stopped|metal_shutdown_drained|platform_shutdown|engine_thread_finished status=0|application_stopped'
         exit 0

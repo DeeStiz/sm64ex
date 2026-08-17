@@ -73,6 +73,7 @@
 		395E4FCD7396D3046C2A7A2F /* MarioGroundKnockbackAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 497B887A768C172EC3ED7A98 /* MarioGroundKnockbackAction.swift */; };
 		3997D68E2D9AFC2C870CBD04 /* YoshiObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 458C487DE63B424A8C00DA51 /* YoshiObjectBridge.swift */; };
 		3A185680189903BB0AA43307 /* GeoLayoutContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0DFE9C241FD2761437D593F /* GeoLayoutContentRuntime.swift */; };
+		3A6DBB605E60A41CBB0AAF71 /* AudioPromotion.swift in Sources */ = {isa = PBXBuildFile; fileRef = F67CD09B5E85C6D4D207A193 /* AudioPromotion.swift */; };
 		3BC4C0E9319AF629A5330E7E /* SeesawPlatformBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4789FFED823D9EAAB8F54ACB /* SeesawPlatformBehavior.swift */; };
 		3D3D38C8A3F908CCFF0C6E7D /* BouncingFireballObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0D4C3FC8AC2456B981C1640 /* BouncingFireballObjectBridge.swift */; };
 		3D45F4E1ED09C5B5EC150CC5 /* ObjectTransform.swift in Sources */ = {isa = PBXBuildFile; fileRef = D4E969DD6A9A905321D1D49C /* ObjectTransform.swift */; };
@@ -510,6 +511,7 @@
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
 		F4620FA3702294FE08475ABC /* DialogText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogText.swift; sourceTree = "<group>"; };
 		F5BB9631CE7A07A55B9BDBCF /* MarioCommonAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCommonAirAction.swift; sourceTree = "<group>"; };
+		F67CD09B5E85C6D4D207A193 /* AudioPromotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPromotion.swift; sourceTree = "<group>"; };
 		F767E8095D423258E7165E3E /* BigBooCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigBooCollision.swift; sourceTree = "<group>"; };
 		F804D686AFFB6AA968F51DEE /* TTCMovingBarBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCMovingBarBehavior.swift; sourceTree = "<group>"; };
 		FBADCC8D3A0FCE39EEF40AC3 /* TuxiesMotherBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TuxiesMotherBehavior.swift; sourceTree = "<group>"; };
@@ -536,6 +538,7 @@
 				6FED187A5E0CCAF0E865A36D /* Audio.swift */,
 				5E1852868F5E323B208C3437 /* AudioMixer.swift */,
 				E51CE2557B77FAF7731F3B79 /* AudioPools.swift */,
+				F67CD09B5E85C6D4D207A193 /* AudioPromotion.swift */,
 				E031BF83D984334D480CF1AE /* AudioResidency.swift */,
 				7E3067F20772683A08D2D750 /* AudioSequence.swift */,
 				822EE189AEC00D0EA0B9FEC6 /* AudioStreamSynthesis.swift */,
@@ -890,6 +893,7 @@
 				E1570F804670ACB1AD2469B0 /* Audio.swift in Sources */,
 				D5578FD5FECA0729AE8EDAC2 /* AudioMixer.swift in Sources */,
 				6CFFFE57D9A674C3022869C0 /* AudioPools.swift in Sources */,
+				3A6DBB605E60A41CBB0AAF71 /* AudioPromotion.swift in Sources */,
 				0D78DE60017C40C08F8475DA /* AudioResidency.swift in Sources */,
 				F56A4EB70031FE139B3F31C8 /* AudioSequence.swift in Sources */,
 				82B778B18D181832BDE132B6 /* AudioStreamSynthesis.swift in Sources */,
