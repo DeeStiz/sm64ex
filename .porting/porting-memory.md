@@ -2,6 +2,19 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31l extends the Swift camera seam to `transition_next_state` and
+  `transition_to_camera_mode`. The fixed-width camera ABI carries mode,
+  previous-mode, transition-frame, movement flags, C-up/distance/yaw/pan state;
+  `SwiftCameraMigrationService` applies the existing transition kernels and C
+  writes the checked result back without pointer sharing. The expanded
+  `script/test_camera_migration.sh`, camera-mode-state/runtime smokes, native
+  ABI smoke, and Debug build `/tmp/sm64-modern-camera-transition-build-2.log`
+  pass. Fresh native launch `/tmp/sm64-modern-m31l-live.log` exercises live
+  Swift camera selection before Metal frame one and exits status 0; both new
+  transition commands are independently exercised by the ABI callback smoke.
+  Full authored-mode geometry/cutscene breadth remains open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31l.md`.
+
 - M31k promotes camera selection/angle transitions to a live Swift-owned seam.
   `SM64ModernCameraMigrationApiV1` carries fixed-width selection, movement,
   sound, status, and transition values; C routes `cam_select_alt_mode` and

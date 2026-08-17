@@ -33,6 +33,10 @@
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
+static s32 sm64_modern_camera_dispatch(
+    SM64ModernCameraCommand command, s32 argument, s32 transition_frames,
+    struct Camera *camera, s32 *out_result);
+
 /**
  * @file camera.c
  * Implements the camera system, including C-button input, camera modes, camera triggers, and cutscenes.
@@ -2810,6 +2814,12 @@ void mode_cannon_camera(struct Camera *c) {
  * @see next_lakitu_state()
  */
 void transition_next_state(UNUSED struct Camera *c, s16 frames) {
+    s32 ignoredResult = 0;
+    if (sm64_modern_camera_dispatch(
+            SM64_MODERN_CAMERA_COMMAND_TRANSITION_NEXT_STATE,
+            frames, frames, c, &ignoredResult)) {
+        return;
+    }
     if (!(sStatusFlags & CAM_FLAG_FRAME_AFTER_CAM_INIT)) {
         sStatusFlags |= (CAM_FLAG_START_TRANSITION | CAM_FLAG_TRANSITION_OUT_OF_C_UP);
         sModeTransition.framesLeft = frames;
@@ -2823,6 +2833,12 @@ void transition_next_state(UNUSED struct Camera *c, s16 frames) {
  *      namely: RADIAL/OUTWARD_RADIAL, 8_DIRECTIONS, FREE_ROAM, CLOSE, SPIRAL_STAIRS, and SLIDE_HOOT
  */
 void transition_to_camera_mode(struct Camera *c, s16 newMode, s16 numFrames) {
+    s32 ignoredResult = 0;
+    if (sm64_modern_camera_dispatch(
+            SM64_MODERN_CAMERA_COMMAND_TRANSITION_TO_MODE,
+            newMode, numFrames, c, &ignoredResult)) {
+        return;
+    }
     if (c->mode != newMode) {
         sModeInfo.newMode = (newMode != -1) ? newMode : sModeInfo.lastMode;
         sModeInfo.lastMode = c->mode;
@@ -3726,8 +3742,9 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
     return finished;
 }
 
-static s32 sm64_modern_camera_dispatch_selection(
-    SM64ModernCameraCommand command, s32 argument, s32 *out_result) {
+static s32 sm64_modern_camera_dispatch(
+    SM64ModernCameraCommand command, s32 argument, s32 transition_frames,
+    struct Camera *camera, s32 *out_result) {
     if (!sm64_modern_camera_authority_active() || out_result == NULL) {
         return FALSE;
     }
@@ -3738,10 +3755,26 @@ static s32 sm64_modern_camera_dispatch_selection(
     input.header.struct_size = sizeof(input);
     input.command = command;
     input.argument = argument;
+    input.transition_frames_left = transition_frames;
     input.selection_flags = (u16)sSelectionFlags;
     input.movement_flags = (u16)gCameraMovementFlags;
     input.sound_flags = (u16)sCameraSoundFlags;
     input.status_flags = (u16)sStatusFlags;
+    if (camera != NULL) {
+        input.mode = camera->mode;
+        input.default_mode = camera->defMode;
+    }
+    input.last_mode = sModeInfo.lastMode;
+    input.new_mode = sModeInfo.newMode;
+    input.transition_max = sModeInfo.max;
+    input.transition_frame = sModeInfo.frame;
+    input.c_up_camera_pitch = sCUpCameraPitch;
+    input.mode_offset_yaw = sModeOffsetYaw;
+    input.lakitu_distance = sLakituDist;
+    input.lakitu_pitch = sLakituPitch;
+    input.area_yaw_change = sAreaYawChange;
+    input.pan_distance = sPanDistance;
+    input.cannon_y_offset = sCannonYOffset;
 
     if (sm64_modern_camera_update(&input, &output)
         != SM64_MODERN_STATUS_OK) {
@@ -3752,6 +3785,25 @@ static s32 sm64_modern_camera_dispatch_selection(
     gCameraMovementFlags = (s16)output.movement_flags;
     sCameraSoundFlags = (s16)output.sound_flags;
     sStatusFlags = (s16)output.status_flags;
+    if (command == SM64_MODERN_CAMERA_COMMAND_TRANSITION_NEXT_STATE
+        || command == SM64_MODERN_CAMERA_COMMAND_TRANSITION_TO_MODE) {
+        sModeInfo.newMode = output.new_mode;
+        sModeInfo.lastMode = output.last_mode;
+        sModeInfo.max = output.transition_max;
+        sModeInfo.frame = output.transition_frame;
+        sModeTransition.framesLeft = output.transition_frames_left;
+        sCUpCameraPitch = output.c_up_camera_pitch;
+        sModeOffsetYaw = output.mode_offset_yaw;
+        sLakituDist = output.lakitu_distance;
+        sLakituPitch = output.lakitu_pitch;
+        sAreaYawChange = output.area_yaw_change;
+        sPanDistance = output.pan_distance;
+        sCannonYOffset = output.cannon_y_offset;
+        if (camera != NULL) {
+            camera->mode = (u8)output.mode;
+            camera->defMode = (u8)output.default_mode;
+        }
+    }
     *out_result = output.result;
     return TRUE;
 }
@@ -3766,9 +3818,9 @@ static s32 sm64_modern_camera_dispatch_selection(
 s32 cam_select_alt_mode(s32 selection) {
     s32 mode = CAM_SELECTION_FIXED;
 
-    if (sm64_modern_camera_dispatch_selection(
+    if (sm64_modern_camera_dispatch(
             SM64_MODERN_CAMERA_COMMAND_SELECT_ALT_MODE,
-            selection, &mode)) {
+            selection, 0, NULL, &mode)) {
         return mode;
     }
 
@@ -3803,8 +3855,8 @@ s32 cam_select_alt_mode(s32 selection) {
 s32 set_cam_angle(s32 mode) {
     s32 curMode = CAM_ANGLE_LAKITU;
 
-    if (sm64_modern_camera_dispatch_selection(
-            SM64_MODERN_CAMERA_COMMAND_SET_ANGLE, mode, &curMode)) {
+    if (sm64_modern_camera_dispatch(
+            SM64_MODERN_CAMERA_COMMAND_SET_ANGLE, mode, 0, NULL, &curMode)) {
         return curMode;
     }
 

@@ -20,9 +20,11 @@ static SM64ModernStatus update_camera(
         output->selection_flags |= 0x0004u;
         output->sound_flags |= 0x0008u;
         output->result = 1;
-    } else {
+    } else if (input->command == SM64_MODERN_CAMERA_COMMAND_SET_ANGLE) {
         output->selection_flags |= 0x0001u;
         output->sound_flags |= 0x0002u;
+        output->result = 1;
+    } else {
         output->result = 1;
     }
     return SM64_MODERN_STATUS_OK;
@@ -81,6 +83,23 @@ int main(void) {
                && output.selection_flags == 0x0001u
                && output.sound_flags == 0x0002u,
            "angle output");
+
+    input.command = SM64_MODERN_CAMERA_COMMAND_TRANSITION_NEXT_STATE;
+    input.argument = 15;
+    input.transition_frames_left = 15;
+    expect(sm64_modern_camera_update(&input, &output)
+               == SM64_MODERN_STATUS_OK, "next-state callback");
+    expect(gCallbackCount == 3 && output.result == 1
+               && output.transition_frames_left == 15,
+           "next-state output");
+
+    input.command = SM64_MODERN_CAMERA_COMMAND_TRANSITION_TO_MODE;
+    input.argument = 13;
+    input.transition_frames_left = 30;
+    expect(sm64_modern_camera_update(&input, &output)
+               == SM64_MODERN_STATUS_OK, "mode-transition callback");
+    expect(gCallbackCount == 4 && output.result == 1,
+           "mode-transition output");
 
     input.reserved = 1;
     expect(sm64_modern_camera_update(&input, &output)

@@ -80,7 +80,9 @@ SM64ModernStatus sm64_modern_camera_update(
         || !valid_header(&input->header, sizeof(*input))
         || input->reserved != 0
         || (input->command != SM64_MODERN_CAMERA_COMMAND_SELECT_ALT_MODE
-            && input->command != SM64_MODERN_CAMERA_COMMAND_SET_ANGLE)) {
+            && input->command != SM64_MODERN_CAMERA_COMMAND_SET_ANGLE
+            && input->command != SM64_MODERN_CAMERA_COMMAND_TRANSITION_NEXT_STATE
+            && input->command != SM64_MODERN_CAMERA_COMMAND_TRANSITION_TO_MODE)) {
         if (sMigrationStatus == SM64_MODERN_STATUS_OK) {
             sMigrationStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
         }

@@ -35,6 +35,7 @@ final class SwiftCameraMigrationService {
     private let ownerThreadToken: UInt64
     private let ownerThreadIdentity: UInt64
     private var eventCount: UInt64 = 0
+    private var loggedCommands: Set<UInt32> = []
     private var lastError: SM64ModernStatus = SM64_MODERN_STATUS_OK
 
     init(ownerThreadToken: UInt64) {
@@ -66,7 +67,9 @@ final class SwiftCameraMigrationService {
               ),
               input.reserved == 0,
               input.command == SM64_MODERN_CAMERA_COMMAND_SELECT_ALT_MODE
-                || input.command == SM64_MODERN_CAMERA_COMMAND_SET_ANGLE,
+                || input.command == SM64_MODERN_CAMERA_COMMAND_SET_ANGLE
+                || input.command == SM64_MODERN_CAMERA_COMMAND_TRANSITION_NEXT_STATE
+                || input.command == SM64_MODERN_CAMERA_COMMAND_TRANSITION_TO_MODE,
               input.pan_distance.isFinite,
               input.cannon_y_offset.isFinite else {
             return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "input")
@@ -108,6 +111,20 @@ final class SwiftCameraMigrationService {
             )
             state = angle.state
             result = angle.angle.rawValue
+        case SM64_MODERN_CAMERA_COMMAND_TRANSITION_NEXT_STATE:
+            let transition = SM64CameraModeStateMachine.transitionNextState(
+                frames: argument, state: state
+            )
+            state = transition.state
+            result = transition.changed ? 1 : 0
+        case SM64_MODERN_CAMERA_COMMAND_TRANSITION_TO_MODE:
+            let transition = SM64CameraModeStateMachine.transitionToCameraMode(
+                argument,
+                frames: Int16(clamping: input.transition_frames_left),
+                state: state
+            )
+            state = transition.state
+            result = transition.changed ? 1 : 0
         default:
             return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "command")
         }
@@ -140,9 +157,10 @@ final class SwiftCameraMigrationService {
         output.pointee = next
 
         eventCount &+= 1
-        if eventCount == 1 || eventCount.isMultiple(of: 600) {
+        if loggedCommands.insert(input.command).inserted
+            || eventCount.isMultiple(of: 600) {
             cameraMigrationLogger.notice(
-                "swift_camera_selection_update command=\(input.command) argument=\(input.argument) result=\(next.result) event=\(self.eventCount) owner_token=\(self.ownerThreadToken, privacy: .public)"
+                "swift_camera_update command=\(input.command) argument=\(input.argument) result=\(next.result) event=\(self.eventCount) owner_token=\(self.ownerThreadToken, privacy: .public)"
             )
         }
         return SM64_MODERN_STATUS_OK
