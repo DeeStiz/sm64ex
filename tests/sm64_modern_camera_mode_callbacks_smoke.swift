@@ -70,6 +70,7 @@ enum SM64ModernCameraModeCallbacksSmoke {
         precondition(SM64CameraModeCallbacks.descriptor(for: 6)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 10)?.outputsSwapped == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 12)?.pureGeometryImplemented == true)
+        precondition(SM64CameraModeCallbacks.descriptor(for: 8)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 13)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 11)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 17)?.pureGeometryImplemented == true)
@@ -180,6 +181,25 @@ enum SM64ModernCameraModeCallbacksSmoke {
             && cannon.outputsSwapped && cannon.focus.y == 125
             && cannon.position.y.isFinite && cannon.position.y < 150)
         fingerprint = hash(fingerprint, cannon)
+
+        let water = SM64CameraModeCallbacks.evaluate(.init(
+            mode: 8,
+            marioPosition: .init(x: 0, y: 0, z: 0),
+            cameraPosition: .init(x: 10, y: 20, z: 30),
+            cameraFocus: .init(x: -10, y: 15, z: 5),
+            cameraDistance: 42,
+            cameraPitch: 0x1234,
+            cameraYaw: 0x2345
+        ))!
+        precondition(water.focus == SM64ObjectVector3(x: -10, y: 15, z: 5)
+            && water.position == SM64ObjectVector3(x: 10, y: 20, z: 30)
+            && water.cameraYaw == 0x2345
+            && water.returnedYaw == 0x2345
+            && water.areaYaw == 0x2345
+            && water.pitch == 0x1234
+            && water.distance == 42
+            && !water.panAhead)
+        fingerprint = hash(fingerprint, water)
 
         let fixed = SM64CameraModeCallbacks.evaluate(.init(
             mode: 13,

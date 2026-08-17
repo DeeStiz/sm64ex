@@ -2168,6 +2168,15 @@ void mode_behind_mario_camera(struct Camera *c) {
 }
 
 s32 nop_update_water_camera(UNUSED struct Camera *c, UNUSED Vec3f focus, UNUSED Vec3f pos) {
+    s16 callbackYaw = 0;
+    u32 callbackFlags = 0;
+    if (sm64_modern_camera_evaluate_callback(
+            c, CAMERA_MODE_WATER_SURFACE, focus, pos,
+            &callbackYaw, &callbackFlags)) {
+        (void)callbackFlags;
+        return callbackYaw;
+    }
+    return 0;
 }
 
 /**
@@ -2220,6 +2229,11 @@ static s32 sm64_modern_camera_evaluate_callback(
     }
     vec3f_copy(input.camera_position, pos);
     vec3f_copy(input.camera_focus, focus);
+    if (mode == CAMERA_MODE_WATER_SURFACE) {
+        vec3f_get_dist_and_angle(
+            focus, pos, &input.camera_distance,
+            &input.camera_pitch, &input.camera_yaw);
+    }
 
     if (mode == CAMERA_MODE_FIXED && camera != NULL) {
         f32 focusFloorOffset;

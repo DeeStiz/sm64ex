@@ -2,6 +2,20 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31w makes the water-surface camera transition (mode 8) deterministic.
+  Swift now owns the explicit transition no-op: it preserves the supplied
+  focus/position and returns the current relative yaw, while the normal
+  per-frame water-surface route continues through the behind-Mario kernel and
+  C collision/water-height policy. The callback fingerprint is
+  `0x91fabbcd699cb58b`; camera primitive/geometry/callback/migration/state/
+  runtime smokes, native ABI smoke, Swift 6 Debug build, and
+  `git diff --check` pass. Signed launch
+  `/tmp/sm64-modern-m31w-live.log` reaches Metal 4 frame one, 360 fixed
+  steps, zero scheduler/audio drops, and status-0 shutdown; the bounded route
+  does not enter a water transition, so physical water feel, authored route
+  telemetry, full camera parity, and human acceptance remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31w.md`.
+
 - M31v promotes the stable first segment of parallel-tracking camera mode
   12 through the Swift evaluator. C snapshots the first path endpoints,
   distance threshold, zoom, Mario floor offset, and transition offset only

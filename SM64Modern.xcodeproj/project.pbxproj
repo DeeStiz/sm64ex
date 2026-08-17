@@ -269,6 +269,7 @@
 		EBD6920A5888FE34514D47BB /* AudioSynthesis.swift in Sources */ = {isa = PBXBuildFile; fileRef = D66A4C16759D4C02C2973885 /* AudioSynthesis.swift */; };
 		ED15CCFF909BC5D6F373EB98 /* FixedStepScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E1D86482A6D2F04696270D /* FixedStepScheduler.swift */; };
 		EF3F4EC4818F96BA083A23B6 /* ProgressionActors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C3F3E0A2388B47713DA5889 /* ProgressionActors.swift */; };
+		F00FA30CEE200C36591A5573 /* CameraWater.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9BE6278934D90E5D6E52BAB /* CameraWater.swift */; };
 		F0A42E68B7BDE5F90AC77823 /* FrontEnd.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86C7DB01D913DFD52E6E0BBF /* FrontEnd.swift */; };
 		F0BBFC46200149DAF4E60080 /* MarioPunchSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BB36E00504555CA75EF4FF5 /* MarioPunchSequence.swift */; };
 		F161530B435714B80D2CA08D /* MrIObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B76DD031A7E484951072C54B /* MrIObjectBridge.swift */; };
@@ -499,6 +500,7 @@
 		B93DAAFB0FF6CAB909448BA5 /* MarioGeometryInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGeometryInput.swift; sourceTree = "<group>"; };
 		B95E0FC4DBBB4274A6BB1E95 /* Explosion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Explosion.swift; sourceTree = "<group>"; };
 		B96E5AD86B3742196A22A436 /* CameraModeCallbacks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeCallbacks.swift; sourceTree = "<group>"; };
+		B9BE6278934D90E5D6E52BAB /* CameraWater.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraWater.swift; sourceTree = "<group>"; };
 		B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftGameplay.swift; sourceTree = "<group>"; };
 		BA6EF56FF4DC7CC2039DAF91 /* BigBooObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigBooObjectBridge.swift; sourceTree = "<group>"; };
 		BA7D8015EB93979846FCCE8A /* AudioTrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTrace.swift; sourceTree = "<group>"; };
@@ -651,6 +653,7 @@
 				635680A88C033EBD3EDB337C /* CameraPrimitives.swift */,
 				BFECD760778C5191A5B0A1FC /* CameraSpiral.swift */,
 				B8EAD015DAC9DCB859D04D1C /* CameraWallAvoidance.swift */,
+				B9BE6278934D90E5D6E52BAB /* CameraWater.swift */,
 				EEB5BA3959D2F4ECAC2E0F25 /* ChainChompEnemy.swift */,
 				1A4D0A85B420C44DA84C20A2 /* ChainChompObjectBridge.swift */,
 				B0C6C29EF4D3EDA95AE7DC1C /* ChainChompRelease.swift */,
@@ -1035,6 +1038,7 @@
 				8890816E4404396A10B3AEBD /* CameraPrimitives.swift in Sources */,
 				44A032A3CE83364A352955C9 /* CameraSpiral.swift in Sources */,
 				C26B5E45D862990F73216E20 /* CameraWallAvoidance.swift in Sources */,
+				F00FA30CEE200C36591A5573 /* CameraWater.swift in Sources */,
 				F3924A69F245DCF391361490 /* ChainChompEnemy.swift in Sources */,
 				266014B18206F0BBAEB3A8B9 /* ChainChompObjectBridge.swift in Sources */,
 				1D60D3C5D08D6CC2D9C827AB /* ChainChompRelease.swift in Sources */,

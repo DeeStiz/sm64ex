@@ -209,9 +209,9 @@ struct SM64CameraCallbackResult: Equatable, Sendable {
 }
 
 /// Bounded-mode callback descriptors plus the callbacks whose C bodies are
-/// already reducible to immutable geometry. Water
-/// callbacks deliberately return nil until their owner-thread path data and
-/// collision policy have their own Swift boundaries.
+/// already reducible to immutable geometry. The water-surface callback is a
+/// deterministic transition no-op; its per-frame water camera continues to
+/// use the behind-Mario value kernel with explicit collision ownership.
 enum SM64CameraModeCallbacks {
     static let descriptors: [SM64CameraModeCallbackDescriptor] = [
         descriptor(0, .none, false, false, false, 0, 0, 0, 0, false, false),
@@ -222,7 +222,7 @@ enum SM64CameraModeCallbacks {
         descriptor(5, .none, false, false, false, 0, 0, 0, 0, false, false),
         descriptor(6, .cUp, true, true, false, 250, 125, 125, 0, true, false),
         descriptor(7, .mario, true, true, false, 800, 125, 125, 0x05B0, true, true),
-        descriptor(8, .waterSurface, false, true, false, 800, 125, 125, 0x05B0, false, true),
+        descriptor(8, .waterSurface, true, true, false, 0, 0, 0, 0, false, false),
         descriptor(9, .slideHoot, true, true, false, 800, 125, 125, 0x1555, true, false),
         descriptor(10, .insideCannon, true, true, true, 800, 125, 125, 0, true, false),
         descriptor(11, .bossFight, true, true, false, 0, 0, 0, 0, false, false),
@@ -295,7 +295,9 @@ enum SM64CameraModeCallbacks {
             return spiral(input, descriptor: descriptor)
         case .parallelTracking:
             return parallel(input, descriptor: descriptor)
-        case .none, .waterSurface:
+        case .waterSurface:
+            return waterSurface(input, descriptor: descriptor)
+        case .none:
             return nil
         }
     }
@@ -608,6 +610,26 @@ enum SM64CameraModeCallbacks {
             panAhead: descriptor.pansAhead,
             sideButtonYaw: 0,
             behindMarioSoundTimer: 0
+        )
+    }
+
+    private static func waterSurface(
+        _ input: SM64CameraCallbackInput,
+        descriptor: SM64CameraModeCallbackDescriptor
+    ) -> SM64CameraCallbackResult? {
+        guard let result = SM64CameraWater.update(input) else { return nil }
+        return SM64CameraCallbackResult(
+            focus: result.focus,
+            position: result.position,
+            cameraYaw: result.cameraYaw,
+            returnedYaw: result.returnedYaw,
+            areaYaw: result.areaYaw,
+            pitch: result.pitch,
+            distance: result.distance,
+            outputsSwapped: descriptor.outputsSwapped,
+            panAhead: descriptor.pansAhead,
+            sideButtonYaw: result.sideButtonYaw,
+            behindMarioSoundTimer: result.behindMarioSoundTimer
         )
     }
 
