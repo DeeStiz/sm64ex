@@ -921,6 +921,37 @@ final class EngineHost {
         )
         metalRenderer = renderer
         renderer.start(on: .current)
+        if ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_TEXTURE_UPLOAD"] == "1" {
+            try admitMarioFaceTextureUploadOnEngineThread(renderer)
+        }
+    }
+
+    private func admitMarioFaceTextureUploadOnEngineThread(_ renderer: MetalRenderer) throws {
+        precondition(isCurrentEngineThread)
+        let environment = ProcessInfo.processInfo.environment
+        guard let gameDirectory = environment["SM64_MODERN_GAME_DIR"] else {
+            throw HostPathError.missingGameDirectory
+        }
+        let rootURL = URL(fileURLWithPath: gameDirectory, isDirectory: true).standardizedFileURL
+        let routeID: SM64MarioFaceGoddardRouteID = .marioNormal
+        guard let route = SM64MarioFaceRouteResourceCatalog.route(routeID),
+              let binding = SM64MarioFaceMetalBindingPacketBuilder.make(routeID: routeID) else {
+            throw SM64MarioFaceTextureUploadAdmissionError.payloadMismatch(
+                textureID: 0, reason: "mario_normal_route_unavailable"
+            )
+        }
+        let payloads = try SM64MarioFaceTextureProvider.load(route: route, rootURL: rootURL)
+        let plan = try SM64MarioFaceTextureUploadPlanBuilder.make(
+            ownerToken: engineThreadIdentifier,
+            expectedOwnerToken: engineThreadIdentifier,
+            routeID: routeID,
+            binding: binding,
+            payloads: payloads
+        )
+        let receipt = try renderer.admitMarioFaceTextureUpload(plan)
+        engineLogger.notice(
+            "mario_face_texture_upload_admitted route=\(receipt.route.rawValue) entries=\(receipt.admittedEntries) source_bytes=\(receipt.sourceByteCount) upload_bytes=\(receipt.uploadByteCount) generations=\(receipt.firstGeneration)-\(receipt.lastGeneration) pending_residency=\(receipt.pendingResidencyCount) fingerprint=\(receipt.planFingerprint, privacy: .public)"
+        )
     }
 
     fileprivate var inputServiceOnEngineThread: AppleInputService? {

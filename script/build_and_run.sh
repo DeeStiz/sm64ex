@@ -80,6 +80,7 @@ else
   "$PROJECT_ROOT/script/test_mario_face_route_shards.sh"
   "$PROJECT_ROOT/script/test_mario_face_metal_binding.sh"
   "$PROJECT_ROOT/script/test_mario_face_texture_provider.sh"
+  "$PROJECT_ROOT/script/test_mario_face_texture_upload_admission.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
@@ -122,6 +123,9 @@ open_app() {
   fi
   if [[ "${SM64_MODERN_RENDER_PACKET_CAPTURE:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_RENDER_PACKET_CAPTURE=1)
+  fi
+  if [[ "${SM64_MODERN_MARIO_FACE_TEXTURE_UPLOAD:-0}" == "1" ]]; then
+    open_arguments+=(--env SM64_MODERN_MARIO_FACE_TEXTURE_UPLOAD=1)
   fi
   if [[ -n "${SM64_MODERN_RENDER_PACKET_PATH:-}" ]]; then
     open_arguments+=(--env SM64_MODERN_RENDER_PACKET_PATH="$SM64_MODERN_RENDER_PACKET_PATH")
@@ -263,6 +267,10 @@ case "$MODE" in
     if [[ "${SM64_MODERN_RENDER_PACKET_CAPTURE:-0}" == "1" ]]; then
       grep -Fq 'swift_render_packet_capture frame=1' <<< "$runtime_log"
       printf '%s\n' "$runtime_log" | grep -E 'swift_render_packet_capture frame=1'
+    fi
+    if [[ "${SM64_MODERN_MARIO_FACE_TEXTURE_UPLOAD:-0}" == "1" ]]; then
+      grep -Eq 'mario_face_texture_upload_admitted route=2 entries=3 source_bytes=5120 upload_bytes=12288 generations=1-3 pending_residency=3 fingerprint=[0-9]+' <<< "$runtime_log"
+      printf '%s\n' "$runtime_log" | grep -E 'mario_face_texture_upload_admitted'
     fi
     /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
     for _ in {1..50}; do

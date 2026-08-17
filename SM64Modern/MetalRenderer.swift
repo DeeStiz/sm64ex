@@ -34,6 +34,7 @@ enum MetalRendererError: LocalizedError {
     case renderEncoderUnavailable
     case uploadEncoderUnavailable
     case textureUnavailable(id: UInt32)
+    case marioFaceTextureUploadFailed(id: UInt32, status: SM64ModernStatus)
     case invalidDraw(shaderID: UInt32)
     case gpuDrainTimedOut(value: UInt64)
 
@@ -50,6 +51,7 @@ enum MetalRendererError: LocalizedError {
         case .renderEncoderUnavailable: "Metal 4 scene render encoder creation failed"
         case .uploadEncoderUnavailable: "Metal 4 texture upload encoder creation failed"
         case let .textureUnavailable(id): "Metal texture \(id) is not ready for drawing"
+        case let .marioFaceTextureUploadFailed(id, status): "Mario-face texture \(id) upload admission failed with status \(status)"
         case let .invalidDraw(shaderID): "Invalid vertex packet for shader 0x\(String(shaderID, radix: 16))"
         case let .gpuDrainTimedOut(value): "Timed out waiting for Metal completion value \(value)"
         }
@@ -304,6 +306,43 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         nextTextureGeneration += 1
         record.upload = upload
         return SM64_MODERN_STATUS_OK
+    }
+
+    /// Admit immutable Mario-face staging payloads on the engine owner. This
+    /// stores upload records only; private textures and scene residency remain
+    /// deferred to the display-link renderer's next reusable frame slot.
+    func admitMarioFaceTextureUpload(
+        _ plan: SM64MarioFaceTextureUploadPlan
+    ) throws -> SM64MarioFaceTextureUploadReceipt {
+        precondition(isOwnerThread(), "Mario-face texture admission belongs to the engine owner")
+        for entry in plan.entries {
+            guard createTexture(entry.textureID) == SM64_MODERN_STATUS_OK else {
+                throw MetalRendererError.marioFaceTextureUploadFailed(
+                    id: entry.textureID, status: SM64_MODERN_STATUS_INVALID_STATE
+                )
+            }
+            let linear = (entry.samplerPacked & 0xff) == SM64MarioFaceMetalSamplerFilter.linear.rawValue
+            let wrapS = (entry.samplerPacked >> 8) & 0xff
+            let wrapT = (entry.samplerPacked >> 16) & 0xff
+            setSampler(tile: 0, id: entry.textureID, linear: linear, wrapS: wrapS, wrapT: wrapT)
+            let status = entry.rgba8Pixels.withUnsafeBytes { rawBuffer -> SM64ModernStatus in
+                guard let baseAddress = rawBuffer.bindMemory(to: UInt8.self).baseAddress else {
+                    return SM64_MODERN_STATUS_INVALID_ARGUMENT
+                }
+                return uploadTexture(
+                    id: entry.textureID,
+                    pixels: baseAddress,
+                    width: entry.width,
+                    height: entry.height
+                )
+            }
+            guard status == SM64_MODERN_STATUS_OK else {
+                throw MetalRendererError.marioFaceTextureUploadFailed(
+                    id: entry.textureID, status: status
+                )
+            }
+        }
+        return plan.receipt(residencyPending: true)
     }
 
     func setSampler(tile: UInt32, id: UInt32, linear: Bool, wrapS: UInt32, wrapT: UInt32) {
