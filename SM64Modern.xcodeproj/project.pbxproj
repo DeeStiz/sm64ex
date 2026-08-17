@@ -97,6 +97,7 @@
 		54BE2C1D3F624579927D2313 /* SLWalkingPenguinBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 287F32D28BA6DAF70AE72591 /* SLWalkingPenguinBehavior.swift */; };
 		59D7CB365C812D63057C71F3 /* LevelScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC89F10EF988BEB5D9624D69 /* LevelScript.swift */; };
 		59D828BFA9A7DCFEEC96AAD2 /* CameraCollision.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EF32B94910902857B072626 /* CameraCollision.swift */; };
+		5A32DB1215CB1BD2E96DC2A3 /* Dialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50D6FA91D973EDFF7DFF2BD0 /* Dialog.swift */; };
 		5AC207F97EE7FDE864A69891 /* MetalScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F51806EB1BDFCB6963D3C6D /* MetalScene.swift */; };
 		5C1840210026D9416120F870 /* WhompObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189D1521FD7CFA3D234A28F6 /* WhompObjectBridge.swift */; };
 		5C4BFBD421D7D3B422C7571A /* YoshiBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21635A888B1CF4C5B13766F6 /* YoshiBehavior.swift */; };
@@ -327,6 +328,7 @@
 		4DDE26E083CE3C79E2FBCCDB /* BehaviorDispatchBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BehaviorDispatchBridge.swift; sourceTree = "<group>"; };
 		4ED5024BA5E198B6E29A4AF7 /* CameraFOV.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraFOV.swift; sourceTree = "<group>"; };
 		4F1624BCF90E209A7872E3B2 /* SaveFileQueries.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveFileQueries.swift; sourceTree = "<group>"; };
+		50D6FA91D973EDFF7DFF2BD0 /* Dialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dialog.swift; sourceTree = "<group>"; };
 		54E9E5A575E124235D4817C6 /* MarioWhirlpoolAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWhirlpoolAction.swift; sourceTree = "<group>"; };
 		57057E1BD2CCF58B27F411E9 /* MarioWaterDiveAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWaterDiveAction.swift; sourceTree = "<group>"; };
 		57360C218D939AFB7F0833F0 /* MarioWallResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWallResponse.swift; sourceTree = "<group>"; };
@@ -564,6 +566,7 @@
 				87414B6C37E5673C98429C04 /* DecorativePendulumBehavior.swift */,
 				6934670448BD38B14CBF7984 /* DecorativePendulumObjectBridge.swift */,
 				3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */,
+				50D6FA91D973EDFF7DFF2BD0 /* Dialog.swift */,
 				E37C0994C353B61075C5EBCA /* ElevatorBehavior.swift */,
 				49737667D24AE6AEA3374B3E /* EnemyLakitu.swift */,
 				994D08C3E7FCF937245A9757 /* EnemyLakituObjectBridge.swift */,
@@ -904,6 +907,7 @@
 				BD144231679BF45B1B35259B /* DecorativePendulumBehavior.swift in Sources */,
 				5EAF59788FCB85F5A7706347 /* DecorativePendulumObjectBridge.swift in Sources */,
 				11833E1637F8649E7554B9F6 /* DeterministicPrimitives.swift in Sources */,
+				5A32DB1215CB1BD2E96DC2A3 /* Dialog.swift in Sources */,
 				205E67C2EEF8113A521111E0 /* ElevatorBehavior.swift in Sources */,
 				BFAC85948508CFC15B564EFE /* EnemyLakitu.swift in Sources */,
 				03FAB70D01EC36C629B7ACEE /* EnemyLakituObjectBridge.swift in Sources */,
