@@ -223,6 +223,7 @@
 		DD3A03E522F13B396092C761 /* ArrowLiftBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */; };
 		E00BF690CC0240E3397ECB1A /* MarioInputCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C50416E3A3BDC9F17816FA9 /* MarioInputCore.swift */; };
 		E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */; };
+		E1570F804670ACB1AD2469B0 /* Audio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FED187A5E0CCAF0E865A36D /* Audio.swift */; };
 		E1AE2DF359A0296B0EAA7E67 /* BulletBill.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B2DFA1C27E45B1D51C0A506 /* BulletBill.swift */; };
 		E2F11DDB5A2813A72A2C9A2A /* SkeeterObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 01C2DB40D32E69B4AFA3E55B /* SkeeterObjectBridge.swift */; };
 		E4DC22B427B7BADD0E429F67 /* BobombObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 406EDDE3B748218288E16122 /* BobombObjectBridge.swift */; };
@@ -364,6 +365,7 @@
 		6E37008029F2850C83A1AFF0 /* PlatformCollisionRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlatformCollisionRegistry.swift; sourceTree = "<group>"; };
 		6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KingBobombBehavior.swift; sourceTree = "<group>"; };
 		6EF73C0EA06595D96E31445A /* MarioWaterInteractionAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioWaterInteractionAction.swift; sourceTree = "<group>"; };
+		6FED187A5E0CCAF0E865A36D /* Audio.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Audio.swift; sourceTree = "<group>"; };
 		7152A9F5156A7D703C8708CE /* SwingPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwingPlatformBehavior.swift; sourceTree = "<group>"; };
 		724F73EC282345F4551FC1BF /* CameraInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraInput.swift; sourceTree = "<group>"; };
 		7316D473A3C5C7E718C32B2E /* AppleAudioRing.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppleAudioRing.h; sourceTree = "<group>"; };
@@ -515,6 +517,7 @@
 				C722E3CB84F20BA573CBEDA7 /* AppleInputService.swift */,
 				D5723E1972C2FF3BB21E3A5B /* AppMain.swift */,
 				CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */,
+				6FED187A5E0CCAF0E865A36D /* Audio.swift */,
 				4DDE26E083CE3C79E2FBCCDB /* BehaviorDispatchBridge.swift */,
 				D6B1983ADD652967A0372D10 /* BehaviorScript.swift */,
 				2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */,
@@ -860,6 +863,7 @@
 				AB8766F154EC93EAB005D1D2 /* AppleAudioService.m in Sources */,
 				45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */,
 				DD3A03E522F13B396092C761 /* ArrowLiftBehavior.swift in Sources */,
+				E1570F804670ACB1AD2469B0 /* Audio.swift in Sources */,
 				8AC19AB29646962A8EF430E1 /* BehaviorDispatchBridge.swift in Sources */,
 				FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */,
 				161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */,
