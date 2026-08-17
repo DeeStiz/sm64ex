@@ -2,7 +2,7 @@
 
 ## Status
 
-M30l is the latest validated bounded Goddard/Mario-face render-packet slice. Swift now
+M30m is the latest validated bounded Goddard/Mario-face route/resource slice. Swift now
 owns M30a's pointer-free `mario_Face` geometry/geo-switch packet plus a copied
 25-channel Goddard animation catalog: component/animator IDs, 820/166 frame
 banks, `GD_ANIM_3H_SCALED`/`GD_ANIM_6H_SCALED` types, and the five source-empty
@@ -116,6 +116,25 @@ Max Metal 4 frame and clean status-0 shutdown. This remains a value/oracle
 boundary: camera/orientation, texture residency, route breadth, Metal encoder
 integration/authority, GPU captures, screenshots, and visual/human acceptance
 remain open.
+M30m adds the source-backed `gdm_gettestdl` route catalog for all six Goddard
+routes (Yoshi scene/shell, Mario normal/game-over, car scene, and testnet2), 19
+texture records for the hand, red/white star, and Mario-face-shine resources,
+and six camera/orientation records carrying the 320x240 view, renderer/main
+control limits, cursor, and quantized two-light defaults from `renderer.c` and
+`gd_main.c`. `SM64MarioFaceRouteRenderPacketBuilder` binds those records to the
+M30l packet without C pointers or Metal mutation. The schema-4 render-domain
+metadata records round-trip through the existing oracle codec; the independent
+C↔Swift contract matches route-resource fingerprint `0xcaa40a26c30b9952` and
+metadata fingerprint `0xb5ef5403d2519fa3` over six routes, 19 textures, 38
+route texture memberships, and 50 metadata records. The focused contract is
+`script/test_mario_face_route_resources.sh`; the regenerated native Debug build
+is `/tmp/sm64-modern-m30m-build.log`, and
+`script/build_and_run.sh --verify` is `/tmp/sm64-modern-m30m-verify.log`
+(`BUILD SUCCEEDED`, native Apple M5 Max Metal 4 frame one, and
+`engine_thread_finished status=0`). This is still a source/packet/oracle
+boundary: live C route emission, complete front-end/gameplay/cutscene/ending
+record breadth, Metal texture residency/encoder authority, GPU captures,
+screenshots, and visual/human acceptance remain open.
 M30b's
 catalog fingerprint remains `0x0e9eaa50355cf262` and timeline fingerprint
 remains `0x2ce6639f480ef29c`. M30a's geometry fingerprint remains
@@ -2267,6 +2286,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M30j: Full resident Mario-face expression composition | `SM64MarioFaceExpressionComposition` resolves all 25 manifest channels from the immutable MFPB provider in source order, emits 3H/6H scaled transform values with source frame/fraction metadata, wraps final-frame adjacency, and preserves explicit empty/invalid-bank unavailable records. | Complete locally — Swift/C composition seed `0xb9ff796b9181bb3f` and fingerprint `0x3f741b052f25ac7f` over 5 scenarios and 25 channels; `script/test_mario_face_expression_composition.sh`, strict Swift 6, `git diff --check`, regenerated build `/tmp/sm64-modern-m30j-build.log`, and complete default verifier `/tmp/sm64-modern-m30j-verify.log` (`verify_exit=0`) pass native Metal 4/Apple M5 Max frame 1 and clean status-0 shutdown; graph/resource IDs, mesh/material/lighting/camera, Metal authority, route breadth, screenshot/GPU, and visual/human acceptance remain |
 | M30k: Mario-face graph/resource binding catalog | `SM64MarioFaceResourceCatalog` binds the 25 source animator/data/node/link records (including the intro `0xE2` -> `0xDD` exception), six source-backed mesh/shape descriptors, 19 quantized material records, and two master star-light records as immutable pointer-free values. | Complete locally — Swift/C fingerprint `0x47eaad2dfd5d62ed` over 6 meshes, 19 materials, 2 lights, 25 animation bindings, 644 vertices, and 1,213 faces; `script/test_mario_face_resource_catalog.sh`, regenerated native Debug build `/tmp/sm64-modern-m30k-build.log`, complete default verifier `/tmp/sm64-modern-m30k-verify.log` (`verify_exit=0`), strict Swift 6, and `git diff --check` pass with native Apple M5 Max Metal 4 frame 1 and clean status 0 shutdown; transform attachment, textures/LOD, camera/orientation, route breadth, Metal encoder/resource residency, screenshot/GPU, and visual/human acceptance remain |
 | M30l: Mario-face render-ready resource packet | `SM64MarioFaceRenderPacketBuilder` joins M30j composition values to M30k mesh/shape/material/light/animator IDs, preserves all 25 attachments and explicit unavailable records, and applies source-material-group/full-resolution policies without claiming textures or camera parity. | Complete locally — Swift/C seed `0x3a480da061ea7187` and aggregate fingerprint `0x193150f025ecf3d2` over 5 scenarios, 6 meshes, 19 material IDs, 2 lights, and 25 animations; `script/test_mario_face_render_packet.sh`, regenerated native Debug build `/tmp/sm64-modern-m30l-build.log`, complete default verifier `/tmp/sm64-modern-m30l-verify.log` (`verify_exit=0`), strict Swift 6, and `git diff --check` pass with native Apple M5 Max Metal 4 frame 1 and clean status 0 shutdown; camera/orientation, texture/LOD resource integration, route breadth, Metal encoder/authority, screenshot/GPU, and visual/human acceptance remain |
+| M30m: Mario-face route, camera, and texture/resource oracle | `SM64MarioFaceRouteResourceCatalog` mirrors all six `gdm_gettestdl` route symbols, 19 source texture records, and six quantized camera/orientation/light records; `SM64MarioFaceRouteRenderOracle` emits and round-trips schema-4 domain-11 metadata plus dynamic M30l face records. | Complete locally — independent C↔Swift route-resource fingerprint `0xcaa40a26c30b9952`, metadata fingerprint `0xb5ef5403d2519fa3`, 6 routes, 19 textures, 38 route memberships, 6 camera records, and 50 metadata records; `script/test_mario_face_route_resources.sh`, regenerated native Debug build `/tmp/sm64-modern-m30m-build.log`, complete verifier `/tmp/sm64-modern-m30m-verify.log`, strict Swift 6, and `git diff --check` pass with native Apple M5 Max Metal 4 frame 1 and status-0 shutdown; live C route emission, route-shard breadth, Metal residency/authority, GPU capture, screenshot, and visual/human acceptance remain |
 | M31: Whole-engine Swift authority | Swift completes title-to-gameplay, saves, audio, rendering, and shutdown with no engine/gameplay C callback; C selector remains equivalent. | Not started |
 | M31a: Swift lifecycle authority seam | Swift runtime owns lifecycle phases, invalid-order rejection, stop-request transition, failure fencing, and explicit C-domain bridge reporting while remaining domains migrate. | Complete locally — strict Swift 6 runtime smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; gameplay/content C bridge remains intentionally open |
 | M31b: Swift engine context seam | Swift owns a real owner-thread engine context with level reset, state/object-pool/scheduler advancement, immutable tick receipts, stop/shutdown cleanup, and explicit lifecycle-domain wiring while C remains the fallback for unmigrated domains. | Complete locally — strict Swift 6 context smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; C gameplay/content fallback remains intentionally open |
@@ -2719,11 +2739,12 @@ replayable trace, and the platform evidence listed in its exit gate.
    animator attachments through a pointer-free graph/resource catalog, with a
    C↔Swift fingerprint admission gate. M30l now joins those IDs and values in
    a C-compared render-ready face packet with explicit source-material-group
-   and full-resolution policies. Next add camera/orientation and
-   route-specific texture/resource records, feed the packet through the live
-   owner-thread render-oracle capture, compare schema-4 records across
-   front-end, gameplay, cutscene, and ending shards, and only then consider a
-   face-renderer authority cutover.
+   and full-resolution policies. M30m now adds all six source `gdm_gettestdl`
+   route records, 19 texture/resource records, six quantized camera/light
+   records, and schema-4 route metadata plus dynamic face records. Next emit
+   the route records from the live C owner-thread Goddard path, compare them
+   against Swift records across front-end, gameplay, cutscene, and ending
+   shards, and only then consider a face-renderer authority cutover.
 9. **M31 whole-engine authority.** Wire title-to-shutdown through
    SwiftEngineRuntime by default. Prove no Swift-mode gameplay, save, audio,
    renderer, or shutdown path enters a C engine callback. Retain the C adapter
