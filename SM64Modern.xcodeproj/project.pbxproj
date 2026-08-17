@@ -115,6 +115,7 @@
 		6054B80D65D1016DEF07B736 /* MarioFaceAnimationPayload.swift in Sources */ = {isa = PBXBuildFile; fileRef = F614773BEB8721E80725416A /* MarioFaceAnimationPayload.swift */; };
 		6321601F8F550EE3305561A4 /* BobombBuddyBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = B3E4F781D55FAEFF9757C3F1 /* BobombBuddyBehavior.swift */; };
 		637DB55CFFCA4EDF63A29B58 /* CameraInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 724F73EC282345F4551FC1BF /* CameraInput.swift */; };
+		638744BDE25442917A53123B /* MarioFaceResourceCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A6447329A9B7A1EEE7CE58 /* MarioFaceResourceCatalog.swift */; };
 		65F4BEF23300074C1E392842 /* MarioShellAirAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 820DE3AD7B88D2679E91FFF4 /* MarioShellAirAction.swift */; };
 		6623355865D93A2C5631F1DF /* GoombaEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 351FD4FF55CB608F105C75CD /* GoombaEnemy.swift */; };
 		663BC366E1E4805F7E8E984C /* Cheats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1618F54073FF985CBD0EF12E /* Cheats.swift */; };
@@ -447,6 +448,7 @@
 		A4B9263B0BC8B2ECBC71F7DC /* SpinyEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpinyEnemy.swift; sourceTree = "<group>"; };
 		A4E9946C93241D4FCF46A311 /* MarioFacePayloadInventory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioFacePayloadInventory.swift; sourceTree = "<group>"; };
 		A65482BCA2CAF5E37432BD93 /* AppleAudioRing.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = AppleAudioRing.c; sourceTree = "<group>"; };
+		A7A6447329A9B7A1EEE7CE58 /* MarioFaceResourceCatalog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioFaceResourceCatalog.swift; sourceTree = "<group>"; };
 		A8B5589C8E65130A7B540D71 /* SaveFileMutator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SaveFileMutator.swift; sourceTree = "<group>"; };
 		A8B624CEA2E264D3A38B48EA /* SmallPenguinObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallPenguinObjectBridge.swift; sourceTree = "<group>"; };
 		AB7C461E8C0CA23A1D8B2CA5 /* MarioQuicksandLandingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioQuicksandLandingAction.swift; sourceTree = "<group>"; };
@@ -691,6 +693,7 @@
 				693D452C9D1D8BE50281DB5E /* MarioFaceExpressionComposition.swift */,
 				0BFB5B772461E752D2E1D5EB /* MarioFacePayloadBundle.swift */,
 				A4E9946C93241D4FCF46A311 /* MarioFacePayloadInventory.swift */,
+				A7A6447329A9B7A1EEE7CE58 /* MarioFaceResourceCatalog.swift */,
 				70A5733D4139CD88D7976A65 /* MarioFaceResourceManifest.swift */,
 				6262B2107E57DA4E72B46ECA /* MarioFaceResourceManifestCodec.swift */,
 				9D8C59955994453AFE524C2A /* MarioFinishTurningAction.swift */,
@@ -1057,6 +1060,7 @@
 				A4B15E26FB7B14FF506AD730 /* MarioFaceExpressionComposition.swift in Sources */,
 				C8C350D40B8A2CDB9F32CCC0 /* MarioFacePayloadBundle.swift in Sources */,
 				BCFD0B5D4F1C30CD6ABFEC55 /* MarioFacePayloadInventory.swift in Sources */,
+				638744BDE25442917A53123B /* MarioFaceResourceCatalog.swift in Sources */,
 				ADF9CDE05AC2A15B5E73BA47 /* MarioFaceResourceManifest.swift in Sources */,
 				0000792BF14B5B419FE3451A /* MarioFaceResourceManifestCodec.swift in Sources */,
 				A18B1A302FC1B7FEACB64ABB /* MarioFinishTurningAction.swift in Sources */,
