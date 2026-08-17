@@ -82,6 +82,41 @@ final class SwiftCameraMigrationService {
             return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "callback_input")
         }
 
+        let geometryModes: Set<Int16> = [1, 2, 14]
+        let geometryFlags = input.geometry_flags
+        let height: SM64CameraHeightInput?
+        let slope: SM64CameraSlopeInput?
+        if geometryModes.contains(input.mode) {
+            height = SM64CameraHeightInput(
+                marioY: input.mario_position.1,
+                floorHeight: input.floor_height,
+                waterHeight: geometryFlags
+                    & UInt16(SM64_MODERN_CAMERA_CALLBACK_HAS_WATER_HEIGHT) != 0
+                    ? input.water_height : nil,
+                isMetalWater: geometryFlags
+                    & UInt16(SM64_MODERN_CAMERA_CALLBACK_IS_METAL_WATER) != 0,
+                isOnPole: geometryFlags
+                    & UInt16(SM64_MODERN_CAMERA_CALLBACK_IS_ON_POLE) != 0,
+                poleObjectY: geometryFlags
+                    & UInt16(SM64_MODERN_CAMERA_CALLBACK_HAS_POLE_DATA) != 0
+                    ? input.pole_object_y : nil,
+                poleObjectHitboxHeight: geometryFlags
+                    & UInt16(SM64_MODERN_CAMERA_CALLBACK_HAS_POLE_DATA) != 0
+                    ? input.pole_hitbox_height : nil
+            )
+            slope = SM64CameraSlopeInput(
+                marioY: input.mario_position.1,
+                floorHeight: geometryFlags
+                    & UInt16(SM64_MODERN_CAMERA_CALLBACK_HAS_SLOPE_FLOOR) != 0
+                    ? input.slope_floor_height : nil,
+                floorType: input.slope_floor_type,
+                floorNormalZ: input.slope_floor_normal_z
+            )
+        } else {
+            height = nil
+            slope = nil
+        }
+
         let callbackInput = SM64CameraCallbackInput(
             mode: input.mode,
             marioPosition: SM64ObjectVector3(
@@ -102,7 +137,9 @@ final class SwiftCameraMigrationService {
             zoomDistance: input.zoom_distance,
             eightDirectionBaseYaw: input.eight_direction_base_yaw,
             eightDirectionYawOffset: input.eight_direction_yaw_offset,
-            cannonYOffset: input.cannon_y_offset
+            cannonYOffset: input.cannon_y_offset,
+            height: height,
+            slope: slope
         )
         guard let result = SM64CameraModeCallbacks.evaluate(callbackInput) else {
             return SM64_MODERN_STATUS_UNSUPPORTED_AUTHORITY

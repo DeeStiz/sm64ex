@@ -36,6 +36,9 @@
 static s32 sm64_modern_camera_dispatch(
     SM64ModernCameraCommand command, s32 argument, s32 transition_frames,
     struct Camera *camera, s32 *out_result);
+static s32 sm64_modern_camera_evaluate_callback(
+    struct Camera *camera, s16 mode, Vec3f focus, Vec3f pos, s16 *out_yaw,
+    u32 *out_flags);
 
 /**
  * @file camera.c
@@ -906,6 +909,14 @@ s16 find_in_bounds_yaw_wdw_bob_thi(Vec3f pos, Vec3f origin, s16 yaw) {
  * Rotates the camera around the area's center point.
  */
 s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
+    s16 callbackYaw = 0;
+    u32 callbackFlags = 0;
+    if (sm64_modern_camera_evaluate_callback(
+            c, CAMERA_MODE_RADIAL, focus, pos, &callbackYaw,
+            &callbackFlags)) {
+        return callbackYaw;
+    }
+
     f32 cenDistX = sMarioCamState->pos[0] - c->areaCenX;
     f32 cenDistZ = sMarioCamState->pos[2] - c->areaCenZ;
     s16 camYaw = atan2s(cenDistZ, cenDistX) + sModeOffsetYaw;
@@ -930,6 +941,17 @@ s32 update_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
  * Update the camera during 8 directional mode
  */
 s32 update_8_directions_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
+    s16 callbackYaw = 0;
+    u32 callbackFlags = 0;
+    if (sm64_modern_camera_evaluate_callback(
+            c, CAMERA_MODE_8_DIRECTIONS, focus, pos, &callbackYaw,
+            &callbackFlags)) {
+        if (callbackFlags & SM64_MODERN_CAMERA_CALLBACK_PANS_AHEAD) {
+            pan_ahead_of_player(c);
+        }
+        return callbackYaw;
+    }
+
     UNUSED f32 cenDistX = sMarioCamState->pos[0] - c->areaCenX;
     UNUSED f32 cenDistZ = sMarioCamState->pos[2] - c->areaCenZ;
     s16 camYaw = s8DirModeBaseYaw + s8DirModeYawOffset;
@@ -1207,6 +1229,14 @@ void mode_8_directions_camera(struct Camera *c) {
  * sModeOffsetYaw is calculated in radial_camera_move, which calls offset_yaw_outward_radial
  */
 s32 update_outward_radial_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
+    s16 callbackYaw = 0;
+    u32 callbackFlags = 0;
+    if (sm64_modern_camera_evaluate_callback(
+            c, CAMERA_MODE_OUTWARD_RADIAL, focus, pos, &callbackYaw,
+            &callbackFlags)) {
+        return callbackYaw;
+    }
+
     f32 xDistFocToMario = sMarioCamState->pos[0] - c->areaCenX;
     f32 zDistFocToMario = sMarioCamState->pos[2] - c->areaCenZ;
     s16 camYaw = atan2s(zDistFocToMario, xDistFocToMario) + sModeOffsetYaw + DEGREES(180);
@@ -2046,8 +2076,22 @@ s32 nop_update_water_camera(UNUSED struct Camera *c, UNUSED Vec3f focus, UNUSED 
  * modes deliberately fall back to the original C implementation.
  */
 static s32 sm64_modern_camera_evaluate_callback(
-    struct Camera *camera, s16 mode, Vec3f focus, Vec3f pos, s16 *out_yaw) {
-    if (sMarioCamState == NULL || out_yaw == NULL) {
+    struct Camera *camera, s16 mode, Vec3f focus, Vec3f pos, s16 *out_yaw,
+    u32 *out_flags) {
+    if (!sm64_modern_camera_authority_active()
+        || sMarioCamState == NULL || out_yaw == NULL || out_flags == NULL) {
+        return FALSE;
+    }
+
+    // These callbacks have small, source-authored area exceptions after the
+    // pure placement step. Keep those routes on C until their bounds policy
+    // is represented by an explicit value input.
+    if ((mode == CAMERA_MODE_RADIAL
+            && (gCurrLevelArea == AREA_WDW_MAIN || gCurrLevelArea == AREA_BOB
+                || gCurrLevelArea == AREA_THI_HUGE
+                || gCurrLevelArea == AREA_THI_TINY))
+        || (mode == CAMERA_MODE_8_DIRECTIONS
+            && gCurrLevelArea == AREA_DDD_SUB)) {
         return FALSE;
     }
 
@@ -2072,6 +2116,58 @@ static s32 sm64_modern_camera_evaluate_callback(
         input.area_center[2] = camera->areaCenZ;
     }
 
+    if (mode == CAMERA_MODE_RADIAL || mode == CAMERA_MODE_OUTWARD_RADIAL
+        || mode == CAMERA_MODE_8_DIRECTIONS) {
+        input.floor_height = sMarioGeometry.currFloorHeight;
+        if (sMarioCamState->action & ACT_FLAG_METAL_WATER) {
+            input.geometry_flags |=
+                SM64_MODERN_CAMERA_CALLBACK_IS_METAL_WATER;
+        } else {
+            input.water_height = find_water_level(
+                sMarioCamState->pos[0], sMarioCamState->pos[2]);
+            if (input.water_height > -11000.f) {
+                input.geometry_flags |=
+                    SM64_MODERN_CAMERA_CALLBACK_HAS_WATER_HEIGHT;
+            }
+        }
+        if (sMarioCamState->action & ACT_FLAG_ON_POLE) {
+            input.geometry_flags |= SM64_MODERN_CAMERA_CALLBACK_IS_ON_POLE;
+            if (sMarioCamState->usedObj != NULL) {
+                input.geometry_flags |=
+                    SM64_MODERN_CAMERA_CALLBACK_HAS_POLE_DATA;
+                input.pole_object_y = sMarioCamState->usedObj->oPosY;
+                input.pole_hitbox_height =
+                    sMarioCamState->usedObj->hitboxHeight;
+            }
+        }
+
+        s16 slopeYaw;
+        if (mode == CAMERA_MODE_8_DIRECTIONS) {
+            input.eight_direction_base_yaw = s8DirModeBaseYaw;
+            input.eight_direction_yaw_offset = s8DirModeYawOffset;
+            slopeYaw = s8DirModeBaseYaw + s8DirModeYawOffset;
+        } else {
+            slopeYaw = atan2s(
+                sMarioCamState->pos[2] - input.area_center[2],
+                sMarioCamState->pos[0] - input.area_center[0]);
+            if (mode == CAMERA_MODE_OUTWARD_RADIAL) {
+                slopeYaw += DEGREES(180);
+            }
+            slopeYaw += sModeOffsetYaw;
+        }
+        struct Surface *slopeFloor = NULL;
+        const f32 slopeX = sMarioCamState->pos[0] + sins(slopeYaw) * 40.f;
+        const f32 slopeZ = sMarioCamState->pos[2] + coss(slopeYaw) * 40.f;
+        input.slope_floor_height = find_floor(
+            slopeX, sMarioCamState->pos[1], slopeZ, &slopeFloor);
+        if (slopeFloor != NULL) {
+            input.geometry_flags |=
+                SM64_MODERN_CAMERA_CALLBACK_HAS_SLOPE_FLOOR;
+            input.slope_floor_type = slopeFloor->type;
+            input.slope_floor_normal_z = slopeFloor->normal.z;
+        }
+    }
+
     if (sm64_modern_camera_evaluate(&input, &output)
         != SM64_MODERN_STATUS_OK) {
         return FALSE;
@@ -2084,7 +2180,12 @@ static s32 sm64_modern_camera_evaluate_callback(
         vec3f_copy(focus, output.focus);
         vec3f_copy(pos, output.position);
     }
+    if (mode == CAMERA_MODE_RADIAL || mode == CAMERA_MODE_OUTWARD_RADIAL
+        || mode == CAMERA_MODE_8_DIRECTIONS) {
+        sAreaYaw = output.area_yaw;
+    }
     *out_yaw = output.returned_yaw;
+    *out_flags = output.flags;
     return TRUE;
 }
 
@@ -2100,8 +2201,10 @@ void mode_water_surface_camera(struct Camera *c) {
  */
 s32 update_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 callbackYaw = 0;
+    u32 callbackFlags = 0;
     if (sm64_modern_camera_evaluate_callback(
-            c, c != NULL ? (s16)c->mode : 0, focus, pos, &callbackYaw)) {
+            c, c != NULL ? (s16)c->mode : 0, focus, pos, &callbackYaw,
+            &callbackFlags)) {
         return callbackYaw;
     }
 
@@ -2834,9 +2937,10 @@ s32 mode_c_up_camera(struct Camera *c) {
  */
 s32 update_in_cannon(struct Camera *c, Vec3f focus, Vec3f pos) {
     s16 callbackYaw = 0;
+    u32 callbackFlags = 0;
     if (sm64_modern_camera_evaluate_callback(
             c, c != NULL ? (s16)c->mode : CAMERA_MODE_INSIDE_CANNON,
-            focus, pos, &callbackYaw)) {
+            focus, pos, &callbackYaw, &callbackFlags)) {
         return callbackYaw;
     }
 

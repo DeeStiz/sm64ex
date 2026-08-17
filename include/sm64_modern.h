@@ -495,6 +495,14 @@ typedef struct SM64ModernCameraCallbackInputV1 {
     float lakitu_distance;
     float zoom_distance;
     float cannon_y_offset;
+    float floor_height;
+    float water_height;
+    float slope_floor_height;
+    float slope_floor_normal_z;
+    float pole_object_y;
+    float pole_hitbox_height;
+    int16_t slope_floor_type;
+    uint16_t geometry_flags;
     float mario_position[3];
     float area_center[3];
     uint32_t reserved;
@@ -515,6 +523,13 @@ typedef struct SM64ModernCameraCallbackOutputV1 {
 
 #define SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED (1u << 0)
 #define SM64_MODERN_CAMERA_CALLBACK_PANS_AHEAD (1u << 1)
+// Input geometry_flags bits. Optional values remain finite zeroes when the
+// corresponding bit is clear; the owner adapter must not infer a live value.
+#define SM64_MODERN_CAMERA_CALLBACK_HAS_WATER_HEIGHT (1u << 0)
+#define SM64_MODERN_CAMERA_CALLBACK_HAS_POLE_DATA (1u << 1)
+#define SM64_MODERN_CAMERA_CALLBACK_IS_METAL_WATER (1u << 2)
+#define SM64_MODERN_CAMERA_CALLBACK_IS_ON_POLE (1u << 3)
+#define SM64_MODERN_CAMERA_CALLBACK_HAS_SLOPE_FLOOR (1u << 4)
 
 typedef SM64ModernStatus (*SM64ModernCameraUpdateFn)(
     void *context,

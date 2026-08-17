@@ -7,6 +7,9 @@
 
 static unsigned gCallbackCount;
 static unsigned gEvaluateCount;
+static uint16_t gLastGeometryFlags;
+static float gLastFloorHeight;
+static float gLastSlopeFloorNormalZ;
 
 static SM64ModernStatus update_camera(
     void *context,
@@ -39,6 +42,9 @@ static SM64ModernStatus evaluate_camera(
         return SM64_MODERN_STATUS_INVALID_ARGUMENT;
     }
     gEvaluateCount++;
+    gLastGeometryFlags = input->geometry_flags;
+    gLastFloorHeight = input->floor_height;
+    gLastSlopeFloorNormalZ = input->slope_floor_normal_z;
     output->focus[0] = input->mario_position[0];
     output->focus[1] = input->mario_position[1] + 125.f;
     output->focus[2] = input->mario_position[2];
@@ -139,6 +145,11 @@ int main(void) {
     callbackInput.face_pitch = -0x1000;
     callbackInput.mode_offset_yaw = 0x0100;
     callbackInput.zoom_distance = 800.f;
+    callbackInput.geometry_flags =
+        SM64_MODERN_CAMERA_CALLBACK_HAS_WATER_HEIGHT
+        | SM64_MODERN_CAMERA_CALLBACK_HAS_SLOPE_FLOOR;
+    callbackInput.floor_height = 100.f;
+    callbackInput.slope_floor_normal_z = 0.5f;
     callbackInput.mario_position[1] = 50.f;
     expect(sm64_modern_camera_evaluate(&callbackInput, &callbackOutput)
                == SM64_MODERN_STATUS_OK, "callback evaluator");
@@ -149,6 +160,12 @@ int main(void) {
                && callbackOutput.flags
                     == SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED,
            "callback output");
+    expect(gLastGeometryFlags
+               == (SM64_MODERN_CAMERA_CALLBACK_HAS_WATER_HEIGHT
+                   | SM64_MODERN_CAMERA_CALLBACK_HAS_SLOPE_FLOOR)
+               && gLastFloorHeight == 100.f
+               && gLastSlopeFloorNormalZ == 0.5f,
+           "callback geometry input");
 
     input.reserved = 1;
     expect(sm64_modern_camera_update(&input, &output)

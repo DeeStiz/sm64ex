@@ -2,6 +2,18 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31n extends the pure camera evaluator to radial, outward-radial, and
+  eight-direction modes. The C adapter snapshots floor/water/pole/slope facts
+  with explicit geometry flags; Swift maps them to `SM64CameraHeightInput` and
+  `SM64CameraSlopeInput`, while C retains source-authored Bob/WDW/THI/DDD
+  bounds, pan-ahead, collision, and Lakitu presentation. The geometry smoke
+  matches at `0x9bc38f9c51aae152`; callback/migration/state/runtime, ABI, Debug
+  build, and `git diff --check` gates pass. Fresh opt-in Bob-omb launch
+  `/tmp/sm64-modern-m31n-bobomb-live.log` reaches Metal frame one and clean
+  status-0 shutdown but stays on C for its authored radial bounds, so live
+  Swift callback telemetry remains open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31n.md`.
+
 - M31m extends the Swift camera boundary to pure callback values. The C camera
   packages Mario/free-roam modes 4/7/16 and inside-cannon mode 10 into a finite
   fixed-width evaluator ABI; Swift calls `SM64CameraModeCallbacks`, returns
