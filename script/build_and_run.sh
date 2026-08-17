@@ -49,6 +49,7 @@ else
   "$PROJECT_ROOT/script/test_dialog_text_pause.sh"
   "$PROJECT_ROOT/script/test_front_end.sh"
   "$PROJECT_ROOT/script/test_front_end_render.sh"
+  "$PROJECT_ROOT/script/test_frontend_migration.sh"
   "$PROJECT_ROOT/script/test_audio.sh"
   "$PROJECT_ROOT/script/test_audio_sequence.sh"
   "$PROJECT_ROOT/script/test_audio_pools.sh"
@@ -266,8 +267,10 @@ case "$MODE" in
       'engine_thread_started' \
       'input_service_ready' \
       'input_bridge_installed abi=1' \
+      'frontend_bridge_installed abi=1 authority=swift state_authority=c render_authority=c' \
       'gameplay_bridge_installed abi=1 slices=mario_buttons,mario_ground_speed,bobomb_release' \
       'input_snapshot_started owner_main=false' \
+      'swift_frontend_observer' \
       'audio_service_started input_hz=32000 format=s16_interleaved_stereo' \
       'audio_sequence_bridge_installed abi=1 authority=swift pcm_authority=c' \
       'audio_enqueue_started blocks_per_native_step=1' \
@@ -281,7 +284,7 @@ case "$MODE" in
       grep -Fq "$expected" <<< "$runtime_log"
     done
     printf '%s\n' "$runtime_log" \
-      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|gameplay_bridge_installed|input_snapshot_started|audio_service_started|audio_enqueue_started|audio_render_started|timebase_configured|fixed_step_scheduler_(started|status)|lifecycle_running|presentation_cadence|lifecycle_step count=1'
+      | grep -E 'window_ready layer=CAMetalLayer|metal_device_ready|metal_display_link_started|metal_scene_initialized|metal_scene_presented frame=1|engine_thread_started|input_service_ready|input_bridge_installed|frontend_bridge_installed|gameplay_bridge_installed|input_snapshot_started|swift_frontend_observer|audio_service_started|audio_enqueue_started|audio_render_started|timebase_configured|fixed_step_scheduler_(started|status)|lifecycle_running|presentation_cadence|lifecycle_step count=1'
     if [[ "${SM64_MODERN_AUDIO_PROMOTION:-0}" == "1" ]]; then
       for expected in \
         'swift_audio_promotion_started' \
@@ -326,6 +329,7 @@ case "$MODE" in
         for expected in \
           'audio_service_stopped' \
           'swift_audio_sequence_observer_finished' \
+          'swift_frontend_observer_finished' \
           'platform_shutdown' \
           'metal_shutdown_drained' \
           'engine_thread_finished status=0' \
@@ -337,7 +341,7 @@ case "$MODE" in
           printf '%s\n' "$shutdown_log" | grep -E 'swift_audio_promotion_finished'
         fi
         printf '%s\n' "$shutdown_log" \
-          | grep -E 'audio_service_stopped|swift_audio_sequence_observer_finished|metal_shutdown_drained|platform_shutdown|engine_thread_finished status=0|application_stopped'
+          | grep -E 'audio_service_stopped|swift_audio_sequence_observer_finished|swift_frontend_observer_finished|metal_shutdown_drained|platform_shutdown|engine_thread_finished status=0|application_stopped'
         exit 0
       fi
       sleep 0.1

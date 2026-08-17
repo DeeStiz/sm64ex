@@ -2,6 +2,24 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31z adds the first live Swift front-end/menu boundary. The C input path
+  packages owner-thread menu edges, activity, and selection delta into a
+  fixed-width observer ABI; Swift replays the title/file/course/level/demo/
+  gameplay/credits/ending reducer with owner-token and malformed-input
+  fencing, while C retains live menu globals, save-slot mutation, transition
+  effects, text/layout rendering, and screen authority. The independent
+  `script/test_frontend_migration.sh` C↔Swift contract matches at
+  `0x147b4bc7da0386a1`; front-end/render/dialog-pause/engine-runtime/audio/
+  camera contracts, regenerated Swift 6 Debug build, and `git diff --check`
+  pass. Signed Apple M5 Max evidence is `/tmp/sm64-modern-m31z-runtime.log`:
+  `frontend_bridge_installed abi=1 authority=swift state_authority=c
+  render_authority=c`, `swift_frontend_observer` at input tick 1, Metal 4
+  frame one, 250 observed input events, observer fingerprint
+  `9030239786378800966`, and status-0 shutdown. This is an input/state
+  observer only; full menu route breadth, save-session parity, physical
+  controls, visual review, and human acceptance remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31z.md`.
+
 - M31y adds the first live Swift audio boundary. C packages owner-thread tick,
   sequence, queue, and secondary-sequence events into a fixed-width observer
   ABI; Swift replays the six-entry background queue and player sequence state

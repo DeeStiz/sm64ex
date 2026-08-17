@@ -85,11 +85,25 @@ private func platformInitialize(
         return inputStatus
     }
     engineLogger.notice("input_bridge_installed abi=1")
+    do {
+        try host.initializeFrontEndOnEngineThread()
+    } catch {
+        engineLogger.error("frontend_bridge_install_failed error=\(error.localizedDescription, privacy: .public)")
+        sm64_modern_uninstall_input_api()
+        sm64_modern_uninstall_rendering_batch_api()
+        sm64_modern_uninstall_rendering_api()
+        do { try host.shutdownMetalOnEngineThread() } catch {
+            engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
+        }
+        return SM64_MODERN_STATUS_PLATFORM_ERROR
+    }
     let gameplayService = host.gameplayServiceOnEngineThread
     var gameplay = makeSwiftGameplayMigrationAPI(service: gameplayService)
     let gameplayStatus = sm64_modern_install_gameplay_migration_api(&gameplay)
     guard gameplayStatus == SM64_MODERN_STATUS_OK else {
         engineLogger.error("gameplay_bridge_install_failed status=\(gameplayStatus)")
+        sm64_modern_uninstall_frontend_migration_api()
+        host.discardFrontEndMigrationOnEngineThread()
         sm64_modern_uninstall_input_api()
         sm64_modern_uninstall_rendering_api()
         do { try host.shutdownMetalOnEngineThread() } catch {
@@ -102,6 +116,8 @@ private func platformInitialize(
     guard marioGroundSpeedStatus == SM64_MODERN_STATUS_OK else {
         engineLogger.error("mario_ground_speed_bridge_install_failed status=\(marioGroundSpeedStatus)")
         sm64_modern_uninstall_gameplay_migration_api()
+        sm64_modern_uninstall_frontend_migration_api()
+        host.discardFrontEndMigrationOnEngineThread()
         sm64_modern_uninstall_input_api()
         sm64_modern_uninstall_rendering_api()
         do { try host.shutdownMetalOnEngineThread() } catch {
@@ -115,6 +131,8 @@ private func platformInitialize(
     } catch {
         audioLogger.error("audio_initialize_failed error=\(error.localizedDescription, privacy: .public)")
         sm64_modern_uninstall_gameplay_migration_api()
+        sm64_modern_uninstall_frontend_migration_api()
+        host.discardFrontEndMigrationOnEngineThread()
         sm64_modern_uninstall_input_api()
         sm64_modern_uninstall_rendering_api()
         do { try host.shutdownMetalOnEngineThread() } catch {
@@ -135,6 +153,7 @@ private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     _ = sm64_modern_progression_set_persistence_authority(0)
     sm64_modern_uninstall_progression_migration_api()
     sm64_modern_uninstall_gameplay_migration_api()
+    host.shutdownFrontEndOnEngineThread()
     sm64_modern_uninstall_input_api()
     sm64_modern_uninstall_rendering_api()
     engineLogger.notice("platform_shutdown")
@@ -245,6 +264,7 @@ final class EngineHost {
     private var inputService: AppleInputService?
     private var audioService: SM64ModernAppleAudioService?
     private var audioMigrationService: SwiftAudioMigrationService?
+    private var frontendMigrationService: SwiftFrontEndMigrationService?
     private var audioPromotion: SM64AudioOwnerPromotion?
     private var loggedAudioEnqueue = false
     private var loggedAudioRender = false
@@ -394,6 +414,8 @@ final class EngineHost {
             _ = sm64_modern_progression_set_persistence_authority(0)
             sm64_modern_uninstall_progression_migration_api()
             progressionMigrationService = nil
+            sm64_modern_uninstall_frontend_migration_api()
+            frontendMigrationService = nil
             finish(state: .failed, status: initializeStatus)
             DispatchQueue.main.async {
                 NSApplication.shared.terminate(nil)
@@ -1160,6 +1182,58 @@ final class EngineHost {
     fileprivate var inputServiceOnEngineThread: AppleInputService? {
         precondition(isCurrentEngineThread)
         return condition.withLock { inputService }
+    }
+
+    fileprivate func initializeFrontEndOnEngineThread() throws {
+        precondition(isCurrentEngineThread)
+        guard engineAuthority == .swift else { return }
+        guard frontendMigrationService == nil else {
+            throw NSError(
+                domain: "io.github.deestiz.sm64modern.FrontEnd",
+                code: Int(SM64_MODERN_STATUS_INVALID_STATE),
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "The Swift front-end observer is already initialized"
+                ]
+            )
+        }
+        let service = SwiftFrontEndMigrationService(
+            ownerThreadToken: engineThreadIdentifier
+        )
+        var migration = service.makeAPI()
+        let status = sm64_modern_install_frontend_migration_api(&migration)
+        guard status == SM64_MODERN_STATUS_OK else {
+            throw NSError(
+                domain: "io.github.deestiz.sm64modern.FrontEnd",
+                code: Int(status),
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "Could not install the Swift front-end observer"
+                ]
+            )
+        }
+        frontendMigrationService = service
+        engineLogger.notice(
+            "frontend_bridge_installed abi=1 authority=swift state_authority=c render_authority=c"
+        )
+    }
+
+    fileprivate func discardFrontEndMigrationOnEngineThread() {
+        precondition(isCurrentEngineThread)
+        frontendMigrationService = nil
+    }
+
+    fileprivate func shutdownFrontEndOnEngineThread() {
+        precondition(isCurrentEngineThread)
+        let service = frontendMigrationService
+        frontendMigrationService = nil
+        sm64_modern_uninstall_frontend_migration_api()
+        if let service {
+            let summary = service.summary()
+            engineLogger.notice(
+                "swift_frontend_observer_finished events=\(summary.events, privacy: .public) transitions=\(summary.transitions, privacy: .public) screen=\(summary.screen, privacy: .public) fingerprint=\(summary.fingerprint, privacy: .public)"
+            )
+        }
     }
 
     fileprivate func initializeAudioOnEngineThread() throws {

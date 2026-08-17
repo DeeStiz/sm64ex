@@ -73,6 +73,10 @@ final class AppleInputService {
     private let automatedMenuInput = ProcessInfo.processInfo.environment["SM64_MODERN_AUTOMATED_MENU"] != nil
     private let automatedGameplayInput = ProcessInfo.processInfo.environment["SM64_MODERN_AUTOMATED_GAMEPLAY"] != nil
     private var automatedMenuReadCount: UInt32 = 0
+    // The front-end observer is fed from the same owner-thread read that
+    // produces the legacy C snapshot. It is intentionally independent of the
+    // C input ABI's lifetime and is only a monotonic boundary timestamp.
+    private var frontendSimulationTick: UInt64 = 0
     private let hapticLock = NSLock()
     private var keyboardWords = [UInt32](repeating: 0, count: Int(SM64_MODERN_INPUT_KEYBOARD_WORD_COUNT))
     private var pendingKeyboardPressWords = [UInt32](
@@ -246,6 +250,8 @@ final class AppleInputService {
 
         lock.lock()
         let isFocused = focused
+        let pendingKeys = pendingKeyboardPressWords
+        let pendingMouseButtons = pendingMousePresses
         var keys = isFocused
             ? zip(keyboardWords, pendingKeyboardPressWords).map { $0 | $1 }
             : [UInt32](repeating: 0, count: keyboardWords.count)
@@ -261,6 +267,7 @@ final class AppleInputService {
         if rawKey == SM64_MODERN_INPUT_NO_KEY, risingButtons != 0 {
             rawKey = gamepadVirtualKeyBase + UInt32(risingButtons.trailingZeroBitCount)
         }
+        var automatedVirtualKey: UInt32?
         if automatedMenuInput {
             // The milestone harness is intentionally opt-in and emits a
             // bounded Start/A sequence using the persisted default keyboard
@@ -289,12 +296,15 @@ final class AppleInputService {
             } else {
                 virtualKey = nil
             }
+            automatedVirtualKey = virtualKey
             if let virtualKey {
                 let word = Int(virtualKey / 32)
                 if word < keys.count {
                     keys[word] |= UInt32(1) << (virtualKey % 32)
                 }
             }
+        } else {
+            automatedVirtualKey = nil
         }
         let automatedLeftStickX: Int16 = automatedGameplayInput ? 16_000 : gamepad.leftX
         let automatedLeftStickY: Int16 = automatedGameplayInput ? 0 : gamepad.leftY
@@ -335,6 +345,60 @@ final class AppleInputService {
         snapshot.last_virtual_key = rawKey
         snapshot.reserved = 0
         outSnapshot.pointee = snapshot
+
+        // M31z consumes this immutable edge from the same read boundary as C.
+        // The callback is optional and therefore has no effect in C-only
+        // compatibility binaries or before the Swift host installs it.
+        frontendSimulationTick &+= 1
+        func pendingKey(_ key: UInt32) -> Bool {
+            let word = Int(key / 32)
+            guard word < pendingKeys.count else { return false }
+            return pendingKeys[word] & (UInt32(1) << (key % 32)) != 0
+        }
+        let pendingStart = pendingKey(0x39) || automatedVirtualKey == 0x39
+        let pendingConfirm = pendingKey(0x26) || automatedVirtualKey == 0x26
+        let pendingBack = pendingKey(0x25)
+            || risingButtons & (UInt32(1) << 1) != 0
+        let startPressed = pendingStart
+            || risingButtons & (UInt32(1) << 6) != 0
+        let confirmPressed = pendingConfirm
+            || risingButtons & (UInt32(1) << 0) != 0
+        let selectionDelta: Int16
+        if automatedLeftStickY >= 16 {
+            selectionDelta = 1
+        } else if automatedLeftStickY <= -16 {
+            selectionDelta = -1
+        } else {
+            selectionDelta = 0
+        }
+        let hasActivity = gamepad.isActive
+            || keys.contains { $0 != 0 }
+            || pendingMouseButtons != 0
+        var frontEndInput = SM64ModernFrontEndInputV1()
+        frontEndInput.header.abi_version = SM64_MODERN_ABI_VERSION_1
+        frontEndInput.header.struct_size = UInt32(
+            MemoryLayout<SM64ModernFrontEndInputV1>.size
+        )
+        frontEndInput.simulation_tick = frontendSimulationTick
+        frontEndInput.advance_legacy_domain = 1
+        frontEndInput.start_pressed = startPressed ? 1 : 0
+        frontEndInput.confirm_pressed = confirmPressed ? 1 : 0
+        frontEndInput.back_pressed = pendingBack ? 1 : 0
+        frontEndInput.has_activity = hasActivity ? 1 : 0
+        frontEndInput.debug_level_select = 0
+        frontEndInput.demo_complete = 0
+        frontEndInput.credits_complete = 0
+        frontEndInput.ending_complete = 0
+        frontEndInput.demo_count = 8
+        frontEndInput.selection_delta = selectionDelta
+        frontEndInput.reserved = 0
+        var frontEndOutput = SM64ModernFrontEndOutputV1()
+        let frontEndStatus = sm64_modern_frontend_evaluate(
+            &frontEndInput, &frontEndOutput
+        )
+        guard frontEndStatus == SM64_MODERN_STATUS_OK else {
+            return frontEndStatus
+        }
         return SM64_MODERN_STATUS_OK
     }
 

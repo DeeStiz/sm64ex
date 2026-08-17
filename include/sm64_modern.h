@@ -752,6 +752,75 @@ typedef struct SM64ModernAudioMigrationApiV1 {
     SM64ModernAudioSequenceObserveFn observe_sequence_event;
 } SM64ModernAudioMigrationApiV1;
 
+// Front-end/menu migration is currently a value-only observer boundary.  The
+// legacy C menu still owns live menu state, text rendering, save-slot writes,
+// and transition side effects; Swift receives the same owner-thread input and
+// advances a replayable model without importing C menu pointers or globals.
+typedef uint32_t SM64ModernFrontEndScreen;
+
+#define SM64_MODERN_FRONT_END_SCREEN_TITLE 0u
+#define SM64_MODERN_FRONT_END_SCREEN_FILE_SELECT 1u
+#define SM64_MODERN_FRONT_END_SCREEN_COURSE_SELECT 2u
+#define SM64_MODERN_FRONT_END_SCREEN_LEVEL_SELECT 3u
+#define SM64_MODERN_FRONT_END_SCREEN_DEMO 4u
+#define SM64_MODERN_FRONT_END_SCREEN_GAMEPLAY 5u
+#define SM64_MODERN_FRONT_END_SCREEN_CREDITS 6u
+#define SM64_MODERN_FRONT_END_SCREEN_ENDING 7u
+
+typedef uint32_t SM64ModernFrontEndTransition;
+
+#define SM64_MODERN_FRONT_END_TRANSITION_NONE 0u
+#define SM64_MODERN_FRONT_END_TRANSITION_OPEN_FILE_SELECT 1u
+#define SM64_MODERN_FRONT_END_TRANSITION_OPEN_COURSE_SELECT 2u
+#define SM64_MODERN_FRONT_END_TRANSITION_START_LEVEL 3u
+#define SM64_MODERN_FRONT_END_TRANSITION_OPEN_LEVEL_SELECT 4u
+#define SM64_MODERN_FRONT_END_TRANSITION_START_DEMO 5u
+#define SM64_MODERN_FRONT_END_TRANSITION_RETURN_TO_TITLE 6u
+#define SM64_MODERN_FRONT_END_TRANSITION_OPEN_CREDITS 7u
+#define SM64_MODERN_FRONT_END_TRANSITION_OPEN_ENDING 8u
+
+typedef struct SM64ModernFrontEndInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint8_t advance_legacy_domain;
+    uint8_t start_pressed;
+    uint8_t confirm_pressed;
+    uint8_t back_pressed;
+    uint8_t has_activity;
+    uint8_t debug_level_select;
+    uint8_t demo_complete;
+    uint8_t credits_complete;
+    uint8_t ending_complete;
+    uint8_t demo_count;
+    int16_t selection_delta;
+    uint32_t reserved;
+} SM64ModernFrontEndInputV1;
+
+typedef struct SM64ModernFrontEndOutputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    SM64ModernFrontEndScreen screen;
+    SM64ModernFrontEndTransition transition;
+    int32_t selected_file;
+    int32_t selected_course;
+    int32_t selected_level;
+    int32_t demo_index;
+    int32_t title_zoom_counter;
+    int32_t title_fade_counter;
+    uint32_t reserved;
+} SM64ModernFrontEndOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernFrontEndEvaluateFn)(
+    void *context,
+    const SM64ModernFrontEndInputV1 *input,
+    SM64ModernFrontEndOutputV1 *out_output);
+
+typedef struct SM64ModernFrontEndMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernFrontEndEvaluateFn evaluate;
+} SM64ModernFrontEndMigrationApiV1;
+
 // Optional gameplay-kernel extension. It is installed separately so the
 // original migration table remains ABI-stable for existing hosts.
 typedef struct SM64ModernMarioGroundSpeedApiV1 {
@@ -1164,6 +1233,15 @@ SM64ModernStatus sm64_modern_audio_observe_sequence_event(
     uint64_t simulation_tick,
     const uint64_t *values,
     uint32_t value_count);
+SM64ModernStatus sm64_modern_validate_frontend_migration_api(
+    const SM64ModernFrontEndMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_frontend_migration_api(
+    const SM64ModernFrontEndMigrationApiV1 *migration);
+void sm64_modern_uninstall_frontend_migration_api(void);
+SM64ModernStatus sm64_modern_frontend_migration_status(void);
+SM64ModernStatus sm64_modern_frontend_evaluate(
+    const SM64ModernFrontEndInputV1 *input,
+    SM64ModernFrontEndOutputV1 *out_output);
 SM64ModernStatus sm64_modern_validate_progression_migration_api(
     const SM64ModernProgressionMigrationApiV1 *migration);
 SM64ModernStatus sm64_modern_install_progression_migration_api(
