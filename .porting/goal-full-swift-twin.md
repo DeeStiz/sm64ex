@@ -27,6 +27,19 @@ C still owns compatibility in-memory mutations and the remaining audio,
 camera, frontend, and rendering bridges, while M33 route breadth, M34 visual/
 device gates, and M35 distribution/human acceptance remain open.
 
+M31k is the latest validated camera authority seam. Swift now owns the
+selection/angle flag transitions that are exercised by the live C camera path:
+the owner-thread ABI carries the fixed-width selection, movement, sound, and
+status state into the existing value kernel, and C retains only the geometry,
+collision, cutscene, and Lakitu presentation bridge. The independent camera
+migration contract, camera-mode state contract, strict runtime smoke, native
+Debug build, and fresh Apple M5 Max launch pass; live telemetry reports
+`camera_selection_bridge_installed authority=swift geometry_authority=c` and a
+Swift camera update before Metal frame one. This is a bounded camera seam, not
+full camera parity or physical/human acceptance; audio, camera geometry,
+frontend, rendering, gameplay/content, M33 breadth, M34 device gates, and M35
+release gates remain open.
+
 M30x is the latest validated bounded Goddard/Mario-face source-geometry and
 isolated-encoder slice. Swift now
 owns M30a's pointer-free `mario_Face` geometry/geo-switch packet plus a copied
@@ -2508,6 +2521,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M31h: Explicit Swift/C domain authority ledger | Swift runtime construction owns a closed value-only partition of every engine domain, labels remaining C work as an explicit compatibility bridge, rejects unassigned domains, and emits the partition in runtime telemetry. | Complete locally — strict Swift 6 runtime smoke, regenerated native Debug build `/tmp/sm64-modern-m31h-build.log`, and gated verifier `/tmp/sm64-modern-m31h-full-verify-2.log` (`verify_exit=0`) pass; live full-game route qualification remains open |
 | M31i: Lifecycle authority ledger closure | The Swift-owned lifecycle phase machine is a first-class ledger domain, so lifecycle authority is explicit alongside state, scheduler, progression, input, Mario input, and action; save persistence is now promoted separately and only four product domains remain C bridges. | Complete locally — strict runtime smoke, regenerated native Debug build `/tmp/sm64-modern-m31i-build.log`, and gated verifier `/tmp/sm64-modern-m31i-full-verify.log` (`verify_exit=0`) pass; gameplay/content callback removal remains open |
 | M31j: Swift save-persistence authority cutover | Swift owns the durable save/menu image and recovery at load, reload, and persist boundaries; C retains only the normalized in-memory compatibility buffer and receives checked snapshots through the owner-thread ABI. | Complete locally — `script/test_progression_migration.sh`, `script/test_progression_persistence.sh`, and `script/test_engine_runtime.sh` pass; regenerated native Debug build `/tmp/sm64-modern-m31j-build-2.log`; fresh Apple M5 Max launch logs `persistence_authority=swift`, `swift_persistence_boundary operation=5 c_durable_io=disabled`, admitted C snapshot, Metal frame one, and status-0 shutdown; full gameplay mutation/save-menu session and remaining audio/camera/frontend/rendering authority remain open |
+| M31k: Swift camera selection/angle authority seam | Swift owns camera alternate-selection and Mario/Lakitu angle transitions, including the exact selection, movement, sound, and status flag mutations; C retains camera geometry, collision, cutscene, and Lakitu presentation through an explicit bridge. | Complete locally — `script/test_camera_migration.sh`, `script/test_camera_mode_state.sh`, and `script/test_engine_runtime.sh` pass under Swift 6; regenerated native Debug build `/tmp/sm64-modern-camera-selection-build.log`; fresh Apple M5 Max launch log `/tmp/sm64-modern-m31k-live.log` reports `camera_selection_bridge_installed abi=1 authority=swift geometry_authority=c`, `swift_camera_selection_update`, Metal frame one, and status-0 shutdown; full camera-mode/geometry/cutscene parity, physical feel, and remaining audio/frontend/rendering bridges remain open |
 | M32a: Metal packet Sendable closure | Scene packets publish value-semantic copy-on-write vertex/draw snapshots so the display-link reader never receives mutable reusable storage. | Complete locally — strict Swift 6 packet-reuse smoke, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; Metal texture bindings, renderer ownership, and remaining unchecked Sendable classes remain open |
 | M32b: Metal texture upload isolation | Scene packets carry immutable `MetalTextureUpload` bytes while only the display-side renderer owns mutable `MTLTexture` residency and frame-retention state. | Complete locally — strict Swift 6 packet/upload smoke, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; renderer-wide owner-thread isolation and remaining unchecked Sendable classes remain open |
 | M32c: Trace-session owner boundary | Oracle trace file state is explicitly owner-thread-only; the C stream callbacks remain isolated unsafe shims rather than making the mutable session unchecked-sendable. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; callback stress, remaining unchecked Sendable classes, and full trace qualification remain open |

@@ -29,6 +29,7 @@ enum SM64ModernSwiftEngineDomain: String, CaseIterable, Equatable, Hashable, Sen
     case input
     case marioInput
     case marioAction
+    case cameraSelection
     case camera
     case audio
     case rendering
@@ -40,7 +41,8 @@ struct SM64ModernSwiftEngineDomainReadiness: Equatable, Sendable {
 
     static let context = Self(swiftOwned: [
         .lifecycle, .state, .objectScheduler, .progression,
-        .savePersistence, .input, .marioInput, .marioAction
+        .savePersistence, .input, .marioInput, .marioAction,
+        .cameraSelection
     ])
 
     func isSwiftOwned(_ domain: SM64ModernSwiftEngineDomain) -> Bool {

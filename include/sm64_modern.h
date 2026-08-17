@@ -446,6 +446,52 @@ typedef struct SM64ModernGameplayMigrationApiV1 {
     SM64ModernGameplayCandidateTransformFn transform_candidate;
 } SM64ModernGameplayMigrationApiV1;
 
+// Camera selection/angle migration extension.  The full camera geometry and
+// cutscene graph remain an explicit C compatibility bridge; this value-only
+// boundary lets Swift own the selection flags and their side effects without
+// exposing Camera pointers or Lakitu state across the ABI.
+typedef uint32_t SM64ModernCameraCommand;
+
+#define SM64_MODERN_CAMERA_COMMAND_SELECT_ALT_MODE 1u
+#define SM64_MODERN_CAMERA_COMMAND_SET_ANGLE 2u
+
+typedef struct SM64ModernCameraStateV1 {
+    SM64ModernAbiHeader header;
+    SM64ModernCameraCommand command;
+    int32_t argument;
+    uint16_t selection_flags;
+    uint16_t movement_flags;
+    uint16_t sound_flags;
+    uint16_t status_flags;
+    int16_t mode;
+    int16_t default_mode;
+    int16_t last_mode;
+    int16_t new_mode;
+    int32_t transition_frames_left;
+    int16_t transition_max;
+    int16_t transition_frame;
+    int16_t c_up_camera_pitch;
+    int16_t mode_offset_yaw;
+    int16_t lakitu_distance;
+    int16_t lakitu_pitch;
+    int16_t area_yaw_change;
+    float pan_distance;
+    float cannon_y_offset;
+    int32_t result;
+    uint32_t reserved;
+} SM64ModernCameraStateV1;
+
+typedef SM64ModernStatus (*SM64ModernCameraUpdateFn)(
+    void *context,
+    const SM64ModernCameraStateV1 *input,
+    SM64ModernCameraStateV1 *out_state);
+
+typedef struct SM64ModernCameraMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernCameraUpdateFn update;
+} SM64ModernCameraMigrationApiV1;
+
 // Optional gameplay-kernel extension. It is installed separately so the
 // original migration table remains ABI-stable for existing hosts.
 typedef struct SM64ModernMarioGroundSpeedApiV1 {
@@ -830,6 +876,17 @@ SM64ModernStatus sm64_modern_install_mario_ground_speed_api(
     const SM64ModernMarioGroundSpeedApiV1 *api);
 void sm64_modern_uninstall_mario_ground_speed_api(void);
 SM64ModernStatus sm64_modern_mario_ground_speed_status(void);
+SM64ModernStatus sm64_modern_validate_camera_migration_api(
+    const SM64ModernCameraMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_camera_migration_api(
+    const SM64ModernCameraMigrationApiV1 *migration);
+void sm64_modern_uninstall_camera_migration_api(void);
+SM64ModernStatus sm64_modern_camera_migration_status(void);
+SM64ModernStatus sm64_modern_camera_update(
+    const SM64ModernCameraStateV1 *input,
+    SM64ModernCameraStateV1 *out_state);
+SM64ModernStatus sm64_modern_camera_set_authority(uint32_t enabled);
+uint32_t sm64_modern_camera_authority_active(void);
 SM64ModernStatus sm64_modern_validate_progression_migration_api(
     const SM64ModernProgressionMigrationApiV1 *migration);
 SM64ModernStatus sm64_modern_install_progression_migration_api(

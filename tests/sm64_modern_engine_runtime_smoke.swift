@@ -100,6 +100,10 @@ enum SM64ModernEngineRuntimeSmoke {
                 == .swift
         )
         precondition(
+            swiftShell.authorityLedger.owner(of: .cameraSelection)
+                == .swift
+        )
+        precondition(
             swiftShell.authorityLedger.cCompatibilityBridgeDomains
                 == [.audio, .camera, .frontend, .rendering]
         )
@@ -113,6 +117,10 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.input))
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.marioInput))
         precondition(swiftShell.swiftContext.domainReadiness.isSwiftOwned(.marioAction))
+        precondition(
+            swiftShell.swiftContext.domainReadiness.isSwiftOwned(.cameraSelection)
+        )
+        precondition(!swiftShell.swiftContext.domainReadiness.isSwiftOwned(.camera))
         precondition(!swiftShell.swiftContext.domainReadiness.isSwiftOwned(.audio))
         precondition(
             !swiftShell.swiftContext.domainReadiness.cFallbackRequired.contains(

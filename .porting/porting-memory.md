@@ -2,6 +2,20 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31k promotes camera selection/angle transitions to a live Swift-owned seam.
+  `SM64ModernCameraMigrationApiV1` carries fixed-width selection, movement,
+  sound, status, and transition values; C routes `cam_select_alt_mode` and
+  `set_cam_angle` through `SwiftCameraMigrationService`, while geometry,
+  collision, cutscenes, and Lakitu presentation remain an explicit C bridge.
+  `script/test_camera_migration.sh`, `script/test_camera_mode_state.sh`, and
+  `script/test_engine_runtime.sh` pass; native Debug build is
+  `/tmp/sm64-modern-camera-selection-build.log`. A fresh Apple M5 Max launch
+  reports `camera_selection_bridge_installed authority=swift geometry_authority=c`,
+  `swift_camera_selection_update`, Metal frame one, and status-0 shutdown;
+  captured log is `/tmp/sm64-modern-m31k-live.log`.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M31k.md`. Full camera
+  geometry/cutscene parity and physical feel remain open.
+
 - M31j promotes durable save persistence to Swift authority. The progression
   migration flag disables C EEPROM/text-save I/O, Swift recovers all four
   normalized slots and menu backups, and a checked C snapshot writer restores

@@ -29,6 +29,7 @@
 #include "engine/graph_node.h"
 #include "level_table.h"
 #include "pc/configfile.h"
+#include "pc/sm64_modern_camera_migration.h"
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
@@ -3725,6 +3726,36 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
     return finished;
 }
 
+static s32 sm64_modern_camera_dispatch_selection(
+    SM64ModernCameraCommand command, s32 argument, s32 *out_result) {
+    if (!sm64_modern_camera_authority_active() || out_result == NULL) {
+        return FALSE;
+    }
+
+    SM64ModernCameraStateV1 input = { 0 };
+    SM64ModernCameraStateV1 output = { 0 };
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.command = command;
+    input.argument = argument;
+    input.selection_flags = (u16)sSelectionFlags;
+    input.movement_flags = (u16)gCameraMovementFlags;
+    input.sound_flags = (u16)sCameraSoundFlags;
+    input.status_flags = (u16)sStatusFlags;
+
+    if (sm64_modern_camera_update(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return FALSE;
+    }
+
+    sSelectionFlags = (s16)output.selection_flags;
+    gCameraMovementFlags = (s16)output.movement_flags;
+    sCameraSoundFlags = (s16)output.sound_flags;
+    sStatusFlags = (s16)output.status_flags;
+    *out_result = output.result;
+    return TRUE;
+}
+
 /**
  * If `selection` is 0, just get the current selection
  * If `selection` is 1, select 'Mario' as the alt mode.
@@ -3734,6 +3765,12 @@ s32 move_point_along_spline(Vec3f p, struct CutsceneSplinePoint spline[], s16 *s
  */
 s32 cam_select_alt_mode(s32 selection) {
     s32 mode = CAM_SELECTION_FIXED;
+
+    if (sm64_modern_camera_dispatch_selection(
+            SM64_MODERN_CAMERA_COMMAND_SELECT_ALT_MODE,
+            selection, &mode)) {
+        return mode;
+    }
 
     if (selection == CAM_SELECTION_MARIO) {
         if (!(sSelectionFlags & CAM_MODE_MARIO_SELECTED)) {
@@ -3765,6 +3802,11 @@ s32 cam_select_alt_mode(s32 selection) {
  */
 s32 set_cam_angle(s32 mode) {
     s32 curMode = CAM_ANGLE_LAKITU;
+
+    if (sm64_modern_camera_dispatch_selection(
+            SM64_MODERN_CAMERA_COMMAND_SET_ANGLE, mode, &curMode)) {
+        return curMode;
+    }
 
     // Switch to Mario mode
     if (mode == CAM_ANGLE_MARIO && !(sSelectionFlags & CAM_MODE_MARIO_ACTIVE)) {

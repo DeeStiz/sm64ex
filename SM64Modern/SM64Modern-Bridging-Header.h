@@ -3,6 +3,7 @@
 
 #include "sm64_modern.h"
 #include "pc/sm64_modern_progression_migration.h"
+#include "pc/sm64_modern_camera_migration.h"
 #include "pc/sm64_modern_timebase.h"
 #include "AppleAudioService.h"
 #include "MetalCompilerBridge.h"

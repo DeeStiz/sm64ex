@@ -130,6 +130,8 @@ private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     guard let host = engineHost(from: context) else { return }
     assert(host.isCurrentEngineThread)
     host.shutdownAudioOnEngineThread()
+    _ = sm64_modern_camera_set_authority(0)
+    sm64_modern_uninstall_camera_migration_api()
     _ = sm64_modern_progression_set_persistence_authority(0)
     sm64_modern_uninstall_progression_migration_api()
     sm64_modern_uninstall_gameplay_migration_api()
@@ -237,6 +239,7 @@ final class EngineHost {
     private var parityCoordinator: GameplayParityCoordinator?
     private var oracleTraceSession: SM64ModernOracleTraceSession?
     private var progressionMigrationService: SwiftProgressionMigrationService?
+    private var cameraMigrationService: SwiftCameraMigrationService?
     private let gameplayService = SwiftGameplayService()
     private var automaticTerminationRequested = false
     private var inputService: AppleInputService?
@@ -384,6 +387,9 @@ final class EngineHost {
 
         let initializeStatus = runtime.initialize()
         guard initializeStatus == SM64_MODERN_STATUS_OK else {
+            _ = sm64_modern_camera_set_authority(0)
+            sm64_modern_uninstall_camera_migration_api()
+            cameraMigrationService = nil
             _ = sm64_modern_progression_set_persistence_authority(0)
             sm64_modern_uninstall_progression_migration_api()
             progressionMigrationService = nil
@@ -419,6 +425,7 @@ final class EngineHost {
         let oracleTraceStatus = oracleTraceSession?.end() ?? SM64_MODERN_STATUS_OK
         oracleTraceSession = nil
         let shutdownStatus = runtime.shutdown()
+        cameraMigrationService = nil
         progressionMigrationService = nil
         engineRuntime = nil
         let executionStatus = engineRunStatus != SM64_MODERN_STATUS_OK
@@ -874,6 +881,30 @@ final class EngineHost {
                 engineLogger.notice(
                     "progression_bridge_installed abi=1 authority=swift persistence_authority=swift"
                 )
+
+                let cameraService = SwiftCameraMigrationService(
+                    ownerThreadToken: engineThreadIdentifier
+                )
+                var cameraMigration = cameraService.makeAPI()
+                status = sm64_modern_install_camera_migration_api(
+                    &cameraMigration
+                )
+                guard status == SM64_MODERN_STATUS_OK else {
+                    _ = sm64_modern_progression_set_persistence_authority(0)
+                    sm64_modern_uninstall_progression_migration_api()
+                    return status
+                }
+                status = sm64_modern_camera_set_authority(1)
+                guard status == SM64_MODERN_STATUS_OK else {
+                    sm64_modern_uninstall_camera_migration_api()
+                    _ = sm64_modern_progression_set_persistence_authority(0)
+                    sm64_modern_uninstall_progression_migration_api()
+                    return status
+                }
+                cameraMigrationService = cameraService
+                engineLogger.notice(
+                    "camera_selection_bridge_installed abi=1 authority=swift geometry_authority=c"
+                )
             } catch {
                 engineLogger.error(
                     "progression_bridge_initialize_failed error=\(error.localizedDescription, privacy: .public)"
@@ -883,6 +914,9 @@ final class EngineHost {
         }
         status = self.lifecycle.initialize(&config, &platform)
         guard status == SM64_MODERN_STATUS_OK else {
+            _ = sm64_modern_camera_set_authority(0)
+            sm64_modern_uninstall_camera_migration_api()
+            cameraMigrationService = nil
             _ = sm64_modern_progression_set_persistence_authority(0)
             sm64_modern_uninstall_progression_migration_api()
             progressionMigrationService = nil
