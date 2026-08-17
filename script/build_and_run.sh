@@ -46,6 +46,7 @@ else
   "$PROJECT_ROOT/script/test_hud.sh"
   "$PROJECT_ROOT/script/test_hud_render.sh"
   "$PROJECT_ROOT/script/test_dialog.sh"
+  "$PROJECT_ROOT/script/test_dialog_text_pause.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"

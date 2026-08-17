@@ -117,6 +117,7 @@
 		6F0CEB028BA8FC9031A4859C /* CameraCutscene.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F9BA67FD54486573E891D8 /* CameraCutscene.swift */; };
 		71832214A0EA82FFBAE64390 /* BobombEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F74F1DC90A46BBEF7D28FE /* BobombEnemy.swift */; };
 		719A899A4EB08E524438CFD3 /* KingBobombBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */; };
+		724CA1435F965914653FECE7 /* PauseMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A415C177E19A84E04B63454 /* PauseMenu.swift */; };
 		74F6B3961402E9A06DBC362B /* MarioWhirlpoolAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E9E5A575E124235D4817C6 /* MarioWhirlpoolAction.swift */; };
 		77C353336E88DAB6B5B3896D /* TTCPendulumBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */; };
 		794F70AFB48B7D7AA1B13D15 /* TuxiesMotherEyes.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80D7D687104873CF663B8AB /* TuxiesMotherEyes.swift */; };
@@ -217,6 +218,7 @@
 		DAE9A21ADCE7B60394E1D895 /* MarioActionCancels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A1F5D72FD64CF1FB014B1A3 /* MarioActionCancels.swift */; };
 		DB2976A6BB2F41F5D1FDB4DC /* PokeyObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58043E5D4DBD9B65144510A3 /* PokeyObjectBridge.swift */; };
 		DB37B41587BCB81D4335C95C /* SnufitObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64D278BDD2C95F399F543A0B /* SnufitObjectBridge.swift */; };
+		DBB35347BCD2DEDD18237821 /* DialogText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4620FA3702294FE08475ABC /* DialogText.swift */; };
 		DD3A03E522F13B396092C761 /* ArrowLiftBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */; };
 		E00BF690CC0240E3397ECB1A /* MarioInputCore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0C50416E3A3BDC9F17816FA9 /* MarioInputCore.swift */; };
 		E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */; };
@@ -338,6 +340,7 @@
 		595FCD866921E9B396C8E841 /* MarioMovePunchAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioMovePunchAction.swift; sourceTree = "<group>"; };
 		596D8EF20F09C73B0AFC37D3 /* RacingPenguinBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RacingPenguinBehavior.swift; sourceTree = "<group>"; };
 		59C730F1F018835E69DE47B1 /* MarioBurningLavaAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioBurningLavaAction.swift; sourceTree = "<group>"; };
+		5A415C177E19A84E04B63454 /* PauseMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseMenu.swift; sourceTree = "<group>"; };
 		5C737B1A16857D51F7C7FE7A /* EngineHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineHost.swift; sourceTree = "<group>"; };
 		5D39626AC1CF73EA2D9419E7 /* PokeyEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokeyEnemy.swift; sourceTree = "<group>"; };
 		5DC36B2F482052DC82E04839 /* MarioHeldWalkingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioHeldWalkingAction.swift; sourceTree = "<group>"; };
@@ -483,6 +486,7 @@
 		F28F9F86BA8486D9F6BB005C /* RotatingPlatformBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RotatingPlatformBehavior.swift; sourceTree = "<group>"; };
 		F2EACF5C30D1F0023F354876 /* BowserShockWave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserShockWave.swift; sourceTree = "<group>"; };
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
+		F4620FA3702294FE08475ABC /* DialogText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogText.swift; sourceTree = "<group>"; };
 		F5BB9631CE7A07A55B9BDBCF /* MarioCommonAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCommonAirAction.swift; sourceTree = "<group>"; };
 		F767E8095D423258E7165E3E /* BigBooCollision.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigBooCollision.swift; sourceTree = "<group>"; };
 		F804D686AFFB6AA968F51DEE /* TTCMovingBarBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TTCMovingBarBehavior.swift; sourceTree = "<group>"; };
@@ -567,6 +571,7 @@
 				6934670448BD38B14CBF7984 /* DecorativePendulumObjectBridge.swift */,
 				3B2B104890A44531EA2C1009 /* DeterministicPrimitives.swift */,
 				50D6FA91D973EDFF7DFF2BD0 /* Dialog.swift */,
+				F4620FA3702294FE08475ABC /* DialogText.swift */,
 				E37C0994C353B61075C5EBCA /* ElevatorBehavior.swift */,
 				49737667D24AE6AEA3374B3E /* EnemyLakitu.swift */,
 				994D08C3E7FCF937245A9757 /* EnemyLakituObjectBridge.swift */,
@@ -675,6 +680,7 @@
 				399C03F347FC9A4D23DFECFD /* OracleTrace.swift */,
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
 				0CB115FFD181E778F9AFE67C /* OwnerThreadEffectRouter.swift */,
+				5A415C177E19A84E04B63454 /* PauseMenu.swift */,
 				375EBE2D9BBFCAD8B34FDF89 /* PiranhaPlant.swift */,
 				E3353EA4B05B2088E0941DEB /* PiranhaPlantObjectBridge.swift */,
 				6E37008029F2850C83A1AFF0 /* PlatformCollisionRegistry.swift */,
@@ -908,6 +914,7 @@
 				5EAF59788FCB85F5A7706347 /* DecorativePendulumObjectBridge.swift in Sources */,
 				11833E1637F8649E7554B9F6 /* DeterministicPrimitives.swift in Sources */,
 				5A32DB1215CB1BD2E96DC2A3 /* Dialog.swift in Sources */,
+				DBB35347BCD2DEDD18237821 /* DialogText.swift in Sources */,
 				205E67C2EEF8113A521111E0 /* ElevatorBehavior.swift in Sources */,
 				BFAC85948508CFC15B564EFE /* EnemyLakitu.swift in Sources */,
 				03FAB70D01EC36C629B7ACEE /* EnemyLakituObjectBridge.swift in Sources */,
@@ -1015,6 +1022,7 @@
 				1519A09FAAD5FD3AB30A5F20 /* OracleTrace.swift in Sources */,
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
 				696004D36164301F6C01B251 /* OwnerThreadEffectRouter.swift in Sources */,
+				724CA1435F965914653FECE7 /* PauseMenu.swift in Sources */,
 				B966D97864B94F9E3BD0EA18 /* PiranhaPlant.swift in Sources */,
 				8F0287C04E3BF3452E17B97B /* PiranhaPlantObjectBridge.swift in Sources */,
 				9EA44DFDFF3DBB57B23876D0 /* PlatformCollisionRegistry.swift in Sources */,

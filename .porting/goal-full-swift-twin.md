@@ -2,7 +2,7 @@
 
 ## Status
 
-M25c is the latest validated HUD/dialog value slice layered on M25b/M25a/M24d/M23j/M34a/M33f/M22bc;
+M25d is the latest validated HUD/dialog/menu value slice layered on M25c/M25b/M25a/M24d/M23j/M34a/M33f/M22bc;
 the durable replay record now carries every mutation operand needed for a
 standalone fresh-image replay—flags, course/star, cap, sound, source slot, and
 recovery decisions—plus canonical per-record/header/artifact hashes. A fresh
@@ -83,9 +83,17 @@ visual/human acceptance is claimed yet. M25c adds a pure Swift dialog timing
 reducer with fixed-point opening/closing timers, vertical/page-scroll/closing
 states, response timing, sound/effect edges, and the legacy 60/30 freeze. The
 dialog fingerprint is `0x5d46e906eaa06b12`; focused native verification is in
-`/tmp/sm64-modern-m25c-verify.log`. Pause-menu ownership, camera glyphs,
-dialog text layout, live HUD owner wiring, Metal draw integration,
-screenshots, and visual/human acceptance remain open. M34a remains the latest
+`/tmp/sm64-modern-m25c-verify.log`. M25d now adds a pure Swift US dialog
+byte-stream layout packet (page boundaries, cursor spacing, `the`/`you`,
+star-count expansion, and visible-line clipping) and a pause/menu value
+reducer (course-vs-castle screen, selection, camera mode, alpha fade,
+resume/exit outcomes, and legacy-domain freeze). Its independent Swift/C
+fingerprint is `0x382a78484379f6f7`; the regenerated native Debug build and
+Metal 4/frame-one/clean-status launch proof are in
+`/tmp/sm64-modern-m25d-verify.log`. The complete 220-script matrix is in
+`/tmp/sm64-modern-m25d-matrix-summary.log` once the run completes. Dialog
+locale metrics, live HUD owner wiring, Metal draw integration, screenshots,
+and visual/human acceptance remain open. M34a remains the latest
 Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -1919,10 +1927,11 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M24b: Owner-thread configuration runtime and fresh-save recovery | The Swift schema loads before lifecycle start, atomically persists repaired legacy values, reports unknown/malformed input, projects fullscreen/skip-intro into the C lifecycle seam, and seeds progression from the durable Swift image so a zeroed pre-lifecycle C buffer cannot corrupt menu-age parity. | Complete locally — runtime fingerprint `0x1b0a9226b4babc19`; focused runtime/replay contracts, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24b-verify-fixed.log`), empty-save launch status 0, invalid-config repair launch status 0, complete 215-script matrix (`runs=215 failures=0`), strict-concurrency audit, and `git diff --check`; M24c carries optional settings and authority persistence |
 | M24c: Lossless optional configuration and restart authority | A Swift sidecar preserves camera/HUD/Discord/language/legal-ROM/cheat values across C's legacy config rewrite, legacy values remain primary, and injected UserDefaults resolution proves persisted authority selection, restart comparison, and invalid-value recovery without mutating global defaults. | Complete locally — runtime fingerprint `0x1b0a9226b4babc19`; sidecar/C-rewrite regression, authority smoke, regenerated native Debug build (`/tmp/sm64-modern-m24c-build.log`, `BUILD SUCCEEDED`), complete 215-script matrix (`runs=215 failures=0`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24c-verify.log`), strict-concurrency audit, and `git diff --check`; live cheat consumers and runtime Swift authority remain |
 | M24d: Swift cheat state and live responsive consumer | The owner thread applies all nine parsed flags through a versioned C compatibility ABI, Swift policy mirrors legacy enable/disable and responsive movement behavior, invalid flag values fail closed, and focused Swift/C evidence is retained. | Complete locally — policy fingerprint `0x0dab67376d3daab8d`; `script/test_cheats.sh` covers Swift/C policy plus ABI application, regenerated native Debug build (`/tmp/sm64-modern-m24d-build.log`, `BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m24d-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 216-script matrix (`matrix_logs=216`, no failure markers), zero unchecked-Sendable audit, and `git diff --check`; remaining per-consumer toggles, live menu persistence/readback, and full configuration authority remain |
-| M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | In progress — M25a value state, M25b immutable render packet, and M25c dialog timing are complete; owner-thread HUD wiring, text/camera/pause/menu state, Metal integration, and visual parity remain |
+| M25: HUD and dialogs | HUD, power meter, in-game menus, dialogs, text layout, pause state, and timing match C. | In progress — M25a value state, M25b immutable render packet, M25c dialog timing, and M25d US text/pause value packets are complete; locale metrics, owner-thread HUD wiring, Metal integration, and visual parity remain |
 | M25a: HUD value projection and power-meter state | `SM64HUDProjection` and `SM64PowerMeterState` mirror the C display gates, 30 Hz timer math, flash suppression, health wedges, swimming emphasis, and legacy power-meter transition order as pure Swift values. | Complete locally — Swift/C fingerprint `0x1d0a1956d7a8121e`; `script/test_hud.sh`, regenerated native Debug build (`/tmp/sm64-modern-m25a-build.log`, `BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25a-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 217-script matrix (`runs=217 failures=0`), strict-concurrency audit, and `git diff --check`; no rendered HUD, text packet, dialog, pause/menu, or human visual acceptance yet |
 | M25b: HUD glyph/text and power-meter render packet | `SM64HUDRenderPacket` mirrors C logical layout, aspect-aware edge placement, glyph IDs/advances, timer punctuation, counter order, and power-meter base/health rectangles as immutable Swift values ready for an owner-thread renderer. | Complete locally — Swift/C fingerprint `0xc086889d07474862`; `script/test_hud_render.sh`, regenerated native Debug build (`BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25b-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 218-script matrix (`/tmp/sm64-modern-m25b-matrix-summary.log`, `runs=218 failures=0`), strict-concurrency audit, and `git diff --check`; live Metal draw integration remains |
 | M25c: Swift dialog timing and page-scroll state | `SM64DialogState` mirrors C dialog creation/reset, fixed-point rotate/zoom opening, vertical/page-scroll/closing transitions, response timing/effect edges, and legacy-domain freeze without sharing C globals. | Complete locally — Swift/C fingerprint `0x5d46e906eaa06b12`; `script/test_dialog.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25c-verify.log`) reach Metal 4/frame-one/clean status 0, complete 219-script matrix (`/tmp/sm64-modern-m25c-matrix-summary.log`, `runs=219 failures=0`), strict-concurrency audit, and `git diff --check`; pause-menu ownership, dialog text/layout, camera glyphs, live HUD wiring, and visual parity remain |
+| M25d: Swift dialog text layout and pause/camera values | `SM64DialogTextLayout` mirrors the US dialog byte stream's page stopping, logical cursor spacing, multi-text expansion, star-count expansion, and visible-line clipping; `SM64PauseMenuModel` mirrors pause opening, course/castle branch, selection/camera changes, alpha fade, resume/exit outcomes, and legacy-domain freeze. | Complete locally — Swift/C fingerprint `0x382a78484379f6f7`; `script/test_dialog_text_pause.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25d-verify.log`) reach Metal 4/frame-one/clean status 0; complete 220-script matrix (`/tmp/sm64-modern-m25d-matrix-summary.log`, `runs=220 failures=0`), strict-concurrency audit, and `git diff --check`; locale-specific metrics, live owner integration, Metal draw integration, and visual parity remain |
 | M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | Not started |
 | M27: Audio sequencing/loading | Swift audio heap, banks, sequences, channels, layers, note allocation, and loading match pre-synthesis C traces. | Not started |
 | M28: Audio synthesis/effects | Swift synthesis, envelopes, resampling, reverb, mixing, music, and effects match 32-kHz PCM bit-for-bit. | Not started |
@@ -2291,8 +2300,10 @@ replayable trace, and the platform evidence listed in its exit gate.
    cadence as a Swift/C contract. M25b adds immutable glyph/text and power-meter
    render packets with C logical coordinates and aspect-aware placement. M25c
    adds the fixed-point dialog/page-scroll timing reducer and effect edges.
-   Then wire those packets to the owner-thread Metal 4 renderer and port camera
-   glyphs, cap icons, pause menu, dialog text/layout, timers, fade state, and
+   M25d adds the US dialog byte-stream layout packet and pause/camera value
+   reducer. Then wire those packets to the owner-thread Metal 4 renderer and
+   port locale metrics, camera glyphs, cap icons, pause menu, dialog text,
+   timers, fade state, and
    HUD camera status. Compare fixed-width layout/render packets and dialog
    timing, not only strings.
 4. **M26 front end.** Port title, file select, course select, demos, loading,
