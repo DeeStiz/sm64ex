@@ -91,8 +91,16 @@ resume/exit outcomes, and legacy-domain freeze). Its independent Swift/C
 fingerprint is `0x382a78484379f6f7`; the regenerated native Debug build and
 Metal 4/frame-one/clean-status launch proof are in
 `/tmp/sm64-modern-m25d-verify.log`. The complete 220-script matrix is in
-`/tmp/sm64-modern-m25d-matrix-summary.log` once the run completes. Dialog
+`/tmp/sm64-modern-m25d-matrix-summary.log` (`runs=220 failures=0`). Dialog
 locale metrics, live HUD owner wiring, Metal draw integration, screenshots,
+and visual/human acceptance remain open. M26a now adds a pure Swift front-end
+state reducer: title zoom/fade cadence, press-start idle demo admission,
+file/course/level selection wrapping, demo return, credits/ending transitions,
+and the 60/30 legacy freeze. Its independent Swift/C fingerprint is
+`0x82b90492a9f11a54`; the regenerated native Debug build and Metal 4/frame-one
+launch proof are in `/tmp/sm64-modern-m26-verify.log`. The complete 221-script
+matrix is in `/tmp/sm64-modern-m26-matrix-summary.log` once the run completes.
+Live screen rendering, ROM text/texture residency, audio, controller feel,
 and visual/human acceptance remain open. M34a remains the latest
 Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
@@ -1932,7 +1940,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M25b: HUD glyph/text and power-meter render packet | `SM64HUDRenderPacket` mirrors C logical layout, aspect-aware edge placement, glyph IDs/advances, timer punctuation, counter order, and power-meter base/health rectangles as immutable Swift values ready for an owner-thread renderer. | Complete locally — Swift/C fingerprint `0xc086889d07474862`; `script/test_hud_render.sh`, regenerated native Debug build (`BUILD SUCCEEDED`), `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25b-verify.log`) reaches Metal 4/frame-one/clean status 0, complete 218-script matrix (`/tmp/sm64-modern-m25b-matrix-summary.log`, `runs=218 failures=0`), strict-concurrency audit, and `git diff --check`; live Metal draw integration remains |
 | M25c: Swift dialog timing and page-scroll state | `SM64DialogState` mirrors C dialog creation/reset, fixed-point rotate/zoom opening, vertical/page-scroll/closing transitions, response timing/effect edges, and legacy-domain freeze without sharing C globals. | Complete locally — Swift/C fingerprint `0x5d46e906eaa06b12`; `script/test_dialog.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25c-verify.log`) reach Metal 4/frame-one/clean status 0, complete 219-script matrix (`/tmp/sm64-modern-m25c-matrix-summary.log`, `runs=219 failures=0`), strict-concurrency audit, and `git diff --check`; pause-menu ownership, dialog text/layout, camera glyphs, live HUD wiring, and visual parity remain |
 | M25d: Swift dialog text layout and pause/camera values | `SM64DialogTextLayout` mirrors the US dialog byte stream's page stopping, logical cursor spacing, multi-text expansion, star-count expansion, and visible-line clipping; `SM64PauseMenuModel` mirrors pause opening, course/castle branch, selection/camera changes, alpha fade, resume/exit outcomes, and legacy-domain freeze. | Complete locally — Swift/C fingerprint `0x382a78484379f6f7`; `script/test_dialog_text_pause.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m25d-verify.log`) reach Metal 4/frame-one/clean status 0; complete 220-script matrix (`/tmp/sm64-modern-m25d-matrix-summary.log`, `runs=220 failures=0`), strict-concurrency audit, and `git diff --check`; locale-specific metrics, live owner integration, Metal draw integration, and visual parity remain |
-| M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | Not started |
+| M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | In progress — M26a value reducer covers title/demo cadence, file/course/level selection, and credits/ending transitions; live screen/asset/input wiring remains |
+| M26a: Swift front-end state and transition reducer | `SM64FrontEndModel`, `SM64IntroPresentationState`, `SM64PressStartDemoState`, and `SM64LevelSelectState` mirror title zoom/fade counters, the 800-tick idle demo trigger, selection wrapping, screen transitions, and legacy-domain freeze as immutable Swift values. | Complete locally — Swift/C fingerprint `0x82b90492a9f11a54`; `script/test_front_end.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m26-verify.log`) reach Metal 4/frame-one/clean status 0; complete 221-script matrix (`/tmp/sm64-modern-m26-matrix-summary.log`, `runs=221 failures=0`), strict-concurrency audit, and `git diff --check`; live rendering, ROM assets, audio, and human input/visual acceptance remain |
 | M27: Audio sequencing/loading | Swift audio heap, banks, sequences, channels, layers, note allocation, and loading match pre-synthesis C traces. | Not started |
 | M28: Audio synthesis/effects | Swift synthesis, envelopes, resampling, reverb, mixing, music, and effects match 32-kHz PCM bit-for-bit. | Not started |
 | M29: Display-list translation | Swift produces immutable Metal scene packets identical to the C renderer bridge for every reachable command/state. | Not started |
@@ -2306,10 +2315,12 @@ replayable trace, and the platform evidence listed in its exit gate.
    timers, fade state, and
    HUD camera status. Compare fixed-width layout/render packets and dialog
    timing, not only strings.
-4. **M26 front end.** Port title, file select, course select, demos, loading,
-   credits, ending, pause, and all transition/fade paths. Each screen must
-   boot, accept input, persist choices, and shut down without a C engine
-   callback.
+4. **M26 front end.** M26a first ports title zoom/fade values, the 800-tick
+   press-start demo admission, file/course/level selection wrapping, and
+   credits/ending return transitions as a Swift/C reducer. Next port title,
+   file-select, course-select, demos, loading, credits, ending, pause, and all
+   transition/fade render paths. Each screen must boot, accept input, persist
+   choices, and shut down without a C engine callback.
 5. **M27 audio sequencing/loading.** Port banks, sequence tables, heaps,
    channels, layers, note allocation, instrument lookup, sequence timing,
    streaming, and load/unload boundaries. Compare pre-synthesis event traces
