@@ -36,6 +36,10 @@ domains are already Swift implementations.
 - The complete gated native verifier passes with `verify_exit=0`; log:
   `/tmp/sm64-modern-m31h-full-verify-2.log`. It reaches the Apple M5 Max
   Metal 4 device, presents frames, drains audio/Metal, and exits status 0.
+- The live Swift run emits `ledger_partitioned=true` with
+  `swift_owned=input,marioAction,marioInput,objectScheduler,progression,state`
+  and `c_bridge=audio,camera,frontend,rendering,savePersistence` before the
+  normal lifecycle telemetry.
 - `git diff --check` passes before commit.
 
 ## Evidence boundary
