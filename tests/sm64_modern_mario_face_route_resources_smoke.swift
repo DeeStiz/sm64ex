@@ -40,6 +40,7 @@ struct SM64ModernMarioFaceRouteResourcesSmoke {
 
         var metadataRecords: [SM64OracleTraceRecord] = []
         var dynamicRecords: [SM64OracleTraceRecord] = []
+        var liveCRecords: [SM64OracleTraceRecord] = []
         var dynamicPacketFingerprint = SM64MarioFaceRouteResourceFingerprint.offset
         for route in routes {
             let camera = SM64MarioFaceRouteResourceCatalog.camera(for: route)
@@ -55,6 +56,11 @@ struct SM64ModernMarioFaceRouteResourcesSmoke {
             let metadataRoundTrip = try routeMetadata.map { try SM64OracleTraceRecord.decode($0.encoded()) }
             precondition(metadataRoundTrip == routeMetadata)
             metadataRecords.append(contentsOf: routeMetadata)
+            liveCRecords.append(try SM64MarioFaceRouteRenderOracle.liveCRecord(
+                route: route,
+                simulationTick: 500 + UInt64(route.routeID.rawValue),
+                sequence: route.routeID.rawValue
+            ))
 
             guard let packet = SM64MarioFaceRouteRenderPacketBuilder.make(
                 routeID: route.routeID, face: face
@@ -73,6 +79,7 @@ struct SM64ModernMarioFaceRouteResourcesSmoke {
 
         let metadataFingerprint = SM64MarioFaceRouteRenderOracle.fingerprint(metadataRecords)
         let dynamicFingerprint = SM64MarioFaceRouteRenderOracle.fingerprint(dynamicRecords)
+        let liveCRecordFingerprint = SM64MarioFaceRouteRenderOracle.fingerprint(liveCRecords)
         print(String(format: "marioFaceRouteResourceFingerprint=0x%016llx", SM64MarioFaceRouteResourceFingerprint.catalog()))
         print("marioFaceRouteCount=\(routes.count)")
         print("marioFaceRouteTextureCount=\(textures.count)")
@@ -80,6 +87,8 @@ struct SM64ModernMarioFaceRouteResourcesSmoke {
         print("marioFaceRouteCameraRecords=\(routes.count)")
         print("marioFaceRouteMetadataRecords=\(metadataRecords.count)")
         print(String(format: "marioFaceRouteMetadataFingerprint=0x%016llx", metadataFingerprint))
+        print("marioFaceRouteLiveRecordCount=\(liveCRecords.count)")
+        print(String(format: "marioFaceRouteLiveRecordFingerprint=0x%016llx", liveCRecordFingerprint))
         print(String(format: "marioFaceRouteDynamicPacketFingerprint=0x%016llx", dynamicPacketFingerprint))
         print(String(format: "marioFaceRouteDynamicFingerprint=0x%016llx", dynamicFingerprint))
         print("marioFaceRouteDynamicPackets=\(routes.count)")

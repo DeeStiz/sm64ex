@@ -1331,7 +1331,7 @@ void sm64_modern_parity_record_render_packet(uint32_t event_id,
         return;
     }
     if (event_id < SM64_MODERN_ORACLE_RENDER_EVENT_DRAW
-        || event_id > SM64_MODERN_ORACLE_RENDER_EVENT_FINISH
+        || event_id > SM64_MODERN_ORACLE_RENDER_EVENT_MARIO_FACE_ROUTE
         || value_count > SM64_MODERN_ORACLE_TRACE_VALUE_CAPACITY
         || (value_count > 0u && !values)) {
         if (sStatus == SM64_MODERN_STATUS_OK) {
@@ -1357,6 +1357,23 @@ void sm64_modern_parity_record_render_packet(uint32_t event_id,
     if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
         sStatus = status;
     }
+}
+
+void sm64_modern_parity_record_mario_face_route(uint32_t route_id) {
+    static const uint32_t update_domains[6] = { 1u, 1u, 2u, 2u, 3u, 3u };
+    static const uint32_t policy_flags[6] = { 4u, 0u, 7u, 7u, 4u, 0u };
+    if (route_id >= 6u) {
+        if (sStatus == SM64_MODERN_STATUS_OK) {
+            sStatus = SM64_MODERN_STATUS_INVALID_ARGUMENT;
+        }
+        return;
+    }
+    const uint64_t values[7] = {
+        route_id, route_id, update_domains[route_id], policy_flags[route_id],
+        320u, 240u, 2u,
+    };
+    sm64_modern_parity_record_render_packet(
+        SM64_MODERN_ORACLE_RENDER_EVENT_MARIO_FACE_ROUTE, values, 7);
 }
 
 void sm64_modern_parity_enter_subsystem(SM64ModernGameplaySubsystem subsystem) {

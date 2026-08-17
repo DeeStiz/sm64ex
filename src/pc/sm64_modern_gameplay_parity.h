@@ -65,9 +65,11 @@ void sm64_modern_parity_record_audio_sequence(uint32_t event_id,
 #define SM64_MODERN_ORACLE_RENDER_EVENT_FRAME_BEGIN 2u
 #define SM64_MODERN_ORACLE_RENDER_EVENT_FRAME_END 3u
 #define SM64_MODERN_ORACLE_RENDER_EVENT_FINISH 4u
+#define SM64_MODERN_ORACLE_RENDER_EVENT_MARIO_FACE_ROUTE 5u
 void sm64_modern_parity_record_render_packet(uint32_t event_id,
                                              const uint64_t *values,
                                              uint32_t value_count);
+void sm64_modern_parity_record_mario_face_route(uint32_t route_id);
 u32 sm64_modern_parity_audio_frame_count(u32 high_count, u32 default_count);
 void sm64_modern_parity_enter_subsystem(SM64ModernGameplaySubsystem subsystem);
 void sm64_modern_parity_enter_object_update(const struct Object *object);

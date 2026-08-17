@@ -246,9 +246,24 @@ static uint64_t metadata_fingerprint(uint64_t resources) {
     return canonical;
 }
 
+static uint64_t live_record_fingerprint(void) {
+    uint64_t aggregate = FNV_OFFSET;
+    aggregate = hash_u64(aggregate, sizeof(routes) / sizeof(routes[0]));
+    for (size_t index = 0; index < sizeof(routes) / sizeof(routes[0]); ++index) {
+        const struct route *route = &routes[index];
+        const uint64_t values[] = {
+            route->id, route->dl, route->update, route->flags, 320, 240, 2,
+        };
+        aggregate = hash_u64(aggregate, record_hash(
+            500 + route->id, 0, UINT64_C(5), route->id, values, 7));
+    }
+    return aggregate;
+}
+
 int main(void) {
     const uint64_t resources = catalog_fingerprint();
     const uint64_t metadata = metadata_fingerprint(resources);
+    const uint64_t live = live_record_fingerprint();
     size_t route_texture_records = 0;
     for (size_t index = 0; index < sizeof(routes) / sizeof(routes[0]); ++index) {
         route_texture_records += routes[index].texture_count;
@@ -260,6 +275,8 @@ int main(void) {
     printf("marioFaceRouteCameraRecords=%zu\n", sizeof(routes) / sizeof(routes[0]));
     printf("marioFaceRouteMetadataRecords=%zu\n", route_texture_records + 2 * sizeof(routes) / sizeof(routes[0]));
     printf("marioFaceRouteMetadataFingerprint=0x%016llx\n", (unsigned long long) metadata);
+    printf("marioFaceRouteLiveRecordCount=%zu\n", sizeof(routes) / sizeof(routes[0]));
+    printf("marioFaceRouteLiveRecordFingerprint=0x%016llx\n", (unsigned long long) live);
     printf("SM64 Modern Mario-face route/resource C contract passed\n");
     return 0;
 }

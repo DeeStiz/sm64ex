@@ -76,6 +76,7 @@ else
   "$PROJECT_ROOT/script/test_mario_face_expression_composition.sh"
   "$PROJECT_ROOT/script/test_mario_face_render_packet.sh"
   "$PROJECT_ROOT/script/test_mario_face_route_resources.sh"
+  "$PROJECT_ROOT/script/test_live_route_oracle.sh" full
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"

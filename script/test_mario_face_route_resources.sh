@@ -49,7 +49,9 @@ for LABEL in \
   marioFaceRouteTextureRecords \
   marioFaceRouteCameraRecords \
   marioFaceRouteMetadataRecords \
-  marioFaceRouteMetadataFingerprint; do
+  marioFaceRouteMetadataFingerprint \
+  marioFaceRouteLiveRecordCount \
+  marioFaceRouteLiveRecordFingerprint; do
   C_VALUE="$(printf '%s\n' "$C_OUTPUT" | sed -n "s/^${LABEL}=//p")"
   SWIFT_VALUE="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n "s/^${LABEL}=//p")"
   [[ -n "$C_VALUE" && "$C_VALUE" == "$SWIFT_VALUE" ]] || {

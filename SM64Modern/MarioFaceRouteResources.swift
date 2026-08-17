@@ -403,6 +403,11 @@ enum SM64MarioFaceRouteRenderPacketBuilder {
 enum SM64MarioFaceRouteRenderOracle {
     static let domain: UInt32 = SM64RenderOracleTraceAdapter.domain
     static let recordKind: UInt32 = SM64RenderOracleTraceAdapter.recordKind
+    /// C's `sm64_modern_parity_record_mario_face_route` uses the render
+    /// inventory event ID below. Its values deliberately stay at the copied
+    /// route/camera boundary; texture/resource fingerprints remain separate
+    /// records so this hook never receives a pointer or a Metal handle.
+    static let liveCEventID: UInt64 = 5
     static let routeRecordBase: UInt64 = 0x4D46_5200
     static let cameraRecordBase: UInt64 = 0x4D46_5300
     static let textureRecordBase: UInt64 = 0x4D46_5400
@@ -490,6 +495,26 @@ enum SM64MarioFaceRouteRenderOracle {
             ]
         ))
         return records
+    }
+
+    static func liveCRecord(
+        route: SM64MarioFaceRouteRecord,
+        simulationTick: UInt64,
+        sequence: UInt32
+    ) throws -> SM64OracleTraceRecord {
+        try SM64OracleTraceRecord(
+            simulationTick: simulationTick,
+            domain: domain,
+            recordKind: recordKind,
+            subjectID: 0,
+            recordID: liveCEventID,
+            sequence: sequence,
+            values: [
+                UInt64(route.routeID.rawValue), UInt64(route.displayListID),
+                UInt64(route.updateDomain.rawValue), UInt64(route.policyFlags),
+                320, 240, 2,
+            ]
+        )
     }
 
     static func fingerprint(_ records: [SM64OracleTraceRecord]) -> UInt64 {

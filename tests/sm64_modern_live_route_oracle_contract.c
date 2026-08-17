@@ -57,14 +57,14 @@ static int load_trace(const char *path, struct FileTrace *trace, uint32_t expect
 }
 
 static SM64ModernStatus emit_live_route_record(uint32_t index, int tamper) {
-    static const uint32_t domains[] = { 1u, 1u, 1u, 2u, 2u, 10u, 3u };
-    static const uint32_t kinds[] = { 2u, 2u, 2u, 2u, 3u, 3u, 1u };
+    static const uint32_t domains[] = { 1u, 1u, 1u, 2u, 2u, 10u, 3u, 11u };
+    static const uint32_t kinds[] = { 2u, 2u, 2u, 2u, 3u, 3u, 1u, 7u };
     static const uint64_t record_ids[] = {
         UINT64_C(0x31000001), UINT64_C(0x31000001), UINT64_C(0x31000001),
         UINT64_C(0x32000001), UINT64_C(0x33000001), UINT64_C(0x17000002),
-        UINT64_C(0x31000002),
+        UINT64_C(0x31000002), UINT64_C(5),
     };
-    static const uint32_t value_counts[] = { 8u, 8u, 8u, 5u, 7u, 8u, 3u };
+    static const uint32_t value_counts[] = { 8u, 8u, 8u, 5u, 7u, 8u, 3u, 7u };
     static const uint64_t values[][8] = {
         { 1u, 0u, UINT64_C(0x41200000), 0u, 0x10u, 0u, 0u, 0u },
         { 1u, 1u, UINT64_C(0x41200000), 0u, 0x10u, 0u, 0u, 0u },
@@ -73,12 +73,20 @@ static SM64ModernStatus emit_live_route_record(uint32_t index, int tamper) {
         { UINT64_C(0x3000880), 0u, UINT64_C(0x3000880), 0u, 0u, 0u, 0u, 0u },
         { 2u, 1u, 0u, 1u, 0u, 0u, 0u, 0u },
         { 1u, 1u, 2u, 0u, 0u, 0u, 0u, 0u },
+        { 2u, 2u, 2u, 7u, 320u, 240u, 2u, 0u },
     };
     uint64_t actual[8];
     memcpy(actual, values[index], sizeof(actual));
     if (tamper && index == 3u) actual[0]++;
 
     sm64_modern_oracle_trace_begin_tick();
+    if (index == 7u) {
+        const SM64ModernStatus status = sm64_modern_oracle_trace_record(
+            domains[index], kinds[index], 0, record_ids[index], 0,
+            actual, value_counts[index]);
+        sm64_modern_oracle_trace_end_tick();
+        return status;
+    }
     const SM64ModernStatus status = sm64_modern_oracle_trace_record(
         domains[index], kinds[index], 0, record_ids[index],
         index == 5u ? UINT32_C(67174529) : 0u,
@@ -146,9 +154,9 @@ int main(int argc, char **argv) {
     }
     struct FileTrace trace;
     memset(&trace, 0, sizeof(trace));
-    if (!load_trace(argv[1], &trace, input_only ? 1u : 7u)) {
+    if (!load_trace(argv[1], &trace, input_only ? 1u : 8u)) {
         fprintf(stderr, "expected %s schema-4 trace\n",
-                input_only ? "one-record input-only" : "seven-record full-route");
+                input_only ? "one-record input-only" : "eight-record full-route");
         return 2;
     }
     if (input_only && tamper) {

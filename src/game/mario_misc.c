@@ -24,6 +24,7 @@
 #include "skybox.h"
 #include "sound_init.h"
 #include "pc/sm64_modern_timebase.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 
 #define TOAD_STAR_1_REQUIREMENT 12
 #define TOAD_STAR_2_REQUIREMENT 25
@@ -108,6 +109,7 @@ Gfx *geo_draw_mario_head_goddard(s32 callContext, struct GraphNode *node, Mat4 *
             if (parameter < ARRAY_COUNT(sGoddardDisplayListPhysical)) {
                 sGoddardDisplayListPhysical[parameter] = gdm_gettestdl(parameter);
                 sGoddardDisplayListValid[parameter] = TRUE;
+                sm64_modern_parity_record_mario_face_route(parameter);
                 gfx = (Gfx *) PHYSICAL_TO_VIRTUAL(sGoddardDisplayListPhysical[parameter]);
             } else {
                 /* Preserve the original Goddard range check on a boundary. */

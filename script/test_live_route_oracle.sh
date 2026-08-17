@@ -143,6 +143,17 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BullyEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BullyObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFace.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFaceAnimation.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFaceAnimationPayload.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFaceExpression.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFaceExpressionComposition.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFacePayloadBundle.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFaceResourceManifest.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFaceResourceCatalog.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFaceRenderPacket.swift" \
+  "$PROJECT_ROOT/SM64Modern/RenderPacketCapture.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioFaceRouteResources.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_live_route_oracle_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-live-route-oracle-smoke"
 xcrun --sdk macosx clang \
@@ -151,6 +162,8 @@ xcrun --sdk macosx clang \
   -Wextra \
   -Werror \
   -mmacosx-version-min=27.0 \
+  -I"$PROJECT_ROOT" \
+  -I"$PROJECT_ROOT/src" \
   -I"$PROJECT_ROOT/include" \
   "$PROJECT_ROOT/src/pc/sm64_modern_oracle_trace.c" \
   "$PROJECT_ROOT/tests/sm64_modern_live_route_oracle_contract.c" \

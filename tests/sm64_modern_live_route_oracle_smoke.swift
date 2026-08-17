@@ -54,7 +54,7 @@ struct SM64ModernLiveRouteOracleSmoke {
         // EngineHost forwards each Swift receipt through one C sidecar tick.
         // Normalize the internal receipt sequence/tick to that ABI boundary
         // before asking the C oracle to replay the file.
-        let sidecarRecords = try context.traceRecords.enumerated().map { index, record in
+        var sidecarRecords = try context.traceRecords.enumerated().map { index, record in
             try SM64OracleTraceRecord(
                 simulationTick: UInt64(index + 1),
                 domain: record.domain,
@@ -65,6 +65,16 @@ struct SM64ModernLiveRouteOracleSmoke {
                 flags: record.flags,
                 values: record.values
             )
+        }
+        if !inputOnly {
+            guard let route = SM64MarioFaceRouteResourceCatalog.route(.marioNormal) else {
+                throw NSError(domain: "SM64ModernLiveRouteOracleSmoke", code: 3)
+            }
+            sidecarRecords.append(try SM64MarioFaceRouteRenderOracle.liveCRecord(
+                route: route,
+                simulationTick: UInt64(sidecarRecords.count + 1),
+                sequence: 0
+            ))
         }
         let output = URL(fileURLWithPath: CommandLine.arguments[1]).standardizedFileURL
         try SM64OracleTraceFile.write(

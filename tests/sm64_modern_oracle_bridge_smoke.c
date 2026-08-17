@@ -169,6 +169,7 @@ static void emit_snapshot(uint64_t value, uint8_t save_marker) {
         const uint64_t render_values[2] = { event, value };
         sm64_modern_parity_record_render_packet(event, render_values, 2);
     }
+    sm64_modern_parity_record_mario_face_route(2);
     sm64_modern_parity_end_tick();
 }
 
@@ -209,7 +210,7 @@ static SM64ModernStatus replay_trace(struct MemoryTrace *trace,
 int main(void) {
     struct MemoryTrace trace;
     record_trace(&trace);
-    expect_u64("bridge record count", trace.count, 25);
+    expect_u64("bridge record count", trace.count, 26);
     expect_u64("bridge domain", trace.records[0].domain, SM64_MODERN_ORACLE_DOMAIN_MARIO);
     expect_u64("bridge tick", trace.records[0].simulation_tick, 1);
     expect_u64("bridge record id", trace.records[0].record_id, SM64_MODERN_FIELD_MARIO_ACTION);
@@ -274,6 +275,13 @@ int main(void) {
         expect_u64("bridge render event", trace.records[record_index].record_id,
                    index + 1u);
     }
+    expect_u64("bridge Mario-face route domain", trace.records[25].domain,
+               SM64_MODERN_ORACLE_DOMAIN_RENDER);
+    expect_u64("bridge Mario-face route event", trace.records[25].record_id,
+               SM64_MODERN_ORACLE_RENDER_EVENT_MARIO_FACE_ROUTE);
+    expect_u64("bridge Mario-face route id", trace.records[25].values[0], 2);
+    expect_u64("bridge Mario-face route update domain", trace.records[25].values[2], 2);
+    expect_u64("bridge Mario-face route policy", trace.records[25].values[3], 7);
 
     expect_status("bridge replay",
                   replay_trace(&trace, UINT64_C(0x1234), UINT8_C(0x01)),
