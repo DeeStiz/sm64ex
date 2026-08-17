@@ -24,6 +24,7 @@ struct SM64ModernMarioFacePayloadBundleSmoke {
         precondition(bundle.frame(componentID: 0x07, bank: 0, sourceFrame: 821) == nil)
         precondition(bundle.frame(componentID: 0x3F, bank: 1, sourceFrame: 1) == nil)
         precondition(bundle.decode(componentID: 0x07, bank: 0, frameQ16: 1 << 16) != nil)
+        precondition(bundle.decode(componentID: 0x07, bank: 0, frameQ16: 820 << 16)?.nextSourceFrame == 1)
         precondition(bundle.decode(componentID: 0xE2, bank: 0, frameQ16: 1 << 16)?.values.count == 6)
         precondition(bundle.decode(componentID: 0x3F, bank: 1, frameQ16: 1 << 16) == nil)
 

@@ -72,6 +72,7 @@ else
   "$PROJECT_ROOT/script/test_mario_face_content_pack.sh"
   "$PROJECT_ROOT/script/test_mario_face_payload_inventory.sh"
   "$PROJECT_ROOT/script/test_mario_face_payload_bundle.sh"
+  "$PROJECT_ROOT/script/test_mario_face_expression_composition.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"

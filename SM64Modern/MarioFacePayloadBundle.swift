@@ -69,9 +69,10 @@ struct SM64MarioFacePayloadBundle: Equatable, Sendable {
         }
         let currentFrame = frameQ16 >> 16
         let fractionQ16 = frameQ16 & 0xFFFF
-        guard currentFrame > 0, currentFrame < payloadBank.count,
-              let current = payloadBank.frame(currentFrame),
-              let next = payloadBank.frame(currentFrame + 1) else { return nil }
+        guard currentFrame > 0, currentFrame <= payloadBank.count,
+              let current = payloadBank.frame(currentFrame) else { return nil }
+        let nextFrame = currentFrame == payloadBank.count ? 1 : currentFrame + 1
+        guard let next = payloadBank.frame(nextFrame) else { return nil }
         let fraction = Float(fractionQ16) / 65_536.0
         var values: [Float] = []
         values.reserveCapacity(current.count)
@@ -85,7 +86,7 @@ struct SM64MarioFacePayloadBundle: Equatable, Sendable {
             bank: bank,
             frameQ16: frameQ16,
             currentSourceFrame: currentFrame,
-            nextSourceFrame: currentFrame + 1,
+            nextSourceFrame: nextFrame,
             fractionQ16: fractionQ16,
             type: payloadType,
             values: values
