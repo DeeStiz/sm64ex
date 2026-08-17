@@ -40,6 +40,7 @@
 		161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */; };
 		1656D9B55126D41EB7138D99 /* BullyEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B512E26120B9CF2080159F3C /* BullyEnemy.swift */; };
 		1909473243D91352E673CFF1 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2F94BADC5F5B17ADE8F57D9 /* Configuration.swift */; };
+		192D9768117EAABD7792AF49 /* EngineAuthorityLedger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5FD9797A3A05AD1EBA0D33B5 /* EngineAuthorityLedger.swift */; };
 		1A5B675F3BCA09516E82E29E /* GeneratedTrigTables.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDCD11317E7D224F441AAC49 /* GeneratedTrigTables.swift */; };
 		1A66522702AC1BD6CFBB4D7A /* Respawner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33B5A4BCF4A5081A0ACFFA15 /* Respawner.swift */; };
 		1A9C263F2C7FC79C4A63A501 /* TTCRotatingSolidBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 214588F2B3DD80568BE38D36 /* TTCRotatingSolidBehavior.swift */; };
@@ -391,6 +392,7 @@
 		5E1852868F5E323B208C3437 /* AudioMixer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMixer.swift; sourceTree = "<group>"; };
 		5E9DA580874381501BF6F49F /* MarioCrawlingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCrawlingAction.swift; sourceTree = "<group>"; };
 		5EBCDC28A1DADF92929BD72A /* KoopaShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoopaShell.swift; sourceTree = "<group>"; };
+		5FD9797A3A05AD1EBA0D33B5 /* EngineAuthorityLedger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineAuthorityLedger.swift; sourceTree = "<group>"; };
 		5FDEF637017419435B14C766 /* CameraCUpTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCUpTransition.swift; sourceTree = "<group>"; };
 		5FE7A3B1DDD9C35A23DE6E47 /* RacingPenguinObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RacingPenguinObjectBridge.swift; sourceTree = "<group>"; };
 		60F74F1DC90A46BBEF7D28FE /* BobombEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BobombEnemy.swift; sourceTree = "<group>"; };
@@ -657,6 +659,7 @@
 				49737667D24AE6AEA3374B3E /* EnemyLakitu.swift */,
 				994D08C3E7FCF937245A9757 /* EnemyLakituObjectBridge.swift */,
 				6291FCF691572C0089D6194D /* EngineAuthority.swift */,
+				5FD9797A3A05AD1EBA0D33B5 /* EngineAuthorityLedger.swift */,
 				5C737B1A16857D51F7C7FE7A /* EngineHost.swift */,
 				EE4A1DC37EDADFFE2A97B1D1 /* EngineRuntime.swift */,
 				BB40062F0B74B53B43A517BA /* EngineState.swift */,
@@ -1035,6 +1038,7 @@
 				BFAC85948508CFC15B564EFE /* EnemyLakitu.swift in Sources */,
 				03FAB70D01EC36C629B7ACEE /* EnemyLakituObjectBridge.swift in Sources */,
 				CFF98EAAB1C2B379F37CB33B /* EngineAuthority.swift in Sources */,
+				192D9768117EAABD7792AF49 /* EngineAuthorityLedger.swift in Sources */,
 				946B96572AA7C94347AF500E /* EngineHost.swift in Sources */,
 				1000A98A2958DA1238E20A6D /* EngineRuntime.swift in Sources */,
 				8F2434A3E57287185819D685 /* EngineState.swift in Sources */,

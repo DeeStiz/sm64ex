@@ -84,6 +84,19 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.authority == .swift)
         precondition(swiftShell.implementation == "swift_lifecycle_owner_c_domain_bridge")
         precondition(swiftShell.phase == .cold)
+        precondition(swiftShell.authorityLedger.isPartitioned)
+        precondition(swiftShell.authorityLedger.unassignedDomains.isEmpty)
+        precondition(
+            swiftShell.authorityLedger.owner(of: .state) == .swift
+        )
+        precondition(
+            swiftShell.authorityLedger.owner(of: .savePersistence)
+                == .cCompatibilityBridge
+        )
+        precondition(
+            swiftShell.authorityLedger.cCompatibilityBridgeDomains
+                == [.audio, .camera, .frontend, .rendering, .savePersistence]
+        )
         precondition(swiftShell.step() == 4)
         precondition(swiftShell.initialize() == 0)
         precondition(swiftShell.phase == .initialized)

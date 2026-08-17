@@ -2,6 +2,27 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31h makes Swift/C authority explicit with a closed value-only domain
+  ledger. Every engine domain is assigned to Swift or the named
+  `c_compatibility_bridge`; `SM64ModernSwiftEngineRuntime` rejects ledger
+  omissions or disagreement with context readiness and logs sorted ownership
+  lists. `script/test_engine_runtime.sh` passes under strict Swift 6. This is
+  an authority guardrail, not full gameplay/content migration; the C bridge,
+  live route qualification, and physical/human gates remain open. The
+  regenerated native Debug build and gated verifier pass at
+  `/tmp/sm64-modern-m31h-build.log` and
+  `/tmp/sm64-modern-m31h-full-verify-2.log`. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31h.md`.
+- M34b closes the repeatable Metal 4 production API/capture harness. The
+  Release runner performs separate API/shader validation and GPU capture (the
+  tools reject both envs together), applies four queued drawable sizes from
+  the engine owner while pausing/resuming CAMetalDisplayLink, and verifies
+  zero scheduler/audio drops plus status-0 shutdown. `gpudebug` finds the
+  CAMetalLayer BGRA8Unorm drawable, memoryless Depth32Float, and
+  `sm64_vertex / sm64_fragment` MTL4 draw. Focused production evidence passed
+  at `/tmp` under `sm64-modern-m34b.*`; visual parity, physical, and human
+  acceptance remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M34b.md`.
 - M30x closes the Goddard face-shine coordinate seam. Swift/C generated-normal
   packet fingerprint `0xfc9ad5b2a13c278f`, 442-record trace fingerprint
   `0xb913f67643075415`, deliberate record-18 divergence, full MFPB frame

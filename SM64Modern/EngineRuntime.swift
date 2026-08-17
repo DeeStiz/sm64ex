@@ -471,6 +471,7 @@ final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
 
     private let cFallback: SM64ModernEngineRuntime
     let swiftContext: SM64ModernSwiftEngineContext
+    let authorityLedger: SM64ModernSwiftEngineAuthorityLedger
     private var didLogDelegation = false
     private(set) var phase: SM64ModernSwiftRuntimePhase = .cold
     private(set) var lastSwiftTick: SM64ModernSwiftEngineTickReceipt?
@@ -481,10 +482,20 @@ final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
 
     init(
         cFallback: SM64ModernEngineRuntime,
-        swiftContext: SM64ModernSwiftEngineContext = SM64ModernSwiftEngineContext()
+        swiftContext: SM64ModernSwiftEngineContext = SM64ModernSwiftEngineContext(),
+        authorityLedger: SM64ModernSwiftEngineAuthorityLedger? = nil
     ) {
         self.cFallback = cFallback
         self.swiftContext = swiftContext
+        let ledger = authorityLedger
+            ?? SM64ModernSwiftEngineAuthorityLedger(readiness: swiftContext.domainReadiness)
+        precondition(ledger.isPartitioned, "Swift engine authority ledger must be a closed partition")
+        precondition(
+            Set(ledger.swiftOwnedDomains)
+                == swiftContext.domainReadiness.swiftOwned,
+            "Swift engine authority ledger disagrees with context readiness"
+        )
+        self.authorityLedger = ledger
     }
 
     func initialize() -> SM64ModernStatus {
@@ -550,7 +561,7 @@ final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
         guard !didLogDelegation else { return }
         didLogDelegation = true
         runtimeLogger.notice(
-            "swift_engine_context_started authority=swift implementation=swift_lifecycle_owner_c_domain_bridge c_domain_bridge=active"
+            "swift_engine_context_started authority=swift implementation=swift_lifecycle_owner_c_domain_bridge c_domain_bridge=active ledger_partitioned=\(self.authorityLedger.isPartitioned) swift_owned=\(self.authorityLedger.swiftOwnedDescription, privacy: .public) c_bridge=\(self.authorityLedger.cCompatibilityBridgeDescription, privacy: .public)"
         )
     }
 }

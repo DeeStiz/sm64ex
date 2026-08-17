@@ -142,6 +142,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BullyCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/BullyEnemy.swift" \
   "$PROJECT_ROOT/SM64Modern/BullyObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/EngineAuthorityLedger.swift" \
   "$PROJECT_ROOT/SM64Modern/EngineRuntime.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioFace.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioFaceAnimation.swift" \

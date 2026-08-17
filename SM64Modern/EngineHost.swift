@@ -248,6 +248,7 @@ final class EngineHost {
     private var marioFacePayloadBundle: SM64MarioFacePayloadBundle?
     private var marioFaceCompositionSource: String = "fallback"
     private var pendingDrawableSize: CGSize?
+    private var pendingPresentationPause: Bool?
     private var engineRunLoop: CFRunLoop?
     private var schedulerWakeCount: UInt64 = 0
     private var schedulerLateWakeCount: UInt64 = 0
@@ -294,6 +295,20 @@ final class EngineHost {
         guard size.width > 0, size.height > 0 else { return }
         let runLoop = condition.withLock { () -> CFRunLoop? in
             pendingDrawableSize = size
+            return engineRunLoop
+        }
+        if let runLoop {
+            CFRunLoopWakeUp(runLoop)
+        }
+    }
+
+    /// Publish a main-actor pause request without touching CAMetalDisplayLink
+    /// from AppKit.  The owner thread consumes the value at a simulation
+    /// boundary, preserving the same thread/lifetime contract as resize.
+    func requestPresentationPaused(_ paused: Bool) {
+        precondition(Thread.isMainThread, "AppKit owns presentation pause requests")
+        let runLoop = condition.withLock { () -> CFRunLoop? in
+            pendingPresentationPause = paused
             return engineRunLoop
         }
         if let runLoop {
@@ -511,6 +526,13 @@ final class EngineHost {
             return
         }
 
+        // Drain AppKit's resize publication even when the display link is
+        // paused or temporarily has no drawable. Presentation remains owned
+        // by Metal's callback; only the layer-size mutation is advanced here.
+        metalRenderer?.applyPendingDrawableSize()
+        if let pause = consumePresentationPauseOnEngineThread() {
+            metalRenderer?.setPresentationPaused(pause)
+        }
         stepCount += 1
         updateMarioFaceTransformOnEngineThread()
         if var promotion = audioPromotion {
@@ -883,6 +905,14 @@ final class EngineHost {
     private func stepCEngineOnEngineThread() -> SM64ModernStatus {
         precondition(isCurrentEngineThread)
         return lifecycle.step()
+    }
+
+    private func consumePresentationPauseOnEngineThread() -> Bool? {
+        precondition(isCurrentEngineThread)
+        return condition.withLock {
+            defer { pendingPresentationPause = nil }
+            return pendingPresentationPause
+        }
     }
 
     private func requestStopCEngineOnEngineThread(reason: SM64ModernExitReason) -> SM64ModernStatus {

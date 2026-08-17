@@ -2,6 +2,19 @@
 
 ## Status
 
+M34b is the latest validated Metal 4 production slice. The Release artifact
+has a repeatable two-pass gate: API/shader validation runs independently from
+GPU capture because Apple's capture tooling rejects simultaneous shader
+validation; both passes exercise the bounded M34 resize/pause harness. The
+owner thread applies four queued drawable-size updates even while the display
+link is paused, resumes presentation, records zero scheduler/audio drops, and
+drains cleanly. `script/test_metal4_production.sh` passed on Apple M5 Max with
+a real CAMetalLayer, three captured MTL4 command buffers, BGRA8Unorm color,
+memoryless Depth32Float, and `sm64_vertex / sm64_fragment` draw discovery via
+`gpudebug`. This is production API/capture evidence, not visual parity,
+physical display, or human acceptance; M31 whole-engine authority and M33
+full-game qualification remain open.
+
 M30x is the latest validated bounded Goddard/Mario-face source-geometry and
 isolated-encoder slice. Swift now
 owns M30a's pointer-free `mario_Face` geometry/geo-switch packet plus a copied
@@ -2479,6 +2492,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M31e: Mario input-core route | Swift context consumes normalized controller state through the qualified Mario button/joystick core, retains A/B frame timers on the owner thread, and emits immutable Mario-input receipts while collision and action dispatch remain fallback. | Complete locally — strict Swift 6 Mario-input/context smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; full Mario action authority and physical acceptance remain open |
 | M31f: Mario action-selection seam | Swift context applies the qualified idle-cancel decision and `setAction` mutation from the Mario-input receipt, preserving action state on the owner thread while movement, collision, and complete action dispatch remain fallback. | Complete locally — strict Swift 6 action-selection/context smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; full Mario action authority remains open |
 | M31g: Schema-4 Swift receipt bridge | Swift context emits fixed-width schema-4 records for input, Mario input/action, progression, and scheduler state; the native owner-thread sink forwards sidecar records to the C oracle API after each closed C tick. | Complete locally — strict Swift 6 trace-sink smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; full trace inventory and parity qualification remain open |
+| M31h: Explicit Swift/C domain authority ledger | Swift runtime construction owns a closed value-only partition of every engine domain, labels remaining C work as an explicit compatibility bridge, rejects unassigned domains, and emits the partition in runtime telemetry. | Complete locally — strict Swift 6 runtime smoke, regenerated native Debug build `/tmp/sm64-modern-m31h-build.log`, and gated verifier `/tmp/sm64-modern-m31h-full-verify-2.log` (`verify_exit=0`) pass; live full-game route qualification remains open |
 | M32a: Metal packet Sendable closure | Scene packets publish value-semantic copy-on-write vertex/draw snapshots so the display-link reader never receives mutable reusable storage. | Complete locally — strict Swift 6 packet-reuse smoke, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; Metal texture bindings, renderer ownership, and remaining unchecked Sendable classes remain open |
 | M32b: Metal texture upload isolation | Scene packets carry immutable `MetalTextureUpload` bytes while only the display-side renderer owns mutable `MTLTexture` residency and frame-retention state. | Complete locally — strict Swift 6 packet/upload smoke, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; renderer-wide owner-thread isolation and remaining unchecked Sendable classes remain open |
 | M32c: Trace-session owner boundary | Oracle trace file state is explicitly owner-thread-only; the C stream callbacks remain isolated unsafe shims rather than making the mutable session unchecked-sendable. | Complete locally — strict Swift 6/native compile, corrected 132-script matrix, regenerated native Debug build, and `git diff --check` pass; callback stress, remaining unchecked Sendable classes, and full trace qualification remain open |
@@ -2499,7 +2513,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M33f: Live route shard promotion | A trace emitted by a real Swift route is replayed by the C oracle, matched against the selected manifest row's exact domain set, and persisted as terminal evidence that cannot be rerun. | Complete locally — strict Swift 6 input-only live trace, C replay `records=1`, manifest-aware exact-coverage promotion with `fixture_only=0`, persistent rerun rejection, 136-script matrix (`runs=136 failures=0`), clean native Debug build, and `git diff --check` pass; all other shards remain open |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | In progress — M33a inventory contract is complete; shard execution, C-vs-Swift schema-4 byte comparison, zero-unexecuted closure, and sanitizer reruns remain |
 | M34a: Metal 4 command/residency contract | Every reusable MTL4 command buffer redeclares scene/layer residency after begin; legacy binding APIs and display-link drawable acquisition are rejected; explicit barrier and presentation ordering remain checked. | Complete locally — focused Metal 4 source/scene smokes, 140-script matrix (`runs=140 failures=0`), regenerated native Swift 6 Debug build, bounded API/GPU validation run with clean normal shutdown, 8.3 MiB `gpucapture` plus `gpudebug` inspection, and `git diff --check` pass; sustained capture, resize/pause stress, visual parity, and physical/human acceptance remain open |
-| M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | In progress — M34a closes the source/resource contract; live validation, capture/debug inspection, archive reuse, resize/pause stress, and drawable visual comparison remain |
+| M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | In progress — M34a closes the source/resource contract and M34b closes separate API/shader-validation plus GPU-capture passes, four owner-thread resize applications, pause/resume, and clean Release shutdown; warm visual comparison, device-loss/minimize coverage, archive-reuse proof, physical display behavior, and human acceptance remain |
 | M35: Distribution and human acceptance | Developer ID, notarized/stapled DMG and ZIP, clean-machine Gatekeeper launch, and fresh-save human 120-star acceptance pass. | Not started |
 
 ## Detailed Work Breakdown

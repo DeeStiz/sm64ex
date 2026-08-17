@@ -358,6 +358,27 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         metalLogger.notice("metal_display_link_started owner_main=\(Thread.isMainThread)")
     }
 
+    /// Owner-thread presentation pause used by the bounded M34 resize/pause
+    /// stress harness.  The display link remains the sole presentation owner;
+    /// callers on AppKit's main actor publish a value request through
+    /// `EngineHost`, which applies it here at the next engine boundary.
+    func setPresentationPaused(_ paused: Bool) {
+        precondition(isOwnerThread(), "Metal presentation pause belongs to the engine owner")
+        guard isRunning else { return }
+        displayLink.isPaused = paused
+        metalLogger.notice("metal_display_link_pause_state paused=\(paused)")
+    }
+
+    /// Apply a queued drawable-size update at an engine boundary.  The
+    /// display-link callback also drains this queue after presenting, but a
+    /// paused or headless display link must not strand AppKit resize requests.
+    func applyPendingDrawableSize() {
+        precondition(isOwnerThread(), "Metal drawable size belongs to the engine owner")
+        guard let drawableSize = consumeDrawableSize() else { return }
+        layer.drawableSize = drawableSize
+        metalLogger.notice("metal_resize_applied drawable=\(Int(drawableSize.width))x\(Int(drawableSize.height))")
+    }
+
     func initializeScene(filteringMode: UInt32) -> SM64ModernStatus {
         metalLogger.notice("metal_scene_initialized filtering=\(filteringMode)")
         return SM64_MODERN_STATUS_OK

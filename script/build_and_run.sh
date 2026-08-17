@@ -138,6 +138,9 @@ open_app() {
   if [[ "${SM64_MODERN_MARIO_FACE_TEXTURE_DRAW:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_MARIO_FACE_TEXTURE_DRAW=1)
   fi
+  if [[ "${SM64_MODERN_M34_STRESS:-0}" == "1" ]]; then
+    open_arguments+=(--env SM64_MODERN_M34_STRESS=1)
+  fi
   if [[ "${SM64_MODERN_MARIO_FACE_DRAW:-0}" == "1" ]]; then
     local runtime_payload="$PROJECT_ROOT/build/sm64-modern-runtime/source_manifest/mario_face_payloads.mfpb"
     local payload_tool="$PROJECT_ROOT/build/sm64-modern-mario-face-payload-bundle/tool/mario-face-payload-bundle"
