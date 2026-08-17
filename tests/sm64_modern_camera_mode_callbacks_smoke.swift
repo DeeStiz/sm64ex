@@ -69,7 +69,7 @@ enum SM64ModernCameraModeCallbacksSmoke {
         precondition(SM64CameraModeCallbacks.descriptor(for: 3)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 6)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 10)?.outputsSwapped == true)
-        precondition(SM64CameraModeCallbacks.descriptor(for: 12)?.pureGeometryImplemented == false)
+        precondition(SM64CameraModeCallbacks.descriptor(for: 12)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 13)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 11)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 17)?.pureGeometryImplemented == true)
@@ -222,6 +222,23 @@ enum SM64ModernCameraModeCallbacksSmoke {
         precondition(spiral.focus == .init(x: 0, y: 80, z: 0)
             && spiral.position == .init(x: 0, y: 100, z: 300)
             && spiral.returnedYaw == 0 && spiral.areaYaw == 0)
+
+        let parallel = SM64CameraModeCallbacks.evaluate(.init(
+            mode: 12,
+            marioPosition: .init(x: 100, y: 0, z: 500),
+            cameraPosition: .init(x: 0, y: 200, z: 500),
+            parallelPathStart: .init(x: 0, y: 0, z: 0),
+            parallelPathEnd: .init(x: 0, y: 0, z: 1000),
+            parallelDistanceThreshold: 50,
+            parallelZoom: 0,
+            parallelMarioFloorOffset: 0,
+            parallelReady: true
+        ))!
+        precondition(parallel.focus == .init(x: 100, y: 150, z: 500)
+            && parallel.position.x.isFinite && parallel.position.y.isFinite
+            && parallel.position.z.isFinite
+            && parallel.returnedYaw == parallel.cameraYaw
+            && !parallel.panAhead)
 
         precondition(SM64CameraModeCallbacks.evaluate(.init(
             mode: 12, marioPosition: .init(x: 0, y: 0, z: 0)

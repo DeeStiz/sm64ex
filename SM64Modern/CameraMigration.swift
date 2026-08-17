@@ -156,6 +156,7 @@ final class SwiftCameraMigrationService {
               input.reserved1 == 0,
               input.reserved2 == 0,
               input.reserved3 == 0,
+              input.reserved4 == 0,
               input.reserved == 0 else {
             return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "callback_input")
         }
@@ -277,6 +278,26 @@ final class SwiftCameraMigrationService {
                 & UInt16(SM64_MODERN_CAMERA_CALLBACK_HAS_SPIRAL_FLOOR_HEIGHT) != 0
                 ? input.spiral_floor_height : nil,
             spiralCurrentFloorHeight: input.spiral_current_floor_height,
+            parallelPathStart: SM64ObjectVector3(
+                x: input.parallel_path_start.0,
+                y: input.parallel_path_start.1,
+                z: input.parallel_path_start.2
+            ),
+            parallelPathEnd: SM64ObjectVector3(
+                x: input.parallel_path_end.0,
+                y: input.parallel_path_end.1,
+                z: input.parallel_path_end.2
+            ),
+            parallelDistanceThreshold: input.parallel_dist_threshold,
+            parallelZoom: input.parallel_zoom,
+            parallelMarioFloorOffset: input.parallel_mario_floor_offset,
+            parallelTransitionOffset: SM64ObjectVector3(
+                x: input.parallel_transition_offset.0,
+                y: input.parallel_transition_offset.1,
+                z: input.parallel_transition_offset.2
+            ),
+            parallelReady: input.parallel_flags
+                & UInt16(SM64_MODERN_CAMERA_CALLBACK_PARALLEL_READY) != 0,
             height: height,
             slope: slope
         )

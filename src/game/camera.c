@@ -1292,6 +1292,17 @@ void mode_outward_radial_camera(struct Camera *c) {
  * so Mario will run slightly towards the camera.
  */
 s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
+    {
+        s16 callbackYaw = 0;
+        u32 callbackFlags = 0;
+        if (sm64_modern_camera_evaluate_callback(
+                c, CAMERA_MODE_PARALLEL_TRACKING, focus, pos,
+                &callbackYaw, &callbackFlags)) {
+            (void)callbackFlags;
+            return callbackYaw;
+        }
+    }
+
     Vec3f path[2];
     Vec3f parMidPoint;
     Vec3f marioOffset;
@@ -2406,6 +2417,30 @@ static s32 sm64_modern_camera_evaluate_callback(
                 SM64_MODERN_CAMERA_CALLBACK_HAS_SPIRAL_FLOOR_HEIGHT;
             input.spiral_floor_height = floorHeight;
         }
+    }
+
+    if (mode == CAMERA_MODE_PARALLEL_TRACKING && camera != NULL
+        && sParTrackPath != NULL
+        && sParTrackIndex == 0
+        && sParTrackPath[1].startOfPath == 0
+        && (sStatusFlags & CAM_FLAG_CHANGED_PARTRACK_INDEX) == 0) {
+        f32 marioFloorOffset;
+        calc_y_to_curr_floor(
+            &marioFloorOffset, 1.f, 200.f,
+            &marioFloorOffset, 0.9f, 200.f);
+        input.parallel_flags |= SM64_MODERN_CAMERA_CALLBACK_PARALLEL_READY;
+        input.parallel_path_start[0] = sParTrackPath[0].pos[0];
+        input.parallel_path_start[1] = sParTrackPath[0].pos[1];
+        input.parallel_path_start[2] = sParTrackPath[0].pos[2];
+        input.parallel_path_end[0] = sParTrackPath[1].pos[0];
+        input.parallel_path_end[1] = sParTrackPath[1].pos[1];
+        input.parallel_path_end[2] = sParTrackPath[1].pos[2];
+        input.parallel_dist_threshold = sParTrackPath[0].distThresh;
+        input.parallel_zoom = sParTrackPath[0].zoom;
+        input.parallel_mario_floor_offset = marioFloorOffset;
+        input.parallel_transition_offset[0] = sParTrackTransOff.pos[0];
+        input.parallel_transition_offset[1] = sParTrackTransOff.pos[1];
+        input.parallel_transition_offset[2] = sParTrackTransOff.pos[2];
     }
 
     if (mode == CAMERA_MODE_RADIAL || mode == CAMERA_MODE_OUTWARD_RADIAL

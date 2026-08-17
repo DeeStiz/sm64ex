@@ -77,6 +77,13 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
     let spiralFocusFloorOffset: Float
     let spiralFloorHeight: Float?
     let spiralCurrentFloorHeight: Float
+    let parallelPathStart: SM64ObjectVector3
+    let parallelPathEnd: SM64ObjectVector3
+    let parallelDistanceThreshold: Float
+    let parallelZoom: Float
+    let parallelMarioFloorOffset: Float
+    let parallelTransitionOffset: SM64ObjectVector3
+    let parallelReady: Bool
     let height: SM64CameraHeightInput?
     let slope: SM64CameraSlopeInput?
 
@@ -122,6 +129,13 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         spiralFocusFloorOffset: Float = 0,
         spiralFloorHeight: Float? = nil,
         spiralCurrentFloorHeight: Float = 0,
+        parallelPathStart: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 0, z: 0),
+        parallelPathEnd: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 0, z: 0),
+        parallelDistanceThreshold: Float = 0,
+        parallelZoom: Float = 0,
+        parallelMarioFloorOffset: Float = 0,
+        parallelTransitionOffset: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 0, z: 0),
+        parallelReady: Bool = false,
         height: SM64CameraHeightInput? = nil,
         slope: SM64CameraSlopeInput? = nil
     ) {
@@ -166,6 +180,13 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         self.spiralFocusFloorOffset = spiralFocusFloorOffset
         self.spiralFloorHeight = spiralFloorHeight
         self.spiralCurrentFloorHeight = spiralCurrentFloorHeight
+        self.parallelPathStart = parallelPathStart
+        self.parallelPathEnd = parallelPathEnd
+        self.parallelDistanceThreshold = parallelDistanceThreshold
+        self.parallelZoom = parallelZoom
+        self.parallelMarioFloorOffset = parallelMarioFloorOffset
+        self.parallelTransitionOffset = parallelTransitionOffset
+        self.parallelReady = parallelReady
         self.height = height
         self.slope = slope
     }
@@ -188,7 +209,7 @@ struct SM64CameraCallbackResult: Equatable, Sendable {
 }
 
 /// Bounded-mode callback descriptors plus the callbacks whose C bodies are
-/// already reducible to immutable geometry. Parallel and water
+/// already reducible to immutable geometry. Water
 /// callbacks deliberately return nil until their owner-thread path data and
 /// collision policy have their own Swift boundaries.
 enum SM64CameraModeCallbacks {
@@ -205,7 +226,7 @@ enum SM64CameraModeCallbacks {
         descriptor(9, .slideHoot, true, true, false, 800, 125, 125, 0x1555, true, false),
         descriptor(10, .insideCannon, true, true, true, 800, 125, 125, 0, true, false),
         descriptor(11, .bossFight, true, true, false, 0, 0, 0, 0, false, false),
-        descriptor(12, .parallelTracking, false, true, false, 0, 0, 0, 0, false, false),
+        descriptor(12, .parallelTracking, true, true, false, 0, 0, 0, 0, false, false),
         descriptor(13, .fixed, true, true, false, 0, 0, 0, 0, false, false),
         descriptor(14, .eightDirections, true, true, false, 1000, 125, 125, 0x05B0, false, true),
         descriptor(15, .slideHoot, true, true, false, 800, 125, 125, 0x1555, true, false),
@@ -241,7 +262,13 @@ enum SM64CameraModeCallbacks {
               finite(input.spiralBasePosition),
               input.spiralFocusFloorOffset.isFinite,
               input.spiralFloorHeight?.isFinite ?? true,
-              input.spiralCurrentFloorHeight.isFinite else { return nil }
+              input.spiralCurrentFloorHeight.isFinite,
+              finite(input.parallelPathStart),
+              finite(input.parallelPathEnd),
+              input.parallelDistanceThreshold.isFinite,
+              input.parallelZoom.isFinite,
+              input.parallelMarioFloorOffset.isFinite,
+              finite(input.parallelTransitionOffset) else { return nil }
 
         switch descriptor.callback {
         case .radial:
@@ -266,7 +293,9 @@ enum SM64CameraModeCallbacks {
             return boss(input, descriptor: descriptor)
         case .spiralStairs:
             return spiral(input, descriptor: descriptor)
-        case .none, .waterSurface, .parallelTracking:
+        case .parallelTracking:
+            return parallel(input, descriptor: descriptor)
+        case .none, .waterSurface:
             return nil
         }
     }
@@ -543,6 +572,38 @@ enum SM64CameraModeCallbacks {
             areaYaw: result.yawOffset,
             pitch: 0,
             distance: 300,
+            outputsSwapped: descriptor.outputsSwapped,
+            panAhead: descriptor.pansAhead,
+            sideButtonYaw: 0,
+            behindMarioSoundTimer: 0
+        )
+    }
+
+    private static func parallel(
+        _ input: SM64CameraCallbackInput,
+        descriptor: SM64CameraModeCallbackDescriptor
+    ) -> SM64CameraCallbackResult? {
+        guard input.parallelReady,
+              let result = SM64CameraParallel.update(
+                SM64CameraParallelInput(
+                    marioPosition: input.marioPosition,
+                    cameraPosition: input.cameraPosition,
+                    pathStart: input.parallelPathStart,
+                    pathEnd: input.parallelPathEnd,
+                    distanceThreshold: input.parallelDistanceThreshold,
+                    zoom: input.parallelZoom,
+                    marioFloorOffset: input.parallelMarioFloorOffset,
+                    transitionOffset: input.parallelTransitionOffset
+                )
+              ) else { return nil }
+        return SM64CameraCallbackResult(
+            focus: result.focus,
+            position: result.position,
+            cameraYaw: result.yaw,
+            returnedYaw: result.yaw,
+            areaYaw: result.yaw,
+            pitch: 0,
+            distance: 0,
             outputsSwapped: descriptor.outputsSwapped,
             panAhead: descriptor.pansAhead,
             sideButtonYaw: 0,

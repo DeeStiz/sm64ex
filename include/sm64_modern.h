@@ -544,6 +544,17 @@ typedef struct SM64ModernCameraCallbackInputV1 {
     float spiral_current_floor_height;
     uint16_t spiral_flags;
     uint16_t reserved3;
+    // Parallel-tracking values are populated only for a stable first path.
+    // Path switching remains on the C fallback until its bounded path-window
+    // contract is promoted separately.
+    float parallel_path_start[3];
+    float parallel_path_end[3];
+    float parallel_dist_threshold;
+    float parallel_zoom;
+    float parallel_mario_floor_offset;
+    float parallel_transition_offset[3];
+    uint16_t parallel_flags;
+    uint16_t reserved4;
     uint32_t reserved;
 } SM64ModernCameraCallbackInputV1;
 
@@ -613,6 +624,7 @@ typedef struct SM64ModernCameraFOVOutputV1 {
 #define SM64_MODERN_CAMERA_CALLBACK_HAS_BOSS_FLOOR_HEIGHT (1u << 8)
 #define SM64_MODERN_CAMERA_CALLBACK_BOSS_FORCE_HEIGHT (1u << 9)
 #define SM64_MODERN_CAMERA_CALLBACK_HAS_SPIRAL_FLOOR_HEIGHT (1u << 0)
+#define SM64_MODERN_CAMERA_CALLBACK_PARALLEL_READY (1u << 0)
 #define SM64_MODERN_CAMERA_CALLBACK_MARIO_MODE_ACTIVE (1u << 0)
 #define SM64_MODERN_CAMERA_CALLBACK_WATER_OR_METAL_ACTION (1u << 1)
 

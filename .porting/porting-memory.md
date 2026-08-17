@@ -2,6 +2,22 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31v promotes the stable first segment of parallel-tracking camera mode
+  12 through the Swift evaluator. C snapshots the first path endpoints,
+  distance threshold, zoom, Mario floor offset, and transition offset only
+  when the path index is zero and no path switch is pending; Swift owns the
+  path-relative rotation, threshold/zoom placement, focus, and returned yaw.
+  C retains path-index switching, transition-offset evolution, collision,
+  mutable camera state, and presentation as an explicit fallback. The callback
+  fingerprint is `0x438d5e36a7302ccc`; camera primitive/geometry/callback/
+  migration/state/runtime smokes, native ABI smoke, Swift 6 Debug build, and
+  `git diff --check` pass. Signed launch
+  `/tmp/sm64-modern-m31v-live.log` reaches Metal 4 frame one, 360 fixed
+  steps, zero scheduler/audio drops, and status-0 shutdown; the bounded route
+  does not enter parallel tracking, so path-switch parity, authored-mode
+  telemetry, full camera parity, physical feel, and human acceptance remain
+  open. Handoff: `.porting/porting-handoff-full-swift-twin-M31v.md`.
+
 - M31u promotes spiral-stairs camera mode 17 through the Swift evaluator. C
   snapshots the staircase anchor, Mario floor offset, current focus/position,
   interpolated floor, and current-floor clamp; Swift owns relative yaw
