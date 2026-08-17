@@ -2354,6 +2354,60 @@ static s32 sm64_modern_camera_evaluate_callback(
         input.camera_yaw = bossYaw;
     }
 
+    if (mode == CAMERA_MODE_SPIRAL_STAIRS && camera != NULL) {
+        f32 focusHeight;
+        f32 distance;
+        f32 floorHeight;
+        s16 focusPitch;
+        s16 focusYaw;
+        s16 positionPitch;
+        s16 positionYaw;
+        s16 yawOffset;
+        Vec3f workingFocus;
+        Vec3f staircasePosition;
+        Vec3f checkPosition;
+        struct Surface *floor = NULL;
+
+        calc_y_to_curr_floor(
+            &focusHeight, 1.f, 200.f,
+            &focusHeight, 0.9f, 200.f);
+        workingFocus[0] = sMarioCamState->pos[0];
+        workingFocus[1] = input.camera_focus[1];
+        workingFocus[2] = sMarioCamState->pos[2];
+        vec3f_get_dist_and_angle(
+            sFixedModeBasePosition, workingFocus,
+            &distance, &focusPitch, &focusYaw);
+        vec3f_get_dist_and_angle(
+            sFixedModeBasePosition, pos,
+            &distance, &positionPitch, &positionYaw);
+        yawOffset = positionYaw - focusYaw;
+        if (yawOffset < DEGREES(-90)) { yawOffset = DEGREES(-90); }
+        if (yawOffset > DEGREES(90)) { yawOffset = DEGREES(90); }
+        vec3f_set_dist_and_angle(
+            sFixedModeBasePosition, staircasePosition,
+            300.f, 0, focusYaw + yawOffset);
+        checkPosition[0] = workingFocus[0]
+            + (staircasePosition[0] - workingFocus[0]) * 0.7f;
+        checkPosition[1] = workingFocus[1]
+            + (staircasePosition[1] - workingFocus[1]) * 0.7f + 300.f;
+        checkPosition[2] = workingFocus[2]
+            + (staircasePosition[2] - workingFocus[2]) * 0.7f;
+        floorHeight = find_floor(
+            checkPosition[0], checkPosition[1] + 50.f,
+            checkPosition[2], &floor);
+
+        input.spiral_base_position[0] = sFixedModeBasePosition[0];
+        input.spiral_base_position[1] = sFixedModeBasePosition[1];
+        input.spiral_base_position[2] = sFixedModeBasePosition[2];
+        input.spiral_focus_floor_offset = focusHeight;
+        input.spiral_current_floor_height = sMarioGeometry.currFloorHeight;
+        if (floorHeight != -11000.f) {
+            input.spiral_flags |=
+                SM64_MODERN_CAMERA_CALLBACK_HAS_SPIRAL_FLOOR_HEIGHT;
+            input.spiral_floor_height = floorHeight;
+        }
+    }
+
     if (mode == CAMERA_MODE_RADIAL || mode == CAMERA_MODE_OUTWARD_RADIAL
         || mode == CAMERA_MODE_8_DIRECTIONS) {
         input.floor_height = sMarioGeometry.currFloorHeight;
@@ -2421,6 +2475,9 @@ static s32 sm64_modern_camera_evaluate_callback(
     if (mode == CAMERA_MODE_RADIAL || mode == CAMERA_MODE_OUTWARD_RADIAL
         || mode == CAMERA_MODE_8_DIRECTIONS) {
         sAreaYaw = output.area_yaw;
+    }
+    if (mode == CAMERA_MODE_SPIRAL_STAIRS) {
+        sSpiralStairsYawOffset = output.area_yaw;
     }
     *out_yaw = output.returned_yaw;
     *out_flags = output.flags;
@@ -2894,6 +2951,17 @@ s32 update_spiral_stairs_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     handle_c_button_movement(c);
     // Set base pos to the center of the staircase
     vec3f_set(sFixedModeBasePosition, -1280.f, 614.f, 1740.f);
+
+    {
+        s16 callbackYaw = 0;
+        u32 callbackFlags = 0;
+        if (sm64_modern_camera_evaluate_callback(
+                c, CAMERA_MODE_SPIRAL_STAIRS, focus, pos,
+                &callbackYaw, &callbackFlags)) {
+            (void)callbackFlags;
+            return callbackYaw;
+        }
+    }
 
     // Focus on Mario, and move the focus up the staircase with him
     calc_y_to_curr_floor(&focusHeight, 1.f, 200.f, &focusHeight, 0.9f, 200.f);

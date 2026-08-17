@@ -72,6 +72,7 @@ enum SM64ModernCameraModeCallbacksSmoke {
         precondition(SM64CameraModeCallbacks.descriptor(for: 12)?.pureGeometryImplemented == false)
         precondition(SM64CameraModeCallbacks.descriptor(for: 13)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 11)?.pureGeometryImplemented == true)
+        precondition(SM64CameraModeCallbacks.descriptor(for: 17)?.pureGeometryImplemented == true)
 
         var fingerprint = fnvOffset
         for descriptor in SM64CameraModeCallbacks.descriptors {
@@ -208,6 +209,19 @@ enum SM64ModernCameraModeCallbacksSmoke {
             && boss.returnedYaw == 0x4000
             && boss.position.x.isFinite && boss.position.y == 100
             && boss.position.z.isFinite)
+
+        let spiral = SM64CameraModeCallbacks.evaluate(.init(
+            mode: 17,
+            marioPosition: .init(x: 0, y: 0, z: 0),
+            cameraPosition: .init(x: 0, y: 100, z: 0),
+            cameraFocus: .init(x: 0, y: 50, z: 0),
+            spiralBasePosition: .init(x: 0, y: 0, z: 0),
+            spiralFocusFloorOffset: 0,
+            spiralCurrentFloorHeight: 0
+        ))!
+        precondition(spiral.focus == .init(x: 0, y: 80, z: 0)
+            && spiral.position == .init(x: 0, y: 100, z: 300)
+            && spiral.returnedYaw == 0 && spiral.areaYaw == 0)
 
         precondition(SM64CameraModeCallbacks.evaluate(.init(
             mode: 12, marioPosition: .init(x: 0, y: 0, z: 0)

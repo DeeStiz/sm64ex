@@ -73,6 +73,10 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
     let bossHeldState: Int16
     let bossFloorHeight: Float?
     let bossForceHeight: Bool
+    let spiralBasePosition: SM64ObjectVector3
+    let spiralFocusFloorOffset: Float
+    let spiralFloorHeight: Float?
+    let spiralCurrentFloorHeight: Float
     let height: SM64CameraHeightInput?
     let slope: SM64CameraSlopeInput?
 
@@ -114,6 +118,10 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         bossHeldState: Int16 = 0,
         bossFloorHeight: Float? = nil,
         bossForceHeight: Bool = false,
+        spiralBasePosition: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 0, z: 0),
+        spiralFocusFloorOffset: Float = 0,
+        spiralFloorHeight: Float? = nil,
+        spiralCurrentFloorHeight: Float = 0,
         height: SM64CameraHeightInput? = nil,
         slope: SM64CameraSlopeInput? = nil
     ) {
@@ -154,6 +162,10 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         self.bossHeldState = bossHeldState
         self.bossFloorHeight = bossFloorHeight
         self.bossForceHeight = bossForceHeight
+        self.spiralBasePosition = spiralBasePosition
+        self.spiralFocusFloorOffset = spiralFocusFloorOffset
+        self.spiralFloorHeight = spiralFloorHeight
+        self.spiralCurrentFloorHeight = spiralCurrentFloorHeight
         self.height = height
         self.slope = slope
     }
@@ -176,7 +188,7 @@ struct SM64CameraCallbackResult: Equatable, Sendable {
 }
 
 /// Bounded-mode callback descriptors plus the callbacks whose C bodies are
-/// already reducible to immutable geometry. Parallel, spiral, and water
+/// already reducible to immutable geometry. Parallel and water
 /// callbacks deliberately return nil until their owner-thread path data and
 /// collision policy have their own Swift boundaries.
 enum SM64CameraModeCallbacks {
@@ -198,7 +210,7 @@ enum SM64CameraModeCallbacks {
         descriptor(14, .eightDirections, true, true, false, 1000, 125, 125, 0x05B0, false, true),
         descriptor(15, .slideHoot, true, true, false, 800, 125, 125, 0x1555, true, false),
         descriptor(16, .mario, true, true, false, 800, 125, 125, 0x05B0, true, true),
-        descriptor(17, .spiralStairs, false, true, false, 0, 0, 0, 0, false, false),
+        descriptor(17, .spiralStairs, true, true, false, 0, 0, 0, 0, false, false),
         descriptor(18, .none, false, false, false, 0, 0, 0, 0, false, false)
     ]
 
@@ -225,7 +237,11 @@ enum SM64CameraModeCallbacks {
               finite(input.bossSecondFocus),
               input.bossFocusDistance.isFinite,
               input.bossAngleVelocity.isFinite,
-              input.bossFloorHeight?.isFinite ?? true else { return nil }
+              input.bossFloorHeight?.isFinite ?? true,
+              finite(input.spiralBasePosition),
+              input.spiralFocusFloorOffset.isFinite,
+              input.spiralFloorHeight?.isFinite ?? true,
+              input.spiralCurrentFloorHeight.isFinite else { return nil }
 
         switch descriptor.callback {
         case .radial:
@@ -248,7 +264,9 @@ enum SM64CameraModeCallbacks {
             return fixed(input, descriptor: descriptor)
         case .bossFight:
             return boss(input, descriptor: descriptor)
-        case .none, .waterSurface, .parallelTracking, .spiralStairs:
+        case .spiralStairs:
+            return spiral(input, descriptor: descriptor)
+        case .none, .waterSurface, .parallelTracking:
             return nil
         }
     }
@@ -495,6 +513,36 @@ enum SM64CameraModeCallbacks {
             areaYaw: result.yaw,
             pitch: 0x1000,
             distance: result.distance,
+            outputsSwapped: descriptor.outputsSwapped,
+            panAhead: descriptor.pansAhead,
+            sideButtonYaw: 0,
+            behindMarioSoundTimer: 0
+        )
+    }
+
+    private static func spiral(
+        _ input: SM64CameraCallbackInput,
+        descriptor: SM64CameraModeCallbackDescriptor
+    ) -> SM64CameraCallbackResult? {
+        guard let result = SM64CameraSpiral.update(
+            SM64CameraSpiralInput(
+                marioPosition: input.marioPosition,
+                cameraPosition: input.cameraPosition,
+                cameraFocus: input.cameraFocus,
+                basePosition: input.spiralBasePosition,
+                focusFloorOffset: input.spiralFocusFloorOffset,
+                floorHeight: input.spiralFloorHeight,
+                currentFloorHeight: input.spiralCurrentFloorHeight
+            )
+        ) else { return nil }
+        return SM64CameraCallbackResult(
+            focus: result.focus,
+            position: result.position,
+            cameraYaw: result.yaw,
+            returnedYaw: result.yaw,
+            areaYaw: result.yawOffset,
+            pitch: 0,
+            distance: 300,
             outputsSwapped: descriptor.outputsSwapped,
             panAhead: descriptor.pansAhead,
             sideButtonYaw: 0,

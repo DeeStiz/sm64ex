@@ -2,6 +2,20 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31u promotes spiral-stairs camera mode 17 through the Swift evaluator. C
+  snapshots the staircase anchor, Mario floor offset, current focus/position,
+  interpolated floor, and current-floor clamp; Swift owns relative yaw
+  clamping, 300-unit placement, focus/height approaches, floor application,
+  and returned yaw while C retains C-button effects, floor lookup, mutable
+  camera state, and presentation. The callback fingerprint is
+  `0x50e8fd2d5387c4a3`; camera primitive/geometry/callback/migration/state/
+  runtime smokes, native ABI smoke, Swift 6 Debug build, and `git diff --check`
+  pass. Signed launch `/tmp/sm64-modern-m31u-live.log` reaches Metal 4 frame
+  one, 360 fixed steps, zero scheduler/audio drops, and status-0 shutdown; no
+  spiral route is entered, so authored-mode telemetry, full camera parity,
+  physical feel, and human acceptance remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31u.md`.
+
 - M31t promotes boss-fight camera mode 11 through the Swift evaluator. C
   snapshots the second focus, held-object state, bounded focus distance,
   arena-floor result, BBH height override, Mario angular velocity, and current

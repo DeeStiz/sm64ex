@@ -15,6 +15,7 @@ xcrun swiftc -parse-as-library -swift-version 6 \
   "$PROJECT_ROOT/SM64Modern/CameraPrimitives.swift" \
   "$PROJECT_ROOT/SM64Modern/CameraBoss.swift" \
   "$PROJECT_ROOT/SM64Modern/CameraFixed.swift" \
+  "$PROJECT_ROOT/SM64Modern/CameraSpiral.swift" \
   "$PROJECT_ROOT/SM64Modern/CameraCUp.swift" \
   "$PROJECT_ROOT/SM64Modern/CameraBehindKernel.swift" \
   "$PROJECT_ROOT/SM64Modern/CameraModeCallbacks.swift" \

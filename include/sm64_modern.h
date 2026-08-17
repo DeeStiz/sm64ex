@@ -537,6 +537,13 @@ typedef struct SM64ModernCameraCallbackInputV1 {
     int16_t boss_held_state;
     uint16_t boss_flags;
     uint16_t reserved2;
+    // Spiral-stairs values are populated only for CAMERA_MODE_SPIRAL_STAIRS.
+    float spiral_base_position[3];
+    float spiral_focus_floor_offset;
+    float spiral_floor_height;
+    float spiral_current_floor_height;
+    uint16_t spiral_flags;
+    uint16_t reserved3;
     uint32_t reserved;
 } SM64ModernCameraCallbackInputV1;
 
@@ -605,6 +612,7 @@ typedef struct SM64ModernCameraFOVOutputV1 {
 #define SM64_MODERN_CAMERA_CALLBACK_FIXED_SMOOTH_MOVEMENT (1u << 7)
 #define SM64_MODERN_CAMERA_CALLBACK_HAS_BOSS_FLOOR_HEIGHT (1u << 8)
 #define SM64_MODERN_CAMERA_CALLBACK_BOSS_FORCE_HEIGHT (1u << 9)
+#define SM64_MODERN_CAMERA_CALLBACK_HAS_SPIRAL_FLOOR_HEIGHT (1u << 0)
 #define SM64_MODERN_CAMERA_CALLBACK_MARIO_MODE_ACTIVE (1u << 0)
 #define SM64_MODERN_CAMERA_CALLBACK_WATER_OR_METAL_ACTION (1u << 1)
 

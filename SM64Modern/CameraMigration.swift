@@ -155,6 +155,7 @@ final class SwiftCameraMigrationService {
               ),
               input.reserved1 == 0,
               input.reserved2 == 0,
+              input.reserved3 == 0,
               input.reserved == 0 else {
             return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "callback_input")
         }
@@ -266,6 +267,16 @@ final class SwiftCameraMigrationService {
                 ? input.boss_floor_height : nil,
             bossForceHeight: input.boss_flags
                 & UInt16(SM64_MODERN_CAMERA_CALLBACK_BOSS_FORCE_HEIGHT) != 0,
+            spiralBasePosition: SM64ObjectVector3(
+                x: input.spiral_base_position.0,
+                y: input.spiral_base_position.1,
+                z: input.spiral_base_position.2
+            ),
+            spiralFocusFloorOffset: input.spiral_focus_floor_offset,
+            spiralFloorHeight: input.spiral_flags
+                & UInt16(SM64_MODERN_CAMERA_CALLBACK_HAS_SPIRAL_FLOOR_HEIGHT) != 0
+                ? input.spiral_floor_height : nil,
+            spiralCurrentFloorHeight: input.spiral_current_floor_height,
             height: height,
             slope: slope
         )
