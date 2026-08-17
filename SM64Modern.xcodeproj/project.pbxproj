@@ -120,6 +120,7 @@
 		71832214A0EA82FFBAE64390 /* BobombEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 60F74F1DC90A46BBEF7D28FE /* BobombEnemy.swift */; };
 		719A899A4EB08E524438CFD3 /* KingBobombBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E60804F0EF8C667FED6EBAD /* KingBobombBehavior.swift */; };
 		724CA1435F965914653FECE7 /* PauseMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A415C177E19A84E04B63454 /* PauseMenu.swift */; };
+		7266996C07A9FA1676FAC4AE /* AudioTrace.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA7D8015EB93979846FCCE8A /* AudioTrace.swift */; };
 		74F6B3961402E9A06DBC362B /* MarioWhirlpoolAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54E9E5A575E124235D4817C6 /* MarioWhirlpoolAction.swift */; };
 		77C353336E88DAB6B5B3896D /* TTCPendulumBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCAB579B5F0CCC996D97C312 /* TTCPendulumBehavior.swift */; };
 		794F70AFB48B7D7AA1B13D15 /* TuxiesMotherEyes.swift in Sources */ = {isa = PBXBuildFile; fileRef = D80D7D687104873CF663B8AB /* TuxiesMotherEyes.swift */; };
@@ -442,6 +443,7 @@
 		B96E5AD86B3742196A22A436 /* CameraModeCallbacks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraModeCallbacks.swift; sourceTree = "<group>"; };
 		B9D7C1D74924B6E54317AA49 /* SwiftGameplay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftGameplay.swift; sourceTree = "<group>"; };
 		BA6EF56FF4DC7CC2039DAF91 /* BigBooObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigBooObjectBridge.swift; sourceTree = "<group>"; };
+		BA7D8015EB93979846FCCE8A /* AudioTrace.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioTrace.swift; sourceTree = "<group>"; };
 		BAB7D9714A5D0EEB844F6E3A /* KoopaShellObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoopaShellObjectBridge.swift; sourceTree = "<group>"; };
 		BB40062F0B74B53B43A517BA /* EngineState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineState.swift; sourceTree = "<group>"; };
 		BC4936117FA9E8B6E655D4A3 /* SmallPenguinBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallPenguinBehavior.swift; sourceTree = "<group>"; };
@@ -527,6 +529,7 @@
 				E51CE2557B77FAF7731F3B79 /* AudioPools.swift */,
 				E031BF83D984334D480CF1AE /* AudioResidency.swift */,
 				7E3067F20772683A08D2D750 /* AudioSequence.swift */,
+				BA7D8015EB93979846FCCE8A /* AudioTrace.swift */,
 				4DDE26E083CE3C79E2FBCCDB /* BehaviorDispatchBridge.swift */,
 				D6B1983ADD652967A0372D10 /* BehaviorScript.swift */,
 				2190411676111392153CCF14 /* BehaviorScriptContentRuntime.swift */,
@@ -876,6 +879,7 @@
 				6CFFFE57D9A674C3022869C0 /* AudioPools.swift in Sources */,
 				0D78DE60017C40C08F8475DA /* AudioResidency.swift in Sources */,
 				F56A4EB70031FE139B3F31C8 /* AudioSequence.swift in Sources */,
+				7266996C07A9FA1676FAC4AE /* AudioTrace.swift in Sources */,
 				8AC19AB29646962A8EF430E1 /* BehaviorDispatchBridge.swift in Sources */,
 				FB22662CA7B17B0C861D757E /* BehaviorScript.swift in Sources */,
 				161305011332BA3EE27E1E02 /* BehaviorScriptContentRuntime.swift in Sources */,

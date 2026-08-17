@@ -2,7 +2,7 @@
 
 ## Status
 
-M27d is the latest validated pre-synthesis audio value slice layered on
+M27e is the latest validated pre-synthesis audio value slice layered on
 M26b/M26a/M25d/M25c/M25b/M25a/M24d/M23j/M34a/M33f/M22bc;
 the durable replay record now carries every mutation operand needed for a
 standalone fresh-image replay—flags, course/star, cap, sound, source slot, and
@@ -157,7 +157,19 @@ Metal 4/frame-one/clean-status launch are in
 `/tmp/sm64-modern-m27d-full-matrix.log`
 (`MATRIX_RESULT runs=226 failures=0`). This remains pre-synthesis: no live
 sequence-owner promotion, PCM, mixer, audible, or physical/human acceptance
-is claimed. M34a remains the latest
+is claimed. M27e now adds an owner-token-gated schema-4 pre-synthesis trace
+session. Sequence, channel/layer/note-pool, residency, and stream events are
+projected into canonical domain-9 state records with stable record IDs,
+sequence numbers, fixed-width values, and round-trip codec checks; a foreign
+owner token fails closed without appending a record. The independent C trace
+fixture matches Swift at fingerprint `0x8677990c2f9f73c4`. The focused
+contract is `script/test_audio_trace.sh`; the regenerated native Debug build
+and Metal 4/frame-one/clean-status launch are in
+`/tmp/sm64-modern-m27e-verify.log`; the exhaustive 227-script matrix is
+`/tmp/sm64-modern-m27e-full-matrix.log`
+(`MATRIX_RESULT runs=227 failures=0`). This is trace-ready but not live audio
+authority: no EngineHost audio cutover, PCM, mixer, audible, or
+physical/human acceptance is claimed. M34a remains the latest
 Metal 4 production checkpoint. The Swift runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -1999,11 +2011,12 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M26: Front-end state | Title, file select, course select, demos, credits, ending, and front-end transitions run without C engine callbacks. | In progress — M26a value reducer and M26b immutable render packet cover the first front-end state/presentation boundary; live screen/asset/input/audio wiring remains |
 | M26a: Swift front-end state and transition reducer | `SM64FrontEndModel`, `SM64IntroPresentationState`, `SM64PressStartDemoState`, and `SM64LevelSelectState` mirror title zoom/fade counters, the 800-tick idle demo trigger, selection wrapping, screen transitions, and legacy-domain freeze as immutable Swift values. | Complete locally — Swift/C fingerprint `0x82b90492a9f11a54`; `script/test_front_end.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m26-verify.log`) reach Metal 4/frame-one/clean status 0; complete 221-script matrix (`/tmp/sm64-modern-m26-matrix-summary.log`, `runs=221 failures=0`), strict-concurrency audit, and `git diff --check`; live rendering, ROM assets, audio, and human input/visual acceptance remain |
 | M26b: Swift front-end render packet | `SM64FrontEndRenderPacket` mirrors C title tile layout, title model/fade markers, file-select text/cursor positions, course/level selection cursors, and demo/credits/ending semantic text commands as immutable values. | Complete locally — Swift/C fingerprint `0x5a7bf7982d12f694`; `script/test_front_end_render.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m26b-verify.log`) reach Metal 4/frame-one/clean status 0; complete 222-script matrix (`/tmp/sm64-modern-m26b-matrix-summary.log`, `runs=222 failures=0`), strict-concurrency audit, and `git diff --check`; live Metal draw/texture/text integration and visual parity remain |
-| M27: Audio sequencing/loading | Swift audio heap, banks, sequences, channels, layers, note allocation, and loading match pre-synthesis C traces. | In progress — M27a closes the value-only M64 command/load-status boundary, M27b closes the tempo/script/event value boundary, M27c closes channel/layer/note pool allocation and teardown values, and M27d closes copied residency/lookup/stream value state; sequence-player owner wiring and pre-synthesis live traces remain |
+| M27: Audio sequencing/loading | Swift audio heap, banks, sequences, channels, layers, note allocation, and loading match pre-synthesis C traces. | In progress — M27a closes the value-only M64 command/load-status boundary, M27b closes the tempo/script/event value boundary, M27c closes channel/layer/note pool allocation and teardown values, M27d closes copied residency/lookup/stream value state, and M27e closes owner-token-gated schema-4 trace projection; EngineHost audio cutover and pre-synthesis live routes remain |
 | M27a: M64 command decoder and sequence/bank load state | Swift decodes one bounded M64 command with C compressed timing/control widths and models three-player bank/sequence status, load-lock, immediate/async thresholds, bank-before-sequence DMA ordering, and discardable unload transitions without ROM pointers or synthesis. | Complete locally — Swift/C fingerprint `0xf233bec42ce7183a`; `script/test_audio.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m27a-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 223-script matrix (`/tmp/sm64-modern-m27a-full-matrix.log`, `runs=223 failures=0`), strict-concurrency audit, and `git diff --check`; live sequence owner, channel/layer allocator, instrument/sample residency, event trace, PCM, and audible acceptance remain |
 | M27b: Sequence-player tempo/script state and event packet | Swift admits C tatums with tempo accumulation, consumes sequence delay/control/value/transpose/channel/loop/variation/end commands, fences malformed data, and emits immutable pre-synthesis event packets without channel or note pointers. | Complete locally — Swift/C fingerprint `0xae744ed9ffb34142`; `script/test_audio_sequence.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m27b-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 224-script matrix (`/tmp/sm64-modern-m27b-full-matrix.log`, `runs=224 failures=0`), strict-concurrency audit, and `git diff --check`; channel/layer ownership, note allocation, instrument/sample residency, live owner wiring, PCM, and audible acceptance remain |
 | M27c: Channel/layer/note pools and allocation policy | Swift mirrors reverse-order layer free-list ownership, channel reinitialization/teardown, disabled/decaying/releasing/active lists, layer/channel/sequence/global allocation-policy search, priority/tie selection, bank-unavailable fencing, layer-note reuse, and prior-layer state. | Complete locally — Swift/C fingerprint `0xc1e495d40cb9e29a`; `script/test_audio_pools.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m27c-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 225-script matrix (`/tmp/sm64-modern-m27c-full-matrix.log`, `runs=225 failures=0`), strict-concurrency audit, and `git diff --check`; instrument/sample residency, live sequence-owner wiring, stream events, PCM, mixer, and audible acceptance remain |
 | M27d: Bank/instrument/sample residency and stream events | Swift mirrors two-sided bank/sequence temporary-pool side selection and eviction, async/immediate completion, discardable/touched residency, instrument fallback/range selection, drum lookup, sample identity, and bounded short/long stream cache TTL/reuse events as copied values. | Complete locally — Swift/C fingerprint `0x994baae3a9e21974`; `script/test_audio_residency.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m27d-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 226-script matrix (`/tmp/sm64-modern-m27d-full-matrix.log`, `runs=226 failures=0`), strict-concurrency audit, and `git diff --check`; live sequence-owner trace promotion, PCM, mixer, and audible acceptance remain |
+| M27e: Owner-thread pre-synthesis trace promotion | `SM64AudioPreSynthesisTraceSession` projects sequence, pool, residency, and stream events into canonical schema-4 domain-9 records with stable IDs, fixed-width values, owner-token admission, and record codec round trips; foreign-token writes fail closed. | Complete locally — Swift/C fingerprint `0x8677990c2f9f73c4`; `script/test_audio_trace.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m27e-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 227-script matrix (`/tmp/sm64-modern-m27e-full-matrix.log`, `runs=227 failures=0`), strict-concurrency audit, and `git diff --check`; EngineHost audio cutover, live route coverage, PCM, mixer, and audible acceptance remain |
 | M28: Audio synthesis/effects | Swift synthesis, envelopes, resampling, reverb, mixing, music, and effects match 32-kHz PCM bit-for-bit. | Not started |
 | M29: Display-list translation | Swift produces immutable Metal scene packets identical to the C renderer bridge for every reachable command/state. | Not started |
 | M30: Goddard/Mario face | Product-reachable Mario-face update, geometry, material, animation, and render paths run in Swift. | Not started |
@@ -2395,8 +2408,11 @@ replayable trace, and the platform evidence listed in its exit gate.
    bank-unavailable, layer-reuse, and channel-teardown value boundary. M27d
    now closes copied bank/sequence side selection and eviction,
    instrument/drum/sample identity and range selection, and bounded short/long
-   stream TTL/reuse events. Next split the work into M27e owner-thread
-   pre-synthesis trace promotion. Do not enable a Swift audio
+   stream TTL/reuse events. M27e now adds owner-token-gated schema-4
+   domain-9 trace projection for those event sources with canonical record
+   IDs, values, sequence numbers, and C↔Swift codec parity. Next enable the
+   trace session only on an EngineHost owner route, then move to M28. Do not
+   enable a Swift audio
    authority until C-vs-Swift event traces match over title, menu, gameplay,
    pause, transition, and shutdown routes.
 6. **M28 audio synthesis/effects.** Port envelopes, pitch, resampling,
