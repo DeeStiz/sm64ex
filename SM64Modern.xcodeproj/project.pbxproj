@@ -217,6 +217,7 @@
 		D0031C8BC47031BF22FCFA00 /* EyerokHand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225D73054770EC25DC64D2C0 /* EyerokHand.swift */; };
 		D19D30E6B7A0A540B8C68BB4 /* FrontEndRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = C43519D037D79EF6DB35F980 /* FrontEndRender.swift */; };
 		D3919C39B72DEEB57976B4BA /* TuxiesMotherBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBADCC8D3A0FCE39EEF40AC3 /* TuxiesMotherBehavior.swift */; };
+		D5578FD5FECA0729AE8EDAC2 /* AudioMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1852868F5E323B208C3437 /* AudioMixer.swift */; };
 		D65F07ACB7B0E4429D8D1086 /* ObjectSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */; };
 		D77819D0FD6CAB42ED53C410 /* ChuckyaEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDDABF519C9DA6F2577DA59 /* ChuckyaEnemy.swift */; };
 		D90B3C570D39D306BB4A38B1 /* MarioWalkingAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99204A42040D31152F30F990 /* MarioWalkingAction.swift */; };
@@ -354,6 +355,7 @@
 		5C737B1A16857D51F7C7FE7A /* EngineHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EngineHost.swift; sourceTree = "<group>"; };
 		5D39626AC1CF73EA2D9419E7 /* PokeyEnemy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokeyEnemy.swift; sourceTree = "<group>"; };
 		5DC36B2F482052DC82E04839 /* MarioHeldWalkingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioHeldWalkingAction.swift; sourceTree = "<group>"; };
+		5E1852868F5E323B208C3437 /* AudioMixer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMixer.swift; sourceTree = "<group>"; };
 		5E9DA580874381501BF6F49F /* MarioCrawlingAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCrawlingAction.swift; sourceTree = "<group>"; };
 		5EBCDC28A1DADF92929BD72A /* KoopaShell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KoopaShell.swift; sourceTree = "<group>"; };
 		5FDEF637017419435B14C766 /* CameraCUpTransition.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCUpTransition.swift; sourceTree = "<group>"; };
@@ -532,6 +534,7 @@
 				D5723E1972C2FF3BB21E3A5B /* AppMain.swift */,
 				CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */,
 				6FED187A5E0CCAF0E865A36D /* Audio.swift */,
+				5E1852868F5E323B208C3437 /* AudioMixer.swift */,
 				E51CE2557B77FAF7731F3B79 /* AudioPools.swift */,
 				E031BF83D984334D480CF1AE /* AudioResidency.swift */,
 				7E3067F20772683A08D2D750 /* AudioSequence.swift */,
@@ -885,6 +888,7 @@
 				45A81321673F7A9E37884420 /* AppleInputService.swift in Sources */,
 				DD3A03E522F13B396092C761 /* ArrowLiftBehavior.swift in Sources */,
 				E1570F804670ACB1AD2469B0 /* Audio.swift in Sources */,
+				D5578FD5FECA0729AE8EDAC2 /* AudioMixer.swift in Sources */,
 				6CFFFE57D9A674C3022869C0 /* AudioPools.swift in Sources */,
 				0D78DE60017C40C08F8475DA /* AudioResidency.swift in Sources */,
 				F56A4EB70031FE139B3F31C8 /* AudioSequence.swift in Sources */,

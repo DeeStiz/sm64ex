@@ -2,7 +2,7 @@
 
 ## Status
 
-M28c is the latest validated audio synthesis value slice layered on
+M28d is the latest validated audio synthesis value slice layered on
 M26b/M26a/M25d/M25c/M25b/M25a/M24d/M23j/M34a/M33f/M22bc;
 the durable replay record now carries every mutation operand needed for a
 standalone fresh-image replay—flags, course/star, cap, sound, source slot, and
@@ -205,7 +205,18 @@ M27 residency events. The independent C fixture matches Swift at fingerprint
 `/tmp/sm64-modern-m28c-full-matrix.log` (`MATRIX_RESULT runs=230
 failures=0`). This remains a value-only refill boundary: no live AVAudio
 route, mixer/effects/reverb authority, audible, or physical/human acceptance
-is claimed. M34a remains the latest Metal 4 production checkpoint. The Swift
+is claimed. M28d now adds a deterministic 32-kHz mixer/effects frame: stable
+music/effect priority order, saturating dry accumulation, optional reverb
+ring feedback/send state, clipped-sample accounting, and interleaved stereo
+assembly. The independent C fixture matches Swift at fingerprint
+`0x8ecc1809c3dd0384`. The focused contract is
+`script/test_audio_mixer.sh`; the regenerated native Debug build and Metal
+4/frame-one/clean-status launch are recorded in
+`/tmp/sm64-modern-m28d-verify.log`; the exhaustive matrix is
+`/tmp/sm64-modern-m28d-full-matrix.log` (`MATRIX_RESULT runs=231
+failures=0`). This remains a value-only mixer boundary: no live AVAudio
+route, EngineHost promotion, audible, or physical/human acceptance is
+claimed. M34a remains the latest Metal 4 production checkpoint. The Swift
 runtime
 now owns lifecycle phase validation, stop-state transitions, failure fencing,
 and a real owner-thread Swift engine context containing the migrated state,
@@ -2053,10 +2064,11 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M27c: Channel/layer/note pools and allocation policy | Swift mirrors reverse-order layer free-list ownership, channel reinitialization/teardown, disabled/decaying/releasing/active lists, layer/channel/sequence/global allocation-policy search, priority/tie selection, bank-unavailable fencing, layer-note reuse, and prior-layer state. | Complete locally — Swift/C fingerprint `0xc1e495d40cb9e29a`; `script/test_audio_pools.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m27c-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 225-script matrix (`/tmp/sm64-modern-m27c-full-matrix.log`, `runs=225 failures=0`), strict-concurrency audit, and `git diff --check`; instrument/sample residency, live sequence-owner wiring, stream events, PCM, mixer, and audible acceptance remain |
 | M27d: Bank/instrument/sample residency and stream events | Swift mirrors two-sided bank/sequence temporary-pool side selection and eviction, async/immediate completion, discardable/touched residency, instrument fallback/range selection, drum lookup, sample identity, and bounded short/long stream cache TTL/reuse events as copied values. | Complete locally — Swift/C fingerprint `0x994baae3a9e21974`; `script/test_audio_residency.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m27d-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 226-script matrix (`/tmp/sm64-modern-m27d-full-matrix.log`, `runs=226 failures=0`), strict-concurrency audit, and `git diff --check`; live sequence-owner trace promotion, PCM, mixer, and audible acceptance remain |
 | M27e: Owner-thread pre-synthesis trace promotion | `SM64AudioPreSynthesisTraceSession` projects sequence, pool, residency, and stream events into canonical schema-4 domain-9 records with stable IDs, fixed-width values, owner-token admission, and record codec round trips; foreign-token writes fail closed. | Complete locally — Swift/C fingerprint `0x8677990c2f9f73c4`; `script/test_audio_trace.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m27e-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 227-script matrix (`/tmp/sm64-modern-m27e-full-matrix.log`, `runs=227 failures=0`), strict-concurrency audit, and `git diff --check`; EngineHost audio cutover, live route coverage, PCM, mixer, and audible acceptance remain |
-| M28: Audio synthesis/effects | Swift synthesis, envelopes, resampling, reverb, mixing, music, and effects match 32-kHz PCM bit-for-bit. | In progress — M28a closes the deterministic scalar decode/ADSR/resample/envelope window, M28b closes the bounded note voice window, and M28c closes loop-aware stream/refill values; mixer/effects, EngineHost promotion, and audible acceptance remain |
+| M28: Audio synthesis/effects | Swift synthesis, envelopes, resampling, reverb, mixing, music, and effects match 32-kHz PCM bit-for-bit. | In progress — M28a closes the deterministic scalar decode/ADSR/resample/envelope window, M28b closes the bounded note voice window, M28c closes loop-aware stream/refill values, and M28d closes the value mixer/frame boundary; EngineHost promotion and audible acceptance remain |
 | M28a: Scalar synthesis value kernel | `SM64AudioADPCMDecoder` mirrors source-aligned C VADPCM block prediction and signed floor division; `SM64AudioADSR` mirrors the US fixed-point envelope states/actions and disabled-state fence; `SM64AudioLinearResampler` and `SM64AudioPCMWindow` project deterministic fixed-point PCM windows. | Complete locally — Swift/C fingerprint `0x6125e76970c44fee`; `script/test_audio_synthesis.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28a-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 228-script matrix (`/tmp/sm64-modern-m28a-full-matrix.log`, `runs=228 failures=0`), strict-concurrency audit, and `git diff --check`; note synthesis/streaming/mixer/reverb, live audio route, and audible acceptance remain |
 | M28b: Note voice synthesis window | `SM64AudioVoiceWindow` consumes M27 note-pool state, sample/stream descriptors, and M28a-decoded samples, projects fixed-point loop-aware dry-left/dry-right/reverb windows, and emits started/released/looped/active/disabled/unavailable lifetime events with no realtime ownership. | Complete locally — Swift/C fingerprint `0xf1018df41ac4c10`; `script/test_audio_voice.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28b-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 229-script matrix (`/tmp/sm64-modern-m28b-full-matrix.log`, `runs=229 failures=0`), strict-concurrency audit, and `git diff --check`; loop-state streaming, mixer/effects/reverb, live audio route, and audible acceptance remain |
 | M28c: Loop-aware ADPCM stream/refill window | `SM64AudioADPCMStreamWindow` decodes copied 9-byte blocks with M28a predictor state, requests M27 short/long stream residency, restores copied loop history, fences malformed/unavailable blocks, and emits deterministic block/history/loop/finish events. | Complete locally — Swift/C fingerprint `0xd64002acff69ef29`; `script/test_audio_stream.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28c-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 230-script matrix (`/tmp/sm64-modern-m28c-full-matrix.log`, `runs=230 failures=0`), strict-concurrency audit, and `git diff --check`; mixer/effects/reverb, live audio route, and audible acceptance remain |
+| M28d: Mixer/effects and 32-kHz frame assembly | `SM64AudioMixer` performs stable music/effect priority ordering, saturating dry accumulation, optional Q15 reverb ring feedback/send, clipped-sample accounting, and deterministic interleaved 32-kHz stereo output. | Complete locally — Swift/C fingerprint `0x8ecc1809c3dd0384`; `script/test_audio_mixer.sh`, regenerated native Debug build and `script/build_and_run.sh --verify` (`/tmp/sm64-modern-m28d-verify.log`) reach Metal 4/frame-one/clean status 0; exhaustive 231-script matrix (`/tmp/sm64-modern-m28d-full-matrix.log`, `runs=231 failures=0`), strict-concurrency audit, and `git diff --check`; EngineHost promotion, realtime AVAudio, audible, and physical acceptance remain |
 | M29: Display-list translation | Swift produces immutable Metal scene packets identical to the C renderer bridge for every reachable command/state. | Not started |
 | M30: Goddard/Mario face | Product-reachable Mario-face update, geometry, material, animation, and render paths run in Swift. | Not started |
 | M31: Whole-engine Swift authority | Swift completes title-to-gameplay, saves, audio, rendering, and shutdown with no engine/gameplay C callback; C selector remains equivalent. | Not started |
@@ -2463,10 +2475,12 @@ replayable trace, and the platform evidence listed in its exit gate.
    window/voice lifetime route, consuming M27 pool/residency descriptors and
    emitting fixed-point dry/reverb packets. M28c now adds loop-aware ADPCM
    block/history state, M27 stream residency requests, refill events, and
-   malformed/unavailable fencing. M28d must add mixer/effects/reverb and
-   32-kHz frame assembly; M28e must promote the trace and PCM window through
-   the EngineHost owner route. Compare PCM bit-for-bit over deterministic
-   windows and keep AVAudio as the only audited realtime leaf shim.
+   malformed/unavailable fencing. M28d now adds stable music/effect priority,
+   saturating dry accumulation, Q15 reverb ring/send state, clipped-sample
+   accounting, and 32-kHz interleaved stereo frame assembly. M28e must
+   promote the trace and PCM window through the EngineHost owner route.
+   Compare PCM bit-for-bit over deterministic windows and keep AVAudio as the
+   only audited realtime leaf shim.
 7. **M29 display-list translation.** Decode every reachable display-list
    command into immutable Swift scene packets, including textures, combine
    modes, geometry modes, matrices, lights, fog, and render-layer ordering.
