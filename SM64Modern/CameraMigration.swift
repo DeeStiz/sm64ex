@@ -153,6 +153,7 @@ final class SwiftCameraMigrationService {
               input.header.struct_size >= UInt32(
                 MemoryLayout<SM64ModernCameraCallbackInputV1>.size
               ),
+              input.reserved1 == 0,
               input.reserved == 0 else {
             return fail(SM64_MODERN_STATUS_INVALID_ARGUMENT, boundary: "callback_input")
         }
@@ -233,6 +234,23 @@ final class SwiftCameraMigrationService {
                 & UInt16(SM64_MODERN_CAMERA_CALLBACK_MARIO_MODE_ACTIVE) != 0,
             waterOrMetalAction: input.state_flags
                 & UInt16(SM64_MODERN_CAMERA_CALLBACK_WATER_OR_METAL_ACTION) != 0,
+            fixedBasePosition: SM64ObjectVector3(
+                x: input.fixed_base_position.0,
+                y: input.fixed_base_position.1,
+                z: input.fixed_base_position.2
+            ),
+            fixedScaleToMario: input.fixed_scale_to_mario,
+            fixedHeightOffset: input.fixed_height_offset,
+            fixedFloorHeight: input.fixed_flags
+                & UInt16(SM64_MODERN_CAMERA_CALLBACK_HAS_FIXED_FLOOR) != 0
+                ? input.fixed_floor_height : nil,
+            fixedCeilingHeight: input.fixed_flags
+                & UInt16(SM64_MODERN_CAMERA_CALLBACK_HAS_FIXED_CEILING) != 0
+                ? input.fixed_ceiling_height : nil,
+            fixedGoalHeight: input.fixed_goal_height,
+            fixedFocusFloorOffset: input.fixed_focus_floor_offset,
+            fixedSmoothMovement: input.fixed_flags
+                & UInt16(SM64_MODERN_CAMERA_CALLBACK_FIXED_SMOOTH_MOVEMENT) != 0,
             height: height,
             slope: slope
         )

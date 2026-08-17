@@ -58,6 +58,14 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
     let behindMarioSoundTimer: Int16
     let marioModeActive: Bool
     let waterOrMetalAction: Bool
+    let fixedBasePosition: SM64ObjectVector3
+    let fixedScaleToMario: Float
+    let fixedHeightOffset: Float
+    let fixedFloorHeight: Float?
+    let fixedCeilingHeight: Float?
+    let fixedGoalHeight: Float
+    let fixedFocusFloorOffset: Float
+    let fixedSmoothMovement: Bool
     let height: SM64CameraHeightInput?
     let slope: SM64CameraSlopeInput?
 
@@ -84,6 +92,14 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         behindMarioSoundTimer: Int16 = 0,
         marioModeActive: Bool = false,
         waterOrMetalAction: Bool = false,
+        fixedBasePosition: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 0, z: 0),
+        fixedScaleToMario: Float = 0,
+        fixedHeightOffset: Float = 0,
+        fixedFloorHeight: Float? = nil,
+        fixedCeilingHeight: Float? = nil,
+        fixedGoalHeight: Float = 0,
+        fixedFocusFloorOffset: Float = 0,
+        fixedSmoothMovement: Bool = false,
         height: SM64CameraHeightInput? = nil,
         slope: SM64CameraSlopeInput? = nil
     ) {
@@ -109,6 +125,14 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         self.behindMarioSoundTimer = behindMarioSoundTimer
         self.marioModeActive = marioModeActive
         self.waterOrMetalAction = waterOrMetalAction
+        self.fixedBasePosition = fixedBasePosition
+        self.fixedScaleToMario = fixedScaleToMario
+        self.fixedHeightOffset = fixedHeightOffset
+        self.fixedFloorHeight = fixedFloorHeight
+        self.fixedCeilingHeight = fixedCeilingHeight
+        self.fixedGoalHeight = fixedGoalHeight
+        self.fixedFocusFloorOffset = fixedFocusFloorOffset
+        self.fixedSmoothMovement = fixedSmoothMovement
         self.height = height
         self.slope = slope
     }
@@ -131,9 +155,9 @@ struct SM64CameraCallbackResult: Equatable, Sendable {
 }
 
 /// Bounded-mode callback descriptors plus the callbacks whose C bodies are
-/// already reducible to immutable geometry. Fixed, parallel, boss, spiral,
-/// and water callbacks deliberately return nil until their owner-thread path
-/// data and collision policy have their own Swift boundaries.
+/// already reducible to immutable geometry. Parallel, boss, spiral, and water
+/// callbacks deliberately return nil until their owner-thread path data and
+/// collision policy have their own Swift boundaries.
 enum SM64CameraModeCallbacks {
     static let descriptors: [SM64CameraModeCallbackDescriptor] = [
         descriptor(0, .none, false, false, false, 0, 0, 0, 0, false, false),
@@ -149,7 +173,7 @@ enum SM64CameraModeCallbacks {
         descriptor(10, .insideCannon, true, true, true, 800, 125, 125, 0, true, false),
         descriptor(11, .bossFight, false, true, false, 0, 0, 0, 0, false, false),
         descriptor(12, .parallelTracking, false, true, false, 0, 0, 0, 0, false, false),
-        descriptor(13, .fixed, false, true, false, 0, 0, 0, 0, false, true),
+        descriptor(13, .fixed, true, true, false, 0, 0, 0, 0, false, false),
         descriptor(14, .eightDirections, true, true, false, 1000, 125, 125, 0x05B0, false, true),
         descriptor(15, .slideHoot, true, true, false, 800, 125, 125, 0x1555, true, false),
         descriptor(16, .mario, true, true, false, 800, 125, 125, 0x05B0, true, true),
@@ -169,7 +193,14 @@ enum SM64CameraModeCallbacks {
               finite(input.marioPosition), finite(input.areaCenter),
               input.lakituDistance.isFinite,
               input.zoomDistance?.isFinite ?? true,
-              input.cannonYOffset.isFinite else { return nil }
+              input.cannonYOffset.isFinite,
+              finite(input.fixedBasePosition),
+              input.fixedScaleToMario.isFinite,
+              input.fixedHeightOffset.isFinite,
+              input.fixedFloorHeight?.isFinite ?? true,
+              input.fixedCeilingHeight?.isFinite ?? true,
+              input.fixedGoalHeight.isFinite,
+              input.fixedFocusFloorOffset.isFinite else { return nil }
 
         switch descriptor.callback {
         case .radial:
@@ -188,8 +219,10 @@ enum SM64CameraModeCallbacks {
             return cUp(input, descriptor: descriptor)
         case .behindMario:
             return behindMario(input, descriptor: descriptor)
+        case .fixed:
+            return fixed(input, descriptor: descriptor)
         case .none, .waterSurface, .bossFight,
-             .parallelTracking, .fixed, .spiralStairs:
+             .parallelTracking, .spiralStairs:
             return nil
         }
     }
@@ -374,6 +407,39 @@ enum SM64CameraModeCallbacks {
             panAhead: descriptor.pansAhead,
             sideButtonYaw: result.sideButtonYaw,
             behindMarioSoundTimer: result.behindMarioSoundTimer
+        )
+    }
+
+    private static func fixed(
+        _ input: SM64CameraCallbackInput,
+        descriptor: SM64CameraModeCallbackDescriptor
+    ) -> SM64CameraCallbackResult? {
+        guard let result = SM64CameraFixed.update(
+            SM64CameraFixedInput(
+                marioPosition: input.marioPosition,
+                cameraPosition: input.cameraPosition,
+                basePosition: input.fixedBasePosition,
+                scaleToMario: input.fixedScaleToMario,
+                heightOffset: input.fixedHeightOffset,
+                floorHeight: input.fixedFloorHeight,
+                ceilingHeight: input.fixedCeilingHeight,
+                goalHeight: input.fixedGoalHeight,
+                focusFloorOffset: input.fixedFocusFloorOffset,
+                smoothMovement: input.fixedSmoothMovement
+            )
+        ) else { return nil }
+        return SM64CameraCallbackResult(
+            focus: result.focus,
+            position: result.position,
+            cameraYaw: result.yaw,
+            returnedYaw: result.yaw,
+            areaYaw: result.yaw,
+            pitch: result.pitch,
+            distance: result.distance,
+            outputsSwapped: descriptor.outputsSwapped,
+            panAhead: descriptor.pansAhead,
+            sideButtonYaw: 0,
+            behindMarioSoundTimer: 0
         )
     }
 

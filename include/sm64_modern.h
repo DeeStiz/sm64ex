@@ -514,6 +514,18 @@ typedef struct SM64ModernCameraCallbackInputV1 {
     float camera_focus[3];
     float mario_position[3];
     float area_center[3];
+    // Fixed-camera values are populated only for CAMERA_MODE_FIXED. Keeping
+    // the collision result and interpolation inputs scalar makes this seam
+    // replayable without exposing Camera, Surface, or Lakitu pointers.
+    float fixed_base_position[3];
+    float fixed_scale_to_mario;
+    float fixed_height_offset;
+    float fixed_floor_height;
+    float fixed_ceiling_height;
+    float fixed_goal_height;
+    float fixed_focus_floor_offset;
+    uint16_t fixed_flags;
+    uint16_t reserved1;
     uint32_t reserved;
 } SM64ModernCameraCallbackInputV1;
 
@@ -577,6 +589,9 @@ typedef struct SM64ModernCameraFOVOutputV1 {
 #define SM64_MODERN_CAMERA_CALLBACK_IS_METAL_WATER (1u << 2)
 #define SM64_MODERN_CAMERA_CALLBACK_IS_ON_POLE (1u << 3)
 #define SM64_MODERN_CAMERA_CALLBACK_HAS_SLOPE_FLOOR (1u << 4)
+#define SM64_MODERN_CAMERA_CALLBACK_HAS_FIXED_FLOOR (1u << 5)
+#define SM64_MODERN_CAMERA_CALLBACK_HAS_FIXED_CEILING (1u << 6)
+#define SM64_MODERN_CAMERA_CALLBACK_FIXED_SMOOTH_MOVEMENT (1u << 7)
 #define SM64_MODERN_CAMERA_CALLBACK_MARIO_MODE_ACTIVE (1u << 0)
 #define SM64_MODERN_CAMERA_CALLBACK_WATER_OR_METAL_ACTION (1u << 1)
 

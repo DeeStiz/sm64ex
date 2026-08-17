@@ -1480,11 +1480,11 @@ s32 update_parallel_tracking_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
 /**
  * Updates the camera during fixed mode.
  */
-s32 update_fixed_camera(struct Camera *c, Vec3f focus, UNUSED Vec3f pos) {
+s32 update_fixed_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
     f32 focusFloorOff;
     f32 goalHeight;
     f32 ceilHeight;
-    f32 heightOffset;
+    f32 heightOffset = 0.f;
     f32 distCamToFocus;
     UNUSED u8 filler2[8];
     f32 scaleToMario = 0.5f;
@@ -1517,6 +1517,17 @@ s32 update_fixed_camera(struct Camera *c, Vec3f focus, UNUSED Vec3f pos) {
 
     handle_c_button_movement(c);
     play_camera_buzz_if_cdown();
+
+    {
+        s16 callbackYaw = 0;
+        u32 callbackFlags = 0;
+        if (sm64_modern_camera_evaluate_callback(
+                c, CAMERA_MODE_FIXED, focus, pos, &callbackYaw,
+                &callbackFlags)) {
+            (void)callbackFlags;
+            return callbackYaw;
+        }
+    }
 
     calc_y_to_curr_floor(&focusFloorOff, 1.f, 200.f, &focusFloorOff, 0.9f, 200.f);
     vec3f_copy(focus, sMarioCamState->pos);
@@ -2169,6 +2180,76 @@ static s32 sm64_modern_camera_evaluate_callback(
         input.area_center[0] = camera->areaCenX;
         input.area_center[1] = camera->areaCenY;
         input.area_center[2] = camera->areaCenZ;
+    }
+
+    if (mode == CAMERA_MODE_FIXED && camera != NULL) {
+        f32 focusFloorOffset;
+        f32 goalHeight;
+        f32 ceilingHeight;
+        f32 distance;
+        f32 scaleToMario = 0.5f;
+        f32 heightOffset = 0.f;
+        s16 unusedPitch;
+        s16 unusedYaw;
+        Vec3f fixedFocus;
+        Vec3f basePosition;
+        struct Surface *ceiling = NULL;
+
+        switch (gCurrLevelArea) {
+            case AREA_RR:
+                scaleToMario = 0.f;
+                break;
+            case AREA_CASTLE_LOBBY:
+                scaleToMario = 0.3f;
+                break;
+            case AREA_BBH:
+                scaleToMario = 0.f;
+                break;
+        }
+
+        calc_y_to_curr_floor(
+            &focusFloorOffset, 1.f, 200.f,
+            &focusFloorOffset, 0.9f, 200.f);
+        fixedFocus[0] = sMarioCamState->pos[0];
+        fixedFocus[1] = sMarioCamState->pos[1] + focusFloorOffset + 125.f;
+        fixedFocus[2] = sMarioCamState->pos[2];
+        vec3f_get_dist_and_angle(
+            fixedFocus, pos, &distance, &unusedPitch, &unusedYaw);
+
+        vec3f_copy(basePosition, sFixedModeBasePosition);
+        vec3f_add(basePosition, sCastleEntranceOffset);
+        input.fixed_base_position[0] = basePosition[0];
+        input.fixed_base_position[1] = basePosition[1];
+        input.fixed_base_position[2] = basePosition[2];
+        input.fixed_scale_to_mario = scaleToMario;
+        input.fixed_height_offset = heightOffset;
+        input.fixed_goal_height = gLakituState.goalPos[1];
+        input.fixed_focus_floor_offset = focusFloorOffset;
+
+        if (sMarioGeometry.currFloorType != SURFACE_DEATH_PLANE
+            && sMarioGeometry.currFloorHeight != -11000.f) {
+            input.fixed_flags |= SM64_MODERN_CAMERA_CALLBACK_HAS_FIXED_FLOOR;
+            input.fixed_floor_height = sMarioGeometry.currFloorHeight;
+            goalHeight = sMarioGeometry.currFloorHeight
+                + basePosition[1] + heightOffset;
+        } else {
+            goalHeight = gLakituState.goalPos[1];
+        }
+
+        if (300.f > distance) {
+            goalHeight += 300.f - distance;
+        }
+        ceilingHeight = find_ceil(
+            camera->pos[0], goalHeight - 100.f,
+            camera->pos[2], &ceiling);
+        if (ceilingHeight != 20000.f) {
+            input.fixed_flags |= SM64_MODERN_CAMERA_CALLBACK_HAS_FIXED_CEILING;
+            input.fixed_ceiling_height = ceilingHeight;
+        }
+        if (sStatusFlags & CAM_FLAG_SMOOTH_MOVEMENT) {
+            input.fixed_flags |=
+                SM64_MODERN_CAMERA_CALLBACK_FIXED_SMOOTH_MOVEMENT;
+        }
     }
 
     if (mode == CAMERA_MODE_RADIAL || mode == CAMERA_MODE_OUTWARD_RADIAL

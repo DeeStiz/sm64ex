@@ -70,6 +70,7 @@ enum SM64ModernCameraModeCallbacksSmoke {
         precondition(SM64CameraModeCallbacks.descriptor(for: 6)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 10)?.outputsSwapped == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 12)?.pureGeometryImplemented == false)
+        precondition(SM64CameraModeCallbacks.descriptor(for: 13)?.pureGeometryImplemented == true)
 
         var fingerprint = fnvOffset
         for descriptor in SM64CameraModeCallbacks.descriptors {
@@ -177,6 +178,21 @@ enum SM64ModernCameraModeCallbacksSmoke {
             && cannon.outputsSwapped && cannon.focus.y == 125
             && cannon.position.y.isFinite && cannon.position.y < 150)
         fingerprint = hash(fingerprint, cannon)
+
+        let fixed = SM64CameraModeCallbacks.evaluate(.init(
+            mode: 13,
+            marioPosition: .init(x: 100, y: 0, z: 200),
+            cameraPosition: .init(x: 0, y: 100, z: 0),
+            fixedBasePosition: .init(x: 0, y: 50, z: 0),
+            fixedScaleToMario: 0.5,
+            fixedFloorHeight: 100,
+            fixedFocusFloorOffset: 0
+        ))!
+        precondition(fixed.focus == .init(x: 100, y: 125, z: 200)
+            && fixed.position == .init(x: 50, y: 225, z: 100)
+            && fixed.distance == 225
+            && fixed.returnedYaw == fixed.cameraYaw
+            && !fixed.panAhead)
 
         precondition(SM64CameraModeCallbacks.evaluate(.init(
             mode: 12, marioPosition: .init(x: 0, y: 0, z: 0)

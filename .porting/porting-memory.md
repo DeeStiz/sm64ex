@@ -2,6 +2,20 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31s promotes fixed-camera mode 13 through the live Swift camera
+  evaluator. C snapshots the fixed anchor, area interpolation policy,
+  floor/ceiling results, smooth flag, and focus-floor offset; Swift owns fixed
+  height interpolation, Mario-relative x/z placement, distance clamping, and
+  returned yaw while C retains C-button/buzzer effects, collision queries,
+  pointer ownership, and Lakitu presentation. The callback fingerprint is
+  `0x3be4915380f50c3f`; camera primitive/geometry/callback/migration/state/
+  runtime smokes, native ABI smoke, Swift 6 Debug build, and `git diff --check`
+  pass. Signed launch `/tmp/sm64-modern-m31s-live.log` reaches Metal 4 frame
+  one, 360 fixed steps, zero scheduler/audio drops, and status-0 shutdown;
+  the bounded route does not enter fixed mode, so authored-mode telemetry,
+  full camera parity, physical feel, and human acceptance remain open.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M31s.md`.
+
 - M31r promotes camera FOV/shake evaluation into the live Swift camera ABI.
   Swift owns FOV function selection, set/approach modes, sleeping and BBH
   targets, phase/decay, and the presented FOV; C keeps the perspective graph
