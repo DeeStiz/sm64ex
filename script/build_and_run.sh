@@ -61,6 +61,7 @@ else
   "$PROJECT_ROOT/script/test_audio_promotion.sh"
   "$PROJECT_ROOT/script/test_display_list_packet.sh"
   "$PROJECT_ROOT/script/test_render_packet_capture.sh"
+  "$PROJECT_ROOT/script/test_render_trace_adapter.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"

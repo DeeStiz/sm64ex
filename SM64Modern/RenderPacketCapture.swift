@@ -25,6 +25,74 @@ struct SM64RenderPacketCaptureSummary: Equatable, Sendable {
     let finishFingerprint: UInt64
 }
 
+struct SM64RenderPacketTraceComparison: Equatable, Sendable {
+    let matched: Bool
+    let firstDivergence: Int?
+    let expectedCount: Int
+    let actualCount: Int
+}
+
+enum SM64RenderOracleTraceAdapter {
+    static let domain: UInt32 = 11
+    static let recordKind: UInt32 = 7
+
+    static func records(
+        packet: SM64RenderFramePacket,
+        simulationTick: UInt64
+    ) throws -> [SM64OracleTraceRecord] {
+        try packet.events.enumerated().map { index, event in
+            try SM64OracleTraceRecord(
+                simulationTick: simulationTick,
+                domain: domain,
+                recordKind: recordKind,
+                recordID: UInt64(event.kind),
+                sequence: UInt32(index),
+                values: event.values
+            )
+        }
+    }
+
+    static func fingerprint(_ records: [SM64OracleTraceRecord]) -> UInt64 {
+        var hash = SM64OracleTraceHash.offset
+        hash = update(hash, UInt64(records.count))
+        for record in records {
+            hash = update(hash, record.canonicalHash)
+        }
+        return hash
+    }
+
+    private static func update(_ hash: UInt64, _ value: UInt64) -> UInt64 {
+        var result = hash
+        for shift in stride(from: 0, through: 56, by: 8) {
+            result ^= (value >> UInt64(shift)) & 0xff
+            result &*= SM64RenderPacketFingerprint.prime
+        }
+        return result
+    }
+
+    static func compare(
+        expected: [SM64OracleTraceRecord],
+        actual: [SM64OracleTraceRecord]
+    ) -> SM64RenderPacketTraceComparison {
+        let sharedCount = min(expected.count, actual.count)
+        for index in 0..<sharedCount where expected[index] != actual[index] {
+            return SM64RenderPacketTraceComparison(
+                matched: false,
+                firstDivergence: index,
+                expectedCount: expected.count,
+                actualCount: actual.count
+            )
+        }
+        let matched = expected.count == actual.count
+        return SM64RenderPacketTraceComparison(
+            matched: matched,
+            firstDivergence: matched ? nil : sharedCount,
+            expectedCount: expected.count,
+            actualCount: actual.count
+        )
+    }
+}
+
 enum SM64RenderPacketEventKind {
     static let draw: UInt32 = 1
     static let frameBegin: UInt32 = 2

@@ -10,6 +10,7 @@ xcrun swiftc \
   -swift-version 6 \
   -Xfrontend -strict-concurrency=complete \
   -module-cache-path "$BUILD_ROOT/module-cache" \
+  "$PROJECT_ROOT/SM64Modern/OracleTrace.swift" \
   "$PROJECT_ROOT/SM64Modern/RenderPacketCapture.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_render_packet_capture_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-render-packet-capture-smoke"
