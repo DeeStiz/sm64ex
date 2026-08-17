@@ -2,7 +2,7 @@
 
 ## Status
 
-M30t is the latest validated bounded Goddard/Mario-face source-geometry and
+M30u is the latest validated bounded Goddard/Mario-face source-geometry and
 isolated-encoder slice. Swift now
 owns M30a's pointer-free `mario_Face` geometry/geo-switch packet plus a copied
 25-channel Goddard animation catalog: component/animator IDs, 820/166 frame
@@ -211,6 +211,29 @@ application stop. The live receipt proves owner-thread staging admission only:
 private texture residency, upload/fragment barriers, face mesh/material
 encoding, route authority, GPU capture, screenshots, and visual/human
 acceptance remain open.
+M30u promotes that bounded window to the complete checked-in Mario-face source
+resource. `SM64MarioFaceSourceGeometryProvider` reads
+`src/goddard/dynlists/dynlist_mario_face.c`, verifies the source SHA-256, and
+parses all 440 vertices, 877 faces, 8 material records, and the authored
+material groups without pointer traversal. The independent C contract now
+matches the full packet fingerprint `0xbbf8124e16eb196f`; the six-face oracle
+remains `0x61c2386833b0fb23`, and the expanded source layout contains 18,417
+Metal vertex floats. The owner-thread admission path allocates private
+geometry, source-index, and material buffers of 73,668, 5,262, and 128 bytes,
+adds them to persistent scene residency, and copies them with an explicit
+Metal 4 `Blit→Vertex|Fragment` device-visible barrier. The face shader binds
+material and source-index resources at fragment slots 2 and 3, while the
+isolated `.load/.store` pass is fenced with `Fragment→Fragment` producer and
+consumer barriers. Because the bounded native verifier can deliver only a few
+display-link callbacks, the opt-in face pipeline is synchronously bootstrapped;
+normal scene pipelines remain asynchronous. The complete gated verifier is
+`/tmp/sm64-modern-m30u-full-verify-2.log` (`verify_exit=0`) and records
+`BUILD SUCCEEDED`, source/geometry admission, the full 877-face private draw,
+Apple M5 Max Metal 4 frame one, clean Metal drain, status-0 engine shutdown,
+and application stop. This closes full source geometry/material residency,
+but the debug source-unit projection is not camera or visual parity: transform
+attachments, texture/material semantics, route authority, complete C draw-list
+comparison, GPU capture, screenshot, and human acceptance remain open.
 M30s binds the admitted Mario-normal entries into the real display-link
 `prepareUploads` path. The first gated frame creates three private RGBA8
 textures, commits them to the persistent scene residency set, and records the
@@ -2406,7 +2429,8 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M30q: Source texture provider and RGBA8 staging contract | `SM64MarioFaceTextureProvider` resolves all 19 checked-in 32x32 PNG assets, validates source row formats and dimensions, expands RGBA16-exported bytes to immutable RGBA8 staging, expands IA8 gray+alpha to RGB+alpha, and reports byte/fingerprint receipts without touching Metal. | Complete locally — independent C↔Swift schema-4 trace fingerprint `0xd9e92749da9c98c6` over 44 records, 19 unique assets/38 route memberships, 37,888 semantic source bytes, and 77,824 upload bytes; `script/test_mario_face_texture_provider.sh`, strict Swift 6, CoreGraphics/ImageIO decode, C replay, route-4 tamper first divergence `4`, regenerated Xcode project, and `/tmp/sm64-modern-m30q-verify.log` pass with `BUILD SUCCEEDED`, native Apple M5 Max Metal 4 frame one, `metal_shutdown_drained`, `engine_thread_finished status=0`, and `application_stopped`; live route upload, private texture residency, face encoder authority, GPU/screenshot, and visual/human acceptance remain |
 | M30r: Mario-normal owner-thread texture upload admission | `SM64MarioFaceTextureUploadPlan` validates the M30p binding against M30q immutable payloads, assigns generations 1–3, admits all three uploads only on the engine owner, and returns an explicit pending-residency receipt; the native gate calls the real `MetalRenderer` create/sampler/upload path without claiming private residency. | Complete locally — independent Swift/C schema-4 admission trace matches plan fingerprint `0x9fb770eeae18fdde` and trace fingerprint `0xbc8a2332f4d034d7` over four records; owner-token mismatch is rejected and route-2 tamper first divergence is `2`; `script/test_mario_face_texture_upload_admission.sh`, strict Swift 6, regenerated project, default `/tmp/sm64-modern-m30r-verify.log`, and gated `SM64_MODERN_MARIO_FACE_TEXTURE_UPLOAD=1 script/build_and_run.sh --verify` (`/tmp/sm64-modern-m30r-live-verify.log`) pass `BUILD SUCCEEDED`, Apple M5 Max Metal 4 frame one, `mario_face_texture_upload_admitted route=2 entries=3 source_bytes=5120 upload_bytes=12288 generations=1-3 pending_residency=3`, clean Metal drain, `engine_thread_finished status=0`, and `application_stopped`; private texture residency/barrier ordering, face mesh/material encoder authority, route cutover, GPU/screenshot, and visual/human acceptance remain |
 | M30s: Mario-normal private residency and barrier receipt | The admitted route is attached to the display-link `prepareUploads` boundary; three private RGBA8 textures are allocated, added/committed to persistent scene residency, and uploaded under the existing Metal 4 producer/consumer `Blit→Fragment` device-visible barriers without drawing the face. | Complete locally — independent Swift/C schema-4 residency trace matches plan fingerprint `0x9fb770eeae18fdde`, receipt fingerprint `0xcac32e783ee8baf`, and trace fingerprint `0x5ac8ece8c0dfbdc5` over four records; upload-order tamper first divergence is `2`; `script/test_mario_face_texture_residency.sh`, strict Swift 6, regenerated project, default `/tmp/sm64-modern-m30s-verify.log`, and gated `SM64_MODERN_MARIO_FACE_TEXTURE_UPLOAD=1 script/build_and_run.sh --verify` (`/tmp/sm64-modern-m30s-live-verify.log`) pass `BUILD SUCCEEDED`, Apple M5 Max Metal 4 frame one, `mario_face_texture_resident route=2 private_textures=3 generations=1-3 residency_committed=1 residency_requested=1 barrier_producer=blit_to_fragment visibility=device barrier_consumer=blit_to_fragment visibility=device`, frame-one `uploads=3`, clean Metal drain, `engine_thread_finished status=0`, and `application_stopped`; face mesh/material encoder authority, route cutover, GPU capture/screenshot, and visual/human acceptance remain |
-| M30t: Source-backed Mario-face mesh window and isolated Metal 4 draw | `SM64MarioFaceSourceMeshPacket` imports eight exact vertex records and six material-0 triangles from the checked-in 440/877/8 Mario-face dynlist, carries a source digest and material group, expands 126 floats through the existing transient/argument-table contract, and draws the bounded window in a separate `.load/.store` Metal 4 render encoder behind `SM64_MODERN_MARIO_FACE_DRAW=1`; C remains comparison authority. | Complete locally — independent C↔Swift schema-4 trace matches packet fingerprint `0x61c2386833b0fb23` and trace fingerprint `0xdb93ef9b0b5d03d9`; `script/test_mario_face_source_geometry.sh`, strict Swift 6, C source inclusion, packet tamper first divergence `2`, regenerated project, and gated `SM64_MODERN_MARIO_FACE_DRAW=1 script/build_and_run.sh --verify` (`/tmp/sm64-modern-m30t-live-verify-2.log`) pass `BUILD SUCCEEDED`, Apple M5 Max Metal 4 frame one, `mario_face_mesh_draw ... encoder=isolated_render`, clean Metal drain, `engine_thread_finished status=0`, and `application_stopped`; full mesh/material resource residency, transform/camera parity, route authority, GPU capture/screenshot, and visual/human acceptance remain |
+| M30t: Source-backed Mario-face mesh window and isolated Metal 4 draw | `SM64MarioFaceSourceMeshPacket` imports eight exact vertex records and six material-0 triangles from the checked-in 440/877/8 Mario-face dynlist, carries a source digest and material group, expands 126 floats through the existing transient/argument-table contract, and draws the bounded window in a separate `.load/.store` Metal 4 render encoder behind `SM64_MODERN_MARIO_FACE_DRAW=1`; C remains comparison authority. | Complete locally — independent C↔Swift schema-4 trace matches packet fingerprint `0x61c2386833b0fb23` and trace fingerprint `0xdb93ef9b0b5d03d9`; `script/test_mario_face_source_geometry.sh`, strict Swift 6, C source inclusion, packet tamper first divergence `2`, regenerated project, and gated `SM64_MODERN_MARIO_FACE_DRAW=1 script/build_and_run.sh --verify` (`/tmp/sm64-modern-m30t-live-verify-2.log`) pass `BUILD SUCCEEDED`, Apple M5 Max Metal 4 frame one, `mario_face_mesh_draw ... encoder=isolated_render`, clean Metal drain, `engine_thread_finished status=0`, and `application_stopped`; superseded by M30u for full resource residency; transform/camera parity, route authority, GPU capture/screenshot, and visual/human acceptance remain |
+| M30u: Full Mario-face source geometry/material Metal residency | `SM64MarioFaceSourceGeometryProvider` verifies and parses the checked-in dynlist, admits all 440 vertices/877 faces/8 materials on the owner thread, expands the full source packet, allocates private geometry/index/material buffers, copies through explicit Metal 4 `Blit→Vertex|Fragment` device barriers, binds fragment material/source-index resources, and draws all 877 faces in the gated isolated pass; C remains comparison authority. | Complete locally — `script/test_mario_face_source_geometry.sh` passes the full packet (`0xbbf8124e16eb196f`), six-face oracle (`0x61c2386833b0fb23`), 18,417-float expansion, and C↔Swift contract; regenerated native Debug build and `SM64_MODERN_MARIO_FACE_DRAW=1 script/build_and_run.sh --verify` (`/tmp/sm64-modern-m30u-full-verify-2.log`, `verify_exit=0`) pass `BUILD SUCCEEDED`, source/geometry admission (`73668/5262/128` bytes), `window_faces=877`, private residency, Apple M5 Max Metal 4 frame one, clean Metal drain, status-0 engine shutdown, and application stop; transform/camera/light semantics, route authority, complete C draw-list comparison, GPU/screenshot, and visual/human acceptance remain |
 | M31: Whole-engine Swift authority | Swift completes title-to-gameplay, saves, audio, rendering, and shutdown with no engine/gameplay C callback; C selector remains equivalent. | Not started |
 | M31a: Swift lifecycle authority seam | Swift runtime owns lifecycle phases, invalid-order rejection, stop-request transition, failure fencing, and explicit C-domain bridge reporting while remaining domains migrate. | Complete locally — strict Swift 6 runtime smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; gameplay/content C bridge remains intentionally open |
 | M31b: Swift engine context seam | Swift owns a real owner-thread engine context with level reset, state/object-pool/scheduler advancement, immutable tick receipts, stop/shutdown cleanup, and explicit lifecycle-domain wiring while C remains the fallback for unmigrated domains. | Complete locally — strict Swift 6 context smoke, corrected 131-script matrix, regenerated native Debug build, and `git diff --check` pass; C gameplay/content fallback remains intentionally open |
@@ -2872,13 +2896,15 @@ replayable trace, and the platform evidence listed in its exit gate.
    Mario-normal route through the real owner-thread create/sampler/upload path,
    and M30s proves three private textures, persistent scene residency, and
    device-visible `Blit→Fragment` producer/consumer barriers on frame one.
-   M30t now imports and draws an exact six-face source window through a second
-   Metal 4 encoder with a C-included dynlist contract. Next expand this into
-   full source vertex/index/material resource buffers, transform attachments,
-   texture/material argument tables, and camera/light ordering while retaining
-   the existing C draw as the comparison authority. Route IDs still need real
-   front-end, gameplay, cutscene, and ending entry-point invocation and complete
-   texture/material/camera ordering evidence.
+   M30t imported and drew an exact six-face source window through a second
+   Metal 4 encoder with a C-included dynlist contract. M30u now promotes that
+   proof to all 440/877/8 source geometry/material records, private
+   geometry/index/material residency, explicit Metal 4 copy barriers, and a
+   full 877-face isolated draw. Next attach the M30j animation transforms and
+   M30m camera/light values, bind source texture/material semantics, and compare
+   a complete Mario-normal C draw list before any authority cutover. Route IDs
+   still need real front-end, gameplay, cutscene, and ending entry-point
+   invocation and complete texture/material/camera ordering evidence.
 9. **M31 whole-engine authority.** Wire title-to-shutdown through
    SwiftEngineRuntime by default. Prove no Swift-mode gameplay, save, audio,
    renderer, or shutdown path enters a C engine callback. Retain the C adapter

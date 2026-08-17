@@ -3,10 +3,11 @@ import Foundation
 @main
 struct SM64ModernMarioFaceSourceGeometrySmoke {
     static func main() throws {
-        guard CommandLine.arguments.count == 2 else {
+        guard CommandLine.arguments.count == 3 else {
             throw NSError(domain: "MarioFaceSourceGeometrySmoke", code: 1)
         }
-        let traceURL = URL(fileURLWithPath: CommandLine.arguments[1]).standardizedFileURL
+        let rootURL = URL(fileURLWithPath: CommandLine.arguments[1]).standardizedFileURL
+        let traceURL = URL(fileURLWithPath: CommandLine.arguments[2]).standardizedFileURL
         let packet = SM64MarioFaceSourceGeometry.packet
         precondition(packet.sourcePath == "src/goddard/dynlists/dynlist_mario_face.c")
         precondition(packet.sourceVertexCount == 440)
@@ -60,6 +61,19 @@ struct SM64ModernMarioFaceSourceGeometrySmoke {
         print(String(format: "marioFaceSourceGeometryPacketFingerprint=0x%016llx", SM64MarioFaceSourceGeometryFingerprint.packet(packet)))
         print(String(format: "marioFaceSourceGeometryTraceFingerprint=0x%016llx", SM64MarioFaceSourceGeometryOracle.fingerprint(records)))
         print("marioFaceSourceGeometryMetalFloats=\(floats.count)")
+        let fullPacket = try SM64MarioFaceSourceGeometryProvider.load(rootURL: rootURL)
+        precondition(fullPacket.schemaVersion == 2)
+        precondition(fullPacket.vertices.count == 440)
+        precondition(fullPacket.triangles.count == 877)
+        precondition(fullPacket.materials.count == 8)
+        precondition(fullPacket.triangles[0] == packet.triangles[0])
+        let fullFloats = fullPacket.debugMetalVertexFloats()
+        precondition(fullFloats.count == 877 * 3 * 7)
+        print("marioFaceSourceGeometryFullVertices=\(fullPacket.vertices.count)")
+        print("marioFaceSourceGeometryFullFaces=\(fullPacket.triangles.count)")
+        print("marioFaceSourceGeometryFullMaterials=\(fullPacket.materials.count)")
+        print(String(format: "marioFaceSourceGeometryFullPacketFingerprint=0x%016llx", SM64MarioFaceSourceGeometryFingerprint.packet(fullPacket)))
+        print("marioFaceSourceGeometryFullMetalFloats=\(fullFloats.count)")
         print("SM64 Modern Mario-face source geometry Swift trace passed path=\(traceURL.path)")
     }
 }

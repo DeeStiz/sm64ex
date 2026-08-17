@@ -280,10 +280,16 @@ case "$MODE" in
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_texture_resident'
     fi
     if [[ "${SM64_MODERN_MARIO_FACE_DRAW:-0}" == "1" ]]; then
-      grep -Eq 'mario_face_mesh_draw route=2 mesh=1 source_path=dynlist_mario_face window_faces=6 source_faces=877 source_vertices=440 material=0 encoder=isolated_render packet_fingerprint=[0-9]+' <<< "$runtime_log"
+      grep -Eq 'mario_face_geometry_source_admitted source_path=src/goddard/dynlists/dynlist_mario_face\.c schema=2 vertices=440 faces=877 materials=8 source_digest=[0-9a-f:]+ packet_fingerprint=[0-9]+' <<< "$runtime_log"
+      printf '%s\n' "$runtime_log" | grep -E 'mario_face_geometry_source_admitted'
+      grep -Eq 'mario_face_geometry_admitted mesh=1 vertices=440 faces=877 materials=8 vertex_bytes=73668 index_bytes=5262 material_bytes=128 packet_fingerprint=[0-9]+' <<< "$runtime_log"
+      printf '%s\n' "$runtime_log" | grep -E 'mario_face_geometry_admitted'
+      grep -Eq 'mario_face_mesh_draw route=2 mesh=1 source_path=dynlist_mario_face window_faces=877 source_faces=877 source_vertices=440 materials=8 encoder=isolated_render private_geometry=1 private_index_buffer=1 private_material_buffer=1 packet_fingerprint=[0-9]+' <<< "$runtime_log"
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_mesh_draw'
     fi
-    /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit"
+    # The bounded native host may have completed its own clean shutdown during
+    # the verification sleep; quitting an already-stopped app is harmless.
+    /usr/bin/osascript -e "tell application id \"$BUNDLE_ID\" to quit" || true
     for _ in {1..50}; do
       if ! kill -0 "$app_pid" >/dev/null 2>&1; then
         shutdown_log="$(/usr/bin/log show --last 2m --style compact \

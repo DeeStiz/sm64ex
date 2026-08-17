@@ -126,6 +126,57 @@ static uint64_t packet_fingerprint(void) {
     return hash;
 }
 
+static uint32_t material_component(uint32_t material, uint32_t channel, int use_diffuse) {
+    static const uint32_t ambient[][3] = {
+        { 1000u, 1000u, 1000u }, { 883u, 602u, 408u }, { 362u, 0u, 0u },
+        { 1000u, 1000u, 1000u }, { 1000u, 1000u, 1000u }, { 362u, 0u, 0u },
+        { 526u, 0u, 0u }, { 1000u, 0u, 0u },
+    };
+    static const uint32_t diffuse[][3] = {
+        { 1000u, 1000u, 1000u }, { 883u, 602u, 408u }, { 362u, 0u, 0u },
+        { 1000u, 1000u, 1000u }, { 1000u, 1000u, 1000u }, { 362u, 0u, 0u },
+        { 526u, 0u, 0u }, { 1000u, 0u, 0u },
+    };
+    return (use_diffuse ? diffuse : ambient)[material][channel];
+}
+
+static uint64_t full_packet_fingerprint(void) {
+    uint64_t hash = hash_u64(FNV_OFFSET, 2u);
+    for (size_t index = 0; index < sizeof(sSourceDigestWords) / sizeof(sSourceDigestWords[0]); ++index) {
+        hash = hash_u64(hash, sSourceDigestWords[index]);
+    }
+    const uint32_t metadata[] = {
+        MESH_ID, SHAPE_ID, VERTEX_GROUP_ID, PLANE_GROUP_ID, MATERIAL_GROUP_ID,
+        SOURCE_VERTEX_COUNT, SOURCE_FACE_COUNT, SOURCE_MATERIAL_COUNT,
+        WINDOW_START, SOURCE_FACE_COUNT, SOURCE_VERTEX_COUNT, SOURCE_MATERIAL_COUNT,
+    };
+    hash = hash_u32_values(hash, metadata, sizeof(metadata) / sizeof(metadata[0]));
+    for (uint32_t index = 0; index < SOURCE_VERTEX_COUNT; ++index) {
+        hash = hash_u64(hash, index);
+        hash = hash_u64(hash, (uint64_t)(int64_t)mario_Face_VtxData[index][0]);
+        hash = hash_u64(hash, (uint64_t)(int64_t)mario_Face_VtxData[index][1]);
+        hash = hash_u64(hash, (uint64_t)(int64_t)mario_Face_VtxData[index][2]);
+    }
+    for (uint32_t face = 0; face < SOURCE_FACE_COUNT; ++face) {
+        hash = hash_u64(hash, mario_Face_FaceData[face][0]);
+        hash = hash_u64(hash, 3u);
+        hash = hash_u64(hash, mario_Face_FaceData[face][1]);
+        hash = hash_u64(hash, mario_Face_FaceData[face][2]);
+        hash = hash_u64(hash, mario_Face_FaceData[face][3]);
+    }
+    for (uint32_t material = 0; material < SOURCE_MATERIAL_COUNT; ++material) {
+        hash = hash_u64(hash, MATERIAL_GROUP_ID);
+        hash = hash_u64(hash, material);
+        for (uint32_t channel = 0; channel < 3; ++channel) {
+            hash = hash_u64(hash, material_component(material, channel, 0));
+        }
+        for (uint32_t channel = 0; channel < 3; ++channel) {
+            hash = hash_u64(hash, material_component(material, channel, 1));
+        }
+    }
+    return hash;
+}
+
 static uint64_t record_hash(const SM64ModernOracleTraceRecordV1 *record) {
     uint64_t hash = FNV_OFFSET;
     hash = hash_u64(hash, record->simulation_tick);
@@ -215,6 +266,12 @@ static int replay(struct Trace *trace, int tamper) {
     printf("marioFaceSourceGeometryTraceFingerprint=0x%016llx\n",
            (unsigned long long) trace_fingerprint(trace));
     printf("marioFaceSourceGeometryMetalFloats=126\n");
+    printf("marioFaceSourceGeometryFullVertices=%u\n", SOURCE_VERTEX_COUNT);
+    printf("marioFaceSourceGeometryFullFaces=%u\n", SOURCE_FACE_COUNT);
+    printf("marioFaceSourceGeometryFullMaterials=%u\n", SOURCE_MATERIAL_COUNT);
+    printf("marioFaceSourceGeometryFullPacketFingerprint=0x%016llx\n",
+           (unsigned long long) full_packet_fingerprint());
+    printf("marioFaceSourceGeometryFullMetalFloats=%u\n", SOURCE_FACE_COUNT * 3u * 7u);
     printf("SM64 Modern Mario-face source geometry C replay passed faces=%u\n", WINDOW_FACES);
     return 1;
 }

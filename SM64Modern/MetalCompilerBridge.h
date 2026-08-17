@@ -53,9 +53,26 @@ void SM64ModernCopyBufferToTexture(
     id<MTLTexture> destination
 ) API_AVAILABLE(macos(26.0));
 
+void SM64ModernCopyBufferToBuffer(
+    id<MTL4ComputeCommandEncoder> encoder,
+    id<MTLBuffer> source,
+    NSUInteger sourceOffset,
+    id<MTLBuffer> destination,
+    NSUInteger destinationOffset,
+    NSUInteger size
+) API_AVAILABLE(macos(26.0));
+
 void SM64ModernBarrierBlitToFragmentProducer(id<MTL4CommandEncoder> encoder)
     API_AVAILABLE(macos(26.0));
 void SM64ModernBarrierBlitToFragmentConsumer(id<MTL4CommandEncoder> encoder)
+    API_AVAILABLE(macos(26.0));
+void SM64ModernBarrierBlitToVertexFragmentProducer(id<MTL4CommandEncoder> encoder)
+    API_AVAILABLE(macos(26.0));
+void SM64ModernBarrierBlitToVertexFragmentConsumer(id<MTL4CommandEncoder> encoder)
+    API_AVAILABLE(macos(26.0));
+void SM64ModernBarrierFragmentToFragmentProducer(id<MTL4CommandEncoder> encoder)
+    API_AVAILABLE(macos(26.0));
+void SM64ModernBarrierFragmentToFragmentConsumer(id<MTL4CommandEncoder> encoder)
     API_AVAILABLE(macos(26.0));
 NS_ASSUME_NONNULL_END
 

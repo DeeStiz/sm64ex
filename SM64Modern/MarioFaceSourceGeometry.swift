@@ -1,3 +1,4 @@
+import CryptoKit
 import Foundation
 
 /// A pointer-free slice of the authored Goddard Mario-face mesh.  The packet
@@ -82,6 +83,13 @@ enum SM64MarioFaceSourceGeometry {
         0xa70e_721e_75a9_cc0e,
     ]
 
+    static let sourceDigestBytes: [UInt8] = [
+        0xa5, 0xbb, 0xe2, 0xb6, 0xc2, 0xa9, 0x93, 0x13,
+        0x10, 0xac, 0xeb, 0x2a, 0x27, 0xcb, 0x86, 0x2b,
+        0x10, 0x41, 0x1d, 0x72, 0x15, 0x5a, 0xb2, 0x5d,
+        0xa7, 0x0e, 0x72, 0x1e, 0x75, 0xa9, 0xcc, 0x0e,
+    ]
+
     static let packet: SM64MarioFaceSourceMeshPacket = {
         let vertices = [
             SM64MarioFaceSourceVertex(sourceIndex: 43, x: 115, y: -178, z: 351),
@@ -127,6 +135,168 @@ enum SM64MarioFaceSourceGeometry {
             materials: materials
         )
     }()
+}
+
+enum SM64MarioFaceSourceGeometryProviderError: Error, Equatable, Sendable {
+    case sourceUnavailable
+    case invalidUTF8
+    case sourceDigestMismatch
+    case missingArray(String)
+    case invalidArray(String)
+    case invalidMaterialGroup
+}
+
+/// Development/content-pack boundary for the complete Goddard mesh.  The
+/// parser is intentionally restricted to the two checked-in C arrays and the
+/// `0xE0` material macro group; it never follows a C pointer or executes C.
+enum SM64MarioFaceSourceGeometryProvider {
+    static func load(rootURL: URL) throws -> SM64MarioFaceSourceMeshPacket {
+        let sourceURL = rootURL.appendingPathComponent(
+            SM64MarioFaceSourceGeometry.sourcePath,
+            isDirectory: false
+        )
+        guard let data = try? Data(contentsOf: sourceURL, options: .mappedIfSafe) else {
+            throw SM64MarioFaceSourceGeometryProviderError.sourceUnavailable
+        }
+        let digest = Array(SHA256.hash(data: data))
+        guard digest == SM64MarioFaceSourceGeometry.sourceDigestBytes else {
+            throw SM64MarioFaceSourceGeometryProviderError.sourceDigestMismatch
+        }
+        let text = String(decoding: data, as: UTF8.self)
+        guard text.utf8.count == data.count else {
+            throw SM64MarioFaceSourceGeometryProviderError.invalidUTF8
+        }
+
+        let vertexRows = try parseRows(
+            text,
+            marker: "static s16 mario_Face_VtxData[VTX_NUM][3]",
+            width: 3,
+            label: "vertices"
+        )
+        let faceRows = try parseRows(
+            text,
+            marker: "static u16 mario_Face_FaceData[FACE_NUM][4]",
+            width: 4,
+            label: "faces"
+        )
+        guard vertexRows.count == 440 else {
+            throw SM64MarioFaceSourceGeometryProviderError.invalidArray("vertices")
+        }
+        guard faceRows.count == 877 else {
+            throw SM64MarioFaceSourceGeometryProviderError.invalidArray("faces")
+        }
+
+        let materials = try parseMaterials(text)
+        guard materials.count == 8 else {
+            throw SM64MarioFaceSourceGeometryProviderError.invalidMaterialGroup
+        }
+        let vertices = vertexRows.enumerated().map { index, row in
+            SM64MarioFaceSourceVertex(
+                sourceIndex: UInt32(index),
+                x: Int16(row[0]), y: Int16(row[1]), z: Int16(row[2])
+            )
+        }
+        let triangles = faceRows.map { row in
+            SM64MarioFaceSourceTriangle(
+                materialID: UInt32(row[0]),
+                indices: [UInt32(row[1]), UInt32(row[2]), UInt32(row[3])]
+            )
+        }
+        return SM64MarioFaceSourceMeshPacket(
+            schemaVersion: 2,
+            sourcePath: SM64MarioFaceSourceGeometry.sourcePath,
+            sourceDigestWords: SM64MarioFaceSourceGeometry.sourceDigestWords,
+            meshID: 1,
+            shapeID: 0xE1,
+            vertexGroupID: 0xDE,
+            planeGroupID: 0xDF,
+            materialGroupID: 0xE0,
+            sourceVertexCount: UInt32(vertices.count),
+            sourceFaceCount: UInt32(triangles.count),
+            sourceMaterialCount: UInt32(materials.count),
+            faceWindowStart: 0,
+            vertices: vertices,
+            triangles: triangles,
+            materials: materials
+        )
+    }
+
+    private static func parseRows(
+        _ text: String,
+        marker: String,
+        width: Int,
+        label: String
+    ) throws -> [[Int]] {
+        guard let markerRange = text.range(of: marker),
+              let open = text[markerRange.upperBound...].firstIndex(of: "{"),
+              let end = text[open...].range(of: "};")?.lowerBound else {
+            throw SM64MarioFaceSourceGeometryProviderError.missingArray(label)
+        }
+        let bodyStart = text.index(after: open)
+        let body = text[bodyStart..<end]
+        var values: [Int] = []
+        var token = ""
+        func flush() {
+            guard !token.isEmpty, let value = Int(token) else { return }
+            values.append(value)
+            token.removeAll(keepingCapacity: true)
+        }
+        for character in body {
+            if character == "-" || character.isNumber {
+                token.append(character)
+            } else {
+                flush()
+            }
+        }
+        flush()
+        guard !values.isEmpty, values.count.isMultiple(of: width) else {
+            throw SM64MarioFaceSourceGeometryProviderError.invalidArray(label)
+        }
+        return stride(from: 0, to: values.count, by: width).map { start in
+            Array(values[start..<(start + width)])
+        }
+    }
+
+    private static func parseMaterials(
+        _ text: String
+    ) throws -> [SM64MarioFaceSourceMaterial] {
+        guard let start = text.range(of: "StartGroup(0xE0)"),
+              let end = text.range(of: "EndGroup(0xE0)", range: start.upperBound..<text.endIndex) else {
+            throw SM64MarioFaceSourceGeometryProviderError.invalidMaterialGroup
+        }
+        let body = String(text[start.upperBound..<end.lowerBound])
+        let pattern = #"SetId\(\s*(\d+)\s*\).*?SetAmbient\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)\s*\).*?SetDiffuse\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)\s*\)"#
+        let regex = try NSRegularExpression(pattern: pattern, options: [.dotMatchesLineSeparators])
+        let range = NSRange(body.startIndex..<body.endIndex, in: body)
+        let matches = regex.matches(in: body, options: [], range: range)
+        return try matches.map { match in
+            guard match.numberOfRanges == 8 else {
+                throw SM64MarioFaceSourceGeometryProviderError.invalidMaterialGroup
+            }
+            func capture(_ index: Int) throws -> String {
+                let range = match.range(at: index)
+                guard let swiftRange = Range(range, in: body) else {
+                    throw SM64MarioFaceSourceGeometryProviderError.invalidMaterialGroup
+                }
+                return String(body[swiftRange])
+            }
+            func quantized(_ index: Int) throws -> UInt32 {
+                guard let value = Double(try capture(index)) else {
+                    throw SM64MarioFaceSourceGeometryProviderError.invalidMaterialGroup
+                }
+                return UInt32((value * 1000.0).rounded())
+            }
+            guard let materialID = UInt32(try capture(1)) else {
+                throw SM64MarioFaceSourceGeometryProviderError.invalidMaterialGroup
+            }
+            return SM64MarioFaceSourceMaterial(
+                materialGroupID: 0xE0,
+                materialID: materialID,
+                ambientRGB1000: [try quantized(2), try quantized(3), try quantized(4)],
+                diffuseRGB1000: [try quantized(5), try quantized(6), try quantized(7)]
+            )
+        }
+    }
 }
 
 enum SM64MarioFaceSourceGeometryFingerprint {

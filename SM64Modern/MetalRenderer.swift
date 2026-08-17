@@ -33,6 +33,7 @@ enum MetalRendererError: LocalizedError {
     case residencySetUnavailable
     case renderEncoderUnavailable
     case marioFaceRenderEncoderUnavailable
+    case marioFaceGeometryBufferUnavailable
     case uploadEncoderUnavailable
     case textureUnavailable(id: UInt32)
     case marioFaceTextureUploadFailed(id: UInt32, status: SM64ModernStatus)
@@ -51,6 +52,7 @@ enum MetalRendererError: LocalizedError {
         case .residencySetUnavailable: "Metal scene residency set creation failed"
         case .renderEncoderUnavailable: "Metal 4 scene render encoder creation failed"
         case .marioFaceRenderEncoderUnavailable: "Metal 4 Mario-face isolated render encoder creation failed"
+        case .marioFaceGeometryBufferUnavailable: "Mario-face private geometry/material buffer creation failed"
         case .uploadEncoderUnavailable: "Metal 4 texture upload encoder creation failed"
         case let .textureUnavailable(id): "Metal texture \(id) is not ready for drawing"
         case let .marioFaceTextureUploadFailed(id, status): "Mario-face texture \(id) upload admission failed with status \(status)"
@@ -131,10 +133,52 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
 
     private struct PreparedMarioFaceDraw {
         let pipeline: MetalShaderCompiler.CompiledPipeline
+        let vertexBuffer: (any MTLBuffer)?
+        let indexBuffer: (any MTLBuffer)?
         let vertexOffset: Int
         let uniformOffset: Int
+        let materialBuffer: (any MTLBuffer)?
         let vertexCount: Int
         let triangleCount: UInt32
+    }
+
+    private struct PreparedMarioFaceGeometryUpload {
+        let residency: MarioFaceGeometryResidency
+        let vertexOffset: Int
+        let vertexByteCount: Int
+        let indexOffset: Int
+        let indexByteCount: Int
+        let materialOffset: Int
+        let materialByteCount: Int
+    }
+
+    private final class MarioFaceGeometryResidency {
+        let packet: SM64MarioFaceSourceMeshPacket
+        let vertexBuffer: any MTLBuffer
+        let indexBuffer: any MTLBuffer
+        let materialBuffer: any MTLBuffer
+        let vertexBytes: Data
+        let indexBytes: Data
+        let materialBytes: Data
+        var uploaded = false
+
+        init(
+            packet: SM64MarioFaceSourceMeshPacket,
+            vertexBuffer: any MTLBuffer,
+            indexBuffer: any MTLBuffer,
+            materialBuffer: any MTLBuffer,
+            vertexBytes: Data,
+            indexBytes: Data,
+            materialBytes: Data
+        ) {
+            self.packet = packet
+            self.vertexBuffer = vertexBuffer
+            self.indexBuffer = indexBuffer
+            self.materialBuffer = materialBuffer
+            self.vertexBytes = vertexBytes
+            self.indexBytes = indexBytes
+            self.materialBytes = materialBytes
+        }
     }
 
     private struct DepthStateKey: Hashable {
@@ -150,7 +194,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     // debug pipeline key; the C display-list shader registry remains the
     // authority for normal scene draws.
     private static let marioFaceShaderKey = MetalShaderKey(
-        shaderID: 0x0000_0200,
+        shaderID: 0x1000_0200,
         filteringMode: 0,
         inputCount: 1,
         textureMask: 0,
@@ -172,8 +216,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private var textures: [UInt32: TextureRecord] = [:]
     private var marioFaceAdmissionPlan: SM64MarioFaceTextureUploadPlan?
     private var marioFaceResidencyLogged = false
-    private let marioFaceSourceGeometry: SM64MarioFaceSourceMeshPacket?
-    private let marioFaceSourceVertexFloats: [Float]?
+    private var marioFaceSourceGeometry: SM64MarioFaceSourceMeshPacket?
+    private var marioFaceSourceVertexFloats: [Float]?
+    private var marioFaceGeometryResidency: MarioFaceGeometryResidency?
     private var marioFaceSourceDrawLogged = false
     private var residentTextureBindings: [UInt64: MetalTextureResidency] = [:]
     private var samplers: [MetalSamplerKey: any MTLSamplerState] = [:]
@@ -198,9 +243,8 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         self.isOwnerThread = isOwnerThread
         self.consumeDrawableSize = consumeDrawableSize
         let sourceGeometryEnabled = ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_DRAW"] == "1"
-        let sourceGeometry = sourceGeometryEnabled ? SM64MarioFaceSourceGeometry.packet : nil
-        self.marioFaceSourceGeometry = sourceGeometry
-        self.marioFaceSourceVertexFloats = sourceGeometry?.debugMetalVertexFloats()
+        self.marioFaceSourceGeometry = nil
+        self.marioFaceSourceVertexFloats = nil
 
         let queueDescriptor = MTL4CommandQueueDescriptor()
         queueDescriptor.label = "SM64 Modern Present Queue"
@@ -221,7 +265,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         self.sceneResidency = sceneResidency
         self.shaderCompiler = try MetalShaderCompiler(device: device)
         if sourceGeometryEnabled {
-            shaderCompiler.prepare(Self.marioFaceShaderKey)
+            shaderCompiler.prepareSynchronously(Self.marioFaceShaderKey)
         }
         self.displayLink = CAMetalDisplayLink(metalLayer: layer)
         super.init()
@@ -230,7 +274,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         }
 
         let argumentDescriptor = MTL4ArgumentTableDescriptor()
-        argumentDescriptor.maxBufferBindCount = 2
+        argumentDescriptor.maxBufferBindCount = 4
         argumentDescriptor.maxTextureBindCount = 2
         argumentDescriptor.maxSamplerStateBindCount = 2
         argumentDescriptor.initializeBindings = true
@@ -378,6 +422,79 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         return plan.receipt(residencyPending: true)
     }
 
+    /// Admit the complete source-backed face mesh on the engine owner. Metal
+    /// handles stay private to this renderer; the display-link performs the
+    /// first shared-to-private copies on its reusable frame slot.
+    func admitMarioFaceSourceGeometry(
+        _ packet: SM64MarioFaceSourceMeshPacket
+    ) throws {
+        precondition(isOwnerThread(), "Mario-face geometry admission belongs to the engine owner")
+        guard packet.schemaVersion == 2,
+              packet.meshID == 1,
+              packet.sourceVertexCount == 440,
+              packet.sourceFaceCount == 877,
+              packet.sourceMaterialCount == 8,
+              packet.vertices.count == Int(packet.sourceVertexCount),
+              packet.triangles.count == Int(packet.sourceFaceCount),
+              packet.materials.count == Int(packet.sourceMaterialCount) else {
+            throw MetalRendererError.invalidDraw(shaderID: Self.marioFaceShaderKey.shaderID)
+        }
+        let vertexFloats = packet.debugMetalVertexFloats()
+        let vertexBytes = vertexFloats.withUnsafeBytes { Data($0) }
+        let indexValues = packet.triangles.flatMap { $0.indices }.map { UInt16($0) }
+        guard indexValues.count == packet.triangles.count * 3,
+              indexValues.allSatisfy({ Int($0) < packet.vertices.count }) else {
+            throw MetalRendererError.invalidDraw(shaderID: Self.marioFaceShaderKey.shaderID)
+        }
+        var indexBytes = Data(capacity: indexValues.count * MemoryLayout<UInt16>.size)
+        for value in indexValues {
+            var littleEndian = value.littleEndian
+            withUnsafeBytes(of: &littleEndian) { indexBytes.append(contentsOf: $0) }
+        }
+        var materialFloats: [Float] = []
+        materialFloats.reserveCapacity(packet.materials.count * 4)
+        for material in packet.materials {
+            materialFloats.append(contentsOf: material.diffuseRGB1000.map { Float($0) / 1000.0 })
+            materialFloats.append(1.0)
+        }
+        let materialBytes = materialFloats.withUnsafeBytes { Data($0) }
+        guard let vertexBuffer = device.makeBuffer(length: vertexBytes.count, options: .storageModePrivate),
+              let indexBuffer = device.makeBuffer(length: indexBytes.count, options: .storageModePrivate),
+              let materialBuffer = device.makeBuffer(length: materialBytes.count, options: .storageModePrivate) else {
+            throw MetalRendererError.marioFaceGeometryBufferUnavailable
+        }
+        vertexBuffer.label = "SM64 Mario Face Private Render Vertices"
+        indexBuffer.label = "SM64 Mario Face Private Source Indices"
+        materialBuffer.label = "SM64 Mario Face Private Material Group"
+        let residency = MarioFaceGeometryResidency(
+            packet: packet,
+            vertexBuffer: vertexBuffer,
+            indexBuffer: indexBuffer,
+            materialBuffer: materialBuffer,
+            vertexBytes: vertexBytes,
+            indexBytes: indexBytes,
+            materialBytes: materialBytes
+        )
+        if let previous = marioFaceGeometryResidency {
+            sceneResidency.removeAllocation(previous.vertexBuffer)
+            sceneResidency.removeAllocation(previous.indexBuffer)
+            sceneResidency.removeAllocation(previous.materialBuffer)
+        }
+        sceneResidency.addAllocation(vertexBuffer)
+        sceneResidency.addAllocation(indexBuffer)
+        sceneResidency.addAllocation(materialBuffer)
+        sceneResidency.commit()
+        sceneResidency.requestResidency()
+        marioFaceSourceGeometry = packet
+        marioFaceSourceVertexFloats = vertexFloats
+        marioFaceGeometryResidency = residency
+        marioFaceSourceDrawLogged = false
+        shaderCompiler.prepare(Self.marioFaceShaderKey)
+        metalLogger.notice(
+            "mario_face_geometry_admitted mesh=\(packet.meshID) vertices=\(packet.vertices.count) faces=\(packet.triangles.count) materials=\(packet.materials.count) vertex_bytes=\(vertexBytes.count) index_bytes=\(indexBytes.count) material_bytes=\(materialBytes.count) packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(packet), privacy: .public)"
+        )
+    }
+
     func setSampler(tile: UInt32, id: UInt32, linear: Bool, wrapS: UInt32, wrapT: UInt32) {
         let sampler = MetalSamplerKey(linear: linear, wrapS: wrapS, wrapT: wrapT)
         textures[id]?.sampler = sampler
@@ -497,6 +614,13 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         }
         if !residentTextureBindings.isEmpty { sceneResidency.commit() }
         residentTextureBindings.removeAll()
+        if let geometry = marioFaceGeometryResidency {
+            sceneResidency.removeAllocation(geometry.vertexBuffer)
+            sceneResidency.removeAllocation(geometry.indexBuffer)
+            sceneResidency.removeAllocation(geometry.materialBuffer)
+            sceneResidency.commit()
+            marioFaceGeometryResidency = nil
+        }
         textures.removeAll()
         samplers.removeAll()
         depthStates.removeAll()
@@ -532,6 +656,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
             frameTextureBindings, into: slot.transientBuffer, cursor: &cursor
         )
         let uploads = preparedUploadResult.uploads
+        let preparedMarioFaceGeometryUpload = try prepareMarioFaceGeometryUpload(
+            into: slot.transientBuffer, cursor: &cursor
+        )
         if let plan = marioFaceAdmissionPlan,
            !marioFaceResidencyLogged,
            preparedUploadResult.residencyChanged {
@@ -581,13 +708,15 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         commandBuffer.useResidencySet(layer.residencySet)
         commandBuffer.pushDebugGroup("M4 SM64 Scene and Present")
 
-        if !uploads.isEmpty {
+        if !uploads.isEmpty || preparedMarioFaceGeometryUpload != nil {
             guard let uploadEncoder = commandBuffer.makeComputeCommandEncoder() else {
                 commandBuffer.popDebugGroup(); commandBuffer.endCommandBuffer()
                 throw MetalRendererError.uploadEncoderUnavailable
             }
-            uploadEncoder.label = "SM64 Modern Texture Uploads"
-            uploadEncoder.pushDebugGroup("Stage RGBA8 textures into private storage")
+            uploadEncoder.label = preparedMarioFaceGeometryUpload == nil
+                ? "SM64 Modern Texture Uploads"
+                : "SM64 Modern Texture and Mario Face Geometry Uploads"
+            uploadEncoder.pushDebugGroup("Stage source-backed resources into private storage")
             for upload in uploads {
                 SM64ModernCopyBufferToTexture(
                     uploadEncoder,
@@ -599,9 +728,40 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
                     upload.texture
                 )
             }
-            SM64ModernBarrierBlitToFragmentProducer(uploadEncoder)
+            if let geometryUpload = preparedMarioFaceGeometryUpload {
+                SM64ModernCopyBufferToBuffer(
+                    uploadEncoder,
+                    slot.transientBuffer,
+                    UInt(geometryUpload.vertexOffset),
+                    geometryUpload.residency.vertexBuffer,
+                    0,
+                    UInt(geometryUpload.vertexByteCount)
+                )
+                SM64ModernCopyBufferToBuffer(
+                    uploadEncoder,
+                    slot.transientBuffer,
+                    UInt(geometryUpload.indexOffset),
+                    geometryUpload.residency.indexBuffer,
+                    0,
+                    UInt(geometryUpload.indexByteCount)
+                )
+                SM64ModernCopyBufferToBuffer(
+                    uploadEncoder,
+                    slot.transientBuffer,
+                    UInt(geometryUpload.materialOffset),
+                    geometryUpload.residency.materialBuffer,
+                    0,
+                    UInt(geometryUpload.materialByteCount)
+                )
+            }
+            if preparedMarioFaceGeometryUpload != nil {
+                SM64ModernBarrierBlitToVertexFragmentProducer(uploadEncoder)
+            } else {
+                SM64ModernBarrierBlitToFragmentProducer(uploadEncoder)
+            }
             uploadEncoder.popDebugGroup()
             uploadEncoder.endEncoding()
+            preparedMarioFaceGeometryUpload?.residency.uploaded = true
         }
 
         let pass = MTL4RenderPassDescriptor()
@@ -623,7 +783,11 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         }
         encoder.label = "SM64 Modern Scene Pass"
         encoder.pushDebugGroup("Replay immutable SM64 display list packet")
-        if !uploads.isEmpty { SM64ModernBarrierBlitToFragmentConsumer(encoder) }
+        if preparedMarioFaceGeometryUpload != nil {
+            SM64ModernBarrierBlitToVertexFragmentConsumer(encoder)
+        } else if !uploads.isEmpty {
+            SM64ModernBarrierBlitToFragmentConsumer(encoder)
+        }
         encoder.setCullMode(.none)
 
         var boundPipeline: MetalShaderKey?
@@ -674,6 +838,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
             encoder.setArgumentTable(slot.argumentTable, stages: [.vertex, .fragment])
             encoder.drawPrimitives(primitiveType: .triangle, vertexStart: 0, vertexCount: Int(draw.triangleCount) * 3)
         }
+        if preparedMarioFaceDraw != nil {
+            SM64ModernBarrierFragmentToFragmentProducer(encoder)
+        }
         encoder.popDebugGroup()
         encoder.endEncoding()
         if let preparedMarioFaceDraw {
@@ -718,6 +885,10 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         }
         if let marioFaceSourceVertexFloats {
             total += marioFaceSourceVertexFloats.count * MemoryLayout<Float>.size + 255
+        }
+        if let geometry = marioFaceGeometryResidency, !geometry.uploaded {
+            total += geometry.vertexBytes.count + geometry.indexBytes.count
+                + geometry.materialBytes.count + 768
         }
         if let packet {
             total += packet.vertices.count * MemoryLayout<Float>.size
@@ -774,6 +945,39 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         }
         if residencyChanged { sceneResidency.commit() }
         return (uploads, residencyChanged)
+    }
+
+    private func prepareMarioFaceGeometryUpload(
+        into buffer: any MTLBuffer,
+        cursor: inout Int
+    ) throws -> PreparedMarioFaceGeometryUpload? {
+        guard let residency = marioFaceGeometryResidency, !residency.uploaded else {
+            return nil
+        }
+
+        func stage(_ data: Data) -> (offset: Int, byteCount: Int) {
+            cursor = aligned(cursor, to: 256)
+            let offset = cursor
+            data.copyBytes(
+                to: buffer.contents().advanced(by: offset).assumingMemoryBound(to: UInt8.self),
+                count: data.count
+            )
+            cursor += data.count
+            return (offset, data.count)
+        }
+
+        let vertex = stage(residency.vertexBytes)
+        let index = stage(residency.indexBytes)
+        let material = stage(residency.materialBytes)
+        return PreparedMarioFaceGeometryUpload(
+            residency: residency,
+            vertexOffset: vertex.offset,
+            vertexByteCount: vertex.byteCount,
+            indexOffset: index.offset,
+            indexByteCount: index.byteCount,
+            materialOffset: material.offset,
+            materialByteCount: material.byteCount
+        )
     }
 
     private func prepareDraws(_ packet: MetalScenePacket?, into buffer: any MTLBuffer, cursor: inout Int) throws -> [PreparedDraw]? {
@@ -834,7 +1038,9 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         cursor: inout Int
     ) throws -> PreparedMarioFaceDraw? {
         guard let geometry = marioFaceSourceGeometry,
-              let vertexFloats = marioFaceSourceVertexFloats else {
+              let vertexFloats = marioFaceSourceVertexFloats,
+              let residency = marioFaceGeometryResidency,
+              residency.uploaded else {
             return nil
         }
         let pipeline: MetalShaderCompiler.CompiledPipeline
@@ -847,15 +1053,27 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         guard vertexFloats.count == expectedFloatCount else {
             throw MetalRendererError.invalidDraw(shaderID: Self.marioFaceShaderKey.shaderID)
         }
-        cursor = aligned(cursor, to: 16)
-        let vertexOffset = cursor
-        let byteCount = vertexFloats.count * MemoryLayout<Float>.size
-        vertexFloats.withUnsafeBufferPointer { source in
-            buffer.contents().advanced(by: vertexOffset).copyMemory(
-                from: source.baseAddress!, byteCount: byteCount
-            )
+        // The full source packet is admitted into private buffers and copied
+        // by the preceding Metal 4 blit encoder.  Keep the transient path
+        // only as a defensive fallback for a renderer constructed by an
+        // older caller; normal M30u draws must use private geometry.
+        let vertexBuffer: (any MTLBuffer)? = residency.vertexBuffer
+        let indexBuffer: (any MTLBuffer)? = residency.indexBuffer
+        let materialBuffer: (any MTLBuffer)? = residency.materialBuffer
+        let vertexOffset: Int
+        if vertexBuffer == nil {
+            cursor = aligned(cursor, to: 16)
+            vertexOffset = cursor
+            let byteCount = vertexFloats.count * MemoryLayout<Float>.size
+            vertexFloats.withUnsafeBufferPointer { source in
+                buffer.contents().advanced(by: vertexOffset).copyMemory(
+                    from: source.baseAddress!, byteCount: byteCount
+                )
+            }
+            cursor += byteCount
+        } else {
+            vertexOffset = 0
         }
-        cursor += byteCount
         cursor = aligned(cursor, to: 16)
         let uniformOffset = cursor
         buffer.contents().advanced(by: uniformOffset)
@@ -864,8 +1082,11 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         cursor += 16
         return PreparedMarioFaceDraw(
             pipeline: pipeline,
+            vertexBuffer: vertexBuffer,
+            indexBuffer: indexBuffer,
             vertexOffset: vertexOffset,
             uniformOffset: uniformOffset,
+            materialBuffer: materialBuffer,
             vertexCount: vertexFloats.count / pipeline.vertexStride,
             triangleCount: geometry.faceWindowCount
         )
@@ -887,6 +1108,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         guard let encoder = commandBuffer.makeRenderCommandEncoder(descriptor: pass) else {
             throw MetalRendererError.marioFaceRenderEncoderUnavailable
         }
+        SM64ModernBarrierFragmentToFragmentConsumer(encoder)
         encoder.label = "SM64 Modern Mario Face Source Window"
         encoder.pushDebugGroup("Isolated Metal 4 source-backed Mario-face draw")
         encoder.setRenderPipelineState(prepared.pipeline.state)
@@ -903,12 +1125,22 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         encoder.setScissorRect(MTLScissorRect(
             x: 0, y: 0, width: colorTexture.width, height: colorTexture.height
         ))
-        slot.argumentTable.setAddress(
-            slot.transientBuffer.gpuAddress + UInt64(prepared.vertexOffset), index: 0
-        )
+        if let vertexBuffer = prepared.vertexBuffer {
+            slot.argumentTable.setAddress(vertexBuffer.gpuAddress, index: 0)
+        } else {
+            slot.argumentTable.setAddress(
+                slot.transientBuffer.gpuAddress + UInt64(prepared.vertexOffset), index: 0
+            )
+        }
         slot.argumentTable.setAddress(
             slot.transientBuffer.gpuAddress + UInt64(prepared.uniformOffset), index: 1
         )
+        if let materialBuffer = prepared.materialBuffer {
+            slot.argumentTable.setAddress(materialBuffer.gpuAddress, index: 2)
+        }
+        if let indexBuffer = prepared.indexBuffer {
+            slot.argumentTable.setAddress(indexBuffer.gpuAddress, index: 3)
+        }
         encoder.setArgumentTable(slot.argumentTable, stages: [.vertex, .fragment])
         encoder.drawPrimitives(
             primitiveType: .triangle,
@@ -920,7 +1152,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         if !marioFaceSourceDrawLogged, let geometry = marioFaceSourceGeometry {
             marioFaceSourceDrawLogged = true
             metalLogger.notice(
-                "mario_face_mesh_draw route=2 mesh=\(geometry.meshID) source_path=dynlist_mario_face window_faces=\(geometry.faceWindowCount) source_faces=\(geometry.sourceFaceCount) source_vertices=\(geometry.sourceVertexCount) material=0 encoder=isolated_render packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(geometry), privacy: .public)"
+                "mario_face_mesh_draw route=2 mesh=\(geometry.meshID) source_path=dynlist_mario_face window_faces=\(geometry.faceWindowCount) source_faces=\(geometry.sourceFaceCount) source_vertices=\(geometry.sourceVertexCount) materials=\(geometry.sourceMaterialCount) encoder=isolated_render private_geometry=1 private_index_buffer=1 private_material_buffer=1 packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(geometry), privacy: .public)"
             )
         }
     }

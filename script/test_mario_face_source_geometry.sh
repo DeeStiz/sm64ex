@@ -22,7 +22,7 @@ xcrun clang -std=c11 -Wall -Wextra -Werror \
   -o "$BUILD_ROOT/mario-face-source-geometry-contract"
 
 TRACE="$BUILD_ROOT/mario-face-source-geometry.trace"
-SWIFT_OUTPUT="$($BUILD_ROOT/mario-face-source-geometry-smoke "$TRACE")"
+SWIFT_OUTPUT="$($BUILD_ROOT/mario-face-source-geometry-smoke "$PROJECT_ROOT" "$TRACE")"
 C_OUTPUT="$($BUILD_ROOT/mario-face-source-geometry-contract "$TRACE")"
 TAMPER_OUTPUT="$($BUILD_ROOT/mario-face-source-geometry-contract "$TRACE" --tamper)"
 printf '%s\n' "$SWIFT_OUTPUT" "$C_OUTPUT" "$TAMPER_OUTPUT"
@@ -37,7 +37,12 @@ for LABEL in \
   marioFaceSourceGeometryMaterialID \
   marioFaceSourceGeometryPacketFingerprint \
   marioFaceSourceGeometryTraceFingerprint \
-  marioFaceSourceGeometryMetalFloats; do
+  marioFaceSourceGeometryMetalFloats \
+  marioFaceSourceGeometryFullVertices \
+  marioFaceSourceGeometryFullFaces \
+  marioFaceSourceGeometryFullMaterials \
+  marioFaceSourceGeometryFullPacketFingerprint \
+  marioFaceSourceGeometryFullMetalFloats; do
   SWIFT_VALUE="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n "s/^${LABEL}=//p")"
   C_VALUE="$(printf '%s\n' "$C_OUTPUT" | sed -n "s/^${LABEL}=//p")"
   [[ -n "$SWIFT_VALUE" && "$SWIFT_VALUE" == "$C_VALUE" ]] || {

@@ -110,6 +110,21 @@ void SM64ModernCopyBufferToTexture(
           destinationOrigin:MTLOriginMake(0, 0, 0)];
 }
 
+void SM64ModernCopyBufferToBuffer(
+    id<MTL4ComputeCommandEncoder> encoder,
+    id<MTLBuffer> source,
+    NSUInteger sourceOffset,
+    id<MTLBuffer> destination,
+    NSUInteger destinationOffset,
+    NSUInteger size
+) {
+    [encoder copyFromBuffer:source
+               sourceOffset:sourceOffset
+                   toBuffer:destination
+          destinationOffset:destinationOffset
+                       size:size];
+}
+
 void SM64ModernBarrierBlitToFragmentProducer(id<MTL4CommandEncoder> encoder) {
     [encoder barrierAfterStages:MTLStageBlit
               beforeQueueStages:MTLStageFragment
@@ -118,6 +133,30 @@ void SM64ModernBarrierBlitToFragmentProducer(id<MTL4CommandEncoder> encoder) {
 
 void SM64ModernBarrierBlitToFragmentConsumer(id<MTL4CommandEncoder> encoder) {
     [encoder barrierAfterQueueStages:MTLStageBlit
+                        beforeStages:MTLStageFragment
+                   visibilityOptions:MTL4VisibilityOptionDevice];
+}
+
+void SM64ModernBarrierBlitToVertexFragmentProducer(id<MTL4CommandEncoder> encoder) {
+    [encoder barrierAfterStages:MTLStageBlit
+              beforeQueueStages:MTLStageVertex | MTLStageFragment
+              visibilityOptions:MTL4VisibilityOptionDevice];
+}
+
+void SM64ModernBarrierBlitToVertexFragmentConsumer(id<MTL4CommandEncoder> encoder) {
+    [encoder barrierAfterQueueStages:MTLStageBlit
+                        beforeStages:MTLStageVertex | MTLStageFragment
+                   visibilityOptions:MTL4VisibilityOptionDevice];
+}
+
+void SM64ModernBarrierFragmentToFragmentProducer(id<MTL4CommandEncoder> encoder) {
+    [encoder barrierAfterStages:MTLStageFragment
+              beforeQueueStages:MTLStageFragment
+              visibilityOptions:MTL4VisibilityOptionDevice];
+}
+
+void SM64ModernBarrierFragmentToFragmentConsumer(id<MTL4CommandEncoder> encoder) {
+    [encoder barrierAfterQueueStages:MTLStageFragment
                         beforeStages:MTLStageFragment
                    visibilityOptions:MTL4VisibilityOptionDevice];
 }

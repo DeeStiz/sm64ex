@@ -924,6 +924,9 @@ final class EngineHost {
         if ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_TEXTURE_UPLOAD"] == "1" {
             try admitMarioFaceTextureUploadOnEngineThread(renderer)
         }
+        if ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_DRAW"] == "1" {
+            try admitMarioFaceSourceGeometryOnEngineThread(renderer)
+        }
     }
 
     private func admitMarioFaceTextureUploadOnEngineThread(_ renderer: MetalRenderer) throws {
@@ -951,6 +954,20 @@ final class EngineHost {
         let receipt = try renderer.admitMarioFaceTextureUpload(plan)
         engineLogger.notice(
             "mario_face_texture_upload_admitted route=\(receipt.route.rawValue) entries=\(receipt.admittedEntries) source_bytes=\(receipt.sourceByteCount) upload_bytes=\(receipt.uploadByteCount) generations=\(receipt.firstGeneration)-\(receipt.lastGeneration) pending_residency=\(receipt.pendingResidencyCount) fingerprint=\(receipt.planFingerprint, privacy: .public)"
+        )
+    }
+
+    private func admitMarioFaceSourceGeometryOnEngineThread(_ renderer: MetalRenderer) throws {
+        precondition(isCurrentEngineThread)
+        let environment = ProcessInfo.processInfo.environment
+        guard let gameDirectory = environment["SM64_MODERN_GAME_DIR"] else {
+            throw HostPathError.missingGameDirectory
+        }
+        let rootURL = URL(fileURLWithPath: gameDirectory, isDirectory: true).standardizedFileURL
+        let packet = try SM64MarioFaceSourceGeometryProvider.load(rootURL: rootURL)
+        try renderer.admitMarioFaceSourceGeometry(packet)
+        engineLogger.notice(
+            "mario_face_geometry_source_admitted source_path=\(packet.sourcePath, privacy: .public) schema=\(packet.schemaVersion) vertices=\(packet.vertices.count) faces=\(packet.triangles.count) materials=\(packet.materials.count) source_digest=\(packet.sourceDigestWords.map { String($0, radix: 16) }.joined(separator: ":"), privacy: .public) packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(packet), privacy: .public)"
         )
     }
 

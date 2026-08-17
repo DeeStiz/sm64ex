@@ -35,6 +35,7 @@ final class MetalShaderCompiler {
     private static let fogOption: UInt32 = 1 << 25
     private static let textureEdgeOption: UInt32 = 1 << 26
     private static let noiseOption: UInt32 = 1 << 27
+    private static let marioFaceMaterialOption: UInt32 = 1 << 28
 
     private static let archiveSchema = 1
     private static let rendererSchema = 2
@@ -122,6 +123,23 @@ final class MetalShaderCompiler {
                 .takeUnretainedValue()
                 .compile(key)
         }
+    }
+
+    /// Compile a bootstrap pipeline before the renderer starts presenting.
+    /// The face-source gate has only a small number of drawable callbacks in
+    /// headless/native verification, so leaving its first pipeline entirely
+    /// asynchronous can exhaust those callbacks before the private mesh is
+    /// eligible to draw.  Normal scene shaders remain asynchronous.
+    func prepareSynchronously(_ key: MetalShaderKey) {
+        lock.lock()
+        guard cache[key] == nil, failures[key] == nil, !pending.contains(key) else {
+            lock.unlock()
+            return
+        }
+        pending.insert(key)
+        lock.unlock()
+        compile(key)
+        SM64ModernWaitForRenderPipelineTasks()
     }
 
     func removeAll() {
@@ -243,6 +261,7 @@ final class MetalShaderCompiler {
         let fog = key.shaderID & fogOption != 0
         let textureEdge = key.shaderID & textureEdgeOption != 0
         let noise = key.shaderID & noiseOption != 0
+        let marioFaceMaterial = key.shaderID & marioFaceMaterialOption != 0
         let useTexture0 = key.textureMask & 1 != 0
         let useTexture1 = key.textureMask & 2 != 0
         let manualFilter = key.filteringMode == 2
@@ -285,6 +304,15 @@ final class MetalShaderCompiler {
 
         let rgbExpression = combinerExpression(shaderID: key.shaderID, alpha: false)
         let alphaExpression = alpha ? combinerExpression(shaderID: key.shaderID, alpha: true) : "1.0"
+        let materialBinding = marioFaceMaterial
+            ? "            device const float4 *materials [[buffer(2)]],\n"
+            : ""
+        let indexBinding = marioFaceMaterial
+            ? "            device const ushort *sourceIndices [[buffer(3)]],\n"
+            : ""
+        let materialBindingUse = marioFaceMaterial
+            ? "            (void)materials;\n            (void)sourceIndices;\n"
+            : ""
         let filterHelper = manualFilter ? """
         float4 sample3Point(texture2d<float> texture, sampler state, float2 uv) {
             float2 size = float2(texture.get_width(), texture.get_height());
@@ -334,9 +362,11 @@ final class MetalShaderCompiler {
             return out;
         }
 
-        fragment float4 sm64_fragment(
+            fragment float4 sm64_fragment(
             VertexOut in [[stage_in]],
             constant DrawUniforms &uniforms [[buffer(1)]],
+        \(materialBinding)
+        \(indexBinding)
             texture2d<float> texture0 [[texture(0)]],
             texture2d<float> texture1 [[texture(1)]],
             sampler sampler0 [[sampler(0)]],
@@ -346,6 +376,7 @@ final class MetalShaderCompiler {
             (void)texture1;
             (void)sampler0;
             (void)sampler1;
+        \(materialBindingUse)
         \(sampling)
             float3 rgb = \(rgbExpression);
             float alpha = \(alphaExpression);
