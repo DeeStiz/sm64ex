@@ -130,6 +130,9 @@ SM64ModernStatus sm64_modern_camera_evaluate(
                 | SM64_MODERN_CAMERA_CALLBACK_IS_METAL_WATER
                 | SM64_MODERN_CAMERA_CALLBACK_IS_ON_POLE
                 | SM64_MODERN_CAMERA_CALLBACK_HAS_SLOPE_FLOOR)) != 0
+        || (input->state_flags
+            & ~(SM64_MODERN_CAMERA_CALLBACK_MARIO_MODE_ACTIVE
+                | SM64_MODERN_CAMERA_CALLBACK_WATER_OR_METAL_ACTION)) != 0
         || !finite_float(input->lakitu_distance)
         || !finite_float(input->zoom_distance)
         || !finite_float(input->cannon_y_offset)
@@ -139,6 +142,9 @@ SM64ModernStatus sm64_modern_camera_evaluate(
         || !finite_float(input->slope_floor_normal_z)
         || !finite_float(input->pole_object_y)
         || !finite_float(input->pole_hitbox_height)
+        || !finite_float(input->camera_distance)
+        || !finite_vector(input->camera_position)
+        || !finite_vector(input->camera_focus)
         || !finite_vector(input->mario_position)
         || !finite_vector(input->area_center)) {
         if (sMigrationStatus == SM64_MODERN_STATUS_OK) {

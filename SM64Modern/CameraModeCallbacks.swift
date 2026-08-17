@@ -39,6 +39,11 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
     let mode: Int16
     let marioPosition: SM64ObjectVector3
     let areaCenter: SM64ObjectVector3
+    let cameraPosition: SM64ObjectVector3
+    let cameraFocus: SM64ObjectVector3
+    let cameraDistance: Float
+    let cameraPitch: Int16
+    let cameraYaw: Int16
     let faceYaw: Int16
     let facePitch: Int16
     let modeOffsetYaw: Int16
@@ -48,6 +53,11 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
     let eightDirectionBaseYaw: Int16
     let eightDirectionYawOffset: Int16
     let cannonYOffset: Float
+    let cButtonsPressed: UInt16
+    let sideButtonYaw: Int16
+    let behindMarioSoundTimer: Int16
+    let marioModeActive: Bool
+    let waterOrMetalAction: Bool
     let height: SM64CameraHeightInput?
     let slope: SM64CameraSlopeInput?
 
@@ -55,6 +65,11 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         mode: Int16,
         marioPosition: SM64ObjectVector3,
         areaCenter: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 0, z: 0),
+        cameraPosition: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 0, z: 0),
+        cameraFocus: SM64ObjectVector3 = SM64ObjectVector3(x: 0, y: 0, z: 0),
+        cameraDistance: Float = 0,
+        cameraPitch: Int16 = 0,
+        cameraYaw: Int16 = 0,
         faceYaw: Int16 = 0,
         facePitch: Int16 = 0,
         modeOffsetYaw: Int16 = 0,
@@ -64,12 +79,22 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         eightDirectionBaseYaw: Int16 = 0,
         eightDirectionYawOffset: Int16 = 0,
         cannonYOffset: Float = 0,
+        cButtonsPressed: UInt16 = 0,
+        sideButtonYaw: Int16 = 0,
+        behindMarioSoundTimer: Int16 = 0,
+        marioModeActive: Bool = false,
+        waterOrMetalAction: Bool = false,
         height: SM64CameraHeightInput? = nil,
         slope: SM64CameraSlopeInput? = nil
     ) {
         self.mode = mode
         self.marioPosition = marioPosition
         self.areaCenter = areaCenter
+        self.cameraPosition = cameraPosition
+        self.cameraFocus = cameraFocus
+        self.cameraDistance = cameraDistance
+        self.cameraPitch = cameraPitch
+        self.cameraYaw = cameraYaw
         self.faceYaw = faceYaw
         self.facePitch = facePitch
         self.modeOffsetYaw = modeOffsetYaw
@@ -79,6 +104,11 @@ struct SM64CameraCallbackInput: Equatable, Sendable {
         self.eightDirectionBaseYaw = eightDirectionBaseYaw
         self.eightDirectionYawOffset = eightDirectionYawOffset
         self.cannonYOffset = cannonYOffset
+        self.cButtonsPressed = cButtonsPressed
+        self.sideButtonYaw = sideButtonYaw
+        self.behindMarioSoundTimer = behindMarioSoundTimer
+        self.marioModeActive = marioModeActive
+        self.waterOrMetalAction = waterOrMetalAction
         self.height = height
         self.slope = slope
     }
@@ -96,6 +126,8 @@ struct SM64CameraCallbackResult: Equatable, Sendable {
     let distance: Float
     let outputsSwapped: Bool
     let panAhead: Bool
+    let sideButtonYaw: Int16
+    let behindMarioSoundTimer: Int16
 }
 
 /// Bounded-mode callback descriptors plus the callbacks whose C bodies are
@@ -107,7 +139,7 @@ enum SM64CameraModeCallbacks {
         descriptor(0, .none, false, false, false, 0, 0, 0, 0, false, false),
         descriptor(1, .radial, true, true, false, 1000, 125, 125, 0x05B0, false, true),
         descriptor(2, .outwardRadial, true, true, false, 1000, 125, 125, 0x05B0, false, true),
-        descriptor(3, .behindMario, false, true, false, 800, 125, 125, 0x05B0, false, true),
+        descriptor(3, .behindMario, true, true, false, 800, 125, 125, 0x05B0, false, true),
         descriptor(4, .mario, true, true, false, 800, 125, 125, 0x05B0, true, true),
         descriptor(5, .none, false, false, false, 0, 0, 0, 0, false, false),
         descriptor(6, .cUp, true, true, false, 250, 125, 125, 0, true, false),
@@ -154,7 +186,9 @@ enum SM64CameraModeCallbacks {
             return cannon(input, descriptor: descriptor)
         case .cUp:
             return cUp(input, descriptor: descriptor)
-        case .none, .behindMario, .waterSurface, .bossFight,
+        case .behindMario:
+            return behindMario(input, descriptor: descriptor)
+        case .none, .waterSurface, .bossFight,
              .parallelTracking, .fixed, .spiralStairs:
             return nil
         }
@@ -297,7 +331,49 @@ enum SM64CameraModeCallbacks {
             pitch: input.facePitch,
             distance: descriptor.baseDistance,
             outputsSwapped: descriptor.outputsSwapped,
-            panAhead: descriptor.pansAhead
+            panAhead: descriptor.pansAhead,
+            sideButtonYaw: 0,
+            behindMarioSoundTimer: 0
+        )
+    }
+
+    private static func behindMario(
+        _ input: SM64CameraCallbackInput,
+        descriptor: SM64CameraModeCallbackDescriptor
+    ) -> SM64CameraCallbackResult? {
+        guard let result = SM64CameraBehindKernel.update(
+            SM64CameraBehindInput(
+                distance: input.cameraDistance,
+                pitch: input.cameraPitch,
+                yaw: input.cameraYaw,
+                marioFacePitch: input.facePitch,
+                marioYaw: input.faceYaw &+ Int16(bitPattern: 0x8000),
+                marioModeActive: input.marioModeActive,
+                waterOrMetalAction: input.waterOrMetalAction,
+                cButtonsPressed: input.cButtonsPressed,
+                sideButtonYaw: input.sideButtonYaw,
+                behindMarioSoundTimer: input.behindMarioSoundTimer
+            )
+        ), let placement = SM64CameraGeometry.focusOnMario(
+            marioPosition: input.marioPosition,
+            positionYOffset: result.focusYOffset,
+            focusYOffset: result.focusYOffset,
+            distance: result.distance,
+            pitch: result.pitch,
+            yaw: result.yaw
+        ) else { return nil }
+        return SM64CameraCallbackResult(
+            focus: placement.focus,
+            position: placement.position,
+            cameraYaw: result.yaw,
+            returnedYaw: result.yaw,
+            areaYaw: result.yaw,
+            pitch: result.pitch,
+            distance: result.distance,
+            outputsSwapped: descriptor.outputsSwapped,
+            panAhead: descriptor.pansAhead,
+            sideButtonYaw: result.sideButtonYaw,
+            behindMarioSoundTimer: result.behindMarioSoundTimer
         )
     }
 
@@ -352,7 +428,9 @@ enum SM64CameraModeCallbacks {
             pitch: pitch,
             distance: distance,
             outputsSwapped: descriptor.outputsSwapped,
-            panAhead: descriptor.pansAhead
+            panAhead: descriptor.pansAhead,
+            sideButtonYaw: 0,
+            behindMarioSoundTimer: 0
         )
     }
 

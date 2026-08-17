@@ -14,6 +14,7 @@ xcrun swiftc -parse-as-library -swift-version 6 \
   "$PROJECT_ROOT/SM64Modern/CameraGeometry.swift" \
   "$PROJECT_ROOT/SM64Modern/CameraPrimitives.swift" \
   "$PROJECT_ROOT/SM64Modern/CameraCUp.swift" \
+  "$PROJECT_ROOT/SM64Modern/CameraBehindKernel.swift" \
   "$PROJECT_ROOT/SM64Modern/CameraModeCallbacks.swift" \
   "$PROJECT_ROOT/tests/sm64_modern_camera_mode_callbacks_smoke.swift" \
   -o "$BUILD_ROOT/sm64-modern-camera-mode-callbacks-smoke"

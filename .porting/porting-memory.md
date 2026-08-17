@@ -2,6 +2,19 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31q promotes behind-Mario camera mode 3 to the Swift evaluator. The
+  stateful kernel owns camera distance/pitch/yaw, Mario-mode and water/metal
+  offsets, C-button yaw rotation, and the behind-Mario sound timer; C retains
+  transition-pointer safety, authored WDW/THI clamps, sound dispatch,
+  pan-ahead, collision, and Lakitu presentation. The callback fingerprint is
+  `0x7f786dcb5db3aae3`; callback/migration/geometry/state/runtime, ABI, Debug
+  build, and `git diff --check` gates pass. Signed launch
+  `/tmp/sm64-modern-m31q-live-4.log` reaches Metal 4 frame one, 360 fixed
+  steps, zero scheduler/audio drops, and status 0 after an explicit game
+  directory is supplied. The bounded route does not enter mode 3, so live
+  authored-mode telemetry and physical feel remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31q.md`.
+
 - M31p promotes the direct C-up placement callback (mode 6) to the Swift
   evaluator. `SM64CameraCUp.update` owns the 250-unit placement, 125-unit
   offsets, live C-up pitch, Mario-facing yaw, and returned Mario yaw; C retains

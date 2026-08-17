@@ -129,6 +129,19 @@ final class SwiftCameraMigrationService {
                 y: input.area_center.1,
                 z: input.area_center.2
             ),
+            cameraPosition: SM64ObjectVector3(
+                x: input.camera_position.0,
+                y: input.camera_position.1,
+                z: input.camera_position.2
+            ),
+            cameraFocus: SM64ObjectVector3(
+                x: input.camera_focus.0,
+                y: input.camera_focus.1,
+                z: input.camera_focus.2
+            ),
+            cameraDistance: input.camera_distance,
+            cameraPitch: input.camera_pitch,
+            cameraYaw: input.camera_yaw,
             faceYaw: input.face_yaw,
             facePitch: input.face_pitch,
             modeOffsetYaw: input.mode_offset_yaw,
@@ -138,6 +151,13 @@ final class SwiftCameraMigrationService {
             eightDirectionBaseYaw: input.eight_direction_base_yaw,
             eightDirectionYawOffset: input.eight_direction_yaw_offset,
             cannonYOffset: input.cannon_y_offset,
+            cButtonsPressed: input.c_buttons_pressed,
+            sideButtonYaw: input.side_button_yaw,
+            behindMarioSoundTimer: input.behind_mario_sound_timer,
+            marioModeActive: input.state_flags
+                & UInt16(SM64_MODERN_CAMERA_CALLBACK_MARIO_MODE_ACTIVE) != 0,
+            waterOrMetalAction: input.state_flags
+                & UInt16(SM64_MODERN_CAMERA_CALLBACK_WATER_OR_METAL_ACTION) != 0,
             height: height,
             slope: slope
         )
@@ -157,6 +177,8 @@ final class SwiftCameraMigrationService {
         next.area_yaw = result.areaYaw
         next.pitch = result.pitch
         next.distance = result.distance
+        next.side_button_yaw = result.sideButtonYaw
+        next.behind_mario_sound_timer = result.behindMarioSoundTimer
         next.flags = (result.outputsSwapped
             ? SM64_MODERN_CAMERA_CALLBACK_OUTPUTS_SWAPPED : 0)
             | (result.panAhead ? SM64_MODERN_CAMERA_CALLBACK_PANS_AHEAD : 0)

@@ -503,6 +503,15 @@ typedef struct SM64ModernCameraCallbackInputV1 {
     float pole_hitbox_height;
     int16_t slope_floor_type;
     uint16_t geometry_flags;
+    float camera_distance;
+    int16_t camera_pitch;
+    int16_t camera_yaw;
+    uint16_t c_buttons_pressed;
+    int16_t side_button_yaw;
+    int16_t behind_mario_sound_timer;
+    uint16_t state_flags;
+    float camera_position[3];
+    float camera_focus[3];
     float mario_position[3];
     float area_center[3];
     uint32_t reserved;
@@ -517,6 +526,8 @@ typedef struct SM64ModernCameraCallbackOutputV1 {
     int16_t area_yaw;
     int16_t pitch;
     float distance;
+    int16_t side_button_yaw;
+    int16_t behind_mario_sound_timer;
     uint32_t flags;
     uint32_t reserved;
 } SM64ModernCameraCallbackOutputV1;
@@ -530,6 +541,8 @@ typedef struct SM64ModernCameraCallbackOutputV1 {
 #define SM64_MODERN_CAMERA_CALLBACK_IS_METAL_WATER (1u << 2)
 #define SM64_MODERN_CAMERA_CALLBACK_IS_ON_POLE (1u << 3)
 #define SM64_MODERN_CAMERA_CALLBACK_HAS_SLOPE_FLOOR (1u << 4)
+#define SM64_MODERN_CAMERA_CALLBACK_MARIO_MODE_ACTIVE (1u << 0)
+#define SM64_MODERN_CAMERA_CALLBACK_WATER_OR_METAL_ACTION (1u << 1)
 
 typedef SM64ModernStatus (*SM64ModernCameraUpdateFn)(
     void *context,

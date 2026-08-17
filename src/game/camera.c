@@ -39,6 +39,10 @@ static s32 sm64_modern_camera_dispatch(
 static s32 sm64_modern_camera_evaluate_callback(
     struct Camera *camera, s16 mode, Vec3f focus, Vec3f pos, s16 *out_yaw,
     u32 *out_flags);
+static s32 sm64_modern_camera_evaluate_behind(
+    struct Camera *camera, Vec3f focus, Vec3f pos, s16 *out_yaw,
+    u32 *out_flags, s16 *out_side_button_yaw,
+    s16 *out_behind_mario_sound_timer);
 
 /**
  * @file camera.c
@@ -1789,6 +1793,54 @@ void mode_fixed_camera(struct Camera *c) {
  * The C-Buttons rotate the camera 90 degrees left/right and 67.5 degrees up/down.
  */
 s32 update_behind_mario_camera(struct Camera *c, Vec3f focus, Vec3f pos) {
+    s16 callbackYaw = 0;
+    u32 callbackFlags = 0;
+    s16 callbackSideButtonYaw = 0;
+    s16 callbackBehindMarioSoundTimer = 0;
+    if (sm64_modern_camera_evaluate_behind(
+            c, focus, pos, &callbackYaw, &callbackFlags,
+            &callbackSideButtonYaw, &callbackBehindMarioSoundTimer)) {
+        sCSideButtonYaw = callbackSideButtonYaw;
+        sBehindMarioSoundTimer = callbackBehindMarioSoundTimer;
+
+        if (sCButtonsPressed & L_CBUTTONS
+            && gPlayer1Controller->buttonPressed & L_CBUTTONS) {
+            play_sound_cbutton_side();
+        }
+        if (sCButtonsPressed & R_CBUTTONS
+            && gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+            play_sound_cbutton_side();
+        }
+        if (sCButtonsPressed & (U_CBUTTONS | D_CBUTTONS)
+            && gPlayer1Controller->buttonPressed & (U_CBUTTONS | D_CBUTTONS)) {
+            play_sound_cbutton_side();
+        }
+        if (sBehindMarioSoundTimer == 28) {
+            if (sCSideButtonYaw < 5 || sCSideButtonYaw > 28) {
+                play_sound_cbutton_up();
+            }
+        }
+        if (sCSideButtonYaw == 28) {
+            if (sBehindMarioSoundTimer < 5 || sBehindMarioSoundTimer > 28) {
+                play_sound_cbutton_up();
+            }
+        }
+
+        if (gCurrLevelArea == AREA_WDW_MAIN) {
+            callbackYaw = clamp_positions_and_find_yaw(
+                pos, focus, 4508.f, -3739.f, 4508.f, -3739.f);
+        }
+        if (gCurrLevelArea == AREA_THI_HUGE) {
+            callbackYaw = clamp_positions_and_find_yaw(
+                pos, focus, 8192.f, -8192.f, 8192.f, -8192.f);
+        }
+        if (gCurrLevelArea == AREA_THI_TINY) {
+            callbackYaw = clamp_positions_and_find_yaw(
+                pos, focus, 2458.f, -2458.f, 2458.f, -2458.f);
+        }
+        return callbackYaw;
+    }
+
     UNUSED u8 unused2[12];
     f32 dist;
     UNUSED u8 unused3[4];
@@ -2189,6 +2241,66 @@ static s32 sm64_modern_camera_evaluate_callback(
     }
     *out_yaw = output.returned_yaw;
     *out_flags = output.flags;
+    return TRUE;
+}
+
+static s32 sm64_modern_camera_evaluate_behind(
+    struct Camera *camera, Vec3f focus, Vec3f pos, s16 *out_yaw,
+    u32 *out_flags, s16 *out_side_button_yaw,
+    s16 *out_behind_mario_sound_timer) {
+    if (!sm64_modern_camera_authority_active()
+        || camera == NULL || focus != camera->focus
+        || sMarioCamState == NULL || out_yaw == NULL || out_flags == NULL
+        || out_side_button_yaw == NULL
+        || out_behind_mario_sound_timer == NULL) {
+        return FALSE;
+    }
+
+    const f32 focusYOffset =
+        (sSelectionFlags & CAM_MODE_MARIO_ACTIVE) != 0 ? 120.f : 125.f;
+    Vec3f currentFocus;
+    vec3f_copy(currentFocus, sMarioCamState->pos);
+    currentFocus[1] += focusYOffset;
+
+    SM64ModernCameraCallbackInputV1 input = { 0 };
+    SM64ModernCameraCallbackOutputV1 output = { 0 };
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.mode = CAMERA_MODE_BEHIND_MARIO;
+    input.face_yaw = sMarioCamState->faceAngle[1];
+    input.face_pitch = sMarioCamState->faceAngle[0];
+    input.camera_distance = 0.f;
+    vec3f_copy(input.camera_position, pos);
+    vec3f_copy(input.camera_focus, currentFocus);
+    vec3f_get_dist_and_angle(
+        currentFocus, pos, &input.camera_distance,
+        &input.camera_pitch, &input.camera_yaw);
+    input.c_buttons_pressed = (u16)sCButtonsPressed;
+    input.side_button_yaw = sCSideButtonYaw;
+    input.behind_mario_sound_timer = sBehindMarioSoundTimer;
+    if (sSelectionFlags & CAM_MODE_MARIO_ACTIVE) {
+        input.state_flags |= SM64_MODERN_CAMERA_CALLBACK_MARIO_MODE_ACTIVE;
+    }
+    if (sMarioCamState->action
+        & (ACT_FLAG_SWIMMING | ACT_FLAG_METAL_WATER)) {
+        input.state_flags |=
+            SM64_MODERN_CAMERA_CALLBACK_WATER_OR_METAL_ACTION;
+    }
+    input.mario_position[0] = sMarioCamState->pos[0];
+    input.mario_position[1] = sMarioCamState->pos[1];
+    input.mario_position[2] = sMarioCamState->pos[2];
+
+    if (sm64_modern_camera_evaluate(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return FALSE;
+    }
+
+    vec3f_copy(focus, output.focus);
+    vec3f_copy(pos, output.position);
+    *out_yaw = output.returned_yaw;
+    *out_flags = output.flags;
+    *out_side_button_yaw = output.side_button_yaw;
+    *out_behind_mario_sound_timer = output.behind_mario_sound_timer;
     return TRUE;
 }
 
