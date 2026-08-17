@@ -229,6 +229,7 @@
 		D0031C8BC47031BF22FCFA00 /* EyerokHand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225D73054770EC25DC64D2C0 /* EyerokHand.swift */; };
 		D19D30E6B7A0A540B8C68BB4 /* FrontEndRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = C43519D037D79EF6DB35F980 /* FrontEndRender.swift */; };
 		D3919C39B72DEEB57976B4BA /* TuxiesMotherBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBADCC8D3A0FCE39EEF40AC3 /* TuxiesMotherBehavior.swift */; };
+		D50A24D59A35C579AEF485DA /* MarioFaceRenderPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003349361D040FC91AEB79A1 /* MarioFaceRenderPacket.swift */; };
 		D5578FD5FECA0729AE8EDAC2 /* AudioMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1852868F5E323B208C3437 /* AudioMixer.swift */; };
 		D65F07ACB7B0E4429D8D1086 /* ObjectSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */; };
 		D77819D0FD6CAB42ED53C410 /* ChuckyaEnemy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DDDABF519C9DA6F2577DA59 /* ChuckyaEnemy.swift */; };
@@ -274,6 +275,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		003349361D040FC91AEB79A1 /* MarioFaceRenderPacket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioFaceRenderPacket.swift; sourceTree = "<group>"; };
 		0036673A4084395EDD23BAF6 /* MarioLedgeCannonAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioLedgeCannonAction.swift; sourceTree = "<group>"; };
 		009071A5D0995E6F7BAC520C /* BowserKeyCutscene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserKeyCutscene.swift; sourceTree = "<group>"; };
 		00F6C1413CC0CD0ED1403F51 /* MarioSlideVariants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioSlideVariants.swift; sourceTree = "<group>"; };
@@ -693,6 +695,7 @@
 				693D452C9D1D8BE50281DB5E /* MarioFaceExpressionComposition.swift */,
 				0BFB5B772461E752D2E1D5EB /* MarioFacePayloadBundle.swift */,
 				A4E9946C93241D4FCF46A311 /* MarioFacePayloadInventory.swift */,
+				003349361D040FC91AEB79A1 /* MarioFaceRenderPacket.swift */,
 				A7A6447329A9B7A1EEE7CE58 /* MarioFaceResourceCatalog.swift */,
 				70A5733D4139CD88D7976A65 /* MarioFaceResourceManifest.swift */,
 				6262B2107E57DA4E72B46ECA /* MarioFaceResourceManifestCodec.swift */,
@@ -1060,6 +1063,7 @@
 				A4B15E26FB7B14FF506AD730 /* MarioFaceExpressionComposition.swift in Sources */,
 				C8C350D40B8A2CDB9F32CCC0 /* MarioFacePayloadBundle.swift in Sources */,
 				BCFD0B5D4F1C30CD6ABFEC55 /* MarioFacePayloadInventory.swift in Sources */,
+				D50A24D59A35C579AEF485DA /* MarioFaceRenderPacket.swift in Sources */,
 				638744BDE25442917A53123B /* MarioFaceResourceCatalog.swift in Sources */,
 				ADF9CDE05AC2A15B5E73BA47 /* MarioFaceResourceManifest.swift in Sources */,
 				0000792BF14B5B419FE3451A /* MarioFaceResourceManifestCodec.swift in Sources */,
