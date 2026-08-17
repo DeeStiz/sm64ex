@@ -565,7 +565,7 @@ final class SM64ModernSwiftEngineRuntime: SM64ModernEngineRuntime {
         guard !didLogDelegation else { return }
         didLogDelegation = true
         runtimeLogger.notice(
-            "swift_engine_context_started authority=swift implementation=swift_lifecycle_owner_c_domain_bridge c_domain_bridge=active ledger_partitioned=\(self.authorityLedger.isPartitioned) swift_owned=\(self.authorityLedger.swiftOwnedDescription, privacy: .public) c_bridge=\(self.authorityLedger.cCompatibilityBridgeDescription, privacy: .public)"
+            "swift_engine_context_started authority=swift implementation=swift_lifecycle_save_persistence_owner_c_domain_bridge c_domain_bridge=active ledger_partitioned=\(self.authorityLedger.isPartitioned) swift_owned=\(self.authorityLedger.swiftOwnedDescription, privacy: .public) c_bridge=\(self.authorityLedger.cCompatibilityBridgeDescription, privacy: .public)"
         )
     }
 }
