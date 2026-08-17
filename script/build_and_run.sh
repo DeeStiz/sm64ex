@@ -130,6 +130,12 @@ open_app() {
   if [[ "${SM64_MODERN_AUDIO_PROMOTION:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_AUDIO_PROMOTION=1)
   fi
+  if [[ "${SM64_MODERN_AUTOMATED_MENU:-0}" == "1" ]]; then
+    open_arguments+=(--env SM64_MODERN_AUTOMATED_MENU=1)
+  fi
+  if [[ "${SM64_MODERN_AUTOMATED_GAMEPLAY:-0}" == "1" ]]; then
+    open_arguments+=(--env SM64_MODERN_AUTOMATED_GAMEPLAY=1)
+  fi
   if [[ "${SM64_MODERN_RENDER_PACKET_CAPTURE:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_RENDER_PACKET_CAPTURE=1)
   fi
@@ -259,6 +265,20 @@ case "$MODE" in
     test "$(defaults read "$APP_BUNDLE/Contents/Info" CFBundleIdentifier)" = "$BUNDLE_ID"
     runtime_log="$(/usr/bin/log show --last 2m --style compact \
       --predicate "processIdentifier == $app_pid && subsystem == \"$BUNDLE_ID\"")"
+    if [[ "${SM64_MODERN_AUTOMATED_MENU:-0}" == "1" ]]; then
+      # Unified-log indexing can lag the owner thread by a few hundred
+      # milliseconds. Poll the same process-scoped stream until the authored
+      # input pulse has crossed the front-end reducer or the bounded wait
+      # expires; never turn an observer-install line into route evidence.
+      for _ in {1..20}; do
+        if grep -Fq 'swift_frontend_transition' <<< "$runtime_log"; then
+          break
+        fi
+        sleep 0.25
+        runtime_log="$(/usr/bin/log show --last 2m --style compact \
+          --predicate "processIdentifier == $app_pid && subsystem == \"$BUNDLE_ID\"")"
+      done
+    fi
     for expected in \
       'window_ready layer=CAMetalLayer' \
       'metal_device_ready' \
@@ -294,6 +314,21 @@ case "$MODE" in
         grep -Fq "$expected" <<< "$runtime_log"
       done
       printf '%s\n' "$runtime_log" | grep -E 'swift_audio_promotion_(started|tick)'
+    fi
+    if [[ "${SM64_MODERN_AUTOMATED_MENU:-0}" == "1" ]]; then
+      # The opt-in route uses the real AppleInputService -> C input boundary;
+      # require evidence that it crossed the authored front-end reducer rather
+      # than merely installing the observer.
+      grep -Fq 'swift_frontend_transition' <<< "$runtime_log"
+      grep -Eq 'swift_frontend_observer screen=[0-9]+ tick=[1-9][0-9]*' <<< "$runtime_log"
+      printf '%s\n' "$runtime_log" | grep -E 'swift_frontend_transition|swift_frontend_observer screen='
+    fi
+    if [[ "${SM64_MODERN_AUTOMATED_MENU:-0}" == "1" && "${SM64_MODERN_AUTOMATED_GAMEPLAY:-0}" == "1" ]]; then
+      # The combined menu/gameplay route must also enter and exercise the
+      # authored pause reducer, including at least one completed outcome.
+      grep -Fq 'swift_pause_menu_observer' <<< "$runtime_log"
+      grep -Fq 'swift_pause_menu_outcome' <<< "$runtime_log"
+      printf '%s\n' "$runtime_log" | grep -E 'swift_pause_menu_observer|swift_pause_menu_outcome'
     fi
     if [[ "${SM64_MODERN_RENDER_PACKET_CAPTURE:-0}" == "1" ]]; then
       grep -Fq 'swift_render_packet_capture frame=1' <<< "$runtime_log"
@@ -339,6 +374,14 @@ case "$MODE" in
           'application_stopped'; do
           grep -Fq "$expected" <<< "$shutdown_log"
         done
+        if [[ "${SM64_MODERN_AUTOMATED_MENU:-0}" == "1" ]]; then
+          grep -Eq 'swift_frontend_observer_finished events=[1-9][0-9]* transitions=[1-9][0-9]*' <<< "$shutdown_log"
+          printf '%s\n' "$shutdown_log" | grep -E 'swift_frontend_observer_finished'
+        fi
+        if [[ "${SM64_MODERN_AUTOMATED_MENU:-0}" == "1" && "${SM64_MODERN_AUTOMATED_GAMEPLAY:-0}" == "1" ]]; then
+          grep -Eq 'swift_pause_menu_observer_finished events=[1-9][0-9]* outcomes=[1-9][0-9]*' <<< "$shutdown_log"
+          printf '%s\n' "$shutdown_log" | grep -E 'swift_pause_menu_observer_finished'
+        fi
         if [[ "${SM64_MODERN_AUDIO_PROMOTION:-0}" == "1" ]]; then
           grep -Fq 'swift_audio_promotion_finished' <<< "$shutdown_log"
           printf '%s\n' "$shutdown_log" | grep -E 'swift_audio_promotion_finished'

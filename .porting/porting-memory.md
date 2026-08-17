@@ -2,6 +2,20 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M33g qualifies the real authored menu/gameplay route instead of only
+  installing observers. `script/build_and_run.sh verify` now propagates the
+  opt-in `SM64_MODERN_AUTOMATED_MENU` and `SM64_MODERN_AUTOMATED_GAMEPLAY`
+  inputs, polls for a transition, and requires nonzero pause outcomes plus
+  shutdown summaries. The combined signed Apple M5 Max run with
+  `SM64_MODERN_AUDIO_PROMOTION=1` passes in
+  `/tmp/sm64-modern-automated-route-qualified-2.log`: Swift frontend
+  `events=253 transitions=3 screen=5`, pause `events=128 outcomes=3`, audio
+  promotion `ticks=253 records=2283 admission_failed=false`, Metal 4 frame one,
+  clean drain, status-0 shutdown, and application stop. This remains live
+  route/observer evidence, not Swift authority, full schema-4 shard promotion,
+  physical input/audio, visual, or human acceptance. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M33g.md`.
+
 - M31aa adds the live Swift pause/menu value boundary. The C pause renderer
   emits post-reducer state, selection, camera choice, alpha, menu activity,
   course bounds, input deltas, and completed resume/exit outcomes through a
