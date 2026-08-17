@@ -224,7 +224,7 @@ struct SM64ContentPack: Sendable {
             return .text
         }
         if path.hasPrefix("src/audio/") { return .audioTables }
-        if path == "sm64.us.sha1" { return .sourceManifest }
+        if path == "sm64.us.sha1" || path.hasPrefix("source_manifest/") { return .sourceManifest }
         return nil
     }
 
