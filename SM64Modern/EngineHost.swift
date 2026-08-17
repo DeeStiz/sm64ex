@@ -245,6 +245,8 @@ final class EngineHost {
     private var loggedAudioRender = false
     private var metalConfiguration: MetalConfiguration?
     private var metalRenderer: MetalRenderer?
+    private var marioFacePayloadBundle: SM64MarioFacePayloadBundle?
+    private var marioFaceCompositionSource: String = "fallback"
     private var pendingDrawableSize: CGSize?
     private var engineRunLoop: CFRunLoop?
     private var schedulerWakeCount: UInt64 = 0
@@ -510,6 +512,7 @@ final class EngineHost {
         }
 
         stepCount += 1
+        updateMarioFaceTransformOnEngineThread()
         if var promotion = audioPromotion {
             let receipt = promotion.tick(
                 ownerToken: engineThreadIdentifier,
@@ -965,10 +968,52 @@ final class EngineHost {
         }
         let rootURL = URL(fileURLWithPath: gameDirectory, isDirectory: true).standardizedFileURL
         let packet = try SM64MarioFaceSourceGeometryProvider.load(rootURL: rootURL)
-        guard let transform = SM64MarioFaceMetalTransformPacketBuilder.make(
+        let initialFrameQ16: UInt32 = 1 << 16
+        let transform: SM64MarioFaceMetalTransformPacket
+        if let payloadPath = ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_PAYLOAD_PATH"],
+           !payloadPath.isEmpty,
+           let bundle = try? SM64MarioFacePayloadBundle.decode(Data(contentsOf: URL(fileURLWithPath: payloadPath))) {
+            let renderPacket = makeMarioFaceRenderPacket(bundle: bundle, frameQ16: initialFrameQ16)
+            guard let composedTransform = SM64MarioFaceMetalTransformPacketBuilder.make(
+                routeID: .marioNormal,
+                face: renderPacket
+            ) else {
+                throw NSError(
+                    domain: "io.github.deestiz.sm64modern.MarioFace",
+                    code: Int(SM64_MODERN_STATUS_INVALID_STATE),
+                    userInfo: [NSLocalizedDescriptionKey: "Mario-normal composed transform attachment was not resident"]
+                )
+            }
+            marioFacePayloadBundle = bundle
+            marioFaceCompositionSource = "mfpb"
+            transform = composedTransform
+            engineLogger.notice(
+                "mario_face_composition_admitted source=mfpb bank=0 frame_q16=\(initialFrameQ16) resident_channels=\(renderPacket.residentChannelCount) unavailable_channels=\(renderPacket.unavailableChannelCount) packet_fingerprint=\(SM64MarioFaceRenderPacketFingerprint.packet(renderPacket), privacy: .public)"
+            )
+        } else if let decoded = SM64MarioFaceAnimationPayload.decode(
+            componentID: 0xE2, bank: 0, frameQ16: initialFrameQ16
+        ), let boundedTransform = SM64MarioFaceMetalTransformPacketBuilder.make(
             routeID: .marioNormal,
-            animationFrameQ16: 1 << 16
-        ) else {
+            animationFrameQ16: initialFrameQ16,
+            animationValues: decoded.values
+        ) {
+            marioFacePayloadBundle = nil
+            marioFaceCompositionSource = "bounded_payload_window"
+            transform = boundedTransform
+            engineLogger.notice(
+                "mario_face_composition_admitted source=bounded_payload_window bank=0 frame_q16=\(initialFrameQ16) component=226 values=\(decoded.values.count)"
+            )
+        } else if let fallbackTransform = SM64MarioFaceMetalTransformPacketBuilder.make(
+            routeID: .marioNormal,
+            animationFrameQ16: initialFrameQ16
+        ) {
+            marioFacePayloadBundle = nil
+            marioFaceCompositionSource = "static_source_fallback"
+            transform = fallbackTransform
+            engineLogger.notice(
+                "mario_face_composition_admitted source=static_source_fallback bank=0 frame_q16=\(initialFrameQ16)"
+            )
+        } else {
             throw NSError(
                 domain: "io.github.deestiz.sm64modern.MarioFace",
                 code: Int(SM64_MODERN_STATUS_INVALID_STATE),
@@ -982,6 +1027,59 @@ final class EngineHost {
         engineLogger.notice(
             "mario_face_transform_admitted route=\(transform.routeID) schema=\(transform.schemaVersion) component=\(transform.animationComponentID) frame_q16=\(transform.animationFrameQ16) viewport=\(transform.viewportWidth)x\(transform.viewportHeight) transform_fingerprint=\(SM64MarioFaceMetalTransformFingerprint.packet(transform), privacy: .public)"
         )
+    }
+
+    private func makeMarioFaceRenderPacket(
+        bundle: SM64MarioFacePayloadBundle,
+        frameQ16: UInt32
+    ) -> SM64MarioFaceRenderFramePacket {
+        let baseFace = SM64MarioFaceInput(
+            bodyIndex: 0,
+            areaUpdateCounter: 0,
+            eyeState: SM64MarioFaceEyeState.blink.rawValue,
+            action: 0,
+            handState: SM64MarioFaceHandState.fists.rawValue,
+            handSwitchCaseCount: 0,
+            capState: 0,
+            modelState: 0
+        )
+        return SM64MarioFaceRenderPacketBuilder.make(
+            input: SM64MarioFaceExpressionInput(
+                face: baseFace,
+                animationBank: 0,
+                animationFrameQ16: frameQ16,
+                peachKissTimeline: false,
+                actionTimer: 100
+            ),
+            bundle: bundle
+        )
+    }
+
+    private func updateMarioFaceTransformOnEngineThread() {
+        precondition(isCurrentEngineThread)
+        guard let renderer = metalRenderer,
+              marioFacePayloadBundle != nil,
+              ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_DRAW"] == "1" else {
+            return
+        }
+        // The full MFPB has the source 820-frame bank. Keep the frame and
+        // interpolation in the same Q16.16 domain as move_animator, so the
+        // transform packet changes with the qualified M30j composition rather
+        // than remaining on the admission-time sample.
+        let sourceFrame = UInt32((stepCount % 820) + 1)
+        let frameQ16 = (sourceFrame << 16) | UInt32((stepCount * 0x1000) & 0xFFFF)
+        guard let bundle = marioFacePayloadBundle else { return }
+        let renderPacket = makeMarioFaceRenderPacket(bundle: bundle, frameQ16: frameQ16)
+        guard let transform = SM64MarioFaceMetalTransformPacketBuilder.make(
+            routeID: .marioNormal,
+            face: renderPacket
+        ) else { return }
+        renderer.updateMarioFaceTransform(transform)
+        if stepCount == 1 || stepCount.isMultiple(of: 300) {
+            engineLogger.notice(
+                "mario_face_composition_tick source=\(self.marioFaceCompositionSource, privacy: .public) bank=0 frame_q16=\(frameQ16) resident_channels=\(renderPacket.residentChannelCount) unavailable_channels=\(renderPacket.unavailableChannelCount) packet_fingerprint=\(SM64MarioFaceRenderPacketFingerprint.packet(renderPacket), privacy: .public) transform_fingerprint=\(SM64MarioFaceMetalTransformFingerprint.packet(transform), privacy: .public)"
+            )
+        }
     }
 
     fileprivate var inputServiceOnEngineThread: AppleInputService? {

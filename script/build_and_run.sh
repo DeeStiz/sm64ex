@@ -85,6 +85,7 @@ else
   "$PROJECT_ROOT/script/test_mario_face_source_geometry.sh"
   "$PROJECT_ROOT/script/test_mario_face_metal_transform.sh"
   "$PROJECT_ROOT/script/test_mario_face_draw_list.sh"
+  "$PROJECT_ROOT/script/test_mario_face_texture_coordinates.sh"
   "$PROJECT_ROOT/script/test_save_replay_artifact.sh"
   "$PROJECT_ROOT/script/test_save_replay_execution.sh"
   "$PROJECT_ROOT/script/test_engine_runtime.sh"
@@ -136,6 +137,15 @@ open_app() {
   fi
   if [[ "${SM64_MODERN_MARIO_FACE_TEXTURE_DRAW:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_MARIO_FACE_TEXTURE_DRAW=1)
+  fi
+  if [[ "${SM64_MODERN_MARIO_FACE_DRAW:-0}" == "1" ]]; then
+    local runtime_payload="$PROJECT_ROOT/build/sm64-modern-runtime/source_manifest/mario_face_payloads.mfpb"
+    local payload_tool="$PROJECT_ROOT/build/sm64-modern-mario-face-payload-bundle/tool/mario-face-payload-bundle"
+    if [[ -x "$payload_tool" ]]; then
+      mkdir -p "$(dirname "$runtime_payload")"
+      "$payload_tool" "$runtime_payload" >/dev/null
+      open_arguments+=(--env SM64_MODERN_MARIO_FACE_PAYLOAD_PATH="$runtime_payload")
+    fi
   fi
   if [[ -n "${SM64_MODERN_RENDER_PACKET_PATH:-}" ]]; then
     open_arguments+=(--env SM64_MODERN_RENDER_PACKET_PATH="$SM64_MODERN_RENDER_PACKET_PATH")
@@ -285,17 +295,19 @@ case "$MODE" in
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_texture_resident'
     fi
     if [[ "${SM64_MODERN_MARIO_FACE_DRAW:-0}" == "1" ]]; then
+      grep -Eq 'mario_face_composition_admitted source=mfpb bank=0 frame_q16=65536 resident_channels=25 unavailable_channels=0 packet_fingerprint=[0-9]+' <<< "$runtime_log"
+      printf '%s\n' "$runtime_log" | grep -E 'mario_face_composition_admitted'
       grep -Eq 'mario_face_geometry_source_admitted source_path=src/goddard/dynlists/dynlist_mario_face\.c schema=2 vertices=440 faces=877 materials=8 source_digest=[0-9a-f:]+ packet_fingerprint=[0-9]+' <<< "$runtime_log"
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_geometry_source_admitted'
-      grep -Eq 'mario_face_geometry_admitted mesh=1 vertices=440 faces=877 materials=8 vertex_bytes=73668 index_bytes=5262 material_index_bytes=5262 material_bytes=128 transform_fingerprint=[0-9]+ packet_fingerprint=[0-9]+' <<< "$runtime_log"
+      grep -Eq 'mario_face_geometry_admitted mesh=1 vertices=440 faces=877 materials=8 vertex_bytes=[0-9]+ index_bytes=5262 material_index_bytes=5262 material_bytes=128 transform_fingerprint=[0-9]+ texture_coordinate_fingerprint=[0-9]+ packet_fingerprint=[0-9]+' <<< "$runtime_log"
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_geometry_admitted'
       grep -Eq 'mario_face_transform_admitted route=2 schema=1 component=226 frame_q16=65536 viewport=320x240 transform_fingerprint=[0-9]+' <<< "$runtime_log"
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_transform_admitted'
-      grep -Eq 'mario_face_mesh_draw route=2 mesh=1 source_path=dynlist_mario_face window_faces=877 source_faces=877 source_vertices=440 materials=8 encoder=isolated_render private_geometry=1 private_index_buffer=1 private_material_index_buffer=1 private_material_buffer=1 transform_schema=1 transform_fingerprint=[0-9]+ packet_fingerprint=[0-9]+' <<< "$runtime_log"
+      grep -Eq 'mario_face_mesh_draw route=2 mesh=1 source_path=dynlist_mario_face window_faces=877 source_faces=877 source_vertices=440 materials=8 encoder=isolated_render private_geometry=1 private_index_buffer=1 private_material_index_buffer=1 private_material_buffer=1 transform_schema=1 transform_fingerprint=[0-9]+ texture_coordinate_fingerprint=[0-9]+ packet_fingerprint=[0-9]+' <<< "$runtime_log"
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_mesh_draw'
     fi
     if [[ "${SM64_MODERN_MARIO_FACE_TEXTURE_DRAW:-0}" == "1" ]]; then
-      grep -Fq 'mario_face_texture_draw texture_id=768 sampler=1 source_format=ia8 upload_format=rgba8 generated_coordinates=source_normal_xy private_texture=1 encoder=isolated_render' <<< "$runtime_log"
+      grep -Eq 'mario_face_texture_draw texture_id=768 sampler=1 source_format=ia8 upload_format=rgba8 generated_coordinates=goddard_normal_q8_st_generated_st hilite_origin=64,64 texture_coordinate_fingerprint=[0-9]+ private_texture=1 encoder=isolated_render' <<< "$runtime_log"
       printf '%s\n' "$runtime_log" | grep -E 'mario_face_texture_draw'
     fi
     # The bounded native host may have completed its own clean shutdown during

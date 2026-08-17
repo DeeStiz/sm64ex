@@ -215,7 +215,11 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     // generated coordinates. Keep this as a separate key so the existing
     // untextured source-geometry gate remains a valid fallback.
     private static let marioFaceTexturedShaderKey = MetalShaderKey(
-        shaderID: 0x1000_0700,
+        // Preserve the material bit and set the renderer-private texture bit
+        // (bit 30).  The latter is deliberately outside the packed combiner
+        // selectors so this key cannot collide with a C display-list shader
+        // that happens to use the same low selector bits.
+        shaderID: 0x5000_0700,
         filteringMode: 0,
         inputCount: 1,
         textureMask: 0,
@@ -239,6 +243,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private var marioFaceResidencyLogged = false
     private var marioFaceSourceGeometry: SM64MarioFaceSourceMeshPacket?
     private var marioFaceSourceVertexFloats: [Float]?
+    private var marioFaceTextureCoordinatePacket: SM64MarioFaceMetalTextureCoordinatePacket?
     private var marioFaceGeometryResidency: MarioFaceGeometryResidency?
     private var marioFaceTransformPacket: SM64MarioFaceMetalTransformPacket?
     private var marioFaceSourceDrawLogged = false
@@ -270,6 +275,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         self.marioFaceTextureDrawEnabled = ProcessInfo.processInfo.environment["SM64_MODERN_MARIO_FACE_TEXTURE_DRAW"] == "1"
         self.marioFaceSourceGeometry = nil
         self.marioFaceSourceVertexFloats = nil
+        self.marioFaceTextureCoordinatePacket = nil
         self.marioFaceTransformPacket = nil
 
         let queueDescriptor = MTL4CommandQueueDescriptor()
@@ -480,7 +486,18 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
               transform.lightColor.count == 4 else {
             throw MetalRendererError.invalidDraw(shaderID: Self.marioFaceShaderKey.shaderID)
         }
-        let vertexFloats = packet.debugMetalVertexFloats()
+        let textureCoordinates: SM64MarioFaceMetalTextureCoordinatePacket?
+        if marioFaceTextureDrawEnabled {
+            guard let generated = SM64MarioFaceMetalTextureCoordinateBuilder.make(source: packet) else {
+                throw MetalRendererError.invalidDraw(shaderID: Self.marioFaceTexturedShaderKey.shaderID)
+            }
+            textureCoordinates = generated
+        } else {
+            textureCoordinates = nil
+        }
+        let vertexFloats = textureCoordinates.map {
+            packet.debugMetalTexturedVertexFloats(coordinates: $0)
+        } ?? packet.debugMetalVertexFloats()
         let vertexBytes = vertexFloats.withUnsafeBytes { Data($0) }
         let indexValues = packet.triangles.flatMap { $0.indices }.map { UInt16($0) }
         guard indexValues.count == packet.triangles.count * 3,
@@ -542,6 +559,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         sceneResidency.requestResidency()
         marioFaceSourceGeometry = packet
         marioFaceSourceVertexFloats = vertexFloats
+        marioFaceTextureCoordinatePacket = textureCoordinates
         marioFaceGeometryResidency = residency
         marioFaceTransformPacket = transform
         marioFaceSourceDrawLogged = false
@@ -551,8 +569,28 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
             shaderCompiler.prepare(Self.marioFaceTexturedShaderKey)
         }
         metalLogger.notice(
-            "mario_face_geometry_admitted mesh=\(packet.meshID) vertices=\(packet.vertices.count) faces=\(packet.triangles.count) materials=\(packet.materials.count) vertex_bytes=\(vertexBytes.count) index_bytes=\(indexBytes.count) material_index_bytes=\(materialIndexBytes.count) material_bytes=\(materialBytes.count) transform_fingerprint=\(SM64MarioFaceMetalTransformFingerprint.packet(transform), privacy: .public) packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(packet), privacy: .public)"
+            "mario_face_geometry_admitted mesh=\(packet.meshID) vertices=\(packet.vertices.count) faces=\(packet.triangles.count) materials=\(packet.materials.count) vertex_bytes=\(vertexBytes.count) index_bytes=\(indexBytes.count) material_index_bytes=\(materialIndexBytes.count) material_bytes=\(materialBytes.count) transform_fingerprint=\(SM64MarioFaceMetalTransformFingerprint.packet(transform), privacy: .public) texture_coordinate_fingerprint=\(textureCoordinates?.fingerprint ?? 0, privacy: .public) packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(packet), privacy: .public)"
         )
+    }
+
+    /// Replace only the value-side animation/camera packet for the already
+    /// admitted source mesh. This is owner-thread state; the display-link
+    /// reads it when preparing the next isolated draw and never receives a C
+    /// graph pointer or mutable animation object.
+    func updateMarioFaceTransform(_ transform: SM64MarioFaceMetalTransformPacket) {
+        precondition(isOwnerThread(), "Mario-face transform updates belong to the engine owner")
+        guard transform.schemaVersion == 1,
+              transform.routeID == SM64MarioFaceGoddardRouteID.marioNormal.rawValue,
+              transform.sourceMeshID == 1,
+              transform.modelMatrix.count == 16,
+              transform.viewMatrix.count == 16,
+              transform.projectionMatrix.count == 16,
+              transform.clipMatrix.count == 16,
+              transform.lightDirection.count == 4,
+              transform.lightColor.count == 4 else {
+            return
+        }
+        marioFaceTransformPacket = transform
     }
 
     func setSampler(tile: UInt32, id: UInt32, linear: Bool, wrapS: UInt32, wrapT: UInt32) {
@@ -1261,13 +1299,13 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         if !marioFaceSourceDrawLogged, let geometry = marioFaceSourceGeometry {
             marioFaceSourceDrawLogged = true
             metalLogger.notice(
-                "mario_face_mesh_draw route=2 mesh=\(geometry.meshID) source_path=dynlist_mario_face window_faces=\(geometry.faceWindowCount) source_faces=\(geometry.sourceFaceCount) source_vertices=\(geometry.sourceVertexCount) materials=\(geometry.sourceMaterialCount) encoder=isolated_render private_geometry=1 private_index_buffer=1 private_material_index_buffer=1 private_material_buffer=1 transform_schema=\(self.marioFaceTransformPacket?.schemaVersion ?? 0) transform_fingerprint=\(self.marioFaceTransformPacket.map(SM64MarioFaceMetalTransformFingerprint.packet) ?? 0, privacy: .public) packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(geometry), privacy: .public)"
+                "mario_face_mesh_draw route=2 mesh=\(geometry.meshID) source_path=dynlist_mario_face window_faces=\(geometry.faceWindowCount) source_faces=\(geometry.sourceFaceCount) source_vertices=\(geometry.sourceVertexCount) materials=\(geometry.sourceMaterialCount) encoder=isolated_render private_geometry=1 private_index_buffer=1 private_material_index_buffer=1 private_material_buffer=1 transform_schema=\(self.marioFaceTransformPacket?.schemaVersion ?? 0) transform_fingerprint=\(self.marioFaceTransformPacket.map(SM64MarioFaceMetalTransformFingerprint.packet) ?? 0, privacy: .public) texture_coordinate_fingerprint=\(self.marioFaceTextureCoordinatePacket?.fingerprint ?? 0, privacy: .public) packet_fingerprint=\(SM64MarioFaceSourceGeometryFingerprint.packet(geometry), privacy: .public)"
             )
         }
         if marioFaceTextureDrawEnabled, !marioFaceTextureDrawLogged {
             marioFaceTextureDrawLogged = true
             metalLogger.notice(
-                "mario_face_texture_draw texture_id=768 sampler=1 source_format=ia8 upload_format=rgba8 generated_coordinates=source_normal_xy private_texture=1 encoder=isolated_render"
+                "mario_face_texture_draw texture_id=768 sampler=1 source_format=ia8 upload_format=rgba8 generated_coordinates=goddard_normal_q8_st_generated_st hilite_origin=64,64 texture_coordinate_fingerprint=\(self.marioFaceTextureCoordinatePacket?.fingerprint ?? 0, privacy: .public) private_texture=1 encoder=isolated_render"
             )
         }
     }

@@ -253,8 +253,8 @@ final class MetalShaderCompiler {
 
     private static func vertexStride(for key: MetalShaderKey) -> Int {
         let alpha = key.shaderID & alphaOption != 0
-        let generatedMarioFaceTexture = key.shaderID & marioFaceTextureOption != 0
-        let textured = key.textureMask != 0 && !generatedMarioFaceTexture
+        let marioFaceTexture = key.shaderID & marioFaceTextureOption != 0
+        let textured = key.textureMask != 0 || marioFaceTexture
         let fog = key.shaderID & fogOption != 0
         return 4 + (textured ? 2 : 0) + (fog ? 4 : 0) + Int(key.inputCount) * (alpha ? 4 : 3)
     }
@@ -278,17 +278,7 @@ final class MetalShaderCompiler {
             cursor += 4;
         """
         if key.textureMask != 0 || marioFaceTexture {
-            if marioFaceTexture {
-                // Goddard's G_TEXTURE_GEN face-shine pass derives spherical
-                // coordinates from the authored face normal. The source
-                // dynlist carries positions rather than a normal array, so
-                // the centered source position is the deterministic value
-                // boundary used here; the C draw-list gate still owns the
-                // authored texture ID/policy and every triangle ordering.
-                vertexAssignments += "\n    float3 sourceNormal = normalize(float3(vertices[cursor - 4], vertices[cursor - 3], vertices[cursor - 2]));\n    out.uv = sourceNormal.xy * 0.5 + 0.5;"
-            } else {
-                vertexAssignments += "\n    out.uv = float2(vertices[cursor], vertices[cursor + 1]);\n    cursor += 2;"
-            }
+            vertexAssignments += "\n    out.uv = float2(vertices[cursor], vertices[cursor + 1]);\n    cursor += 2;"
         }
         if fog {
             vertexAssignments += "\n    out.fog = float4(vertices[cursor], vertices[cursor + 1], vertices[cursor + 2], vertices[cursor + 3]);\n    cursor += 4;"

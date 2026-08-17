@@ -1,5 +1,20 @@
 # SM64 Modern Porting Memory
 
+## Latest validated slices (2026-08-17)
+
+- M30x closes the Goddard face-shine coordinate seam. Swift/C generated-normal
+  packet fingerprint `0xfc9ad5b2a13c278f`, 442-record trace fingerprint
+  `0xb913f67643075415`, deliberate record-18 divergence, full MFPB frame
+  refresh, 9-float textured stream, and non-colliding Metal feature key all
+  pass. Native gated verify: `/tmp/sm64-modern-m30x-full-verify-2.log`.
+- The textured Mario-face key must retain the material feature and set the
+  private bit-30 texture feature (`0x5000_0700`). Reusing `0x1000_0700`
+  collides with low combiner IDs and causes a 7-vs-9 float packet failure.
+- M30x handoff: `.porting/porting-handoff-full-swift-twin-M30x.md`. M33 still
+  has only one promoted live route shard; M34 still needs warm-pipeline
+  capture, resize/pause stress, and visual comparison; M35 distribution and
+  human acceptance remain external gates.
+
 ## Current Milestone
 
 - M23j closes the live progression-boundary shadow seam. Non-mutation C
