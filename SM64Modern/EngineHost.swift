@@ -97,11 +97,27 @@ private func platformInitialize(
         }
         return SM64_MODERN_STATUS_PLATFORM_ERROR
     }
+    do {
+        try host.initializePauseMenuOnEngineThread()
+    } catch {
+        engineLogger.error("pause_menu_bridge_install_failed error=\(error.localizedDescription, privacy: .public)")
+        sm64_modern_uninstall_frontend_migration_api()
+        host.discardFrontEndMigrationOnEngineThread()
+        sm64_modern_uninstall_input_api()
+        sm64_modern_uninstall_rendering_batch_api()
+        sm64_modern_uninstall_rendering_api()
+        do { try host.shutdownMetalOnEngineThread() } catch {
+            engineLogger.fault("metal_rollback_failed error=\(error.localizedDescription, privacy: .public)")
+        }
+        return SM64_MODERN_STATUS_PLATFORM_ERROR
+    }
     let gameplayService = host.gameplayServiceOnEngineThread
     var gameplay = makeSwiftGameplayMigrationAPI(service: gameplayService)
     let gameplayStatus = sm64_modern_install_gameplay_migration_api(&gameplay)
     guard gameplayStatus == SM64_MODERN_STATUS_OK else {
         engineLogger.error("gameplay_bridge_install_failed status=\(gameplayStatus)")
+        sm64_modern_uninstall_pause_menu_migration_api()
+        host.discardPauseMenuMigrationOnEngineThread()
         sm64_modern_uninstall_frontend_migration_api()
         host.discardFrontEndMigrationOnEngineThread()
         sm64_modern_uninstall_input_api()
@@ -116,6 +132,8 @@ private func platformInitialize(
     guard marioGroundSpeedStatus == SM64_MODERN_STATUS_OK else {
         engineLogger.error("mario_ground_speed_bridge_install_failed status=\(marioGroundSpeedStatus)")
         sm64_modern_uninstall_gameplay_migration_api()
+        sm64_modern_uninstall_pause_menu_migration_api()
+        host.discardPauseMenuMigrationOnEngineThread()
         sm64_modern_uninstall_frontend_migration_api()
         host.discardFrontEndMigrationOnEngineThread()
         sm64_modern_uninstall_input_api()
@@ -131,6 +149,8 @@ private func platformInitialize(
     } catch {
         audioLogger.error("audio_initialize_failed error=\(error.localizedDescription, privacy: .public)")
         sm64_modern_uninstall_gameplay_migration_api()
+        sm64_modern_uninstall_pause_menu_migration_api()
+        host.discardPauseMenuMigrationOnEngineThread()
         sm64_modern_uninstall_frontend_migration_api()
         host.discardFrontEndMigrationOnEngineThread()
         sm64_modern_uninstall_input_api()
@@ -153,6 +173,7 @@ private func platformShutdown(_ context: UnsafeMutableRawPointer?) {
     _ = sm64_modern_progression_set_persistence_authority(0)
     sm64_modern_uninstall_progression_migration_api()
     sm64_modern_uninstall_gameplay_migration_api()
+    host.shutdownPauseMenuOnEngineThread()
     host.shutdownFrontEndOnEngineThread()
     sm64_modern_uninstall_input_api()
     sm64_modern_uninstall_rendering_api()
@@ -265,6 +286,7 @@ final class EngineHost {
     private var audioService: SM64ModernAppleAudioService?
     private var audioMigrationService: SwiftAudioMigrationService?
     private var frontendMigrationService: SwiftFrontEndMigrationService?
+    private var pauseMenuMigrationService: SwiftPauseMenuMigrationService?
     private var audioPromotion: SM64AudioOwnerPromotion?
     private var loggedAudioEnqueue = false
     private var loggedAudioRender = false
@@ -1232,6 +1254,58 @@ final class EngineHost {
             let summary = service.summary()
             engineLogger.notice(
                 "swift_frontend_observer_finished events=\(summary.events, privacy: .public) transitions=\(summary.transitions, privacy: .public) screen=\(summary.screen, privacy: .public) fingerprint=\(summary.fingerprint, privacy: .public)"
+            )
+        }
+    }
+
+    fileprivate func initializePauseMenuOnEngineThread() throws {
+        precondition(isCurrentEngineThread)
+        guard engineAuthority == .swift else { return }
+        guard pauseMenuMigrationService == nil else {
+            throw NSError(
+                domain: "io.github.deestiz.sm64modern.PauseMenu",
+                code: Int(SM64_MODERN_STATUS_INVALID_STATE),
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "The Swift pause/menu observer is already initialized"
+                ]
+            )
+        }
+        let service = SwiftPauseMenuMigrationService(
+            ownerThreadToken: engineThreadIdentifier
+        )
+        var migration = service.makeAPI()
+        let status = sm64_modern_install_pause_menu_migration_api(&migration)
+        guard status == SM64_MODERN_STATUS_OK else {
+            throw NSError(
+                domain: "io.github.deestiz.sm64modern.PauseMenu",
+                code: Int(status),
+                userInfo: [
+                    NSLocalizedDescriptionKey:
+                        "Could not install the Swift pause/menu observer"
+                ]
+            )
+        }
+        pauseMenuMigrationService = service
+        engineLogger.notice(
+            "pause_menu_bridge_installed abi=1 authority=swift state_authority=c render_authority=c"
+        )
+    }
+
+    fileprivate func discardPauseMenuMigrationOnEngineThread() {
+        precondition(isCurrentEngineThread)
+        pauseMenuMigrationService = nil
+    }
+
+    fileprivate func shutdownPauseMenuOnEngineThread() {
+        precondition(isCurrentEngineThread)
+        let service = pauseMenuMigrationService
+        pauseMenuMigrationService = nil
+        sm64_modern_uninstall_pause_menu_migration_api()
+        if let service {
+            let summary = service.summary()
+            engineLogger.notice(
+                "swift_pause_menu_observer_finished events=\(summary.events, privacy: .public) outcomes=\(summary.outcomes, privacy: .public) state=\(summary.state, privacy: .public) fingerprint=\(summary.fingerprint, privacy: .public)"
             )
         }
     }

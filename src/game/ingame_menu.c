@@ -24,6 +24,7 @@
 #include "types.h"
 #include "macros.h"
 #include "pc/cheats.h"
+#include "pc/sm64_modern_pause_migration.h"
 #include "pc/sm64_modern_timebase.h"
 #ifdef BETTERCAMERA
 #include "bettercamera.h"
@@ -2656,6 +2657,37 @@ s32 gCourseCompleteCoins = 0;
 s8 gHudFlash = 0;
 static s8 sCourseCompleteHighScoreVisible = FALSE;
 
+static u64 sPauseMenuObserverTick;
+
+static void sm64_modern_pause_observe_state(s16 outcome) {
+    SM64ModernPauseMenuSnapshotV1 snapshot = { 0 };
+    snapshot.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    snapshot.header.struct_size = sizeof(snapshot);
+    snapshot.simulation_tick = ++sPauseMenuObserverTick;
+    snapshot.state = (u32) gDialogBoxState;
+    snapshot.selection = (s32) gDialogLineNum;
+    snapshot.camera_selection = (s32) gDialogCameraAngleIndex;
+    snapshot.text_alpha = (u32) gDialogTextAlpha;
+    snapshot.menu_mode_active = gMenuMode != -1;
+    snapshot.can_exit_course =
+        ((gMarioStates[0].action & ACT_FLAG_PAUSE_EXIT)
+         || (Cheats.EnableCheats && Cheats.ExitAnywhere)) ? 1 : 0;
+#ifdef VERSION_EU
+    snapshot.confirm_pressed =
+        (gPlayer3Controller->buttonPressed & (A_BUTTON | Z_TRIG | START_BUTTON))
+        ? 1 : 0;
+#else
+    snapshot.confirm_pressed =
+        ((gPlayer3Controller->buttonPressed & A_BUTTON)
+         || (gPlayer3Controller->buttonPressed & START_BUTTON)) ? 1 : 0;
+#endif
+    snapshot.course_number = (s32) gCurrCourseNum;
+    snapshot.course_minimum = COURSE_MIN;
+    snapshot.course_maximum = COURSE_MAX;
+    snapshot.outcome = outcome;
+    (void) sm64_modern_pause_menu_observe_snapshot(&snapshot);
+}
+
 s16 render_pause_courses_and_castle(void) {
     s16 num;
 
@@ -2716,6 +2748,7 @@ s16 render_pause_courses_and_castle(void) {
                     num = 1;
                 }
 
+                sm64_modern_pause_observe_state(num);
                 return num;
             }
             break;
@@ -2739,6 +2772,7 @@ s16 render_pause_courses_and_castle(void) {
                 gMenuMode = -1;
                 gDialogBoxState = DIALOG_STATE_OPENING;
 
+                sm64_modern_pause_observe_state(1);
                 return 1;
             }
             break;
@@ -2758,6 +2792,7 @@ s16 render_pause_courses_and_castle(void) {
     optmenu_draw_prompt();
 #endif
 
+    sm64_modern_pause_observe_state(0);
     return 0;
 }
 

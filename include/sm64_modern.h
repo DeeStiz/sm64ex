@@ -821,6 +821,40 @@ typedef struct SM64ModernFrontEndMigrationApiV1 {
     SM64ModernFrontEndEvaluateFn evaluate;
 } SM64ModernFrontEndMigrationApiV1;
 
+// Pause/menu snapshots are emitted only from the live C pause renderer. They
+// carry copied state and the completed C outcome; Swift can replay and
+// fingerprint the reducer without traversing menu globals or display-list
+// pointers. C remains the compatibility authority until a later cutover.
+typedef struct SM64ModernPauseMenuSnapshotV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t state;
+    int32_t selection;
+    int32_t camera_selection;
+    uint32_t text_alpha;
+    uint8_t menu_mode_active;
+    uint8_t can_exit_course;
+    uint8_t confirm_pressed;
+    uint8_t reserved0;
+    int32_t vertical_selection_delta;
+    int32_t horizontal_camera_delta;
+    int32_t course_number;
+    int32_t course_minimum;
+    int32_t course_maximum;
+    int32_t outcome;
+    uint32_t reserved;
+} SM64ModernPauseMenuSnapshotV1;
+
+typedef SM64ModernStatus (*SM64ModernPauseMenuObserveFn)(
+    void *context,
+    const SM64ModernPauseMenuSnapshotV1 *snapshot);
+
+typedef struct SM64ModernPauseMenuMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernPauseMenuObserveFn observe;
+} SM64ModernPauseMenuMigrationApiV1;
+
 // Optional gameplay-kernel extension. It is installed separately so the
 // original migration table remains ABI-stable for existing hosts.
 typedef struct SM64ModernMarioGroundSpeedApiV1 {
@@ -1242,6 +1276,14 @@ SM64ModernStatus sm64_modern_frontend_migration_status(void);
 SM64ModernStatus sm64_modern_frontend_evaluate(
     const SM64ModernFrontEndInputV1 *input,
     SM64ModernFrontEndOutputV1 *out_output);
+SM64ModernStatus sm64_modern_validate_pause_menu_migration_api(
+    const SM64ModernPauseMenuMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_pause_menu_migration_api(
+    const SM64ModernPauseMenuMigrationApiV1 *migration);
+void sm64_modern_uninstall_pause_menu_migration_api(void);
+SM64ModernStatus sm64_modern_pause_menu_migration_status(void);
+SM64ModernStatus sm64_modern_pause_menu_observe_snapshot(
+    const SM64ModernPauseMenuSnapshotV1 *snapshot);
 SM64ModernStatus sm64_modern_validate_progression_migration_api(
     const SM64ModernProgressionMigrationApiV1 *migration);
 SM64ModernStatus sm64_modern_install_progression_migration_api(

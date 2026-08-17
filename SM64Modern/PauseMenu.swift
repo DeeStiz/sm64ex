@@ -124,6 +124,27 @@ struct SM64PauseMenuModel: Equatable, Sendable {
         menuModeActive = true
     }
 
+    /// Synchronizes the value-only observer with a snapshot emitted after the
+    /// legacy C pause renderer has applied its input. C remains responsible
+    /// for the live globals, display-list work, and transition side effects;
+    /// Swift only receives a replayable reducer state.
+    mutating func synchronize(
+        state: SM64PauseMenuState,
+        selection: Int8,
+        cameraSelection: SM64PauseCameraSelection,
+        textAlpha: UInt16,
+        menuModeActive: Bool,
+        outcome: SM64PauseMenuOutcome,
+        cameraChanged: Bool
+    ) -> SM64PauseMenuTickResult {
+        self.state = state
+        self.selection = selection
+        self.cameraSelection = cameraSelection
+        self.textAlpha = textAlpha
+        self.menuModeActive = menuModeActive
+        return result(outcome: outcome, cameraChanged: cameraChanged)
+    }
+
     private func result(outcome: SM64PauseMenuOutcome, cameraChanged: Bool) -> SM64PauseMenuTickResult {
         SM64PauseMenuTickResult(
             state: state,

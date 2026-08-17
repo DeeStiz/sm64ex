@@ -247,6 +247,7 @@
 		D0031C8BC47031BF22FCFA00 /* EyerokHand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 225D73054770EC25DC64D2C0 /* EyerokHand.swift */; };
 		D19D30E6B7A0A540B8C68BB4 /* FrontEndRender.swift in Sources */ = {isa = PBXBuildFile; fileRef = C43519D037D79EF6DB35F980 /* FrontEndRender.swift */; };
 		D3919C39B72DEEB57976B4BA /* TuxiesMotherBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBADCC8D3A0FCE39EEF40AC3 /* TuxiesMotherBehavior.swift */; };
+		D3CB3610BE774CD177298E5C /* PauseMenuMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = F532D465DBC5EF1B9314784D /* PauseMenuMigration.swift */; };
 		D50A24D59A35C579AEF485DA /* MarioFaceRenderPacket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 003349361D040FC91AEB79A1 /* MarioFaceRenderPacket.swift */; };
 		D5578FD5FECA0729AE8EDAC2 /* AudioMixer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5E1852868F5E323B208C3437 /* AudioMixer.swift */; };
 		D65F07ACB7B0E4429D8D1086 /* ObjectSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B66C2AFF387E6991F0587F1D /* ObjectSnapshot.swift */; };
@@ -573,6 +574,7 @@
 		F2EACF5C30D1F0023F354876 /* BowserShockWave.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BowserShockWave.swift; sourceTree = "<group>"; };
 		F3F0AEF5342F3B329237DD66 /* ContentPack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentPack.swift; sourceTree = "<group>"; };
 		F4620FA3702294FE08475ABC /* DialogText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogText.swift; sourceTree = "<group>"; };
+		F532D465DBC5EF1B9314784D /* PauseMenuMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PauseMenuMigration.swift; sourceTree = "<group>"; };
 		F5BB9631CE7A07A55B9BDBCF /* MarioCommonAirAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioCommonAirAction.swift; sourceTree = "<group>"; };
 		F614773BEB8721E80725416A /* MarioFaceAnimationPayload.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioFaceAnimationPayload.swift; sourceTree = "<group>"; };
 		F67CD09B5E85C6D4D207A193 /* AudioPromotion.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPromotion.swift; sourceTree = "<group>"; };
@@ -812,6 +814,7 @@
 				1F1CDC9A691A6D703E79DDA8 /* OracleTraceSession.swift */,
 				0CB115FFD181E778F9AFE67C /* OwnerThreadEffectRouter.swift */,
 				5A415C177E19A84E04B63454 /* PauseMenu.swift */,
+				F532D465DBC5EF1B9314784D /* PauseMenuMigration.swift */,
 				375EBE2D9BBFCAD8B34FDF89 /* PiranhaPlant.swift */,
 				E3353EA4B05B2088E0941DEB /* PiranhaPlantObjectBridge.swift */,
 				6E37008029F2850C83A1AFF0 /* PlatformCollisionRegistry.swift */,
@@ -1198,6 +1201,7 @@
 				E1175BF134A324D0B19B7F56 /* OracleTraceSession.swift in Sources */,
 				696004D36164301F6C01B251 /* OwnerThreadEffectRouter.swift in Sources */,
 				724CA1435F965914653FECE7 /* PauseMenu.swift in Sources */,
+				D3CB3610BE774CD177298E5C /* PauseMenuMigration.swift in Sources */,
 				B966D97864B94F9E3BD0EA18 /* PiranhaPlant.swift in Sources */,
 				8F0287C04E3BF3452E17B97B /* PiranhaPlantObjectBridge.swift in Sources */,
 				9EA44DFDFF3DBB57B23876D0 /* PlatformCollisionRegistry.swift in Sources */,

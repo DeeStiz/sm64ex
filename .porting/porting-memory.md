@@ -2,6 +2,24 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31aa adds the live Swift pause/menu value boundary. The C pause renderer
+  emits post-reducer state, selection, camera choice, alpha, menu activity,
+  course bounds, input deltas, and completed resume/exit outcomes through a
+  fixed-width observer ABI; Swift synchronizes a strict Swift 6 value model
+  with owner-token and malformed-input fencing while C retains pause globals,
+  rendering, course transitions, and side effects. The independent
+  `script/test_pause_migration.sh` contract matches C and Swift at
+  `0xe9e5aeca06cb603d`; native Debug, regenerated Xcode Debug, focused pause /
+  frontend / dialog / runtime tests, and the full signed verifier pass.
+  `/tmp/sm64-modern-m31aa-runtime.log` reports
+  `pause_menu_bridge_installed abi=1 authority=swift state_authority=c
+  render_authority=c`, Metal 4 frame one,
+  `swift_pause_menu_observer_finished events=0 outcomes=0`, and status-0
+  shutdown. The bounded startup route does not open pause, so this is
+  installation/shutdown evidence only; authored pause-route parity, visual or
+  controller feel, physical acceptance, and human acceptance remain open.
+  Handoff: `.porting/porting-handoff-full-swift-twin-M31aa.md`.
+
 - M31z adds the first live Swift front-end/menu boundary. The C input path
   packages owner-thread menu edges, activity, and selection delta into a
   fixed-width observer ABI; Swift replays the title/file/course/level/demo/
