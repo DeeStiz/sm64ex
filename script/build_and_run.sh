@@ -136,6 +136,9 @@ open_app() {
   if [[ "${SM64_MODERN_AUTOMATED_GAMEPLAY:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_AUTOMATED_GAMEPLAY=1)
   fi
+  if [[ "${SM64_MODERN_AUTOMATED_MARIO:-0}" == "1" ]]; then
+    open_arguments+=(--env SM64_MODERN_AUTOMATED_MARIO=1)
+  fi
   if [[ "${SM64_MODERN_RENDER_PACKET_CAPTURE:-0}" == "1" ]]; then
     open_arguments+=(--env SM64_MODERN_RENDER_PACKET_CAPTURE=1)
   fi
@@ -602,6 +605,74 @@ case "$MODE" in
     printf '%s\n' "$m14_record_log" "$m14_shadow_log" \
       | grep -E 'swift_authority_(fallback=c|requested mode=native|promoted)|swift_shadow_started|swift_gameplay_evidence|bounded_(parity_run_complete|swift_authority_run_complete)|parity_result subsystem=4|engine_thread_finished status=0'
     ;;
+  --m15-native-verify|m15-native-verify)
+    M15_TEMP="$(mktemp -d "${TMPDIR:-/tmp}/sm64-modern-m15-native.XXXXXX")"
+    trap '/bin/rm -rf -- "$M15_TEMP"' EXIT
+    M15_TRACE="$M15_TEMP/mario-native-v1.trace"
+    M15_RECORD_SAVE="$M15_TEMP/record-save"
+    M15_SHADOW_SAVE="$M15_TEMP/shadow-save"
+    M15_TICKS="${SM64_MODERN_M15_TICKS:-8}"
+    M15_SWIFT_TICKS="${SM64_MODERN_M15_SWIFT_TICKS:-8}"
+    M15_TOTAL_TICKS=$((M15_TICKS + M15_SWIFT_TICKS))
+    mkdir -p "$M15_RECORD_SAVE" "$M15_SHADOW_SAVE"
+
+    # The C record exercises both production Mario callbacks and the existing
+    # Bob-omb actor callback on the real game-owner thread. The Mario probe is
+    # opt-in and commits its scalar outputs before the canonical snapshots.
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=record \
+      --env SM64_MODERN_PARITY_TRACE="$M15_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M15_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M15_RECORD_SAVE" \
+      --env SM64_MODERN_SWIFT_AUTHORITY=c \
+      --env SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
+      --env SM64_MODERN_AUTOMATED_MARIO=1 \
+      --env SM64_MODERN_AUTOMATED_BOBOMB=1
+    m15_record_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$m15_record_pid"
+    test -s "$M15_TRACE"
+    m15_record_log="$(/usr/bin/log show --last 5m --style compact \
+      --predicate "processIdentifier == $m15_record_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=1 schema=3' <<< "$m15_record_log"
+    grep -Fq "bounded_parity_run_complete steps=$M15_TICKS" <<< "$m15_record_log"
+    grep -Fq 'parity_result subsystem=1 status=0' <<< "$m15_record_log"
+    grep -Fq 'parity_result subsystem=4 status=0' <<< "$m15_record_log"
+    grep -Eq 'swift_gameplay_evidence mario_buttons=0 mario_ground_speed=0 bobomb_release=0' <<< "$m15_record_log"
+    grep -Fq 'parity_session_finished status=0' <<< "$m15_record_log"
+
+    # Shadow must match both subsystems byte-for-byte, then promote only after
+    # exact candidate coverage and nonzero Swift callback evidence. The second
+    # bounded slice proves native Swift callbacks continue after promotion.
+    /usr/bin/open -n "$APP_BUNDLE" \
+      --env SM64_MODERN_GAME_DIR="$PROJECT_ROOT" \
+      --env SM64_MODERN_PARITY_MODE=shadow \
+      --env SM64_MODERN_PARITY_TRACE="$M15_TRACE" \
+      --env SM64_MODERN_PARITY_TICKS="$M15_TICKS" \
+      --env SM64_MODERN_SAVE_DIR="$M15_SHADOW_SAVE" \
+      --env SM64_MODERN_SWIFT_AUTHORITY=swift \
+      --env SM64_MODERN_SWIFT_SLICES=mario-buttons,bobomb-release \
+      --env SM64_MODERN_SWIFT_PROMOTE=1 \
+      --env SM64_MODERN_SWIFT_AUTHORITY_TICKS="$M15_SWIFT_TICKS" \
+      --env SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
+      --env SM64_MODERN_AUTOMATED_MARIO=1 \
+      --env SM64_MODERN_AUTOMATED_BOBOMB=1
+    m15_shadow_pid="$(wait_for_app_pid)"
+    wait_for_app_exit "$m15_shadow_pid"
+    m15_shadow_log="$(/usr/bin/log show --last 5m --style compact \
+      --predicate "processIdentifier == $m15_shadow_pid && subsystem == \"$BUNDLE_ID\"")"
+    grep -Fq 'parity_session_started mode=3 schema=3' <<< "$m15_shadow_log"
+    grep -Fq 'swift_authority_requested mode=native' <<< "$m15_shadow_log"
+    grep -Fq 'swift_shadow_started subsystems=1,4 promote=true' <<< "$m15_shadow_log"
+    grep -Fq 'parity_result subsystem=1 status=0' <<< "$m15_shadow_log"
+    grep -Fq 'parity_result subsystem=4 status=0' <<< "$m15_shadow_log"
+    grep -Eq 'swift_gameplay_evidence mario_buttons=[1-9][0-9]* mario_ground_speed=[1-9][0-9]* bobomb_release=[1-9][0-9]*' <<< "$m15_shadow_log"
+    grep -Fq 'swift_authority_promoted subsystems=1,4' <<< "$m15_shadow_log"
+    grep -Fq "bounded_swift_authority_run_complete steps=$M15_TOTAL_TICKS authority_steps=$M15_SWIFT_TICKS" <<< "$m15_shadow_log"
+    grep -Fq 'engine_thread_finished status=0' <<< "$m15_shadow_log"
+    printf '%s\n' "$m15_record_log" "$m15_shadow_log" \
+      | grep -E 'swift_authority_(fallback=c|requested mode=native|promoted)|swift_shadow_started|swift_gameplay_evidence|bounded_(parity_run_complete|swift_authority_run_complete)|parity_result subsystem=(1|4)|engine_thread_finished status=0'
+    ;;
   --m7-record-live|m7-record-live)
     M7_DIR="${SM64_MODERN_M7_DIR:-$PROJECT_ROOT/build/sm64-modern-m7-live}"
     M7_SOURCE_SAVE="${SM64_MODERN_M7_SOURCE_SAVE:-$PROJECT_ROOT/build/sm64-modern-state}"
@@ -677,7 +748,7 @@ case "$MODE" in
       | grep -E 'swift_shadow_started|swift_gameplay_slice_exercised|parity_result subsystem=(1|4)|swift_authority_promoted|bounded_swift_authority_run_complete|engine_thread_finished status=0'
     ;;
   *)
-    echo "usage: $0 [run|--debug|--logs|--telemetry|--metal-validation|--metal-hud|--metal-capture|--verify|--parity-verify|--m11-shadow-verify|--m13-shadow-verify|--m14-native-verify|--m7-record-live|--m7-shadow-live]" >&2
+    echo "usage: $0 [run|--debug|--logs|--telemetry|--metal-validation|--metal-hud|--metal-capture|--verify|--parity-verify|--m11-shadow-verify|--m13-shadow-verify|--m14-native-verify|--m15-native-verify|--m7-record-live|--m7-shadow-live]" >&2
     exit 2
     ;;
 esac

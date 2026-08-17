@@ -14,6 +14,7 @@
 #include "engine/level_script.h"
 #include "game_init.h"
 #include "main.h"
+#include "mario.h"
 #include "memory.h"
 #include "obj_behaviors.h"
 #include "profiler.h"
@@ -661,6 +662,7 @@ void game_loop_one_iteration(void) {
     read_controller_inputs();
     levelCommandAddr = level_script_execute(levelCommandAddr);
     sm64_modern_bobomb_release_test_step();
+    sm64_modern_mario_authority_test_step();
     sm64_modern_parity_capture_snapshots();
     display_and_vsync();
 

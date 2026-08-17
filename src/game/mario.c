@@ -1,4 +1,5 @@
 #include <PR/ultratypes.h>
+#include <stdlib.h>
 
 #include "sm64.h"
 #include "area.h"
@@ -37,6 +38,7 @@
 #include "pc/cheats.h"
 #include "pc/sm64_modern_gameplay_migration.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 #ifdef BETTERCAMERA
 #include "bettercamera.h"
 #endif
@@ -1297,6 +1299,74 @@ void update_mario_button_inputs(struct MarioState *m) {
     m->input = (u16) output.input;
     m->framesSinceA = (u8) output.frames_since_a;
     m->framesSinceB = (u8) output.frames_since_b;
+}
+
+void sm64_modern_mario_authority_test_step(void) {
+    // This probe is deliberately opt-in and runs after the normal game step,
+    // immediately before the parity snapshot. It exercises the same typed
+    // callbacks as production Mario input/movement, then commits their scalar
+    // outputs into the real Mario state so C and Swift shadow traces compare
+    // the identical snapshot. Normal launches never enter this path.
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO") == NULL
+        || gMarioState == NULL
+        || gMarioState->controller == NULL) {
+        return;
+    }
+
+    struct MarioState *m = gMarioState;
+    const uint64_t tick = sm64_modern_parity_simulation_tick();
+    const uint32_t phase = (uint32_t) (tick & 3u);
+    const uint32_t buttonPressed = phase == 0u ? SM64_MODERN_N64_BUTTON_A
+        : phase == 1u ? SM64_MODERN_N64_BUTTON_B
+        : phase == 2u ? SM64_MODERN_N64_BUTTON_Z : 0u;
+    const uint32_t buttonDown = phase == 0u ? SM64_MODERN_N64_BUTTON_A
+        : phase == 2u ? SM64_MODERN_N64_BUTTON_Z : 0u;
+    const SM64ModernMarioButtonInputV1 buttonInput = {
+        { SM64_MODERN_ABI_VERSION_1, sizeof(SM64ModernMarioButtonInputV1) },
+        tick,
+        m->input,
+        SM64_MODERN_MARIO_INPUT_A_PRESSED
+            | SM64_MODERN_MARIO_INPUT_A_DOWN
+            | SM64_MODERN_MARIO_INPUT_B_PRESSED
+            | SM64_MODERN_MARIO_INPUT_Z_DOWN
+            | SM64_MODERN_MARIO_INPUT_Z_PRESSED,
+        buttonPressed,
+        buttonDown,
+        m->squishTimer,
+        m->framesSinceA,
+        m->framesSinceB,
+        0,
+    };
+    SM64ModernMarioButtonOutputV1 buttonOutput;
+    if (sm64_modern_gameplay_update_mario_buttons(&buttonInput, &buttonOutput)
+        != SM64_MODERN_STATUS_OK) {
+        return;
+    }
+    m->input = (u16) buttonOutput.input;
+    m->framesSinceA = (u8) buttonOutput.frames_since_a;
+    m->framesSinceB = (u8) buttonOutput.frames_since_b;
+
+    const SM64ModernMarioGroundSpeedInputV1 speedInput = {
+        { SM64_MODERN_ABI_VERSION_1, sizeof(SM64ModernMarioGroundSpeedInputV1) },
+        sm64_modern_timebase_simulation_tick(),
+        sm64_modern_gameplay_float_bits(m->intendedMag),
+        sm64_modern_gameplay_float_bits(m->forwardVel),
+        sm64_modern_gameplay_float_bits(m->quicksandDepth),
+        sm64_modern_gameplay_float_bits(m->floor ? m->floor->normal.y : 1.0f),
+        m->intendedYaw,
+        m->faceAngle[1],
+        m->floor && m->floor->type == SURFACE_SLOW,
+        Cheats.Responsive,
+        Cheats.EnableCheats,
+        0,
+    };
+    SM64ModernMarioGroundSpeedOutputV1 speedOutput;
+    if (sm64_modern_gameplay_update_mario_ground_speed(&speedInput, &speedOutput)
+        == SM64_MODERN_STATUS_OK) {
+        m->forwardVel = sm64_modern_gameplay_float_from_bits(
+            speedOutput.forward_velocity_bits);
+        m->faceAngle[1] = (s16) speedOutput.face_yaw;
+    }
 }
 
 /**

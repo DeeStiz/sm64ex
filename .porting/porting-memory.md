@@ -2,6 +2,22 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M33h qualifies a bounded native Mario gameplay promotion slice. The
+  opt-in `SM64_MODERN_AUTOMATED_MARIO=1` owner-thread probe invokes the
+  production Mario button and ground-speed callbacks after the normal C step,
+  commits their scalar outputs into the canonical Mario snapshot, and stays
+  off for normal launches. `SM64_MODERN_M15_TICKS=8
+  SM64_MODERN_M15_SWIFT_TICKS=8 ./script/build_and_run.sh m15-native-verify`
+  exits 0 in `/tmp/sm64-modern-m15-native-certified.log`: C records Mario
+  `actual=152` and Bob-omb `actual=112`; Swift shadow matches `152/152` and
+  `112/112`, both `eligible=1`, evidence is
+  `mario_buttons=8 mario_ground_speed=8 bobomb_release=8`, promotion is
+  `subsystems=1,4`, and the post-promotion run completes at
+  `steps=16 authority_steps=8` with status-0 shutdown. This is a test-only
+  authority slice, not full-game Swift ownership, route-shard closure,
+  physical visual/audio/controller evidence, or human acceptance. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M33h.md`.
+
 - M33g qualifies the real authored menu/gameplay route instead of only
   installing observers. `script/build_and_run.sh verify` now propagates the
   opt-in `SM64_MODERN_AUTOMATED_MENU` and `SM64_MODERN_AUTOMATED_GAMEPLAY`
