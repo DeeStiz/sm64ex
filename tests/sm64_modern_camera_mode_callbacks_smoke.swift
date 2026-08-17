@@ -66,6 +66,7 @@ enum SM64ModernCameraModeCallbacksSmoke {
     static func main() {
         precondition(SM64CameraModeCallbacks.descriptors.count == 19)
         precondition(SM64CameraModeCallbacks.descriptor(for: 1)?.callback == .radial)
+        precondition(SM64CameraModeCallbacks.descriptor(for: 6)?.pureGeometryImplemented == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 10)?.outputsSwapped == true)
         precondition(SM64CameraModeCallbacks.descriptor(for: 12)?.pureGeometryImplemented == false)
 
@@ -119,6 +120,20 @@ enum SM64ModernCameraModeCallbacksSmoke {
             && mario.returnedYaw == 0x6000 && mario.distance == 700
             && mario.pitch == 0x05B0)
         fingerprint = hash(fingerprint, mario)
+
+        let cUp = SM64CameraModeCallbacks.evaluate(.init(
+            mode: 6,
+            marioPosition: .init(x: 100, y: 0, z: 0),
+            faceYaw: 0x6000,
+            facePitch: 0x1000,
+            modeOffsetYaw: 0x0100,
+            lakituPitch: 0x0200
+        ))!
+        precondition(cUp.cameraYaw == Int16(bitPattern: 0xE100)
+            && cUp.returnedYaw == 0x6000 && cUp.pitch == 0x1000
+            && cUp.distance == 250 && !cUp.outputsSwapped
+            && !cUp.panAhead)
+        fingerprint = hash(fingerprint, cUp)
 
         let slide = SM64CameraModeCallbacks.evaluate(.init(
             mode: 9,

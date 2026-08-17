@@ -65,7 +65,7 @@ static const Descriptor descriptors[] = {
     { 3, 3, 0, 1, 0, 800.f, 125.f, 125.f, 0x05B0, 0, 1 },
     { 4, 4, 1, 1, 0, 800.f, 125.f, 125.f, 0x05B0, 1, 1 },
     { 5, 0, 0, 0, 0, 0.f, 0.f, 0.f, 0, 0, 0 },
-    { 6, 5, 0, 1, 0, 250.f, 125.f, 125.f, 0, 1, 0 },
+    { 6, 5, 1, 1, 0, 250.f, 125.f, 125.f, 0, 1, 0 },
     { 7, 4, 1, 1, 0, 800.f, 125.f, 125.f, 0x05B0, 1, 1 },
     { 8, 6, 0, 1, 0, 800.f, 125.f, 125.f, 0x05B0, 0, 1 },
     { 9, 7, 1, 1, 0, 800.f, 125.f, 125.f, 0x1555, 1, 0 },
@@ -121,6 +121,9 @@ int main(void) {
     });
     fingerprint = hash_result(fingerprint, (Result){
         (int16_t)0xE000, 0x6000, (int16_t)0xE000, 0x05B0, 700.f, 0, 1
+    });
+    fingerprint = hash_result(fingerprint, (Result){
+        (int16_t)0xE100, 0x6000, (int16_t)0xE100, 0x1000, 250.f, 0, 0
     });
     fingerprint = hash_result(fingerprint, (Result){
         (int16_t)0xD100, 0x5000, (int16_t)0xD100, 0x1555, 800.f, 0, 0

@@ -99,7 +99,7 @@ struct SM64CameraCallbackResult: Equatable, Sendable {
 }
 
 /// Bounded-mode callback descriptors plus the callbacks whose C bodies are
-/// already reducible to immutable geometry.  Fixed, parallel, boss, spiral,
+/// already reducible to immutable geometry. Fixed, parallel, boss, spiral,
 /// and water callbacks deliberately return nil until their owner-thread path
 /// data and collision policy have their own Swift boundaries.
 enum SM64CameraModeCallbacks {
@@ -110,7 +110,7 @@ enum SM64CameraModeCallbacks {
         descriptor(3, .behindMario, false, true, false, 800, 125, 125, 0x05B0, false, true),
         descriptor(4, .mario, true, true, false, 800, 125, 125, 0x05B0, true, true),
         descriptor(5, .none, false, false, false, 0, 0, 0, 0, false, false),
-        descriptor(6, .cUp, false, true, false, 250, 125, 125, 0, true, false),
+        descriptor(6, .cUp, true, true, false, 250, 125, 125, 0, true, false),
         descriptor(7, .mario, true, true, false, 800, 125, 125, 0x05B0, true, true),
         descriptor(8, .waterSurface, false, true, false, 800, 125, 125, 0x05B0, false, true),
         descriptor(9, .slideHoot, true, true, false, 800, 125, 125, 0x1555, true, false),
@@ -152,7 +152,9 @@ enum SM64CameraModeCallbacks {
             return slideHoot(input, descriptor: descriptor)
         case .insideCannon:
             return cannon(input, descriptor: descriptor)
-        case .none, .behindMario, .cUp, .waterSurface, .bossFight,
+        case .cUp:
+            return cUp(input, descriptor: descriptor)
+        case .none, .behindMario, .waterSurface, .bossFight,
              .parallelTracking, .fixed, .spiralStairs:
             return nil
         }
@@ -272,6 +274,30 @@ enum SM64CameraModeCallbacks {
             positionYOffset: descriptor.positionYOffset + input.cannonYOffset,
             pitchOverride: input.facePitch,
             returnedYaw: input.faceYaw
+        )
+    }
+
+    private static func cUp(
+        _ input: SM64CameraCallbackInput,
+        descriptor: SM64CameraModeCallbackDescriptor
+    ) -> SM64CameraCallbackResult? {
+        guard let placement = SM64CameraCUp.update(
+            marioPosition: input.marioPosition,
+            marioFaceYaw: input.faceYaw,
+            pitch: input.facePitch,
+            modeOffsetYaw: input.modeOffsetYaw,
+            lakituPitch: input.lakituPitch
+        ) else { return nil }
+        return SM64CameraCallbackResult(
+            focus: placement.focus,
+            position: placement.position,
+            cameraYaw: placement.yaw,
+            returnedYaw: input.faceYaw,
+            areaYaw: placement.yaw,
+            pitch: input.facePitch,
+            distance: descriptor.baseDistance,
+            outputsSwapped: descriptor.outputsSwapped,
+            panAhead: descriptor.pansAhead
         )
     }
 

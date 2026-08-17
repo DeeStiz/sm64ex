@@ -2,6 +2,16 @@
 
 ## Latest validated slices (2026-08-17)
 
+- M31p promotes the direct C-up placement callback (mode 6) to the Swift
+  evaluator. `SM64CameraCUp.update` owns the 250-unit placement, 125-unit
+  offsets, live C-up pitch, Mario-facing yaw, and returned Mario yaw; C retains
+  head/stick input, entry/exit transitions, collision, sounds, and Lakitu.
+  The callback fingerprint is `0x08345ea7e6c05fde`; geometry/callback,
+  migration/state/runtime, ABI, Debug build, and `git diff --check` gates pass.
+  The bounded launch does not enter C-up, so live callback and physical-feel
+  evidence remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M31p.md`.
+
 - M31o promotes the direct slide/hoot transition callback (modes 9 and 15) to
   the Swift camera evaluator. The existing Swift kernel owns face-yaw plus
   offset, 800-unit placement, 125-unit offsets, 0x1555 pitch, and returned

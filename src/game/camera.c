@@ -2102,6 +2102,9 @@ static s32 sm64_modern_camera_evaluate_callback(
     input.mode = mode;
     input.face_yaw = sMarioCamState->faceAngle[1];
     input.face_pitch = sMarioCamState->faceAngle[0];
+    if (mode == CAMERA_MODE_C_UP) {
+        input.face_pitch = sCUpCameraPitch;
+    }
     input.mode_offset_yaw = sModeOffsetYaw;
     input.lakitu_pitch = sLakituPitch;
     input.lakitu_distance = sLakituDist;
@@ -2819,7 +2822,15 @@ s32 exit_c_up(struct Camera *c) {
 /**
  * The mode used when C-Up is pressed.
  */
-s32 update_c_up(UNUSED struct Camera *c, Vec3f focus, Vec3f pos) {
+s32 update_c_up(struct Camera *c, Vec3f focus, Vec3f pos) {
+    s16 callbackYaw = 0;
+    u32 callbackFlags = 0;
+    if (sm64_modern_camera_evaluate_callback(
+            c, c != NULL ? (s16)c->mode : CAMERA_MODE_C_UP,
+            focus, pos, &callbackYaw, &callbackFlags)) {
+        return callbackYaw;
+    }
+
     s16 pitch = sCUpCameraPitch;
     s16 yaw = sMarioCamState->faceAngle[1] + sModeOffsetYaw + DEGREES(180);
 
