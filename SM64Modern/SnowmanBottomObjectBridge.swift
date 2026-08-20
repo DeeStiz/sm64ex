@@ -98,7 +98,7 @@ final class SM64SnowmanBottomObjectBridge {
             movementFlags: record.moveFlags,
             dialogTriggered: record.dialogResponse == 1
         ))
-        var spawnedCheckpoint: SM64ObjectID?
+        let spawnedCheckpoint: SM64ObjectID? = nil
         _ = engineState.objects.mutate(id) { next in
             next.action = output.action
             next.timer = output.timer

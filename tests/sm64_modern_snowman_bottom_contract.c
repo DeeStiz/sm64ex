@@ -23,10 +23,10 @@ static uint64_t row(uint64_t seed, int action, int timer, int pitch, uint32_t ve
 int main(void) {
     uint64_t fingerprint = OFFSET;
     fingerprint = row(fingerprint, 1, 0, 0, UINT32_C(0), 0);
-    fingerprint = row(fingerprint, 2, 0, 2000, UINT32_C(0), 0);
-    fingerprint = row(fingerprint, 3, 0, 2000, UINT32_C(1117782016), 0);
-    fingerprint = row(fingerprint, 2, 201, 2000, UINT32_C(0), 1);
-    fingerprint = row(fingerprint, 4, 0, 0, UINT32_C(3238002688), 0);
+    fingerprint = row(fingerprint, 2, 0, 20000, UINT32_C(0), 0);
+    fingerprint = row(fingerprint, 3, 0, 4000, UINT32_C(1117782016), 0);
+    fingerprint = row(fingerprint, 2, 201, 4000, UINT32_C(0), 1);
+    fingerprint = row(fingerprint, 4, 0, 0, UINT32_C(0), 0);
     printf("snowmanBottomFingerprint=0x%016llx\n", (unsigned long long)fingerprint);
     puts("SM64 Modern snowman bottom C contract passed");
     return 0;

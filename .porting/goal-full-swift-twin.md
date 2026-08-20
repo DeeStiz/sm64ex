@@ -89,6 +89,14 @@ integration is complete. The worker-result writer and serial merge gate pass
 strict Swift 6 smoke. Full live route execution, sanitizer parity, Metal
 visual/device closure, release, and human acceptance remain open.
 
+Continuation Phase 3 adds route-local, not-yet-promoted slices for Act Selector,
+LLL Bowser Puzzle, Snowman Bottom, and Treasure Chest. Their focused C↔Swift
+contracts, strict Swift 6 smokes, source action-list checks, and generation-safe
+owner lifecycle checks pass, but their identities remain C adapters in the
+canonical manifest until central dispatch, effect aggregation, and coverage
+integration are completed. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase3-route-local-batch.md`.
+
 The fresh M33ne verifier cleared the complete matrix and regenerated strict
 Swift 6 Xcode build, but the host launch is currently blocked:
 focused/matrix gates matched, the regenerated Swift 6 Debug build succeeded,

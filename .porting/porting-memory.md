@@ -34,6 +34,17 @@
   Swift 6 smoke-tested. Full live route execution, sanitizer parity, and
   physical/release/human gates remain open.
 
+- Continuation Phase 3 route-local batch (2026-08-20) adds strict Swift 6/C
+  contracts for Act Selector (`0x6f091847f70c607d`), LLL Bowser Puzzle
+  (`0x69639baba7e78631`), Snowman Bottom (`0xf11cbad11f3035e9`, lifecycle
+  `0x10b1a473897b6603`), and Treasure Chest (`0x2dc072092ddbe3ed`). Parent/
+  child ordering, generation fences, source action lists, and owner lifecycle
+  checks pass. These routes remain local-only and are not counted in the Swift
+  behavior manifest until central dispatch/coverage integration is complete.
+  M34 warm-pipeline/stress work is tracked separately; full live route,
+  sanitizer, visual/device, release, and human gates remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-phase3-route-local-batch.md`.
+
 - M33h qualifies a bounded native Mario gameplay promotion slice. The
   opt-in `SM64_MODERN_AUTOMATED_MARIO=1` owner-thread probe invokes the
   production Mario button and ground-speed callbacks after the normal C step,
