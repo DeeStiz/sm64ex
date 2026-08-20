@@ -1,13 +1,16 @@
 SM64 Modern native macOS — nightly continuation update (2026-08-20)
-1.) Centrally promote Sushi Shark and its collision child through dispatch
-    route 259, preserving water-level propagation, generation-safe cleanup,
-    and wave-trail child spawning.
-2.) Update the deterministic behavior manifest to 534 rows, 492 Swift owners,
-    and 42 explicit C adapters at `0xa610f82db91e28f6`.
-3.) Preserve the M34c warm-pipeline and resize/pause stress evidence boundary:
-    source/build gates pass, but the three-frame display-link run does not
-    close visual/device acceptance.
-4.) Record the remaining central route promotions, 7,419-shard live closure,
+1.) Centrally promote Sushi Shark/collision child and the NPC/menu family
+    through dispatch routes 259–264, preserving generation-safe ownership and
+    effect delivery.
+2.) Update the deterministic behavior manifest to 534 rows, 500 Swift owners,
+    and 34 explicit C adapters at `0xaffa1724f93c6e44`.
+3.) Add a bounded live route-shard executor that requires record-mode live
+    traces, rejects fixture/missing/reused evidence, and emits isolated worker
+    results for canonical batches up to 256 rows.
+4.) Preserve the M34c warm-pipeline and resize/pause stress evidence boundary:
+    source/build gates pass, but host/compositor throttling still stops the
+    visible display-link run at three frames and archive reuse is unproven.
+5.) Record the remaining central route promotions, 7,419-shard live closure,
     M35 distribution, and human-acceptance gates in the goal and handoff docs.
 
 Refresh 11

@@ -13,16 +13,16 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 
 ## Current status
 
-The status below is pinned to `nightly` continuation commit `98bcbcf5`
+The status below is pinned to the current `nightly` continuation
 (2026-08-20).
 
 * **M33nk** remains the latest numbered behavior-qualification slice. The
-  continuation has centrally promoted Sushi Shark and its collision child
-  (`bhvSushiShark`, `bhvSushiSharkCollisionChild`) through route 259, with
-  focused contract `0x829e2dcf1c565b1a`.
-* The deterministic behavior manifest contains **534 rows**: **492 Swift
-  value/owner routes** and **42 explicit C adapters**. Its current fingerprint
-  is `0xa610f82db91e28f6`.
+  continuation has centrally promoted Sushi Shark/collision child and the
+  NPC/menu family (routes 259–264); the NPC/menu focused contract is
+  `0x4ff30b57a3db6922`.
+* The deterministic behavior manifest contains **534 rows**: **500 Swift
+  value/owner routes** and **34 explicit C adapters**. Its current fingerprint
+  is `0xaffa1724f93c6e44`.
 * **M34c** is the latest Metal 4 implementation checkpoint; **M34b** remains
   the latest validated production/capture slice. Its two-pass
   harness keeps API/shader validation separate from GPU capture and exercises
@@ -43,7 +43,7 @@ The source-of-truth tracker and the complete milestone ledger are in
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
-[`../.porting/porting-handoff-full-swift-twin-phase4-sushi-integration.md`](../.porting/porting-handoff-full-swift-twin-phase4-sushi-integration.md).
+[`../.porting/porting-handoff-full-swift-twin-phase5-npc-menu-integration.md`](../.porting/porting-handoff-full-swift-twin-phase5-npc-menu-integration.md).
 
 ## Architecture and ownership
 
@@ -142,6 +142,7 @@ gates before recording a milestone handoff.
 | C/Swift ABI | `make abi-smoke` | Versioned POD layout and callable-core contract |
 | Behavior ownership | `./script/test_behavior_manifest.sh` | Reproducible 534-row manifest and matching Swift/C fingerprint |
 | Route inventory | `./script/test_route_shards.sh` | Canonical 7,419-shard inventory and ledger schema (inventory status remains planned) |
+| Live shard executor | `./script/test_route_shard_live_executor.sh` | Bounded canonical live-trace admission and isolated worker-result gate (does not launch all gameplay shards) |
 | Live route oracle | `./script/test_live_route_oracle.sh input-only` or `full` | Reachable owner-thread route execution and C/Swift oracle comparison |
 | Focused route | `./script/test_<route>.sh` | The route's C contract, Swift smoke, dispatch, and integration gates |
 | Cadence regression | `./script/test_course_exit_cadence.sh` | One-shot menu/dialog/cutscene admissions across the 60/30 pair |
