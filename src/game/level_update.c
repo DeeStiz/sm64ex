@@ -1193,6 +1193,35 @@ s32 update_level(void) {
     return changeLevel;
 }
 
+/*
+ * Run the continuous gameplay portion of the level update on a held native
+ * step.  The level script itself remains paired at the original 30 Hz, but
+ * Mario, actors, collision preparation, and the camera still need a second
+ * 60 Hz pass.  Their movement helpers apply the native half-step scale, so
+ * the two passes cover exactly one original N64 interval without a speed
+ * multiplier or a second legacy/script update.
+ */
+void level_update_native_step(void) {
+    if (!sm64_modern_timebase_should_advance_native_dynamics()
+        || sm64_modern_timebase_should_advance_legacy_domain()
+        || sCurrPlayMode != PLAY_MODE_NORMAL
+        // Dialog/cutscene time-stop is a legacy-timed interaction.  The
+        // object allow-list (Mario plus the initiating NPC) must not run a
+        // second time on the held native redraw or it can re-enter the
+        // Koopa dialog/camera handoff between logical frames.
+        || (gTimeStopState & TIME_STOP_ACTIVE)
+        || gCurrentArea == NULL
+        || gMarioState == NULL) {
+        return;
+    }
+
+    area_update_objects();
+
+    sm64_modern_parity_enter_subsystem(SM64_MODERN_GAMEPLAY_SUBSYSTEM_CAMERA);
+    update_camera(gCurrentArea->camera);
+    sm64_modern_parity_leave_subsystem();
+}
+
 s32 init_level(void) {
     s32 val4 = 0;
 

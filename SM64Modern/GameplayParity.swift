@@ -331,7 +331,7 @@ final class GameplayParityCoordinator {
         // thread while the evidence counters are still authoritative.
         let evidence = gameplayService.evidence()
         parityLogger.notice(
-            "swift_gameplay_evidence mario_buttons=\(evidence.marioButtonUpdates) mario_ground_speed=\(evidence.marioGroundSpeedUpdates) bobomb_release=\(evidence.bobombReleaseUpdates) cheat_policy=\(evidence.cheatPolicyUpdates)"
+            "swift_gameplay_evidence mario_buttons=\(evidence.marioButtonUpdates) mario_ground_speed=\(evidence.marioGroundSpeedUpdates) bobomb_release=\(evidence.bobombReleaseUpdates) cheat_policy=\(evidence.cheatPolicyUpdates) mario_action=\(evidence.marioActionUpdates) mario_action_cancel=\(evidence.marioActionCancelUpdates) mario_ground_step=\(evidence.marioGroundStepUpdates) mario_air_step=\(evidence.marioAirStepUpdates) mario_water_step=\(evidence.marioWaterStepUpdates) mario_bonk=\(evidence.marioBonkUpdates) mario_terrain_impulse=\(evidence.marioTerrainImpulseUpdates) mario_quicksand=\(evidence.marioQuicksandUpdates) mario_steep_push=\(evidence.marioSteepPushUpdates) mario_terrain_sound=\(evidence.marioTerrainSoundUpdates) mario_floor_predicates=\(evidence.marioFloorPredicateUpdates) mario_forward_velocity=\(evidence.marioForwardVelocityUpdates) mario_velocity_derivation=\(evidence.marioVelocityDerivationUpdates) mario_punch=\(evidence.marioPunchUpdates) mario_wall_response=\(evidence.marioWallResponseUpdates) mario_walk_animation=\(evidence.marioWalkAnimationUpdates) mario_held_walk_animation=\(evidence.marioHeldWalkAnimationUpdates) mario_slope_acceleration=\(evidence.marioSlopeAccelerationUpdates) mario_slope_deceleration=\(evidence.marioSlopeDecelerationUpdates) mario_decelerating_speed=\(evidence.marioDeceleratingSpeedUpdates) mario_shell_speed=\(evidence.marioShellSpeedUpdates) mario_landing_acceleration=\(evidence.marioLandingAccelerationUpdates) mario_gravity=\(evidence.marioGravityUpdates) mario_vertical_wind=\(evidence.marioVerticalWindUpdates) mario_sliding=\(evidence.marioSlidingUpdates) mario_ground_dive_punch=\(evidence.marioGroundDivePunchUpdates) mario_slide_predicates=\(evidence.marioSlidePredicatesUpdates) mario_begin_braking=\(evidence.marioBeginBrakingUpdates) mario_triple_jump_selector=\(evidence.marioTripleJumpSelectorUpdates) mario_y_velocity=\(evidence.marioYVelocityUpdates) mario_steep_jump=\(evidence.marioSteepJumpUpdates)"
         )
 
         for index in 0..<SM64_MODERN_GAMEPLAY_SUBSYSTEM_COUNT {
@@ -411,6 +411,68 @@ final class GameplayParityCoordinator {
             let subsystem: SM64ModernGameplaySubsystem
             switch token {
             case "mario-buttons", "mario_buttons":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-action", "mario_action":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-action-cancel", "mario_action_cancel":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-ground-step", "mario_ground_step":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-air-step", "mario_air_step":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-water-step", "mario_water_step":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-bonk", "mario_bonk":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-terrain-impulse", "mario_terrain_impulse":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-quicksand", "mario_quicksand":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-steep-push", "mario_steep_push":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-terrain-sound", "mario_terrain_sound":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-floor-predicates", "mario_floor_predicates":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-forward-velocity", "mario_forward_velocity":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-velocity-derivation", "mario_velocity_derivation":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-punch", "mario_punch":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-wall-response", "mario_wall_response":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-walk-animation", "mario_walk_animation":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-held-walk-animation", "mario_held_walk_animation":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-slope-acceleration", "mario_slope_acceleration":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-slope-deceleration", "mario_slope_deceleration":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-decelerating-speed", "mario_decelerating_speed":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-shell-speed", "mario_shell_speed":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-landing-acceleration", "mario_landing_acceleration":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-gravity", "mario_gravity":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-vertical-wind", "mario_vertical_wind":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-sliding", "mario_sliding":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-ground-dive-punch", "mario_ground_dive_punch":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-slide-predicates", "mario_slide_predicates":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-begin-braking", "mario_begin_braking":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-triple-jump-selector", "mario_triple_jump_selector":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-y-velocity", "mario_y_velocity":
+                subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
+            case "mario-steep-jump", "mario_steep_jump":
                 subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_MARIO
             case "bobomb-release", "bobomb_release":
                 subsystem = SM64_MODERN_GAMEPLAY_SUBSYSTEM_ACTOR_BOBOMB_BATTLEFIELD

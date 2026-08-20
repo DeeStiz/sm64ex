@@ -1,0 +1,9 @@
+#include <stdint.h>
+#include <stdio.h>
+static const uint64_t O=UINT64_C(1469598103934665603),P=UINT64_C(1099511628211);
+static uint64_t hu(uint64_t h,uint32_t v){for(unsigned b=0;b<4;++b){h^=(v>>(b*8))&0xffu;h*=P;}return h;}
+static uint64_t hf(uint64_t h,float v){union{float f;uint32_t u;}b={v};return hu(h,b.u);}
+struct O{int32_t action,timer,move_pitch,face_pitch,angle_velocity,delete_flag;float x,y,z,forward,velocity_y;};
+static struct O u(int a,int t,int child,int wait,float speed,float y){struct O o={a,t,0,0,0,0,0,y,0,0,0};if(a==0)o.action=child?3:1;else if(a==1){o.velocity_y=10;if(t>wait){o.action=2;o.timer=0;}}else if(a==2){o.angle_velocity=512;o.move_pitch=512;if(t+1==64){o.action=3;o.timer=0;}}else if(a==3){o.velocity_y=-10;if(t>wait){o.action=4;o.timer=0;}}else if(a==4){o.angle_velocity=-512;o.move_pitch=512;if(t+1==64){o.action=1;o.timer=0;}}o.face_pitch += o.angle_velocity<0 ? -o.angle_velocity : o.angle_velocity;o.y += o.velocity_y;return o;}
+static void ap(uint64_t*h,struct O o){*h=hu(*h,(uint32_t)o.action);*h=hu(*h,(uint32_t)o.timer);*h=hf(*h,o.x);*h=hf(*h,o.y);*h=hf(*h,o.z);*h=hu(*h,(uint32_t)o.move_pitch);*h=hu(*h,(uint32_t)o.face_pitch);*h=hu(*h,(uint32_t)o.angle_velocity);*h=hf(*h,o.forward);*h=hf(*h,o.velocity_y);*h=hu(*h,(uint32_t)o.delete_flag);}
+int main(void){struct O first=u(0,0,0,65,7,100),second=u(0,0,1,65,7,100),move=u(1,0,0,65,7,100),rotate=u(2,0,0,65,0,100),descend=u(3,66,0,65,7,100);if(first.action!=1||second.action!=3||move.y!=110||move.velocity_y!=10||rotate.move_pitch!=512||descend.action!=4||descend.y!=90)return 2;uint64_t h=O;ap(&h,first);ap(&h,second);ap(&h,move);ap(&h,rotate);ap(&h,descend);printf("checkerboardPlatformFingerprint=0x%016llx\n",(unsigned long long)h);puts("SM64 Modern checkerboard platform C contract passed");return 0;}

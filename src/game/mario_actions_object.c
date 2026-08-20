@@ -1,4 +1,6 @@
 #include <PR/ultratypes.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "sm64.h"
 #include "mario_actions_object.h"
@@ -10,6 +12,8 @@
 #include "audio_defines.h"
 #include "engine/math_util.h"
 #include "thread6.h"
+#include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_mario_punch_migration.h"
 
 /**
  * Used by act_punching() to determine Mario's forward velocity during each
@@ -25,7 +29,71 @@ void animated_stationary_ground_step(struct MarioState *m, s32 animation, u32 en
     }
 }
 
+static s32 try_sm64_modern_mario_punch_sequence(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_PUNCH") == NULL
+        || !m || !m->marioObj
+        || (m->input & INPUT_INTERACT_OBJ_GRABBABLE) != 0) {
+        return -1;
+    }
+    u32 animation;
+    switch (m->actionArg) {
+        case 0:
+        case 1: animation = MARIO_ANIM_FIRST_PUNCH; break;
+        case 2: animation = MARIO_ANIM_FIRST_PUNCH_FAST; break;
+        case 3:
+        case 4: animation = MARIO_ANIM_SECOND_PUNCH; break;
+        case 5: animation = MARIO_ANIM_SECOND_PUNCH_FAST; break;
+        case 6: animation = MARIO_ANIM_GROUND_KICK; break;
+        case 9: animation = MARIO_ANIM_BREAKDANCE; break;
+        default: return -1;
+    }
+    const s32 animationFrame = set_mario_animation(m, animation);
+    SM64ModernMarioPunchInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.moving_action = (m->action & ACT_FLAG_MOVING) != 0;
+    input.action_argument = m->actionArg;
+    input.animation_frame = animationFrame;
+    input.animation_at_end = is_anim_at_end(m);
+    input.animation_past_end = is_anim_past_end(m);
+    input.b_pressed = (m->input & INPUT_B_PRESSED) != 0;
+
+    SM64ModernMarioPunchOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_punch(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->actionArg = output.action_argument;
+    m->flags |= output.flags;
+    if (output.punch_state_valid != 0) {
+        m->marioBodyState->punchState = (u8) output.punch_state;
+    }
+    switch (output.sound_kind) {
+        case SM64_MODERN_MARIO_PUNCH_SOUND_YAH:
+            play_sound(SOUND_MARIO_PUNCH_YAH, m->marioObj->header.gfx.cameraToObject);
+            break;
+        case SM64_MODERN_MARIO_PUNCH_SOUND_WAH:
+            play_sound(SOUND_MARIO_PUNCH_WAH, m->marioObj->header.gfx.cameraToObject);
+            break;
+        case SM64_MODERN_MARIO_PUNCH_SOUND_HOO:
+            play_mario_action_sound(m, SOUND_MARIO_PUNCH_HOO, 1);
+            break;
+        default:
+            break;
+    }
+    if (output.transition_action != 0) {
+        set_mario_action(m, output.transition_action, 0);
+    }
+    return 0;
+}
+
 s32 mario_update_punch_sequence(struct MarioState *m) {
+    if (try_sm64_modern_mario_punch_sequence(m) == 0) {
+        return FALSE;
+    }
+
     u32 endAction, crouchEndAction;
     s32 animFrame;
 

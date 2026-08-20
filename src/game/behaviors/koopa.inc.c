@@ -495,6 +495,10 @@ s32 obj_begin_race(s32 noTimer) {
  * Wait for mario to approach, and then enter the show init text action.
  */
 static void koopa_the_quick_act_wait_before_race(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
+
     koopa_shelled_act_stopped();
 
     if (o->oKoopaTheQuickInitTextboxCooldown != 0) {
@@ -515,6 +519,10 @@ static void koopa_the_quick_act_wait_before_race(void) {
  * return to the waiting action.
  */
 static void koopa_the_quick_act_show_init_text(void) {
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
+
     s32 response = obj_update_race_proposition_dialog(
         sKoopaTheQuickProperties[o->oKoopaTheQuickRaceIndex].initText);
     UNUSED s32 unused;
@@ -705,6 +713,13 @@ static void koopa_the_quick_act_stop(void) {
  * the star.
  */
 static void koopa_the_quick_act_after_race(void) {
+    // Dialog state, timer ownership, and star spawning are logical-boundary
+    // effects. Keep the actor's movement pass native, but do not advance this
+    // state machine twice per paired interval.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
+
     cur_obj_init_animation_with_sound(7);
 
     if (o->parentObj->oKoopaRaceEndpointUnk100 == 0) {

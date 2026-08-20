@@ -19,8 +19,13 @@ case "$CONFIGURATION" in
     ;;
 esac
 
+MAKE_TARGETS=(native-core)
+if [[ "${SM64_MODERN_SKIP_SMOKE_TESTS:-0}" != "1" ]]; then
+  MAKE_TARGETS+=(timebase-smoke cadence-smoke oracle-trace-smoke oracle-bridge-smoke)
+fi
+
 exec make -C "$PROJECT_ROOT" \
   SM64_MODERN_NATIVE=1 \
   DEBUG="$DEBUG_VALUE" \
   BUILD_DIR_BASE="$BUILD_DIR_BASE" \
-  native-core timebase-smoke cadence-smoke oracle-trace-smoke oracle-bridge-smoke
+  "${MAKE_TARGETS[@]}"

@@ -62,10 +62,13 @@ enum SM64MarioSlope {
             normalY: input.floorNormalY
         )
 
-        let steepness = sqrt(
-            input.floorNormalX * input.floorNormalX
-                + input.floorNormalZ * input.floorNormalZ
+        // Match the native ARM C path's contracted product and rounded
+        // square-root result before continuing with Float arithmetic.
+        let normalZ2 = SM64DeterministicPrimitives.cFloatMultiply(
+            input.floorNormalZ, input.floorNormalZ
         )
+        let normalSquared = fmaf(input.floorNormalX, input.floorNormalX, normalZ2)
+        let steepness = Float(sqrt(Double(normalSquared)))
         var forwardVelocity = input.forwardVelocity
         if floorIsSlope {
             let slopeAcceleration: Float
@@ -83,9 +86,9 @@ enum SM64MarioSlope {
                 slopeAcceleration = 1.7
             }
             if floorDeltaYaw > -0x4000 && floorDeltaYaw < 0x4000 {
-                forwardVelocity += slopeAcceleration * steepness
+                forwardVelocity = fmaf(slopeAcceleration, steepness, forwardVelocity)
             } else {
-                forwardVelocity -= slopeAcceleration * steepness
+                forwardVelocity = fmaf(-slopeAcceleration, steepness, forwardVelocity)
             }
         }
 

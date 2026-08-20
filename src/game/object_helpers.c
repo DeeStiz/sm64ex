@@ -2262,6 +2262,7 @@ void spawn_mist_particles_with_sound(u32 sp18) {
 }
 
 void cur_obj_push_mario_away(f32 radius) {
+    const f32 nativeStepScale = sm64_modern_timebase_native_step_scale();
     f32 marioRelX = gMarioObject->oPosX - o->oPosX;
     f32 marioRelZ = gMarioObject->oPosZ - o->oPosZ;
     f32 marioDist = sqrtf(sqr(marioRelX) + sqr(marioRelZ));
@@ -2269,8 +2270,11 @@ void cur_obj_push_mario_away(f32 radius) {
     if (marioDist < radius) {
         //! If this function pushes Mario out of bounds, it will trigger Mario's
         //  oob failsafe
-        gMarioStates[0].pos[0] += (radius - marioDist) / radius * marioRelX;
-        gMarioStates[0].pos[2] += (radius - marioDist) / radius * marioRelZ;
+        // This helper is called from native actor updates too. Scale the
+        // displacement so the held half-step cannot apply the full logical
+        // push a second time (notably when Koopa is waiting at the flag).
+        gMarioStates[0].pos[0] += (radius - marioDist) / radius * marioRelX * nativeStepScale;
+        gMarioStates[0].pos[2] += (radius - marioDist) / radius * marioRelZ * nativeStepScale;
     }
 }
 

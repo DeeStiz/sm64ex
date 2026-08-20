@@ -1,0 +1,8 @@
+import Foundation
+
+enum SM64WaterPillarAction: Int32, Equatable, Sendable { case waiting = 0; case sinking = 1; case peerWait = 2; case peerReady = 3; case draining = 4; case drained = 5 }
+struct SM64WaterPillarInput: Equatable, Sendable { let action:SM64WaterPillarAction;let timer:Int32;let positionY:Float;let groundPounded:Bool;let peerAction:Int32?;let drained:Bool;let environmentLevel0:Int32;let environmentLevel2:Int32 }
+struct SM64WaterPillarOutput: Equatable, Sendable { let action:SM64WaterPillarAction;let timer:Int32;let positionY:Float;let environmentLevel0:Int32;let environmentLevel2:Int32;let spawnMist:Bool;let playDrainSound:Bool;let playPuzzleJingle:Bool;let setMoatDrained:Bool }
+enum SM64WaterPillarBehavior {
+ static func update(_ i:SM64WaterPillarInput)->SM64WaterPillarOutput{var a=i.action;var t=i.timer &+ 1;var y=i.positionY;var e0=i.environmentLevel0;var e2=i.environmentLevel2;var mist=false;var sound=false;var jingle=false;var save=false;if i.drained{if i.timer == 0{y -= 80;e0 = -2450;e2 = -2450};a = .drained}else{switch i.action{case .waiting:if i.groundPounded{a = .sinking;t=0;mist=true};case .sinking:if i.timer < 4{y -= 20}else{a = .peerWait;t=0};case .peerWait:if let p=i.peerAction,p < 2{a = .peerReady;t=0};case .peerReady:if let p=i.peerAction,p > 1{a = .draining;t=0;save=true;jingle=true};case .draining:sound=true;if i.timer < 300{e0 = max(e0-5,-2450);e2 = max(e2-5,-2450)}else{a = .drained;t=0};case .drained:break}};return .init(action:a,timer:t,positionY:y,environmentLevel0:e0,environmentLevel2:e2,spawnMist:mist,playDrainSound:sound,playPuzzleJingle:jingle,setMoatDrained:save)}
+}

@@ -1,0 +1,14 @@
+import Foundation
+struct SM64AnimatedFloorSwitchObjectEffectRecord:Equatable,Sendable{let objectID:SM64ObjectID;let output:SM64AnimatedFloorSwitchOutput;let parentID:SM64ObjectID?}
+final class SM64AnimatedFloorSwitchObjectBridge{
+ static let defaultBehaviorIdentity:UInt64=0x6268_765F_616673
+ private struct State{let behaviorByte:Int32;let parentID:SM64ObjectID?;var animationActive:Bool;var toggle:Int32;var remaining:Int32;var frame:Int32;var parentAction:Int32}
+ private var states:[SM64ObjectID:State]=[:];private(set)var effectLog:[SM64AnimatedFloorSwitchObjectEffectRecord]=[]
+ var registeredIDs:[SM64ObjectID]{states.keys.sorted{$0.slot == $1.slot ? $0.generation < $1.generation : $0.slot < $1.slot}}
+ func beginExternalTick(){effectLog.removeAll(keepingCapacity:true)}
+ @discardableResult func spawn(in e:SM64SwiftEngineState,behaviorByte:Int32 = 0,position:SM64ObjectVector3 = .zero,parent:SM64ObjectID? = nil)throws->SM64ObjectID{let id=try e.spawnObject(in:.surface,behaviorIdentity:Self.defaultBehaviorIdentity,parent:parent);guard attach(id,behaviorByte:behaviorByte,position:position,parent:parent,in:e.objects)else{_ = e.objects.despawn(id);preconditionFailure("newly spawned animated floor switch object could not attach")};return id}
+ @discardableResult func attach(_ id:SM64ObjectID,behaviorByte:Int32,position:SM64ObjectVector3,parent:SM64ObjectID?,in p:SM64ObjectPool)->Bool{guard p.record(for:id) != nil else{return false};states[id]=State(behaviorByte:behaviorByte,parentID:parent,animationActive:false,toggle:1,remaining:0,frame:0,parentAction:0);return p.mutate(id){r in r.position=position;r.homePosition=position;r.behaviorParams2ndByte=behaviorByte;r.collisionDistance=8000;r.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle|SM64ObjectScheduler.objectFlagBuildTransform}}
+ @discardableResult func setParentAction(_ action:Int32,for id:SM64ObjectID)->Bool{guard var s=states[id]else{return false};s.parentAction=action;states[id]=s;return true}
+ @discardableResult func updateInline(_ id:SM64ObjectID,state e:SM64SwiftEngineState)->Bool{guard var s=states[id],e.objects.record(for:id) != nil else{return false};let parentAction=s.parentID.flatMap{e.objects.record(for:$0)?.action} ?? s.parentAction;let o=SM64AnimatedFloorSwitchBehavior.update(.init(parentAction:parentAction,behaviorByte:s.behaviorByte,animationActive:s.animationActive,toggle:s.toggle,remaining:s.remaining,frame:s.frame));s.animationActive=o.animationActive;s.toggle=o.toggle;s.remaining=o.remaining;s.frame=o.frame;states[id]=s;_ = e.objects.mutate(id){n in n.animationState=o.modelFrame;n.timer &+= 1};effectLog.append(.init(objectID:id,output:o,parentID:s.parentID));return true}
+ func remove(_ id:SM64ObjectID){states.removeValue(forKey:id)};func pruneExternal(unloaded:[SM64ObjectID],pool:SM64ObjectPool){for id in unloaded{remove(id)};for id in registeredIDs where pool.record(for:id)==nil{remove(id)}}
+}

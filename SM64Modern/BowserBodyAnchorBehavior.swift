@@ -1,0 +1,3 @@
+import Foundation
+struct SM64BowserBodyAnchorOutput: Equatable, Sendable { let position: SM64ObjectVector3; let faceAngles: SM64ObjectAngles; let interactionType: UInt32; let tangible: Bool }
+enum SM64BowserBodyAnchorBehavior { static func update(position:SM64ObjectVector3,faceAngles:SM64ObjectAngles,parentAction:Int32,parentSubAction:Int32,parentOpacity:Int32,parentHeld:Bool)->SM64BowserBodyAnchorOutput{if parentAction == 4 { let type:UInt32 = parentSubAction == 11 ? 0 : 1<<23; return .init(position:position,faceAngles:faceAngles,interactionType:type,tangible:type != 0) };let tangible=parentOpacity >= 100 && !parentHeld;return .init(position:position,faceAngles:faceAngles,interactionType:tangible ? (1<<3):0,tangible:tangible)} }

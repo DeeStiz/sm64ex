@@ -1,0 +1,6 @@
+import Foundation
+private let offset: UInt64 = 1_469_598_103_934_665_603
+private let prime: UInt64 = 1_099_511_628_211
+private func hash(_ seed: UInt64, _ value: UInt64) -> UInt64 { var result = seed; for index in 0..<8 { result ^= (value >> UInt64(index * 8)) & 255; result &*= prime }; return result }
+private func row(_ output: SM64RrCruiserWingOutput) -> [UInt64] { [UInt64(bitPattern: Int64(output.timer)), UInt64(bitPattern: Int64(output.faceYaw)), UInt64(bitPattern: Int64(output.facePitch)), output.playRockSound ? 1 : 0] }
+@main struct SM64RrCruiserWingSmoke { static func main() { let first = SM64RrCruiserWingBehavior.update(.init(timer: 0, baseYaw: 100, basePitch: 200, reverse: false)); let reverse = SM64RrCruiserWingBehavior.update(.init(timer: 16, baseYaw: 100, basePitch: 200, reverse: true)); let reset = SM64RrCruiserWingBehavior.update(.init(timer: 64, baseYaw: 100, basePitch: 200, reverse: false)); precondition(first.timer == 1 && first.faceYaw == 100 && first.facePitch == 2248); precondition(reverse.faceYaw == -8092); precondition(reset.timer == 0 && reset.playRockSound); var fingerprint = offset; for output in [first, reverse, reset] { for value in row(output) { fingerprint = hash(fingerprint, value) } }; print(String(format: "rrCruiserWingFingerprint=0x%016llx", fingerprint)); print("SM64 Modern RR cruiser wing smoke passed") } }

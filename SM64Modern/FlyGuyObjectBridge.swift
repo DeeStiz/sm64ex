@@ -102,6 +102,27 @@ final class SM64FlyGuyObjectBridge {
     }
 
     @discardableResult
+    func spawnFlame(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        parent: SM64ObjectID? = nil
+    ) throws -> SM64ObjectID {
+        let id = try engineState.spawnObject(
+            in: .unimportant,
+            behaviorIdentity: Self.flameBehaviorIdentity,
+            parent: parent
+        )
+        var flame = SM64FlyGuyFlameState()
+        flame.positionX = position.x
+        flame.positionY = position.y
+        flame.positionZ = position.z
+        flames[id] = flame
+        parentForFlame[id] = parent ?? id
+        synchronizeFlame(id: id, state: flame, pool: engineState.objects)
+        return id
+    }
+
+    @discardableResult
     func attach(
         _ id: SM64ObjectID,
         homeX: Float = 0,

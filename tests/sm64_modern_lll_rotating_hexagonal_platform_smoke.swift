@@ -1,0 +1,4 @@
+import Foundation
+private let o:UInt64=1_469_598_103_934_665_603,p:UInt64=1_099_511_628_211
+private func h(_ x:UInt64,_ v:UInt32)->UInt64{var y=x;for b in 0..<4{y^=UInt64((v>>UInt32(b*8))&0xff);y&*=p};return y}
+@main enum SM64ModernLllRotatingHexagonalPlatformSmoke{static func main(){let a=SM64LllRotatingHexagonalPlatformBehavior.update(.init(moveYaw:0));let b=SM64LllRotatingHexagonalPlatformBehavior.update(.init(moveYaw:0x7fff));precondition(a == .init(moveYaw:0x100,faceYaw:0x100,angleVelocityYaw:0x100));precondition(b.moveYaw == 0x80ff && b.faceYaw == 0x80ff);var f=o;f=h(f,UInt32(bitPattern:a.moveYaw));f=h(f,UInt32(bitPattern:a.faceYaw));f=h(f,UInt32(bitPattern:a.angleVelocityYaw));f=h(f,UInt32(bitPattern:b.moveYaw));f=h(f,UInt32(bitPattern:b.faceYaw));f=h(f,UInt32(bitPattern:b.angleVelocityYaw));print(String(format:"lllRotatingHexagonalPlatformFingerprint=0x%016llx",f));print("SM64 Modern LLL rotating hexagonal platform smoke passed")}}

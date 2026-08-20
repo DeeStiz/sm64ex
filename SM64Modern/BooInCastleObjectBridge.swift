@@ -1,0 +1,20 @@
+import Foundation
+
+struct SM64BooInCastleObjectEffectRecord: Equatable, Sendable { let objectID: SM64ObjectID; let output: SM64BooInCastleOutput }
+final class SM64BooInCastleObjectBridge {
+    static let defaultBehaviorIdentity: UInt64 = 0x6268_765F_626963
+    private struct State { var stars: Int32; var room: Int32; var distance: Float; var positionZ: Float; var activeDifferentRoom: Bool; var angleToMario: Int32; var angleToHome: Int32 }
+    private var states: [SM64ObjectID: State] = [:]; private(set) var effectLog: [SM64BooInCastleObjectEffectRecord] = []
+    var registeredIDs: [SM64ObjectID] { states.keys.sorted { $0.slot == $1.slot ? $0.generation < $1.generation : $0.slot < $1.slot } }
+    func beginExternalTick() { effectLog.removeAll(keepingCapacity: true) }
+    @discardableResult
+    func spawn(in engineState: SM64SwiftEngineState, stars: Int32 = 12, room: Int32 = 0, position: SM64ObjectVector3 = .zero) throws -> SM64ObjectID { let id = try engineState.spawnObject(in: .default, behaviorIdentity: Self.defaultBehaviorIdentity); guard attach(id, stars: stars, room: room, position: position, in: engineState.objects) else { _ = engineState.objects.despawn(id); preconditionFailure("newly spawned castle Boo could not attach") }; return id }
+    @discardableResult
+    func attach(_ id: SM64ObjectID, stars: Int32, room: Int32, position: SM64ObjectVector3, in pool: SM64ObjectPool) -> Bool { guard pool.record(for: id) != nil else { return false }; states[id] = State(stars: stars, room: room, distance: 10_000, positionZ: position.z, activeDifferentRoom: false, angleToMario: 0, angleToHome: 0); return pool.mutate(id) { record in record.position = position; record.homePosition = .init(x: -1000, y: position.y, z: -9000); record.graphYOffset = 60; record.opacity = 255; record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle | SM64ObjectScheduler.objectFlagBuildTransform } }
+    @discardableResult
+    func setInputs(for id: SM64ObjectID, room: Int32? = nil, distanceToMario: Float? = nil, activeDifferentRoom: Bool? = nil, angleToMario: Int32? = nil, angleToHome: Int32? = nil) -> Bool { guard var state = states[id] else { return false }; if let room { state.room = room }; if let distanceToMario { state.distance = distanceToMario }; if let activeDifferentRoom { state.activeDifferentRoom = activeDifferentRoom }; if let angleToMario { state.angleToMario = angleToMario }; if let angleToHome { state.angleToHome = angleToHome }; states[id] = state; return true }
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, state engineState: SM64SwiftEngineState) -> Bool { guard let state = states[id], let record = engineState.objects.record(for: id) else { return false }; let output = SM64BooInCastleBehavior.update(.init(action: record.action, timer: record.timer, stars: state.stars, room: state.room, distanceToMario: state.distance, positionZ: record.position.z, opacity: record.opacity, forwardVelocity: record.forwardVelocity, activeDifferentRoom: state.activeDifferentRoom, angleToMario: state.angleToMario, angleToHome: state.angleToHome)); _ = engineState.objects.mutate(id) { next in next.action = output.action; next.timer = output.timer; next.opacity = output.opacity; next.scale = .init(x: output.scale, y: output.scale, z: output.scale); next.forwardVelocity = output.forwardVelocity; next.velocity.y = output.velocityY; next.faceAngles.yaw = output.targetAngle; next.graphFlags = output.visible ? next.graphFlags & ~UInt16(0x10) : next.graphFlags | 0x10; if output.shouldDelete { next.activeFlags = 0 }; next.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle | SM64ObjectScheduler.objectFlagBuildTransform }; effectLog.append(.init(objectID: id, output: output)); return true }
+    func remove(_ id: SM64ObjectID) { states.removeValue(forKey: id) }
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) { for id in unloaded { remove(id) }; for id in registeredIDs where pool.record(for: id) == nil { remove(id) } }
+}

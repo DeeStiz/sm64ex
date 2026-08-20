@@ -1,4 +1,6 @@
 #include <ultra64.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "sm64.h"
 #include "engine/math_util.h"
@@ -9,6 +11,17 @@
 #include "interaction.h"
 #include "mario_step.h"
 #include "pc/sm64_modern_timebase.h"
+#include "pc/sm64_modern_gameplay_migration.h"
+#include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_mario_ground_step_migration.h"
+#include "pc/sm64_modern_mario_air_step_migration.h"
+#include "pc/sm64_modern_mario_bonk_migration.h"
+#include "pc/sm64_modern_mario_terrain_migration.h"
+#include "pc/sm64_modern_mario_quicksand_migration.h"
+#include "pc/sm64_modern_mario_steep_push_migration.h"
+#include "pc/sm64_modern_mario_velocity_derivation_migration.h"
+#include "pc/sm64_modern_mario_gravity_migration.h"
+#include "pc/sm64_modern_mario_vertical_wind_migration.h"
 
 static s16 sMovingSandSpeeds[] = { 12, 8, 4, 0 };
 
@@ -87,7 +100,56 @@ BAD_RETURN(s32) init_bully_collision_data(struct BullyCollisionData *data, f32 p
     data->velZ = forwardVel * coss(yaw);
 }
 
+static s32 try_sm64_modern_mario_bonk(struct MarioState *m, u32 negateSpeed) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_BONK") == NULL || !m) {
+        return -1;
+    }
+
+    SM64ModernMarioBonkInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.face_yaw = m->faceAngle[1];
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.velocity_x_bits = sm64_modern_gameplay_float_bits(m->vel[0]);
+    input.velocity_z_bits = sm64_modern_gameplay_float_bits(m->vel[2]);
+    input.wall_present = m->wall != NULL;
+    input.wall_angle = m->wall != NULL
+        ? atan2s(m->wall->normal.z, m->wall->normal.x) : 0;
+    input.negate_speed = negateSpeed != 0;
+    input.metal_cap = (m->flags & MARIO_METAL_CAP) != 0;
+
+    SM64ModernMarioBonkOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_bonk(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->faceAngle[1] = (s16) output.face_yaw;
+    m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    m->slideVelX = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->slideVelZ = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    m->vel[0] = m->slideVelX;
+    m->vel[2] = m->slideVelZ;
+    switch (output.sound_kind) {
+        case SM64_MODERN_MARIO_BONK_SOUND_METAL_BONK:
+            play_sound(SOUND_ACTION_METAL_BONK, m->marioObj->header.gfx.cameraToObject);
+            break;
+        case SM64_MODERN_MARIO_BONK_SOUND_BONK:
+            play_sound(SOUND_ACTION_BONK, m->marioObj->header.gfx.cameraToObject);
+            break;
+        default:
+            play_sound(SOUND_ACTION_HIT, m->marioObj->header.gfx.cameraToObject);
+            break;
+    }
+    return 0;
+}
+
 void mario_bonk_reflection(struct MarioState *m, u32 negateSpeed) {
+    if (try_sm64_modern_mario_bonk(m, negateSpeed) == 0) {
+        return;
+    }
+
     if (m->wall != NULL) {
         s16 wallAngle = atan2s(m->wall->normal.z, m->wall->normal.x);
         m->faceAngle[1] = wallAngle - (s16)(m->faceAngle[1] - wallAngle);
@@ -105,7 +167,46 @@ void mario_bonk_reflection(struct MarioState *m, u32 negateSpeed) {
     }
 }
 
+static s32 try_sm64_modern_mario_quicksand(
+    struct MarioState *m,
+    f32 sinkingSpeed) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_QUICKSAND") == NULL
+        || !m || !m->floor) {
+        return -1;
+    }
+
+    SM64ModernMarioQuicksandInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.floor_type = m->floor->type;
+    input.riding_shell = (m->action & ACT_FLAG_RIDING_SHELL) != 0;
+    input.quicksand_depth_bits = sm64_modern_gameplay_float_bits(m->quicksandDepth);
+    input.sinking_speed_bits = sm64_modern_gameplay_float_bits(sinkingSpeed);
+
+    SM64ModernMarioQuicksandOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_quicksand(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->quicksandDepth = sm64_modern_gameplay_float_from_bits(output.quicksand_depth_bits);
+    if (output.action != 0) {
+        if (output.update_sound_camera != 0) {
+            update_mario_sound_and_camera(m);
+        }
+        return (s32) drop_and_set_mario_action(
+            m, output.action, output.action_argument);
+    }
+    return 0;
+}
+
 u32 mario_update_quicksand(struct MarioState *m, f32 sinkingSpeed) {
+    const s32 swiftResult = try_sm64_modern_mario_quicksand(m, sinkingSpeed);
+    if (swiftResult >= 0) {
+        return (u32) swiftResult;
+    }
+
     if (m->action & ACT_FLAG_RIDING_SHELL) {
         m->quicksandDepth = 0.0f;
     } else {
@@ -156,7 +257,41 @@ u32 mario_update_quicksand(struct MarioState *m, f32 sinkingSpeed) {
     return 0;
 }
 
+static s32 try_sm64_modern_mario_steep_push(
+    struct MarioState *m,
+    u32 action,
+    u32 actionArg) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_STEEP_PUSH") == NULL
+        || !m) {
+        return -1;
+    }
+
+    SM64ModernMarioSteepPushInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.floor_angle = m->floorAngle;
+    input.face_yaw = m->faceAngle[1];
+    input.action = action;
+    input.action_argument = actionArg;
+
+    SM64ModernMarioSteepPushOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_steep_push(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    m->faceAngle[1] = (s16) output.face_yaw;
+    return (s32) set_mario_action(m, output.action, output.action_argument);
+}
+
 u32 mario_push_off_steep_floor(struct MarioState *m, u32 action, u32 actionArg) {
+    const s32 swiftResult = try_sm64_modern_mario_steep_push(m, action, actionArg);
+    if (swiftResult >= 0) {
+        return (u32) swiftResult;
+    }
+
     s16 floorDYaw = m->floorAngle - m->faceAngle[1];
 
     if (floorDYaw > -0x4000 && floorDYaw < 0x4000) {
@@ -170,7 +305,46 @@ u32 mario_push_off_steep_floor(struct MarioState *m, u32 action, u32 actionArg) 
     return set_mario_action(m, action, actionArg);
 }
 
+static s32 try_sm64_modern_mario_terrain_impulse(
+    struct MarioState *m,
+    SM64ModernMarioTerrainImpulseFamily family) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_TERRAIN") == NULL
+        || !m || !m->floor) {
+        return -1;
+    }
+
+    SM64ModernMarioTerrainImpulseInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.family = family;
+    input.floor_type = m->floor->type;
+    input.force = m->floor->force;
+    input.moving_action = (m->action & ACT_FLAG_MOVING) != 0;
+    input.face_yaw = m->faceAngle[1];
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.global_timer = gGlobalTimer;
+    input.velocity_x_bits = sm64_modern_gameplay_float_bits(m->vel[0]);
+    input.velocity_z_bits = sm64_modern_gameplay_float_bits(m->vel[2]);
+
+    SM64ModernMarioTerrainImpulseOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_terrain_impulse(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->vel[0] = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->vel[2] = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    return output.applied != 0;
+}
+
 u32 mario_update_moving_sand(struct MarioState *m) {
+    const s32 swiftResult = try_sm64_modern_mario_terrain_impulse(
+        m, SM64_MODERN_MARIO_TERRAIN_IMPULSE_MOVING_SAND);
+    if (swiftResult >= 0) {
+        return (u32) swiftResult;
+    }
+
     struct Surface *floor = m->floor;
     s32 floorType = floor->type;
 
@@ -189,6 +363,17 @@ u32 mario_update_moving_sand(struct MarioState *m) {
 }
 
 u32 mario_update_windy_ground(struct MarioState *m) {
+    const s32 swiftResult = try_sm64_modern_mario_terrain_impulse(
+        m, SM64_MODERN_MARIO_TERRAIN_IMPULSE_HORIZONTAL_WIND);
+    if (swiftResult >= 0) {
+#if VERSION_JP
+        if (swiftResult != 0) {
+            play_sound(SOUND_ENV_WIND2, m->marioObj->header.gfx.cameraToObject);
+        }
+#endif
+        return (u32) swiftResult;
+    }
+
     struct Surface *floor = m->floor;
 
     if (floor->type == SURFACE_HORIZONTAL_WIND) {
@@ -256,7 +441,35 @@ s32 stationary_ground_step(struct MarioState *m) {
     return stepResult;
 }
 
-static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
+static void fill_sm64_modern_ground_probe(
+    SM64ModernMarioGroundQuarterProbeV1 *probe,
+    struct Surface *floor,
+    f32 floorHeight,
+    f32 ceilHeight,
+    f32 waterLevel,
+    struct Surface *upperWall) {
+    if (!probe) return;
+    memset(probe, 0, sizeof(*probe));
+    probe->floor.present = floor != NULL;
+    probe->floor.surface_id = floor != NULL ? 1u : 0u;
+    probe->floor.height_bits = sm64_modern_gameplay_float_bits(floorHeight);
+    probe->floor.normal_y_bits = sm64_modern_gameplay_float_bits(
+        floor != NULL ? floor->normal.y : 1.0f);
+    probe->ceiling_height_bits = sm64_modern_gameplay_float_bits(ceilHeight);
+    probe->water_level_bits = sm64_modern_gameplay_float_bits(waterLevel);
+    probe->upper_wall.present = upperWall != NULL;
+    probe->upper_wall.surface_id = upperWall != NULL ? 1u : 0u;
+    if (upperWall != NULL) {
+        probe->upper_wall.normal_x_bits = sm64_modern_gameplay_float_bits(upperWall->normal.x);
+        probe->upper_wall.normal_z_bits = sm64_modern_gameplay_float_bits(upperWall->normal.z);
+        probe->upper_wall.wall_angle = atan2s(upperWall->normal.z, upperWall->normal.x);
+    }
+}
+
+static s32 perform_ground_quarter_step(
+    struct MarioState *m,
+    Vec3f nextPos,
+    SM64ModernMarioGroundQuarterProbeV1 *probe) {
     UNUSED struct Surface *lowerWall;
     struct Surface *upperWall;
     struct Surface *ceil;
@@ -275,6 +488,9 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
 
     m->wall = upperWall;
 
+    fill_sm64_modern_ground_probe(
+        probe, floor, floorHeight, ceilHeight, waterLevel, upperWall);
+
     if (floor == NULL) {
         return GROUND_STEP_HIT_WALL_STOP_QSTEPS;
     }
@@ -283,6 +499,8 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
         floorHeight = waterLevel;
         floor = &gWaterSurfacePseudoFloor;
         floor->originOffset = floorHeight; //! Wrong origin offset (no effect)
+        fill_sm64_modern_ground_probe(
+            probe, floor, floorHeight, ceilHeight, waterLevel, upperWall);
     }
 
     if (nextPos[1] > floorHeight + 100.0f) {
@@ -320,18 +538,94 @@ static s32 perform_ground_quarter_step(struct MarioState *m, Vec3f nextPos) {
     return GROUND_STEP_NONE;
 }
 
+static s32 try_sm64_modern_ground_step(struct MarioState *m, f32 nativeStepScale) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_GROUND_STEP") == NULL || !m || !m->floor) {
+        return -1;
+    }
+
+    SM64ModernMarioGroundStepInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.position_x_bits = sm64_modern_gameplay_float_bits(m->pos[0]);
+    input.position_y_bits = sm64_modern_gameplay_float_bits(m->pos[1]);
+    input.position_z_bits = sm64_modern_gameplay_float_bits(m->pos[2]);
+    input.velocity_x_bits = sm64_modern_gameplay_float_bits(m->vel[0]);
+    input.velocity_y_bits = sm64_modern_gameplay_float_bits(m->vel[1]);
+    input.velocity_z_bits = sm64_modern_gameplay_float_bits(m->vel[2]);
+    input.floor.present = 1;
+    input.floor.surface_id = 1;
+    input.floor.height_bits = sm64_modern_gameplay_float_bits(m->floorHeight);
+    input.floor.normal_y_bits = sm64_modern_gameplay_float_bits(m->floor->normal.y);
+    input.face_yaw = m->faceAngle[1];
+    input.native_step_scale_bits = sm64_modern_gameplay_float_bits(nativeStepScale);
+    input.riding_shell = (m->action & ACT_FLAG_RIDING_SHELL) != 0;
+    input.terrain_sound_addend = mario_get_terrain_sound_addend(m);
+
+    struct MarioState probeState = *m;
+    for (unsigned index = 0; index < 4; ++index) {
+        Vec3f intendedPos;
+        intendedPos[0] = probeState.pos[0]
+            + probeState.floor->normal.y * (probeState.vel[0] * nativeStepScale / 4.0f);
+        intendedPos[1] = probeState.pos[1];
+        intendedPos[2] = probeState.pos[2]
+            + probeState.floor->normal.y * (probeState.vel[2] * nativeStepScale / 4.0f);
+        const s32 result = perform_ground_quarter_step(
+            &probeState, intendedPos, &input.quarter_probes[index]);
+        if (result == GROUND_STEP_LEFT_GROUND
+            || result == GROUND_STEP_HIT_WALL_STOP_QSTEPS) {
+            for (unsigned remaining = index + 1; remaining < 4; ++remaining) {
+                memset(&input.quarter_probes[remaining], 0,
+                       sizeof(input.quarter_probes[remaining]));
+                input.quarter_probes[remaining].ceiling_height_bits =
+                    sm64_modern_gameplay_float_bits(probeState.ceilHeight);
+                input.quarter_probes[remaining].water_level_bits =
+                    sm64_modern_gameplay_float_bits((f32) probeState.waterLevel);
+            }
+            break;
+        }
+    }
+
+    SM64ModernMarioGroundStepOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_ground_step(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->pos[0] = sm64_modern_gameplay_float_from_bits(output.position_x_bits);
+    m->pos[1] = sm64_modern_gameplay_float_from_bits(output.position_y_bits);
+    m->pos[2] = sm64_modern_gameplay_float_from_bits(output.position_z_bits);
+    m->floorHeight = sm64_modern_gameplay_float_from_bits(output.floor.height_bits);
+    if (output.floor.present == 0) {
+        m->floor = &gWaterSurfacePseudoFloor;
+        m->floor->originOffset = m->floorHeight;
+    } else if (probeState.floor != NULL) {
+        m->floor = probeState.floor;
+    }
+    m->wall = output.wall_present != 0 ? probeState.wall : NULL;
+    m->terrainSoundAddend = output.terrain_sound_addend;
+    vec3f_copy(m->marioObj->header.gfx.pos, m->pos);
+    vec3s_set(m->marioObj->header.gfx.angle, 0, m->faceAngle[1], 0);
+    return (s32) output.result;
+}
+
 s32 perform_ground_step(struct MarioState *m) {
     s32 i;
     u32 stepResult;
     Vec3f intendedPos;
     const f32 nativeStepScale = sm64_modern_timebase_native_step_scale();
 
+    const s32 swiftResult = try_sm64_modern_ground_step(m, nativeStepScale);
+    if (swiftResult >= 0) {
+        return swiftResult;
+    }
+
     for (i = 0; i < 4; i++) {
         intendedPos[0] = m->pos[0] + m->floor->normal.y * (m->vel[0] * nativeStepScale / 4.0f);
         intendedPos[2] = m->pos[2] + m->floor->normal.y * (m->vel[2] * nativeStepScale / 4.0f);
         intendedPos[1] = m->pos[1];
 
-        stepResult = perform_ground_quarter_step(m, intendedPos);
+        stepResult = perform_ground_quarter_step(m, intendedPos, NULL);
         if (stepResult == GROUND_STEP_LEFT_GROUND || stepResult == GROUND_STEP_HIT_WALL_STOP_QSTEPS) {
             break;
         }
@@ -387,7 +681,65 @@ u32 check_ledge_grab(struct MarioState *m, struct Surface *wall, Vec3f intendedP
     return 1;
 }
 
-s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepArg) {
+static void fill_sm64_modern_air_wall_probe(
+    SM64ModernMarioAirWallProbeV1 *probe,
+    struct Surface *wall) {
+    if (!probe) return;
+    memset(probe, 0, sizeof(*probe));
+    probe->present = wall != NULL;
+    probe->surface_id = wall != NULL ? 1u : 0u;
+    probe->surface_type = wall != NULL ? wall->type : 0u;
+    if (wall != NULL) {
+        probe->normal_x_bits = sm64_modern_gameplay_float_bits(wall->normal.x);
+        probe->normal_z_bits = sm64_modern_gameplay_float_bits(wall->normal.z);
+        probe->wall_angle = atan2s(wall->normal.z, wall->normal.x);
+    }
+}
+
+static void fill_sm64_modern_air_probe(
+    SM64ModernMarioAirQuarterProbeV1 *probe,
+    struct Surface *floor,
+    f32 floorHeight,
+    f32 ceilHeight,
+    f32 waterLevel,
+    struct Surface *upperWall,
+    struct Surface *lowerWall,
+    struct Surface *ledgeFloor,
+    f32 ledgeFloorHeight,
+    Vec3f ledgePos,
+    u32 ledgePresent) {
+    if (!probe) return;
+    memset(probe, 0, sizeof(*probe));
+    probe->floor.present = floor != NULL;
+    probe->floor.surface_id = floor != NULL ? 1u : 0u;
+    probe->floor.height_bits = sm64_modern_gameplay_float_bits(
+        floor != NULL ? floorHeight : 0.0f);
+    probe->floor.normal_y_bits = sm64_modern_gameplay_float_bits(
+        floor != NULL ? floor->normal.y : 1.0f);
+    probe->ceiling_height_bits = sm64_modern_gameplay_float_bits(ceilHeight);
+    probe->water_level_bits = sm64_modern_gameplay_float_bits(waterLevel);
+    fill_sm64_modern_air_wall_probe(&probe->upper_wall, upperWall);
+    fill_sm64_modern_air_wall_probe(&probe->lower_wall, lowerWall);
+    probe->ledge_present = ledgePresent;
+    if (ledgeFloor != NULL) {
+        probe->ledge_floor.present = 1;
+        probe->ledge_floor.surface_id = 1u;
+        probe->ledge_floor.height_bits = sm64_modern_gameplay_float_bits(ledgeFloorHeight);
+        probe->ledge_floor.normal_y_bits = sm64_modern_gameplay_float_bits(ledgeFloor->normal.y);
+        probe->ledge_floor_angle = atan2s(ledgeFloor->normal.z, ledgeFloor->normal.x);
+    }
+    if (ledgePresent != 0) {
+        probe->ledge_position_x_bits = sm64_modern_gameplay_float_bits(ledgePos[0]);
+        probe->ledge_position_y_bits = sm64_modern_gameplay_float_bits(ledgePos[1]);
+        probe->ledge_position_z_bits = sm64_modern_gameplay_float_bits(ledgePos[2]);
+    }
+}
+
+s32 perform_air_quarter_step(
+    struct MarioState *m,
+    Vec3f intendedPos,
+    u32 stepArg,
+    SM64ModernMarioAirQuarterProbeV1 *probe) {
     s16 wallDYaw;
     Vec3f nextPos;
     struct Surface *upperWall;
@@ -410,6 +762,25 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
 
     m->wall = NULL;
 
+    if (probe != NULL) {
+        struct Surface *ledgeFloor = NULL;
+        Vec3f ledgePos = { 0.0f, 0.0f, 0.0f };
+        u32 ledgePresent = 0;
+        if ((stepArg & AIR_STEP_CHECK_LEDGE_GRAB) && upperWall == NULL && lowerWall != NULL) {
+            ledgePos[0] = nextPos[0] - lowerWall->normal.x * 60.0f;
+            ledgePos[2] = nextPos[2] - lowerWall->normal.z * 60.0f;
+            ledgePos[1] = find_floor(ledgePos[0], nextPos[1] + 160.0f, ledgePos[2], &ledgeFloor);
+            const f32 displacementX = nextPos[0] - intendedPos[0];
+            const f32 displacementZ = nextPos[2] - intendedPos[2];
+            ledgePresent = m->vel[1] <= 0.0f
+                && displacementX * m->vel[0] + displacementZ * m->vel[2] <= 0.0f
+                && ledgeFloor != NULL && ledgePos[1] - nextPos[1] > 100.0f;
+        }
+        fill_sm64_modern_air_probe(
+            probe, floor, floorHeight, ceilHeight, waterLevel, upperWall, lowerWall,
+            ledgePresent != 0 ? ledgeFloor : NULL, ledgePos[1], ledgePos, ledgePresent);
+    }
+
     //! The water pseudo floor is not referenced when your intended qstep is
     // out of bounds, so it won't detect you as landing.
 
@@ -427,6 +798,24 @@ s32 perform_air_quarter_step(struct MarioState *m, Vec3f intendedPos, u32 stepAr
         floorHeight = waterLevel;
         floor = &gWaterSurfacePseudoFloor;
         floor->originOffset = floorHeight; //! Incorrect origin offset (no effect)
+        if (probe != NULL) {
+            struct Surface *ledgeFloor = NULL;
+            Vec3f ledgePos = { 0.0f, 0.0f, 0.0f };
+            u32 ledgePresent = 0;
+            if ((stepArg & AIR_STEP_CHECK_LEDGE_GRAB) && upperWall == NULL && lowerWall != NULL) {
+                ledgePos[0] = nextPos[0] - lowerWall->normal.x * 60.0f;
+                ledgePos[2] = nextPos[2] - lowerWall->normal.z * 60.0f;
+                ledgePos[1] = find_floor(ledgePos[0], nextPos[1] + 160.0f, ledgePos[2], &ledgeFloor);
+                const f32 displacementX = nextPos[0] - intendedPos[0];
+                const f32 displacementZ = nextPos[2] - intendedPos[2];
+                ledgePresent = m->vel[1] <= 0.0f
+                    && displacementX * m->vel[0] + displacementZ * m->vel[2] <= 0.0f
+                    && ledgeFloor != NULL && ledgePos[1] - nextPos[1] > 100.0f;
+            }
+            fill_sm64_modern_air_probe(
+                probe, floor, floorHeight, ceilHeight, waterLevel, upperWall, lowerWall,
+                ledgePresent != 0 ? ledgeFloor : NULL, ledgePos[1], ledgePos, ledgePresent);
+        }
     }
 
     //! This check uses f32, but findFloor uses short (overflow jumps)
@@ -518,6 +907,35 @@ void apply_twirl_gravity(struct MarioState *m) {
     }
 }
 
+static s32 try_sm64_modern_mario_gravity(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_GRAVITY") == NULL || !m) {
+        return -1;
+    }
+
+    SM64ModernMarioGravityInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.action = m->action;
+    input.mario_flags = m->flags;
+    input.input = m->input;
+    input.angle_velocity_y = m->angleVel[1];
+    input.velocity_y_bits = sm64_modern_gameplay_float_bits(m->vel[1]);
+    input.unk_c4_bits = sm64_modern_gameplay_float_bits(m->unkC4);
+
+    SM64ModernMarioGravityOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_gravity(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    if (output.wing_flutter != 0 && m->marioBodyState != NULL) {
+        m->marioBodyState->wingFlutter = TRUE;
+    }
+    return 0;
+}
+
 u32 should_strengthen_gravity_for_jump_ascent(struct MarioState *m) {
     if (!(m->flags & MARIO_UNKNOWN_08)) {
         return FALSE;
@@ -535,6 +953,10 @@ u32 should_strengthen_gravity_for_jump_ascent(struct MarioState *m) {
 }
 
 void apply_gravity(struct MarioState *m) {
+    if (try_sm64_modern_mario_gravity(m) == 0) {
+        return;
+    }
+
     if (m->action == ACT_TWIRLING && m->vel[1] < 0.0f) {
         apply_twirl_gravity(m);
     } else if (m->action == ACT_SHOT_FROM_CANNON) {
@@ -583,6 +1005,31 @@ void apply_gravity(struct MarioState *m) {
 }
 
 void apply_vertical_wind(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_VERTICAL_WIND") != NULL
+        && m != NULL && m->floor != NULL) {
+        SM64ModernMarioVerticalWindInputV1 input;
+        memset(&input, 0, sizeof(input));
+        input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+        input.header.struct_size = sizeof(input);
+        input.simulation_tick = sm64_modern_parity_simulation_tick();
+        input.action = m->action;
+        input.floor_type = m->floor->type;
+        input.position_y_bits = sm64_modern_gameplay_float_bits(m->pos[1]);
+        input.velocity_y_bits = sm64_modern_gameplay_float_bits(m->vel[1]);
+
+        SM64ModernMarioVerticalWindOutputV1 output;
+        if (sm64_modern_gameplay_update_mario_vertical_wind(&input, &output)
+            == SM64_MODERN_STATUS_OK) {
+            m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+#ifdef VERSION_JP
+            if (output.active != 0) {
+                play_sound(SOUND_ENV_WIND2, m->marioObj->header.gfx.cameraToObject);
+            }
+#endif
+            return;
+        }
+    }
+
     f32 maxVelY;
     f32 offsetY;
 
@@ -609,6 +1056,84 @@ void apply_vertical_wind(struct MarioState *m) {
     }
 }
 
+static s32 try_sm64_modern_air_step(struct MarioState *m, u32 stepArg, f32 nativeStepScale) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_AIR_STEP") == NULL || !m || !m->floor) {
+        return -1;
+    }
+
+    SM64ModernMarioAirStepInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.position_x_bits = sm64_modern_gameplay_float_bits(m->pos[0]);
+    input.position_y_bits = sm64_modern_gameplay_float_bits(m->pos[1]);
+    input.position_z_bits = sm64_modern_gameplay_float_bits(m->pos[2]);
+    input.velocity_x_bits = sm64_modern_gameplay_float_bits(m->vel[0]);
+    input.velocity_y_bits = sm64_modern_gameplay_float_bits(m->vel[1]);
+    input.velocity_z_bits = sm64_modern_gameplay_float_bits(m->vel[2]);
+    input.floor.present = 1;
+    input.floor.surface_id = 1;
+    input.floor.height_bits = sm64_modern_gameplay_float_bits(m->floorHeight);
+    input.floor.normal_y_bits = sm64_modern_gameplay_float_bits(m->floor->normal.y);
+    input.face_pitch = m->faceAngle[0];
+    input.face_yaw = m->faceAngle[1];
+    input.face_roll = m->faceAngle[2];
+    input.floor_angle = m->floorAngle;
+    input.action = m->action;
+    input.step_arg = stepArg;
+    input.native_step_scale_bits = sm64_modern_gameplay_float_bits(nativeStepScale);
+    input.riding_shell = (m->action & ACT_FLAG_RIDING_SHELL) != 0;
+    input.ceil_present = m->ceil != NULL;
+    input.ceil_type = m->ceil != NULL ? m->ceil->type : 0;
+
+    struct MarioState probeState = *m;
+    probeState.wall = NULL;
+    for (unsigned index = 0; index < 4; ++index) {
+        Vec3f intendedPos;
+        intendedPos[0] = probeState.pos[0]
+            + probeState.vel[0] * nativeStepScale / 4.0f;
+        intendedPos[1] = probeState.pos[1]
+            + probeState.vel[1] * nativeStepScale / 4.0f;
+        intendedPos[2] = probeState.pos[2]
+            + probeState.vel[2] * nativeStepScale / 4.0f;
+
+        const s32 quarterStepResult = perform_air_quarter_step(
+            &probeState, intendedPos, stepArg,
+            &input.quarter_probes[index]);
+        if (quarterStepResult == AIR_STEP_LANDED
+            || quarterStepResult == AIR_STEP_GRABBED_LEDGE
+            || quarterStepResult == AIR_STEP_GRABBED_CEILING
+            || quarterStepResult == AIR_STEP_HIT_LAVA_WALL) {
+            break;
+        }
+    }
+
+    SM64ModernMarioAirStepOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_air_step(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->pos[0] = sm64_modern_gameplay_float_from_bits(output.position_x_bits);
+    m->pos[1] = sm64_modern_gameplay_float_from_bits(output.position_y_bits);
+    m->pos[2] = sm64_modern_gameplay_float_from_bits(output.position_z_bits);
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    m->floorHeight = sm64_modern_gameplay_float_from_bits(output.floor.height_bits);
+    if (output.floor.present == 0) {
+        m->floor = &gWaterSurfacePseudoFloor;
+        m->floor->originOffset = m->floorHeight;
+    } else if (probeState.floor != NULL) {
+        m->floor = probeState.floor;
+    }
+    m->wall = output.wall.present != 0 ? probeState.wall : NULL;
+    m->flags |= output.flags_or;
+    m->faceAngle[0] = (s16) output.face_pitch;
+    m->faceAngle[1] = (s16) output.face_yaw;
+    m->faceAngle[2] = (s16) output.face_roll;
+    m->floorAngle = (s16) output.floor_angle;
+    return (s32) output.result;
+}
+
 s32 perform_air_step(struct MarioState *m, u32 stepArg) {
     Vec3f intendedPos;
     s32 i;
@@ -618,12 +1143,18 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
 
     m->wall = NULL;
 
+    const s32 swiftResult = try_sm64_modern_air_step(m, stepArg, nativeStepScale);
+    if (swiftResult >= 0) {
+        stepResult = swiftResult;
+        goto perform_air_step_post_collision;
+    }
+
     for (i = 0; i < 4; i++) {
         intendedPos[0] = m->pos[0] + m->vel[0] * nativeStepScale / 4.0f;
         intendedPos[1] = m->pos[1] + m->vel[1] * nativeStepScale / 4.0f;
         intendedPos[2] = m->pos[2] + m->vel[2] * nativeStepScale / 4.0f;
 
-        quarterStepResult = perform_air_quarter_step(m, intendedPos, stepArg);
+        quarterStepResult = perform_air_quarter_step(m, intendedPos, stepArg, NULL);
 
         //! On one qf, hit OOB/ceil/wall to store the 2 return value, and continue
         // getting 0s until your last qf. Graze a wall on your last qf, and it will
@@ -640,6 +1171,7 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
         }
     }
 
+perform_air_step_post_collision:
     if (m->vel[1] >= 0.0f) {
         m->peakHeight = m->pos[1];
     }
@@ -659,13 +1191,52 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
 
 // They had these functions the whole time and never used them? Lol
 
+static s32 try_sm64_modern_mario_velocity_derivation(
+    struct MarioState *m,
+    SM64ModernMarioVelocityDerivationFamily family) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_VELOCITY_DERIVATION") == NULL
+        || !m) {
+        return -1;
+    }
+    SM64ModernMarioVelocityDerivationInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.family = family;
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.face_pitch = m->faceAngle[0];
+    input.face_yaw = m->faceAngle[1];
+    SM64ModernMarioVelocityDerivationOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_velocity_derivation(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->vel[0] = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    m->vel[2] = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    if (family == SM64_MODERN_MARIO_VELOCITY_FROM_YAW) {
+        m->slideVelX = sm64_modern_gameplay_float_from_bits(output.slide_velocity_x_bits);
+        m->slideVelZ = sm64_modern_gameplay_float_from_bits(output.slide_velocity_z_bits);
+    }
+    return 0;
+}
+
 void set_vel_from_pitch_and_yaw(struct MarioState *m) {
+    if (try_sm64_modern_mario_velocity_derivation(
+            m, SM64_MODERN_MARIO_VELOCITY_FROM_PITCH_YAW) == 0) {
+        return;
+    }
     m->vel[0] = m->forwardVel * coss(m->faceAngle[0]) * sins(m->faceAngle[1]);
     m->vel[1] = m->forwardVel * sins(m->faceAngle[0]);
     m->vel[2] = m->forwardVel * coss(m->faceAngle[0]) * coss(m->faceAngle[1]);
 }
 
 void set_vel_from_yaw(struct MarioState *m) {
+    if (try_sm64_modern_mario_velocity_derivation(
+            m, SM64_MODERN_MARIO_VELOCITY_FROM_YAW) == 0) {
+        return;
+    }
     m->vel[0] = m->slideVelX = m->forwardVel * sins(m->faceAngle[1]);
     m->vel[1] = 0.0f;
     m->vel[2] = m->slideVelZ = m->forwardVel * coss(m->faceAngle[1]);

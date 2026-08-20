@@ -1,0 +1,5 @@
+import Foundation
+private let offset: UInt64 = 1_469_598_103_934_665_603
+private let prime: UInt64 = 1_099_511_628_211
+private func hash(_ seed: UInt64, _ value: UInt64) -> UInt64 { var result = seed; for byte in 0..<8 { result ^= (value >> UInt64(byte * 8)) & 255; result &*= prime }; return result }
+@main struct SM64BetaBowserAnchorSmoke { static func main() { let output = SM64BetaBowserAnchorBehavior.update(.init(marioPosition: .init(x: 1, y: 2, z: 3), marioYaw: 0, debugRadius: 20, debugHeight: 40)); precondition(output.position == .init(x: 1, y: 32, z: 303) && output.hitboxRadius == 120 && output.hitboxHeight == 340 && output.attackCollidedObjects, "beta anchor placement"); var f=offset; f=hash(f,UInt64(output.position.x.bitPattern)); f=hash(f,UInt64(output.position.y.bitPattern)); f=hash(f,UInt64(output.position.z.bitPattern)); f=hash(f,UInt64(output.hitboxRadius.bitPattern)); f=hash(f,UInt64(output.hitboxHeight.bitPattern)); f=hash(f,UInt64(output.attackCollidedObjects ? 1:0)); print(String(format:"betaBowserAnchorFingerprint=0x%016llx",f)); print("SM64 Modern beta-Bowser-anchor smoke passed") } }

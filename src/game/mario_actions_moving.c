@@ -1,4 +1,5 @@
 #include <PR/ultratypes.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "sm64.h"
@@ -17,6 +18,20 @@
 #include "pc/cheats.h"
 #include "pc/sm64_modern_gameplay_migration.h"
 #include "pc/sm64_modern_timebase.h"
+#include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_mario_wall_response_migration.h"
+#include "pc/sm64_modern_mario_walk_animation_migration.h"
+#include "pc/sm64_modern_mario_held_walk_animation_migration.h"
+#include "pc/sm64_modern_mario_slope_acceleration_migration.h"
+#include "pc/sm64_modern_mario_slope_deceleration_migration.h"
+#include "pc/sm64_modern_mario_decelerating_speed_migration.h"
+#include "pc/sm64_modern_mario_shell_speed_migration.h"
+#include "pc/sm64_modern_mario_landing_acceleration_migration.h"
+#include "pc/sm64_modern_mario_sliding_migration.h"
+#include "pc/sm64_modern_mario_ground_dive_punch_migration.h"
+#include "pc/sm64_modern_mario_slide_predicates_migration.h"
+#include "pc/sm64_modern_mario_begin_braking_migration.h"
+#include "pc/sm64_modern_mario_triple_jump_selector_migration.h"
 
 struct LandingAction {
     s16 numFrames;
@@ -151,7 +166,31 @@ void slide_bonk(struct MarioState *m, u32 fastAction, u32 slowAction) {
     }
 }
 
+static s32 try_sm64_modern_mario_triple_jump_selector(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_TRIPLE_JUMP") == NULL || !m) {
+        return -1;
+    }
+    SM64ModernMarioTripleJumpSelectorInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.mario_flags = m->flags;
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+
+    SM64ModernMarioTripleJumpSelectorOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_triple_jump_selector(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    return set_mario_action(m, output.action, output.action_argument);
+}
+
 s32 set_triple_jump_action(struct MarioState *m, UNUSED u32 action, UNUSED u32 actionArg) {
+    const s32 swiftResult = try_sm64_modern_mario_triple_jump_selector(m);
+    if (swiftResult >= 0) {
+        return swiftResult;
+    }
     if (m->flags & MARIO_WING_CAP) {
         return set_mario_action(m, ACT_FLYING_TRIPLE_JUMP, 0);
     } else if (m->forwardVel > 20.0f) {
@@ -223,7 +262,54 @@ void update_sliding_angle(struct MarioState *m, f32 accel, f32 lossFactor) {
     }
 }
 
+static s32 try_sm64_modern_mario_sliding(struct MarioState *m, f32 stopSpeed) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_SLIDING") == NULL
+        || !m || !m->floor) {
+        return -1;
+    }
+    SM64ModernMarioSlidingInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.floor_class = mario_get_floor_class(m);
+    input.floor_is_slope = mario_floor_is_slope(m);
+    input.floor_normal_x_bits = sm64_modern_gameplay_float_bits(m->floor->normal.x);
+    input.floor_normal_y_bits = sm64_modern_gameplay_float_bits(m->floor->normal.y);
+    input.floor_normal_z_bits = sm64_modern_gameplay_float_bits(m->floor->normal.z);
+    input.intended_yaw = m->intendedYaw;
+    input.intended_magnitude_bits = sm64_modern_gameplay_float_bits(m->intendedMag);
+    input.face_yaw = m->faceAngle[1];
+    input.slide_yaw = m->slideYaw;
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.slide_velocity_x_bits = sm64_modern_gameplay_float_bits(m->slideVelX);
+    input.slide_velocity_z_bits = sm64_modern_gameplay_float_bits(m->slideVelZ);
+    input.stop_speed_bits = sm64_modern_gameplay_float_bits(stopSpeed);
+
+    SM64ModernMarioSlidingOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_sliding(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->faceAngle[1] = (s16) output.face_yaw;
+    m->slideYaw = (s16) output.slide_yaw;
+    m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    m->slideVelX = sm64_modern_gameplay_float_from_bits(output.slide_velocity_x_bits);
+    m->slideVelZ = sm64_modern_gameplay_float_from_bits(output.slide_velocity_z_bits);
+    m->vel[0] = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    m->vel[2] = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    if (output.update_moving_sand != 0) mario_update_moving_sand(m);
+    if (output.update_windy_ground != 0) mario_update_windy_ground(m);
+    return output.stopped != 0 ? TRUE : FALSE;
+}
+
 s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
+    const s32 swiftResult = try_sm64_modern_mario_sliding(m, stopSpeed);
+    if (swiftResult >= 0) {
+        return swiftResult;
+    }
+
     f32 lossFactor;
     f32 accel;
     f32 oldSpeed;
@@ -287,7 +373,51 @@ s32 update_sliding(struct MarioState *m, f32 stopSpeed) {
     return stopped;
 }
 
+static s32 try_sm64_modern_slope_acceleration(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_SLOPE_ACCEL") == NULL
+        || !m || !m->floor) {
+        return -1;
+    }
+    SM64ModernMarioSlopeAccelerationInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.floor_class = mario_get_floor_class(m);
+    input.terrain_is_slide = (m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE;
+    input.floor_normal_x_bits = sm64_modern_gameplay_float_bits(m->floor->normal.x);
+    input.floor_normal_y_bits = sm64_modern_gameplay_float_bits(m->floor->normal.y);
+    input.floor_normal_z_bits = sm64_modern_gameplay_float_bits(m->floor->normal.z);
+    input.floor_angle = m->floorAngle;
+    input.face_yaw = m->faceAngle[1];
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.action = m->action;
+
+    SM64ModernMarioSlopeAccelerationOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_slope_acceleration(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    m->slideYaw = (s16) output.slide_yaw;
+    m->slideVelX = sm64_modern_gameplay_float_from_bits(output.slide_velocity_x_bits);
+    m->slideVelZ = sm64_modern_gameplay_float_from_bits(output.slide_velocity_z_bits);
+    m->vel[0] = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    m->vel[2] = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    if (output.update_moving_sand != 0) {
+        mario_update_moving_sand(m);
+    }
+    if (output.update_windy_ground != 0) {
+        mario_update_windy_ground(m);
+    }
+    return 0;
+}
+
 void apply_slope_accel(struct MarioState *m) {
+    if (try_sm64_modern_slope_acceleration(m) == 0) {
+        return;
+    }
     f32 slopeAccel;
 
     struct Surface *floor = m->floor;
@@ -338,7 +468,54 @@ void apply_slope_accel(struct MarioState *m) {
     mario_update_windy_ground(m);
 }
 
+static s32 try_sm64_modern_landing_acceleration(
+    struct MarioState *m, f32 frictionFactor) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_LANDING_ACCEL") == NULL
+        || !m || !m->floor) {
+        return -1;
+    }
+    SM64ModernMarioLandingAccelerationInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.friction_factor_bits = sm64_modern_gameplay_float_bits(frictionFactor);
+    input.floor_class = mario_get_floor_class(m);
+    input.terrain_is_slide = (m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE;
+    input.floor_normal_x_bits = sm64_modern_gameplay_float_bits(m->floor->normal.x);
+    input.floor_normal_y_bits = sm64_modern_gameplay_float_bits(m->floor->normal.y);
+    input.floor_normal_z_bits = sm64_modern_gameplay_float_bits(m->floor->normal.z);
+    input.floor_angle = m->floorAngle;
+    input.face_yaw = m->faceAngle[1];
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.action = m->action;
+
+    SM64ModernMarioLandingAccelerationOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_landing_acceleration(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    m->slideYaw = (s16) output.slide_yaw;
+    m->slideVelX = sm64_modern_gameplay_float_from_bits(output.slide_velocity_x_bits);
+    m->slideVelZ = sm64_modern_gameplay_float_from_bits(output.slide_velocity_z_bits);
+    m->vel[0] = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    m->vel[2] = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    if (output.update_moving_sand != 0) {
+        mario_update_moving_sand(m);
+    }
+    if (output.update_windy_ground != 0) {
+        mario_update_windy_ground(m);
+    }
+    return output.stopped != 0;
+}
+
 s32 apply_landing_accel(struct MarioState *m, f32 frictionFactor) {
+    const s32 swiftResult = try_sm64_modern_landing_acceleration(m, frictionFactor);
+    if (swiftResult >= 0) {
+        return swiftResult;
+    }
     s32 stopped = FALSE;
 
     apply_slope_accel(m);
@@ -354,6 +531,51 @@ s32 apply_landing_accel(struct MarioState *m, f32 frictionFactor) {
     return stopped;
 }
 
+static s32 try_sm64_modern_shell_speed(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_SHELL_SPEED") == NULL
+        || !m || !m->floor) {
+        return -1;
+    }
+    SM64ModernMarioShellSpeedInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.intended_magnitude_bits = sm64_modern_gameplay_float_bits(m->intendedMag);
+    input.intended_yaw = m->intendedYaw;
+    input.face_yaw = m->faceAngle[1];
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.floor_is_slow = m->floor->type == SURFACE_SLOW;
+    input.floor_normal_y_bits = sm64_modern_gameplay_float_bits(m->floor->normal.y);
+    input.floor_class = mario_get_floor_class(m);
+    input.terrain_is_slide = (m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE;
+    input.floor_normal_x_bits = sm64_modern_gameplay_float_bits(m->floor->normal.x);
+    input.floor_normal_z_bits = sm64_modern_gameplay_float_bits(m->floor->normal.z);
+    input.floor_angle = m->floorAngle;
+    input.action = m->action;
+
+    SM64ModernMarioShellSpeedOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_shell_speed(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    m->faceAngle[1] = (s16) output.face_yaw;
+    m->slideYaw = (s16) output.slide_yaw;
+    m->slideVelX = sm64_modern_gameplay_float_from_bits(output.slide_velocity_x_bits);
+    m->slideVelZ = sm64_modern_gameplay_float_from_bits(output.slide_velocity_z_bits);
+    m->vel[0] = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    m->vel[2] = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    if (output.update_moving_sand != 0) {
+        mario_update_moving_sand(m);
+    }
+    if (output.update_windy_ground != 0) {
+        mario_update_windy_ground(m);
+    }
+    return 0;
+}
+
 void update_shell_speed(struct MarioState *m) {
     f32 maxTargetSpeed;
     f32 targetSpeed;
@@ -362,6 +584,10 @@ void update_shell_speed(struct MarioState *m) {
         m->floorHeight = m->waterLevel;
         m->floor = &gWaterSurfacePseudoFloor;
         m->floor->originOffset = m->waterLevel; //! Negative origin offset
+    }
+
+    if (try_sm64_modern_shell_speed(m) == 0) {
+        return;
     }
 
     if (m->floor != NULL && m->floor->type == SURFACE_SLOW) {
@@ -397,7 +623,54 @@ void update_shell_speed(struct MarioState *m) {
     apply_slope_accel(m);
 }
 
+static s32 try_sm64_modern_slope_deceleration(
+    struct MarioState *m, f32 decelCoef) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_SLOPE_DECEL") == NULL
+        || !m || !m->floor || decelCoef != decelCoef) {
+        return -1;
+    }
+    SM64ModernMarioSlopeDecelerationInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.coefficient_bits = sm64_modern_gameplay_float_bits(decelCoef);
+    input.floor_class = mario_get_floor_class(m);
+    input.terrain_is_slide = (m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE;
+    input.floor_normal_x_bits = sm64_modern_gameplay_float_bits(m->floor->normal.x);
+    input.floor_normal_y_bits = sm64_modern_gameplay_float_bits(m->floor->normal.y);
+    input.floor_normal_z_bits = sm64_modern_gameplay_float_bits(m->floor->normal.z);
+    input.floor_angle = m->floorAngle;
+    input.face_yaw = m->faceAngle[1];
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.action = m->action;
+
+    SM64ModernMarioSlopeDecelerationOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_slope_deceleration(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    m->slideYaw = (s16) output.slide_yaw;
+    m->slideVelX = sm64_modern_gameplay_float_from_bits(output.slide_velocity_x_bits);
+    m->slideVelZ = sm64_modern_gameplay_float_from_bits(output.slide_velocity_z_bits);
+    m->vel[0] = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    m->vel[2] = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    if (output.update_moving_sand != 0) {
+        mario_update_moving_sand(m);
+    }
+    if (output.update_windy_ground != 0) {
+        mario_update_windy_ground(m);
+    }
+    return output.stopped != 0;
+}
+
 s32 apply_slope_decel(struct MarioState *m, f32 decelCoef) {
+    const s32 swiftResult = try_sm64_modern_slope_deceleration(m, decelCoef);
+    if (swiftResult >= 0) {
+        return swiftResult;
+    }
     f32 decel;
     s32 stopped = FALSE;
 
@@ -424,7 +697,45 @@ s32 apply_slope_decel(struct MarioState *m, f32 decelCoef) {
     return stopped;
 }
 
+static s32 try_sm64_modern_decelerating_speed(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_DECELERATING_SPEED") == NULL
+        || !m) {
+        return -1;
+    }
+    SM64ModernMarioDeceleratingSpeedInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.face_yaw = m->faceAngle[1];
+    input.velocity_y_bits = sm64_modern_gameplay_float_bits(m->vel[1]);
+
+    SM64ModernMarioDeceleratingSpeedOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_decelerating_speed(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    m->vel[0] = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    m->vel[2] = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    m->slideVelX = m->vel[0];
+    m->slideVelZ = m->vel[2];
+    if (output.update_moving_sand != 0) {
+        mario_update_moving_sand(m);
+    }
+    if (output.update_windy_ground != 0) {
+        mario_update_windy_ground(m);
+    }
+    return output.stopped != 0;
+}
+
 s32 update_decelerating_speed(struct MarioState *m) {
+    const s32 swiftResult = try_sm64_modern_decelerating_speed(m);
+    if (swiftResult >= 0) {
+        return swiftResult;
+    }
     s32 stopped = FALSE;
 
     if ((m->forwardVel = approach_f32(m->forwardVel, 0.0f, 1.0f, 1.0f)) == 0.0f) {
@@ -464,7 +775,33 @@ void update_walking_speed(struct MarioState *m) {
     apply_slope_accel(m);
 }
 
+static s32 try_sm64_modern_mario_slide_predicates(
+    struct MarioState *m,
+    SM64ModernMarioSlidePredicatesOutputV1 *out_output) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_SLIDE_PREDICATES") == NULL
+        || !m || !m->area || !out_output) {
+        return -1;
+    }
+    SM64ModernMarioSlidePredicatesInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.input = m->input;
+    input.terrain_is_slide = (m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE;
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.facing_downhill = mario_facing_downhill(m, FALSE);
+    input.intended_yaw = m->intendedYaw;
+    input.face_yaw = m->faceAngle[1];
+    return sm64_modern_gameplay_update_mario_slide_predicates(&input, out_output)
+        == SM64_MODERN_STATUS_OK ? 0 : -1;
+}
+
 s32 should_begin_sliding(struct MarioState *m) {
+    SM64ModernMarioSlidePredicatesOutputV1 output;
+    if (try_sm64_modern_mario_slide_predicates(m, &output) == 0) {
+        return output.should_begin_sliding != 0;
+    }
     if (m->input & INPUT_ABOVE_SLIDE) {
         s32 slideLevel = (m->area->terrainType & TERRAIN_MASK) == TERRAIN_SLIDE;
         s32 movingBackward = m->forwardVel <= -1.0f;
@@ -478,11 +815,45 @@ s32 should_begin_sliding(struct MarioState *m) {
 }
 
 s32 analog_stick_held_back(struct MarioState *m) {
+    SM64ModernMarioSlidePredicatesOutputV1 output;
+    if (try_sm64_modern_mario_slide_predicates(m, &output) == 0) {
+        return output.analog_stick_held_back != 0;
+    }
     s16 intendedDYaw = m->intendedYaw - m->faceAngle[1];
     return intendedDYaw < -0x471C || intendedDYaw > 0x471C;
 }
 
+static s32 try_sm64_modern_mario_ground_dive_or_punch(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_GROUND_DIVE_PUNCH") == NULL
+        || !m || !m->controller) {
+        return -1;
+    }
+    SM64ModernMarioGroundDivePunchInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.b_pressed = (m->input & INPUT_B_PRESSED) != 0;
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.stick_magnitude_bits = sm64_modern_gameplay_float_bits(m->controller->stickMag);
+    input.velocity_y_bits = sm64_modern_gameplay_float_bits(m->vel[1]);
+
+    SM64ModernMarioGroundDivePunchOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_ground_dive_punch(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    if (output.triggered == 0) return FALSE;
+    return set_mario_action(m, output.action, output.action_argument);
+}
+
 s32 check_ground_dive_or_punch(struct MarioState *m) {
+    const s32 swiftResult = try_sm64_modern_mario_ground_dive_or_punch(m);
+    if (swiftResult >= 0) {
+        return swiftResult;
+    }
+
     UNUSED s32 unused;
 
     if (m->input & INPUT_B_PRESSED) {
@@ -498,7 +869,37 @@ s32 check_ground_dive_or_punch(struct MarioState *m) {
     return FALSE;
 }
 
+static s32 try_sm64_modern_mario_begin_braking_action(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_BEGIN_BRAKING") == NULL || !m) {
+        return -1;
+    }
+    mario_drop_held_object(m);
+    SM64ModernMarioBeginBrakingInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.action_state = m->actionState;
+    input.action_argument = m->actionArg;
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.floor_normal_y_bits = sm64_modern_gameplay_float_bits(
+        m->floor ? m->floor->normal.y : 1.0f);
+    input.face_yaw = m->faceAngle[1];
+
+    SM64ModernMarioBeginBrakingOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_begin_braking(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->faceAngle[1] = (s16)output.face_yaw;
+    return set_mario_action(m, output.action, output.action_argument);
+}
+
 s32 begin_braking_action(struct MarioState *m) {
+    const s32 swiftResult = try_sm64_modern_mario_begin_braking_action(m);
+    if (swiftResult >= 0) {
+        return swiftResult;
+    }
     mario_drop_held_object(m);
 
     if (m->actionState == 1) {
@@ -513,7 +914,46 @@ s32 begin_braking_action(struct MarioState *m) {
     return set_mario_action(m, ACT_DECELERATING, 0);
 }
 
+static s32 try_sm64_modern_walk_animation(struct MarioState *m) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_WALK_ANIMATION") == NULL
+        || !m || !m->marioObj) {
+        return -1;
+    }
+    SM64ModernMarioWalkAnimationInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.intended_magnitude_bits = sm64_modern_gameplay_float_bits(m->intendedMag);
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.quicksand_depth_bits = sm64_modern_gameplay_float_bits(m->quicksandDepth);
+    input.action_timer = m->actionTimer;
+    input.animation_past_frame23 = is_anim_past_frame(m, 23);
+    input.animation_past_frame1 = is_anim_past_frame(m, 1);
+    input.animation_past_frame2 = is_anim_past_frame(m, 2);
+    input.metal_cap = (m->flags & MARIO_METAL_CAP) != 0;
+    input.walking_pitch = m->marioObj->oMarioWalkingPitch;
+    input.running_pitch = tilt_body_running(m);
+
+    SM64ModernMarioWalkAnimationOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_walk_animation(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    set_mario_anim_with_accel(m, output.animation_id, output.animation_acceleration);
+    m->actionTimer = output.action_timer;
+    m->marioObj->oMarioWalkingPitch = (s32) output.walking_pitch;
+    m->marioObj->header.gfx.angle[0] = (s16) output.walking_pitch;
+    if (output.sound_kind != SM64_MODERN_MARIO_WALK_SOUND_NONE) {
+        play_step_sound(m, (s16) output.sound_frame1, (s16) output.sound_frame2);
+    }
+    return 0;
+}
+
 void anim_and_audio_for_walk(struct MarioState *m) {
+    if (try_sm64_modern_walk_animation(m) == 0) {
+        return;
+    }
     s32 val14;
     struct Object *marioObj = m->marioObj;
     s32 val0C = TRUE;
@@ -604,7 +1044,49 @@ void anim_and_audio_for_walk(struct MarioState *m) {
     marioObj->header.gfx.angle[0] = marioObj->oMarioWalkingPitch;
 }
 
+static s32 try_sm64_modern_held_walk_animation(
+    struct MarioState *m, SM64ModernMarioHeldWalkVariant variant) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_HELD_WALK_ANIMATION") == NULL
+        || !m || !m->marioObj
+        || variant > SM64_MODERN_MARIO_HELD_WALK_HEAVY) {
+        return -1;
+    }
+    SM64ModernMarioHeldWalkAnimationInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.variant = variant;
+    input.intended_magnitude_bits = sm64_modern_gameplay_float_bits(m->intendedMag);
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.quicksand_depth_bits = sm64_modern_gameplay_float_bits(m->quicksandDepth);
+    input.action_timer = m->actionTimer;
+    if (variant == SM64_MODERN_MARIO_HELD_WALK_HEAVY) {
+        input.animation_past_frame1 = is_anim_past_frame(m, 26);
+        input.animation_past_frame2 = is_anim_past_frame(m, 79);
+    } else {
+        input.animation_past_frame1 = is_anim_past_frame(m, 12);
+        input.animation_past_frame2 = is_anim_past_frame(m, 62);
+    }
+    input.metal_cap = (m->flags & MARIO_METAL_CAP) != 0;
+
+    SM64ModernMarioHeldWalkAnimationOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_held_walk_animation(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    set_mario_anim_with_accel(m, output.animation_id, output.animation_acceleration);
+    m->actionTimer = output.action_timer;
+    if (output.sound_kind != SM64_MODERN_MARIO_WALK_SOUND_NONE) {
+        play_step_sound(m, (s16) output.sound_frame1, (s16) output.sound_frame2);
+    }
+    return 0;
+}
+
 void anim_and_audio_for_hold_walk(struct MarioState *m) {
+    if (try_sm64_modern_held_walk_animation(m, SM64_MODERN_MARIO_HELD_WALK_LIGHT) == 0) {
+        return;
+    }
     s32 val0C;
     s32 val08 = TRUE;
     f32 val04;
@@ -662,12 +1144,81 @@ void anim_and_audio_for_hold_walk(struct MarioState *m) {
 }
 
 void anim_and_audio_for_heavy_walk(struct MarioState *m) {
+    if (try_sm64_modern_held_walk_animation(m, SM64_MODERN_MARIO_HELD_WALK_HEAVY) == 0) {
+        return;
+    }
     s32 val04 = (s32)(m->intendedMag * 0x10000);
     set_mario_anim_with_accel(m, MARIO_ANIM_WALK_WITH_HEAVY_OBJ, val04);
     play_step_sound(m, 26, 79);
 }
 
+static s32 try_sm64_modern_wall_response(struct MarioState *m, Vec3f startPos) {
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_WALL_RESPONSE") == NULL
+        || !m || !m->marioObj) {
+        return -1;
+    }
+    SM64ModernMarioWallResponseInputV1 input;
+    memset(&input, 0, sizeof(input));
+    input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    input.header.struct_size = sizeof(input);
+    input.simulation_tick = sm64_modern_parity_simulation_tick();
+    input.start_position_x_bits = sm64_modern_gameplay_float_bits(startPos[0]);
+    input.start_position_z_bits = sm64_modern_gameplay_float_bits(startPos[2]);
+    input.position_x_bits = sm64_modern_gameplay_float_bits(m->pos[0]);
+    input.position_z_bits = sm64_modern_gameplay_float_bits(m->pos[2]);
+    input.velocity_x_bits = sm64_modern_gameplay_float_bits(m->vel[0]);
+    input.velocity_y_bits = sm64_modern_gameplay_float_bits(m->vel[1]);
+    input.velocity_z_bits = sm64_modern_gameplay_float_bits(m->vel[2]);
+    input.forward_velocity_bits = sm64_modern_gameplay_float_bits(m->forwardVel);
+    input.face_yaw = m->faceAngle[1];
+    input.animation_frame = m->marioObj->header.gfx.unk38.animFrame;
+    input.animation_past_frame1 = is_anim_past_frame(m, 6);
+    input.animation_past_frame2 = is_anim_past_frame(m, 18);
+    input.terrain_sound_addend = m->terrainSoundAddend;
+    input.floor_slope_pitch = find_floor_slope(m, 0x4000);
+    input.wall_present = m->wall != NULL;
+    input.wall_angle = m->wall != NULL
+        ? atan2s(m->wall->normal.z, m->wall->normal.x) : 0;
+
+    SM64ModernMarioWallResponseOutputV1 output;
+    if (sm64_modern_gameplay_update_mario_wall_response(&input, &output)
+        != SM64_MODERN_STATUS_OK) {
+        return -1;
+    }
+    m->vel[0] = sm64_modern_gameplay_float_from_bits(output.velocity_x_bits);
+    m->vel[1] = sm64_modern_gameplay_float_from_bits(output.velocity_y_bits);
+    m->vel[2] = sm64_modern_gameplay_float_from_bits(output.velocity_z_bits);
+    m->forwardVel = sm64_modern_gameplay_float_from_bits(output.forward_velocity_bits);
+    m->slideVelX = m->vel[0];
+    m->slideVelZ = m->vel[2];
+    m->flags |= output.flags;
+    if (output.animation_id == MARIO_ANIM_PUSHING) {
+        set_mario_animation(m, output.animation_id);
+    } else {
+        set_mario_anim_with_accel(m, output.animation_id, output.animation_acceleration);
+    }
+    if (output.sound_kind == SM64_MODERN_MARIO_WALL_SOUND_STEP) {
+        play_step_sound(m, 6, 18);
+    } else if (output.sound_kind == SM64_MODERN_MARIO_WALL_SOUND_MOVING_SLIDE) {
+        play_sound(SOUND_MOVING_TERRAIN_SLIDE + m->terrainSoundAddend,
+                   m->marioObj->header.gfx.cameraToObject);
+    }
+    if (output.particle_dust != 0) {
+        m->particleFlags |= PARTICLE_DUST;
+    }
+    m->actionState = output.action_state;
+    m->actionArg = output.action_argument;
+    m->marioObj->header.gfx.angle[0] = (s16) output.gfx_pitch;
+    m->marioObj->header.gfx.angle[1] = (s16) output.gfx_yaw;
+    m->marioObj->header.gfx.angle[2] = (s16) output.gfx_roll;
+    return 0;
+}
+
 void push_or_sidle_wall(struct MarioState *m, Vec3f startPos) {
+    if (try_sm64_modern_wall_response(m, startPos) == 0) {
+        return;
+    }
+
     s16 wallAngle;
     s16 dWallAngle;
     f32 dx = m->pos[0] - startPos[0];

@@ -50,6 +50,7 @@ s32 set_water_plunge_action(struct MarioState *m);
 s32 execute_mario_action(UNUSED struct Object *o);
 // Test-only M15 gate: exercise the production Mario ABI on the owner thread.
 void sm64_modern_mario_authority_test_step(void);
+s32 sm64_modern_mario_idle_cancel(struct MarioState *m);
 void init_mario(void);
 void init_mario_from_save_file(void);
 

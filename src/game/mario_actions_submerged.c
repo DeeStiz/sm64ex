@@ -1,4 +1,6 @@
 #include <PR/ultratypes.h>
+#include <stdlib.h>
+#include <string.h>
 
 #include "sm64.h"
 #include "level_update.h"
@@ -16,6 +18,9 @@
 #include "behavior_data.h"
 #include "level_table.h"
 #include "thread6.h"
+#include "pc/sm64_modern_gameplay_migration.h"
+#include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_mario_water_step_migration.h"
 
 #define MIN_SWIM_STRENGTH 160
 #define MIN_SWIM_SPEED 16.0f
@@ -67,7 +72,26 @@ static f32 get_buoyancy(struct MarioState *m) {
     return buoyancy;
 }
 
-static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
+static void fill_sm64_modern_water_probe(
+    SM64ModernMarioWaterStepInputV1 *probe,
+    struct Surface *floor,
+    f32 floorHeight,
+    f32 ceilHeight,
+    struct Surface *wall) {
+    if (!probe) return;
+    memset(probe, 0, sizeof(*probe));
+    probe->floor.present = floor != NULL;
+    probe->floor.surface_id = floor != NULL ? 1u : 0u;
+    probe->floor.height_bits = sm64_modern_gameplay_float_bits(floorHeight);
+    probe->ceiling_height_bits = sm64_modern_gameplay_float_bits(ceilHeight);
+    probe->wall.present = wall != NULL;
+    probe->wall.surface_id = wall != NULL ? 1u : 0u;
+}
+
+static u32 perform_water_full_step(
+    struct MarioState *m,
+    Vec3f nextPos,
+    SM64ModernMarioWaterStepInputV1 *probe) {
     struct Surface *wall;
     struct Surface *ceil;
     struct Surface *floor;
@@ -77,6 +101,10 @@ static u32 perform_water_full_step(struct MarioState *m, Vec3f nextPos) {
     wall = resolve_and_return_wall_collisions(nextPos, 10.0f, 110.0f);
     floorHeight = find_floor(nextPos[0], nextPos[1], nextPos[2], &floor);
     ceilHeight = vec3f_find_ceil(nextPos, floorHeight, &ceil);
+
+    if (probe != NULL) {
+        fill_sm64_modern_water_probe(probe, floor, floorHeight, ceilHeight, wall);
+    }
 
     if (floor == NULL) {
         return WATER_STEP_CANCELLED;
@@ -186,7 +214,44 @@ static u32 perform_water_step(struct MarioState *m) {
         m->vel[1] = 0.0f;
     }
 
-    stepResult = perform_water_full_step(m, nextPos);
+    if (getenv("SM64_MODERN_AUTOMATED_MARIO_WATER_STEP") != NULL && m->floor != NULL) {
+        SM64ModernMarioWaterStepInputV1 input;
+        memset(&input, 0, sizeof(input));
+        input.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+        input.header.struct_size = sizeof(input);
+        input.simulation_tick = sm64_modern_parity_simulation_tick();
+        input.position_x_bits = sm64_modern_gameplay_float_bits(m->pos[0]);
+        input.position_y_bits = sm64_modern_gameplay_float_bits(m->pos[1]);
+        input.position_z_bits = sm64_modern_gameplay_float_bits(m->pos[2]);
+        input.next_position_x_bits = sm64_modern_gameplay_float_bits(nextPos[0]);
+        input.next_position_y_bits = sm64_modern_gameplay_float_bits(nextPos[1]);
+        input.next_position_z_bits = sm64_modern_gameplay_float_bits(nextPos[2]);
+        input.current_floor.present = 1;
+        input.current_floor.surface_id = 1;
+        input.current_floor.height_bits = sm64_modern_gameplay_float_bits(m->floorHeight);
+
+        struct MarioState probeState = *m;
+        if (perform_water_full_step(&probeState, nextPos, &input) >= 0) {
+            SM64ModernMarioWaterStepOutputV1 output;
+            if (sm64_modern_gameplay_update_mario_water_step(&input, &output)
+                == SM64_MODERN_STATUS_OK) {
+                m->pos[0] = sm64_modern_gameplay_float_from_bits(output.position_x_bits);
+                m->pos[1] = sm64_modern_gameplay_float_from_bits(output.position_y_bits);
+                m->pos[2] = sm64_modern_gameplay_float_from_bits(output.position_z_bits);
+                m->floorHeight = sm64_modern_gameplay_float_from_bits(output.floor.height_bits);
+                if (probeState.floor != NULL) {
+                    m->floor = probeState.floor;
+                }
+                stepResult = output.result;
+            } else {
+                stepResult = perform_water_full_step(m, nextPos, NULL);
+            }
+        } else {
+            stepResult = perform_water_full_step(m, nextPos, NULL);
+        }
+    } else {
+        stepResult = perform_water_full_step(m, nextPos, NULL);
+    }
 
     vec3f_copy(marioObj->header.gfx.pos, m->pos);
     vec3s_set(marioObj->header.gfx.angle, -m->faceAngle[0], m->faceAngle[1], m->faceAngle[2]);

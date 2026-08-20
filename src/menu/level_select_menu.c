@@ -97,6 +97,30 @@ int start_demo(int timer)
     return timer;
 }
 
+static void render_level_select_text(void) {
+    print_text_centered(160, 80, "SELECT STAGE");
+    print_text_centered(160, 30, "PRESS START BUTTON");
+    print_text_fmt_int(40, 60, "%2d", gCurrLevelNum);
+    print_text(80, 60, gLevelSelect_StageNamesText[gCurrLevelNum - 1]); // print stage name
+}
+
+/*
+ * Re-emit intro UI on a native redraw that holds the logical level-script
+ * state.  The update callback owns input/timer progression; this helper only
+ * queues the text that render_game consumes for the current presentation.
+ */
+void lvl_intro_render(s16 arg1) {
+    switch (arg1) {
+        case 1:
+        case 2:
+            print_intro_text();
+            break;
+        case 3:
+            render_level_select_text();
+            break;
+    }
+}
+
 // input loop for the level select menu. updates the selected stage
 // count if an input was received. signals the stage to be started
 // or the level select to be exited if start or the quit combo is
@@ -141,10 +165,7 @@ s16 level_select_input_loop(void) {
 
     gCurrSaveFileNum = 4; // file 4 is used for level select tests
     gCurrActNum = 6;
-    print_text_centered(160, 80, "SELECT STAGE");
-    print_text_centered(160, 30, "PRESS START BUTTON");
-    print_text_fmt_int(40, 60, "%2d", gCurrLevelNum);
-    print_text(80, 60, gLevelSelect_StageNamesText[gCurrLevelNum - 1]); // print stage name
+    render_level_select_text();
 
 #define QUIT_LEVEL_SELECT_COMBO (Z_TRIG | START_BUTTON | L_CBUTTONS | R_CBUTTONS)
 

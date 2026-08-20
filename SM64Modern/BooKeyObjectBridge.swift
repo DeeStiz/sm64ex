@@ -1,0 +1,22 @@
+import Foundation
+
+struct SM64BooKeyObjectEffectRecord: Equatable, Sendable { let objectID: SM64ObjectID; let output: SM64BooKeyOutput; let spawnedSparkles: SM64ObjectID? }
+final class SM64BooKeyObjectBridge {
+    static let alphaBehaviorIdentity: UInt64 = 0x6268_765F_61626B
+    static let betaBehaviorIdentity: UInt64 = 0x6268_765F_62626B
+    private struct State { let kind: SM64BooKeyKind; var parentAlive: Bool; let parentID: SM64ObjectID?; var collided: Bool; var landed: Bool }
+    private var states: [SM64ObjectID: State] = [:]; private let goldenCoinSparklesBridge: SM64GoldenCoinSparklesObjectBridge?; private(set) var effectLog: [SM64BooKeyObjectEffectRecord] = []
+    init(goldenCoinSparklesBridge: SM64GoldenCoinSparklesObjectBridge? = nil) { self.goldenCoinSparklesBridge = goldenCoinSparklesBridge }
+    var registeredIDs: [SM64ObjectID] { states.keys.sorted { $0.slot == $1.slot ? $0.generation < $1.generation : $0.slot < $1.slot } }
+    func beginExternalTick() { effectLog.removeAll(keepingCapacity: true) }
+    @discardableResult
+    func spawn(in engineState: SM64SwiftEngineState, kind: SM64BooKeyKind, parent: SM64ObjectID? = nil, position: SM64ObjectVector3 = .zero) throws -> SM64ObjectID { let id = try engineState.spawnObject(in: .level, behaviorIdentity: kind == .alpha ? Self.alphaBehaviorIdentity : Self.betaBehaviorIdentity, parent: parent); guard attach(id, kind: kind, parent: parent, position: position, in: engineState.objects) else { _ = engineState.objects.despawn(id); preconditionFailure("newly spawned Boo key could not attach") }; return id }
+    @discardableResult
+    func attach(_ id: SM64ObjectID, kind: SM64BooKeyKind, parent: SM64ObjectID?, position: SM64ObjectVector3, in pool: SM64ObjectPool) -> Bool { guard pool.record(for: id) != nil else { return false }; states[id] = State(kind: kind, parentAlive: true, parentID: parent, collided: false, landed: false); return pool.mutate(id) { record in record.position = position; record.parent = parent ?? record.parent; record.hitboxRadius = 32; record.hitboxHeight = 64; record.intangibleTimer = kind == .alpha ? 0 : -1; record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle | SM64ObjectScheduler.objectFlagBuildTransform } }
+    @discardableResult
+    func setInputs(for id: SM64ObjectID, parentAlive: Bool? = nil, collided: Bool? = nil, landed: Bool? = nil) -> Bool { guard var state = states[id] else { return false }; if let parentAlive { state.parentAlive = parentAlive }; if let collided { state.collided = collided }; if let landed { state.landed = landed }; states[id] = state; return true }
+    @discardableResult
+    func updateInline(_ id: SM64ObjectID, state engineState: SM64SwiftEngineState) -> Bool { guard var state = states[id], let record = engineState.objects.record(for: id) else { return false }; let parentRecord = state.parentID.flatMap { engineState.objects.record(for: $0) }; let output = SM64BooKeyBehavior.update(.init(kind: state.kind, action: record.action, timer: record.timer, roll: record.faceAngles.roll, yaw: record.faceAngles.yaw, velocityY: record.velocity.y, graphYOffset: record.graphYOffset, parentAlive: state.parentAlive, collided: state.collided, landed: state.landed)); state.collided = false; state.landed = false; states[id] = state; var position = record.position; if output.copyParent, let parentRecord { position = SM64ObjectVector3(x: parentRecord.position.x, y: parentRecord.position.y + 40, z: parentRecord.position.z) }; var sparkles: SM64ObjectID?; if output.spawnSparkles, let goldenCoinSparklesBridge { sparkles = try? goldenCoinSparklesBridge.spawnSparkles(in: engineState, position: position) }; _ = engineState.objects.mutate(id) { next in next.action = output.action; next.timer = output.timer; next.faceAngles.roll = output.roll; next.faceAngles.yaw = output.yaw; next.position = position; next.velocity.y = output.velocityY; next.graphYOffset = output.graphYOffset; next.intangibleTimer = output.tangible ? 0 : -1; if output.shouldDelete { next.activeFlags = 0 }; next.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle | SM64ObjectScheduler.objectFlagBuildTransform }; effectLog.append(.init(objectID: id, output: output, spawnedSparkles: sparkles)); return true }
+    func remove(_ id: SM64ObjectID) { states.removeValue(forKey: id) }
+    func pruneExternal(unloaded: [SM64ObjectID], pool: SM64ObjectPool) { for id in unloaded { remove(id) }; for id in registeredIDs where pool.record(for: id) == nil { remove(id) } }
+}

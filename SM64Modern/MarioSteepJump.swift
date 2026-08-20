@@ -36,6 +36,8 @@ enum SM64MarioSteepJump {
             faceYaw = Int16(truncatingIfNeeded: Int32(turned) + Int32(angleTemp))
         }
 
+        guard forwardVelocity.isFinite else { return nil }
+
         return SM64MarioSteepJumpResult(
             action: SM64MarioActionID.steepJump,
             steepJumpYaw: steepJumpYaw,

@@ -18,6 +18,9 @@ struct SM64BooSchedulerTickResult: Equatable, Sendable {
 /// retain stable transforms, collision fields, and deletion boundaries.
 final class SM64BooObjectBridge {
     static let defaultBehaviorIdentity: UInt64 = 0x6268_765F_626F_6F
+    static let ghostHuntBehaviorIdentity: UInt64 = 0x6268_765F_676862
+    static let merryGoRoundBehaviorIdentity: UInt64 = 0x6268_765F_6D726267
+    static let withCageBehaviorIdentity: UInt64 = 0x6268_765F_626377
     static let defaultModel: UInt32 = 0x54 // MODEL_BOO
 
     private let scheduler: SM64ObjectScheduler
@@ -80,14 +83,21 @@ final class SM64BooObjectBridge {
         homeZ: Float = 0,
         moveYaw: Int16 = 0,
         model: UInt32 = SM64BooObjectBridge.defaultModel,
-        behaviorIdentity: UInt64 = SM64BooObjectBridge.defaultBehaviorIdentity
+        behaviorIdentity: UInt64 = SM64BooObjectBridge.defaultBehaviorIdentity,
+        hitbox: SM64BooHitbox = .standard,
+        baseScale: Float = 1
     ) throws -> SM64ObjectID {
         let id = try engineState.spawnObject(in: .generalActor, model: model, behaviorIdentity: behaviorIdentity)
-        guard attach(id, homeX: homeX, homeY: homeY, homeZ: homeZ, moveYaw: moveYaw, in: engineState.objects) else {
+        guard attach(id, homeX: homeX, homeY: homeY, homeZ: homeZ, moveYaw: moveYaw, hitbox: hitbox, baseScale: baseScale, in: engineState.objects) else {
             _ = engineState.objects.despawn(id)
             preconditionFailure("newly spawned Boo could not attach")
         }
         return id
+    }
+
+    @discardableResult
+    func spawnBooWithCage(in engineState: SM64SwiftEngineState, homeX: Float = 0, homeY: Float = 0, homeZ: Float = 0, moveYaw: Int16 = 0) throws -> SM64ObjectID {
+        try spawnBoo(in: engineState, homeX: homeX, homeY: homeY, homeZ: homeZ, moveYaw: moveYaw, behaviorIdentity: Self.withCageBehaviorIdentity, hitbox: .withCage, baseScale: 2)
     }
 
     @discardableResult
@@ -97,10 +107,12 @@ final class SM64BooObjectBridge {
         homeY: Float = 0,
         homeZ: Float = 0,
         moveYaw: Int16 = 0,
+        hitbox: SM64BooHitbox = .standard,
+        baseScale: Float = 1,
         in pool: SM64ObjectPool
     ) -> Bool {
         guard pool.record(for: id) != nil else { return false }
-        let state = SM64BooState(homeX: homeX, homeY: homeY, homeZ: homeZ, moveYaw: moveYaw)
+        let state = SM64BooState(homeX: homeX, homeY: homeY, homeZ: homeZ, moveYaw: moveYaw, hitbox: hitbox, baseScale: baseScale)
         states[id] = state
         inputs[id] = SM64BooTickInput()
         synchronizeRecord(id: id, state: state, pool: pool, previousAction: state.action)

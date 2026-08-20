@@ -1,0 +1,6 @@
+import Foundation
+private let o:UInt64=1_469_598_103_934_665_603,p:UInt64=1_099_511_628_211
+private func h(_ x:UInt64,_ v:UInt32)->UInt64{var y=x;for b in 0..<4{y^=UInt64((v>>UInt32(b*8))&0xff);y&*=p};return y}
+private func f(_ x:UInt64,_ v:Float)->UInt64{h(x,v.bitPattern)}
+private func a(_ v:SM64LllRotatingHexFlameOutput,_ x:inout UInt64){x=f(x,v.position.x);x=f(x,v.position.y);x=f(x,v.position.z);x=f(x,v.velocity.x);x=f(x,v.velocity.y);x=f(x,v.velocity.z);x=h(x,v.shouldDelete ? 1:0)}
+@main enum SM64ModernLllRotatingHexFlameSmoke{static func main(){let front=SM64LllRotatingHexFlameBehavior.update(.init(parentPosition:.init(x:100,y:200,z:300),parentMoveYaw:0,parentAction:0,leftOffset:200,forwardOffset:0,previousPosition:.zero));let yawed=SM64LllRotatingHexFlameBehavior.update(.init(parentPosition:.init(x:100,y:200,z:300),parentMoveYaw:0x4000,parentAction:3,leftOffset:200,forwardOffset:0,previousPosition:.zero));precondition(front.position == .init(x:300,y:300,z:300) && !front.shouldDelete);precondition(yawed.position == .init(x:100,y:300,z:100) && yawed.shouldDelete);var x=o;a(front,&x);a(yawed,&x);print(String(format:"lllRotatingHexFlameFingerprint=0x%016llx",x));print("SM64 Modern LLL rotating hex flame smoke passed")}}

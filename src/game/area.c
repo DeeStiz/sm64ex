@@ -302,9 +302,9 @@ void area_update_objects(void) {
     const bool advanceLegacyDomain = sm64_modern_timebase_should_advance_legacy_domain();
 
     // The area counter is a logical 30 Hz identity used by scripts and
-    // render-cache invalidation.  The object pipeline itself now has a
-    // native-dynamics admission, so a held 60/30 step still resolves motion,
-    // platforms, and collisions without advancing this legacy counter.
+    // render-cache invalidation.  A held 60/30 step still advances continuous
+    // object behavior, while the broad object-collision scan and boundary
+    // sinks remain paired at the logical rate.
     if (!sm64_modern_timebase_should_advance_native_dynamics()) {
         return;
     }
@@ -399,7 +399,14 @@ void render_game(void) {
         print_displaying_credits_entry();
         gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, BORDER_HEIGHT, SCREEN_WIDTH,
                       SCREEN_HEIGHT - BORDER_HEIGHT);
-        gPauseScreenMode = render_menus_and_dialogs();
+        const s16 renderedPauseScreenMode = render_menus_and_dialogs();
+        // The menu renderer still runs on held native redraws, but its return
+        // value is a logical-frame transition consumed by play_mode_paused.
+        // Do not overwrite a non-zero exit/continue result with the held
+        // redraw's default zero before the next legacy update can consume it.
+        if (sm64_modern_timebase_should_advance_legacy_domain()) {
+            gPauseScreenMode = renderedPauseScreenMode;
+        }
 
         if (gPauseScreenMode != 0) {
             gSaveOptSelectIndex = gPauseScreenMode;

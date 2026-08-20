@@ -13,6 +13,7 @@
 #include "game_init.h"
 #include "interaction.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_timebase.h"
 #include "level_update.h"
 #include "mario.h"
 #include "mario_step.h"
@@ -1739,6 +1740,14 @@ void check_kick_or_punch_wall(struct MarioState *m) {
 }
 
 void mario_process_interactions(struct MarioState *m) {
+    // Object collision results are prepared once per logical interval.  Do
+    // not consume the same interaction status again on the held native pass;
+    // doing so can replay pole/dialog transitions before the initiating NPC
+    // has committed its boundary-owned state.
+    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
+        return;
+    }
+
     sm64_modern_parity_enter_subsystem(SM64_MODERN_GAMEPLAY_SUBSYSTEM_INTERACTION);
     sDelayInvincTimer = FALSE;
     sInvulnerable = (m->action & ACT_FLAG_INVULNERABLE) || m->invincTimer != 0;

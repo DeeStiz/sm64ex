@@ -1,0 +1,5 @@
+import Foundation
+private let offset: UInt64 = 1_469_598_103_934_665_603
+private let prime: UInt64 = 1_099_511_628_211
+private func hash(_ seed: UInt64, _ value: UInt64) -> UInt64 { var result = seed; for index in 0..<8 { result ^= (value >> UInt64(index * 8)) & 255; result &*= prime }; return result }
+@main struct SM64RrRotatingBridgePlatformSmoke { static func main() { let first = SM64RrRotatingBridgePlatformBehavior.update(.init(moveYaw: 0)); let second = SM64RrRotatingBridgePlatformBehavior.update(.init(moveYaw: -128)); precondition(first.moveYaw == -128 && first.angleVelocityYaw == -128); precondition(second.moveYaw == -256); var fingerprint = offset; for output in [first, second] { fingerprint = hash(fingerprint, UInt64(bitPattern: Int64(output.moveYaw))); fingerprint = hash(fingerprint, UInt64(bitPattern: Int64(output.angleVelocityYaw))) }; print(String(format: "rrRotatingBridgePlatformFingerprint=0x%016llx", fingerprint)); print("SM64 Modern RR rotating bridge platform smoke passed") } }

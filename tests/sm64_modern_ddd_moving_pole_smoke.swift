@@ -1,0 +1,4 @@
+import Foundation
+private let o:UInt64=1_469_598_103_934_665_603,p:UInt64=1_099_511_628_211
+private func h(_ x:UInt64,_ v:UInt32)->UInt64{var y=x;for b in 0..<4{y^=UInt64((v>>UInt32(b*8))&0xff);y&*=p};return y}
+@main enum SM64ModernDddMovingPoleSmoke{static func main(){let out=SM64DddMovingPoleBehavior.update(.init(parentPosition:.init(x:1,y:2,z:3),parentFaceAngles:.init(pitch:4,yaw:5,roll:6),parentMoveAngles:.init(pitch:7,yaw:8,roll:9)));precondition(out.position == .init(x:1,y:2,z:3) && out.faceAngles == .init(pitch:4,yaw:5,roll:6) && out.moveAngles == .init(pitch:7,yaw:8,roll:9));var x=o;x=h(x,out.position.x.bitPattern);x=h(x,out.position.y.bitPattern);x=h(x,out.position.z.bitPattern);x=h(x,UInt32(bitPattern:out.faceAngles.pitch));x=h(x,UInt32(bitPattern:out.faceAngles.yaw));x=h(x,UInt32(bitPattern:out.faceAngles.roll));print(String(format:"dddMovingPoleFingerprint=0x%016llx",x));print("SM64 Modern DDD moving pole smoke passed")}}

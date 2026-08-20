@@ -1,0 +1,5 @@
+#include <stdint.h>
+#include <stdio.h>
+static const uint64_t O=UINT64_C(1469598103934665603),P=UINT64_C(1099511628211);static uint64_t h(uint64_t x,uint32_t v){for(unsigned b=0;b<4;++b){x^=(v>>(b*8))&0xffu;x*=P;}return x;}
+struct O{int32_t action,yaw,vel,spawn,count;};static struct O u(int a,float d,int b,int yaw){struct O o={a,yaw,0,0,0};if(a==0){if(d<3000)o.action=1;}else if(a==1){o.action=2;o.spawn=1;o.count=b==0?8:6;}else if(a==2){o.vel=-0x100;o.yaw-=0x100;if(d>3200)o.action=3;}else if(a==3)o.action=0;return o;}static void ap(uint64_t*x,struct O o){*x=h(*x,(uint32_t)o.action);*x=h(*x,(uint32_t)o.yaw);*x=h(*x,(uint32_t)o.vel);*x=h(*x,(uint32_t)o.spawn);*x=h(*x,(uint32_t)o.count);}
+int main(void){struct O idle=u(0,4000,0,0),start=u(0,2999,0,0),spawn=u(1,2000,0,0),rotate=u(2,2000,1,0),leave=u(2,3201,1,0);if(idle.action!=0||start.action!=1||spawn.action!=2||spawn.count!=8||rotate.yaw!=-0x100||leave.action!=3)return 2;uint64_t f=O;ap(&f,idle);ap(&f,start);ap(&f,spawn);ap(&f,rotate);ap(&f,leave);printf("lllRotatingFireBarFingerprint=0x%016llx\n",(unsigned long long)f);puts("SM64 Modern LLL rotating fire bar C contract passed");return 0;}

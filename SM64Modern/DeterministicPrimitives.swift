@@ -5,6 +5,13 @@ import Foundation
 /// wrapping and IEEE-754 bit conversions: a native Swift caller must not
 /// inherit trapping integer arithmetic or platform-dependent serialization.
 enum SM64DeterministicPrimitives {
+    /// C-oracle Float operations kept out of fused multiply-add optimization.
+    /// The legacy engine evaluates these as distinct `f32` expressions.
+    @inline(never) static func cFloatMultiply(_ lhs: Float, _ rhs: Float) -> Float {
+        let result = lhs * rhs
+        return Float(bitPattern: result.bitPattern)
+    }
+
     static func floatBits(_ value: Float) -> UInt32 {
         value.bitPattern
     }

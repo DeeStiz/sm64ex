@@ -398,6 +398,62 @@ typedef struct SM64ModernMarioGroundSpeedOutputV1 {
     uint32_t reserved;
 } SM64ModernMarioGroundSpeedOutputV1;
 
+// Bounded Mario action-entry migration. Pointer-backed surfaces/objects stay
+// in C; only the scalar state consumed and produced by the value kernel crosses
+// this boundary. Unsupported action families return UNSUPPORTED_AUTHORITY so
+// the legacy C entry path remains an explicit compatibility fallback.
+typedef struct SM64ModernMarioActionInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t requested_action;
+    uint32_t action_argument;
+    uint32_t current_action;
+    uint32_t flags;
+    int32_t floor_class;
+    uint32_t facing_downhill;
+    uint32_t held_object_present;
+    uint32_t ridden_object_present;
+    uint32_t squish_timer;
+    uint32_t quicksand_depth_bits;
+    uint32_t intended_magnitude_bits;
+    uint32_t forward_velocity_bits;
+    int32_t intended_yaw;
+    int32_t face_pitch;
+    int32_t face_yaw;
+    int32_t face_roll;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t position_y_bits;
+    uint32_t peak_height_bits;
+    uint32_t wall_kick_timer;
+    uint32_t hurt_counter;
+    uint32_t reserved;
+} SM64ModernMarioActionInputV1;
+
+typedef struct SM64ModernMarioActionOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t action;
+    uint32_t previous_action;
+    uint32_t action_argument;
+    uint32_t action_state;
+    uint32_t action_timer;
+    uint32_t flags;
+    uint32_t forward_velocity_bits;
+    int32_t face_pitch;
+    int32_t face_yaw;
+    int32_t face_roll;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t wall_kick_timer;
+    uint32_t peak_height_bits;
+    uint32_t dropped_held_object;
+    uint32_t dropped_ridden_object;
+    uint32_t hurt_counter;
+    uint32_t reserved;
+} SM64ModernMarioActionOutputV1;
+
 typedef struct SM64ModernBobombReleaseInputV1 {
     SM64ModernAbiHeader header;
     uint64_t simulation_tick;
@@ -428,6 +484,10 @@ typedef SM64ModernStatus (*SM64ModernMarioGroundSpeedUpdateFn)(
     void *context,
     const SM64ModernMarioGroundSpeedInputV1 *input,
     SM64ModernMarioGroundSpeedOutputV1 *out_output);
+typedef SM64ModernStatus (*SM64ModernMarioActionUpdateFn)(
+    void *context,
+    const SM64ModernMarioActionInputV1 *input,
+    SM64ModernMarioActionOutputV1 *out_output);
 typedef SM64ModernStatus (*SM64ModernBobombReleaseUpdateFn)(
     void *context,
     const SM64ModernBobombReleaseInputV1 *input,
@@ -445,6 +505,1207 @@ typedef struct SM64ModernGameplayMigrationApiV1 {
     SM64ModernBobombReleaseUpdateFn update_bobomb_release;
     SM64ModernGameplayCandidateTransformFn transform_candidate;
 } SM64ModernGameplayMigrationApiV1;
+
+typedef struct SM64ModernMarioActionApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioActionUpdateFn update;
+} SM64ModernMarioActionApiV1;
+
+typedef uint32_t SM64ModernMarioActionCancelFamily;
+#define SM64_MODERN_MARIO_ACTION_CANCEL_IDLE 1u
+
+typedef struct SM64ModernMarioActionCancelInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t family;
+    uint32_t current_action;
+    uint32_t action_argument;
+    uint32_t action_state;
+    uint32_t input;
+    int32_t health;
+    uint32_t quicksand_depth_bits;
+    uint32_t floor_normal_y_bits;
+    uint32_t terrain_is_snow;
+    uint32_t held_object_present;
+    int32_t intended_yaw;
+    uint32_t reserved;
+} SM64ModernMarioActionCancelInputV1;
+
+typedef struct SM64ModernMarioActionCancelOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t action;
+    uint32_t action_argument;
+    int32_t face_yaw;
+    uint32_t face_yaw_valid;
+    uint32_t should_drop_held_object;
+    uint32_t reserved;
+} SM64ModernMarioActionCancelOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioActionCancelUpdateFn)(
+    void *context,
+    const SM64ModernMarioActionCancelInputV1 *input,
+    SM64ModernMarioActionCancelOutputV1 *out_output);
+
+typedef struct SM64ModernMarioActionCancelApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioActionCancelUpdateFn update;
+} SM64ModernMarioActionCancelApiV1;
+
+typedef struct SM64ModernMarioGroundFloorProbeV1 {
+    uint32_t present;
+    uint32_t surface_id;
+    uint32_t height_bits;
+    uint32_t normal_y_bits;
+} SM64ModernMarioGroundFloorProbeV1;
+
+typedef struct SM64ModernMarioGroundWallProbeV1 {
+    uint32_t present;
+    uint32_t surface_id;
+    uint32_t normal_x_bits;
+    uint32_t normal_z_bits;
+    int32_t wall_angle;
+} SM64ModernMarioGroundWallProbeV1;
+
+typedef struct SM64ModernMarioGroundQuarterProbeV1 {
+    SM64ModernMarioGroundFloorProbeV1 floor;
+    uint32_t ceiling_height_bits;
+    uint32_t water_level_bits;
+    SM64ModernMarioGroundWallProbeV1 upper_wall;
+} SM64ModernMarioGroundQuarterProbeV1;
+
+typedef struct SM64ModernMarioGroundStepInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t position_x_bits;
+    uint32_t position_y_bits;
+    uint32_t position_z_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    SM64ModernMarioGroundFloorProbeV1 floor;
+    int32_t face_yaw;
+    uint32_t native_step_scale_bits;
+    uint32_t riding_shell;
+    uint32_t terrain_sound_addend;
+    SM64ModernMarioGroundQuarterProbeV1 quarter_probes[4];
+    uint32_t reserved;
+} SM64ModernMarioGroundStepInputV1;
+
+typedef struct SM64ModernMarioGroundStepOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t position_x_bits;
+    uint32_t position_y_bits;
+    uint32_t position_z_bits;
+    SM64ModernMarioGroundFloorProbeV1 floor;
+    uint32_t wall_present;
+    uint32_t wall_surface_id;
+    uint32_t result;
+    uint32_t quarter_steps;
+    uint32_t terrain_sound_addend;
+    uint32_t reserved;
+} SM64ModernMarioGroundStepOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioGroundStepUpdateFn)(
+    void *context,
+    const SM64ModernMarioGroundStepInputV1 *input,
+    SM64ModernMarioGroundStepOutputV1 *out_output);
+
+typedef struct SM64ModernMarioGroundStepApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioGroundStepUpdateFn update;
+} SM64ModernMarioGroundStepApiV1;
+
+// Bounded Mario airborne-step migration. Collision queries remain owned by C
+// and cross as immutable quarter-step probes; Swift owns the deterministic
+// branch order and scalar Mario state transition. Surface types are carried
+// explicitly so burning-wall and hangable-ceiling decisions never infer from
+// an absent pointer or a platform-specific float recomputation.
+typedef struct SM64ModernMarioAirWallProbeV1 {
+    uint32_t present;
+    uint32_t surface_id;
+    uint32_t surface_type;
+    uint32_t normal_x_bits;
+    uint32_t normal_z_bits;
+    int32_t wall_angle;
+    uint32_t reserved;
+} SM64ModernMarioAirWallProbeV1;
+
+typedef struct SM64ModernMarioAirQuarterProbeV1 {
+    SM64ModernMarioGroundFloorProbeV1 floor;
+    uint32_t ceiling_height_bits;
+    uint32_t water_level_bits;
+    SM64ModernMarioAirWallProbeV1 upper_wall;
+    SM64ModernMarioAirWallProbeV1 lower_wall;
+    SM64ModernMarioGroundFloorProbeV1 ledge_floor;
+    uint32_t ledge_position_x_bits;
+    uint32_t ledge_position_y_bits;
+    uint32_t ledge_position_z_bits;
+    int32_t ledge_floor_angle;
+    uint32_t ledge_present;
+} SM64ModernMarioAirQuarterProbeV1;
+
+typedef struct SM64ModernMarioAirStepInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t position_x_bits;
+    uint32_t position_y_bits;
+    uint32_t position_z_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    SM64ModernMarioGroundFloorProbeV1 floor;
+    int32_t face_pitch;
+    int32_t face_yaw;
+    int32_t face_roll;
+    int32_t floor_angle;
+    uint32_t action;
+    uint32_t step_arg;
+    uint32_t native_step_scale_bits;
+    uint32_t riding_shell;
+    uint32_t ceil_present;
+    uint32_t ceil_type;
+    SM64ModernMarioAirQuarterProbeV1 quarter_probes[4];
+    uint32_t reserved;
+} SM64ModernMarioAirStepInputV1;
+
+typedef struct SM64ModernMarioAirStepOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t position_x_bits;
+    uint32_t position_y_bits;
+    uint32_t position_z_bits;
+    uint32_t velocity_y_bits;
+    SM64ModernMarioGroundFloorProbeV1 floor;
+    SM64ModernMarioAirWallProbeV1 wall;
+    uint32_t result;
+    uint32_t quarter_steps;
+    uint32_t flags_or;
+    int32_t face_pitch;
+    int32_t face_yaw;
+    int32_t face_roll;
+    int32_t floor_angle;
+    uint32_t terrain_sound_addend;
+    uint32_t reserved;
+} SM64ModernMarioAirStepOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioAirStepUpdateFn)(
+    void *context,
+    const SM64ModernMarioAirStepInputV1 *input,
+    SM64ModernMarioAirStepOutputV1 *out_output);
+
+typedef struct SM64ModernMarioAirStepApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioAirStepUpdateFn update;
+} SM64ModernMarioAirStepApiV1;
+
+// Bounded submerged collision reducer. C supplies the single water-step
+// floor/ceiling/wall query; Swift owns only the branch result and scalar
+// position/floor update. Whirlpool/current effects remain in the C caller.
+typedef struct SM64ModernMarioWaterFloorProbeV1 {
+    uint32_t present;
+    uint32_t surface_id;
+    uint32_t height_bits;
+} SM64ModernMarioWaterFloorProbeV1;
+
+typedef struct SM64ModernMarioWaterWallProbeV1 {
+    uint32_t present;
+    uint32_t surface_id;
+    uint32_t reserved;
+} SM64ModernMarioWaterWallProbeV1;
+
+typedef struct SM64ModernMarioWaterStepInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t position_x_bits;
+    uint32_t position_y_bits;
+    uint32_t position_z_bits;
+    uint32_t next_position_x_bits;
+    uint32_t next_position_y_bits;
+    uint32_t next_position_z_bits;
+    SM64ModernMarioWaterFloorProbeV1 current_floor;
+    SM64ModernMarioWaterFloorProbeV1 floor;
+    uint32_t ceiling_height_bits;
+    SM64ModernMarioWaterWallProbeV1 wall;
+    uint32_t reserved;
+} SM64ModernMarioWaterStepInputV1;
+
+typedef struct SM64ModernMarioWaterStepOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t position_x_bits;
+    uint32_t position_y_bits;
+    uint32_t position_z_bits;
+    SM64ModernMarioWaterFloorProbeV1 floor;
+    uint32_t result;
+    uint32_t reserved;
+} SM64ModernMarioWaterStepOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioWaterStepUpdateFn)(
+    void *context,
+    const SM64ModernMarioWaterStepInputV1 *input,
+    SM64ModernMarioWaterStepOutputV1 *out_output);
+
+typedef struct SM64ModernMarioWaterStepApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioWaterStepUpdateFn update;
+} SM64ModernMarioWaterStepApiV1;
+
+typedef uint32_t SM64ModernMarioBonkSoundKind;
+#define SM64_MODERN_MARIO_BONK_SOUND_HIT 0u
+#define SM64_MODERN_MARIO_BONK_SOUND_BONK 1u
+#define SM64_MODERN_MARIO_BONK_SOUND_METAL_BONK 2u
+
+// Shared scalar counterpart of mario_bonk_reflection. C keeps the actual
+// sound dispatch and Mario/object pointers; Swift owns only angle reflection,
+// optional speed negation, and the derived horizontal velocity values.
+typedef struct SM64ModernMarioBonkInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    int32_t face_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_z_bits;
+    uint32_t wall_present;
+    int32_t wall_angle;
+    uint32_t negate_speed;
+    uint32_t metal_cap;
+    uint32_t reserved;
+} SM64ModernMarioBonkInputV1;
+
+typedef struct SM64ModernMarioBonkOutputV1 {
+    SM64ModernAbiHeader header;
+    int32_t face_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_z_bits;
+    SM64ModernMarioBonkSoundKind sound_kind;
+    uint32_t reserved;
+} SM64ModernMarioBonkOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioBonkUpdateFn)(
+    void *context,
+    const SM64ModernMarioBonkInputV1 *input,
+    SM64ModernMarioBonkOutputV1 *out_output);
+
+typedef struct SM64ModernMarioBonkApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioBonkUpdateFn update;
+} SM64ModernMarioBonkApiV1;
+
+typedef uint32_t SM64ModernMarioTerrainImpulseFamily;
+#define SM64_MODERN_MARIO_TERRAIN_IMPULSE_MOVING_SAND 1u
+#define SM64_MODERN_MARIO_TERRAIN_IMPULSE_HORIZONTAL_WIND 2u
+
+// Scalar counterpart of mario_update_moving_sand and
+// mario_update_windy_ground. The C caller retains surface/audio effects and
+// applies the returned horizontal velocity; Swift owns only deterministic
+// impulse arithmetic.
+typedef struct SM64ModernMarioTerrainImpulseInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    SM64ModernMarioTerrainImpulseFamily family;
+    uint32_t floor_type;
+    int32_t force;
+    uint32_t moving_action;
+    int32_t face_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t global_timer;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_z_bits;
+    uint32_t reserved;
+} SM64ModernMarioTerrainImpulseInputV1;
+
+typedef struct SM64ModernMarioTerrainImpulseOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_z_bits;
+    uint32_t applied;
+    uint32_t sound_kind;
+    uint32_t reserved;
+} SM64ModernMarioTerrainImpulseOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioTerrainImpulseUpdateFn)(
+    void *context,
+    const SM64ModernMarioTerrainImpulseInputV1 *input,
+    SM64ModernMarioTerrainImpulseOutputV1 *out_output);
+
+typedef struct SM64ModernMarioTerrainImpulseApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioTerrainImpulseUpdateFn update;
+} SM64ModernMarioTerrainImpulseApiV1;
+
+typedef struct SM64ModernMarioQuicksandInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t floor_type;
+    uint32_t riding_shell;
+    uint32_t quicksand_depth_bits;
+    uint32_t sinking_speed_bits;
+    uint32_t reserved;
+} SM64ModernMarioQuicksandInputV1;
+
+typedef struct SM64ModernMarioQuicksandOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t quicksand_depth_bits;
+    uint32_t action;
+    uint32_t action_argument;
+    uint32_t update_sound_camera;
+    uint32_t reserved;
+} SM64ModernMarioQuicksandOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioQuicksandUpdateFn)(
+    void *context,
+    const SM64ModernMarioQuicksandInputV1 *input,
+    SM64ModernMarioQuicksandOutputV1 *out_output);
+
+typedef struct SM64ModernMarioQuicksandApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioQuicksandUpdateFn update;
+} SM64ModernMarioQuicksandApiV1;
+
+typedef struct SM64ModernMarioSteepPushInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    int32_t floor_angle;
+    int32_t face_yaw;
+    uint32_t action;
+    uint32_t action_argument;
+    uint32_t reserved;
+} SM64ModernMarioSteepPushInputV1;
+
+typedef struct SM64ModernMarioSteepPushOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t forward_velocity_bits;
+    int32_t face_yaw;
+    uint32_t action;
+    uint32_t action_argument;
+    uint32_t reserved;
+} SM64ModernMarioSteepPushOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioSteepPushUpdateFn)(
+    void *context,
+    const SM64ModernMarioSteepPushInputV1 *input,
+    SM64ModernMarioSteepPushOutputV1 *out_output);
+
+typedef struct SM64ModernMarioSteepPushApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioSteepPushUpdateFn update;
+} SM64ModernMarioSteepPushApiV1;
+
+typedef struct SM64ModernMarioTerrainSoundInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t floor_present;
+    uint32_t floor_type;
+    uint32_t floor_height_bits;
+    uint32_t water_level_bits;
+    uint32_t terrain_type;
+    uint32_t is_lava_level;
+    uint32_t reserved;
+} SM64ModernMarioTerrainSoundInputV1;
+
+typedef struct SM64ModernMarioTerrainSoundOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t terrain_sound_addend;
+    uint32_t reserved;
+} SM64ModernMarioTerrainSoundOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioTerrainSoundUpdateFn)(
+    void *context,
+    const SM64ModernMarioTerrainSoundInputV1 *input,
+    SM64ModernMarioTerrainSoundOutputV1 *out_output);
+
+typedef struct SM64ModernMarioTerrainSoundApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioTerrainSoundUpdateFn update;
+} SM64ModernMarioTerrainSoundApiV1;
+
+typedef struct SM64ModernMarioFloorPredicatesInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t floor_present;
+    uint32_t floor_type;
+    uint32_t terrain_type;
+    uint32_t normal_y_bits;
+    int32_t floor_angle;
+    int32_t face_yaw;
+    uint32_t is_crawling;
+    int32_t turn_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t reserved;
+} SM64ModernMarioFloorPredicatesInputV1;
+
+typedef struct SM64ModernMarioFloorPredicatesOutputV1 {
+    SM64ModernAbiHeader header;
+    int32_t floor_class;
+    uint32_t is_slippery;
+    uint32_t is_slope;
+    uint32_t is_steep;
+    uint32_t facing_downhill;
+    uint32_t reserved;
+} SM64ModernMarioFloorPredicatesOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioFloorPredicatesUpdateFn)(
+    void *context,
+    const SM64ModernMarioFloorPredicatesInputV1 *input,
+    SM64ModernMarioFloorPredicatesOutputV1 *out_output);
+
+typedef struct SM64ModernMarioFloorPredicatesApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioFloorPredicatesUpdateFn update;
+} SM64ModernMarioFloorPredicatesApiV1;
+
+typedef struct SM64ModernMarioForwardVelocityInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t forward_velocity_bits;
+    int32_t face_yaw;
+    uint32_t reserved;
+} SM64ModernMarioForwardVelocityInputV1;
+
+typedef struct SM64ModernMarioForwardVelocityOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t forward_velocity_bits;
+    uint32_t slide_velocity_x_bits;
+    uint32_t slide_velocity_z_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_z_bits;
+    uint32_t reserved;
+} SM64ModernMarioForwardVelocityOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioForwardVelocityUpdateFn)(
+    void *context,
+    const SM64ModernMarioForwardVelocityInputV1 *input,
+    SM64ModernMarioForwardVelocityOutputV1 *out_output);
+
+typedef struct SM64ModernMarioForwardVelocityApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioForwardVelocityUpdateFn update;
+} SM64ModernMarioForwardVelocityApiV1;
+
+typedef uint32_t SM64ModernMarioVelocityDerivationFamily;
+#define SM64_MODERN_MARIO_VELOCITY_FROM_YAW 1u
+#define SM64_MODERN_MARIO_VELOCITY_FROM_PITCH_YAW 2u
+
+typedef struct SM64ModernMarioVelocityDerivationInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    SM64ModernMarioVelocityDerivationFamily family;
+    uint32_t forward_velocity_bits;
+    int32_t face_pitch;
+    int32_t face_yaw;
+    uint32_t reserved;
+} SM64ModernMarioVelocityDerivationInputV1;
+
+typedef struct SM64ModernMarioVelocityDerivationOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t slide_velocity_x_bits;
+    uint32_t slide_velocity_z_bits;
+    uint32_t reserved;
+} SM64ModernMarioVelocityDerivationOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioVelocityDerivationUpdateFn)(
+    void *context,
+    const SM64ModernMarioVelocityDerivationInputV1 *input,
+    SM64ModernMarioVelocityDerivationOutputV1 *out_output);
+
+typedef struct SM64ModernMarioVelocityDerivationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioVelocityDerivationUpdateFn update;
+} SM64ModernMarioVelocityDerivationApiV1;
+
+typedef uint32_t SM64ModernMarioPunchSoundKind;
+#define SM64_MODERN_MARIO_PUNCH_SOUND_NONE 0u
+#define SM64_MODERN_MARIO_PUNCH_SOUND_YAH 1u
+#define SM64_MODERN_MARIO_PUNCH_SOUND_WAH 2u
+#define SM64_MODERN_MARIO_PUNCH_SOUND_HOO 3u
+
+typedef struct SM64ModernMarioPunchInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t moving_action;
+    uint32_t action_argument;
+    int32_t animation_frame;
+    uint32_t animation_at_end;
+    uint32_t animation_past_end;
+    uint32_t b_pressed;
+    uint32_t reserved;
+} SM64ModernMarioPunchInputV1;
+
+typedef struct SM64ModernMarioPunchOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t action_argument;
+    uint32_t animation_id;
+    uint32_t transition_action;
+    uint32_t flags;
+    uint32_t punch_state;
+    uint32_t punch_state_valid;
+    SM64ModernMarioPunchSoundKind sound_kind;
+    uint32_t reserved;
+} SM64ModernMarioPunchOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioPunchUpdateFn)(
+    void *context,
+    const SM64ModernMarioPunchInputV1 *input,
+    SM64ModernMarioPunchOutputV1 *out_output);
+
+typedef struct SM64ModernMarioPunchApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioPunchUpdateFn update;
+} SM64ModernMarioPunchApiV1;
+
+typedef uint32_t SM64ModernMarioWallResponseSoundKind;
+#define SM64_MODERN_MARIO_WALL_SOUND_NONE 0u
+#define SM64_MODERN_MARIO_WALL_SOUND_STEP 1u
+#define SM64_MODERN_MARIO_WALL_SOUND_MOVING_SLIDE 2u
+
+typedef struct SM64ModernMarioWallResponseInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t start_position_x_bits;
+    uint32_t start_position_z_bits;
+    uint32_t position_x_bits;
+    uint32_t position_z_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t forward_velocity_bits;
+    int32_t face_yaw;
+    int32_t animation_frame;
+    uint32_t animation_past_frame1;
+    uint32_t animation_past_frame2;
+    uint32_t terrain_sound_addend;
+    int32_t floor_slope_pitch;
+    uint32_t wall_present;
+    int32_t wall_angle;
+    uint32_t reserved;
+} SM64ModernMarioWallResponseInputV1;
+
+typedef struct SM64ModernMarioWallResponseOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t forward_velocity_bits;
+    uint32_t flags;
+    uint32_t animation_id;
+    int32_t animation_acceleration;
+    SM64ModernMarioWallResponseSoundKind sound_kind;
+    uint32_t particle_dust;
+    uint32_t action_state;
+    uint32_t action_argument;
+    int32_t gfx_pitch;
+    int32_t gfx_yaw;
+    int32_t gfx_roll;
+    uint32_t reserved;
+} SM64ModernMarioWallResponseOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioWallResponseUpdateFn)(
+    void *context,
+    const SM64ModernMarioWallResponseInputV1 *input,
+    SM64ModernMarioWallResponseOutputV1 *out_output);
+
+typedef struct SM64ModernMarioWallResponseApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioWallResponseUpdateFn update;
+} SM64ModernMarioWallResponseApiV1;
+
+typedef uint32_t SM64ModernMarioWalkSoundKind;
+#define SM64_MODERN_MARIO_WALK_SOUND_NONE 0u
+#define SM64_MODERN_MARIO_WALK_SOUND_TERRAIN 1u
+#define SM64_MODERN_MARIO_WALK_SOUND_TERRAIN_TIPTOE 2u
+#define SM64_MODERN_MARIO_WALK_SOUND_QUICKSAND 3u
+#define SM64_MODERN_MARIO_WALK_SOUND_METAL 4u
+#define SM64_MODERN_MARIO_WALK_SOUND_METAL_TIPTOE 5u
+
+typedef struct SM64ModernMarioWalkAnimationInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t intended_magnitude_bits;
+    uint32_t forward_velocity_bits;
+    uint32_t quicksand_depth_bits;
+    uint32_t action_timer;
+    uint32_t animation_past_frame23;
+    uint32_t animation_past_frame1;
+    uint32_t animation_past_frame2;
+    uint32_t metal_cap;
+    int32_t walking_pitch;
+    int32_t running_pitch;
+    uint32_t reserved;
+} SM64ModernMarioWalkAnimationInputV1;
+
+typedef struct SM64ModernMarioWalkAnimationOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t animation_id;
+    int32_t animation_acceleration;
+    uint32_t action_timer;
+    int32_t walking_pitch;
+    SM64ModernMarioWalkSoundKind sound_kind;
+    int32_t sound_frame1;
+    int32_t sound_frame2;
+    uint32_t reserved;
+} SM64ModernMarioWalkAnimationOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioWalkAnimationUpdateFn)(
+    void *context,
+    const SM64ModernMarioWalkAnimationInputV1 *input,
+    SM64ModernMarioWalkAnimationOutputV1 *out_output);
+
+typedef struct SM64ModernMarioWalkAnimationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioWalkAnimationUpdateFn update;
+} SM64ModernMarioWalkAnimationApiV1;
+
+typedef uint32_t SM64ModernMarioHeldWalkVariant;
+#define SM64_MODERN_MARIO_HELD_WALK_LIGHT 0u
+#define SM64_MODERN_MARIO_HELD_WALK_HEAVY 1u
+
+typedef struct SM64ModernMarioHeldWalkAnimationInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    SM64ModernMarioHeldWalkVariant variant;
+    uint32_t intended_magnitude_bits;
+    uint32_t forward_velocity_bits;
+    uint32_t quicksand_depth_bits;
+    uint32_t action_timer;
+    uint32_t animation_past_frame1;
+    uint32_t animation_past_frame2;
+    uint32_t metal_cap;
+    uint32_t reserved;
+} SM64ModernMarioHeldWalkAnimationInputV1;
+
+typedef struct SM64ModernMarioHeldWalkAnimationOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t animation_id;
+    int32_t animation_acceleration;
+    uint32_t action_timer;
+    SM64ModernMarioWalkSoundKind sound_kind;
+    int32_t sound_frame1;
+    int32_t sound_frame2;
+    uint32_t reserved;
+} SM64ModernMarioHeldWalkAnimationOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioHeldWalkAnimationUpdateFn)(
+    void *context,
+    const SM64ModernMarioHeldWalkAnimationInputV1 *input,
+    SM64ModernMarioHeldWalkAnimationOutputV1 *out_output);
+
+typedef struct SM64ModernMarioHeldWalkAnimationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioHeldWalkAnimationUpdateFn update;
+} SM64ModernMarioHeldWalkAnimationApiV1;
+
+typedef struct SM64ModernMarioSlopeAccelerationInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    int32_t floor_class;
+    uint32_t terrain_is_slide;
+    uint32_t floor_normal_x_bits;
+    uint32_t floor_normal_y_bits;
+    uint32_t floor_normal_z_bits;
+    int32_t floor_angle;
+    int32_t face_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t action;
+    uint32_t reserved;
+} SM64ModernMarioSlopeAccelerationInputV1;
+
+typedef struct SM64ModernMarioSlopeAccelerationOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t forward_velocity_bits;
+    int32_t slide_yaw;
+    uint32_t slide_velocity_x_bits;
+    uint32_t slide_velocity_z_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t facing_downhill;
+    uint32_t floor_is_slope;
+    uint32_t floor_is_steep;
+    uint32_t update_moving_sand;
+    uint32_t update_windy_ground;
+    uint32_t reserved;
+} SM64ModernMarioSlopeAccelerationOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioSlopeAccelerationUpdateFn)(
+    void *context,
+    const SM64ModernMarioSlopeAccelerationInputV1 *input,
+    SM64ModernMarioSlopeAccelerationOutputV1 *out_output);
+
+typedef struct SM64ModernMarioSlopeAccelerationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioSlopeAccelerationUpdateFn update;
+} SM64ModernMarioSlopeAccelerationApiV1;
+
+typedef struct SM64ModernMarioSlopeDecelerationInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t coefficient_bits;
+    int32_t floor_class;
+    uint32_t terrain_is_slide;
+    uint32_t floor_normal_x_bits;
+    uint32_t floor_normal_y_bits;
+    uint32_t floor_normal_z_bits;
+    int32_t floor_angle;
+    int32_t face_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t action;
+    uint32_t reserved;
+} SM64ModernMarioSlopeDecelerationInputV1;
+
+typedef struct SM64ModernMarioSlopeDecelerationOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t stopped;
+    uint32_t forward_velocity_bits;
+    int32_t slide_yaw;
+    uint32_t slide_velocity_x_bits;
+    uint32_t slide_velocity_z_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t facing_downhill;
+    uint32_t floor_is_slope;
+    uint32_t floor_is_steep;
+    uint32_t update_moving_sand;
+    uint32_t update_windy_ground;
+    uint32_t reserved;
+} SM64ModernMarioSlopeDecelerationOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioSlopeDecelerationUpdateFn)(
+    void *context,
+    const SM64ModernMarioSlopeDecelerationInputV1 *input,
+    SM64ModernMarioSlopeDecelerationOutputV1 *out_output);
+
+typedef struct SM64ModernMarioSlopeDecelerationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioSlopeDecelerationUpdateFn update;
+} SM64ModernMarioSlopeDecelerationApiV1;
+
+typedef struct SM64ModernMarioDeceleratingSpeedInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t forward_velocity_bits;
+    int32_t face_yaw;
+    uint32_t velocity_y_bits;
+    uint32_t reserved;
+} SM64ModernMarioDeceleratingSpeedInputV1;
+
+typedef struct SM64ModernMarioDeceleratingSpeedOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t stopped;
+    uint32_t forward_velocity_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t update_moving_sand;
+    uint32_t update_windy_ground;
+    uint32_t reserved;
+} SM64ModernMarioDeceleratingSpeedOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioDeceleratingSpeedUpdateFn)(
+    void *context,
+    const SM64ModernMarioDeceleratingSpeedInputV1 *input,
+    SM64ModernMarioDeceleratingSpeedOutputV1 *out_output);
+
+typedef struct SM64ModernMarioDeceleratingSpeedApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioDeceleratingSpeedUpdateFn update;
+} SM64ModernMarioDeceleratingSpeedApiV1;
+
+typedef struct SM64ModernMarioShellSpeedInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t intended_magnitude_bits;
+    int32_t intended_yaw;
+    int32_t face_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t floor_is_slow;
+    uint32_t floor_normal_y_bits;
+    int32_t floor_class;
+    uint32_t terrain_is_slide;
+    uint32_t floor_normal_x_bits;
+    uint32_t floor_normal_z_bits;
+    int32_t floor_angle;
+    uint32_t action;
+    uint32_t reserved;
+} SM64ModernMarioShellSpeedInputV1;
+
+typedef struct SM64ModernMarioShellSpeedOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t forward_velocity_bits;
+    int32_t face_yaw;
+    int32_t slide_yaw;
+    uint32_t slide_velocity_x_bits;
+    uint32_t slide_velocity_z_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t facing_downhill;
+    uint32_t floor_is_slope;
+    uint32_t floor_is_steep;
+    uint32_t update_moving_sand;
+    uint32_t update_windy_ground;
+    uint32_t reserved;
+} SM64ModernMarioShellSpeedOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioShellSpeedUpdateFn)(
+    void *context,
+    const SM64ModernMarioShellSpeedInputV1 *input,
+    SM64ModernMarioShellSpeedOutputV1 *out_output);
+
+typedef struct SM64ModernMarioShellSpeedApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioShellSpeedUpdateFn update;
+} SM64ModernMarioShellSpeedApiV1;
+
+typedef struct SM64ModernMarioLandingAccelerationInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t friction_factor_bits;
+    int32_t floor_class;
+    uint32_t terrain_is_slide;
+    uint32_t floor_normal_x_bits;
+    uint32_t floor_normal_y_bits;
+    uint32_t floor_normal_z_bits;
+    int32_t floor_angle;
+    int32_t face_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t action;
+    uint32_t reserved;
+} SM64ModernMarioLandingAccelerationInputV1;
+
+typedef struct SM64ModernMarioLandingAccelerationOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t stopped;
+    uint32_t forward_velocity_bits;
+    int32_t slide_yaw;
+    uint32_t slide_velocity_x_bits;
+    uint32_t slide_velocity_z_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t floor_is_slope;
+    uint32_t update_moving_sand;
+    uint32_t update_windy_ground;
+    uint32_t reserved;
+} SM64ModernMarioLandingAccelerationOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioLandingAccelerationUpdateFn)(
+    void *context,
+    const SM64ModernMarioLandingAccelerationInputV1 *input,
+    SM64ModernMarioLandingAccelerationOutputV1 *out_output);
+
+typedef struct SM64ModernMarioLandingAccelerationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioLandingAccelerationUpdateFn update;
+} SM64ModernMarioLandingAccelerationApiV1;
+
+// Value-only gravity reducer boundary. Action/flag/input bitfields are copied
+// as fixed-width values; the C owner retains Mario/body-state mutation and
+// effects while Swift owns the deterministic vertical-velocity reducer.
+typedef struct SM64ModernMarioGravityInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t action;
+    uint32_t mario_flags;
+    uint32_t input;
+    int32_t angle_velocity_y;
+    uint32_t velocity_y_bits;
+    uint32_t unk_c4_bits;
+    uint32_t reserved;
+} SM64ModernMarioGravityInputV1;
+
+typedef struct SM64ModernMarioGravityOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t velocity_y_bits;
+    uint32_t wing_flutter;
+    uint32_t reserved;
+} SM64ModernMarioGravityOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioGravityUpdateFn)(
+    void *context,
+    const SM64ModernMarioGravityInputV1 *input,
+    SM64ModernMarioGravityOutputV1 *out_output);
+
+typedef struct SM64ModernMarioGravityApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioGravityUpdateFn update;
+} SM64ModernMarioGravityApiV1;
+
+typedef struct SM64ModernMarioVerticalWindInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t action;
+    uint32_t floor_type;
+    uint32_t position_y_bits;
+    uint32_t velocity_y_bits;
+    uint32_t reserved;
+} SM64ModernMarioVerticalWindInputV1;
+
+typedef struct SM64ModernMarioVerticalWindOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t velocity_y_bits;
+    uint32_t active;
+    uint32_t reserved;
+} SM64ModernMarioVerticalWindOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioVerticalWindUpdateFn)(
+    void *context,
+    const SM64ModernMarioVerticalWindInputV1 *input,
+    SM64ModernMarioVerticalWindOutputV1 *out_output);
+
+typedef struct SM64ModernMarioVerticalWindApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioVerticalWindUpdateFn update;
+} SM64ModernMarioVerticalWindApiV1;
+
+typedef struct SM64ModernMarioSlidingInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    int32_t floor_class;
+    uint32_t floor_is_slope;
+    uint32_t floor_normal_x_bits;
+    uint32_t floor_normal_y_bits;
+    uint32_t floor_normal_z_bits;
+    int32_t intended_yaw;
+    uint32_t intended_magnitude_bits;
+    int32_t face_yaw;
+    int32_t slide_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t slide_velocity_x_bits;
+    uint32_t slide_velocity_z_bits;
+    uint32_t stop_speed_bits;
+    uint32_t reserved;
+} SM64ModernMarioSlidingInputV1;
+
+typedef struct SM64ModernMarioSlidingOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t stopped;
+    int32_t face_yaw;
+    int32_t slide_yaw;
+    uint32_t forward_velocity_bits;
+    uint32_t slide_velocity_x_bits;
+    uint32_t slide_velocity_z_bits;
+    uint32_t velocity_x_bits;
+    uint32_t velocity_y_bits;
+    uint32_t velocity_z_bits;
+    uint32_t update_moving_sand;
+    uint32_t update_windy_ground;
+    uint32_t reserved;
+} SM64ModernMarioSlidingOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioSlidingUpdateFn)(
+    void *context,
+    const SM64ModernMarioSlidingInputV1 *input,
+    SM64ModernMarioSlidingOutputV1 *out_output);
+
+typedef struct SM64ModernMarioSlidingApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioSlidingUpdateFn update;
+} SM64ModernMarioSlidingApiV1;
+
+typedef struct SM64ModernMarioGroundDivePunchInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t b_pressed;
+    uint32_t forward_velocity_bits;
+    uint32_t stick_magnitude_bits;
+    uint32_t velocity_y_bits;
+    uint32_t reserved;
+} SM64ModernMarioGroundDivePunchInputV1;
+
+typedef struct SM64ModernMarioGroundDivePunchOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t triggered;
+    uint32_t action;
+    uint32_t action_argument;
+    uint32_t velocity_y_bits;
+    uint32_t reserved;
+} SM64ModernMarioGroundDivePunchOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioGroundDivePunchUpdateFn)(
+    void *context,
+    const SM64ModernMarioGroundDivePunchInputV1 *input,
+    SM64ModernMarioGroundDivePunchOutputV1 *out_output);
+
+typedef struct SM64ModernMarioGroundDivePunchApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioGroundDivePunchUpdateFn update;
+} SM64ModernMarioGroundDivePunchApiV1;
+
+typedef struct SM64ModernMarioSlidePredicatesInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t input;
+    uint32_t terrain_is_slide;
+    uint32_t forward_velocity_bits;
+    uint32_t facing_downhill;
+    int32_t intended_yaw;
+    int32_t face_yaw;
+    uint32_t reserved;
+} SM64ModernMarioSlidePredicatesInputV1;
+
+typedef struct SM64ModernMarioSlidePredicatesOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t should_begin_sliding;
+    uint32_t analog_stick_held_back;
+    uint32_t reserved;
+} SM64ModernMarioSlidePredicatesOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioSlidePredicatesUpdateFn)(
+    void *context,
+    const SM64ModernMarioSlidePredicatesInputV1 *input,
+    SM64ModernMarioSlidePredicatesOutputV1 *out_output);
+
+typedef struct SM64ModernMarioSlidePredicatesApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioSlidePredicatesUpdateFn update;
+} SM64ModernMarioSlidePredicatesApiV1;
+
+typedef struct SM64ModernMarioBeginBrakingInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t action_state;
+    uint32_t action_argument;
+    uint32_t forward_velocity_bits;
+    uint32_t floor_normal_y_bits;
+    int32_t face_yaw;
+    uint32_t reserved;
+} SM64ModernMarioBeginBrakingInputV1;
+
+typedef struct SM64ModernMarioBeginBrakingOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t action;
+    uint32_t action_argument;
+    int32_t face_yaw;
+    uint32_t intent;
+    uint32_t reserved;
+} SM64ModernMarioBeginBrakingOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioBeginBrakingUpdateFn)(
+    void *context,
+    const SM64ModernMarioBeginBrakingInputV1 *input,
+    SM64ModernMarioBeginBrakingOutputV1 *out_output);
+
+typedef struct SM64ModernMarioBeginBrakingApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioBeginBrakingUpdateFn update;
+} SM64ModernMarioBeginBrakingApiV1;
+
+typedef struct SM64ModernMarioTripleJumpSelectorInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t mario_flags;
+    uint32_t forward_velocity_bits;
+    uint32_t reserved;
+} SM64ModernMarioTripleJumpSelectorInputV1;
+
+typedef struct SM64ModernMarioTripleJumpSelectorOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t action;
+    uint32_t action_argument;
+    uint32_t intent;
+    uint32_t reserved;
+} SM64ModernMarioTripleJumpSelectorOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioTripleJumpSelectorUpdateFn)(
+    void *context,
+    const SM64ModernMarioTripleJumpSelectorInputV1 *input,
+    SM64ModernMarioTripleJumpSelectorOutputV1 *out_output);
+
+typedef struct SM64ModernMarioTripleJumpSelectorApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioTripleJumpSelectorUpdateFn update;
+} SM64ModernMarioTripleJumpSelectorApiV1;
+
+typedef struct SM64ModernMarioYVelocityInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t initial_velocity_y_bits;
+    uint32_t forward_velocity_bits;
+    uint32_t multiplier_bits;
+    uint32_t squish_timer;
+    uint32_t quicksand_depth_bits;
+    uint32_t reserved;
+} SM64ModernMarioYVelocityInputV1;
+
+typedef struct SM64ModernMarioYVelocityOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t velocity_y_bits;
+    uint32_t half_speed_applied;
+    uint32_t reserved;
+} SM64ModernMarioYVelocityOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioYVelocityUpdateFn)(
+    void *context,
+    const SM64ModernMarioYVelocityInputV1 *input,
+    SM64ModernMarioYVelocityOutputV1 *out_output);
+
+typedef struct SM64ModernMarioYVelocityApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioYVelocityUpdateFn update;
+} SM64ModernMarioYVelocityApiV1;
+
+typedef struct SM64ModernMarioSteepJumpInputV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    int32_t face_yaw;
+    int32_t floor_angle;
+    uint32_t forward_velocity_bits;
+    uint32_t reserved;
+} SM64ModernMarioSteepJumpInputV1;
+
+typedef struct SM64ModernMarioSteepJumpOutputV1 {
+    SM64ModernAbiHeader header;
+    uint32_t action;
+    int32_t steep_jump_yaw;
+    uint32_t forward_velocity_bits;
+    int32_t face_yaw;
+    uint32_t should_drop_held_object;
+    uint32_t reserved;
+} SM64ModernMarioSteepJumpOutputV1;
+
+typedef SM64ModernStatus (*SM64ModernMarioSteepJumpUpdateFn)(
+    void *context,
+    const SM64ModernMarioSteepJumpInputV1 *input,
+    SM64ModernMarioSteepJumpOutputV1 *out_output);
+
+typedef struct SM64ModernMarioSteepJumpApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernMarioSteepJumpUpdateFn update;
+} SM64ModernMarioSteepJumpApiV1;
 
 // Camera selection/angle migration extension.  The full camera geometry and
 // cutscene graph remain an explicit C compatibility bridge; this value-only
@@ -1239,6 +2500,192 @@ SM64ModernStatus sm64_modern_install_mario_ground_speed_api(
     const SM64ModernMarioGroundSpeedApiV1 *api);
 void sm64_modern_uninstall_mario_ground_speed_api(void);
 SM64ModernStatus sm64_modern_mario_ground_speed_status(void);
+SM64ModernStatus sm64_modern_validate_mario_action_api(
+    const SM64ModernMarioActionApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_action_api(
+    const SM64ModernMarioActionApiV1 *api);
+void sm64_modern_uninstall_mario_action_api(void);
+SM64ModernStatus sm64_modern_mario_action_status(void);
+SM64ModernStatus sm64_modern_validate_mario_action_cancel_api(
+    const SM64ModernMarioActionCancelApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_action_cancel_api(
+    const SM64ModernMarioActionCancelApiV1 *api);
+void sm64_modern_uninstall_mario_action_cancel_api(void);
+SM64ModernStatus sm64_modern_mario_action_cancel_status(void);
+SM64ModernStatus sm64_modern_validate_mario_ground_step_api(
+    const SM64ModernMarioGroundStepApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_ground_step_api(
+    const SM64ModernMarioGroundStepApiV1 *api);
+void sm64_modern_uninstall_mario_ground_step_api(void);
+SM64ModernStatus sm64_modern_mario_ground_step_status(void);
+SM64ModernStatus sm64_modern_validate_mario_air_step_api(
+    const SM64ModernMarioAirStepApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_air_step_api(
+    const SM64ModernMarioAirStepApiV1 *api);
+void sm64_modern_uninstall_mario_air_step_api(void);
+SM64ModernStatus sm64_modern_mario_air_step_status(void);
+SM64ModernStatus sm64_modern_validate_mario_water_step_api(
+    const SM64ModernMarioWaterStepApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_water_step_api(
+    const SM64ModernMarioWaterStepApiV1 *api);
+void sm64_modern_uninstall_mario_water_step_api(void);
+SM64ModernStatus sm64_modern_mario_water_step_status(void);
+SM64ModernStatus sm64_modern_validate_mario_bonk_api(
+    const SM64ModernMarioBonkApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_bonk_api(
+    const SM64ModernMarioBonkApiV1 *api);
+void sm64_modern_uninstall_mario_bonk_api(void);
+SM64ModernStatus sm64_modern_mario_bonk_status(void);
+SM64ModernStatus sm64_modern_validate_mario_terrain_impulse_api(
+    const SM64ModernMarioTerrainImpulseApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_terrain_impulse_api(
+    const SM64ModernMarioTerrainImpulseApiV1 *api);
+void sm64_modern_uninstall_mario_terrain_impulse_api(void);
+SM64ModernStatus sm64_modern_mario_terrain_impulse_status(void);
+SM64ModernStatus sm64_modern_validate_mario_quicksand_api(
+    const SM64ModernMarioQuicksandApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_quicksand_api(
+    const SM64ModernMarioQuicksandApiV1 *api);
+void sm64_modern_uninstall_mario_quicksand_api(void);
+SM64ModernStatus sm64_modern_mario_quicksand_status(void);
+SM64ModernStatus sm64_modern_validate_mario_steep_push_api(
+    const SM64ModernMarioSteepPushApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_steep_push_api(
+    const SM64ModernMarioSteepPushApiV1 *api);
+void sm64_modern_uninstall_mario_steep_push_api(void);
+SM64ModernStatus sm64_modern_mario_steep_push_status(void);
+SM64ModernStatus sm64_modern_validate_mario_terrain_sound_api(
+    const SM64ModernMarioTerrainSoundApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_terrain_sound_api(
+    const SM64ModernMarioTerrainSoundApiV1 *api);
+void sm64_modern_uninstall_mario_terrain_sound_api(void);
+SM64ModernStatus sm64_modern_mario_terrain_sound_status(void);
+SM64ModernStatus sm64_modern_validate_mario_floor_predicates_api(
+    const SM64ModernMarioFloorPredicatesApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_floor_predicates_api(
+    const SM64ModernMarioFloorPredicatesApiV1 *api);
+void sm64_modern_uninstall_mario_floor_predicates_api(void);
+SM64ModernStatus sm64_modern_mario_floor_predicates_status(void);
+SM64ModernStatus sm64_modern_validate_mario_forward_velocity_api(
+    const SM64ModernMarioForwardVelocityApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_forward_velocity_api(
+    const SM64ModernMarioForwardVelocityApiV1 *api);
+void sm64_modern_uninstall_mario_forward_velocity_api(void);
+SM64ModernStatus sm64_modern_mario_forward_velocity_status(void);
+SM64ModernStatus sm64_modern_validate_mario_velocity_derivation_api(
+    const SM64ModernMarioVelocityDerivationApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_velocity_derivation_api(
+    const SM64ModernMarioVelocityDerivationApiV1 *api);
+void sm64_modern_uninstall_mario_velocity_derivation_api(void);
+SM64ModernStatus sm64_modern_mario_velocity_derivation_status(void);
+SM64ModernStatus sm64_modern_validate_mario_punch_api(
+    const SM64ModernMarioPunchApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_punch_api(
+    const SM64ModernMarioPunchApiV1 *api);
+void sm64_modern_uninstall_mario_punch_api(void);
+SM64ModernStatus sm64_modern_mario_punch_status(void);
+SM64ModernStatus sm64_modern_validate_mario_wall_response_api(
+    const SM64ModernMarioWallResponseApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_wall_response_api(
+    const SM64ModernMarioWallResponseApiV1 *api);
+void sm64_modern_uninstall_mario_wall_response_api(void);
+SM64ModernStatus sm64_modern_mario_wall_response_status(void);
+SM64ModernStatus sm64_modern_validate_mario_walk_animation_api(
+    const SM64ModernMarioWalkAnimationApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_walk_animation_api(
+    const SM64ModernMarioWalkAnimationApiV1 *api);
+void sm64_modern_uninstall_mario_walk_animation_api(void);
+SM64ModernStatus sm64_modern_mario_walk_animation_status(void);
+SM64ModernStatus sm64_modern_validate_mario_held_walk_animation_api(
+    const SM64ModernMarioHeldWalkAnimationApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_held_walk_animation_api(
+    const SM64ModernMarioHeldWalkAnimationApiV1 *api);
+void sm64_modern_uninstall_mario_held_walk_animation_api(void);
+SM64ModernStatus sm64_modern_mario_held_walk_animation_status(void);
+SM64ModernStatus sm64_modern_validate_mario_slope_acceleration_api(
+    const SM64ModernMarioSlopeAccelerationApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_slope_acceleration_api(
+    const SM64ModernMarioSlopeAccelerationApiV1 *api);
+void sm64_modern_uninstall_mario_slope_acceleration_api(void);
+SM64ModernStatus sm64_modern_mario_slope_acceleration_status(void);
+SM64ModernStatus sm64_modern_validate_mario_slope_deceleration_api(
+    const SM64ModernMarioSlopeDecelerationApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_slope_deceleration_api(
+    const SM64ModernMarioSlopeDecelerationApiV1 *api);
+void sm64_modern_uninstall_mario_slope_deceleration_api(void);
+SM64ModernStatus sm64_modern_mario_slope_deceleration_status(void);
+SM64ModernStatus sm64_modern_validate_mario_decelerating_speed_api(
+    const SM64ModernMarioDeceleratingSpeedApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_decelerating_speed_api(
+    const SM64ModernMarioDeceleratingSpeedApiV1 *api);
+void sm64_modern_uninstall_mario_decelerating_speed_api(void);
+SM64ModernStatus sm64_modern_mario_decelerating_speed_status(void);
+SM64ModernStatus sm64_modern_validate_mario_shell_speed_api(
+    const SM64ModernMarioShellSpeedApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_shell_speed_api(
+    const SM64ModernMarioShellSpeedApiV1 *api);
+void sm64_modern_uninstall_mario_shell_speed_api(void);
+SM64ModernStatus sm64_modern_mario_shell_speed_status(void);
+SM64ModernStatus sm64_modern_validate_mario_landing_acceleration_api(
+    const SM64ModernMarioLandingAccelerationApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_landing_acceleration_api(
+    const SM64ModernMarioLandingAccelerationApiV1 *api);
+void sm64_modern_uninstall_mario_landing_acceleration_api(void);
+SM64ModernStatus sm64_modern_mario_landing_acceleration_status(void);
+SM64ModernStatus sm64_modern_validate_mario_gravity_api(
+    const SM64ModernMarioGravityApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_gravity_api(
+    const SM64ModernMarioGravityApiV1 *api);
+void sm64_modern_uninstall_mario_gravity_api(void);
+SM64ModernStatus sm64_modern_mario_gravity_status(void);
+SM64ModernStatus sm64_modern_validate_mario_vertical_wind_api(
+    const SM64ModernMarioVerticalWindApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_vertical_wind_api(
+    const SM64ModernMarioVerticalWindApiV1 *api);
+void sm64_modern_uninstall_mario_vertical_wind_api(void);
+SM64ModernStatus sm64_modern_mario_vertical_wind_status(void);
+SM64ModernStatus sm64_modern_validate_mario_sliding_api(
+    const SM64ModernMarioSlidingApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_sliding_api(
+    const SM64ModernMarioSlidingApiV1 *api);
+void sm64_modern_uninstall_mario_sliding_api(void);
+SM64ModernStatus sm64_modern_mario_sliding_status(void);
+SM64ModernStatus sm64_modern_validate_mario_ground_dive_punch_api(
+    const SM64ModernMarioGroundDivePunchApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_ground_dive_punch_api(
+    const SM64ModernMarioGroundDivePunchApiV1 *api);
+void sm64_modern_uninstall_mario_ground_dive_punch_api(void);
+SM64ModernStatus sm64_modern_mario_ground_dive_punch_status(void);
+SM64ModernStatus sm64_modern_validate_mario_slide_predicates_api(
+    const SM64ModernMarioSlidePredicatesApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_slide_predicates_api(
+    const SM64ModernMarioSlidePredicatesApiV1 *api);
+void sm64_modern_uninstall_mario_slide_predicates_api(void);
+SM64ModernStatus sm64_modern_mario_slide_predicates_status(void);
+SM64ModernStatus sm64_modern_validate_mario_begin_braking_api(
+    const SM64ModernMarioBeginBrakingApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_begin_braking_api(
+    const SM64ModernMarioBeginBrakingApiV1 *api);
+void sm64_modern_uninstall_mario_begin_braking_api(void);
+SM64ModernStatus sm64_modern_mario_begin_braking_status(void);
+SM64ModernStatus sm64_modern_validate_mario_triple_jump_selector_api(
+    const SM64ModernMarioTripleJumpSelectorApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_triple_jump_selector_api(
+    const SM64ModernMarioTripleJumpSelectorApiV1 *api);
+void sm64_modern_uninstall_mario_triple_jump_selector_api(void);
+SM64ModernStatus sm64_modern_mario_triple_jump_selector_status(void);
+SM64ModernStatus sm64_modern_validate_mario_y_velocity_api(
+    const SM64ModernMarioYVelocityApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_y_velocity_api(
+    const SM64ModernMarioYVelocityApiV1 *api);
+void sm64_modern_uninstall_mario_y_velocity_api(void);
+SM64ModernStatus sm64_modern_mario_y_velocity_status(void);
+SM64ModernStatus sm64_modern_validate_mario_steep_jump_api(
+    const SM64ModernMarioSteepJumpApiV1 *api);
+SM64ModernStatus sm64_modern_install_mario_steep_jump_api(
+    const SM64ModernMarioSteepJumpApiV1 *api);
+void sm64_modern_uninstall_mario_steep_jump_api(void);
+SM64ModernStatus sm64_modern_mario_steep_jump_status(void);
 SM64ModernStatus sm64_modern_validate_camera_migration_api(
     const SM64ModernCameraMigrationApiV1 *migration);
 SM64ModernStatus sm64_modern_install_camera_migration_api(

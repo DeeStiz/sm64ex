@@ -11,6 +11,7 @@
 #include "game/memory.h"
 #include "game/object_helpers.h"
 #include "game/object_list_processor.h"
+#include "game/level_update.h"
 #include "game/profiler.h"
 #include "game/save_file.h"
 #include "game/sound_init.h"
@@ -20,6 +21,7 @@
 #include "level_script.h"
 #include "level_misc_macros.h"
 #include "math_util.h"
+#include "menu/level_select_menu.h"
 #include "surface_collision.h"
 #include "surface_load.h"
 #include "level_table.h"
@@ -916,6 +918,20 @@ struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {
             const uint8_t executed_size = sCurrentCmd->size;
             LevelScriptJumpTable[sCurrentCmd->type]();
             record_level_script_command(executed_type, executed_size);
+        }
+    } else if (sCurrentCmd != NULL && sCurrentCmd->type == 0x12) {
+        /*
+         * CALL_LOOP is paused on the held native tick, but render_game still
+         * builds a fresh display list. Re-emit only the intro UI's render
+         * side-effects; invoking its update callback again would duplicate
+         * input, timers, demo progression, or menu state transitions.
+         */
+        typedef s32 (*LevelCallLoopFunc)(s16, s32);
+        const LevelCallLoopFunc callback = CMD_GET(LevelCallLoopFunc, 4);
+        if (callback == lvl_intro_update) {
+            lvl_intro_render(CMD_GET(s16, 2));
+        } else if (callback == lvl_init_or_update && CMD_GET(s16, 2) == 1) {
+            level_update_native_step();
         }
     }
 

@@ -639,11 +639,15 @@ void update_objects(UNUSED s32 unused) {
     s64 cycleCounts[30];
     const bool advanceLegacyDomain = sm64_modern_timebase_should_advance_legacy_domain();
 
-    // The area entry point admits this pass on every native simulation step.
-    // Legacy counters and time-stop latches remain boundary-owned below,
-    // while surfaces, object-native behavior, platform displacement, and
-    // collision preparation are continuous dynamics.
+    // The area entry point admits the object world on every native simulation
+    // step.  A held step uses the reduced path below; broad object collision,
+    // unloading, and time-stop latching remain boundary-owned.
     if (!sm64_modern_timebase_should_advance_native_dynamics()) {
+        return;
+    }
+
+    if (!advanceLegacyDomain) {
+        update_objects_native_step();
         return;
     }
 
@@ -709,4 +713,33 @@ void update_objects(UNUSED s32 unused) {
     }
 
     gPrevFrameObjectCount = gObjectCounter;
+}
+
+/*
+ * Advance the continuous object domains on a held native step without
+ * repeating the expensive broad object-collision scan or boundary sinks.
+ * Terrain surfaces and platform displacement stay current for native motion;
+ * object interaction statuses, unloading, and time-stop latching remain
+ * logical-boundary owned so a held pass cannot replay them.
+ */
+void update_objects_native_step(void) {
+    if (!sm64_modern_timebase_should_advance_native_dynamics()
+        || sm64_modern_timebase_should_advance_legacy_domain()
+        || (gTimeStopState & TIME_STOP_ACTIVE)) {
+        return;
+    }
+
+    gObjectLists = gObjectListArray;
+    gNumRoomedObjectsInMarioRoom = 0;
+    gNumRoomedObjectsNotInMarioRoom = 0;
+    gCheckingSurfaceCollisionsForCamera = FALSE;
+    gObjectCounter = 0;
+
+    reset_debug_objectinfo();
+    stub_debug_5();
+    clear_dynamic_surfaces();
+    update_terrain_objects();
+    apply_mario_platform_displacement();
+    update_non_terrain_objects();
+    update_mario_platform();
 }

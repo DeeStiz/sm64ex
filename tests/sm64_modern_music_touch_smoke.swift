@@ -1,0 +1,5 @@
+import Foundation
+private let offset: UInt64 = 1_469_598_103_934_665_603
+private let prime: UInt64 = 1_099_511_628_211
+private func hash(_ seed: UInt64, _ value: UInt64) -> UInt64 { var result = seed; for byte in 0..<8 { result ^= (value >> UInt64(byte * 8)) & 255; result &*= prime }; return result }
+@main struct SM64MusicTouchSmoke { static func main() { let idle = SM64MusicTouchBehavior.update(.init(action: 0, timer: 0, distanceToMario: 200)); let touch = SM64MusicTouchBehavior.update(.init(action: 0, timer: 0, distanceToMario: 199)); let done = SM64MusicTouchBehavior.update(.init(action: 1, timer: 4, distanceToMario: 10)); precondition(idle.action == 0 && !idle.playPuzzleJingle, "music-touch boundary"); precondition(touch.action == 1 && touch.playPuzzleJingle, "music-touch trigger"); precondition(done.action == 1 && !done.playPuzzleJingle, "music-touch latch"); var f=offset; for o in [idle,touch,done] { f=hash(f,UInt64(o.action)); f=hash(f,UInt64(o.timer)); f=hash(f,UInt64(o.playPuzzleJingle ? 1:0)) }; print(String(format:"musicTouchFingerprint=0x%016llx",f)); print("SM64 Modern music-touch smoke passed") } }

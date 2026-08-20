@@ -1,0 +1,4 @@
+import Foundation
+enum SM64BetaHoldableState: UInt8, Equatable, Sendable { case free=0; case held=1; case thrown=2; case dropped=3 }
+struct SM64BetaHoldableOutput: Equatable, Sendable { let state: SM64BetaHoldableState; let visible: Bool; let forwardVelocity: Float; let velocityY: Float; let clearFaceYawFlag: Bool }
+enum SM64BetaHoldableBehavior { static func update(state:SM64BetaHoldableState,forwardVelocity:Float,velocityY:Float)->SM64BetaHoldableOutput{switch state{case .free:return .init(state:state,visible:true,forwardVelocity:forwardVelocity,velocityY:velocityY,clearFaceYawFlag:false);case .held:return .init(state:state,visible:false,forwardVelocity:forwardVelocity,velocityY:velocityY,clearFaceYawFlag:false);case .thrown:return .init(state:.free,visible:true,forwardVelocity:40,velocityY:20,clearFaceYawFlag:true);case .dropped:return .init(state:.free,visible:true,forwardVelocity:0,velocityY:0,clearFaceYawFlag:false)}} }

@@ -1,0 +1,4 @@
+import Foundation
+private let fnvOffset:UInt64=1_469_598_103_934_665_603;private let fnvPrime:UInt64=1_099_511_628_211
+private func hash(_ seed:UInt64,_ value:UInt64)->UInt64{var r=seed;for i in 0..<8{r ^= (value >> UInt64(i*8)) & 0xff;r &*= fnvPrime};return r}
+@main struct SM64FlameMarioSmoke{static func main(){let o=SM64FlameMarioBehavior.update(.init(marioPosition:.init(x:10,y:200,z:-4),marioYaw:0,timer:1,activeParticleFlags:1<<11,particleFlag:1<<11));precondition(o.position == .init(x:10,y:80,z:36)&&o.scale==2&&o.spawnSmoke && !o.shouldDelete);var f=fnvOffset;f=hash(f,UInt64(o.position.x.bitPattern));f=hash(f,UInt64(o.position.y.bitPattern));f=hash(f,UInt64(o.position.z.bitPattern));f=hash(f,UInt64(o.scale.bitPattern));f=hash(f,o.spawnSmoke ? 1:0);f=hash(f,o.clearParticleFlag ? 1:0);f=hash(f,o.shouldDelete ? 1:0);print(String(format:"flameMarioFingerprint=0x%016llx",f));print("SM64 Modern flame Mario smoke passed")}}

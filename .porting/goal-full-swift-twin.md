@@ -2,7 +2,58 @@
 
 ## Status
 
-M34b is the latest validated Metal 4 production slice. The Release artifact
+M33nk is the latest behavior-qualification slice; M34b remains the
+latest validated Metal 4 production slice. The squishable-platform, LLL
+drawbridge, shared water-wave, waterfall, volcano sound-loop, and tumbling
+bridge, WDW/JRB floating-platform, packed sliding-platform, small-water-wave,
+birds/sand ambient-sound, rotating-exclamation-mark, water-air-bubble, and
+object-bubble, water-droplet, water-mist, water-mist-2, water-splash child,
+bubble-maybe, wind, shared shallow-water-wave/splash, water-splash-spawner,
+large-water-splash, object-water-splash, bubble-particle-spawner, and
+bubble-particle child, Piranha waking-bubble, Piranha parent-bubble, and shared
+wave-trail, strong-wind particle, tiny/visible wind-hazard, and water-particle
+routes, plunge-bubble parent/children, breath-mist spawners, and mist-puff
+spawners, mist-puff routes, Tweester sand particles, Mario flame/black-smoke,
+ground particle spawners, animated-texture, sparkle, sparkle-spawner,
+camera-gated ambient-sound, act-selector star visuals, collectible-star interaction, star-spawn coordinates, spawned-star trajectory/time-stop, CCM slide-triggered star spawn, hidden-star trigger/reveal including Bowser red-coin threshold, 120-star cannon grate gate, celebration-star parent/child, warp family, exit-podium warp, DDD global collision selection, break-only warp/cannon/snowball identities, coin-sparkle, purple-particle, tiny-star particle,
+and tiny-star particle spawner, punch-triangle particle, triangle-spawner,
+tree-leaf, tree-snow, leaf-spawner, mist-circle particle, sparkle-particle
+spawner, random-texture, simple animation, unused-fake-star, cloud-part, cloud,
+break-box triangle, cannon-base-unused, break-only no-op, cannon-barrel
+bubbles, blue-coin switch, hidden blue-coin, hidden red-coin star, red-coin
+star-marker, red-coin, star-door, cap-switch, cap-switch-base, tower-door,
+openable-grill, openable-cage-door, door, warp-door, hidden-object,
+recovery-heart, one-coin, yellow-coin, temporary-yellow-coin, moving-yellow-coin,
+and moving-blue-coin, water-level-diamond, changing-water-level, and
+water-level-pillar, floor-switch, grill-switch, animate-switch,
+hidden-object-switch, animated floor-switch child, hidden one-up
+parent/trigger/spawner, and stationary/walking/running-away/sliding/
+jump-on-approach one-up, large/small breakable-box, and exclamation-box
+content, orange-number counter, sound-spawner, and rock-solid collision
+routes, Bowser-sub/moat environment gate, Tick Tock Clock hand, and castle
+floor-trap, castle-flag initializer, Boo cage, alpha/beta Boo-key, castle Boo,
+and merry-go-round, music-touch, text-surface, grand-star, beta-anchor, and
+shared another-elevator, cut-out no-op, terminal stub/carry/static, and
+small-water-wave helper, igloo barrier, big snowman text-interaction, Ukiki
+cage-child, sunken-ship terminal/helper, static collision-load, Manta Ray
+manager, small/large Bomp, Grindel/Thwomp, coin-formation, big-boulder,
+big-boulder generator, horizontal-Grindel, Beta Fish splash-spawner, and
+unused-particle spawner, Snowman checkpoint, Bowser body-anchor, and Bowser
+tail-anchor, Beta chest, Beta trampoline, Beta holdable, Seaweed, oscillating
+JRB ship-part, falling-pillar, BBH coffin, unused blue-coin motion, patterned
+coin-formation, coin-inside-Boo, aquarium blue-fish, tank-fish-group, and
+clam-shell bubble, Bob-omb Mario-anchor, Bub/spawner, butterfly, shared
+tilting-pyramid, Boo-with-cage, bookend, book-switch, generic-fish group,
+cannon-barrel, cannon-parent, Ghost Hunt Boo shared-script, Merry-Go-Round Boo
+shared-script, Boo-manager, Bubba, Bowling Ball, TTM/THI Bowling Ball spawners, pit Bowling Ball, Metal Cap, Vanish Cap, Wing Cap, SSL pyramid wall, THI huge/tiny island tops, pyramid top fragments, pyramid pillar detectors, Pyramid Top, DDD pole, Donut Platform, Courtyard Boo Triplet, Falling Bowser Platform, Giant Pole, End Cutscene Actor, End Birds, Beginning Peach, Haunted Bookshelf, Haunted Bookshelf Manager, JRB Floating Box, JRB Sliding Box, Jet Stream, Jet Stream Water Ring, Jet Stream Ring Spawner, Manta Ray Water Ring, Haunted Chair, Whirlpool, Manta Ray, Jumping Box, Kickable Board, Koopa Flag, Pole Grabbing, Tree, Koopa Race Endpoint, WF Breakable Wall, Unused Poundable Platform, Yellow Background Menu, Snow Mound, RR Cruiser Wing, Spindrift, Spindel, RR Rotating Bridge Platform, Snowman Wind, Snowman Head, Mr Blizzard Snowball, unlock-door star, platform-on-track child, volcano falling-trap, TTM/LLL rolling-log, Tox Box, and Mr. I blue-coin child routes are now
+Swift 6 value/owner paths with checked C parity contracts and strict
+dispatch/manifest coverage. The manifest is 534 rows with 488 Swift routes
+and 46 explicit C adapters at `0x315aaf6ce5ab1f31`; the focused Bubba
+contract is `0x0b48c789602881e2` and the Bowling Ball contract is
+`0x88570fdd4c786c82`; the DDD pole contract is `0xdd1cacb7655e0161`; the Donut Platform contract is `0x6eaf95309fdb0276`; the Courtyard Boo Triplet contract is `0xc7156d87ae802621`; the Falling Bowser Platform contract is `0xd083c6e2b90b4fc4`; the Giant Pole contract is `0xfa62f431d9f8d801`; the End Cutscene Actor contract is `0xf1db9ac56ad3bbe6`; the End Birds contract is `0x1320d37d6d85bfb9`; the Beginning Peach contract is `0x4cb2b11640e9f51b`; the Haunted Bookshelf contract is `0x4254bbcb9d4a35c7`; the Haunted Bookshelf Manager contract is `0x391346c3d3849a04`; the JRB Floating Box contract is `0x775ddf4e9c1eab53`; the JRB Sliding Box contract is `0x00f003b059ed44bb`; the Jet Stream contract is `0xd378e30e1b7f6c9d`; the Jet Stream Water Ring contract is `0x555f966268de8e68`; the Jet Stream Ring Spawner contract is `0xd2754d36b2625378`; the Manta Ray Water Ring contract is `0x3642be0555c82298`; the Haunted Chair contract is `0x7381c9aed05b4b42`; the Whirlpool contract is `0x61362df8181e01ae`; the Manta Ray contract is `0x0b08fed50dda5e32`; the Jumping Box contract is `0x5c2b7dd16ac14cca`; the Kickable Board contract is `0xaebbcf560ba239a1`; the Koopa Flag, Pole Grabbing, and Tree contracts share `0xbade382be297f52c`; the Koopa Race Endpoint contract is `0xa651adf251518d63`; the WF Breakable Wall contract is `0x8330c26af29f2b62`; the Unused Poundable Platform contract is `0x961f8e9cf67ce60b`; the Yellow Background Menu contract is `0x52a54fdc3009b604`; the Snow Mound contract is `0x3065533e47dbdaa9`; the RR Cruiser Wing contract is `0xe22b35ba86dc9748`; the Spindrift contract is `0x9ac8294303fff174`; the Spindel contract is `0x2f02c221a0c4104e`; the RR Rotating Bridge Platform contract is `0xa474c104378973c3`; the Snowman Wind contract is `0x0bb6ba5b32436749`; the Mr Blizzard Snowball contract is `0x6153d13d64702c49`;
+the Unlock Door Star contract is `0xa818fe2cbab2403f`; the Track Ball contract is `0x7f3cd721bf073d7f`; the Volcano Falling Trap contract is `0x7d60df81755c4d3d`; the Rolling Log contract is `0x8ceff3be0ab6b31e`; the Tox Box contract is `0x94a72bac32bcb54b`; the Metal Cap contract is `0x7d801e7751989d7e`; the Vanish Cap contract is `0xbdb3f6492e88f4fa`; the Wing Cap contract is `0xbe5f068bbc416fc6`; the Snowman Head contract is `0x2eb225e676e807a4`; the SSL wall contract is `0x303f2d4f9153d591`; the THI island-top contract is `0xaf302a9065f8736c`; the Pyramid Top Fragment contract is `0xe99b6f194e4e8396`; the Pyramid Pillar Detector contract is `0xbe7829c4abd81985`; the Pyramid Top contract is `0xbcc9c4f70394755f`; the Mr. I blue-coin mapping reuses the existing `MrIObjectBridge` owner; the expanded cloud
+state/effect contract is `0xc214f1fa256bfd3e`. Runtime promotion, full-game shard execution,
+and physical/release/human gates remain open. M34b's Release artifact
 has a repeatable two-pass gate: API/shader validation runs independently from
 GPU capture because Apple's capture tooling rejects simultaneous shader
 validation; both passes exercise the bounded M34 resize/pause harness. The
@@ -14,6 +65,19 @@ memoryless Depth32Float, and `sm64_vertex / sm64_fragment` draw discovery via
 `gpudebug`. This is production API/capture evidence, not visual parity,
 physical display, or human acceptance; M31 whole-engine authority and M33
 full-game qualification remain open.
+
+The fresh M33ne verifier cleared the complete matrix and regenerated strict
+Swift 6 Xcode build, but the host launch is currently blocked:
+focused/matrix gates matched, the regenerated Swift 6 Debug build succeeded,
+the host launched on Apple M5 Max with Metal 4/BGRA8Unorm and a frame-one
+the retained log is `/tmp/sm64-modern-m33ne-full-verify.log` and ends after
+`** BUILD SUCCEEDED **` with LaunchServices `kLSNoExecutableErr (-10827)`;
+the direct executable diagnostic also exits `134` in AppKit registration. The
+last complete host proof remains M33nc at `/tmp/sm64-modern-m33nc-full-verify.log`.
+This confirms current code/matrix/build wiring only; it does
+not close physical visual/performance, thermal, release, or human acceptance;
+the same host log records `audio_service_stopped ... underrun=75`; sustained
+audio/device and physical performance gates still remain separate.
 
 M31j is the latest validated authority cutover. Swift now owns the durable
 save image: the owner-thread adapter recovers and writes all four slots at the
@@ -52,8 +116,2266 @@ button/ground-speed/Bob-omb evidence `8/8/8`, Mario `152/152` and Bob-omb
 `112/112` matched records, `eligible=1` for both, post-promotion 16-step
 completion, regenerated Swift 6 `BUILD SUCCEEDED`, and status-0 shutdown.
 The probe is test-only; it does not make the full Mario/content engine Swift
-authority and does not close the remaining 7,418 route shards, physical
+authority and does not close the remaining 7,419 route shards, physical
 visual/audio/controller gates, or M35 release/human acceptance.
+
+The post-commit live route promotion smoke still passes for shard
+`0xd9446dfed10e189e` with exact coverage, C/Swift replay, and persistent
+rerun rejection. A later M34 rerun rebuilt and signed Release but could not
+be launched by this host's LaunchServices (`kLSNoExecutableErr`) despite a
+present Mach-O and valid bundle metadata; it is not counted as new Metal
+evidence, and the earlier M34c validation/capture artifact remains the
+authoritative production result.
+
+M33i adds the first production `set_mario_action` Swift boundary. A separate
+ABI carries scalar action-entry state; supported moving/airborne/submerged/
+cutscene transitions use the existing Swift value kernel, while unsupported
+families explicitly fall back to C. The C reference and Swift kernel match at
+`0xb9811f2d752218b9`; ABI v1, native C, Swift 6 Xcode build, and the updated
+timebase inventory pass. The M16 native shadow/promotion run is not yet
+qualified because this host aborts inside AppKit/HIServices registration
+before `AppDelegate` or the engine starts; the crash is
+`NSApplication.shared` at `AppMain.swift:7`, with a concurrent LaunchServices
+fault, not a gameplay or Metal fault.
+
+The runtime-independent ABI smoke installs the actual Swift callback table,
+invokes the C migration entry point for eight supported actions, compares every
+output field against the C reference, and passes with `updates=8`.
+
+M33j adds the first live C-to-Swift common-idle-cancel boundary. The existing
+Swift decision kernel now receives the C input/action/terrain snapshot through
+an owner-thread ABI; C applies the returned action/drop/face-yaw intent and
+keeps the original path as fallback. The eight-case C-to-Swift ABI smoke
+passes, native core and ABI layouts pass, and the M17 native promotion gate is
+ready but remains host-launch-unqualified for the same AppKit/LaunchServices
+failure.
+
+M33k adds Mario ground-step migration. A fixed four-quarter ABI carries
+immutable floor, ceiling, water, and canonical wall-angle probes from the
+opt-in production `perform_ground_step` path into the existing Swift
+`SM64MarioGroundStep` kernel. The seven-case C→Swift ABI smoke, ABI layout,
+native core, and Swift 6 build pass.
+
+M33l adds Mario airborne-step migration. A fixed four-quarter ABI carries
+immutable floor, ceiling, water, upper/lower-wall, and ledge probes plus
+canonical wall angles and surface types from the opt-in production
+`perform_air_step` path into a Swift 6 value kernel. The eight-case C→Swift
+ABI smoke covers flight, landing, ceiling/hang, wall, lava, ledge, and OOB
+branches; native C, ABI layout, timebase audit, and regenerated strict Swift
+6 build pass. The M19 native promotion gate is prepared but remains
+host-launch-unqualified by the pre-engine AppKit/LaunchServices crash.
+
+M33m adds the shared submerged `perform_water_full_step` collision reducer.
+A fixed ABI carries current/next position plus C-sampled floor, ceiling, and
+wall facts into `SM64MarioWaterStep`; current/whirlpool effects stay in the C
+caller and invalid callback status falls back to C. The six-case C→Swift ABI
+smoke covers free movement, wall, ceiling, floor, missing-floor cancellation,
+and cramped-water cancellation. Native C, ABI layout, timebase audit, and
+regenerated strict Swift 6 build pass; M20 native promotion remains open at
+the same host GUI boundary.
+
+M33n adds the shared `mario_bonk_reflection` scalar seam. Swift now owns
+canonical wall-angle reflection, optional speed negation, and horizontal
+velocity derivation while C keeps the sound/device effect and pointer-backed
+Mario state. The six-case C→Swift ABI smoke covers no-wall, wall, metal, and
+negated-speed branches; native C, ABI layout, timebase audit, route promotion,
+and regenerated strict Swift 6 build pass. M21 native promotion remains open
+at the pre-engine AppKit/LaunchServices boundary.
+
+M33o adds the moving-sand and horizontal-wind terrain impulse seam. Swift now
+owns the scalar impulse arithmetic for both families, including legacy
+global-timer modulo behavior, while C retains surface ownership and JP wind
+sound delivery. The seven-case C→Swift ABI smoke, classified timebase audit,
+native C/ABI checks, strict live-route promotion, and regenerated strict Swift
+6 build pass. M22 native promotion remains open at the same pre-engine host
+boundary.
+
+M33p adds the shared `mario_update_quicksand` reducer. Swift now owns the
+exact depth clamps, riding-shell reset, lethal/instant thresholds, and death
+action intent while C retains sound/camera updates and action installation.
+The nine-case C→Swift ABI smoke, native C/ABI checks, strict timebase audit,
+live-route promotion, and regenerated strict Swift 6 build pass. M23 native
+promotion remains open at the same pre-engine host boundary.
+
+M33q adds the shared `mario_push_off_steep_floor` scalar seam. Swift now owns
+the signed floor/face-angle alignment decision and ±16 forward-speed result;
+C retains `set_mario_action` and pointer-backed effects. The five-case C→Swift
+ABI smoke, native C/ABI checks, strict timebase audit, live-route promotion,
+and regenerated strict Swift 6 build pass. M24 native promotion remains open
+at the same pre-engine host boundary.
+
+M33r adds the `mario_get_terrain_sound_addend` selector seam. Swift now owns
+the surface/terrain lookup, water/quicksand override, and 7×6 terrain sound
+table selection while C retains playback and fallback. The eight-case C→Swift
+ABI smoke, native C/ABI checks, strict timebase audit, live-route promotion,
+and regenerated strict Swift 6 build pass. M25 native promotion remains open
+at the same pre-engine host boundary.
+
+M33s adds the shared Mario floor-predicate seam. Swift now returns floor
+class, slipperiness, slope, and steepness from immutable surface/terrain/
+normal/yaw scalars; C retains movement action bodies and fallback. The
+nine-case C→Swift ABI smoke, native C/ABI checks, strict timebase audit,
+live-route promotion, and regenerated strict Swift 6 build pass. M26 native
+promotion remains open at the same pre-engine host boundary.
+
+M33t extends the floor-predicate seam with `mario_facing_downhill`, including
+the signed turn-yaw/negative-speed compatibility branch. The ten-case
+C→Swift ABI smoke, native C/ABI checks, strict timebase audit, live-route
+promotion, and regenerated strict Swift 6 build pass. M27 native promotion
+remains open at the same pre-engine host boundary.
+
+M33u adds the core `mario_set_forward_vel` scalar seam. Swift now derives
+forward and slide velocities from the requested speed and face yaw for every
+opt-in action call; C retains the Mario pointer/state wrapper and fallback.
+The six-case C→Swift ABI smoke, native C/ABI checks, strict timebase audit,
+live-route promotion, and regenerated strict Swift 6 build pass. M28 native
+promotion remains open at the same pre-engine host boundary.
+
+M33v adds the paired `set_vel_from_yaw` / `set_vel_from_pitch_and_yaw` scalar
+seam. Swift now derives yaw-only and pitch/yaw velocity vectors while C keeps
+Mario state mutation and fallback. The six-case C→Swift ABI smoke, native
+C/ABI checks, strict timebase audit, live-route promotion, and regenerated
+strict Swift 6 build pass. M29 native promotion remains open at the same
+pre-engine host boundary.
+
+M33w adds the shared punch-sequence reducer. Swift now owns the action-
+argument, animation, punch-flag, punch-state, transition, and sound-intent
+decisions; C retains object-grab fallback, animation installation, body-state
+mutation, sound playback, and action installation. The ten-case C→Swift ABI
+smoke, native C/ABI checks, classified timebase audit, live-route promotion,
+and regenerated strict Swift 6 build pass. M30 native promotion remains open
+at the same pre-engine host boundary.
+
+M33x adds the shared `push_or_sidle_wall` response reducer. Swift now owns
+the finite wall/no-wall decision, canonical velocity clamp, signed wall-angle
+branch, sidestep/pushing animation intent, acceleration, sound, dust, action,
+and graphics-angle outputs; C retains wall probing, Mario/object mutation,
+audio/particle delivery, and explicit fallback. The six-case C→Swift ABI
+smoke, ABI/native C checks, strict Swift 6 Xcode build, and all existing
+Mario ABI smokes pass. `m31-native-verify` is prepared for a healthy AppKit
+host; the pre-engine LaunchServices crash remains the runtime promotion
+blocker.
+
+M33y adds the shared `anim_and_audio_for_walk` reducer. Swift now owns the
+speed-band animation selection, fixed-point acceleration, action-timer
+transitions, step-sound classification, and walking-pitch easing; C retains
+the Mario animation/effect delivery and explicit fallback. The eight-case
+C→Swift ABI smoke, ABI/native C checks, classified timebase audit
+(`actionTimer 202→204`, `animation_sites 788→789`), all existing Mario ABI
+smokes, and regenerated strict Swift 6 build pass. `m32-native-verify` is
+prepared for a healthy AppKit host; the pre-engine LaunchServices crash
+remains the runtime promotion blocker.
+
+The attempted `SM64_MODERN_M32_TICKS=8 SM64_MODERN_M32_SWIFT_TICKS=8
+./script/build_and_run.sh m32-native-verify` run rebuilt and ad-hoc-signed
+the Debug app successfully, verified an arm64 Mach-O and bundle identifier,
+then LaunchServices rejected the executable with `kLSNoExecutableErr`
+(`-10827`) before `NSApplication`/the engine thread. This is launch-host
+evidence only; no M32 runtime authority or Metal result is counted.
+
+M33z adds the shared held-object walking animation reducers. Swift now owns
+the light-object speed-band/timer transitions, heavy-object speed scaling,
+and common metal/quicksand/terrain sound intent; C retains animation/effect
+delivery and explicit fallback. The eight-case C→Swift ABI smoke, ABI/native
+C checks, classified timebase audit (`actionTimer 204→206`,
+`animation_sites 789→790`), strict Swift 6 Xcode build, and native core link
+pass. `m33-native-verify` is prepared; runtime promotion remains subject to
+the pre-engine LaunchServices blocker.
+
+The attempted `SM64_MODERN_M33_TICKS=8 SM64_MODERN_M33_SWIFT_TICKS=8
+./script/build_and_run.sh m33-native-verify` run rebuilt and signed the
+Debug app successfully, then LaunchServices again returned `kLSNoExecutableErr`
+(`-10827`) before `NSApplication`/the engine thread. No M33 runtime authority
+evidence is counted.
+
+M33aa adds the `apply_slope_accel` scalar seam. Swift now owns floor-slope
+classification, signed downhill acceleration, canonical slide/velocity
+derivation, and steep/facing flags; C retains moving-sand/wind effect calls,
+Mario pointer mutation, and fallback. The seven-case C→Swift ABI smoke,
+ABI/native C checks, strict Swift 6 Xcode build, and Metal source contract
+pass. `m33aa-native-verify` is prepared; runtime promotion remains blocked
+before engine startup by LaunchServices.
+
+M33ab adds the `apply_slope_decel` scalar seam. Swift now owns floor-class
+deceleration, stop detection, reapplication of slope acceleration, and the
+resulting slide/velocity values; C retains moving-sand/wind effects and
+pointer mutation. The seven-case C→Swift ABI smoke, ABI/native C checks,
+strict Swift 6 Xcode build, and full Mario ABI regression pass.
+`m33ab-native-verify` is prepared; runtime promotion remains blocked before
+engine startup by LaunchServices.
+
+M33ac adds the `update_decelerating_speed` scalar seam. Swift now owns the
+unit-step approach-to-zero, canonical yaw velocity reconstruction, and stop
+intent; C retains moving-sand/wind effects, slide-state mutation, and
+fallback. The six-case C→Swift ABI smoke, ABI/native C checks, strict Swift 6
+Xcode build, and full Mario ABI regression pass. `m33ac-native-verify` is
+prepared; runtime promotion remains blocked before engine startup by
+LaunchServices.
+
+M33ad adds the `update_shell_speed` scalar composition. Swift now owns shell
+target-speed approach, yaw easing, slope reapplication, and canonical shell
+velocity output; C retains water pseudo-floor setup, moving-sand/wind effects,
+pointer mutation, and fallback. The six-case C→Swift ABI smoke, ABI/native C
+checks, strict Swift 6 Xcode build, and full Mario ABI regression pass.
+`m33ad-native-verify` is prepared; runtime promotion remains blocked before
+engine startup by LaunchServices.
+
+M33ae adds the shared `apply_landing_accel` reducer. Swift now owns the
+friction/forward-speed reduction, slope reapplication, canonical slide and
+velocity outputs, and moving-surface intent; C retains the landing caller's
+pointer-backed mutation, moving-sand/wind delivery, and explicit fallback.
+The six-case C→Swift ABI smoke and focused landing adapter pass; the
+native ABI/layout, full Mario ABI regression, strict Swift 6 build, timebase,
+Metal contract, and `m33ae-native-verify` gates are prepared for the same
+healthy AppKit host. Runtime promotion remains blocked before engine startup
+by LaunchServices.
+
+M33af adds the shared `apply_gravity` reducer. Swift now owns the ordered
+twirl/cannon/long-jump/lava/blown/strengthened/metal-water/wing/default
+vertical-velocity branches and wing-flutter intent; C retains Mario and body
+state mutation plus fallback. The eleven-case C→Swift gravity ABI smoke,
+ABI/native C checks, full 23-script Mario regression, regenerated strict Swift
+6 build, and source-level wiring pass. `m33af-native-verify` is prepared for
+the same healthy AppKit host; runtime promotion remains blocked before engine
+startup by LaunchServices.
+
+M33ag adds the shared `apply_vertical_wind` reducer. Swift now owns the
+ground-pound exclusion, vertical-wind height window, maximum-updraft formula,
+and velocity approach/clamp; C retains wind audio, pointer-backed mutation,
+and fallback. The seven-case C→Swift vertical-wind ABI smoke, ABI/native C
+checks, full 24-script Mario regression, regenerated strict Swift 6 build,
+timebase/Metal/route gates, and source-level wiring pass. `m33ag-native-verify`
+remains subject to the same LaunchServices runtime gate.
+
+M33ah adds the shared `update_sliding` reducer. Swift now owns the steering,
+floor-class acceleration/loss, slope-angle impulse, facing-yaw easing,
+100-unit cap-late behavior, signed forward speed, and stop reduction; C
+retains moving-sand/wind effects, Mario pointer mutation, and fallback. The
+six-case C→Swift sliding ABI smoke, contraction-fenced C oracle, native C/ABI
+checks, full 25-script Mario regression, strict Swift 6 build, and
+timebase/Metal/route gates pass. `m33ah-native-verify` is prepared; runtime
+promotion remains blocked before engine startup by LaunchServices.
+
+M33ai adds the shared `check_ground_dive_or_punch` decision seam. Swift now
+owns the B-pressed threshold decision, dive action argument, and jump-kick
+vertical impulse; C retains `set_mario_action`, pointer-backed state mutation,
+and fallback. The four-case C→Swift ABI smoke, native C/ABI checks, full
+26-script Mario regression, strict Swift 6 build, and timebase/Metal/route
+gates pass. `m33ai-native-verify` is prepared; runtime promotion remains
+blocked before engine startup by LaunchServices.
+
+M33aj adds the paired `should_begin_sliding` and `analog_stick_held_back`
+predicates. Swift now owns the above-slide/terrain/backward/downhill decision
+and the signed stick-yaw threshold; C retains caller flow and fallback. The
+six-case C→Swift predicate ABI smoke, native C/ABI checks, full 27-script Mario
+regression, strict Swift 6 build, and timebase/Metal/route gates pass.
+`m33aj-native-verify` is prepared; runtime promotion remains blocked before
+engine startup by LaunchServices.
+
+M33ak adds the shared `begin_braking_action` reducer. Swift now owns the
+action-state wall branch, floor-normal/forward-speed braking threshold, and
+the braking/decelerating action selection; C retains held-object dropping,
+face/action mutation, and fallback. The four-case C→Swift ABI smoke, native
+C/ABI checks, full 28-script Mario regression, strict Swift 6 build, and
+timebase/Metal/route gates pass. `m33ak-native-verify` is prepared; runtime
+promotion remains blocked before engine startup by LaunchServices.
+
+M33al adds the shared `set_triple_jump_action` selector. Swift now owns the
+wing-cap/high-speed/ordinary jump selection while C retains action installation
+and fallback. The four-case C→Swift ABI smoke, native C/ABI checks, full
+29-script Mario regression, strict Swift 6 build, and timebase/Metal/route
+gates pass. `m33al-native-verify` is prepared; runtime promotion remains
+blocked before engine startup by LaunchServices.
+
+M33am adds the shared `set_mario_y_vel_based_on_fspeed` reducer. Swift now owns
+the additive forward-speed Y-velocity calculation and squish/quicksand
+half-speed decision while C retains the additive-Y trampoline call, Mario
+pointer mutation, and fallback. The four-case C→Swift ABI smoke, native C/ABI
+checks, full 30-script Mario regression, strict Swift 6 build, and
+timebase/Metal/route gates pass. `m33am-native-verify` is wired; runtime
+promotion remains blocked before engine startup by LaunchServices.
+
+M33an bridges the existing `set_steep_jump_action` kernel. Swift now owns the
+canonical floor/face yaw projection and forward-speed reduction while C
+retains the Mario object steep-jump yaw, held-object drop, action mutation,
+and fallback. The four-case C→Swift ABI smoke, native C/ABI checks, full
+31-script Mario regression, strict Swift 6 build, and timebase/Metal/route
+gates pass. `m33an-native-verify` is wired; runtime promotion remains blocked
+before engine startup by LaunchServices.
+
+M33ao adds the first post-M33 Mario behavior owner route: `bhvArrowLift` now
+uses its existing deterministic Swift kernel through a generation-safe owner
+bridge and shared behavior dispatcher. Swift owns the action/timer gate,
+canonical movement vectors, and 384-unit displacement; the owner bridge owns
+level-list lifetime, platform relation input, record mutation, and transform
+flags. The behavior manifest moves from 81 to 82 Swift routes (453 to 452
+explicit C adapters), behavior/dispatch/coverage contracts pass, and the
+strict Swift 6/timebase/Metal gates pass.
+
+M33ap extends the owner queue with the shared `ElevatorBehavior` route for
+`bhvRrElevatorPlatform`, `bhvHmcElevatorPlatform`, and `bhvMeshElevator`. Swift
+owns the action/timer/platform gate, signed approach, authored bounds, and
+sound/shake intents; the owner bridge owns level-list metadata, Mario relation
+input, record position/velocity/action mutation, and transform flags. The
+manifest now reports 85 Swift routes and 449 explicit C adapters; behavior,
+engine-runtime, route, strict Swift 6, timebase, and Metal gates pass.
+
+M33aq adds the shared `SeesawPlatformBehavior` owner route for `bhvSeesawPlatform`.
+Swift owns the platform relation gate, canonical angle rotation, pitch-velocity
+clamp, return-to-zero oscillator, and rocking-sound intent; the owner bridge
+owns the copied pitch velocity, collision-model behavior byte, level-list
+record mutation, and transform flags. The manifest now reports 86 Swift routes
+and 448 explicit C adapters; behavior, engine-runtime, route, strict Swift 6,
+timebase, and Metal gates pass.
+
+M33ar adds the shared `SwingPlatformBehavior` owner route for `bhvSwingPlatform`.
+Swift owns the initialized accumulated angle, signed speed update, and
+render-facing roll delta; the owner bridge owns copied angle/speed state,
+level-list lifetime, roll/angle-velocity record mutation, and transform flags.
+The manifest now reports 87 Swift routes and 447 explicit C adapters; behavior,
+engine-runtime, route, strict Swift 6, timebase, and Metal gates pass.
+
+M33as adds the shared `RotatingPlatformBehavior` owner route for
+`bhvRotatingPlatform`. Swift owns the idle/spin action machine, signed high
+behavior-byte speed semantics, and yaw output; the owner bridge owns the
+level-list record, action/timer boundary, angle velocity, and transform flags.
+The manifest now reports 88 Swift routes and 446 explicit C adapters; behavior,
+engine-runtime, route, strict Swift 6, timebase, and Metal gates pass.
+
+M33at adds the `TTCMovingBarBehavior` owner route for `bhvTTCMovingBar`. Swift
+owns the delay/stopped-timer/action machine, offset/speed evolution, random
+pause inputs, and perpendicular move yaw; the owner bridge owns initialized
+state, home-relative position projection, velocity derivation, action/timer
+boundaries, and level-list record mutation. The manifest now reports 89 Swift
+routes and 445 explicit C adapters; behavior, engine-runtime, route, strict
+Swift 6, timebase, and Metal gates pass.
+
+M33au adds the `TTCSpinnerBehavior` owner route for `bhvTTCSpinner`. Swift
+owns speed selection, random direction/pause behavior, timer reset, and
+wrapped face-pitch output; the owner bridge owns direction/change-timer state,
+explicit random inputs, level-list lifetime, pitch/angle-velocity mutation,
+and transform flags. The manifest now reports 90 Swift routes and 444 explicit
+C adapters; behavior, engine-runtime, route, strict Swift 6, timebase, and
+Metal gates pass.
+
+M33av adds the `TTCTreadmillBehavior` owner route for `bhvTTCTreadmill`. Swift
+owns deterministic master election, shared surface speed, random target/timer
+selection, approach, and forward-velocity output; the owner bridge owns the
+shared master/surface state, per-treadmill target timing, level-list lifetime,
+and forward-velocity record mutation. The manifest now reports 91 Swift routes
+and 443 explicit C adapters; behavior, engine-runtime, route, strict Swift 6,
+timebase, and Metal gates pass.
+
+M33aw adds the `TTCPendulumBehavior` owner route for `bhvTTCPendulum`. Swift
+owns acceleration direction, angle/velocity oscillator state, delay and sound
+timers, random acceleration/delay inputs, and render roll; the owner bridge
+owns copied state, level-list lifetime, pitch/roll mutation, and transform
+flags. The manifest now reports 92 Swift routes and 442 explicit C adapters;
+behavior, engine-runtime, route, strict Swift 6, timebase, and Metal gates
+pass.
+
+M33ax adds the `TTCElevatorBehavior` owner route for `bhvTTCElevator`. Swift
+owns speed selection, random direction/move-time selection, gravity, endpoint
+clamping, and position output; the owner bridge owns authored peak height,
+direction/move-time state, level-list lifetime, and vertical position/velocity
+mutation. The manifest now reports 93 Swift routes and 441 explicit C
+adapters; behavior, engine-runtime, route, strict Swift 6, timebase, and Metal
+gates pass.
+
+M33ay adds the `TTCRotatingSolidBehavior` owner route for
+`bhvTTCRotatingSolid`. Swift owns turn timing, vertical reset, symmetric roll
+approach, endpoint-independent number-of-turns state, and alert/click intents;
+the owner bridge owns copied rotation/sound state, level-list lifetime, and
+roll/vertical record mutation. The manifest now reports 94 Swift routes and
+440 explicit C adapters; behavior, engine-runtime, route, strict Swift 6,
+timebase, and Metal gates pass.
+
+M33az adds a new `TTC2DRotatorBehavior` kernel and owner route for
+`bhvTTC2DRotator`. Swift owns signed yaw approach, turn timing, target/increment
+updates, random direction timers, and angle-velocity output; the owner bridge
+owns hand/cog initialization, explicit random inputs, level-list lifetime, and
+yaw mutation. The manifest now reports 95 Swift routes and 439 explicit C
+adapters; behavior, engine-runtime, route, strict Swift 6, timebase, and Metal
+gates pass.
+
+M33ba adds a new `TTCCogBehavior` kernel and owner route for `bhvTTCCog`. Swift
+owns shape/direction initialization, slow/fast speed selection, random target
+approach, and wrapped yaw output; the owner bridge owns explicit random
+decisions, level-list lifetime, and yaw/angle-velocity mutation. The manifest
+now reports 96 Swift routes and 438 explicit C adapters; behavior,
+engine-runtime, route, strict Swift 6, timebase, and Metal gates pass.
+
+M33bb adds the `PyramidElevatorBehavior` kernel and parent/marker owner routes
+for `bhvPyramidElevator` and `bhvPyramidElevatorTrajectoryMarkerBall`. Swift
+owns idle/start/constant/bottom motion, canonical sine jolts, platform-gated
+action transitions, and marker-active intent; the owner bridge owns parent
+relations, end-of-frame marker deactivation, level-list position/velocity
+mutation, and transform state. The manifest now reports 98 Swift routes and
+436 explicit C adapters; behavior, engine-runtime, route, strict Swift 6,
+timebase, and Metal gates pass.
+
+M33bc adds the `TTCPitBlockBehavior` kernel and owner route for
+`bhvTTCPitBlock`. Swift owns the TTC speed/wait tables, timer boundary,
+endpoint clamp, direction reversal, and explicit random-wait input; the owner
+bridge owns authored collision selection and level-list position/velocity
+mutation. The manifest now reports 99 Swift routes and 435 explicit C
+adapters; the independent Swift/C pit-block contract,
+dispatch/coverage/engine-runtime/route replay, strict Swift 6, timebase, and
+Metal gates pass. Handoff: `.porting/porting-handoff-full-swift-twin-M33bc.md`.
+
+M33bd adds the `StaticCheckeredPlatformBehavior` kernel and owner route for
+`bhvStaticCheckeredPlatform`. Swift owns explicit reset/set/rotate debug modes
+and copied debug-row values; the owner owns level-list angle/velocity and
+transform mutation without reading C's global debug array. The manifest now
+reports 100 Swift routes and 434 explicit C adapters; the independent Swift/C
+contract, dispatch/coverage/engine-runtime/live route, strict Swift 6, and
+Metal gates pass. Handoff: `.porting/porting-handoff-full-swift-twin-M33bd.md`.
+
+M33be adds the `BBHTiltingTrapPlatformBehavior` kernel and owner route for
+`bhvBbhTiltingTrapPlatform`. Swift owns the Mario-on cosine tilt, return clamp,
+US grace window, and action selection; the owner owns platform relation and
+level-list action/timer/pitch mutation. The manifest now reports 101 Swift
+routes and 433 explicit C adapters; the independent Swift/C contract,
+dispatch/coverage/engine-runtime/live route, strict Swift 6, and Metal gates
+pass. Handoff: `.porting/porting-handoff-full-swift-twin-M33be.md`.
+
+M33bf adds `LLLSinkingPlatformBehavior` and one shared owner route for
+`bhvLllSinkingRectangularPlatform` and `bhvLllSinkingSquarePlatforms`. Swift
+owns the common action helper, rectangular displacement, square pitch
+oscillation, and stable timer state; the owner owns the two behavior identities
+and level-list mutation. The manifest now reports 103 Swift routes and 431
+explicit C adapters; the independent Swift/C contract,
+dispatch/coverage/engine-runtime, strict Swift 6, timebase, and Metal gates
+pass. Handoff: `.porting/porting-handoff-full-swift-twin-M33bf.md`.
+
+M33bg adds `WfRotatingWoodenPlatformBehavior` and an owner route for
+`bhvWfRotatingWoodenPlatform`. Swift owns the wait/spin action machine,
+timer edges, yaw velocity/wrap, and sound intent; the owner owns level-list
+action/timer/yaw/transform mutation. The manifest now reports 104 Swift routes
+and 430 explicit C adapters; the independent Swift/C contract,
+dispatch/coverage/engine-runtime/live route, strict Swift 6, timebase, and
+Metal gates pass. Handoff: `.porting/porting-handoff-full-swift-twin-M33bg.md`.
+
+M33bh adds `RotatingOctagonalPlatformBehavior` and an owner route for
+`bhvOctagonalPlatformRotating`. Swift owns the authored speed table and fixed
+yaw-step reducer; the owner owns behavior-parameter packing and level-list
+yaw/angle-velocity mutation. The manifest now reports 105 Swift routes and
+429 explicit C adapters; the independent Swift/C contract,
+dispatch/coverage/engine-runtime/live route, strict Swift 6, timebase, and
+Metal gates pass. Handoff: `.porting/porting-handoff-full-swift-twin-M33bh.md`.
+
+M33bi adds `WfSolidTowerPlatformBehavior` and a parent-owned child route for
+`bhvWfSolidTowerPlatform`. Swift owns the parent-action deletion predicate; the
+owner owns stable parent linkage, end-of-frame deactivation/unload, and
+generation-safe cleanup. The manifest now reports 106 Swift routes and 428
+explicit C adapters; the independent Swift/C contract,
+dispatch/coverage/engine-runtime/live route, strict Swift 6, timebase, and
+Metal gates pass. Handoff: `.porting/porting-handoff-full-swift-twin-M33bi.md`.
+
+M33bj adds `WfTowerPlatformBehavior` and one shared parent-aware owner route
+for `bhvWfElevatorTowerPlatform` and `bhvWfSlidingTowerPlatform`. Swift owns
+the elevator and sliding timer/movement reducers plus parent-action deletion;
+the owner owns parent linkage, child list mutation, unload, and transforms. The
+manifest now reports 108 Swift routes and 426 explicit C adapters; the
+independent Swift/C contract, dispatch/coverage/engine-runtime/live
+route/replay, strict Swift 6, timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bj.md`.
+
+M33bk adds `WfSlidingPlatformBehavior` and an owner route for the used
+`bhvWfSlidingPlatform`. Swift owns initialization offsets, the authored speed
+table, explicit random wait, extend/retract timer edges, endpoint snaps, yaw
+reversal, and fvel movement; the owner owns level-list mutation. The manifest
+now reports 109 Swift routes and 425 explicit C adapters; the independent
+Swift/C contract, dispatch/coverage/engine-runtime/live route/replay, strict
+Swift 6, timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bk.md`.
+
+M33bl adds `WdwExpressElevatorBehavior` and a shared owner route for
+`bhvWdwExpressElevator` plus the static `bhvWdwExpressElevatorPlatform`
+identity. Swift owns the express elevator timer/movement/home-clamp reducer and
+static no-op; the owner owns level-list mutation. The manifest now reports 111
+Swift routes and 423 explicit C adapters; the independent Swift/C contract,
+dispatch/coverage/engine-runtime/live route/replay, strict Swift 6, timebase,
+and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bl.md`.
+
+M33bm adds `LllSinkingRockBlockBehavior` and an owner route for
+`bhvLllSinkingRockBlock`. Swift owns the shared stepped-on oscillation helper,
+124-unit angle approach, -110-unit offset, endpoint detection, and home-Y
+projection; the owner owns level-list mutation. The manifest now reports 112
+Swift routes and 422 explicit C adapters; the independent Swift/C contract,
+dispatch/coverage/engine-runtime/live route/replay, strict Swift 6, timebase,
+and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bm.md`.
+
+M33bn adds `LllMovingOctagonalMeshBehavior` and an owner route for
+`bhvLllMovingOctagonalMeshPlatform`. Swift owns both authored movement tables,
+sequence/timer transitions, Mario gating, speed approach, yaw/fvel movement,
+and stepped-on vertical rotation; the owner owns level-list mutation. The
+manifest now reports 113 Swift routes and 421 explicit C adapters; the
+independent Swift/C contract, dispatch/coverage/engine-runtime/live
+route/replay, strict Swift 6, timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bn.md`.
+
+M33bo adds `FerrisWheelPlatformBehavior` and a parent/child owner route for
+`bhvFerrisWheelAxle` and `bhvFerrisWheelPlatform`. Swift owns all four
+parent-relative transform/velocity calculations; the owner owns axle allocation,
+source-order children, parent links, and level-list mutation. The manifest now
+reports 115 Swift routes and 419 explicit C adapters; the independent Swift/C
+contract, dispatch/coverage/engine-runtime/live route/replay, strict Swift 6,
+timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bo.md`.
+
+M33bp revalidates the Ferris-wheel parent/child route after the current project
+regeneration and full gate pass. The route remains at manifest fingerprint
+`0x91b63014605cd752` with 115 Swift routes and 419 explicit C adapters; the
+independent contract, four-child dispatch, strict Swift 6, live route/replay,
+timebase, and Metal gates remain green. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bp.md`.
+
+M33bq adds `CheckerboardPlatformBehavior` and a shared parent/child owner route
+for `bhvCheckerboardElevatorGroup` and `bhvCheckerboardPlatformSub`. Swift owns
+the child action cycle and pitch/velocity phases; the owner owns variant
+speeds/scales, child positions, source-order allocation, parent links, and
+group teardown. The manifest now reports 117 Swift routes and 417 explicit C
+adapters; the independent Swift/C contract, dispatch/coverage/engine-runtime/
+live route/replay, strict Swift 6, timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bq.md`.
+
+M33br adds `WfTowerPlatformGroupBehavior` and a parent spawner route for
+`bhvTowerPlatformGroup`. Swift owns the group height/action machine; the owner
+allocates the six solid/sliding children and elevator child in source order
+through the existing bridges, then tears down the group. The manifest now
+reports 118 Swift routes and 416 explicit C adapters; the independent Swift/C
+contract, dispatch/coverage/engine-runtime/live route/replay, strict Swift 6,
+timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33br.md`.
+
+M33bs adds `LllRotatingHexagonalPlatformBehavior` and an owner route for
+`bhvLllRotatingHexagonalPlatform`. Swift owns the authored fixed 0x100 yaw step
+and angle velocity; the owner owns level-list angle/transform mutation. The
+manifest now reports 119 Swift routes and 415 explicit C adapters; the
+independent Swift/C contract, dispatch/coverage/engine-runtime/live
+route/replay, strict Swift 6, timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bs.md`.
+
+M33bt adds `LllRotatingHexFlameBehavior` and an owner route for the
+parent-relative `bhvLllRotatingHexFlame` child. Swift owns parent-relative
+transform math, fixed Y offset, velocity, and parent-action deletion; the owner
+owns parent linkage and end-of-frame unload. The manifest now reports 120
+Swift routes and 414 explicit C adapters; the independent Swift/C contract,
+dispatch/coverage/engine-runtime/live route/replay, strict Swift 6, timebase,
+and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bt.md`.
+
+M33bu adds `LllRotatingFireBarBehavior` and a parent route for
+`bhvLllRotatingBlockWithFireBars`. Swift owns distance activation, fixed
+rotation, and six/eight flame allocation intent; the owner reuses the shared
+flame bridge for source-order child traversal and deletion. The manifest now
+reports 121 Swift routes and 413 explicit C adapters; the independent Swift/C
+contract, dispatch/coverage/engine-runtime/live route/replay, strict Swift 6,
+timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bu.md`.
+
+M33bv adds `ActivatedBackAndForthPlatformBehavior` and an owner route for
+`bhvActivatedBackAndForthPlatform`. Swift owns packed parameter decoding,
+activation/countdown, endpoint reversal, distance fence, vertical/horizontal
+displacement, and yaw flip; the owner owns level-list mutation. The manifest
+now reports 122 Swift routes and 412 explicit C adapters; the independent
+Swift/C contract, dispatch/coverage/engine-runtime/live route/replay, strict
+Swift 6, timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bv.md`.
+
+M33bw adds `BitfsSinkingPlatformBehavior` and a shared owner route for
+`bhvBitfsSinkingPlatforms` and `bhvBitfsSinkingCagePlatform`. Swift owns the
+platform/cage sine offsets and timer progression; the owner owns level-list
+mutation and cage parameters, while the pole child remains an explicit seam.
+The manifest now reports 124 Swift routes and 410 explicit C adapters; the
+independent Swift/C contract, dispatch/coverage/engine-runtime/live
+route/replay, strict Swift 6, timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bw.md`.
+
+M33bx adds `DddMovingPoleBehavior` and an owner route for the BITFS cage’s
+`bhvDddMovingPole` child. Swift owns the parent-copy position/angle reducer;
+the owner owns stable parent linkage and the cage’s child allocation. The
+manifest now reports 125 Swift routes and 409 explicit C adapters; the
+independent Swift/C contract, dispatch/coverage/engine-runtime/live
+route/replay, strict Swift 6, timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bx.md`.
+
+M33by adds `LllRotatingHexagonalRingBehavior` and an owner route for
+`bhvLllRotatingHexagonalRing`. Swift owns the ring action/yaw machine and flame
+spawn intent; the owner allocates the explicit C fallback volcano-flame child.
+The manifest now reports 126 Swift routes and 408 explicit C adapters; the
+independent Swift/C contract, dispatch/coverage/engine-runtime/live
+route/replay, strict Swift 6, timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33by.md`.
+
+M33bz adds `LllFloatingWoodBridgeBehavior` and a parent/child owner route for
+`bhvLllFloatingWoodBridge` and `bhvLllWoodPiece`. Swift owns distance actions
+and oscillating piece state; the owner allocates three source-order children,
+maintains parent links, and handles deletion/unload. The manifest now reports
+128 Swift routes and 406 explicit C adapters; the independent Swift/C
+contract, dispatch/coverage/engine-runtime/live route/replay, strict Swift 6,
+timebase, and Metal gates pass. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33bz.md`.
+
+M33ca adds `SquishablePlatformBehavior` and a generation-safe owner route for
+`bhvSquishablePlatform` (dispatch route 80). Swift owns the canonical sine,
+scale, and timer reducer; the owner applies the Y scale and transform flags to
+the surface object. The focused Swift/C contract matches at
+`0x5ea6031146ab76b9`, the dispatch smoke exercises the live route, and the
+manifest now reports 129 Swift routes and 405 explicit C adapters at
+`0xd90440569af0d7c0`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33ca.md`.
+
+M33cb adds `LllDrawbridgeBehavior` and a shared parent/child owner route for
+`bhvLllDrawbridgeSpawner` and `bhvLllDrawbridge` (dispatch route 81). Swift
+owns the signed 16-bit roll/action reducer, global-timer cadence, and lower/
+raise sound intents; the owner allocates both source-order surface halves at
+the C default-list boundary, marks the spawner for end-of-frame unload, and
+keeps child execution on the next surface tick. The focused Swift/C contract
+matches `0x00a9bbb5dd67a85c`; the manifest now reports 131 Swift routes and
+403 explicit C adapters at `0x93f173ac9312c2bf`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cb.md`.
+
+M33cc adds `IdleWaterWaveBehavior` and a shared owner route for both
+`bhvIdleWaterWave` and `bhvObjectWaterWave` (dispatch route 82), while
+preserving their distinct native loops. Swift owns Mario-position/water-level
+copy plus active-particle-flag clearing for idle waves, and the independent
+16-frame timer deactivation for object waves; the owner applies transform
+flags and end-of-frame removal for default and unimportant list instances.
+The corrected focused Swift/C contract matches `0xe94c75e5c75e93dd`; the
+manifest remains 142 Swift routes and 392 explicit C adapters at
+`0x66ba4998c339725c`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by
+the host LaunchServices `-10827` boundary; physical visual, GPU capture,
+thermal, release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cc.md`.
+
+M33cd adds `WaterfallSoundLoopBehavior` and its owner route for
+`bhvWaterfallSoundLoop` (dispatch route 83). Swift owns the persistent
+`SOUND_ENV_WATERFALL2` sound intent; the owner keeps the default-list object
+generation-safe and emits one effect per native tick. The focused Swift/C
+contract matches `0x0000000000000001`; the manifest now reports 134 Swift
+routes and 400 explicit C adapters at `0x43f46dd08c1c3691`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by
+the host LaunchServices `-10827` boundary; physical visual, GPU capture,
+thermal, release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cd.md`.
+
+M33ce adds `VolcanoSoundLoopBehavior` and its owner route for
+`bhvVolcanoSoundLoop` (dispatch route 84). Swift owns the persistent
+`SOUND_ENV_DRONING1` sound intent; the owner keeps the default-list object
+generation-safe and emits one effect per native tick. The focused Swift/C
+contract matches `0x0000000000000001`; the manifest now reports 135 Swift
+routes and 399 explicit C adapters at `0xdfbac15995e813e9`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by
+the host LaunchServices `-10827` boundary; physical visual, GPU capture,
+thermal, release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33ce.md`.
+
+M33cf adds `TumblingBridgeBehavior` and a shared parent/child owner route for
+`bhvWfTumblingBridge`, `bhvBbhTumblingBridge`, `bhvLllTumblingBridge`, and
+`bhvTumblingBridgePlatform` (dispatch route 85). Swift owns the parent action,
+distance visibility, variant-specific spawn transition, child roll/pitch
+acceleration, gravity, floor exit, and parent-exit deletion. The owner
+allocates nine source-order platform children and corrects the earlier
+manifest misclassification that routed LLL tumbling children through the
+Bully bridge. The focused Swift/C contract matches
+`0x8a7c746dcafb01e0`; the manifest now reports 138 Swift routes and 396
+explicit C adapters at `0xae5502809f33c0a7`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cf.md`.
+
+M33cg adds `FloatingPlatformBehavior` and a shared owner route for
+`bhvWdwSquareFloatingPlatform`, `bhvWdwRectangularFloatingPlatform`, and
+`bhvJrbFloatingPlatform` (dispatch route 86). Swift owns the shared
+water-vs-floor home-height selection, Mario-on-platform tilt, float/velocity
+approach, sine bob timer, and face-angle mutation. The owner stores the
+variant-specific water/floor inputs and generation-safe bob state. The focused
+Swift/C contract matches `0xe004d03fa0b6aaa0`; the manifest now reports 141
+Swift routes and 393 explicit C adapters at `0x99c3328373e59344`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by the
+host LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cg.md`.
+
+M33ch adds `SlidingPlatform2Behavior` and its owner route for
+`bhvSlidingPlatform2` (dispatch route 87). Swift owns the packed parameter
+decoder, horizontal/vertical variant selection, endpoint clamping, speed
+reversal, timer cadence, and position operation. The owner preserves the
+source home position and generation-safe movement state. The focused Swift/C
+contract matches `0xeb26a71e2cef7135`; the manifest now reports 142 Swift
+routes and 392 explicit C adapters at `0x66ba4998c339725c`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by the
+host LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33ch.md`.
+
+M33ci adds `SmallWaterWaveBehavior` and its owner route for
+`bhvSmallWaterWave` (dispatch route 88), leaving the script-only `398`
+subroutine and splash child explicit. Swift owns the +7 rise, sine scales,
+angle progression, water-level deactivation, interaction deletion, and
+60-frame script retirement; the owner emits the explicit splash child when
+the native loop crosses water level. The same pass corrects and revalidates
+the distinct `bhvIdleWaterWave`/`bhvObjectWaterWave` semantics. The focused
+Swift/C contract matches `0x3d732d26085342da`; the manifest now reports 143
+Swift routes and 391 explicit C adapters at `0xcdc77a2c5de41780`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by the
+host LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33ci.md`.
+
+M33cj adds `AmbientSoundLoopBehavior` and a shared owner route for
+`bhvBirdsSoundLoop` and `bhvSandSoundLoop` (dispatch route 89). Swift owns
+the camera-behind-Mario suppression boundary, bird variant sound selection,
+and moving-sand sound intent; the owner keeps default-list loop objects
+generation-safe. The focused Swift/C contract matches
+`0x76f14fcfeaac188b`; the manifest now reports 145 Swift routes and 389
+explicit C adapters at `0x4cec35dde19a015d`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cj.md`.
+
+M33ck adds `RotatingExclamationMarkBehavior` and its parent-linked owner route
+for `bhvRotatingExclamationMark` (dispatch route 90). Swift owns the authored
+0x800 yaw increment and parent-action lifetime rule; the owner retains the
+generation-safe parent link and removes the child when the exclamation box
+leaves action 1. The focused Swift/C contract matches
+`0x64ad5ae55aeff75d`; the manifest now reports 146 Swift routes and 388
+explicit C adapters at `0xda36fd8ed3111498`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33ck.md`.
+
+M33cl adds `WaterAirBubbleBehavior` and its owner route for
+`bhvWaterAirBubble` (dispatch route 91). Swift owns the first-30-frame
+intangible rise, forward-velocity approach, Mario-facing yaw, scale pulse,
+random-jitter inputs, water-boundary teardown, interaction teardown, sound
+intent, and 30-child bubble spawn intent. The owner emits explicit
+unmigrated `bhvBubbleMaybe` children while preserving generation-safe cleanup.
+The focused Swift/C contract matches `0xef59d871e236c6d8`; the manifest now
+reports 147 Swift routes and 387 explicit C adapters at
+`0x86d580387f6d1293`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cl.md`.
+
+M33cm adds `ObjectBubbleBehavior` and its owner route for
+`bhvObjectBubble` (dispatch route 92). Swift owns the water-boundary test and
+splash spawn intent; the owner marks the bubble for end-of-frame removal and
+emits the explicit `bhvBubbleSplash` fallback child. The focused Swift/C
+contract matches `0xe71868dec0bbb6e3`; the manifest now reports 148 Swift
+routes and 386 explicit C adapters at `0x322382a5b2bd8398`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by
+the host LaunchServices `-10827` boundary; physical visual, GPU capture,
+thermal, release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cm.md`.
+
+M33cn adds `WaterDropletBehavior` and its owner route for `bhvWaterDroplet`
+(dispatch route 93). Swift owns gravity, water re-entry detection, timeout
+and invalid-water teardown, interaction deletion, and splash-child intent;
+the owner preserves unimportant-list lifecycle and emits explicit
+`bhvWaterDropletSplash` fallback children. The focused Swift/C contract
+matches `0x0dc920f91610be97`; the manifest now reports 149 Swift routes and
+385 explicit C adapters at `0x2515d7250f7168b3`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cn.md`.
+
+M33co adds `WaterMistBehavior` and its owner route for `bhvWaterMist`
+(dispatch route 94). Swift owns authored initial/random translation inputs,
+forward movement, opacity decay, scale derivation, and lifetime teardown; the
+owner preserves unimportant-list lifecycle and transform state. The focused
+Swift/C contract matches `0xa7d3721a6c9c17b8`; the manifest now reports 150
+Swift routes and 384 explicit C adapters at `0xb144d755397d76eb`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by
+the host LaunchServices `-10827` boundary; physical visual, GPU capture,
+thermal, release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33co.md`.
+
+M33cp adds `WaterMist2Behavior` and its owner route for `bhvWaterMist2`
+(dispatch route 95). Swift owns the authored water-level placement and
+opacity derivation while the owner preserves the object home transform and
+unimportant-list lifecycle. The focused Swift/C contract matches
+`0x5b484a3470865f4c`; the manifest now reports 151 Swift routes and 383
+explicit C adapters at `0x295dd78f53930cf1`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cp.md`.
+
+M33cq adds the shared `WaterSplashBehavior` and owner route for
+`bhvBubbleSplash` and `bhvWaterDropletSplash` (dispatch route 96). Swift
+owns the surface-height/scale initialization, six-frame animation lifetime,
+and generation-safe child attachment from the already-migrated object-bubble
+and water-droplet parents. The focused Swift/C contract matches
+`0x13f1cb3de4660b22`; the manifest now reports 153 Swift routes and 381
+explicit C adapters at `0xd3d568514234937a`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cq.md`.
+
+M33cr adds `BubbleMaybeBehavior` and its owner route for `bhvBubbleMaybe`
+(dispatch route 97). Swift owns authored initial offsets, per-tick random
+movement inputs, sinusoidal billboarding scale, phase/rate progression, and
+the 60-frame child lifetime. The water-air bubble owner now attaches all 30
+spawned children to the generation-safe route. The focused Swift/C contract
+matches `0xa62ff9e3ae021fcc`; the manifest now reports 154 Swift routes and
+380 explicit C adapters at `0x61d0a1e40da60504`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cr.md`.
+
+M33cs adds `WindBehavior` and its owner route for `bhvWind` (dispatch route
+98). Swift owns explicit random placement, pitch/yaw initialization,
+forward-velocity movement, face-angle jitter, opacity/scale state, and the
+ten-tick lifetime. The focused Swift/C contract matches
+`0x11aada993961bfdf`; the manifest now reports 155 Swift routes and 379
+explicit C adapters at `0xb89cf9fffa4283bf`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cs.md`.
+
+M33ct adds `ShallowWaterWaveBehavior` and its owner route for
+`bhvShallowWaterWave` (dispatch route 99). Swift owns the parent particle
+flag lifecycle, five-droplet allocation, explicit water-level/velocity child
+inputs, and delayed parent deactivation while reusing the migrated droplet
+owner for each child. The focused Swift/C contract matches
+`0x156c000b5e160bc7`; the manifest now reports 156 Swift routes and 378
+explicit C adapters at `0xc629435cdbd7af78`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33ct.md`.
+
+M33cu extends the shared `ShallowWaterWaveBehavior` owner route (dispatch
+route 99) to `bhvShallowWaterSplash`. Swift owns the separate shallow-splash
+particle flag and 18-droplet allocation while retaining the wave route's
+shared droplet owner and delayed parent teardown. The focused Swift/C
+contract matches `0x2ba834e809509a34`; the manifest now reports 157 Swift
+routes and 377 explicit C adapters at `0x8ddf16913fde2860`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by
+the host LaunchServices `-10827` boundary; physical visual, GPU capture,
+thermal, release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cu.md`.
+
+M33cv adds `WaterSplashSpawnerBehavior` and its owner route for
+`bhvWaterSplash` (dispatch route 100). Swift owns the source-ordered six-tick
+droplet phase, three-droplet allocation per phase tick, five-tick animation
+tail, active-particle teardown, and shared migrated droplet children. The
+focused Swift/C contract matches `0x7e0113d5eed1ec4d`; the manifest now
+reports 158 Swift routes and 376 explicit C adapters at
+`0xd5036d8c20e8fdc6`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cv.md`.
+
+M33cw adds `WaterSplashSpawnerBehavior` and its owner route for
+`bhvWaterSplash` (dispatch route 100). Swift owns the source-ordered six-tick
+droplet phase, three-droplet allocation per phase tick, five-tick animation
+tail, active-particle teardown, and shared migrated droplet children. The
+focused Swift/C contract matches `0x7e0113d5eed1ec4d`; the manifest remains
+534 rows with 158 Swift routes and 376 explicit C adapters at
+`0xd5036d8c20e8fdc6`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cw.md`.
+
+M33cx extends the shared `WaterSplashBehavior` owner route (dispatch route
+96) to `bhvObjectWaterSplash`, the unimportant six-frame splash emitted by
+small-water-wave and bubble consumers. Swift owns the child animation/lifetime
+and now attaches the spawned object splash through the generation-safe bridge.
+The focused Swift/C contract matches `0xca741cdc72052b3d`; the manifest now
+reports 159 Swift routes and 375 explicit C adapters at
+`0xa846fa6aa355aa39`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cx.md`.
+
+M33cy completes the shared `WaterSplashBehavior` owner route (dispatch route
+96) for `bhvObjectWaterSplash`. Swift owns the unimportant six-frame child
+animation/lifetime and attaches object-created splashes emitted by the
+small-water-wave route. The focused Swift/C contract matches
+`0xca741cdc72052b3d`; the manifest remains 534 rows with 159 Swift routes
+and 375 explicit C adapters at `0xa846fa6aa355aa39`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cy.md`.
+
+M33cz adds `BubbleParticleSpawnerBehavior` and its owner route for
+`bhvBubbleParticleSpawner` (dispatch route 101). Swift owns the explicit
+delay, bubble particle-flag clear, parent deactivation, and child allocation;
+the spawned `bhvSmallWaterWave` is attached to its existing Swift owner. The
+focused Swift/C contract matches `0x5bd294135d7f1822`; the manifest now
+reports 160 Swift routes and 374 explicit C adapters at
+`0xabe0f97b38b74f78`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33cz.md`.
+
+M33da adds `BubbleParticleSpawnerBehavior` and its owner route for
+`bhvBubbleParticleSpawner` (dispatch route 101). Swift owns the explicit
+delay, bubble particle-flag clear, parent deactivation, and child allocation;
+the spawned `bhvSmallWaterWave` is attached to its existing Swift owner. The
+focused Swift/C contract matches `0x5bd294135d7f1822`; the manifest remains
+534 rows with 160 Swift routes and 374 explicit C adapters at
+`0xabe0f97b38b74f78`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33da.md`.
+
+M33db adds `PiranhaPlantWakingBubbleBehavior` and its owner route for
+`bhvPiranhaPlantWakingBubbles` (dispatch route 102). Swift owns explicit
+initial random yaw/forward/vertical velocity inputs, fvel movement, and the
+ten-frame unimportant-child lifetime. The focused Swift/C contract matches
+`0xeedc64c08e2c2ae2`; the manifest now reports 161 Swift routes and 373
+explicit C adapters at `0x11c82b5f755f1c1c`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33db.md`.
+
+M33dc adds `PiranhaPlantBubbleBehavior` and its owner route for
+`bhvPiranhaPlantBubble` (dispatch route 103). Swift owns the source-relative
+parent transform, idle/grow-shrink/burst action machine, active-radius and
+sleeping-parent gates, scale curve, and 15 waking-bubble child allocation.
+The focused Swift/C contract matches `0xc251b628ccd714f3`; the manifest now
+reports 162 Swift routes and 372 explicit C adapters at
+`0x588d15204cce5953`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33dc.md`.
+
+M33dd adds the shared `WaveTrailBehavior` owner route (dispatch route 104) for
+`bhvWaveTrail` and `bhvObjectWaveTrail`. Swift owns water-level placement,
+two-tick animation cadence, alternate-frame deletion, shrink state, and the
+Mario-only active-particle teardown. The focused Swift/C contract matches
+`0xb0261387b6fce0a1`; the manifest now reports 164 Swift routes and 370
+explicit C adapters at `0x1df2437891d67125`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33dd.md`.
+
+M33de adds the shared `StrongWindParticleBehavior` owner route (dispatch route
+105) for `bhvStrongWindParticle` and `bhvTinyStrongWindParticle`. Swift owns
+explicit spawn offsets, pitch-derived velocity, wind-spread yaw inputs, hitbox
+state, penguin-proximity deletion, opacity, and the 16-frame lifetime. The
+focused Swift/C contract matches `0x5b4c3a0189f542ff`; the manifest now
+reports 166 Swift routes and 368 explicit C adapters at
+`0x097a9f5f203a4d9b`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33de.md`.
+
+M33df records the fully validated shared `StrongWindParticleBehavior` route
+(dispatch route 105) for `bhvStrongWindParticle` and
+`bhvTinyStrongWindParticle`. Swift owns explicit offsets, pitch-derived
+velocity, wind-spread yaw inputs, hitbox state, penguin-proximity deletion,
+opacity, and the 16-frame lifetime. The focused Swift/C contract remains
+`0x5b4c3a0189f542ff`; the manifest remains 534 rows with 166 Swift routes and
+368 explicit C adapters at `0x097a9f5f203a4d9b`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33df.md`.
+
+M33dg adds the shared `WaterParticleBehavior` owner route (dispatch route 106)
+for `bhvSmallParticle`, `bhvSmallParticleSnow`, and
+`bhvSmallParticleBubbles`. Swift owns initialization offsets/phases,
+per-tick movement and oscillating scale, variant lifetime, water-crossing
+deletion, and object-water-splash child attachment. The focused Swift/C
+contract matches `0xbfefc9eb63220ccb`; the manifest now reports 169 Swift
+routes and 365 explicit C adapters at `0x0fa5bee7f6536d0e`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by
+the host LaunchServices `-10827` boundary; physical visual, GPU capture,
+thermal, release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33dg.md`.
+
+M33dh adds `PlungeBubbleBehavior` and its owner route for `bhvPlungeBubble`
+(dispatch route 107). Swift owns the plunge particle-flag clear, three
+`bhvSmallParticle` child allocations, and parent deactivation while reusing
+the migrated water-particle owner. The focused Swift/C contract matches
+`0x0e83419be2ab4360`; the manifest now reports 170 Swift routes and 364
+explicit C adapters at `0x57cfccb0f89ca87f`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33dh.md`.
+
+M33di adds `BreathParticleSpawnerBehavior` and its owner route for
+`bhvBreathParticleSpawner` (dispatch route 108). Swift owns eight
+source-ordered water-mist child spawns, breath-particle flag clear, and the
+delayed parent teardown while reusing the migrated mist owner. The focused
+Swift/C contract matches `0x7acd5b1c686e6243`; the manifest now reports 171
+Swift routes and 363 explicit C adapters at `0x9b7f64537a1a69fd`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by
+the host LaunchServices `-10827` boundary; physical visual, GPU capture,
+thermal, release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33di.md`.
+
+M33dj adds the mist-particle family: `bhvMistParticleSpawner`,
+`bhvWhitePuff1`, and `bhvWhitePuff2` (dispatch routes 110/109). Swift owns
+parent flag clear and teardown, child allocation, puff-one offset/scale/
+opacity/deletion, and puff-two animation lifetime. The focused Swift/C
+contract matches `0xe19d34136d15bfae`; the manifest now reports 174 Swift
+routes and 360 explicit C adapters at `0x23bdc42d0f078b52`. Dispatch,
+coverage, engine-runtime, live route/replay, route-shard replay, regenerated
+strict Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native
+runtime promotion remains blocked before `NSApplication`/engine startup by
+the host LaunchServices `-10827` boundary; physical visual, GPU capture,
+thermal, release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33dj.md`.
+
+M33dk records the fully validated mist-particle family:
+`bhvMistParticleSpawner`, `bhvWhitePuff1`, and `bhvWhitePuff2` (dispatch
+routes 110/109). Swift owns parent flag clear/teardown, child allocation,
+puff-one offset/scale/opacity/deletion, and puff-two animation lifetime. The
+focused Swift/C contract remains `0xe19d34136d15bfae`; the manifest remains
+534 rows with 174 Swift routes and 360 explicit C adapters at
+`0x23bdc42d0f078b52`. Dispatch, coverage, engine-runtime, live route/replay,
+route-shard replay, regenerated strict Swift 6 build, timebase, Metal 4, and
+diff/syntax gates pass. Native runtime promotion remains blocked before
+`NSApplication`/engine startup by the host LaunchServices `-10827` boundary;
+physical visual, GPU capture, thermal, release, and human acceptance remain
+separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33dk.md`.
+
+M33dl adds `TweesterSandParticleBehavior` and its owner route for
+`bhvTweesterSandParticle` (dispatch route 111). Swift owns explicit initial
+random placement/facing, upward motion, yaw/forward-velocity growth, scale,
+and the 16-frame lifetime. The focused Swift/C contract matches
+`0xff9a37ed90d8f611`; the manifest now reports 175 Swift routes and 359
+explicit C adapters at `0xe44e4e266f95fcdc`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33dl.md`.
+
+M33ek adds `bhvDirtParticleSpawner` and `bhvSnowParticleSpawner`, preserving
+one-shot delay/teardown, parent particle-flag clearing, and four allocated
+white-puff child records per source particle table. Their focused Swift/C
+contract is `0x23f36bdf5e01a3e6`; the manifest now reports 206 Swift routes and
+328 explicit C adapters at `0xe9cf7cd0e0b46401`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33el adds `bhvAnimatedTexture` as a Swift 6 general-actor route (dispatch route
+142), preserving the home-position snap, `oAnimState` increment, and
+`ANIMATE_TEXTURE(oAnimState, 2)` global-frame cadence, with the authored physics
+fields retained at the owner boundary. Its focused Swift/C contract is
+`0x091c01d58b64a017`; the manifest now reports 207 Swift routes and 327 explicit
+C adapters at `0xe9b3a1a5c4fc5379`. Dispatch, coverage, engine runtime,
+live-route oracle, route-shard replay, strict Swift 6 Xcode build, Metal 4 source
+contract, and repository hygiene gates pass. Runtime/device/release/visual/
+performance/thermal/human acceptance remain separate open evidence.
+
+M33em adds `bhvSparkle` as a Swift 6 unimportant-list route (dispatch route
+143), preserving billboard-owned object-list placement, the nine-step
+`oAnimState` animation setup, and immediate script deactivation. Its focused
+Swift/C contract is `0xfc140e57a3aaa42a`; the manifest now reports 208 Swift
+routes and 326 explicit C adapters at `0x3454398b0bbdfc78`. Dispatch, coverage,
+engine runtime, live-route oracle, route-shard replay, strict Swift 6 Xcode
+build, Metal 4 source contract, and repository hygiene gates pass. Runtime/
+device/release/visual/performance/thermal/human acceptance remain separate
+open evidence.
+
+M33en adds `bhvSparkleSpawn` as a Swift 6 parent/child route (dispatch route
+144), preserving injected random translation and scale, `bhvSparkle` child
+attachment, the three source-timer spawn windows, and parent teardown. Its
+focused Swift/C contract is `0xcd2af35f3ff483e2`; the manifest now reports 209
+Swift routes and 325 explicit C adapters at `0x7355930858b3236d`. Dispatch,
+coverage, engine runtime, live-route oracle, route-shard replay, strict Swift 6
+Xcode build, Metal 4 source contract, and repository hygiene gates pass.
+Runtime/device/release/visual/performance/thermal/human acceptance remain
+separate open evidence.
+
+M33ex adds `bhvSparkleParticleSpawner` as a Swift 6 unimportant-list animation
+route (dispatch route 159), preserving parent particle-flag clearing, injected
+random offsets, graph Y offset, twelve-frame animation progression, and
+deactivation. Its focused Swift/C contract is `0x2d4912f8fbe7cefb`; the
+manifest now reports 224 Swift routes and 310 explicit C adapters at
+`0xc2d37cbcc480fe53`. Dispatch, coverage, engine runtime, live-route oracle,
+route-shard replay, strict Swift 6 Xcode build, Metal 4 source contract, and
+repository hygiene gates pass. Runtime/device/release/visual/performance/
+thermal/human acceptance remain separate open evidence.
+
+M33ey adds pure Swift 6 script routes `bhvRandomAnimatedTexture` and
+`bhvUnused0DFC` (dispatch routes 160/161), preserving graph offsets, initial
+animation state, per-frame animation progression, object-list ownership, and
+the six-frame deactivation lifecycle. Their focused Swift/C contract is
+`0x6d651eeaf51053c4`; the manifest now reports 226 Swift routes and 308 explicit
+C adapters at `0x7c74a6098b2f8d58`. Dispatch, coverage, engine runtime,
+live-route oracle, route-shard replay, strict Swift 6 Xcode build, Metal 4 source
+contract, and repository hygiene gates pass. Runtime/device/release/visual/
+performance/thermal/human acceptance remain separate open evidence.
+
+M33eo adds `bhvAmbientSounds` as a Swift 6 default-list init route (dispatch
+route 145), preserving the camera-behind-Mario suppression gate and the
+`SOUND_AIR_CASTLE_OUTDOORS_AMBIENT` intent. Its focused Swift/C contract is
+`0x5420115802dc1402`; the manifest now reports 210 Swift routes and 324 explicit
+C adapters at `0xd124413ee4358b22`. Dispatch, coverage, engine runtime,
+live-route oracle, route-shard replay, strict Swift 6 Xcode build, Metal 4 source
+contract, and repository hygiene gates pass. Runtime/device/release/visual/
+performance/thermal/human acceptance remain separate open evidence.
+
+M33ep adds the coin sparkle family `bhvCoinSparkles` and
+`bhvGoldenCoinSparkles` as Swift 6 value/owner routes (dispatch routes 146/147),
+preserving the eight-step coin sparkle animation, 0.6 scale/graph offset,
+three random-offset child allocations, hidden parent rendering, and one-tick
+parent teardown. Focused Swift/C contracts are
+`0xe192c79c177d4d5b` and `0xd56058c8905ae623`; the manifest now reports 212
+Swift routes and 322 explicit C adapters at `0xf175efe87066d794`. Dispatch,
+coverage, engine runtime, live-route oracle, route-shard replay, strict Swift 6
+Xcode build, Metal 4 source contract, and repository hygiene gates pass.
+Runtime/device/release/visual/performance/thermal/human acceptance remain
+separate open evidence.
+
+M33eq adds `bhvPurpleParticle` as a Swift 6 unimportant-list particle route
+(dispatch route 148), preserving the ten-frame lifetime, random initial
+vertical/forward velocities, yaw-derived X/Z movement, and deterministic C
+fallback boundary. Its focused Swift/C contract is `0xc2a3e2f7dce0356f`; the
+manifest now reports 213 Swift routes and 321 explicit C adapters at
+`0xd9cca3003843c4d1`. Dispatch, coverage, engine runtime, live-route oracle,
+route-shard replay, strict Swift 6 Xcode build, Metal 4 source contract, and
+repository hygiene gates pass. Runtime/device/release/visual/performance/
+thermal/human acceptance remain separate open evidence.
+
+M33er adds shared Swift 6 wall/pound tiny-star particle routes
+`bhvWallTinyStarParticle` and `bhvPoundTinyStarParticle` (dispatch routes
+149/150), preserving Mario-relative wall placement, pound offset/velocity,
+yaw-derived movement, scale decay, animation state, and ten-frame teardown.
+Their focused Swift/C contract is `0xe8bb0b3e328ac784`; the manifest now
+reports 215 Swift routes and 319 explicit C adapters at
+`0x7b4b957c07253729`. Dispatch, coverage, engine runtime, live-route oracle,
+route-shard replay, strict Swift 6 Xcode build, Metal 4 source contract, and
+repository hygiene gates pass. Runtime/device/release/visual/performance/
+thermal/human acceptance remain separate open evidence.
+
+M33es adds shared Swift 6 vertical/horizontal tiny-star particle spawner routes
+`bhvVertStarParticleSpawner` and `bhvHorStarParticleSpawner` (dispatch routes
+151/152), preserving source-ordered child seed tables, active-particle flag
+clearing, hidden parent rendering, one-frame delay, and parent teardown through
+the migrated wall/pound child bridge. Their focused Swift/C contract is
+`0x34c0be5cd8a031e1`; the manifest now reports 217 Swift routes and 317 explicit
+C adapters at `0x3cda8870e2b98613`. Dispatch, coverage, engine runtime,
+live-route oracle, route-shard replay, strict Swift 6 Xcode build, Metal 4 source
+contract, and repository hygiene gates pass. Runtime/device/release/visual/
+performance/thermal/human acceptance remain separate open evidence.
+
+M33ej adds `bhvCelebrationStarSparkle`, preserving the unimportant-list
+ownership, 15-unit vertical movement, graph offset, animation, and frame-12
+teardown. Its focused Swift/C contract is `0x3c269d00bc387018`; the manifest
+now reports 204 Swift routes and 330 explicit C adapters at
+`0xbefee66c4ae7d794`. Dispatch, coverage, engine runtime, live-route oracle,
+strict Swift 6 build, and repository hygiene gates pass. Runtime/device/
+release/visual/performance/thermal/human acceptance remain separate open
+evidence.
+
+M33ez adds `bhvUnusedFakeStar` as a Swift 6 default-list rotation route
+(dispatch route 162), preserving the continuous 0x100 pitch/yaw increments,
+position/transform ownership, and update cadence. Its focused Swift/C contract
+is `0xd7d190b7a3d2c103`; the manifest now reports 227 Swift routes and 307
+explicit C adapters at `0x6590caef8ca5630e`. Dispatch, coverage, engine
+runtime, live-route oracle, route-shard replay, strict Swift 6 Xcode build,
+Metal 4 source contract, and repository hygiene gates pass. Runtime/device/
+release/visual/performance/thermal/human acceptance remain separate open
+evidence.
+
+M33fa adds `bhvCloudPart` as a Swift 6 visual child route (dispatch route 163),
+preserving parent-center/radius placement, phase oscillation, height table,
+parent yaw, Fwoosh scale cap, and unload deletion. Its focused Swift/C contract
+is `0x7f284c51b78d4f79`; the manifest now reports 228 Swift routes and 306
+explicit C adapters at `0x8967b85d2730602b`. Dispatch, coverage, engine
+runtime, live-route oracle, route-shard replay, strict Swift 6 Xcode build,
+Metal 4 source contract, and repository hygiene gates pass. Runtime/device/
+release/visual/performance/thermal/human acceptance remain separate open
+evidence.
+
+M33fb adds `bhvBreakBoxTriangle` as a Swift 6 unimportant-list generic physics
+route (dispatch route 164), preserving forward-velocity/gravity movement,
+face-angle velocity rotation, the 18-frame repeat lifecycle, and owner-state
+teardown. Its focused Swift/C contract is `0x5a7497ff09f8798d`; the manifest now
+reports 229 Swift routes and 305 explicit C adapters at
+`0x6a413ab27ad0998a`. Dispatch, coverage, engine runtime, live-route oracle,
+route-shard replay, strict Swift 6 Xcode build, Metal 4 source contract, and
+repository hygiene gates pass. Runtime/device/release/visual/performance/
+thermal/human acceptance remain separate open evidence.
+
+M33ei adds `bhvFlamethrower`, preserving activation/spit action timing,
+parameterized child velocity/lifetime, target-yaw updates, and migrated
+FlamethrowerFlame ownership. Its focused Swift/C contract is
+`0x41c0251022573e33`; the manifest now reports 203 Swift routes and 331
+explicit C adapters at `0xf33d9e1691980eff`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33eh adds `bhvFirePiranhaPlant`, preserving hide/grow actions, active-plant
+global cap, variant scales, attack/death-spin handling, animation-frame spit,
+and migrated small-Piranha flame parameters. Its focused Swift/C contract is
+`0x93bc09750aba7202`; the manifest now reports 202 Swift routes and 332
+explicit C adapters at `0x51c07e3cec989886`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33eg adds `bhvFireSpitter`, preserving idle activation, scale grow/shrink
+timing, target-yaw updates, and migrated small-Piranha flame spawn parameters.
+Its focused Swift/C contract is `0xa87862255ff5485c`; the manifest now reports
+201 Swift routes and 333 explicit C adapters at `0xec619dd0099ccd45`.
+Dispatch, coverage, engine runtime, live-route oracle, strict Swift 6 build,
+and repository hygiene gates pass. Runtime/device/release/visual/performance/
+thermal/human acceptance remain separate open evidence.
+
+M33et adds `bhvPunchTinyTriangle` and `bhvTriangleParticleSpawner` as shared
+Swift 6 value/owner routes (dispatch routes 153/154), preserving Mario-relative
+triangle placement, injected yaw/velocity seeds, scale/animation decay,
+active-particle flag clearing, child allocation, one-frame delay, and parent
+teardown. Focused Swift/C contracts are `0xf6800ccb09272913` and
+`0x34c0be5cd8a031e1`; the manifest now reports 219 Swift routes and 315
+explicit C adapters at `0xed6eb6fed67479dc`. Dispatch, coverage, engine
+runtime, live-route oracle, route-shard replay, strict Swift 6 Xcode build,
+Metal 4 source contract, and repository hygiene gates pass. Runtime/device/
+release/visual/performance/thermal/human acceptance remain separate open
+evidence.
+
+M33fc adds `bhvCannonBaseUnused` as a Swift 6 default-list eight-frame route
+(dispatch route 165), preserving vertical velocity displacement, animation
+progression, billboard/update ownership, and script deactivation. Its focused
+Swift/C contract is `0x0d4198aef1dc5ec8`; the manifest now reports 230 Swift
+routes and 304 explicit C adapters at `0x71433d10a451d5cd`. Dispatch, coverage,
+engine runtime, live-route oracle, route-shard replay, strict Swift 6 Xcode
+build, Metal 4 source contract, and repository hygiene gates pass.
+Runtime/device/release/visual/performance/thermal/human acceptance remain
+separate open evidence.
+
+M33eu adds `bhvTreeLeaf` as a Swift 6 unimportant-list environment-particle
+route (dispatch route 155), preserving phase-driven leaf motion, gravity and
+forward-velocity decay, face-angle evolution, floor/object-count deletion
+guards, and injected random-state inputs. Its focused Swift/C contract is
+`0xf6ce7660d6866f67`; the manifest now reports 220 Swift routes and 314 explicit
+C adapters at `0x4ecb0fc39c046dc1`. Dispatch, coverage, engine runtime,
+live-route oracle, route-shard replay, strict Swift 6 Xcode build, Metal 4 source
+contract, and repository hygiene gates pass. Runtime/device/release/visual/
+performance/thermal/human acceptance remain separate open evidence.
+
+M33ef adds `bhvSmallPiranhaFlame`, preserving decorative and projectile modes,
+approach-speed/yaw behavior, pitch movement, recursive ephemeral children,
+Fly Guy flame emissions, distance limits, and water/wall teardown. Its
+focused Swift/C contract is `0xf8bb618bfd45100b`; the manifest now reports 200
+Swift routes and 334 explicit C adapters at `0xe403f110694aaa3f`. Dispatch,
+coverage, engine runtime, live-route oracle, strict Swift 6 build, and
+repository hygiene gates pass. Runtime/device/release/visual/performance/
+thermal/human acceptance remain separate open evidence.
+
+M33ee adds `bhvBowserFlameSpawn`, preserving Bowser-relative trajectory-table
+placement, frame-window gating, yaw/pitch derivation, and migrated
+moving/growing flame child spawning. Its focused Swift/C contract is
+`0xdbcb4efd79313efe`; the manifest now reports 199 Swift routes and 335
+explicit C adapters at `0x6a01c5d4e36c5c56`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33ed adds the Beta moving-flame spawner/child pair, preserving the eight-child
+action sequence, phase-derived forward velocity, scale, and owning-list order.
+Its focused Swift/C contract is `0x4a67f01614ad0eaa`; the manifest now reports
+198 Swift routes and 336 explicit C adapters at `0x5033552c6044e54b`. Dispatch,
+coverage, engine runtime, live-route oracle, strict Swift 6 build, and
+repository hygiene gates pass. Runtime/device/release/visual/performance/
+thermal/human acceptance remain separate open evidence.
+
+M33ec adds `bhvFlameMovingForwardGrowing`, preserving pitch decay, transform
+motion, scale growth, floor impact, and migrated Bowser-flame child spawning.
+Its focused Swift/C contract is `0x1390274b8f482d54`; the manifest now reports
+196 Swift routes and 338 explicit C adapters at `0x5149bd8497c6d3c9`.
+Dispatch, coverage, engine runtime, live-route oracle, strict Swift 6 build,
+and repository hygiene gates pass. Runtime/device/release/visual/performance/
+thermal/human acceptance remain separate open evidence.
+
+M33eb adds `bhvKoopaShellFlame` as an unimportant-list shell-flame route,
+preserving injected random initialization, forward/gravity movement, scale
+decay, animation, and floor/timer teardown. Its focused Swift/C contract is
+`0x363cfed54163fc8d`; the manifest now reports 195 Swift routes and 339
+explicit C adapters at `0x6c4a89957bee4e86`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33ea adds `bhvVolcanoFlames` as an unimportant-list moving flame route,
+including the LLL ring child identity. Its focused Swift/C contract is
+`0x778dae045a532d02`; the manifest now reports 194 Swift routes and 340
+explicit C adapters at `0x8755495046caa258`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33dz adds `bhvBlueBowserFlame` and `bhvFlameFloatingLanding`, preserving
+blue-flame growth, landing child selection, and the migrated Bowser/blue-group
+teardown paths. Their focused Swift/C contract is `0x63916908579630a5`; the
+manifest now reports 193 Swift routes and 341 explicit C adapters at
+`0x0b2b3f11f032d140`. Dispatch, coverage, engine runtime, live-route oracle,
+strict Swift 6 build, and repository hygiene gates pass. Runtime/device/
+release/visual/performance/thermal/human acceptance remain separate open
+evidence.
+
+M33fd adds the five BREAK-only behavior identities
+`bhvUnused05A8`, `bhvUnused1820`, `bhvUnused1F30`, `bhvUnused2A10`, and
+`bhvUnused2A54` through one Swift 6 no-op owner route (dispatch route 166),
+preserving script-break semantics without deactivation or field mutation. Their
+focused Swift/C contract is `0x162a8345ecfd7fc0`; the manifest now reports 235
+Swift routes and 299 explicit C adapters at `0x6827a243c28f53af`. Dispatch,
+coverage, engine runtime, live-route oracle, route-shard replay, strict Swift 6
+Xcode build, Metal 4 source contract, and repository hygiene gates pass.
+Runtime/device/release/visual/performance/thermal/human acceptance remain
+separate open evidence.
+
+M33fe adds `bhvCannonBarrelBubbles` as a Swift 6 parent-aware cannon child
+route (dispatch route 167), preserving parent yaw/pitch propagation, barrel
+distance/velocity approach, reset-to-parent behavior, water-bomb spawning, and
+child launch parameters through the existing Swift water-bomb bridge. Its
+focused Swift/C contract is `0xebed5a565204fb74`; the manifest now reports 236
+Swift routes and 298 explicit C adapters at `0xe84627a37d504123`. Dispatch,
+coverage, engine runtime, live-route oracle, route-shard replay, strict Swift 6
+Xcode build, Metal 4 source contract, and repository hygiene gates pass.
+Runtime/device/release/visual/performance/thermal/human acceptance remain
+separate open evidence.
+
+M33ff adds `bhvCloud` as a Swift 6 parent/child environment route (dispatch
+route 168), preserving the five-part Lakitu cloud and six-part Fwoosh spawn
+shape, parent transform propagation, distance-gated Fwoosh orbit, hidden/home
+return, and Lakitu unload behavior through the existing `bhvCloudPart` owner
+bridge. Its focused Swift/C contract is `0x8552420d12e1a824`; the behavior
+dispatch smoke is `0x681ceb2358bf2e21`; the manifest is 534 rows with 237
+Swift routes and 297 explicit C adapters at `0x3ddc36fb71502e51`. The focused
+cloud/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal
+source gates, strict Swift 6 Xcode build, shell syntax, and `git diff --check`
+pass. Fwoosh wind-blow effect sequencing, zero-unexecuted full-game shard
+closure, runtime/device/release/visual/performance/thermal, and human
+acceptance remain separate open evidence.
+
+M33fg tightens the same `bhvCloud` reducer against the authored Fwoosh wind
+state: timer reset, 100-frame nearby activation, grow-speed decay, scale
+evolution, `SOUND_ENV_WIND1`/`SOUND_AIR_BLOW_WIND` intent, particle-spawn intent,
+hard stop at `-0.16`, hidden/home return, and Lakitu deletion. The owner bridge
+now allocates the authored odd/even tiny/visible strong-wind child variants
+through the existing generation-safe route. The expanded Swift/C contract is
+`0xc214f1fa256bfd3e`; all M33ff dispatch, coverage, engine-runtime, live-route,
+route-shard, timebase, Metal source, strict Swift 6 Xcode, shell, and hygiene
+gates pass. Sound delivery through the production effect sink, full-game shard
+closure, runtime/device/release/visual/performance/thermal, and human
+acceptance remain open.
+
+M33fh adds `bhvCelebrationStar` as a Swift 6 level-list parent route (dispatch
+route 169), preserving star/Bowser-key initialization, Mario-relative orbit,
+sparkle-child allocation, authored diameter growth/shrink, the timer-40
+face-camera transition, variant-specific scale, live Mario yaw alignment, and
+timer-59 retirement. Its focused Swift/C contract is
+`0xeee35755ab0382d6`; the behavior manifest is 534 rows with 238 Swift routes
+and 296 explicit C adapters at `0x2b2006e0351baeba`. Celebration-star focused
+smoke, dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal
+source gates, strict Swift 6 Xcode build, shell syntax, and `git diff --check`
+pass. Full-game shard closure, runtime/device/release/visual/performance/
+thermal, audio/effect delivery, and human acceptance remain open.
+
+M33fi adds the shared `bhvWarp`, `bhvFadingWarp`, and `bhvWarpPipe` family as
+Swift 6 value/owner routes (dispatch route 170), preserving behavior-byte
+radius decoding (`50`/`85`, `10x`, and `10000` sentinel), 50-unit hitbox
+height, fading subtype, pipe collision intent, and per-tick interaction reset.
+Its focused Swift/C contract is `0xd94ed7a7d5b6bd96`; the behavior manifest is
+534 rows with 241 Swift routes and 293 explicit C adapters at
+`0xc96df469e7e1bb21`. Warp smoke, dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source gates, strict Swift 6 Xcode build, shell
+syntax, and `git diff --check` pass. Full-game shard closure, runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33fj closes fourteen additional script-only warp identities—`bhvInstantActiveWarp`,
+`bhvAirborneWarp`, `bhvHardAirKnockBackWarp`, `bhvSpinAirborneCircleWarp`,
+`bhvDeathWarp`, `bhvSpinAirborneWarp`, `bhvFlyingWarp`, both painting warps,
+both airborne warps, both launch warps, and `bhvSwimmingWarp`—through the
+existing Swift 6 no-op owner route. Each source behavior is literal `BREAK()`;
+the route preserves the authored script-break/no-mutation semantics and
+generation-safe identity coverage. The manifest is now 534 rows with 255 Swift
+routes and 279 explicit C adapters at `0xd4dca5a8adfe18b7`. Dispatch, no-op,
+coverage/engine-runtime/live-route/route-shard/timebase/Metal source, strict
+Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game shard
+closure, runtime/device/release/visual/performance/thermal/audio/effect, and
+human acceptance remain open.
+
+M33fk extends the warp owner route with `bhvExitPodiumWarp`, preserving the
+surface-list 50-unit hitbox, 8,000-unit collision-distance admission, podium
+collision-data identity, and per-tick interaction reset. Its focused warp
+contract is `0x17d388ad293f702f`; the manifest is now 534 rows with 256 Swift
+routes and 278 explicit C adapters at `0x039fb580fe5b74ce`. Warp/dispatch,
+coverage/engine-runtime/live-route/route-shard/timebase/Metal source, strict
+Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game shard
+closure, runtime/device/release/visual/performance/thermal/audio/effect, and
+human acceptance remain open.
+
+M33fl adds `bhvDddWarp` as a Swift 6 surface/global route (dispatch route 171),
+preserving the `gDddPaintingStatus & BOWSERS_SUB_BEATEN` collision-data choice,
+30,000-unit collision-distance admission, and per-tick collision-model load
+intent. Its focused Swift/C contract is `0x0beb6d523e928e2c`; the behavior
+manifest is now 534 rows with 257 Swift routes and 277 explicit C adapters at
+`0xc42f765f2a0b1491`. DDD-warp, dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode, shell syntax, and
+`git diff --check` pass. Full-game shard closure, runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33fm closes the two remaining literal `BREAK()` identities discovered in the
+source audit—`bhvInsideCannon` and `bhvSnowBall`—through the existing Swift 6
+no-op owner route. The route preserves script-break/no-mutation semantics and
+extends the explicit identity coverage list. The manifest is now 534 rows with
+259 Swift routes and 275 explicit C adapters at `0x378cbd8ec1fcc8fc`.
+Dispatch/no-op, coverage/engine-runtime/live-route/route-shard/timebase/Metal
+source, strict Swift 6 Xcode, shell syntax, and `git diff --check` pass.
+Full-game shard closure, runtime/device/release/visual/performance/thermal/
+audio/effect, and human acceptance remain open.
+
+M33fn adds `bhvActSelectorStarType` as a Swift 6 default-list visual route
+(dispatch route 172), preserving the three authored selector modes: unselected
+size decay/clamp and yaw reset, selected size growth/clamp and 0x800 yaw pulse,
+and 100-coin yaw-only rotation. Its focused Swift/C contract is
+`0x2514df42b8a6e2f6`; the behavior manifest is now 534 rows with 260 Swift
+routes and 274 explicit C adapters at `0x88465bc1acfdd074`. Act-selector smoke,
+dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal source,
+strict Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game
+shard closure, runtime/device/release/visual/performance/thermal/audio/effect,
+and human acceptance remain open.
+
+M33fo adds `bhvStar` as a Swift 6 collectible-star route (dispatch route 173),
+preserving save-bit model selection between solid and transparent stars, the
+80×50 interaction hitbox, 0x800 yaw rotation, and interaction-triggered
+retirement with reset semantics. Its focused Swift/C contract is
+`0x6c47433452c2fada`; the behavior manifest is now 534 rows with 261 Swift
+routes and 273 explicit C adapters at `0x95d27cf7d81efa04`. Collect-star smoke,
+dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal source,
+strict Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game
+shard closure, runtime/device/release/visual/performance/thermal/audio/effect,
+and human acceptance remain open.
+
+M33fp adds `bhvStarSpawnCoordinates` as a Swift 6 level-list trajectory route
+(dispatch route 174), preserving star/transparent model selection, the
+intro/rise/fall/landed action machine, canonical home-vector yaw and velocities,
+30-frame sine rise, sparkle-spawner children, environment/star-appears intents,
+time-stop enable/clear boundaries, tangible landing, and interaction retirement.
+Its focused Swift/C contract is `0x75b6cafe102b8788`; the behavior manifest is
+now 534 rows with 262 Swift routes and 272 explicit C adapters at
+`0x4dc4d53de25a4410`. Star-spawn smoke, dispatch/coverage/engine-runtime/live-
+route/route-shard/timebase/Metal source, strict Swift 6 Xcode, shell syntax,
+and `git diff --check` pass. Full-game shard closure, runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33fq adds the reusable `bhvSparkleSpawn`-backed owner path to
+`bhvStarSpawnCoordinates`, closing the actual trajectory/cutscene child effect
+boundary: authored intro/rise/fall/landed state, canonical home vector,
+transparent-star selection, time-stop enable/clear, tangible landing, and
+generation-safe sparkle-spawner allocation. The focused contract remains
+`0x75b6cafe102b8788`; the manifest remains 534 rows with 262 Swift routes and
+272 explicit C adapters at `0x4dc4d53de25a4410`. Star-spawn/dispatch/coverage/
+engine-runtime/live-route/route-shard/timebase/Metal source, strict Swift 6
+Xcode, shell syntax, and `git diff --check` pass. Full-game shard closure,
+runtime/device/release/visual/performance/thermal/audio/effect, and human
+acceptance remain open.
+
+M33fr adds `bhvSpawnedStar` and `bhvSpawnedStarNoLevelExit` as shared Swift 6
+spawned-star trajectory routes (dispatch routes 175/176), preserving transparent
+model selection, Mario/no-exit home setup, gravity launch/settle/wait/idle
+actions, sparkle-spawner children, power-star/environment/star-appears intents,
+time-stop boundaries, tangent landing, rotation decay, and interaction
+retirement. Its focused Swift/C contract is `0xb755cd8968059736`; the behavior
+manifest is now 534 rows with 264 Swift routes and 270 explicit C adapters at
+`0x4aeb916bbd03ab16`. Spawned-star/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode, shell syntax, and
+`git diff --check` pass. Full-game shard closure, runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33fs adds `bhvCcmTouchedStarSpawn` as a Swift 6 global-trigger owner route
+(dispatch route 177), preserving the CCM slide flag gate, authored trigger
+reposition, exact default-star home coordinates, generation-safe child
+`bhvStarSpawnCoordinates` allocation, hitbox, and trigger retirement. Its
+focused Swift/C contract is `0x3b5fc80d0d29ed1d`; the behavior manifest is now
+534 rows with 265 Swift routes and 269 explicit C adapters at
+`0x8b6520b382b6243c`. CCM-star, dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode, shell syntax, and
+`git diff --check` pass. Full-game shard closure, runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33ft adds `bhvHiddenStar` and `bhvHiddenStarTrigger` as shared Swift 6
+parent/trigger routes (dispatch routes 178/179), preserving the trigger counter
+gate, collision-driven increment and number/sound intent, reveal timer, mist
+intent, red-coin star-spawn child allocation, trigger hitbox, and parent/trigger
+retirement. Its focused Swift/C contract is `0x3c3e715c0f2df866`; the behavior
+manifest is now 534 rows with 267 Swift routes and 267 explicit C adapters at
+`0x54a4c58ab8938f88`. Hidden-star, dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode, shell syntax, and
+`git diff --check` pass. Full-game shard closure, runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33fu extends the hidden-star owner with `bhvBowserCourseRedCoinStar`, sharing
+the parent reducer while preserving the authored eight-trigger red-coin
+threshold, reveal timer, no-exit star-spawn intent, and route identity. The
+focused hidden-star contract remains `0x3c3e715c0f2df866`; the behavior manifest
+is now 534 rows with 268 Swift routes and 266 explicit C adapters at
+`0xcf24ecc000518665`. Hidden-star/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode, shell syntax, and
+`git diff --check` pass. Full-game shard closure, runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33fv adds `bhvHiddenAt120Stars` as a Swift 6 surface/global gate (dispatch
+route 180), preserving the total-star threshold at 120, 4,000-unit collision
+distance, and collision-model load intent while deactivating the grate when
+the gate opens. Its focused Swift/C contract is `0x3da0a8473d7acb17`; the
+behavior manifest is now 534 rows with 269 Swift routes and 265 explicit C
+adapters at `0x5a4277aae5c1d649`. Grate/dispatch/coverage/engine-runtime/
+live-route/route-shard/timebase/Metal source, strict Swift 6 Xcode, shell
+syntax, and `git diff --check` pass. Full-game shard closure, runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33fw adds `bhvBlueCoinSwitch` and `bhvHiddenBlueCoin` as a shared Swift 6
+interaction owner pair (dispatch routes 181/182), preserving the switch's
+authored idle/receding/ticking state machine, ground-pound admission,
+six-frame recede edge, 20-unit movement, hidden/ticking transition,
+fast/slow sound cadence, 240-frame expiry, nearest-switch generation-safe
+binding, hidden-coin inactive/waiting/active states, 200+20 blink window,
+interaction retirement, and golden-coin sparkle child request. Their focused
+Swift/C contract is `0x0c0e3c6bdb4cf6c3`; the behavior manifest is now 534 rows
+with 271 Swift routes and 263 explicit C adapters at
+`0x4040da43b7c33c72`. Blue-coin/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode, shell syntax, and
+`git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33fx adds `bhvHiddenRedCoinStar`, `bhvRedCoinStarMarker`, and `bhvRedCoin`
+as a Swift 6 red-coin progression family (dispatch routes 183/184/185),
+preserving the eight-coin gate, zero-coin default-star fallback, JRB marker
+exception, marker pitch/Y-offset/Z-scale initialization and 0x100 yaw cadence,
+red-coin nearest-parent binding, counter increment, last-coin orange-number
+suppression, sound ordinal, golden-sparkle request, reveal timer, no-exit star
+spawn, mist intent, and parent/coin retirement. Their focused Swift/C contract
+is `0x8d4612ddfe2bb067`; the behavior manifest is now 534 rows with 274 Swift
+routes and 260 explicit C adapters at `0x6fe162d80502b55a`. Red-coin/dispatch/
+coverage/engine-runtime/live-route/route-shard/timebase/Metal source, strict
+Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game shard
+closure, native runtime/device/release/visual/performance/thermal/audio/effect,
+and human acceptance remain open.
+
+M33fy adds `bhvStarDoor` as a Swift 6 paired surface route (dispatch route
+186), preserving interaction/neighbor activation, the 16-frame opening move,
+31-frame open hold, 16-frame close move, reset edge, tangible/intangible
+transitions, room-gated visibility, collision-load intent, open/close sound
+and rumble edges, and owner-thread paired-door state. Its focused Swift/C
+contract is `0x216079c2c53c04c5`; the behavior manifest is now 534 rows with
+275 Swift routes and 259 explicit C adapters at `0x995600ba4bfbc8ca`.
+Star-door/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/
+Metal source, strict Swift 6 Xcode, shell syntax, and `git diff --check` pass.
+Full-game shard closure, native runtime/device/release/visual/performance/
+thermal/audio/effect, and human acceptance remain open.
+
+M33fz adds `bhvCapSwitch` and `bhvCapSwitchBase` as a Swift 6 cap-unlock
+surface/base pair (dispatch routes 187/188), preserving variant animation
+selection, 71-unit initialization offset, generation-safe base-child spawn,
+wing/metal/vanish save-flag gating, Mario-on-platform activation, activation
+sound, press scaling, timer-4 mist/triangle/rumble effects, dialog completion,
+pressed-state scale, and base collision-load intent. Their focused Swift/C
+contract is `0x4b9fda77d0cf8565`; the behavior manifest is now 534 rows with
+277 Swift routes and 257 explicit C adapters at `0x2ac67d61263b5895`.
+Cap-switch/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/
+Metal source, strict Swift 6 Xcode, shell syntax, and `git diff --check` pass.
+Full-game shard closure, native runtime/device/release/visual/performance/
+thermal/audio/effect, and human acceptance remain open.
+
+M33ga adds `bhvTowerDoor` as a Swift 6 surface collision route (dispatch route
+189), preserving the first-frame -0x4000 yaw correction, Mario-attack
+explosion/particle intent, wall-explosion sound, zero-coin outcome, and
+generation-safe retirement. Its focused Swift/C contract is
+`0xc556234e1d089035`; the behavior manifest is now 534 rows with 278 Swift
+routes and 256 explicit C adapters at `0x431e12ef6be3c4bb`. Tower-door/
+dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal source,
+strict Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game
+shard closure, native runtime/device/release/visual/performance/thermal/audio/
+effect, and human acceptance remain open.
+
+M33gb adds `bhvOpenableGrill` and `bhvOpenableCageDoor` as a Swift 6
+parent/child environment route (dispatch routes 190/191), preserving the two
+authored half-width variants, floor-switch discovery and action-2 admission,
+cage-open sound/jingle intents, generation-safe child allocation, child
+direction/yaw setup, 64-frame cage travel, and collision-load ownership. Their
+focused Swift/C contract is `0xb2e5b527958d6d7c`; the behavior manifest is now
+534 rows with 280 Swift routes and 254 explicit C adapters at
+`0x95a07155c113c1a4`. Openable-grill/dispatch/coverage/engine-runtime/
+live-route/route-shard/timebase/Metal source, strict Swift 6 Xcode, shell
+syntax, and `git diff --check` pass. Full-game shard closure, native
+runtime/device/release/visual/performance/thermal/audio/effect, and human
+acceptance remain open.
+
+M33gc adds `bhvDoor` and `bhvDoorWarp` as shared Swift 6 surface routes
+(dispatch route 192), preserving the authored interaction-mask action mapping,
+wood/iron open and close sound timing, warp-door close timing, camera-event
+distinction, room-gated visibility, animation reset, Mario-opened-door
+time-stop intent, and action-zero collision ownership. Their focused Swift/C
+contract is `0x38f73900b34f019a`; the behavior manifest is now 534 rows with
+282 Swift routes and 252 explicit C adapters at `0x73c3a9af5378685b`. Door/
+dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal source,
+strict Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game
+shard closure, native runtime/device/release/visual/performance/thermal/audio/
+effect, and human acceptance remain open.
+
+M33gd adds `bhvHiddenObject` as a Swift 6 switch-gated surface route (dispatch
+route 193), preserving breakable/unbreakable action branches, variant loot
+counts and scale, switch activation, tangible/hidden transitions, 360+20
+blink timing, attack/ground-pound break effects, collision-load intent, and
+switch-driven reset. Its focused Swift/C contract is
+`0x74fc22100d8f003b`; the behavior manifest is now 534 rows with 283 Swift
+routes and 251 explicit C adapters at `0x68fb3f1a1d12d5b6`. Hidden-object/
+dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal source,
+strict Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game
+shard closure, native runtime/device/release/visual/performance/thermal/audio/
+effect, and human acceptance remain open.
+
+M33ge adds `bhvRecoveryHeart` as a Swift 6 general-actor effect route
+(dispatch route 194), preserving 50-unit hitbox/hurtbox setup, Mario-overlap
+spin-speed selection, one-shot heart-spin sound gating, off-overlap decay to
+the 400 minimum, 0x10000 spin accumulation, +4 heal pulses, and owner-thread
+yaw updates. Its focused Swift/C contract is `0x286a983fa291efd2`; the
+behavior manifest is now 534 rows with 284 Swift routes and 250 explicit C
+adapters at `0x3b36975f88532b9b`. Recovery-heart/dispatch/coverage/
+engine-runtime/live-route/route-shard/timebase/Metal source, strict Swift 6
+Xcode, shell syntax, and `git diff --check` pass. Full-game shard closure,
+native runtime/device/release/visual/performance/thermal/audio/effect, and
+human acceptance remain open.
+
+M33gf adds `bhvOneCoin`, `bhvYellowCoin`, and `bhvTemporaryYellowCoin` as a
+shared Swift 6 coin route (dispatch route 195), preserving common coin hitbox
+and value setup, floor-distance no-shadow selection, animation progression,
+temporary 200-frame wait plus 20 two-frame blinks, interaction sparkle
+retirement, and generation-safe owner cleanup. Their focused Swift/C contract
+is `0x02cbc40bcdd89035`; the behavior manifest is now 534 rows with 287 Swift
+routes and 247 explicit C adapters at `0x05ce99962dfaeca5`. Coin/dispatch/
+coverage/engine-runtime/live-route/route-shard/timebase/Metal source, strict
+Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game shard
+closure, native runtime/device/release/visual/performance/thermal/audio/effect,
+and human acceptance remain open.
+
+M33gg adds `bhvMovingYellowCoin` and `bhvMovingBlueCoin` as a shared Swift 6
+physics/interaction route (dispatch route 196), preserving yellow/blue coin
+values, gravity/friction/buoyancy setup, yellow tangibility delay and
+301-frame action transition, blue 1,500-unit movement admission, grounded
+forward-speed acceleration/cap, airborne damping, coin-drop sound gating,
+flicker/death fences, and interaction sparkle retirement. Their focused Swift/C
+contract is `0x5fad4e584bf56f1f`; the behavior manifest is now 534 rows with
+289 Swift routes and 245 explicit C adapters at `0x626fe55eb8d2c425`.
+Moving-coin/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/
+Metal source, strict Swift 6 Xcode, shell syntax, and `git diff --check` pass.
+Full-game shard closure, native runtime/device/release/visual/performance/
+thermal/audio/effect, and human acceptance remain open.
+
+M33gh adds `bhvWaterLevelDiamond` and `bhvInitializeChangingWaterLevel` as
+Swift 6 environment/global routes (dispatch routes 197/198), preserving the
+diamond initialization/idle/change/spinning actions, shared water-changing
+gate, target-level approach, trigger/drain sound edges, 0x800 spin, rumble
+intent, collision values, and the initializer's region-copy/10-frame sine
+cadence. Their focused Swift/C contract is `0x385a79b4fb5775cd`; the behavior
+manifest is now 534 rows with 291 Swift routes and 243 explicit C adapters at
+`0x7c51e00bd314c000`. Water-level/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode, shell syntax, and
+`git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gi adds `bhvWaterLevelPillar` as a Swift 6 environment/surface route
+(dispatch route 199), preserving persistent drained initialization, ground-
+pound admission, 20-unit sinking, peer-pillar synchronization, moat-drained
+save/jingle intent, 300-frame environment-level approach, water-drain sound,
+and collision-owner lifecycle. Its focused Swift/C contract is
+`0xc7ec0e0bc7a2ca6a`; the behavior manifest is now 534 rows with 292 Swift
+routes and 242 explicit C adapters at `0x4119710289586733`. Water-pillar/
+dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal source,
+strict Swift 6 Xcode, shell syntax, and `git diff --check` pass. Full-game
+shard closure, native runtime/device/release/visual/performance/thermal/audio/
+effect, and human acceptance remain open.
+
+M33gj adds the shared purple floor-switch route for
+`bhvFloorSwitchHardcodedModel`, `bhvFloorSwitchGrills`,
+`bhvFloorSwitchAnimatesObject`, and `bhvFloorSwitchHiddenObjects` (dispatch
+route 200), preserving platform/lateral admission, Mario action gating,
+pressed scaling, activation sound/rumble, fast/slow ticking, byte-specific
+release/wait behavior, unpressed recovery, and collision ownership. Their
+focused Swift/C contract is `0x908ab416de4408fe`; the behavior manifest is now
+534 rows with 296 Swift routes and 238 explicit C adapters at
+`0x8fb3aa416c3f5410`. Floor-switch/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode, shell syntax, and
+`git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gk adds the animated floor-switch child route for
+`bhvAnimatesOnFloorSwitchPress` (dispatch route 201), preserving the parent
+action-2 gate, toggle/retrigger behavior, authored 250/200/200-frame variant
+durations, remaining-time sound cadence, frame/model progression, collision
+load intent, parent linkage, and generation-safe owner cleanup. Its focused
+Swift/C contract is `0xd3d13ed14b76d885`; the behavior manifest is now 534
+rows with 297 Swift routes and 237 explicit C adapters at
+`0xc994933ec600a82c`. Animated-floor-switch/dispatch/coverage/engine-runtime/
+live-route/route-shard/timebase/Metal source, strict Swift 6 Xcode build,
+shell syntax, and `git diff --check` pass. Full-game shard closure, native
+runtime/device/release/visual/performance/thermal/audio/effect, and human
+acceptance remain open.
+
+M33gl adds the shared hidden-one-up family for `bhvHidden1up`,
+`bhvHidden1upTrigger`, `bhvHidden1upInPole`, `bhvHidden1upInPoleTrigger`, and
+`bhvHidden1upInPoleSpawner` (dispatch route 202), preserving trigger-count
+gating, hidden/reveal/tangible transitions, 37-frame rise, sparkle cadence,
+away/toward-Mario motion, 30-frame disappearance, trigger consumption, and
+the pole spawner's one-up plus two-trigger child allocation. Its focused
+Swift/C contract is `0x471482b44d925ead`; the behavior manifest is now 534
+rows with 302 Swift routes and 232 explicit C adapters at
+`0x9e5ba7d19c0efce1`. Hidden-one-up/dispatch/coverage/engine-runtime/
+live-route/route-shard/timebase/Metal source, strict Swift 6 Xcode build,
+shell syntax, and `git diff --check` pass. Full-game shard closure, native
+runtime/device/release/visual/performance/thermal/audio/effect, and human
+acceptance remain open.
+
+M33gm extends the hidden-one-up owner with the regular `bhv1Up`,
+`bhv1upWalking`, `bhv1upRunningAway`, `bhv1upSliding`, and
+`bhv1upJumpOnApproach` routes (dispatch route 202), preserving stationary
+interaction, 37-frame appearance/rise, walking timeout, away movement,
+approach gates, sparkle cadence, tangible transitions, and disappearance
+fences. The focused Swift/C contract is
+`0x33249b91023d6e53`; the behavior manifest is now 534 rows with 307 Swift
+routes and 227 explicit C adapters at `0xcca6724933d0cf63`.
+Hidden-one-up/dispatch/coverage/engine-runtime/live-route/route-shard/
+timebase/Metal source, strict Swift 6 Xcode build, shell syntax, and
+`git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gn adds `bhvBreakableBox` and `bhvBreakableBoxSmall` as a shared Swift 6
+holdable/surface route (dispatch route 203), preserving the large-box attack
+break and coin outcome, small-box hold/thrown/dropped transitions, landing and
+sliding effects, break particles, lava/death behavior, 810-frame flashing,
+900-frame respawn fence, hitboxes, model/scale, and collision ownership. Its
+focused Swift/C contract is `0x597e320f93b7a3b4`; the behavior manifest is now
+534 rows with 309 Swift routes and 225 explicit C adapters at
+`0xf02d6f930ce7fd3a`. Breakable-box/dispatch/coverage/engine-runtime/
+live-route/route-shard/timebase/Metal source, strict Swift 6 Xcode build,
+shell syntax, and `git diff --check` pass. Full-game shard closure, native
+runtime/device/release/visual/performance/thermal/audio/effect, and human
+acceptance remain open.
+
+M33go adds `bhvExclamationBox` as a Swift 6 content/effect owner route
+(dispatch route 204), preserving save/override gating, animation state,
+rotating-mark child allocation, tangible/hidden transitions, attack wobble,
+content selection for caps/shell/coins/1-Ups/stars, break mist/triangles/sound,
+and the 300-frame return fence. Its focused Swift/C contract is
+`0x7fe70358270d770d`; the behavior manifest is now 534 rows with 310 Swift
+routes and 224 explicit C adapters at `0xd37b562c2158fc48`.
+Exclamation-box/dispatch/coverage/engine-runtime/live-route/route-shard/
+timebase/Metal source, strict Swift 6 Xcode build, shell syntax, and
+`git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gp adds `bhvOrangeNumber` as a Swift 6 counter/effect owner route
+(dispatch route 205), preserving behavior-byte animation selection, 26-unit
+rise, 2-unit gravity, -21/14 bounce clamp, 35-frame sparkle/expiry edge, and
+golden-sparkle child ownership. Its focused Swift/C contract is
+`0xf40a1d75f5001d52`; the behavior manifest is now 534 rows with 311 Swift
+routes and 223 explicit C adapters at `0x1dbb88a3ad5f3973`.
+Orange-number/dispatch/coverage/engine-runtime/live-route/route-shard/
+timebase/Metal source, strict Swift 6 Xcode build, shell syntax, and
+`git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gq adds `bhvSoundSpawner` and `bhvRockSolid` as Swift 6 owner routes
+(dispatch routes 206/207), preserving the three-frame delay plus one-shot
+sound edge, 30-frame deactivation window, persistent rock collision-load
+intent, object-list ownership, and lifecycle pruning. Their focused Swift/C
+contract is `0x4361939714f8a64d`; the behavior manifest is now 534 rows with
+313 Swift routes and 221 explicit C adapters at `0x47574fde9831c28f`.
+Sound/rock/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/
+Metal source, strict Swift 6 Xcode build, shell syntax, and `git diff --check`
+pass. Full-game shard closure, native runtime/device/release/visual/
+performance/thermal/audio/effect, and human acceptance remain open.
+
+M33gr adds `bhvBowserSubDoor`, `bhvBowsersSub`, `bhvMoatGrills`, and
+`bhvInvisibleObjectsUnderBridge` as shared Swift 6 environment-gate owners
+(dispatch route 208), preserving submarine unlock deletion, moat-drain
+collision/model gating, under-bridge environment-region writes, and immediate
+initializer teardown. Their focused Swift/C contract is
+`0xd85441b458599c53`; the behavior manifest is now 534 rows with 317 Swift
+routes and 217 explicit C adapters at `0x4e7028d3111efac8`.
+Environment-gate/dispatch/coverage/engine-runtime/live-route/route-shard/
+timebase/Metal source, strict Swift 6 Xcode build, shell syntax, and
+`git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gs adds `bhvClockHourHand` and `bhvClockMinuteHand` as a shared Swift 6
+mechanical route (dispatch route 209), preserving the four-frame default-
+surface safety delay, hour/minute roll velocities, painting detection,
+stop/fast/random/slow threshold selection, and rotation stop edge. Their
+focused Swift/C contract is `0xe2f9dc6a50eec264`; the behavior manifest is now
+534 rows with 319 Swift routes and 215 explicit C adapters at
+`0x20925804d9638075`. Clock-arm/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode build, shell syntax,
+and `git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gt adds `bhvCastleFloorTrap` and `bhvFloorTrapInCastle` as a shared Swift
+6 parent/child mechanical route (dispatch route 210), preserving trap open/
+close/rotate actions, four-frame angle-velocity changes, open sound edge,
+child roll propagation, Mario platform turn handoff, interaction reset, and
+surface collision ownership. Their focused Swift/C contract is
+`0x3489058a8683fdcc`; the behavior manifest is now 534 rows with 321 Swift
+routes and 213 explicit C adapters at `0x8c9f983fb771b6cb`.
+Castle-floor-trap/dispatch/coverage/engine-runtime/live-route/route-shard/
+timebase/Metal source, strict Swift 6 Xcode build, shell syntax, and
+`git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gu adds `bhvCastleFlagWaving` as a Swift 6 static animation initializer
+route (dispatch route 211), preserving the random-frame admission clamp,
+stable animation state, default-list ownership, and lifecycle pruning. Its
+focused Swift/C contract is `0x4d94c25d07ee7834`; the behavior manifest is now
+534 rows with 322 Swift routes and 212 explicit C adapters at
+`0x110c8e667334b8d2`. Castle-flag/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode build, shell syntax,
+and `git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gv adds `bhvBooCage` as a Swift 6 parent-linked state-machine route
+(dispatch route 212), preserving in-boo parent transform copying, death-triggered
+falling, initial 60-unit velocity, sparkle and landing effects, ground
+tangibility, Mario entry, 100-frame transition, hitbox values, and lifecycle
+ownership. Its focused Swift/C contract is `0x4a2b92235e4bf5a3`; the behavior
+manifest is now 534 rows with 323 Swift routes and 211 explicit C adapters at
+`0xf93f70eef4023093`. Boo-cage/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode build, shell syntax,
+and `git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gw adds `bhvAlphaBooKey` and `bhvBetaBooKey` as a shared Swift 6
+parent/drop interaction route (dispatch route 213), preserving alpha/beta
+rotation, parent-death transition, 40-unit drop velocity, dropped-state roll
+settling, 90-frame tangibility fence, parent handoff, collision collection,
+and golden-sparkle ownership. Their focused Swift/C contract is
+`0xde6afa5beafcc025`; the behavior manifest is now 534 rows with 325 Swift
+routes and 209 explicit C adapters at `0x878503ce8420d210`.
+Boo-key/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/
+Metal source, strict Swift 6 Xcode build, shell syntax, and `git diff --check`
+pass. Full-game shard closure, native runtime/device/release/visual/
+performance/thermal/audio/effect, and human acceptance remain open.
+
+M33gx adds `bhvBooInCastle` as a Swift 6 room/opacity owner route (dispatch
+route 214), preserving the 12-star gate, room-1 appearance, opacity 180,
+2× scale, 1,000-unit laugh transition, home-target movement, opacity fade
+past Z=-5000, and cross-room reset. Its focused Swift/C contract is
+`0x87a7c25160ed3ec6`; the behavior manifest is now 534 rows with 326 Swift
+routes and 208 explicit C adapters at `0x79d7d43594c341c7`.
+Boo-in-castle/dispatch/coverage/engine-runtime/live-route/route-shard/
+timebase/Metal source, strict Swift 6 Xcode build, shell syntax, and
+`git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33gy adds `bhvMerryGoRound` as a Swift 6 mechanical/audio owner route
+(dispatch route 215), preserving the outside-room latch, howling-wind effect,
+0x80 yaw rotation, stopped-state audio handoff, room reset, and collision
+ownership. Its focused Swift/C contract is `0x5ab347fa61686883`; the behavior
+manifest is now 534 rows with 327 Swift routes and 207 explicit C adapters at
+`0xc96a5596e0e78ff3`. Merry-go-round/dispatch/coverage/engine-runtime/
+live-route/route-shard/timebase/Metal source, strict Swift 6 Xcode build,
+shell syntax, and `git diff --check` pass. Full-game shard closure, native
+runtime/device/release/visual/performance/thermal/audio/effect, and human
+acceptance remain open.
+
+M33gz adds `bhvPlaysMusicTrackWhenTouched` as a Swift 6 distance-gated audio
+route (dispatch route 216), preserving the strict 200-unit boundary, one-shot
+puzzle-jingle edge, action latch, timer progression, and default-list
+ownership. Its focused Swift/C contract is `0x931eddc04c6c6167`; the behavior
+manifest is now 534 rows with 328 Swift routes and 206 explicit C adapters at
+`0xb50044bba999b59b`. Music-touch/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode build, shell syntax,
+and `git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33ha adds `bhvMessagePanel` and `bhvSignOnWall` as a shared Swift 6 text-
+surface route (dispatch route 217), preserving 150×80 text hitboxes,
+interaction-type/subtype ownership, per-tick interaction reset, and the
+Message Panel versus wall-sign collision-load distinction. Their focused
+Swift/C contract is `0xcbdcbe39fe5d7123`; the behavior manifest is now 534
+rows with 330 Swift routes and 204 explicit C adapters at
+`0xb37f15ffad58b15f`. Text-surface/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode build, shell syntax,
+and `git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33hb adds `bhvGrandStar` as a Swift 6 cutscene/interaction owner route
+(dispatch route 218), preserving appearance sparkle/audio edges, 70-frame
+appearance timing, launch/arc state, home-height landing handoff, rotation,
+2× scale/graph offset policy, tangibility, and interaction retirement. Its
+focused Swift/C contract is `0x4ee77eda1fde3209`; the behavior manifest is now
+534 rows with 331 Swift routes and 203 explicit C adapters at
+`0x67dbbe01b5bc53ae`. Grand-star/dispatch/coverage/engine-runtime/live-route/
+route-shard/timebase/Metal source, strict Swift 6 Xcode build, shell syntax,
+and `git diff --check` pass. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33hc adds `bhvBetaBowserAnchor` as a Swift 6 Mario-relative collision owner
+route (dispatch route 219), preserving 30-unit vertical/300-unit forward
+placement, debug-radius/height offsets, active hitbox values, and attack intent
+for touched non-Mario objects. Its focused Swift/C contract is
+`0xbc3315ebf35944be`; the behavior manifest is now 534 rows with 332 Swift
+routes and 202 explicit C adapters at `0xd3ae579b50c58226`.
+Beta-anchor/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/
+Metal source, strict Swift 6 Xcode build, shell syntax, and `git diff --check`
+pass. Full-game shard closure, native runtime/device/release/visual/
+performance/thermal/audio/effect, and human acceptance remain open.
+
+M33hd adds `bhvAnotherElavator` as an explicit source-verified alias to the
+existing Swift elevator owner: its behavior script invokes the same
+`bhv_elevator_init` and `bhv_elevator_loop` with the HMC elevator collision.
+The dispatch/manifest alias is covered by the existing elevator contract and
+strict build; the behavior manifest is now 534 rows with 333 Swift routes and
+201 explicit C adapters at `0xc4552cfb6723328f`. Full-game shard closure,
+native runtime/device/release/visual/performance/thermal/audio/effect, and
+human acceptance remain open.
+
+M33he adds `bhvCutOutObject` and `bhvPurpleSwitchHiddenBoxes` as explicit
+source-verified aliases. The cut-out script disables rendering and breaks
+without native state mutation; the purple hidden-box script writes behavior
+byte `2` and jumps directly to the existing floor-switch implementation.
+The dispatch/manifest aliases and existing no-op/floor-switch contracts pass;
+the behavior manifest is now 534 rows with 335 Swift routes and 199 explicit
+C adapters at `0x7396cb7fc6200083`. Full-game shard closure, native
+runtime/device/release/visual/performance/thermal/audio/effect, and human
+acceptance remain open.
+
+M33hf closes the next source-verified terminal family: the rotating-
+counterclockwise, stub, unused-one, static-object, yellow-ball, and six
+carry-helper scripts terminate without a native callback, while
+`bhvSmallWaterWave398` is a helper subroutine already executed by the Swift
+small-wave owner. They are registered against the existing no-op or
+small-water-wave value owners with stable dispatch identities; the dispatch
+smoke and deterministic manifest contract pass at 534 rows with 349 Swift
+routes and 185 explicit C adapters (`0xf54dd7c2fe19f8fd`). Full-game shard
+closure, native runtime/device/release/visual/performance/thermal/audio/effect,
+and human acceptance remain open.
+
+M33hg extends the same value-owned route to `bhvIgloo`,
+`bhvBigSnowmanWhole`, `bhvUkikiCageChild`, `bhvSunkenShipPart2`, and the
+`bhvSunkenShipSetRotation` helper. The Swift owner preserves the igloo
+barrier/text-interaction fields and per-tick reset, the fixed Ukiki child
+position, and the sunken-ship scale/drawing-distance/face-angle setup before
+the terminal script break. Dispatch field assertions, manifest, Metal 4
+source, engine runtime, and regenerated strict Swift 6 Xcode Debug build pass;
+the manifest is 534 rows with 354 Swift routes and 180 explicit C adapters at
+`0x49a2ea62552e3479`. Full-game shard closure, native runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33ia adds source-verified static collision-load owners for `bhvTower`,
+`bhvBulletBillCannon`, `bhvLllHexagonalMesh`, `bhvHiddenStaircaseStep`,
+`bhvPillarBase`, `bhvInSunkenShip`, and `bhvInSunkenShip2`. The value owner
+preserves surface-list admission, authored collision identities, collision and
+drawing distances, room scope, the sunken-ship rotation helper, and registers
+the collision surface with the Swift engine state on each owner tick. Dispatch
+field/route assertions, manifest/Metal contracts, engine runtime, live-route,
+route-shard, timebase, and regenerated strict Swift 6 Xcode Debug build pass;
+the manifest is 534 rows with 361 Swift routes and 173 explicit C adapters at
+`0xbd8a849d5c4a5bbb`. Full-game shard closure, native runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33ib classifies `bhvMantaRayRingManager` as a persistent no-op owner because
+its source script is an empty `BEGIN_LOOP` with no native callback or field
+mutation. The persistent mode is distinct from terminal `BREAK()` routes and
+reports non-terminal script state. Dispatch, manifest, Metal 4 source, and
+strict-build gates pass; one explicit C adapter is retired.
+
+M33ic adds the shared small/large Bomp action machine (`bhvSmallBomp` and
+`bhvLargeBomp`). Swift preserves the random-start timer, wait/poke-out/extend/
+retract thresholds, variant-specific speeds, fixed X clamps, yaw reversals,
+surface collision identity, and sound edges. The independent C↔Swift contract
+matches at `0x60f27e7f0e517b6f`; dispatch, manifest, Metal 4 source, engine
+runtime, live-route, route-shard, timebase, and regenerated strict Swift 6
+Xcode Debug build pass. The manifest is 534 rows with 364 Swift routes and
+170 explicit C adapters at `0xfce7473eb9a9c811`. Full-game shard closure,
+native runtime/device/release/visual/performance/thermal/audio/effect, and
+human acceptance remain open.
+
+M33id adds the shared Grindel/Thwomp five-state action machine for
+`bhvGrindel`, `bhvThwomp`, and `bhvThwomp2`. Swift preserves behavior-byte
+wait admission, random wait/pause timers, falling gravity, home-height landing,
+nearby landing sound/shake, variant scale/drawing setup, collision identity,
+and surface-owner registration. The independent C↔Swift contract matches at
+`0x69cbaa275918d295`; dispatch, manifest, Metal 4 source, engine runtime,
+live-route, route-shard, timebase, and regenerated strict Swift 6 Xcode Debug
+build pass. The manifest is 534 rows with 367 Swift routes and 167 explicit C
+adapters at `0x92867b41d99a059b`. Full-game shard closure, native runtime/device/
+release/visual/performance/thermal/audio/effect, and human acceptance remain
+open.
+
+M33ie extends the Swift coin owner through `bhvThreeCoinsSpawn`,
+`bhvTenCoinsSpawn`, and `bhvSingleCoinGetsSpawned`. Formation parents now
+spawn the exact 3/10 level-list children, deactivate after the default-list
+pass, and preserve the scheduler's next-pass ordering. The independent
+formation contract matches at `0xcb80b3715d3a6b4a`; coin dispatch, engine
+runtime, live-route, route-shard, timebase, manifest, Metal 4 source, and
+regenerated strict Swift 6 Xcode Debug build pass. The manifest is 534 rows
+with 370 Swift routes and 164 explicit C adapters at
+`0xda5e7977cf2e5d16`. Full-game shard closure, native runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33ev extends the tree-particle family with `bhvTreeSnow` and
+`bhvLeafParticleSpawner` (dispatch routes 156/157), preserving shared
+phase/gravity leaf motion, level-gated snow/leaf selection, random spawn
+thresholds and scale/velocity fields, active-particle flag clearing, child
+ownership, one-frame delay, and parent teardown. Focused Swift/C contracts are
+`0xf6ce7660d6866f67` and `0x3b7b1c095b691cea`; the manifest now reports 222
+Swift routes and 312 explicit C adapters at `0xf451324f263a831e`. Dispatch,
+coverage, engine runtime, live-route oracle, route-shard replay, strict Swift 6
+Xcode build, Metal 4 source contract, and repository hygiene gates pass.
+Runtime/device/release/visual/performance/thermal/human acceptance remain
+separate open evidence.
+
+M33dy adds `bhvBlueFlamesGroup`, a 16-frame parent that bursts migrated
+`bhvFlameBouncing` children. Its focused Swift/C contract is
+`0xbae357f5c46332c3`; the manifest now reports 191 Swift routes and 343
+explicit C adapters at `0xa6a655f1e291de66`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33dx adds shared Bowser flame routes `bhvFlameBowser` and
+`bhvFlameLargeBurningOut` using the migrated black-smoke-upward teardown.
+Their focused Swift/C contract is `0xdf08caf0976be19c`; the manifest now
+reports 190 Swift routes and 344 explicit C adapters at
+`0xd3013583bb59dced`. Dispatch, coverage, engine runtime, live-route oracle,
+strict Swift 6 build, and repository hygiene gates pass. Runtime/device/
+release/visual/performance/thermal/human acceptance remain separate open
+evidence.
+
+M33ew adds `bhvMistCircParticleSpawner` as a Swift 6 default-list spawner
+route (dispatch route 158), preserving the 20-child mist table, 20-unit Y
+offset, randomized scale/forward velocity/yaw, white-puff explosion child
+ownership, active-particle flag clearing, and one-frame parent delay. Its
+focused Swift/C contract is `0x8b836f6e24508c9b`; the manifest now reports 223
+Swift routes and 311 explicit C adapters at `0x1164b7a306c15cec`. Dispatch,
+coverage, engine runtime, live-route oracle, route-shard replay, strict Swift 6
+Xcode build, Metal 4 source contract, and repository hygiene gates pass.
+Runtime/device/release/visual/performance/thermal/human acceptance remain
+separate open evidence.
+
+M33dw adds `bhvFlameBouncing` with timer/Bowser/floor deletion guards alongside
+M33dv's parameterized flamethrower flame. Its focused Swift/C contract is
+`0x4fd248c09d17fc44`; the manifest now reports 188 Swift routes and 346
+explicit C adapters at `0x1054f76a59f135e0`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33dv adds `bhvFlamethrowerFlame` with parameterized size/movement alongside
+M33du's static flame route. Its focused Swift/C contract is
+`0x8c2fc52c616141ec`; the manifest now reports 187 Swift routes and 347
+explicit C adapters at `0x9cd1c075a05ef181`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. The canonical verification matrix also completes all source, contract,
+content, and build stages before the host LaunchServices
+`kLSNoExecutableErr (-10827)` app-open boundary. Runtime/device/release/
+visual/performance/thermal/human acceptance remain separate open evidence.
+
+M33du adds the static `bhvFlame` interaction route alongside M33dt's one-shot
+star-key puff parent. Its focused Swift/C contract is
+`0x4087c9da74b17dc2`; the manifest now reports 186 Swift routes and 348
+explicit C adapters at `0x4ac99b401bb68824`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33dt adds the one-shot `bhvStarKeyCollectionPuffSpawner` parent route using
+the migrated white-puff explosion child. Its focused Swift/C contract is
+`0xdc6eeddd4cfb14f4`; the manifest now reports 185 Swift routes and 349
+explicit C adapters at `0x6ea8468d7c77df19`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33ds adds the shared `bhvSmoke`/`bhvBobombFuseSmoke` dust-smoke route family
+alongside M33dr's white-puff explosion. Its focused Swift/C contract is
+`0x0149577f96a62f5b`; the manifest now reports 184 Swift routes and 350
+explicit C adapters at `0xad222b530f9b5d2d`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33dr adds the `bhvWhitePuffExplosion` fade/movement route alongside M33dq's
+moving smoke route. Its focused Swift/C contract is
+`0xa830d1da5d262cbe`; the manifest now reports 182 Swift routes and 352
+explicit C adapters at `0x27d99092c5da319c`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33dq adds the `bhvWhitePuffSmoke2` moving smoke route alongside M33dp's
+ten-frame smoke route. Its focused Swift/C contract is
+`0xe495eac58d877d0b`; the manifest now reports 181 Swift routes and 353
+explicit C adapters at `0x836c9e309f8ea9f7`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33dp adds the `bhvWhitePuffSmoke` ten-frame smoke route alongside M33do's
+upward parent/child route. Its focused Swift/C contract is
+`0x026925e9e7f47060`; the manifest now reports 180 Swift routes and 354
+explicit C adapters at `0x1f5414cb8f690a82`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33do adds the `bhvBlackSmokeUpward` parent/child route alongside M33dn's
+Bowser black-smoke child. Its focused Swift/C contract is
+`0xa47446326f1b5362`; the manifest now reports 179 Swift routes and 355
+explicit C adapters at `0xb136bac81c66c1b7`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33dn adds the Bowser black-smoke child route `bhvBlackSmokeBowser` alongside
+the M33dm Mario flame/black-smoke family. Its focused Swift/C contract is
+`0x24b7da005aaead81`; the manifest now reports 178 Swift routes and 356
+explicit C adapters at `0x766c6f528773cf75`. Dispatch, coverage, engine
+runtime, live-route oracle, strict Swift 6 build, and repository hygiene gates
+pass. Runtime/device/release/visual/performance/thermal/human acceptance
+remain separate open evidence.
+
+M33dm adds the Mario flame/black-smoke family: `bhvFireParticleSpawner` and
+`bhvBlackSmokeMario` (dispatch routes 113/112). Swift owns Mario-relative
+flame placement/scale, particle-flag deletion, odd-tick smoke allocation, and
+black-smoke movement/lifetime. The focused Swift/C contract matches
+`0x030bac5b402feed1`; the manifest now reports 177 Swift routes and 357
+explicit C adapters at `0x17326257cf8abf95`. Dispatch, coverage,
+engine-runtime, live route/replay, route-shard replay, regenerated strict
+Swift 6 build, timebase, Metal 4, and diff/syntax gates pass. Native runtime
+promotion remains blocked before `NSApplication`/engine startup by the host
+LaunchServices `-10827` boundary; physical visual, GPU capture, thermal,
+release, and human acceptance remain separate open gates. Handoff:
+`.porting/porting-handoff-full-swift-twin-M33dm.md`.
+
+The Debug target now explicitly sets `ENABLE_DEBUG_DYLIB=NO`, so verification
+builds produce a normal arm64 app executable instead of Xcode's preview/debug
+executor stub. A fresh normal-executable build succeeds; this removes a
+project-side launch ambiguity, but the host's independent LaunchServices
+`kLSNoExecutableErr` still prevents runtime qualification.
 
 M31k is the latest validated camera authority seam. Swift now owns the
 selection/angle flag transitions that are exercised by the live C camera path:
@@ -1035,6 +3357,17 @@ audit pass. Eyerok hand behavior/owner records, collision movement, real
 camera/audio/dialog consumers, durable reward persistence, and device/visual/
 human acceptance remain open.
 
+M33if adds `bhvBigBoulder` as a Swift rolling-sphere owner. It preserves the
+initial 40-unit launch, 70-unit speed cap, rolling face-pitch update, damage
+hitbox, 20,000-unit collision distance, scale/graph offset, impact sound/mist
+edges, and below-world retirement. The independent C↔Swift contract matches
+at `0x4e41a388291ec45d`; dispatch, manifest, Metal 4 source, engine runtime,
+live-route, route-shard, timebase, and regenerated strict Swift 6 Xcode Debug
+build pass. The manifest is 534 rows with 371 Swift routes and 163 explicit C
+adapters at `0x3c0ee295ed374325`. The big-boulder generator remains a separate
+unmigrated route; full-game shards, native runtime/device/release/visual/
+performance/thermal/audio/effect, and human acceptance remain open.
+
 M21n adds the pointer-free Eyerok hand action table. It preserves sleep/wake,
 idle/open/eye/close/retreat, Mario targeting and smash/fist branches,
 double-pound selection/launch, attack/recover/become-active/death phases,
@@ -1156,6 +3489,294 @@ unchecked-Sendable audit pass are the evidence boundary. Bubble/smoke child
 consumers, full Bowser controller/arena authority, collision consumers,
 durable reward/warp transitions, and device/visual/human acceptance remain
 open.
+
+M33ig completes the boulder family with `bhvBigBoulderGenerator`. The Swift
+owner preserves the 256-frame timer wrap, room-4 gate, 1,500/6,000-unit radius
+bands, 64/128-frame spawn cadence, default-list parent to level-list child
+ordering, and generation-safe child ownership. The independent C↔Swift
+generator contract matches at `0xd1c51a063b8591e2`; dispatch child-order,
+manifest, Metal 4 source, engine runtime, live-route, route-shard, timebase,
+and regenerated strict Swift 6 Xcode Debug build pass. The manifest is 534
+rows with 372 Swift routes and 162 explicit C adapters at
+`0x55adfc756c03014f`. Full-game shard closure, native runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+
+M33ih adds `bhvHorizontalGrindel` as a Swift collision/movement owner. It
+preserves ground-entry impact, target-yaw approach/reversal, 300-unit home
+distance branching, 60-frame wait, jump velocity/gravity, face-yaw offset,
+scale, collision identity, and surface-owner registration. The independent
+C↔Swift contract matches at `0x741c6bdcff466761`; dispatch, manifest, Metal 4
+source, engine runtime, live-route, route-shard, timebase, and regenerated
+strict Swift 6 Xcode Debug build pass. The manifest is 534 rows with 373
+Swift routes and 161 explicit C adapters at `0x1ce029ec622e6820`. Full-game
+shard closure, native runtime/device/release/visual/performance/thermal/audio/
+effect, and human acceptance remain open.
+M33ii classifies `bhvBetaFishSplashSpawner` as a persistent no-op owner. The
+source callback only samples water level and performs no object or global state
+mutation; the Swift mode remains distinct from terminal `BREAK()` routes.
+Dispatch, manifest, Metal 4 source, and strict Swift 6 build gates pass. The
+manifest is 534 rows with 374 Swift routes and 160 explicit C adapters at
+`0x810174b08b8cf876`. Full-game shard closure, native runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+M33ij adds `bhvUnusedParticleSpawn` as a collision-triggered purple-particle
+owner. Ground or Mario collision retires the source object and allocates ten
+generation-safe children through the existing purple-particle bridge; ground
+retirement alone produces no particles. The independent C↔Swift contract
+matches at `0x93b3d7b3f9b4a249`; dispatch, manifest, Metal 4 source, engine
+runtime, live-route, route-shard, timebase, and regenerated strict Swift 6
+Xcode Debug build pass. The manifest is 534 rows with 375 Swift routes and
+159 explicit C adapters at `0xafc74c8d351f29c7`. Full-game shard closure,
+native runtime/device/release/visual/performance/thermal/audio/effect, and
+human acceptance remain open.
+M33ik adds the parent-linked `bhvSnowmansBodyCheckpoint` owner. It preserves
+the 800-unit trigger radius, parent counter increment, child retirement after
+trigger, and parent-unload retirement through generation-safe IDs. The
+independent C↔Swift contract matches at `0x2cfd68bc01186e83`; dispatch,
+manifest, Metal 4 source, engine runtime, live-route, route-shard, timebase,
+and regenerated strict Swift 6 Xcode Debug build pass. The manifest is 534
+rows with 376 Swift routes and 158 explicit C adapters at
+`0xd12aada2542f5a8a`. Full-game shard closure, native runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+M33il adds the parent-transform `bhvBowserBodyAnchor` owner. It preserves
+Bowser position/angle copying, damage/text interaction switching by action and
+subaction, opacity/held-state tangibility, hitbox/subtype fields, and per-tick
+interaction reset through generation-safe parent IDs. The independent C↔Swift
+contract matches at `0x395f16ac7663392a`; dispatch, manifest, Metal 4 source,
+engine runtime, live-route, route-shard, timebase, and regenerated strict Swift
+6 Xcode Debug build pass. The manifest is 534 rows with 377 Swift routes and
+157 explicit C adapters at `0x21a7de5da556d219`. Full-game shard closure,
+native runtime/device/release/visual/performance/thermal/audio/effect, and
+human acceptance remain open.
+M33im adds the parent-linked `bhvBowserTailAnchor` owner. It preserves the
+three-action tangible/collision-cooldown/intangible machine, parent intangible
+timer writes, 90-unit parent-relative offset, hitbox, and per-tick interaction
+reset through generation-safe IDs. The independent C↔Swift contract matches at
+`0xf4c20714deadfd91`; dispatch, manifest, Metal 4 source, engine runtime,
+live-route, route-shard, timebase, and regenerated strict Swift 6 Xcode Debug
+build pass. The manifest is 534 rows with 378 Swift routes and 156 explicit C
+adapters at `0x333d1f9a04d86a7d`. Full-game shard closure, native runtime/
+device/release/visual/performance/thermal/audio/effect, and human acceptance
+remain open.
+M33in adds the Beta chest bottom/lid family (`bhvBetaChestBottom` and
+`bhvBetaChestLid`). The owner preserves 300-unit opening admission, 0x400
+pitch steps, bubble/sound child spawn, parent-relative lid ownership, hitbox
+fields, and generation-safe child cleanup. The independent C↔Swift contract
+matches at `0x52df92ff78e81e61`; dispatch, manifest, Metal 4 source, engine
+runtime, live-route, route-shard, timebase, and regenerated strict Swift 6
+Xcode Debug build pass. The manifest is 534 rows with 380 Swift routes and
+154 explicit C adapters at `0x4728179210c55d8f`. Full-game shard closure,
+native runtime/device/release/visual/performance/thermal/audio/effect, and
+human acceptance remain open.
+M33io adds the Beta trampoline top/spring family (`bhvBetaTrampolineTop`,
+`bhvBetaTrampolineSpring`). The owner preserves top child creation, Mario-on-
+platform reset, parent transform copying, the 75-unit spring offset, and the
+authored compression scale formula. The independent C↔Swift contract matches
+at `0xcd064d83a22e382d`; dispatch/child, manifest, Metal 4 source, engine
+runtime, live-route, route-shard, timebase, and regenerated strict Swift 6
+Xcode Debug build pass. The manifest is 534 rows with 382 Swift routes and
+152 explicit C adapters at `0xcd0d8a9166173a35`. Full-game shard closure,
+native runtime/device/release/visual/performance/thermal/audio/effect, and
+human acceptance remain open.
+M33ip adds the Beta holdable four-state owner (`bhvBetaHoldableObject`). It
+preserves free/held/thrown/dropped render transitions, fixed throw velocity,
+drop reset, holdable hitbox/physics fields, and generation-safe lifecycle. The
+independent C↔Swift contract matches at `0xb158eeb0609e333f`; dispatch,
+manifest, Metal 4 source, engine runtime, live-route, route-shard, timebase,
+and regenerated strict Swift 6 Xcode Debug build pass. The manifest is 534
+rows with 383 Swift routes and 151 explicit C adapters at
+`0xdf3dec4581b174de`. Full-game shard closure, native runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+M33iq adds four source-backed environment/collision families: Seaweed's fixed
+four-child bundle (`bhvSeaweed`/`bhvSeaweedBundle`), oscillating JRB ship parts
+(`bhvShipPart3`/`bhvInSunkenShip3`), distance-triggered falling pillars and
+parent-tracking hitboxes, and BBH's six-coffin room spawner/stand-up action.
+The focused dispatch smoke, manifest, Metal 4 source, engine runtime,
+live-route oracle, route-shard replay, timebase, regenerated strict Swift 6
+Xcode Debug build, shell, and hygiene gates pass. The manifest is 534 rows
+with 391 Swift routes and 143 explicit C adapters at
+`0x952813f313876818`. Full-game shard closure, native runtime/device/release/
+visual/performance/thermal/audio/effect, and human acceptance remain open.
+The complete post-slice verifier reaches `BUILD SUCCEEDED` and stops only at
+the host LaunchServices open (`kLSNoExecutableErr -10827`); the supplied crash
+report places that abort in HIServices/AppKit registration at
+`SM64Modern/AppMain.swift:7`, before engine or Metal initialization.
+M33ir extends the shared moving-coin owner through the unused
+`bhvBlueCoinSliding` and `bhvBlueCoinJumping` routes. It preserves the
+500/1000-unit admission gates, away-from-Mario yaw, bounce velocity, wall and
+slow-down transitions, jumping launch/intangibility window, fade lifecycle,
+blue-coin hitbox value, and interaction retirement. The focused moving-coin
+C↔Swift contract is `0xfd52c263df59f22e`; dispatch, manifest, Metal 4 source,
+engine runtime, live-route, route-shard, timebase, regenerated strict Swift 6
+Xcode Debug build, shell, and hygiene gates pass. The manifest is 534 rows
+with 393 Swift routes and 141 explicit C adapters at
+`0x9fc3aa9106efa36c`. Full-game shard closure and native/device/release/
+visual/performance/thermal/audio/effect/human acceptance remain open.
+M33is extends the coin owner with the source-authored `bhvCoinFormation` and
+`bhvCoinFormationSpawn` pattern routes. It preserves the five fixed offset
+patterns, respawn-mask filtering, above-floor placement, 2,000/2,100-unit
+reload window, spawner/list ordering, and generation-safe child ownership.
+The focused coin-formation C↔Swift contract is `0xa9ad1ceef6ee12df`;
+dispatch/child-order, manifest, Metal 4 source, engine runtime, live-route,
+route-shard, timebase, regenerated strict Swift 6 Xcode Debug build, shell,
+and hygiene gates pass. The manifest is 534 rows with 395 Swift routes and
+139 explicit C adapters at `0x492eb69e9e25bd3a`. Full-game shard closure and
+native/device/release/visual/performance/thermal/audio/effect/human acceptance
+remain open.
+M33it adds `bhvCoinInsideBoo` to the existing coin owner. The typed reducer
+preserves parent-following while the Boo is inside, BBH blue-model/scale
+selection, Mario-yaw release velocity, the 90-frame tangible transition,
+hitbox/interaction semantics, and golden-sparkle retirement. Its focused
+C↔Swift contract is `0x8267c3d6ad936c5d`; dispatch, manifest, Metal 4 source,
+engine runtime, live-route, route-shard, timebase, regenerated strict Swift 6
+Xcode Debug build, shell, and hygiene gates pass. The manifest is 534 rows
+with 396 Swift routes and 138 explicit C adapters at
+`0x551df337864a52cc`. Full-game shard closure and native/device/release/
+visual/performance/thermal/audio/effect/human acceptance remain open.
+M33iu adds `bhvBlueFish` as a Swift aquarium actor owner. The reducer
+preserves deterministic dive/turn/ascend/turn-back timing, random-angle and
+velocity inputs, canonical trig movement, animation acceleration, and parent
+duplicate retirement. Its focused C↔Swift contract is
+`0xe56ef70774bdd136`; dispatch, manifest, Metal 4 source, engine runtime,
+live-route, route-shard, timebase, regenerated strict Swift 6 Xcode Debug
+build, shell, and hygiene gates pass. The manifest is 534 rows with 397 Swift
+routes and 137 explicit C adapters at `0xc4dd70d2c40c27ad`. Full-game shard
+closure and native/device/release/visual/performance/thermal/audio/effect/
+human acceptance remain open.
+The post-slice full verifier reaches `BUILD SUCCEEDED` and stops only at the
+host LaunchServices open (`kLSNoExecutableErr -10827`), recorded in
+`/tmp/sm64-modern-m33iu-full-verify-final.log`.
+M33iv extends the aquarium owner with `bhvTankFishGroup`, preserving the
+room-15/7 admission gate, 15-child default-list allocation, parent linkage,
+room-leave duplicate transition, and fish-child ordering. The expanded
+blue-fish C↔Swift contract is `0x90a2b9c9c958763b`; dispatch/group smoke,
+manifest, Metal 4 source, engine runtime, live-route, route-shard, timebase,
+regenerated strict Swift 6 Xcode Debug build, shell, and hygiene gates pass.
+The manifest is 534 rows with 398 Swift routes and 136 explicit C adapters at
+`0x94fbba7f2f065fcc`. Full-game shard closure and native/device/release/
+visual/performance/thermal/audio/effect/human acceptance remain open.
+M33iw adds `bhvClamShell` with a typed closed/open reducer and BubbleMaybe
+child owner. It preserves the 1.5 Y scale, 150-frame proximity opening,
+tangible/intangible animation edges, shake timer, and twelve-bubble burst.
+The focused clam-shell C↔Swift contract is `0x7b4567896fc8e985`; dispatch,
+manifest, Metal 4 source, engine runtime, live-route, route-shard, timebase,
+regenerated strict Swift 6 Xcode Debug build, shell, and hygiene gates pass.
+The manifest is 534 rows with 399 Swift routes and 135 explicit C adapters at
+`0x5748fbd502eceb32`. Full-game shard closure and native/device/release/
+visual/performance/thermal/audio/effect/human acceptance remain open.
+M33ix adds `bhvBobombAnchorMario` as a parent-relative owner. It preserves
+the 100/150 relative transform, parent yaw propagation, 50/50 throw handoff,
+10/10 toss handoff, and parent-deactivation cleanup. Its focused C↔Swift
+contract is `0xad72b949318ab252`; dispatch, manifest, Metal 4 source, engine
+runtime, live-route, route-shard, timebase, regenerated strict Swift 6 Xcode
+Debug build, shell, and hygiene gates pass. The manifest is 534 rows with 400
+Swift routes and 134 explicit C adapters at `0x4b6f1a58f66f1039`. Full-game
+shard closure and native/device/release/visual/performance/thermal/audio/
+effect/human acceptance remain open.
+M33iy adds the `bhvChirpChirp`/`bhvChirpChirpUnused` spawner aliases and
+`bhvBub` child movement owner. It preserves the 1,500-unit spawner gate,
+parent action cycle, water-level vertical approach, Mario/home yaw targeting,
+flee transition, interaction particle edge, and parent-deletion cleanup. The
+focused Bub C↔Swift contract is `0xe3586252d673cd41`; dispatch/child-order,
+manifest, Metal 4 source, engine runtime, live-route, route-shard, timebase,
+regenerated strict Swift 6 Xcode Debug build, shell, and hygiene gates pass.
+The manifest is 534 rows with 403 Swift routes and 131 explicit C adapters at
+`0x101aaca428f2c0f6`. Full-game shard closure and native/device/release/
+visual/performance/thermal/audio/effect/human acceptance remain open.
+M33iz adds `bhvButterfly` as a Swift three-state actor owner. It preserves
+rest/follow/return-home transitions, canonical yaw/pitch approach, the
+7-unit flight step, home snap, phase-driven vertical motion, and animation
+state edges. Its focused C↔Swift contract is `0x337978782426bd62`; dispatch,
+manifest, Metal 4 source, engine runtime, live-route, route-shard, timebase,
+regenerated strict Swift 6 Xcode Debug build, shell, and hygiene gates pass.
+The manifest is 534 rows with 404 Swift routes and 130 explicit C adapters at
+`0x643b79fd4cb0b6b4`. Full-game shard closure and native/device/release/
+visual/performance/thermal/audio/effect/human acceptance remain open.
+M33ja consolidates the shared tilting-inverted-pyramid kernel across
+`bhvBitfsTiltingInvertedPyramid`, `bhvAnotherTiltingPlatform`, and
+`bhvLllTiltingInvertedPyramid`. The owner preserves normal approach,
+Mario-on-platform admission, variant collision metadata, and surface-list
+ordering. Dispatch/variant smoke, manifest, Metal 4 source, engine runtime,
+live-route, route-shard, timebase, regenerated strict Swift 6 Xcode Debug
+build, shell, and hygiene gates pass. The manifest is 534 rows with 408 Swift
+routes and 126 explicit C adapters at `0xe116735ea26da581`. Full-game shard
+closure and native/device/release/visual/performance/thermal/audio/effect/
+human acceptance remain open.
+M33jb extends the existing Boo owner through `bhvBooWithCage`, preserving the
+cage-specific hitbox and scale, shared chase/bounce/death actions, and the
+12-star cage-child initialization gate. Dispatch/cage smoke, manifest, Metal
+4 source, engine runtime, live-route, route-shard, timebase, regenerated
+strict Swift 6 Xcode Debug build, shell, and hygiene gates pass. The manifest
+remains 534 rows with 408 Swift routes and 126 explicit C adapters at
+`0xe116735ea26da581`. Full-game shard closure and native/device/release/
+visual/performance/thermal/audio/effect/human acceptance remain open.
+M33jc adds the haunted-bookend spawner and flying child owners for
+`bhvBookendSpawn` and `bhvFlyingBookend`. The route preserves the 40-frame
+near/facing spawn gate, child action-3 launch transition, forward movement,
+and parent/list ordering. Dispatch/child smoke, manifest, Metal 4 source,
+engine runtime, live-route, route-shard, timebase, regenerated strict Swift 6
+Xcode Debug build, shell, and hygiene gates pass. The manifest is 534 rows
+with 410 Swift routes and 124 explicit C adapters at
+`0xeb6e950bc1b8415d`. Full-game shard closure and native/device/release/
+visual/performance/thermal/audio/effect/human acceptance remain open.
+M33jd adds `bhvBookSwitch` to the bookend owner. It preserves progressive
+switch depression, the parent manager sequence/answer gate, tangible distance
+range, failure bookend spawning, and parent retirement. Dispatch/book-switch
+smoke, manifest, Metal 4 source, engine runtime, live-route, route-shard,
+timebase, regenerated strict Swift 6 Xcode Debug build, shell, and hygiene
+gates pass. The manifest is 534 rows with 411 Swift routes and 123 explicit C
+adapters at `0x747918e51ee3f1ff`. Full-game shard closure and native/device/
+release/visual/performance/thermal/audio/effect/human acceptance remain open.
+M33je consolidates the generic fish declarations into one Swift group/child
+owner: `bhvFish`, `bhvFish2`, `bhvFish3`, `bhvFishGroup`, and
+`bhvLargeFishGroup`. It preserves 5/20-child variant selection,
+distance-gated group spawning, default-list child ordering, water-level
+approach, yaw targeting, flee cycling, and parent retirement. Dispatch/group
+smoke, manifest, Metal 4 source, engine runtime, live-route, route-shard,
+timebase, regenerated strict Swift 6 Xcode Debug build, shell, and hygiene
+gates pass. The manifest is 534 rows with 416 Swift routes and 118 explicit C
+adapters at `0xa27b63f0f9f51b67`. Full-game shard closure and native/device/
+release/visual/performance/thermal/audio/effect/human acceptance remain open.
+M33jf closes the parent-presentation `bhvCannonBarrel` route. The owner copies
+the cannon parent position, yaw, and pitch and hides the barrel when the
+parent is inactive, preserving default-list child ordering. Dispatch/parent
+copy smoke, manifest, Metal 4 source, engine runtime, live-route, route-shard,
+timebase, regenerated strict Swift 6 Xcode Debug build, shell, and hygiene
+gates pass. The manifest is 534 rows with 417 Swift routes and 117 explicit C
+adapters at `0xe2a1348113f12828`. Full-game shard closure and native/device/
+release/visual/performance/thermal/audio/effect/human acceptance remain open.
+M33jg adds the opened-cannon parent action owner for `bhvCannon`. It preserves
+the interaction admission, raise/aim/recoil/hide/reset phases, behavior-byte
+yaw, and attached barrel ordering. Dispatch/action smoke, manifest, Metal 4
+source, engine runtime, live-route, route-shard, timebase, regenerated strict
+Swift 6 Xcode Debug build, shell, and hygiene gates pass. The manifest is 534
+rows with 418 Swift routes and 116 explicit C adapters at
+`0xb2f40e5b6f3f114b`. Full-game shard closure and native/device/release/
+visual/performance/thermal/audio/effect/human acceptance remain open.
+M33jh registers `bhvGhostHuntBoo` as the exact shared script behind `bhvBoo`,
+using the existing Boo value/owner kernel rather than a duplicate behavior.
+The Ghost Hunt identity dispatch, manifest, Metal 4 source, engine runtime,
+live-route, route-shard, timebase, regenerated strict Swift 6 Xcode Debug
+build, shell, and hygiene gates pass. The manifest is 534 rows with 419 Swift
+routes and 115 explicit C adapters at `0x1dc62b6702fe4306`. Full-game shard
+closure and native/device/release/visual/performance/thermal/audio/effect/
+human acceptance remain open.
+M33ji registers `bhvMerryGoRoundBoo` as another exact shared Ghost Hunt Boo
+script identity, reusing the same Swift Boo kernel with explicit dispatch.
+The identity smoke, manifest, Metal 4 source, engine runtime, live-route,
+route-shard, timebase, regenerated strict Swift 6 Xcode Debug build, shell,
+and hygiene gates pass. The manifest is 534 rows with 420 Swift routes and
+114 explicit C adapters at `0x32dc4e2f2c40f084`. Full-game shard closure and
+native/device/release/visual/performance/thermal/audio/effect/human acceptance
+remain open.
+M33jk adds the Merry-Go-Round Boo manager owner. It preserves the 1,000-unit
+manager gate, two-remaining Boo spawn rule, five-kill Big Boo transition,
+manager timer reset, and generation-safe child ownership through the existing
+Boo/BigBoo bridges. Dispatch/manager smoke, manifest, Metal 4 source, engine
+runtime, live-route, route-shard, timebase, regenerated strict Swift 6 Xcode
+Debug build, shell, and hygiene gates pass. The manifest is 534 rows with 421
+Swift routes and 113 explicit C adapters at `0x6ac01224ca4ff0ca`. Full-game
+shard closure and native/device/release/visual/performance/thermal/audio/
+effect/human acceptance remain open.
 M21z migrates the shared explosion child behaviors. Swift now allocates the
  source 40-child water-bubble route or the ground-smoke child in the owner
  bridge, preserves source model/behavior identities, explicit random
@@ -2786,6 +5407,216 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M33f: Live route shard promotion | A trace emitted by a real Swift route is replayed by the C oracle, matched against the selected manifest row's exact domain set, and persisted as terminal evidence that cannot be rerun. | Complete locally — strict Swift 6 input-only live trace, C replay `records=1`, manifest-aware exact-coverage promotion with `fixture_only=0`, persistent rerun rejection, 136-script matrix (`runs=136 failures=0`), clean native Debug build, and `git diff --check` pass; all other shards remain open |
 | M33g: Authored menu/gameplay route qualification | The real AppleInputService-to-C input boundary drives title/file/course/gameplay/pause transitions while the Swift front-end, pause, audio-sequence, and bounded PCM observers consume the same owner-thread route; route evidence must require nonzero transitions/outcomes and status-0 shutdown. | Complete locally — `SM64_MODERN_AUTOMATED_MENU=1 SM64_MODERN_AUTOMATED_GAMEPLAY=1 SM64_MODERN_AUDIO_PROMOTION=1 ./script/build_and_run.sh verify` passes with `verify_exit=0`, regenerated Swift 6 Debug `BUILD SUCCEEDED`, frontend `events=253 transitions=3 screen=5`, pause `events=128 outcomes=3 state=2`, audio promotion `ticks=253 records=2283 admission_failed=false`, Metal 4 frame one, clean drain, status-0 engine shutdown, and application stop in `/tmp/sm64-modern-automated-route-qualified-2.log`; this is live route/observer evidence, not Swift authority, full schema-4 shard promotion, physical input/audio, visual, or human acceptance |
 | M33h: Mario callback native promotion | The opt-in owner-thread probe invokes production Mario buttons and ground speed, commits outputs into the canonical Mario snapshot, and a combined C trace with Bob-omb must shadow-match and promote both gameplay subsystems before a bounded post-promotion run. | Complete locally — `SM64_MODERN_M15_TICKS=8 SM64_MODERN_M15_SWIFT_TICKS=8 ./script/build_and_run.sh m15-native-verify` exits 0; regenerated Swift 6 `BUILD SUCCEEDED`; C record has subsystem 1 `actual=152` and subsystem 4 `actual=112`; Swift shadow matches `152/152` and `112/112`, `eligible=1` for both, evidence `mario_buttons=8 mario_ground_speed=8 bobomb_release=8`, promotes `subsystems=1,4`, completes `steps=16 authority_steps=8`, and shuts down status 0 in `/tmp/sm64-modern-m15-native-certified.log`; this is a bounded test-only authority slice, not full-game Swift authority or physical/visual/human acceptance |
+| M33i: Mario action-entry Swift boundary | Supported scalar `set_mario_action` transitions must cross a separate ABI, match the Swift value kernel exactly, transform Mario action/flags/velocity/face-angle parity fields, and preserve explicit C fallback for unsupported families. | Implemented locally — Swift/C migration fingerprint `0xb9811f2d752218b9`, `make abi-smoke` passes with action input/output/API layout, `script/test_mario_action_migration.sh` passes, timebase audit passes with the classified `201→202` action-timer inventory change, native C and Swift 6 Xcode builds pass; M16 native C↔Swift runtime promotion remains open because the host crashes in AppKit/LaunchServices before engine startup |
+| M33j: Mario common-idle-cancel Swift boundary | The production `check_common_idle_cancels` path must cross a value-only ABI for idle cancel priority, terrain/health/quicksand decisions, held-object drop intent, and face-yaw intent, with explicit C fallback. | Implemented locally — C→Swift action-cancel ABI smoke passes with `updates=8`, `make abi-smoke`, native C build, Swift 6 Xcode build, and timebase audit pass; M17 native promotion remains open only because the host AppKit/LaunchServices launch fails before engine startup |
+| M33k: Mario ground-step probe boundary | Four-quarter floor/ceiling/water/wall ground-step decisions must cross immutable POD probes into Swift with exact position/floor/result parity; wall angles are carried canonically rather than recomputed from platform floats. | Implemented locally — C→Swift ground-step ABI smoke passes with `updates=7`, ABI/native C/timebase checks pass, Swift 6 Xcode build passes; native M18 promotion remains open because the host GUI process fails before engine startup |
+| M33l: Mario airborne-step probe boundary | Four-quarter airborne floor/ceiling/water/upper-wall/lower-wall/ledge decisions must cross immutable POD probes into Swift with canonical wall angles and surface types; invalid or unsupported authority remains on the C path. | Implemented locally — C→Swift air-step ABI smoke passes with `updates=8` across flight/landing/ceiling/hang/wall/lava/ledge/OOB cases, ABI/native C/timebase checks pass, regenerated strict Swift 6 Xcode build passes, and `m19-native-verify` is prepared; native promotion remains open because the host GUI process fails before engine startup |
+| M33m: Mario submerged water-step reducer | The shared `perform_water_full_step` floor/ceiling/wall reducer must cross immutable current/next position and collision probes into Swift while current/whirlpool effects remain in C; explicit C fallback is required. | Implemented locally — C→Swift water-step ABI smoke passes with `updates=6`, ABI/native C/timebase checks pass, regenerated strict Swift 6 Xcode Debug build passes in `build/xcode-derived-air`, and `m20-native-verify` is prepared; native promotion remains open because the host GUI process fails before engine startup |
+| M33n: Mario bonk/reflection scalar seam | The shared `mario_bonk_reflection` helper must cross wall-angle, speed, and velocity state into Swift with exact signed-angle behavior; C retains sound dispatch and object effects, with explicit fallback. | Implemented locally — C→Swift bonk ABI smoke passes with `updates=6`, `make abi-smoke`, native C build, timebase audit, strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m21-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33o: Mario terrain impulse seam | Moving-sand and horizontal-wind helpers must cross floor type, force, action, yaw, legacy global timer, and velocity scalars into Swift with exact modulo/trig behavior; C retains surface/audio effects and fallback. | Implemented locally — C→Swift terrain ABI smoke passes with `updates=7`, `make abi-smoke`, native C build, classified timebase audit (`global_timer 45→46`), strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m22-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33p: Mario quicksand reducer seam | `mario_update_quicksand` must cross floor type, riding-shell state, depth, and sinking speed into Swift with exact clamps/death thresholds; C retains sound/camera and action-install effects, with explicit fallback. | Implemented locally — C→Swift quicksand ABI smoke passes with `updates=9`, `make abi-smoke`, native C build, strict timebase audit, strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m23-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33q: Mario steep-floor push-off seam | `mario_push_off_steep_floor` must cross floor angle, face yaw, action, and argument into Swift with exact signed-angle threshold and ±16 velocity; C retains action installation and effects, with explicit fallback. | Implemented locally — C→Swift steep-push ABI smoke passes with `updates=5`, `make abi-smoke`, native C build, strict timebase audit, strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m24-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33r: Mario terrain-sound selector seam | `mario_get_terrain_sound_addend` must cross floor/water/terrain scalars into Swift with exact water/quicksand overrides and sound-table lookup; C retains playback and fallback. | Implemented locally — C→Swift terrain-sound ABI smoke passes with `updates=8`, `make abi-smoke`, native C build, strict timebase audit, strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m25-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33s: Mario floor-predicate seam | Floor class, slipperiness, slope, and steepness helpers must cross immutable floor/terrain/normal/yaw scalars into Swift with exact thresholds; C retains action bodies and fallback. | Implemented locally — C→Swift floor-predicates ABI smoke passes with `updates=9`, `make abi-smoke`, native C build, strict timebase audit, strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m26-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33t: Mario facing-downhill predicate extension | `mario_facing_downhill` must share the floor predicate ABI, preserving signed floor/face-angle thresholds plus the nonzero-turn-yaw negative-speed branch; C retains callers and fallback. | Implemented locally — C→Swift floor-predicates ABI smoke passes with `updates=10`, `make abi-smoke`, native C build, strict timebase audit, strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m27-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33u: Mario forward-velocity scalar seam | `mario_set_forward_vel` must cross speed and face-yaw scalars into Swift with exact sine/cosine-derived slide/velocity fields; C retains pointer/state mutation and fallback. | Implemented locally — C→Swift forward-velocity ABI smoke passes with `updates=6`, `make abi-smoke`, native C build, strict timebase audit, strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m28-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33v: Mario velocity-derivation scalar seam | `set_vel_from_yaw` and `set_vel_from_pitch_and_yaw` must cross speed/pitch/yaw scalars into Swift with exact canonical-trig vectors; C retains state mutation and fallback. | Implemented locally — C→Swift velocity-derivation ABI smoke passes with `updates=6`, `make abi-smoke`, native C build, strict timebase audit, strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m29-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33w: Mario punch-sequence reducer | The shared punch sequence must cross action/animation/edge scalars into Swift with exact argument/animation/flag/punch-state/transition decisions; C retains object-grab, animation, sound, body, and action effects plus fallback. | Implemented locally — C→Swift punch ABI smoke passes with `updates=10`, `make abi-smoke`, native C build, classified animation-site timebase audit (`784→785`), strict live-route promotion, and regenerated strict Swift 6 Xcode Debug build pass; `m30-native-verify` is prepared, while native promotion remains open because the host GUI process fails before engine startup |
+| M33x: Mario wall-response reducer | `push_or_sidle_wall` must cross copied position/velocity/animation/wall facts into Swift with exact pushing/sidestep, clamp, signed-angle, sound, dust, action, and graphics outputs; C retains wall probing, pointer-backed effects, and fallback. | Implemented locally — six-case C→Swift wall-response ABI smoke passes with `updates=6`, `make abi-smoke`, native C build, all existing Mario ABI smokes, strict Swift 6 Xcode Debug build, and prepared `m31-native-verify`; runtime promotion remains open because the host GUI process fails before engine startup |
+| M33y: Mario walking animation/audio reducer | `anim_and_audio_for_walk` must cross copied speed, timer, animation-edge, cap, and pitch facts into Swift with exact animation/acceleration/timer/sound/pitch output; C retains animation and effect delivery plus fallback. | Implemented locally — eight-case C→Swift walk-animation ABI smoke passes with `updates=8`, `make abi-smoke`, native C build, all existing Mario ABI smokes, classified timebase audit (`actionTimer 202→204`, `animation_sites 788→789`), strict Swift 6 Xcode Debug build, prepared `m32-native-verify`, and an attempted M32 run that built/signed a valid arm64 bundle before LaunchServices `kLSNoExecutableErr` (`-10827`) blocked engine startup |
+| M33z: Mario held-walking animation reducers | `anim_and_audio_for_hold_walk` and `anim_and_audio_for_heavy_walk` must cross copied variant/speed/timer/cap/sound facts into Swift with exact light/heavy animation, acceleration, timer, and sound output; C retains animation/effect delivery plus fallback. | Implemented locally — eight-case C→Swift held-walk ABI smoke passes with `updates=8`, `make abi-smoke`, native C build, classified timebase audit (`actionTimer 204→206`, `animation_sites 789→790`), strict Swift 6 Xcode Debug build, prepared `m33-native-verify`, and an attempted M33 run that built/signed successfully before LaunchServices `kLSNoExecutableErr` (`-10827`) blocked engine startup |
+| M33aa: Mario slope-acceleration scalar seam | `apply_slope_accel` must cross floor class/terrain/normal/angle/action/speed facts into Swift with exact slope thresholds, signed acceleration, slide velocity, and steepness flags; C retains moving-sand/wind effects and pointer mutation. | Implemented locally — seven-case C→Swift slope-acceleration ABI smoke passes, `make abi-smoke`, native C build, strict Swift 6 Xcode Debug build, `git diff --check`, and Metal 4 source contract pass; `m33aa-native-verify` is prepared while runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33ab: Mario slope-deceleration scalar seam | `apply_slope_decel` must cross coefficient/floor/normal/angle/action/speed facts into Swift with exact class-specific deceleration, stop detection, slope reapplication, and velocity outputs; C retains moving-sand/wind effects and pointer mutation. | Implemented locally — seven-case C→Swift slope-deceleration ABI smoke passes, `make abi-smoke`, native C build, strict Swift 6 Xcode Debug build, full Mario ABI regression, timebase audit, and prepared `m33ab-native-verify`; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33ac: Mario decelerating-speed scalar seam | `update_decelerating_speed` must cross forward speed, yaw, and vertical velocity into Swift with exact approach-to-zero, stop, and canonical velocity outputs; C retains moving-sand/wind effects and slide-state mutation. | Implemented locally — six-case C→Swift decelerating-speed ABI smoke passes, `make abi-smoke`, native C build, strict Swift 6 Xcode Debug build, full Mario ABI regression, timebase audit, and prepared `m33ac-native-verify`; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33ad: Mario shell-speed scalar composition | `update_shell_speed` must cross target-speed, yaw, floor, and slope facts into Swift with exact target approach, yaw easing, slope reapplication, and velocity output; C retains water pseudo-floor setup, moving-sand/wind effects, and pointer mutation. | Implemented locally — six-case C→Swift shell-speed ABI smoke passes, `make abi-smoke`, native C build, strict Swift 6 Xcode Debug build, full Mario ABI regression, timebase audit, and prepared `m33ad-native-verify`; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33ae: Mario landing-acceleration reducer | `apply_landing_accel` must cross friction, floor/terrain/normal/angle, action, and forward-speed facts into Swift with exact friction reduction, slope reapplication, canonical slide/velocity output, and moving-surface intent; C retains pointer mutation/effects and fallback. | Implemented locally — six-case C→Swift landing-acceleration ABI smoke, `make abi-smoke`, native C build, full 22-script Mario ABI regression, strict Swift 6 Xcode Debug build, timebase/Metal contracts, live-route promotion, and `m33ae-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33af: Mario gravity reducer | `apply_gravity` must cross action/flag/input bits, angle velocity, vertical velocity, and blow-force scalars into Swift with exact branch ordering, terminal clamps, and wing-flutter intent; C retains body-state mutation and fallback. | Implemented locally — eleven-case C→Swift gravity ABI smoke, `make abi-smoke`, native C build, full 23-script Mario ABI regression, strict Swift 6 Xcode Debug build, and `m33af-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33ag: Mario vertical-wind reducer | `apply_vertical_wind` must cross action, floor type, position Y, and vertical velocity into Swift with exact exclusion/window/updraft arithmetic and active intent; C retains sound/effects, pointer mutation, and fallback. | Implemented locally — seven-case C→Swift vertical-wind ABI smoke, `make abi-smoke`, native C build, full 24-script Mario regression, owner-thread install, strict Swift 6 build, timebase/Metal/route gates, and `m33ag-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33ah: Mario sliding reducer | `update_sliding` must cross floor class/slope, normals, intended/face/slide yaw, speed, slide velocity, and stop speed into Swift with exact steering, slope impulse, facing easing, cap-late, signed speed, and stop output; C retains effects, pointer mutation, and fallback. | Implemented locally — six-case C→Swift sliding ABI smoke, contraction-fenced C oracle, `make abi-smoke`, native C build, full 25-script Mario regression, owner-thread install, strict Swift 6 build, timebase/Metal/route gates, and `m33ah-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33ai: Mario ground dive/punch decision seam | `check_ground_dive_or_punch` must cross B edge, forward speed, stick magnitude, and vertical velocity into Swift with exact dive threshold/argument, move-punch fallback, and jump impulse; C retains action installation, pointer mutation, and fallback. | Implemented locally — four-case C→Swift ground-dive/punch ABI smoke, `make abi-smoke`, native C build, full 26-script Mario regression, owner-thread install, strict Swift 6 build, timebase/Metal/route gates, and `m33ai-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33aj: Mario slide predicate pair | `should_begin_sliding` and `analog_stick_held_back` must cross input/terrain/speed/facing/yaw scalars into Swift with exact above-slide, terrain/backward/downhill, and signed yaw thresholds; C retains callers and fallback. | Implemented locally — six-case C→Swift slide-predicates ABI smoke, `make abi-smoke`, native C build, full 27-script Mario regression, owner-thread install, strict Swift 6 build, timebase/Metal/route gates, and `m33aj-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33al: Mario triple-jump action selector | `set_triple_jump_action` must cross wing-cap flags and forward speed into Swift with exact flying-triple/triple/ordinary jump action selection; C retains action installation and fallback. | Implemented locally — four-case C→Swift triple-jump-selector ABI smoke, `make abi-smoke`, native C build, full 29-script Mario regression, owner-thread install, strict Swift 6 build, timebase/Metal/route gates, and `m33al-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33ak: Mario begin-braking reducer | `begin_braking_action` must cross action state/argument, forward speed, floor normal, and face yaw into Swift with exact standing-against-wall, braking, and decelerating outputs; C retains held-object drop, action installation, and fallback. | Implemented locally — four-case C→Swift begin-braking ABI smoke, `make abi-smoke`, native C build, full 28-script Mario regression, owner-thread install, strict Swift 6 build, timebase/Metal/route gates, and `m33ak-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33am: Mario Y-velocity reducer | `set_mario_y_vel_based_on_fspeed` must cross initial Y velocity, forward velocity, multiplier, squish timer, and quicksand depth into Swift with exact additive and half-speed output; C retains the additive-Y trampoline call, pointer mutation, and fallback. | Implemented locally — four-case C→Swift Y-velocity ABI smoke, corrected fixed ABI layout (`input=40`, `output=20`, `api=24`), `make abi-smoke`, native C build, full 30-script Mario regression, owner-thread install, strict Swift 6 build, timebase/Metal/route gates, and `m33am-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33an: Mario steep-jump projection bridge | `set_steep_jump_action` must cross face/floor yaw and forward velocity into Swift with exact canonical projection, steep-jump yaw, reduced speed, and action/drop intents; C retains object/action mutation and fallback. | Implemented locally — four-case C→Swift steep-jump ABI smoke, contraction-fenced C oracle, `make abi-smoke`, native C build, full 31-script Mario regression, owner-thread install, strict Swift 6 build, timebase/Metal/route gates, and `m33an-native-verify` wiring pass; runtime promotion remains open at the pre-engine LaunchServices boundary |
+| M33ao: ArrowLift behavior owner route | `bhvArrowLift` must map to a Swift value/owner route with exact action/timer/platform gate, perpendicular movement yaw, 384-unit displacement clamp, and level-list record/transform mutation. | Implemented locally — behavior manifest `0xbb2a460a474844f5` with 534 rows (`82` Swift, `452` C adapters), ArrowLift kernel/owner/dispatch smoke, Swift/C behavior manifest contract, behavior dispatch/coverage contracts, strict Swift 6 build, timebase/Metal source contract, and `git diff --check` pass |
+| M33ap: shared elevator behavior owner route | `bhvRrElevatorPlatform`, `bhvHmcElevatorPlatform`, and `bhvMeshElevator` must share a Swift owner route with exact action/timer/platform gate, signed vertical approach, authored bounds, and level-list record/transform mutation. | Implemented locally — behavior manifest `0x77f38abae15f38c7` with 534 rows (`85` Swift, `449` C adapters), elevator kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33aq: seesaw platform owner route | `bhvSeesawPlatform` must map to a Swift owner route with exact platform relation, canonical angle rotation, pitch-velocity clamp/oscillation, behavior-byte initialization, and level-list record/transform mutation. | Implemented locally — behavior manifest `0x4a137cf8b4a93c53` with 534 rows (`86` Swift, `448` C adapters), seesaw kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33ar: swing platform owner route | `bhvSwingPlatform` must map to a Swift owner route with exact initialized angle, signed speed update, roll truncation, angle-velocity output, and level-list record/transform mutation. | Implemented locally — behavior manifest `0x8e4dacee8f942e1d` with 534 rows (`87` Swift, `447` C adapters), swing kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33as: rotating platform owner route | `bhvRotatingPlatform` must map to a Swift owner route with exact idle/spin timer machine, signed high-byte speed, yaw wrapping, angle velocity, and level-list record/transform mutation. | Implemented locally — behavior manifest `0x082601bf1f2b759d` with 534 rows (`88` Swift, `446` C adapters), rotating kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33at: TTC moving-bar owner route | `bhvTTCMovingBar` must map to a Swift owner route with exact delay/stopped-timer/action machine, offset/speed evolution, random pause/fakeout inputs, perpendicular movement projection, and level-list record/velocity mutation. | Implemented locally — behavior manifest `0xf0db08da233c763c` with 534 rows (`89` Swift, `445` C adapters), TTC moving-bar kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33au: TTC spinner owner route | `bhvTTCSpinner` must map to a Swift owner route with exact speed selection, random direction/pause timer, timer reset, pitch wrapping, and level-list pitch/angle-velocity mutation. | Implemented locally — behavior manifest `0x7ed1b7c2e5861512` with 534 rows (`90` Swift, `444` C adapters), TTC spinner kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33av: TTC treadmill owner route | `bhvTTCTreadmill` must map to a Swift owner route with deterministic master election, shared surface speed, random target/timer selection, forward-velocity output, and level-list record mutation. | Implemented locally — behavior manifest `0xcd9afab7d4c3ba50` with 534 rows (`91` Swift, `443` C adapters), TTC treadmill kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33aw: TTC pendulum owner route | `bhvTTCPendulum` must map to a Swift owner route with exact acceleration direction, angle/velocity oscillator, delay/sound timers, random inputs, render roll, and level-list record/transform mutation. | Implemented locally — behavior manifest `0x8614e92b657db1d0` with 534 rows (`92` Swift, `442` C adapters), TTC pendulum kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33ax: TTC elevator owner route | `bhvTTCElevator` must map to a Swift owner route with exact speed selection, random direction/move-time, gravity, endpoint clamps, and level-list position/velocity mutation. | Implemented locally — behavior manifest `0x6705ed97d56f0810` with 534 rows (`93` Swift, `441` C adapters), TTC elevator kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33ay: TTC rotating-solid owner route | `bhvTTCRotatingSolid` must map to a Swift owner route with exact turn timing, vertical reset, symmetric roll approach, turn-count state, alert/click intents, and level-list roll/vertical mutation. | Implemented locally — behavior manifest `0x5b42304f8eac6fcf` with 534 rows (`94` Swift, `440` C adapters), TTC rotating-solid kernel/owner/dispatch smoke, Swift/C behavior manifest, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33az: TTC 2D rotator kernel/owner route | `bhvTTC2DRotator` must map to a Swift kernel/owner route with exact signed yaw approach, target/increment timer machine, random direction timers, hand/cog initialization, and level-list yaw mutation. | Implemented locally — behavior manifest `0x4dab77e5a10ebf1d` with 534 rows (`95` Swift, `439` C adapters), independent Swift/C 2D-rotator contract, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33ba: TTC cog kernel/owner route | `bhvTTCCog` must map to a Swift kernel/owner route with exact shape/direction initialization, slow/fast speed selection, random target approach, yaw wrapping, and level-list yaw/angle-velocity mutation. | Implemented locally — behavior manifest `0xf19ba271940de087` with 534 rows (`96` Swift, `438` C adapters), independent Swift/C TTC-cog contract, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33bb: Pyramid elevator and marker owner routes | `bhvPyramidElevator` and `bhvPyramidElevatorTrajectoryMarkerBall` must map to Swift state/owner routes with exact idle/start/constant/bottom sine motion, Mario platform gate, parent marker deactivation, and level-list record mutation. | Implemented locally — behavior manifest `0xc23cbbd8f1da242a` with 534 rows (`98` Swift, `436` C adapters), independent Swift/C pyramid contract, parent/marker owner dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/timebase/Metal contracts, and `git diff --check` pass |
+| M33bc: TTC pit-block owner route | `bhvTTCPitBlock` must map to a Swift owner route with exact TTC speed/wait tables, timer boundary, endpoint clamps, direction reversal, random wait input, and level-list position/velocity mutation. | Implemented locally — behavior manifest `0x6407c55ada6af8ff` with 534 rows (`99` Swift, `435` C adapters), independent Swift/C pit-block contract `0xc3d7d5eca91d331a`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, route/replay/ledger, timebase/Metal contracts, and `git diff --check` pass |
+| M33bd: static checkered platform owner route | `bhvStaticCheckeredPlatform` must map to a Swift owner route with explicit reset/set/rotate debug modes, debug-row velocity assignment, and level-list angle/velocity mutation. | Implemented locally — behavior manifest `0x63f91b2c8ee1dd97` with 534 rows (`100` Swift, `434` C adapters), independent Swift/C contract `0x753404c234d2e779`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route, Metal contract, and `git diff --check` pass |
+| M33be: BBH tilting-trap platform owner route | `bhvBbhTiltingTrapPlatform` must map to a Swift owner route with Mario-on cosine tilt, return-to-horizontal clamp, US grace window, action selection, and level-list pitch/timer mutation. | Implemented locally — behavior manifest `0x93f9b63f3b188fb4` with 534 rows (`101` Swift, `433` C adapters), independent Swift/C contract `0x6c6afec03d0d021f`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route, Metal contract, and `git diff --check` pass |
+| M33bf: LLL sinking rectangular/square platform owner route | `bhvLllSinkingRectangularPlatform` and `bhvLllSinkingSquarePlatforms` must share a Swift owner route with exact common action helper, rectangular displacement, square pitch oscillation, and level-list timer/state mutation. | Implemented locally — behavior manifest `0x741771aa11ee90ab` with 534 rows (`103` Swift, `431` C adapters), independent Swift/C contract `0xa935cd578cd8061e`, shared owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, timebase/Metal contracts, and `git diff --check` pass |
+| M33bg: WF rotating wooden platform owner route | `bhvWfRotatingWoodenPlatform` must map to a Swift owner route with exact wait/spin timer edges, 0x100 yaw velocity, wrapped yaw mutation, sound intent, and level-list action/timer mutation. | Implemented locally — behavior manifest `0xada02ba6c34cea39` with 534 rows (`104` Swift, `430` C adapters), independent Swift/C contract `0x9ee1260bc3fb16f6`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route, timebase/Metal contracts, and `git diff --check` pass |
+| M33bh: rotating octagonal platform owner route | `bhvOctagonalPlatformRotating` must map to a Swift owner route with exact authored speed table, collision-model parameter, fixed yaw step, and level-list yaw/angle-velocity mutation. | Implemented locally — behavior manifest `0xe1a207e118c55001` with 534 rows (`105` Swift, `429` C adapters), independent Swift/C contract `0xf57874338637fe3a`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bi: WF solid tower parent-child owner route | `bhvWfSolidTowerPlatform` must map to a Swift owner route with stable parent linkage, parent-action-3 deletion, end-of-frame unload, and generation-safe cleanup. | Implemented locally — behavior manifest `0xe0d6bc958d032a68` with 534 rows (`106` Swift, `428` C adapters), independent Swift/C contract `0xa803617659589552`, parent-child owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route, timebase/Metal contracts, and `git diff --check` pass |
+| M33bj: WF elevator/sliding tower shared parent-child route | `bhvWfElevatorTowerPlatform` and `bhvWfSlidingTowerPlatform` must share a Swift owner route with exact timer/movement reducers, parent-action-3 deletion, parent linkage, and child unload. | Implemented locally — behavior manifest `0x589f15dd8883c738` with 534 rows (`108` Swift, `426` C adapters), independent Swift/C contract `0x1a8fd8eae6c8d1aa`, shared parent-child owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bk: WF sliding brick platform owner route | `bhvWfSlidingPlatform` must map to a Swift owner route with exact initialization offsets, 10/15/20 speed table, random initial timer, extend/retract endpoints, yaw reversal, and fvel movement. | Implemented locally — behavior manifest `0x003984e3e42b8d6f` with 534 rows (`109` Swift, `425` C adapters), independent Swift/C contract `0xbc884548def390e0`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bl: WDW express elevator/static platform shared route | `bhvWdwExpressElevator` and `bhvWdwExpressElevatorPlatform` must share a Swift owner route with exact elevator timer/movement/home clamp, Mario gate, sound intent, and static no-op identity. | Implemented locally — behavior manifest `0x9f8914cb7d696934` with 534 rows (`111` Swift, `423` C adapters), independent Swift/C contract `0x87df032d5fc88546`, shared owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bm: LLL sinking rock block owner route | `bhvLllSinkingRockBlock` must map to a Swift owner route with exact stepped-on 124-unit oscillation, -110-unit sine offset, endpoint behavior, and level-list home-Y mutation. | Implemented locally — behavior manifest `0x9b98f7335cf79a94` with 534 rows (`112` Swift, `422` C adapters), independent Swift/C contract `0xe8e181158c7912cf`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bn: LLL moving octagonal mesh owner route | `bhvLllMovingOctagonalMeshPlatform` must map to a Swift owner route with both authored movement tables, sequence/timer transitions, Mario-gated start, fvel yaw movement, and stepped-on vertical rotation state. | Implemented locally — behavior manifest `0x472e722cd491e91c` with 534 rows (`113` Swift, `421` C adapters), independent Swift/C contract `0x196e000b71f0f852`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bo: Ferris wheel axle/platform parent-child route | `bhvFerrisWheelAxle` and `bhvFerrisWheelPlatform` must share a Swift owner route with source-order four-child allocation, stable parent links, and exact parent-relative transform/velocity outputs. | Implemented locally — behavior manifest `0x91b63014605cd752` with 534 rows (`115` Swift, `419` C adapters), independent Swift/C contract `0x642ceeb84fd3cb93`, parent/child owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bq: checkerboard elevator group/child route | `bhvCheckerboardElevatorGroup` and `bhvCheckerboardPlatformSub` must share a Swift owner route with variant speed/scale, source-order two-child allocation, wait/move/rotate phases, parent linkage, and group teardown. | Implemented locally — behavior manifest `0x5c59bdccfb75ec63` with 534 rows (`117` Swift, `417` C adapters), independent Swift/C contract `0x83f074a0cb0df5ce`, parent/child owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33br: WF tower platform group parent spawner route | `bhvTowerPlatformGroup` must map to a Swift owner route with height-triggered action transitions, source-order six solid/sliding plus elevator child allocation, existing child-route reuse, and group teardown. | Implemented locally — behavior manifest `0x7473d9a4b5f2c752` with 534 rows (`118` Swift, `416` C adapters), independent Swift/C contract `0x0f916f8c7ed47f32`, parent/child owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bs: LLL rotating hexagonal platform owner route | `bhvLllRotatingHexagonalPlatform` must map to a Swift owner route with exact authored 0x100 yaw step, angle velocity, and level-list transform mutation. | Implemented locally — behavior manifest `0x79587f713ecf2614` with 534 rows (`119` Swift, `415` C adapters), independent Swift/C contract `0xb3d0e00436eb7273`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bt: LLL rotating hex flame parent-child route | `bhvLllRotatingHexFlame` must map to a Swift owner route with parent-relative left/forward transforms, fixed Y offset, velocity output, parent-action deletion, and child unload. | Implemented locally — behavior manifest `0x5a77afc11815cae9` with 534 rows (`120` Swift, `414` C adapters), independent Swift/C contract `0x348f5a90083b5892`, parent-child owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bu: LLL rotating fire-bar parent route | `bhvLllRotatingBlockWithFireBars` must map to a Swift owner route with distance activation, fixed rotation, six/eight flame allocation, shared child bridge, source-order traversal, and deletion. | Implemented locally — behavior manifest `0xb7856fd3537dd26d` with 534 rows (`121` Swift, `413` C adapters), independent Swift/C contract `0x98c415f26aa73548`, parent/child owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bv: activated back-and-forth platform owner route | `bhvActivatedBackAndForthPlatform` must map to a Swift owner route with packed parameter decoding, Mario activation/countdown, endpoint reversal, distance fence, vertical/horizontal displacement, and yaw flip. | Implemented locally — behavior manifest `0x22a7174deef17aff` with 534 rows (`122` Swift, `412` C adapters), independent Swift/C contract `0x905af2b0dc0f6d21`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bw: BITFS sinking platform/cage shared route | `bhvBitfsSinkingPlatforms` and `bhvBitfsSinkingCagePlatform` must share a Swift owner route with exact sine/timer outputs, cage parameter behavior, and level-list mutation while keeping the pole child explicit. | Implemented locally — behavior manifest `0x7e4ea872ef81327a` with 534 rows (`124` Swift, `410` C adapters), independent Swift/C contract `0x958fce35c8bc9b45`, shared owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bx: DDD moving pole parent-copy child route | `bhvDddMovingPole` must map to a Swift owner route with exact parent position/angle copy, stable parent linkage, and cage child allocation. | Implemented locally — behavior manifest `0x62ab368424ec515b` with 534 rows (`125` Swift, `409` C adapters), independent Swift/C contract `0xa0f4cd2e9d31d0bd`, parent-child owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33by: LLL rotating hexagonal ring parent route | `bhvLllRotatingHexagonalRing` must map to a Swift owner route with action/yaw transitions, Mario/platform gates, flame spawn intent, and explicit volcano-flame child fallback. | Implemented locally — behavior manifest `0x537be24a34b0d7be` with 534 rows (`126` Swift, `408` C adapters), independent Swift/C contract `0xf6e1a2aa863378a4`, owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33bz: LLL floating wood bridge parent/child route | `bhvLllFloatingWoodBridge` and `bhvLllWoodPiece` must share a Swift owner route with distance-triggered bridge actions, three source-order child allocations, oscillation/timer state, parent links, and deletion/unload. | Implemented locally — behavior manifest `0xeb5ad8f5ba75bf12` with 534 rows (`128` Swift, `406` C adapters), independent Swift/C contract `0x57cd8e848459e5bd`, parent-child owner/dispatch smoke, behavior dispatch/coverage/engine-runtime, strict Swift 6 build, live route/replay, timebase/Metal contracts, and `git diff --check` pass |
+| M33ff: Cloud parent/child owner route | `bhvCloud` must map to a Swift owner route with exact five-part Lakitu/six-part Fwoosh allocation, parent transform propagation, distance-gated orbit/hide/unload transitions, and generation-safe `bhvCloudPart` linkage. | Implemented locally — behavior manifest `0x3ddc36fb71502e51` with 534 rows (`237` Swift, `297` C adapters), focused cloud contract `0x8552420d12e1a824`, dispatch smoke `0x681ceb2358bf2e21`, cloud/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; Fwoosh wind-blow effect sequencing and all full-game shard/runtime/device/release/visual/performance/thermal/human gates remain open |
+| M33fg: Cloud wind-state reducer refinement | `bhvCloud` must preserve Fwoosh timer activation, grow-speed/scale evolution, wind sound/particle intents, hard stop, hide/home return, and Lakitu unload through fixed-width values while retaining the existing parent/child owner route. | Implemented locally — expanded Swift/C cloud contract `0xc214f1fa256bfd3e`, behavior manifest `0x3ddc36fb71502e51` with 534 rows (`237` Swift, `297` C adapters), owner allocation of authored odd/even strong-wind child variants, dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal gates, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; production sound delivery, full-game shards, runtime/device/release/visual/performance/thermal/human gates remain open |
+| M33fh: Celebration-star parent owner route | `bhvCelebrationStar` must map to a Swift owner route with star/Bowser-key initialization, Mario-relative orbit, sparkle-child ownership, diameter/timer transitions, variant-specific scale, face-camera alignment, and generation-safe retirement. | Implemented locally — focused Swift/C contract `0xeee35755ab0382d6`, behavior manifest `0x2b2006e0351baeba` with 534 rows (`238` Swift, `296` C adapters), dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fi: Warp-family value/owner routes | `bhvWarp`, `bhvFadingWarp`, and `bhvWarpPipe` must share a Swift route with authored behavior-byte hitbox decoding, fading subtype, pipe collision intent, and interaction reset. | Implemented locally — focused Swift/C contract `0xd94ed7a7d5b6bd96`, behavior manifest `0xc96df469e7e1bb21` with 534 rows (`241` Swift, `293` C adapters), dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fj: Script-only warp identity closure | Fourteen literal `BREAK()` warp identities must share the existing Swift no-op owner route without inventing state mutation or deactivation, while retaining exact dispatch and manifest coverage. | Implemented locally — behavior manifest `0xd4dca5a8adfe18b7` with 534 rows (`255` Swift, `279` C adapters), all break-only identities route through `NoOpObjectBridge`, dispatch/no-op/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fk: Exit-podium warp extension | `bhvExitPodiumWarp` must share the warp owner path with a surface-list 50-unit hitbox, 8,000-unit collision-distance admission, authored collision identity, and interaction reset. | Implemented locally — focused warp contract `0x17d388ad293f702f`, behavior manifest `0x039fb580fe5b74ce` with 534 rows (`256` Swift, `278` C adapters), warp/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fl: DDD warp global collision-selection route | `bhvDddWarp` must cross the Bowser’s Sub beaten flag into Swift, select the authored pre/post collision dataset, preserve 30,000-unit collision-distance admission, and retain collision-model load intent. | Implemented locally — focused Swift/C contract `0x0beb6d523e928e2c`, behavior manifest `0xc42f765f2a0b1491` with 534 rows (`257` Swift, `277` C adapters), DDD-warp/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fm: Literal BREAK identity audit closure | `bhvInsideCannon` and `bhvSnowBall` must share the existing Swift no-op owner route because their source scripts are literal `BREAK()` with no native state mutation. | Implemented locally — behavior manifest `0x378cbd8ec1fcc8fc` with 534 rows (`259` Swift, `275` C adapters), all literal-break identities route through `NoOpObjectBridge`, dispatch/no-op/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fn: Act-selector star-type visual route | `bhvActSelectorStarType` must preserve unselected/selected/100-coin size and yaw reducers, clamps, timer cadence, and owner-thread transform updates as immutable Swift values. | Implemented locally — focused Swift/C contract `0x2514df42b8a6e2f6`, behavior manifest `0x88465bc1acfdd074` with 534 rows (`260` Swift, `274` C adapters), act-selector/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fo: Collectible-star value/owner route | `bhvStar` must preserve save-bit model selection, 80×50 interaction hitbox, 0x800 yaw cadence, interaction reset, and generation-safe retirement through immutable Swift values. | Implemented locally — focused Swift/C contract `0x6c47433452c2fada`, behavior manifest `0x95d27cf7d81efa04` with 534 rows (`261` Swift, `273` C adapters), collect-star/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fp: Star-spawn coordinates trajectory route | `bhvStarSpawnCoordinates` must preserve model selection, intro/rise/fall/landed motion, canonical home-vector velocities, sparkle children, time-stop boundaries, tangible landing, and interaction retirement. | Implemented locally — focused Swift/C contract `0x75b6cafe102b8788`, behavior manifest `0x4dc4d53de25a4410` with 534 rows (`262` Swift, `272` C adapters), star-spawn/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fq: Star-spawn sparkle/time-stop owner closure | `bhvStarSpawnCoordinates` must allocate the existing `bhvSparkleSpawn` child route and own time-stop enable/clear transitions without exposing C objects. | Implemented locally — focused Swift/C contract `0x75b6cafe102b8788`, behavior manifest `0x4dc4d53de25a4410` with 534 rows (`262` Swift, `272` C adapters), generation-safe sparkle-spawner allocation, star-spawn/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fr: Spawned-star trajectory/value-owner routes | `bhvSpawnedStar` and `bhvSpawnedStarNoLevelExit` must share a Swift route with transparent model selection, Mario/no-exit home setup, gravity launch/settle/wait/idle actions, sparkle children, time-stop boundaries, rotation decay, and interaction retirement. | Implemented locally — focused Swift/C contract `0xb755cd8968059736`, behavior manifest `0x4aeb916bbd03ab16` with 534 rows (`264` Swift, `270` C adapters), spawned-star/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fs: CCM slide-triggered star spawn route | `bhvCcmTouchedStarSpawn` must preserve the global slide gate, authored trigger reposition, exact default-star home coordinates, child star-spawn owner allocation, hitbox, and trigger retirement. | Implemented locally — focused Swift/C contract `0x3b5fc80d0d29ed1d`, behavior manifest `0x8b6520b382b6243c` with 534 rows (`265` Swift, `269` C adapters), CCM-star/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ft: Hidden-star parent/trigger routes | `bhvHiddenStar` and `bhvHiddenStarTrigger` must share Swift parent/trigger state for counter gating, collision increment, reveal timer, mist/star effects, hitbox, and retirement. | Implemented locally — focused Swift/C contract `0x3c3e715c0f2df866`, behavior manifest `0x54a4c58ab8938f88` with 534 rows (`267` Swift, `267` C adapters), hidden-star/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fu: Bowser red-coin hidden-star threshold | `bhvBowserCourseRedCoinStar` must reuse the hidden-star parent route with an authored eight-trigger threshold, reveal timer, no-exit star-spawn intent, and distinct identity coverage. | Implemented locally — focused hidden-star contract `0x3c3e715c0f2df866`, behavior manifest `0xcf24ecc000518665` with 534 rows (`268` Swift, `266` C adapters), hidden-star/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fv: 120-star cannon-grate global gate | `bhvHiddenAt120Stars` must preserve the total-star threshold, 4,000-unit collision-distance admission, collision-model load intent, and grate deactivation. | Implemented locally — focused Swift/C contract `0x3da0a8473d7acb17`, behavior manifest `0x5a4277aae5c1d649` with 534 rows (`269` Swift, `265` C adapters), grate/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fw: Blue-coin switch/hidden-coin interaction pair | `bhvBlueCoinSwitch` and `bhvHiddenBlueCoin` must preserve the authored switch action machine, six-frame recede, sound/expiry cadence, nearest-switch binding, hidden-coin blink/interaction lifecycle, and golden-sparkle child request through generation-safe Swift owners. | Implemented locally — focused Swift/C contract `0x0c0e3c6bdb4cf6c3`, behavior manifest `0x4040da43b7c33c72` with 534 rows (`271` Swift, `263` C adapters), blue-coin/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fx: Red-coin star progression family | `bhvHiddenRedCoinStar`, `bhvRedCoinStarMarker`, and `bhvRedCoin` must preserve the eight-coin gate, marker initialization/rotation, nearest-parent counter updates, sound/orange-number effects, golden sparkles, no-exit star spawn, and retirement through generation-safe Swift owners. | Implemented locally — focused Swift/C contract `0x8d4612ddfe2bb067`, behavior manifest `0x6fe162d80502b55a` with 534 rows (`274` Swift, `260` C adapters), red-coin/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fy: Paired star-door surface route | `bhvStarDoor` must preserve neighbor activation, opening/closing movement/timers, open hold, room-gated visibility, tangible/intangible transitions, collision-load intent, sound/rumble edges, and reset semantics through the Swift owner route. | Implemented locally — focused Swift/C contract `0x216079c2c53c04c5`, behavior manifest `0x995600ba4bfbc8ca` with 534 rows (`275` Swift, `259` C adapters), star-door/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33fz: Cap-switch activation/base pair | `bhvCapSwitch` and `bhvCapSwitchBase` must preserve variant/save-flag gating, base-child ownership, activation/press timers, scale/effect edges, dialog completion, pressed state, and collision-load intent through Swift owners. | Implemented locally — focused Swift/C contract `0x4b9fda77d0cf8565`, behavior manifest `0x2ac67d61263b5895` with 534 rows (`277` Swift, `257` C adapters), cap-switch/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ga: Tower-door collision/explosion route | `bhvTowerDoor` must preserve first-frame yaw correction, Mario-attack explosion/particle intent, wall-explosion audio, zero-coin outcome, and owner-thread retirement. | Implemented locally — focused Swift/C contract `0xc556234e1d089035`, behavior manifest `0x431e12ef6be3c4bb` with 534 rows (`278` Swift, `256` C adapters), tower-door/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gb: Openable-grill parent/child environment route | `bhvOpenableGrill` and `bhvOpenableCageDoor` must preserve variant widths, floor-switch gating, child allocation, cage-open effects, 64-frame yaw travel, and collision ownership through Swift owners. | Implemented locally — focused Swift/C contract `0xb2e5b527958d6d7c`, behavior manifest `0x95a07155c113c1a4` with 534 rows (`280` Swift, `254` C adapters), openable-grill/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gc: Generic door/warp-door route | `bhvDoor` and `bhvDoorWarp` must preserve interaction-mask action mapping, wood/iron and warp sound timing, camera-event distinction, room visibility, animation reset, time-stop intent, and action-zero collision ownership through a shared Swift owner. | Implemented locally — focused Swift/C contract `0x38f73900b34f019a`, behavior manifest `0x73c3a9af5378685b` with 534 rows (`282` Swift, `252` C adapters), door/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gd: Hidden-object switch-gated route | `bhvHiddenObject` must preserve breakable/unbreakable branches, variant loot/scale, switch activation, visibility/tangibility, 360+20 blink timing, attack break effects, collision-load intent, and reset semantics through the Swift owner. | Implemented locally — focused Swift/C contract `0x74fc22100d8f003b`, behavior manifest `0x68fb3f1a1d12d5b6` with 534 rows (`283` Swift, `251` C adapters), hidden-object/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ge: Recovery-heart spin/heal route | `bhvRecoveryHeart` must preserve hitbox setup, overlap spin-speed selection, one-shot sound gating, 400 minimum decay, 0x10000 spin accumulation, +4 heal pulses, and owner-thread yaw updates. | Implemented locally — focused Swift/C contract `0x286a983fa291efd2`, behavior manifest `0x3b36975f88532b9b` with 534 rows (`284` Swift, `250` C adapters), recovery-heart/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gf: Common yellow-coin/temporary-coin route | `bhvOneCoin`, `bhvYellowCoin`, and `bhvTemporaryYellowCoin` must preserve hitbox/value setup, no-shadow selection, animation cadence, temporary blink/expiry timing, interaction sparkle retirement, and owner cleanup through a shared Swift route. | Implemented locally — focused Swift/C contract `0x02cbc40bcdd89035`, behavior manifest `0x05ce99962dfaeca5` with 534 rows (`287` Swift, `247` C adapters), coin/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gg: Moving yellow/blue coin route | `bhvMovingYellowCoin` and `bhvMovingBlueCoin` must preserve coin values, physics setup, yellow tangibility/timeout, blue movement admission/acceleration/damping, sound gating, flicker/death, and interaction retirement through a shared Swift owner. | Implemented locally — focused Swift/C contract `0x5fad4e584bf56f1f`, behavior manifest `0x626fe55eb8d2c425` with 534 rows (`289` Swift, `245` C adapters), moving-coin/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gh: Water-level diamond/initializer routes | `bhvWaterLevelDiamond` and `bhvInitializeChangingWaterLevel` must preserve global-changing gating, target-level approach, sounds/spin/rumble, collision values, and 10-frame region-copy/sine cadence through Swift environment owners. | Implemented locally — focused Swift/C contract `0x385a79b4fb5775cd`, behavior manifest `0x7c51e00bd314c000` with 534 rows (`291` Swift, `243` C adapters), water-level/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gi: Water-level pillar/moat-drain route | `bhvWaterLevelPillar` must preserve persistent drained initialization, ground-pound sinking, peer synchronization, moat-drained save/jingle, 300-frame environment approach, water-drain sound, and collision ownership through a Swift environment owner. | Implemented locally — focused Swift/C contract `0xc7ec0e0bc7a2ca6a`, behavior manifest `0x4119710289586733` with 534 rows (`292` Swift, `242` C adapters), water-pillar/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gj: Shared purple floor-switch family | `bhvFloorSwitchHardcodedModel`, `bhvFloorSwitchGrills`, `bhvFloorSwitchAnimatesObject`, and `bhvFloorSwitchHiddenObjects` must preserve platform/lateral admission, Mario action gating, press scale/effects, ticking/release behavior, and collision ownership through a shared Swift route. | Implemented locally — focused Swift/C contract `0x908ab416de4408fe`, behavior manifest `0x8fb3aa416c3f5410` with 534 rows (`296` Swift, `238` C adapters), floor-switch/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gk: Animated floor-switch child route | `bhvAnimatesOnFloorSwitchPress` must preserve its parent action-2 gate, toggle/retrigger state, 250/200/200-frame variant durations, remaining-time sound cadence, frame/model progression, collision-load intent, parent linkage, and owner cleanup through a fixed-width Swift child owner. | Implemented locally — focused Swift/C contract `0xd3d13ed14b76d885`, behavior manifest `0xc994933ec600a82c` with 534 rows (`297` Swift, `237` C adapters), animated-floor-switch/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gl: Hidden one-up family | `bhvHidden1up`, `bhvHidden1upTrigger`, `bhvHidden1upInPole`, `bhvHidden1upInPoleTrigger`, and `bhvHidden1upInPoleSpawner` must preserve trigger-count gating, reveal/tangible/rise/disappear state, sparkle cadence, Mario-directed movement, trigger consumption, and pole child allocation through a shared Swift owner. | Implemented locally — focused Swift/C contract `0x471482b44d925ead`, behavior manifest `0x9e5ba7d19c0efce1` with 534 rows (`302` Swift, `232` C adapters), hidden-one-up/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gm: Regular one-up family extension | `bhv1Up`, `bhv1upWalking`, `bhv1upRunningAway`, `bhv1upSliding`, and `bhv1upJumpOnApproach` must preserve stationary interaction, appearance/rise timing, walking timeout, away/approach gates, sparkle cadence, tangible transitions, and disappearance fences through the shared Swift owner. | Implemented locally — focused Swift/C contract `0x33249b91023d6e53`, behavior manifest `0xcca6724933d0cf63` with 534 rows (`307` Swift, `227` C adapters), hidden-one-up/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gn: Large/small breakable-box routes | `bhvBreakableBox` and `bhvBreakableBoxSmall` must preserve attack/hold/thrown/dropped behavior, landing/sliding/break effects, lava/death handling, flash/respawn fences, hitboxes, model/scale, and collision ownership through a shared Swift owner. | Implemented locally — focused Swift/C contract `0x597e320f93b7a3b4`, behavior manifest `0xf02d6f930ce7fd3a` with 534 rows (`309` Swift, `225` C adapters), breakable-box/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33go: Exclamation-box content/effect route | `bhvExclamationBox` must preserve save/override gating, animation/mark child ownership, tangible/hidden transitions, attack wobble, cap/shell/coin/1-Up/star content selection, break effects, and the 300-frame return fence through a Swift owner. | Implemented locally — focused Swift/C contract `0x7fe70358270d770d`, behavior manifest `0xd37b562c2158fc48` with 534 rows (`310` Swift, `224` C adapters), exclamation-box/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gp: Orange-number counter/effect route | `bhvOrangeNumber` must preserve behavior-byte animation selection, 26-unit rise, 2-unit gravity, -21/14 bounce clamp, 35-frame sparkle/expiry edge, and golden-sparkle child ownership through a Swift owner. | Implemented locally — focused Swift/C contract `0xf40a1d75f5001d52`, behavior manifest `0x1dbb88a3ad5f3973` with 534 rows (`311` Swift, `223` C adapters), orange-number/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gq: Sound-spawner and rock-solid routes | `bhvSoundSpawner` and `bhvRockSolid` must preserve delayed one-shot sound timing, deactivation, persistent collision-load intent, object-list ownership, and lifecycle pruning through Swift owners. | Implemented locally — focused Swift/C contract `0x4361939714f8a64d`, behavior manifest `0x47574fde9831c28f` with 534 rows (`313` Swift, `221` C adapters), sound/rock/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gr: Bowser-sub and moat environment gates | `bhvBowserSubDoor`, `bhvBowsersSub`, `bhvMoatGrills`, and `bhvInvisibleObjectsUnderBridge` must preserve submarine unlock deletion, moat-drain collision/model gating, under-bridge environment writes, immediate initializer teardown, and lifecycle ownership through Swift owners. | Implemented locally — focused Swift/C contract `0xd85441b458599c53`, behavior manifest `0x4e7028d3111efac8` with 534 rows (`317` Swift, `217` C adapters), environment-gate/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gs: Tick Tock Clock hand route | `bhvClockHourHand` and `bhvClockMinuteHand` must preserve the four-frame safety delay, roll velocities, painting detection, speed thresholds, and rotation stop edge through a shared Swift mechanical owner. | Implemented locally — focused Swift/C contract `0xe2f9dc6a50eec264`, behavior manifest `0x20925804d9638075` with 534 rows (`319` Swift, `215` C adapters), clock-arm/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gt: Castle floor-trap parent/child route | `bhvCastleFloorTrap` and `bhvFloorTrapInCastle` must preserve open/close/rotate actions, angle-velocity changes, open sound edge, child roll propagation, Mario turn handoff, interaction reset, and surface collision ownership through Swift owners. | Implemented locally — focused Swift/C contract `0x3489058a8683fdcc`, behavior manifest `0x8c9f983fb771b6cb` with 534 rows (`321` Swift, `213` C adapters), castle-floor-trap/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gu: Castle flag initializer route | `bhvCastleFlagWaving` must preserve random-frame admission/clamping, stable animation state, default-list ownership, and lifecycle pruning through a Swift owner. | Implemented locally — focused Swift/C contract `0x4d94c25d07ee7834`, behavior manifest `0x110c8e667334b8d2` with 534 rows (`322` Swift, `212` C adapters), castle-flag/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gv: Boo-cage parent-linked route | `bhvBooCage` must preserve in-boo parent copying, death-triggered falling, initial velocity, sparkle/landing effects, ground tangibility, Mario entry, 100-frame transition, hitbox values, and lifecycle ownership through a Swift owner. | Implemented locally — focused Swift/C contract `0x4a2b92235e4bf5a3`, behavior manifest `0xf93f70eef4023093` with 534 rows (`323` Swift, `211` C adapters), boo-cage/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gw: Alpha/beta Boo-key family | `bhvAlphaBooKey` and `bhvBetaBooKey` must preserve rotation, parent-death/drop transition, drop velocity, dropped-state settling, tangibility fence, parent handoff, collision collection, and sparkle ownership through a shared Swift owner. | Implemented locally — focused Swift/C contract `0xde6afa5beafcc025`, behavior manifest `0x878503ce8420d210` with 534 rows (`325` Swift, `209` C adapters), Boo-key/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gx: Castle Boo room/opacity route | `bhvBooInCastle` must preserve the 12-star gate, room appearance, opacity/scale, laugh transition, home-target movement, Z fade, and cross-room reset through a Swift owner. | Implemented locally — focused Swift/C contract `0x87a7c25160ed3ec6`, behavior manifest `0x79d7d43594c341c7` with 534 rows (`326` Swift, `208` C adapters), Boo-in-castle/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gy: Merry-go-round mechanical/audio route | `bhvMerryGoRound` must preserve outside-room latching, howling wind, 0x80 yaw rotation, stopped-state audio, room reset, and collision ownership through a Swift owner. | Implemented locally — focused Swift/C contract `0x5ab347fa61686883`, behavior manifest `0xc96a5596e0e78ff3` with 534 rows (`327` Swift, `207` C adapters), merry-go-round/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33gz: Distance-gated music-touch route | `bhvPlaysMusicTrackWhenTouched` must preserve the strict 200-unit gate, one-shot puzzle-jingle edge, action latch, timer progression, and default-list ownership through a Swift owner. | Implemented locally — focused Swift/C contract `0x931eddc04c6c6167`, behavior manifest `0xb50044bba999b59b` with 534 rows (`328` Swift, `206` C adapters), music-touch/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ha: Text-surface panel/sign routes | `bhvMessagePanel` and `bhvSignOnWall` must preserve 150×80 text hitboxes, interaction type/subtype, interaction reset, and distinct collision-load behavior through a shared Swift owner. | Implemented locally — focused Swift/C contract `0xcbdcbe39fe5d7123`, behavior manifest `0xb37f15ffad58b15f` with 534 rows (`330` Swift, `204` C adapters), text-surface/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33hb: Grand-star cutscene/interaction route | `bhvGrandStar` must preserve appearance sparkle/audio edges, 70-frame appearance timing, launch/arc phases, landing handoff, rotation, 2× scale/graph offset, tangibility, and interaction retirement through a Swift owner. | Implemented locally — focused Swift/C contract `0x4ee77eda1fde3209`, behavior manifest `0x67dbbe01b5bc53ae` with 534 rows (`331` Swift, `203` C adapters), grand-star/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33hc: Beta Bowser anchor route | `bhvBetaBowserAnchor` must preserve Mario-relative placement, debug-radius/height offsets, hitbox values, and attack intent for touched non-Mario objects through a Swift owner. | Implemented locally — focused Swift/C contract `0xbc3315ebf35944be`, behavior manifest `0xd3ae579b50c58226` with 534 rows (`332` Swift, `202` C adapters), beta-anchor/dispatch/coverage/engine-runtime/live-route/route-shard/timebase/Metal contracts, strict Swift 6 Xcode build, shell syntax, and `git diff --check` pass; full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33hd: Source-verified another-elevator alias | `bhvAnotherElavator` must map to the existing Swift elevator owner because its script uses the same native elevator init/loop and HMC collision. | Implemented locally — explicit dispatch/manifest alias, existing elevator parity contract, regenerated strict Swift 6 build, shell syntax, and `git diff --check` pass; behavior manifest `0xc4552cfb6723328f` with 534 rows (`333` Swift, `201` C adapters); full-game shards and native/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33he: Source-verified terminal aliases | `bhvCutOutObject` and `bhvPurpleSwitchHiddenBoxes` must reuse the no-op and floor-switch owners because their scripts are a render-disabled break and an exact floor-switch `GOTO` alias. | Implemented locally — explicit dispatch/manifest aliases, existing no-op/floor-switch contracts, regenerated strict Swift 6 build, shell syntax, and `git diff --check` pass; behavior manifest `0x7396cb7fc6200083` with 534 rows (`335` Swift, `199` C adapters); full-game shards and native/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33hf: Terminal/no-native behavior closure | The rotating-counterclockwise, stub, unused-one, static-object, yellow-ball, and carry-helper scripts must terminate without a C callback, while `bhvSmallWaterWave398` must reuse the existing Swift small-wave helper owner. | Implemented locally — stable no-op/helper identities, dispatch assertions, manifest/Metal contracts, engine runtime, live-route oracle, route-shard replay, timebase audit, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), and the complete `./script/build_and_run.sh --verify` focused gate pass; the final native app open reproduces LaunchServices `kLSNoExecutableErr (-10827)` before AppKit/engine startup; behavior manifest `0xf54dd7c2fe19f8fd` with 534 rows (`349` Swift, `185` C adapters); full-game shards and native/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33hg: Static interaction/terminal owner closure | `bhvIgloo`, `bhvBigSnowmanWhole`, `bhvUkikiCageChild`, `bhvSunkenShipPart2`, and `bhvSunkenShipSetRotation` must preserve their exact field writes, fixed child position, rotation setup, and per-tick reset without a C callback. | Implemented locally — no-op owner modes with field assertions, dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), and post-slice `./script/build_and_run.sh --verify` matrix completion; the final native app open returns LaunchServices `kLSNoExecutableErr (-10827)` after the successful build, recorded in `/tmp/sm64-modern-m33hg-full-verify.log`; behavior manifest `0x49a2ea62552e3479` with 534 rows (`354` Swift, `180` C adapters); full-game shards plus native/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ia: Static collision-load owner closure | `bhvTower`, `bhvBulletBillCannon`, `bhvLllHexagonalMesh`, `bhvHiddenStaircaseStep`, `bhvPillarBase`, `bhvInSunkenShip`, and `bhvInSunkenShip2` must preserve surface admission, authored collision identities/distances, room scope, drawing distance, and sunken-ship rotation without a C callback. | Implemented locally — static collision value modes, collision-owner registration assertions, dispatch/manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xbd8a849d5c4a5bbb` with 534 rows (`361` Swift, `173` C adapters); post-slice full verifier, full-game shards, and native/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ib: Empty Manta Ray manager loop | `bhvMantaRayRingManager` must remain a persistent no-op because its source is an empty loop with no native callback or field mutation, distinct from terminal break routes. | Implemented locally — persistent no-op mode, dispatch/manifest/Metal contracts, strict Swift 6 build, shell syntax, and `git diff --check` pass; behavior manifest `0x74b2ea46c157eaab` with 534 rows (`362` Swift, `172` C adapters); full-game shards and native/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ic: Small/large Bomp family | `bhvSmallBomp` and `bhvLargeBomp` must preserve the shared wait/poke-out/extend/retract action machine, variant speeds, fixed X clamps, yaw reversals, random-start timer, surface collision identity, and sound edges. | Implemented locally — focused C↔Swift contract `0x60f27e7f0e517b6f`, Bomp owner/dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xfce7473eb9a9c811` with 534 rows (`364` Swift, `170` C adapters); post-slice full verifier, full-game shards, and native/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33id: Grindel/Thwomp family | `bhvGrindel`, `bhvThwomp`, and `bhvThwomp2` must preserve the shared wait/start-fall/fall/land/pause reducer, behavior-byte timing, random timers, gravity/home landing, landing sound/shake, variant scale/drawing, collision identity, and surface owner registration. | Implemented locally — focused C↔Swift contract `0x69cbaa275918d295`, Thwomp owner/dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), and post-slice `./script/build_and_run.sh --verify` matrix completion; the final native app open returns LaunchServices `kLSNoExecutableErr (-10827)` after the successful build, recorded in `/tmp/sm64-modern-m33id-full-verify.log`; behavior manifest `0x92867b41d99a059b` with 534 rows (`367` Swift, `167` C adapters); full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ie: Coin formation spawner family | `bhvThreeCoinsSpawn`, `bhvTenCoinsSpawn`, and `bhvSingleCoinGetsSpawned` must preserve exact 3/10 child counts, default-to-level list ordering, parent deactivation, and shared coin child behavior. | Implemented locally — focused C↔Swift contract `0xcb80b3715d3a6b4a`, coin formation dispatch/child-order smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xda5e7977cf2e5d16` with 534 rows (`370` Swift, `164` C adapters); full-game shards, native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33if: Big-boulder rolling owner | `bhvBigBoulder` must preserve the initial launch, speed cap, rolling face pitch, damage hitbox, collision distance, scale/graph offset, impact sound/mist edges, and below-world retirement. | Implemented locally — focused C↔Swift contract `0x4e41a388291ec45d`, boulder dispatch/hitbox smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x3c0ee295ed374325` with 534 rows (`371` Swift, `163` C adapters); the big-boulder generator plus full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ig: Big-boulder generator | `bhvBigBoulderGenerator` must preserve the 256-frame wrap, room-4/radius gates, 64/128-frame spawn cadence, default-to-level child ordering, and generation-safe child ownership. | Implemented locally — focused C↔Swift generator contract `0xd1c51a063b8591e2`, generator dispatch/child-order smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x55adfc756c03014f` with 534 rows (`372` Swift, `162` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ih: Horizontal Grindel collision/movement owner | `bhvHorizontalGrindel` must preserve ground-entry impact, target-yaw approach/reversal, 300-unit home branching, 60-frame wait, jump velocity/gravity, face-yaw offset, scale, collision identity, and surface-owner registration. | Implemented locally — focused C↔Swift contract `0x741c6bdcff466761`, horizontal-Grindel dispatch/collision smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x1ce029ec622e6820` with 534 rows (`373` Swift, `161` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ii: Beta Fish splash spawner no-op | `bhvBetaFishSplashSpawner` must remain a persistent no-op because its native callback only samples water level and performs no object/global mutation, distinct from terminal break routes. | Implemented locally — persistent no-op dispatch/manifest/Metal source contracts, strict Swift 6 build, shell syntax, and `git diff --check` pass; behavior manifest `0x810174b08b8cf876` with 534 rows (`374` Swift, `160` C adapters); full-game shards and native/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ij: Unused particle collision spawner | `bhvUnusedParticleSpawn` must retire on ground/Mario collision and allocate ten purple-particle children through the existing owner, while ground-only retirement emits no particles. | Implemented locally — focused C↔Swift contract `0x93b3d7b3f9b4a249`, dispatch child smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xafc74c8d351f29c7` with 534 rows (`375` Swift, `159` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ik: Snowman checkpoint parent route | `bhvSnowmansBodyCheckpoint` must preserve the 800-unit Mario trigger radius, parent counter increment, trigger retirement, and parent-unload retirement through generation-safe ownership. | Implemented locally — focused C↔Swift contract `0x2cfd68bc01186e83`, checkpoint parent/counter dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xd12aada2542f5a8a` with 534 rows (`376` Swift, `158` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33il: Bowser body-anchor parent route | `bhvBowserBodyAnchor` must preserve parent position/angle copying, action/subaction interaction switching, opacity/held-state tangibility, hitbox/subtype fields, and interaction reset through generation-safe ownership. | Implemented locally — focused C↔Swift contract `0x395f16ac7663392a`, body-anchor parent/interaction dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x21a7de5da556d219` with 534 rows (`377` Swift, `157` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33im: Bowser tail-anchor parent route | `bhvBowserTailAnchor` must preserve the tangible/collision-cooldown/intangible actions, parent intangible-timer writes, 90-unit relative offset, hitbox, and interaction reset through generation-safe ownership. | Implemented locally — focused C↔Swift contract `0xf4c20714deadfd91`, tail-anchor parent/collision dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x333d1f9a04d86a7d` with 534 rows (`378` Swift, `156` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33in: Beta chest bottom/lid family | `bhvBetaChestBottom` and `bhvBetaChestLid` must preserve 300-unit opening admission, 0x400 pitch steps, bubble/sound child spawn, parent-relative lid ownership, hitbox fields, and generation-safe cleanup. | Implemented locally — focused C↔Swift contract `0x52df92ff78e81e61`, beta-chest dispatch/child smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x4728179210c55d8f` with 534 rows (`380` Swift, `154` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33io: Beta trampoline top/spring family | `bhvBetaTrampolineTop` and `bhvBetaTrampolineSpring` must preserve top child creation, Mario-on-platform reset, parent transform copying, 75-unit spring offset, and compression scale. | Implemented locally — focused C↔Swift contract `0xcd064d83a22e382d`, trampoline dispatch/child smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xcd0d8a9166173a35` with 534 rows (`382` Swift, `152` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ip: Beta holdable object | `bhvBetaHoldableObject` must preserve free/held/thrown/dropped render transitions, fixed throw velocity, drop reset, holdable hitbox/physics fields, and lifecycle ownership. | Implemented locally — focused C↔Swift contract `0xb158eeb0609e333f`, holdable dispatch/state smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xdf3dec4581b174de` with 534 rows (`383` Swift, `151` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33iq: Seaweed, ship-part, falling-pillar, and coffin families | `bhvSeaweed`/`bhvSeaweedBundle`, `bhvShipPart3`/`bhvInSunkenShip3`, `bhvFallingPillar`/`bhvFallingPillarHitbox`, and `bhvCoffinSpawner`/`bhvCoffin` must preserve child allocation, fixed transforms, oscillation, collision ownership, trigger/action transitions, and list order. | Implemented locally — dispatch/child-order smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x952813f313876818` with 534 rows (`391` Swift, `143` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ir: Unused blue-coin motion family | `bhvBlueCoinSliding` and `bhvBlueCoinJumping` must preserve 500/1000-unit admission, away yaw, bounce velocity, wall/slow/fade actions, jumping launch/intangibility, blue hitbox value, and collection retirement. | Implemented locally — focused moving-coin C↔Swift contract `0xfd52c263df59f22e`, dispatch motion smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x9fc3aa9106efa36c` with 534 rows (`393` Swift, `141` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33is: Patterned coin formation family | `bhvCoinFormation` and `bhvCoinFormationSpawn` must preserve five fixed offset patterns, respawn-mask filtering, above-floor placement, 2,000/2,100-unit reload, spawner/list ordering, and child ownership. | Implemented locally — focused coin-formation C↔Swift contract `0xa9ad1ceef6ee12df`, dispatch/child-order smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x492eb69e9e25bd3a` with 534 rows (`395` Swift, `139` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33it: Coin-inside-Boo family | `bhvCoinInsideBoo` must preserve parent-following, BBH blue-model/scale selection, Mario-yaw release velocity, the 90-frame tangible transition, hitbox/interaction semantics, and sparkle retirement. | Implemented locally — focused C↔Swift contract `0x8267c3d6ad936c5d`, dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x551df337864a52cc` with 534 rows (`396` Swift, `138` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33iu: Aquarium blue-fish actor | `bhvBlueFish` must preserve deterministic dive/turn/ascend/turn-back timing, random angle/velocity inputs, canonical trig movement, animation acceleration, and parent-duplicate retirement. | Implemented locally — focused C↔Swift contract `0xe56ef70774bdd136`, dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xc4dd70d2c40c27ad` with 534 rows (`397` Swift, `137` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33iv: Tank-fish group family | `bhvTankFishGroup` must preserve the room-15/7 admission gate, 15-child default-list allocation, parent linkage, room-leave duplicate transition, and fish-child ordering. | Implemented locally — expanded blue-fish C↔Swift contract `0x90a2b9c9c958763b`, dispatch/group smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x94fbba7f2f065fcc` with 534 rows (`398` Swift, `136` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33iw: Clam-shell family | `bhvClamShell` must preserve 1.5 Y scale, 150-frame proximity opening, tangible/intangible animation edges, shake timer, and twelve BubbleMaybe children. | Implemented locally — focused clam-shell C↔Swift contract `0x7b4567896fc8e985`, dispatch/bubble smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x5748fbd502eceb32` with 534 rows (`399` Swift, `135` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ix: Bob-omb Mario anchor | `bhvBobombAnchorMario` must preserve the 100/150 relative transform, parent yaw propagation, 50/50 throw handoff, 10/10 toss handoff, and parent-deactivation cleanup. | Implemented locally — focused C↔Swift contract `0xad72b949318ab252`, dispatch/anchor smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x4b6f1a58f66f1039` with 534 rows (`400` Swift, `134` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33iy: Bub spawner/child family | `bhvChirpChirp`, `bhvChirpChirpUnused`, and `bhvBub` must preserve the 1,500-unit spawn gate, parent action cycle, water-level vertical approach, Mario/home yaw targeting, flee transition, interaction particle edge, and parent-deletion cleanup. | Implemented locally — focused Bub C↔Swift contract `0xe3586252d673cd41`, dispatch/child-order smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x101aaca428f2c0f6` with 534 rows (`403` Swift, `131` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33iz: Butterfly actor | `bhvButterfly` must preserve rest/follow/return-home transitions, canonical yaw/pitch approach, 7-unit flight, home snap, phase-driven vertical motion, and animation edges. | Implemented locally — focused Butterfly C↔Swift contract `0x337978782426bd62`, dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x643b79fd4cb0b6b4` with 534 rows (`404` Swift, `130` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ja: Tilting-inverted-pyramid family | `bhvBitfsTiltingInvertedPyramid`, `bhvAnotherTiltingPlatform`, and `bhvLllTiltingInvertedPyramid` must preserve normal approach, Mario-on-platform admission, variant collision metadata, and surface-list ordering. | Implemented locally — dispatch/variant smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xe116735ea26da581` with 534 rows (`408` Swift, `126` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33jb: Boo-with-cage family | `bhvBooWithCage` must preserve cage-specific hitbox/scale, shared chase/bounce/death actions, and the 12-star cage-child initialization gate. | Implemented locally — dispatch/cage smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xe116735ea26da581` with 534 rows (`408` Swift, `126` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33jc: Haunted-bookend family | `bhvBookendSpawn` and `bhvFlyingBookend` must preserve the 40-frame near/facing spawn gate, child action-3 launch, forward movement, and parent/list ordering. | Implemented locally — dispatch/child smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xeb6e950bc1b8415d` with 534 rows (`410` Swift, `124` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33jd: Book-switch family | `bhvBookSwitch` must preserve progressive depression, parent manager sequence/answer gate, tangible distance range, failure bookend spawning, and parent retirement. | Implemented locally — dispatch/book-switch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x747918e51ee3f1ff` with 534 rows (`411` Swift, `123` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33je: Generic fish family | `bhvFish`, `bhvFish2`, `bhvFish3`, `bhvFishGroup`, and `bhvLargeFishGroup` must preserve 5/20-child variants, distance-gated spawning, default-list ordering, water-level approach, yaw targeting, flee cycling, and parent retirement. | Implemented locally — dispatch/group smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xa27b63f0f9f51b67` with 534 rows (`416` Swift, `118` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33jf: Cannon-barrel parent copy | `bhvCannonBarrel` must preserve parent position/yaw/pitch copying, default-list child ordering, and hiding when the cannon parent is inactive. | Implemented locally — dispatch/parent-copy smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xe2a1348113f12828` with 534 rows (`417` Swift, `117` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33jg: Opened-cannon parent | `bhvCannon` must preserve interaction admission, raise/aim/recoil/hide/reset phases, behavior-byte yaw, and attached barrel ordering. | Implemented locally — dispatch/action smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0xb2f40e5b6f3f114b` with 534 rows (`418` Swift, `116` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33jh: Ghost Hunt Boo shared identity | `bhvGhostHuntBoo` must reuse the existing Boo value/owner kernel as the exact shared script behind `bhvBoo`, with explicit identity dispatch. | Implemented locally — shared-identity dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x1dc62b6702fe4306` with 534 rows (`419` Swift, `115` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33ji: Merry-Go-Round Boo shared identity | `bhvMerryGoRoundBoo` must reuse the existing Boo value/owner kernel as an exact shared Ghost Hunt script identity with explicit dispatch. | Implemented locally — identity dispatch smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x32dc4e2f2c40f084` with 534 rows (`420` Swift, `114` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33jk: Merry-Go-Round Boo manager | `bhvMerryGoRoundBooManager` must preserve the 1,000-unit gate, two-remaining Boo spawn rule, five-kill Big Boo transition, timer reset, and generation-safe child ownership. | Implemented locally — dispatch/manager smoke, manifest/Metal contracts, engine runtime, live-route/route-shard/timebase reruns, regenerated strict Swift 6 Xcode Debug build (`BUILD SUCCEEDED`), shell syntax, and `git diff --check` pass; behavior manifest `0x6ac01224ca4ff0ca` with 534 rows (`421` Swift, `113` C adapters); full-game shards and native runtime/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33kl: Bubba underwater enemy owner | `bhvBubba` must preserve the 300/200 interaction/hurtbox setup, home patrol, attack admission, 30-frame chomp countdown, water/air movement, water-entry effect intent, and owner-thread cleanup. | Implemented locally — focused Swift/C contract `0x0b48c789602881e2`, dispatch/attack/hitbox smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x80a983c5605203d9` with 534 rows (`422` Swift, `112` C adapters); full-game shards and native/device/release/visual/performance/thermal/audio/effect/human gates remain open |
+| M33lm: Bowling Ball family | `bhvBobBowlingBallSpawner`, `bhvBowlingBall`, and `bhvFreeBowlingBall` must preserve source-typed spawn admission, path-target roll, 70-unit speed cap, damage hitbox, free-ball wake/roll/reset/intangible transitions, and generation-safe child ownership. | Implemented locally — focused Swift/C contract `0x88570fdd4c786c82`, dispatch/spawn/reset smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x68dc4d8d0460d86b` with 534 rows (`425` Swift, `109` C adapters); fresh post-slice native/device/visual/performance/thermal/audio/effect/human acceptance remains open |
+| M33ln: DDD pole | `bhvDDDPole` must preserve the save-flag deletion gate, 100-unit hitbox-down offset, behavior-parameter max travel, 10-unit oscillation, clamp/bounce timer reset, and owner cleanup. | Implemented locally — focused Swift/C contract `0xdd1cacb7655e0161`, dispatch/save-gate/bounce smoke, manifest, Metal source, engine runtime/live-route source coverage, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0xae26729c45810286` with 534 rows (`426` Swift, `108` C adapters); fresh post-slice native/device/visual/performance/thermal/audio/effect/human acceptance remains open |
+| M33lo: Donut Platform family | `bhvDonutPlatformSpawner` and `bhvDonutPlatform` must preserve the authored 31-position spawn table, generation-safe spawned-mask ownership, gravity/landing behavior, distance deletion, near-Mario explosion/coin intent, and collision ownership. | Implemented locally — focused Swift/C contract `0x6eaf95309fdb0276`, dispatch/two-child spawn/far-delete smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier `verify_rc=0` with current host Apple M5 Max Metal 4 frame-one/status-0 evidence, shell syntax, and `git diff --check` pass; behavior manifest `0xc5ddb57868e0d609` with 534 rows (`428` Swift, `106` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33lp: Courtyard Boo triplet | `bhvCourtyardBooTriplet` must preserve the 12-star gate, one-shot parent deactivation, three authored relative positions, explicit yaw seeds, Ghost Hunt Boo child identity, and generation-safe parent ownership. | Implemented locally — focused Swift/C contract `0xc7156d87ae802621`, dispatch/three-child/star-gate smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x37bae115965f08a8` with 534 rows (`429` Swift, `105` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33lq: Falling Bowser Platform | `bhvFallingBowserPlatform` must preserve the 11-variant collision table, Bowser presence/action-13/fire trigger, health/held shake gate, 8-unit pre-fall motion, -4 gravity phase, camera-shake intent, and 300-frame retirement. | Implemented locally — focused Swift/C contract `0xd083c6e2b90b4fc4`, dispatch/activation/fall/shake smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x463f67708b78d1ef` with 534 rows (`430` Swift, `104` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33lr: Giant Pole | `bhvGiantPole` must preserve pole hitbox/interaction setup, first-frame yellow-sphere child allocation at hitbox-height-plus-50, parent ownership, and the existing pole base-loop boundary. | Implemented locally — focused Swift/C contract `0xfa62f431d9f8d801`, dispatch/top-ball/height smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0xc7c25be9b7c28f37` with 534 rows (`431` Swift, `103` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33ls: End Cutscene Actors | `bhvEndPeach` and `bhvEndToad` must preserve the authored animation-index progression rules, including Peach 0–3/6–7 transitions and Toad 0/2 transitions selected by side. | Implemented locally — focused Swift/C contract `0xf1db9ac56ad3bbe6`, dispatch/Peach-Toad animation smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x3e80c3991572967e` with 534 rows (`433` Swift, `101` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33lt: End Birds | `bhvEndBirds1` and `bhvEndBirds2` must preserve the shared cutscene route, 0.7 scale initialization, authored target points, near-target rotation/motion boundaries, fly-away sound edge, and birds-1 cutscene-timer deletion. | Implemented locally — focused Swift/C contract `0x1320d37d6d85bfb9`, dispatch/shared-route/init/deletion smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x3ba8fe811cd8d433` with 534 rows (`435` Swift, `99` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33lu: Beginning Peach | `bhvBeginningPeach` must preserve camera-target placement ownership, initialization pose/animation, opacity vanish/appear timing, dialog gate, and fade-out deletion. | Implemented locally — focused Swift/C contract `0x4cb2b11640e9f51b`, dispatch/shared-route/opacity/camera smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x944b4c0e94a8d7ae` with 534 rows (`436` Swift, `98` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33lv: Haunted Bookshelf child | `bhvHauntedBookshelf` must preserve book-family identity dispatch, room-6 collision ownership, manager-driven action-1 admission, +5 X recede motion, sound intent, and deletion after frame 102. | Implemented locally — focused Swift/C contract `0x4254bbcb9d4a35c7`, dispatch/book-route/recede/retirement smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x61848e953f9d8250` with 534 rows (`437` Swift, `97` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33lw: Haunted Bookshelf Manager | `bhvHauntedBookshelfManager` must preserve three BookSwitch child allocation, near/facing admission, sequence/timer gates, solved-sequence bookshelf-open transition, in-room behavior, and manager retirement. | Implemented locally — focused Swift/C contract `0x391346c3d3849a04`, dispatch/three-switch/solved-open smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x57fbaa14ce02790d` with 534 rows (`438` Swift, `96` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33lx: JRB Floating Box | `bhvJrbFloatingBox` must preserve the shared floating-platform route, home-Y ownership, exact `sins(timer * 0x400) * 10` vertical cadence, and surface owner lifetime. | Implemented locally — focused Swift/C contract `0x775ddf4e9c1eab53`, dispatch/shared-route/sine-height smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0xb47cf58707837f93` with 534 rows (`439` Swift, `95` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33ly: JRB Sliding Box | `bhvJrbSlidingBox` must preserve Ship Part 3 parent-relative placement, parent angle copying, sine-driven relative-Z slide, damage hitbox/tangibility cadence, and generation-safe parent ownership. | Implemented locally — focused Swift/C contract `0x00f003b059ed44bb`, dispatch/shared-route/parent-relative smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x74bca13e4fe563b7` with 534 rows (`440` Swift, `94` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33lz: Jet Stream | `bhvJetStream` must preserve the 5,000-unit visibility/particle gate, 60 bubble-particle intent, source-position ownership, and water-sound effect edge. | Implemented locally — focused Swift/C contract `0xd378e30e1b7f6c9d`, dispatch/shared-wind/visibility smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x087c1778a89847a8` with 534 rows (`441` Swift, `93` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33ma: Jet Stream Water Ring | `bhvJetStreamWaterRing` must preserve collected/not-collected action state, 225-frame scale/opacity progression, crossing-plane collection, 21-frame collected retirement, and environment-owner lifetime. | Implemented locally — focused Swift/C contract `0x555f966268de8e68`, dispatch/shared-route/collection/fade smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x16fdfcef00fea828` with 534 rows (`442` Swift, `92` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mb: Jet Stream Ring Spawner | `bhvJetStreamRingSpawner` must preserve five ring cadence times, 300-frame timer wrap, ring-index wrap, five-collected inactive transition, child ring ownership, and star-spawn intent. | Implemented locally — focused Swift/C contract `0xd2754d36b2625378`, dispatch/shared-route/five-ring/star-intent smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x11a02d5495b04b27` with 534 rows (`443` Swift, `91` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mc: Manta Ray Water Ring | `bhvMantaRayWaterRing` must preserve distinct 50-frame scale progression, 151-frame opacity fade, crossing-plane collection, 21-frame collected retirement, and shared wind/environment ownership. | Implemented locally — focused Swift/C contract `0x3642be0555c82298`, dispatch/shared-route/collection/fade smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x28152e0f506db082` with 534 rows (`444` Swift, `90` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mf: Manta Ray parent | `bhvMantaRay` must preserve the authored eight-point trajectory, 10-unit movement orientation, five-ring cadence, ring-child ownership, five-collected action transition, and star-spawn intent. | Implemented locally — focused Swift/C contract `0x0b08fed50dda5e32`, dispatch/trajectory/ring/star smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x679ec225a8c273ef` with 534 rows (`447` Swift, `87` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mg: Jumping Box | `bhvJumpingBox` must preserve held/free/thrown/dropped state boundaries, jump cadence, breakable-box hitbox/content values, collision retirement, and break/coin effect intent. | Implemented locally — focused Swift/C contract `0x5c2b7dd16ac14cca`, dispatch/shared-breakable/jump/break smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0xf0259a8c2fa1a4c3` with 534 rows (`448` Swift, `86` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mh: Kickable Board | `bhvKickableBoard` must preserve the initial attack-to-rock transition, delayed overhead attack gate, rocking phase/velocity decay, falling pitch clamp, intangible/fell model transition, hitbox ownership, and fall/impact sound intents. | Implemented locally — focused Swift/C contract `0xaebbcf560ba239a1`, dispatch/shared-breakable/rock/fall smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mh-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x49d2c08b78aa4695` with 534 rows (`449` Swift, `85` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mi: Koopa Flag | `bhvKoopaFlag` must preserve the shared pole-base vertical admission, 11-frame push delay, 80×700 pole hitbox, 70-unit Mario push intent, and punch exemption. | Implemented locally — focused Swift/C contract `0xbade382be297f52c`, dispatch/shared-pole/vertical-gate smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mi-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0xe0087da9dbaf1a8f` with 534 rows (`450` Swift, `84` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mj: Shared pole-base family | `bhvKoopaFlag`, `bhvPoleGrabbing`, and `bhvTree` must preserve the common pole-base vertical admission, 11-frame push delay, 80-unit radius, authored 700/1,500/500 hitbox heights, 70-unit Mario push intent, and punch exemption. | Implemented locally — shared focused Swift/C contract `0xbade382be297f52c`, dispatch/three-identity/height smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mj-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0xf38db915bc3a1fb5` with 534 rows (`452` Swift, `82` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mk: Koopa Race Endpoint | `bhvKoopaRaceEndpoint` must preserve race-begun/ended gating, Koopa-finished and 400-unit distance admission, timer-stop/fanfare intent, cannon-shot `-1` status, normal-win `1` status, and generation-safe Koopa Flag child ownership. | Implemented locally — focused Swift/C contract `0xa651adf251518d63`, dispatch/parent-child/finish-status smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mk-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x12bc237011ca07f5` with 534 rows (`453` Swift, `81` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33ml: WF Breakable Walls | `bhvWfBreakableWallLeft` and `bhvWfBreakableWallRight` must preserve cannon-shot tangibility, collision-triggered explosion/coin result, 300×400 hitboxes, interaction type 8, and the right-wall puzzle-jingle edge. | Implemented locally — focused Swift/C contract `0x8330c26af29f2b62`, dispatch/two-identity/explosion-jingle smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33ml-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x4a0a8820beb13c92` with 534 rows (`455` Swift, `79` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mm: Unused Poundable Platform | `bhvUnusedPoundablePlatform` must preserve 1.02 scale, ground-pound admission, mist/triangle break particles, collision-model loading, and deletion after timer 7. | Implemented locally — focused Swift/C contract `0x961f8e9cf67ce60b`, dispatch/ground-pound/break-particle smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mm-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0xdd43b710433b642b` with 534 rows (`456` Swift, `78` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mn: Yellow Background Menu | `bhvYellowBackgroundInMenu` must preserve the authored `0x8000` yaw initializer, constant scale 9.0, per-tick transform publication, and menu-surface ownership. | Implemented locally — focused Swift/C contract `0x52a54fdc3009b604`, dispatch/menu-surface scale/rotation smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mn-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x577544db49bf44a3` with 534 rows (`457` Swift, `77` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mo: Snow Mound family | `bhvSlidingSnowMound` and `bhvSnowMoundSpawn` must preserve the two-action slide/fall reducer, 118/50-frame transitions, sink-sound edge, 64/128/192/224/256 spawn cadence, 256 timer reset, and large-child scale. | Implemented locally — shared focused Swift/C contract `0x3065533e47dbdaa9`, dispatch/two-identity/action/cadence smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mo-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x811bcc7ceedc69c2` with 534 rows (`459` Swift, `75` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mp: RR Cruiser Wing | `bhvRrCruiserWing` must preserve source-yaw/pitch oscillation, reverse behavior-byte direction, timer-64 reset, and boat-rock sound intent. | Implemented locally — focused Swift/C contract `0xe22b35ba86dc9748`, dispatch/oscillation/reverse/reset smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mp-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0xe633af99aef4920e` with 534 rows (`460` Swift, `74` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mq: Spindrift | `bhvSpindrift` must preserve hitbox/loot values, forward-velocity approach, home/Mario yaw admission, attack-to-recoil transition, 20-frame recovery/reset, and movement ownership. | Implemented locally — focused Swift/C contract `0x9ac8294303fff174`, dispatch/attack/movement/recovery smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mq-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x3c40bb596263a099` with 534 rows (`461` Swift, `73` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mr: Spindel | `bhvSpindel` must preserve phase/direction transitions, timer-32 cooldown reset, pitch/Z motion, authored home-Y sine lift, roll sound edge, and camera-shake timing intent. | Implemented locally — focused Swift/C contract `0x2f02c221a0c4104e`, dispatch/phase/cooldown/motion smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mr-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x6f1902ef39888288` with 534 rows (`462` Swift, `72` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33ms: RR Rotating Bridge Platform | `bhvRrRotatingBridgePlatform` must preserve the `-0x80` yaw step/velocity and the existing flamethrower parent flame sequence. | Implemented locally — focused Swift/C rotation contract `0xa474c104378973c3`, dispatch/shared-flamethrower/rotation smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33ms-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0xb585051aa8228f6f` with 534 rows (`463` Swift, `71` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mt: Snowman Wind | `bhvSLSnowmanWind` must preserve idle textbox admission, dialog completion, ±`0x1500` yaw clamp, 12 strong-wind particle intent, dialog ID 153, and wind-sound edge. | Implemented locally — focused Swift/C contract `0x0bb6ba5b32436749`, dispatch/dialog/yaw-clamp/wind smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mt-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x5395bd13d5a9f195` with 534 rows (`464` Swift, `70` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mu: Mr Blizzard Snowball | `bhvMrBlizzardSnowball` must preserve parent-held admission, throw-distance launch math, forward/gravity motion, ground/water deletion, 30×30 hitbox, and white-particle/sand-sound intent. | Implemented locally — focused Swift/C contract `0x6153d13d64702c49`, dispatch/launch/motion/delete smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, full verifier (`/tmp/sm64-modern-m33mu-full-verify.log`, `verify_exit=0`) with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x1af2a780287b2dc9` with 534 rows (`465` Swift, `69` C adapters); physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33mv: Unlock Door Star | `bhvUnlockDoorStar` must preserve the 30-frame rise, yaw-velocity ramp, scale growth, 30-frame wait/menu-star sound, hidden particle phase, and 50-frame post-sound lifetime. | Implemented locally — focused Swift/C contract `0xa818fe2cbab2403f`, shared spawned-star dispatch lane, aggregate/manifest/runtime/live-oracle gates, regenerated strict Swift 6 Xcode Debug build, complete `--verify` matrix with Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x1c009f71986f30d4` with 534 rows (`466` Swift, `68` C adapters); particle child geometry/audio effect promotion, physical visual/performance/thermal/device, release, and human acceptance remain open |
+| M33mw: Track Ball and Scuttlebug ledger closure | `bhvTrackBall` must preserve the signed 16-bit parent-base index gate (`1...5` survives; stale children delete), while `bhvScuttlebugSpawn` is counted against its already-verified Swift spawner owner. | Implemented locally — focused Track Ball Swift/C contract `0x7f3cd721bf073d7f`, active/stale parent-child dispatch smoke, Scuttlebug owner mapping, manifest/runtime/live-oracle/Metal gates, regenerated strict Swift 6 Xcode build, retained complete verifier log `/tmp/sm64-modern-m33mw-full-verify.log` reaching build success, Metal 4 frame one, status-0 engine shutdown, and application stop; behavior manifest `0x478b49ec28547d0e` with 534 rows (`468` Swift, `66` C adapters); route-shard, sanitizer, physical/device/performance/thermal, release, audio/effect, and human acceptance remain open |
+| M33mx: Volcano Falling Trap | `bhvLllVolcanoFallingTrap` must preserve the Mario-radius trigger, accelerating impact pitch clamp, large-pound/camera-shake edge, eight-frame sine lift, 50-frame rise transition, and 200-frame reset. | Implemented locally — focused Swift/C contract `0x7d60df81755c4d3d`, shared LLL trap dispatch, trigger/impact/rise/reset smoke, manifest/runtime/live-oracle/Metal gates, regenerated strict Swift 6 Xcode build, complete verifier `/tmp/sm64-modern-m33mx-full-verify.log` with `verify_exit=0`, Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x21d168433820cac2` with 534 rows (`469` Swift, `65` C adapters); route-shard, sanitizer, physical/device/performance/thermal, release, audio/effect, and human acceptance remain open |
+| M33my: TTM/LLL Rolling Log family | `bhvTtmRollingLog` and `bhvLllRollingLog` must preserve platform-driven pitch acceleration, home/far damping toward zero/`0x100`, canonical yaw movement, authored endpoint rollback, and roll-sound cadence. | Implemented locally — shared focused Swift/C contract `0x8ceff3be0ab6b31e`, two-identity trap-lane dispatch smoke, manifest/runtime/live-oracle/Metal gates, regenerated strict Swift 6 Xcode build, complete verifier `/tmp/sm64-modern-m33my-full-verify.log` with `verify_exit=0`, Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x35687163b03770f3` with 534 rows (`471` Swift, `63` C adapters); route-shard, sanitizer, physical/device/performance/thermal, release, audio/effect, and human acceptance remain open |
+| M33mz: Tox Box | `bhvToxBox` must preserve direction-table action selection, timer-20 waits, eight-frame movement/rotation cadence, authored vertical transform, move sound/shake edges, and collision-model loading. | Implemented locally — focused Swift/C contract `0x94a72bac32bcb54b`, shared collision dispatch, action/collision smoke, manifest/runtime/live-oracle/Metal gates, regenerated strict Swift 6 Xcode build, complete verifier `/tmp/sm64-modern-m33mz-full-verify.log` with `verify_exit=0`, Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x588c2e8f5b914266` with 534 rows (`472` Swift, `62` C adapters); route-shard, sanitizer, physical/device/performance/thermal, release, audio/effect, and human acceptance remain open |
+| M33na: Mr. I blue-coin ledger correction | `bhvMrIBlueCoin` already executes through the verified Mr. I owner and now counts explicitly in the coverage manifest. | Implemented locally — manifest-only Swift-owner mapping validated by `./script/test_behavior_manifest.sh` at `0x3e9458888f34b92e` with `473` Swift rows and `61` C adapters; no runtime code changed after M33mz, so the next full verifier must carry the corrected fingerprint before this ledger correction is fully closed |
+| M33nb: TTM/THI Bowling Ball spawners | `bhvTtmBowlingBallSpawner` and `bhvThiBowlingBallSpawner` must preserve period-128/64 admission, 8,000/12,000-unit spawn radii, Mario-height and near-player fences, behavior-param propagation, and generation-safe child allocation through the existing Bowling Ball owner. | Implemented locally — aggregate TTM/THI child allocation smoke, Mr. I blue-coin ledger mapping, manifest/runtime/live-oracle/Metal gates, regenerated strict Swift 6 Xcode build, complete verifier `/tmp/sm64-modern-m33nb-full-verify.log` with `verify_exit=0`, Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0x181b05d3df64670c` with 534 rows (`475` Swift, `59` C adapters); route-shard, sanitizer, physical/device/performance/thermal, release, audio/effect, and human acceptance remain open |
+| M33nc: Pit Bowling Ball | `bhvPitBowlingBall` must preserve gravity/friction/buoyancy initialization, flat-floor 28-unit forward velocity, hitbox/visibility, camera-shake, and environment-roll sound effects through the Bowling Ball owner. | Implemented locally — focused Bowling Ball contract `0x88570fdd4c786c82` remains matched, pit physics/effect dispatch smoke, manifest/runtime/live-oracle/Metal gates, regenerated strict Swift 6 Xcode build, complete verifier `/tmp/sm64-modern-m33nc-full-verify.log` with `verify_exit=0`, Apple M5 Max Metal 4 frame-one/status-0 host evidence, shell syntax, and `git diff --check` pass; behavior manifest `0xe69be08621cbc0da` with 534 rows (`476` Swift, `58` C adapters); route-shard, sanitizer, physical/device/performance/thermal, release, audio/effect, and human acceptance remain open |
+| M33ne: SSL/THI/Pyramid environment family | `bhvSslMovingPyramidWall`, `bhvThiHugeIslandTop`, `bhvThiTinyIslandTop`, and `bhvPyramidTopFragment` preserve authored start offsets, 100-frame ±5.12 wall motion, THI water-drain/pound gates, environment writes, fragment spin, and timer-60 retirement. | Implemented locally — focused contracts `0x303f2d4f9153d591`, `0xaf302a9065f8736c`, and `0xe99b6f194e4e8396`, aggregate/runtime/live/Metal gates, and matrix/strict build pass; retained verifier `/tmp/sm64-modern-m33ne-full-verify.log` reaches `** BUILD SUCCEEDED **` but host LaunchServices `-10827` prevents a current full host closure. Manifest `0x0da99c3fe082de39` has 534 rows (`480` Swift, `54` C adapters); route-shard, sanitizer, host recovery, physical/device/performance/thermal, release, audio/effect, and human acceptance remain open |
+| M33nf: Pyramid pillar touch detectors | `bhvPyramidPillarTouchDetector` must preserve tangible collision admission, parent touched-count increment, and detector deactivation on Mario contact. | Implemented locally — focused contract `0xbe7829c4abd81985`, aggregate/runtime/live/Metal gates, and manifest `0x97fdfcfb56219817` with 534 rows (`481` Swift, `53` C adapters); the latest host verifier remains blocked by LaunchServices `-10827`, while prior M33nc host proof is retained |
+| M33ng: Pyramid Top parent | `bhvPyramidTop` must preserve the four-pillar solve transition, spin/explosion sound edges, fragment emission counts, yaw acceleration, and deactivation state. | Implemented locally — focused contract `0xbcc9c4f70394755f`, aggregate/runtime/live/Metal gates, and manifest `0x6f35083bdf103ad9` with 534 rows (`483` Swift, `51` C adapters); the latest host verifier remains blocked by LaunchServices `-10827`, while prior M33nc host proof is retained |
+| M33nh: Metal Cap | `bhvMetalCap` must preserve gravity/friction/buoyancy initialization, yaw roll, timer-21 tangibility, cap hitbox, opacity, and post-300-frame retirement. | Implemented locally — focused contract `0x7d801e7751989d7e`, cap-lane dispatch, aggregate/runtime/live/Metal gates, and manifest `0xf2bb37d4f264e7f7` with 534 rows (`484` Swift, `50` C adapters); the latest host verifier remains blocked by LaunchServices `-10827`, while prior M33nc host proof is retained |
+| M33ni: Vanish Cap | `bhvVanishCap` must preserve gravity/friction/buoyancy initialization, yaw roll, timer-21 tangibility, translucent opacity, cap hitbox, and lifetime fence. | Implemented locally — focused contract `0xbdb3f6492e88f4fa`, shared cap dispatch, aggregate/runtime/live/Metal gates, and manifest `0xc1b90ecb4f66a6e6` with 534 rows (`485` Swift, `49` C adapters); the latest host verifier remains blocked by LaunchServices `-10827`, while prior M33nc host proof is retained |
+| M33nj: Wing Cap | `bhvWingCap` must preserve gravity/friction/buoyancy initialization, yaw roll, timer-21 tangibility, opaque opacity, cap hitbox, and lifetime fence. | Implemented locally — focused contract `0xbe5f068bbc416fc6`, shared cap dispatch, aggregate/runtime/live/Metal gates, and manifest `0xeba09e9ed494e209` with 534 rows (`486` Swift, `48` C adapters); the latest host verifier remains blocked by LaunchServices `-10827`, while prior M33nc host proof is retained |
+| M33nk: Snowman Head | `bhvSnowmansHead` must preserve 0.7 scale, gravity/friction/buoyancy initialization, dialog action gates, falling collision transition, -994 Y clamp, explosion/jingle edge, and post-dialog mist/star intent. | Implemented locally — focused contract `0x2eb225e676e807a4`, explicit snowman-head dispatch/owner bridge, aggregate/runtime/live/Metal gates, manifest `0x315aaf6ce5ab1f31` with 534 rows (`488` Swift, `46` C adapters), XcodeGen regeneration, shell syntax, and `git diff --check` pass; the latest full host verifier remains blocked by LaunchServices `-10827`, while prior M33nc host proof is retained |
+| M33md: Haunted Chair | `bhvHauntedChair` must preserve piano/free initialization state, 31-frame lift admission, 50-frame rise, 40-frame launch countdown, launch velocity/sound edge, hitbox setup, and ground/wall retirement. | Implemented locally — focused Swift/C contract `0x7381c9aed05b4b42`, dispatch/lift/launch smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x37c9138dc04c8a14` with 534 rows (`445` Swift, `89` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
+| M33me: Whirlpool | `bhvWhirlpool` must preserve the 5,000-unit visibility/bubble gate, source orientation values, yaw rotation cadence, water-sound intent, and whirlpool hitbox ownership. | Implemented locally — focused Swift/C contract `0x61362df8181e01ae`, dispatch/shared-wind/bubble/rotation smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0xe887dabeda31e43b` with 534 rows (`446` Swift, `88` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | In progress — M33a inventory contract is complete; shard execution, C-vs-Swift schema-4 byte comparison, zero-unexecuted closure, and sanitizer reruns remain |
 | M34a: Metal 4 command/residency contract | Every reusable MTL4 command buffer redeclares scene/layer residency after begin; legacy binding APIs and display-link drawable acquisition are rejected; explicit barrier and presentation ordering remain checked. | Complete locally — focused Metal 4 source/scene smokes, 140-script matrix (`runs=140 failures=0`), regenerated native Swift 6 Debug build, bounded API/GPU validation run with clean normal shutdown, 8.3 MiB `gpucapture` plus `gpudebug` inspection, and `git diff --check` pass; sustained capture, resize/pause stress, visual parity, and physical/human acceptance remain open |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | In progress — M34a closes the source/resource contract and M34b closes separate API/shader-validation plus GPU-capture passes, four owner-thread resize applications, pause/resume, and clean Release shutdown; warm visual comparison, device-loss/minimize coverage, archive-reuse proof, physical display behavior, and human acceptance remain |
@@ -2797,6 +5628,86 @@ This is the execution order for the remaining rewrite. A milestone is not
 closed by compiling a type or by a fixture-only smoke: each work package must
 produce a Swift-owned implementation, an independent C oracle contract, a
 replayable trace, and the platform evidence listed in its exit gate.
+
+### Ultra-level autonomous completion plan (M33nk onward)
+
+The remaining rewrite is executed as a repeating, evidence-producing loop. A
+route is never counted as migrated because a Swift file exists; it is counted
+only after the value kernel, owner bridge, C oracle, dispatch identity,
+manifest row, live trace, and strict build all agree. The current checkpoint
+is M33nk: 534 reachable declarations, 488 Swift-owned rows, 46 explicit C
+adapters; matrix/build are green, while the external LaunchServices host gate
+is pending recovery. The
+host result is still not physical visual, performance, thermal, release, or
+human acceptance.
+
+1. **Close the behavior adapter ledger in source order.** Start with compact
+   particle/ambient/cannon/cloud families, then move through collision,
+   global-state, environment, NPC, boss, menu, camera, audio, and save
+   families. For each reachable C declaration: extract the exact action
+   machine and list/parent ordering; define fixed-width `Sendable` input and
+   output values; implement the pure Swift reducer; attach a generation-safe
+   owner bridge; preserve C as an explicit invalid-input fallback; and add a
+   focused C↔Swift fingerprint contract. Every slice updates
+   `BehaviorDispatchBridge`, the coverage manifest, the route oracle source
+   lists, and the goal/handoff ledger in the same iteration.
+
+2. **Promote behavior from compatibility to authority.** For each migrated
+   family, add a live owner-thread probe that consumes copied C POD state,
+   commits the Swift result only after exact byte parity, and records the
+   schema-4 domain/effect/render/audio/save receipts. Re-run the paired C
+   oracle, reject missing/extra records and first divergence, and persist a
+   terminal shard report. No fixture-only output, guessed zero, or raw C
+   pointer may close a shard.
+
+3. **Close all 7,419 reachable route shards.** Generate the deterministic
+   inventory and shard manifest from the content pack; execute every course,
+   area, star/red-coin path, enemy/platform/hazard family, NPC/puzzle, boss
+   phase, camera/cutscene, menu/transition, audio sequence, save mutation,
+   death/warp/retry, and edge/failure route. Each shard runs from an isolated
+   initial-save/input/timebase/build fingerprint under Debug, sanitizer, and
+   optimized configurations. The terminal report must say `passed` with
+   exact C/Swift bytes and zero planned/running/unexecuted rows; any blocked
+   hardware route stays explicitly blocked rather than silently promoted.
+
+4. **Make Swift 6 strictness boring.** Keep mutable engine state on the
+   dedicated owner thread; use immutable value snapshots across callbacks;
+   require `Sendable` trace/effect/content types; and confine Metal/AppKit/AVF
+   handles to their owners. Re-run `SWIFT_VERSION=6` with complete strict
+   concurrency after each slice, audit `@unchecked Sendable`, pointer casts,
+   global mutable state, and callback captures, then run ASan/UBSan/TSan and a
+   normal rebuild. A remaining unsafe leaf must name its owner, lifetime,
+   synchronization, and fallback proof.
+
+5. **Finish Metal 4 production evidence.** Keep the M34a source contract and
+   M34b two-pass rule: API/shader validation is separate from GPU capture.
+   Validate reusable `MTL4CommandBuffer`/allocator lifetimes, argument tables,
+   private/memoryless resources, residency re-declaration, barriers/events,
+   pipeline/archive reuse, drawable wait/commit/signal/present order, resize,
+   pause/resume, minimize/device-loss recovery, HDR/sRGB/depth behavior, and
+   clean GPU-drained shutdown. Capture the real `CAMetalLayer`, inspect it with
+   `gpudebug`, compare against C render packets/screenshots, and publish FPS,
+   GPU time, memory, and thermal evidence separately from compile proof.
+
+6. **Release and human-acceptance closure.** Archive Debug and Release from
+   isolated derived data; sign every nested binary with the intended identity;
+   notarize/staple DMG and ZIP; verify Gatekeeper on a clean machine; and run
+   first-launch/no-content, ROM import/invalid ROM, corrupt-save recovery,
+   controller reconnect, audio-route change, resize/display, and 60/30 cadence
+   scenarios. Finish with a fresh-save human 120-star pass covering controls,
+   camera feel, collision, audio, haptics, menus, visuals, credits, and
+   ending. Record source/build/install/launch, physical, release/store, and
+   human evidence as independent gates.
+
+**Per-slice exit checklist:** focused Swift/C contract; dispatch identity and
+owner smoke; manifest row/fingerprint; engine-runtime and live-route oracle;
+route-shard replay/ledger; strict Swift 6 Xcode build; relevant Metal 4 source
+contract; shell syntax and `git diff --check`; updated goal/memory/handoff;
+and an explicit list of evidence still unavailable. **100% means** zero
+unmigrated reachable adapters, zero unqualified route shards, no strict Swift
+6 diagnostics, no legacy Metal 3 API surface, clean validation/capture/
+sanitizer runs, and independent runtime/device/release/visual/performance/
+thermal/human gates all closed.
 
 ### Phase A — finish the camera and gameplay substrate (M16i–M16k)
 
@@ -3337,3 +6248,5 @@ Load `porting-methodology`, `porting-start-milestone`, `porting-execute`, `porti
 - Declarative data is generated into the content pack; executable behavior is Swift-owned.
 - ROM-derived assets are never committed or shipped in public source artifacts.
 - The native app keeps C fallback permanently, but Swift authority is the default and the only mode used for final full-game qualification.
+cage-child, and sunken-ship terminal/helper routes are now
+cage-child, sunken-ship terminal/helper, and static collision-load routes are now

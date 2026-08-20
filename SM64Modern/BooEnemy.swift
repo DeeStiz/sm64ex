@@ -32,6 +32,15 @@ struct SM64BooHitbox: Equatable, Sendable {
         hurtboxRadius: 40,
         hurtboxHeight: 60
     )
+
+    static let withCage = Self(
+        interactType: 1 << 15,
+        damageOrCoinValue: 3,
+        radius: 180,
+        height: 140,
+        hurtboxRadius: 80,
+        hurtboxHeight: 120
+    )
 }
 
 struct SM64BooState: Equatable, Sendable {
@@ -69,8 +78,8 @@ struct SM64BooState: Equatable, Sendable {
     var markedForDeletion = false
     var timer: UInt32 = 0
 
-    init(homeX: Float = 0, homeY: Float = 0, homeZ: Float = 0, moveYaw: Int16 = 0) {
-        self.hitbox = .standard
+    init(homeX: Float = 0, homeY: Float = 0, homeZ: Float = 0, moveYaw: Int16 = 0, hitbox: SM64BooHitbox = .standard, baseScale: Float = 1) {
+        self.hitbox = hitbox
         self.homeX = homeX
         self.homeY = homeY
         self.homeZ = homeZ
@@ -80,6 +89,7 @@ struct SM64BooState: Equatable, Sendable {
         self.initialMoveYaw = moveYaw
         self.moveYaw = moveYaw
         self.faceYaw = moveYaw
+        self.baseScale = baseScale
     }
 }
 
@@ -177,7 +187,7 @@ enum SM64BooKernel {
             state.forwardVelocity = 0
             state.velocityY = 0
             state.gravity = 0
-            state.baseScale = 1
+            state.baseScale = state.baseScale == 0 ? 1 : state.baseScale
             state.targetOpacity = 255
             state.tangible = false
             state.interactionType = 0
