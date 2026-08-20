@@ -59,6 +59,18 @@
   archive and a live post-resume drawable are still required. Handoff:
   `.porting/porting-handoff-full-swift-twin-M34c-warmup-stress.md`.
 
+- M33 Act Selector central integration checkpoint (2026-08-20) wires the new
+  generation-safe parent/child selector owner into `BehaviorDispatchBridge`,
+  shares the existing star-type bridge, preserves parent-first child updates,
+  and promotes `bhvActSelector` in the manifest. The manifest is now 534 rows
+  with 490 Swift owners and 44 C adapters at `0x025e2ed348e1c5ff`.
+  `test_act_selector.sh`, behavior manifest/coverage, dispatch bridge, engine
+  runtime, and strict Debug checks pass. Sushi Shark, NPC/menu, Squarish Path
+  Moving, Pushable Metal Box, Tilting Bowser Lava Platform, LLL Bowser Puzzle,
+  Snowman Bottom, and Treasure Chest remain local-only pending central wiring.
+  Handoff:
+  `.porting/porting-handoff-full-swift-twin-phase3-act-selector-integration.md`.
+
 - M33h qualifies a bounded native Mario gameplay promotion slice. The
   opt-in `SM64_MODERN_AUTOMATED_MARIO=1` owner-thread probe invokes the
   production Mario button and ground-speed callbacks after the normal C step,

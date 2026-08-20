@@ -259,6 +259,7 @@ enum SM64BehaviorDispatchRoute: UInt16, Equatable, Sendable {
     case unmigrated = 255
     case snowmanHead = 256
     case madPiano = 257
+    case actSelector = 258
 }
 
 struct SM64BehaviorDispatchEvent: Equatable, Sendable {
@@ -547,6 +548,7 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let celebrationStarEffects: [SM64CelebrationStarObjectEffectRecord]
     let warpEffects: [SM64WarpObjectEffectRecord]
     let dddWarpEffects: [SM64DddWarpObjectEffectRecord]
+    let actSelectorEffects: [SM64ActSelectorObjectEffectRecord]
     let actSelectorStarTypeEffects: [SM64ActSelectorStarTypeObjectEffectRecord]
     let collectStarEffects: [SM64CollectStarObjectEffectRecord]
     let starSpawnCoordinatesEffects: [SM64StarSpawnCoordinatesObjectEffectRecord]
@@ -843,6 +845,7 @@ final class SM64BehaviorDispatchBridge {
     let celebrationStar: SM64CelebrationStarObjectBridge
     let warp: SM64WarpObjectBridge
     let dddWarp: SM64DddWarpObjectBridge
+    let actSelector: SM64ActSelectorObjectBridge
     let actSelectorStarType: SM64ActSelectorStarTypeObjectBridge
     let collectStar: SM64CollectStarObjectBridge
     let starSpawnCoordinates: SM64StarSpawnCoordinatesObjectBridge
@@ -1129,7 +1132,12 @@ final class SM64BehaviorDispatchBridge {
         self.celebrationStar = SM64CelebrationStarObjectBridge(sparkleBridge: self.celebrationStarSparkle)
         self.warp = SM64WarpObjectBridge()
         self.dddWarp = SM64DddWarpObjectBridge()
-        self.actSelectorStarType = SM64ActSelectorStarTypeObjectBridge()
+        let sharedActSelectorStarType = SM64ActSelectorStarTypeObjectBridge()
+        self.actSelectorStarType = sharedActSelectorStarType
+        self.actSelector = SM64ActSelectorObjectBridge(
+            scheduler: scheduler,
+            starTypeBridge: sharedActSelectorStarType
+        )
         self.collectStar = SM64CollectStarObjectBridge()
         self.starSpawnCoordinates = SM64StarSpawnCoordinatesObjectBridge(sparkleSpawnerBridge: self.sparkleSpawner)
         self.spawnedStar = SM64SpawnedStarObjectBridge(sparkleSpawnerBridge: self.sparkleSpawner)
@@ -1716,6 +1724,8 @@ final class SM64BehaviorDispatchBridge {
             return .dddWarp
         case SM64ActSelectorStarTypeObjectBridge.defaultBehaviorIdentity:
             return .actSelectorStarType
+        case SM64ActSelectorObjectBridge.defaultBehaviorIdentity:
+            return .actSelector
         case SM64CollectStarObjectBridge.defaultBehaviorIdentity:
             return .collectStar
         case SM64StarSpawnCoordinatesObjectBridge.defaultBehaviorIdentity:
@@ -2185,6 +2195,7 @@ final class SM64BehaviorDispatchBridge {
         for id in celebrationStar.registeredIDs { celebrationStar.remove(id) }
         for id in warp.registeredIDs { warp.remove(id) }
         for id in dddWarp.registeredIDs { dddWarp.remove(id) }
+        for id in actSelector.registeredIDs { actSelector.remove(id) }
         for id in actSelectorStarType.registeredIDs { actSelectorStarType.remove(id) }
         for id in collectStar.registeredIDs { collectStar.remove(id) }
         for id in starSpawnCoordinates.registeredIDs { starSpawnCoordinates.remove(id) }
@@ -2482,6 +2493,7 @@ final class SM64BehaviorDispatchBridge {
         warp.beginExternalTick()
         dddWarp.beginExternalTick()
         groundParticleSpawner.beginExternalTick()
+        actSelector.beginExternalTick()
         actSelectorStarType.beginExternalTick()
         collectStar.beginExternalTick()
         starSpawnCoordinates.beginExternalTick()
@@ -4025,6 +4037,15 @@ final class SM64BehaviorDispatchBridge {
     @discardableResult
     func spawnActSelectorStarType(in engineState: SM64SwiftEngineState, type: SM64ActSelectorStarType = .notSelected, position: SM64ObjectVector3 = .zero, size: Float = 1) throws -> SM64ObjectID {
         try actSelectorStarType.spawnStar(in: engineState, type: type, position: position, size: size)
+    }
+
+    @discardableResult
+    func spawnActSelector(
+        in engineState: SM64SwiftEngineState,
+        input: SM64ActSelectorInitializationInput,
+        position: SM64ObjectVector3 = .zero
+    ) throws -> SM64ObjectID {
+        try actSelector.spawnSelector(in: engineState, input: input, position: position)
     }
 
     @discardableResult
@@ -6048,6 +6069,7 @@ final class SM64BehaviorDispatchBridge {
         cloud.beginExternalTick()
         warp.beginExternalTick()
         dddWarp.beginExternalTick()
+        actSelector.beginExternalTick()
         actSelectorStarType.beginExternalTick()
         collectStar.beginExternalTick()
         starSpawnCoordinates.beginExternalTick()
@@ -6560,6 +6582,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.dddWarp.updateInline(id, state: engineState)
             case .actSelectorStarType:
                 _ = self.actSelectorStarType.updateInline(id, state: engineState)
+            case .actSelector:
+                _ = self.actSelector.updateInline(id, state: engineState)
             case .collectStar:
                 _ = self.collectStar.updateInline(id, state: engineState)
             case .starSpawnCoordinates:
@@ -7314,6 +7338,7 @@ final class SM64BehaviorDispatchBridge {
         celebrationStar.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         warp.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         dddWarp.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        actSelector.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         actSelectorStarType.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         collectStar.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         starSpawnCoordinates.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
@@ -7679,6 +7704,7 @@ final class SM64BehaviorDispatchBridge {
             celebrationStarEffects: celebrationStar.effectLog,
             warpEffects: warp.effectLog,
             dddWarpEffects: dddWarp.effectLog,
+            actSelectorEffects: actSelector.effectLog,
             actSelectorStarTypeEffects: actSelectorStarType.effectLog,
             collectStarEffects: collectStar.effectLog,
             starSpawnCoordinatesEffects: starSpawnCoordinates.effectLog,

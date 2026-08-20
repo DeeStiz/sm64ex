@@ -106,6 +106,15 @@ without a post-resume acknowledgement, so M34 visual/device closure remains
 open; the run is retained as a failed evidence attempt, not a passing gate.
 Handoff: `.porting/porting-handoff-full-swift-twin-M34c-warmup-stress.md`.
 
+M33 Act Selector central integration is now complete locally. The owner shares
+the existing star-type bridge, preserves parent-first child updates and
+generation-safe pruning, and the manifest is now 490 Swift owners and 44 C
+adapters at `0x025e2ed348e1c5ff`; the focused route, manifest, dispatch, engine
+runtime, and strict Debug checks pass. The remaining Phase 3 route-local slices
+are not promoted until their central wiring and effect aggregation are closed.
+Handoff:
+`.porting/porting-handoff-full-swift-twin-phase3-act-selector-integration.md`.
+
 The fresh M33ne verifier cleared the complete matrix and regenerated strict
 Swift 6 Xcode build, but the host launch is currently blocked:
 focused/matrix gates matched, the regenerated Swift 6 Debug build succeeded,

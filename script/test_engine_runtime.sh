@@ -43,6 +43,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/DecorativePendulumObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/MadPianoBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/MadPianoObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/ActSelectorBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/ActSelectorObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/NpcMenuBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/NpcMenuObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/PushableMetalBoxBehavior.swift" \
