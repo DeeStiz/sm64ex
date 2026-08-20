@@ -584,6 +584,9 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/UnusedParticleSpawnBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/SnowmanCheckpointBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/SnowmanCheckpointObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SnowmanBottomBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/SnowmanBottomObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SnowmanBottomRouteOwner.swift" \
   "$PROJECT_ROOT/SM64Modern/SnowmanHeadBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/SnowmanHeadObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BowserBodyAnchorBehavior.swift" \

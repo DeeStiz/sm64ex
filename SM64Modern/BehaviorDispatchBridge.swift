@@ -270,6 +270,7 @@ enum SM64BehaviorDispatchRoute: UInt16, Equatable, Sendable {
     case pushableMetalBox = 266
     case tiltingBowserLavaPlatform = 267
     case lllBowserPuzzle = 268
+    case snowmanBottom = 269
 }
 
 struct SM64BehaviorDispatchEvent: Equatable, Sendable {
@@ -291,6 +292,8 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let pushableMetalBoxEffects: [SM64PushableMetalBoxObjectEffectRecord]
     let tiltingBowserLavaPlatformEffects: [SM64TiltingBowserLavaPlatformObjectEffectRecord]
     let lllBowserPuzzleEffects: [SM64LllBowserPuzzleObjectEffectRecord]
+    let snowmanBottomEffects: [SM64SnowmanBottomObjectEffectRecord]
+    let snowmanBottomCheckpointEffects: [SM64SnowmanCheckpointObjectEffectRecord]
     let decorativePendulumEffects: [SM64DecorativePendulumObjectEffectRecord]
     let decorativePendulumDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let respawnerEffects: [SM64RespawnerObjectEffectRecord]
@@ -656,6 +659,7 @@ final class SM64BehaviorDispatchBridge {
     let horizontalGrindel: SM64HorizontalGrindelObjectBridge
     let unusedParticleSpawn: SM64UnusedParticleSpawnObjectBridge
     let snowmanCheckpoint: SM64SnowmanCheckpointObjectBridge
+    let snowmanBottom: SM64SnowmanBottomRouteOwner
     let bowserBodyAnchor: SM64BowserBodyAnchorObjectBridge
     let bowserTailAnchor: SM64BowserTailAnchorObjectBridge
     let snowmanHead: SM64SnowmanHeadObjectBridge
@@ -1108,6 +1112,7 @@ final class SM64BehaviorDispatchBridge {
         self.purpleParticle = SM64PurpleParticleObjectBridge()
         self.unusedParticleSpawn = SM64UnusedParticleSpawnObjectBridge(purpleParticleBridge: self.purpleParticle)
         self.snowmanCheckpoint = SM64SnowmanCheckpointObjectBridge()
+        self.snowmanBottom = SM64SnowmanBottomRouteOwner()
         self.bowserBodyAnchor = SM64BowserBodyAnchorObjectBridge()
         self.bowserTailAnchor = SM64BowserTailAnchorObjectBridge()
         self.snowmanHead = SM64SnowmanHeadObjectBridge()
@@ -1305,6 +1310,8 @@ final class SM64BehaviorDispatchBridge {
             return .unusedParticleSpawn
         case SM64SnowmanCheckpointObjectBridge.defaultBehaviorIdentity:
             return .snowmanCheckpoint
+        case SM64SnowmanBottomObjectBridge.defaultBehaviorIdentity:
+            return .snowmanBottom
         case SM64BowserBodyAnchorObjectBridge.defaultBehaviorIdentity:
             return .bowserBodyAnchor
         case SM64BowserTailAnchorObjectBridge.defaultBehaviorIdentity:
@@ -2086,6 +2093,10 @@ final class SM64BehaviorDispatchBridge {
         for id in horizontalGrindel.registeredIDs { horizontalGrindel.remove(id) }
         for id in unusedParticleSpawn.registeredIDs { unusedParticleSpawn.remove(id) }
         for id in snowmanCheckpoint.registeredIDs { snowmanCheckpoint.remove(id) }
+        snowmanBottom.pruneExternal(
+            unloaded: snowmanBottom.registeredIDs,
+            pool: SM64ObjectPool(capacity: 1)
+        )
     for id in bowserBodyAnchor.registeredIDs { bowserBodyAnchor.remove(id) }
     for id in bowserTailAnchor.registeredIDs { bowserTailAnchor.remove(id) }
     for id in snowmanHead.registeredIDs { snowmanHead.remove(id) }
@@ -2380,6 +2391,7 @@ final class SM64BehaviorDispatchBridge {
         horizontalGrindel.beginExternalTick()
         unusedParticleSpawn.beginExternalTick()
         snowmanCheckpoint.beginExternalTick()
+        snowmanBottom.beginExternalTick()
         bowserBodyAnchor.beginExternalTick()
         bowserTailAnchor.beginExternalTick()
         snowmanHead.beginExternalTick()
@@ -5149,6 +5161,19 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnSnowmanBottom(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        parentHead: SM64ObjectID? = nil
+    ) throws -> SM64ObjectID {
+        try snowmanBottom.spawn(
+            in: engineState,
+            position: position,
+            parentHead: parentHead
+        )
+    }
+
+    @discardableResult
     func spawnSnowmanHead(in engineState: SM64SwiftEngineState, position: SM64ObjectVector3 = .zero) throws -> SM64ObjectID {
         try snowmanHead.spawn(in: engineState, position: position)
     }
@@ -6120,6 +6145,7 @@ final class SM64BehaviorDispatchBridge {
         horizontalGrindel.beginExternalTick()
         unusedParticleSpawn.beginExternalTick()
         snowmanCheckpoint.beginExternalTick()
+        snowmanBottom.beginExternalTick()
         bowserBodyAnchor.beginExternalTick()
         bowserTailAnchor.beginExternalTick()
         snowmanHead.beginExternalTick()
@@ -6438,7 +6464,14 @@ final class SM64BehaviorDispatchBridge {
             case .unusedParticleSpawn:
                 _ = self.unusedParticleSpawn.updateInline(id, state: engineState)
             case .snowmanCheckpoint:
+                let parentID = record.parent
+                if let parentRecord = engineState.objects.record(for: parentID),
+                   parentRecord.behaviorIdentity == SM64SnowmanBottomObjectBridge.defaultBehaviorIdentity {
+                    break
+                }
                 _ = self.snowmanCheckpoint.updateInline(id, state: engineState)
+            case .snowmanBottom:
+                _ = self.snowmanBottom.updateInline(id, state: engineState)
             case .snowmanHead:
                 _ = self.snowmanHead.updateInline(id, state: engineState)
             case .madPiano:
@@ -7079,6 +7112,7 @@ final class SM64BehaviorDispatchBridge {
             horizontalGrindel.remove(id)
             unusedParticleSpawn.remove(id)
             snowmanCheckpoint.remove(id)
+            snowmanBottom.remove(id, state: engineState)
             snowmanHead.remove(id)
             bowserBodyAnchor.remove(id)
             bowserTailAnchor.remove(id)
@@ -7355,6 +7389,7 @@ final class SM64BehaviorDispatchBridge {
         for id in snowmanCheckpoint.registeredIDs where engineState.objects.record(for: id) == nil {
             snowmanCheckpoint.remove(id)
         }
+        snowmanBottom.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         for id in snowmanHead.registeredIDs where engineState.objects.record(for: id) == nil {
             snowmanHead.remove(id)
         }
@@ -7762,6 +7797,8 @@ final class SM64BehaviorDispatchBridge {
             pushableMetalBoxEffects: pushableMetalBox.effectLog,
             tiltingBowserLavaPlatformEffects: tiltingBowserLavaPlatform.effectLog,
             lllBowserPuzzleEffects: lllBowserPuzzle.effectLog,
+            snowmanBottomEffects: snowmanBottom.bottomEffects,
+            snowmanBottomCheckpointEffects: snowmanBottom.checkpointEffects,
             decorativePendulumEffects: decorativePendulum.effectLog,
             decorativePendulumDeliveries: decorativePendulum.deliveryLog,
             respawnerEffects: respawner.effectLog,

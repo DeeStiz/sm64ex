@@ -380,6 +380,7 @@ struct SM64BehaviorCoverageManifestTool {
         "bhvHorizontalGrindel": ("HorizontalGrindelObjectBridge", "horizontal Grindel movement/collision route"),
         "bhvUnusedParticleSpawn": ("UnusedParticleSpawnObjectBridge", "collision-triggered purple-particle spawner route"),
         "bhvSnowmansBodyCheckpoint": ("SnowmanCheckpointObjectBridge", "parent-linked snowman checkpoint route"),
+        "bhvSnowmansBottom": ("SnowmanBottomRouteOwner", "Snowman bottom parent/checkpoint owner route"),
         "bhvSnowmansHead": ("SnowmanHeadObjectBridge", "snowman head dialog/fall/reward route"),
         "bhvBowserBodyAnchor": ("BowserBodyAnchorObjectBridge", "parent-transform Bowser body hitbox route"),
         "bhvBowserTailAnchor": ("BowserTailAnchorObjectBridge", "parent-linked Bowser tail tangible route"),
