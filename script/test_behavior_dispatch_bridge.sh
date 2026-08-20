@@ -62,6 +62,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BBHTiltingTrapPlatformObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/LLLSinkingPlatformBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/LLLSinkingPlatformObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/LllBowserPuzzleBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/LllBowserPuzzleObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/WfRotatingWoodenPlatformBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/WfRotatingWoodenPlatformObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/RotatingOctagonalPlatformBehavior.swift" \

@@ -269,6 +269,7 @@ enum SM64BehaviorDispatchRoute: UInt16, Equatable, Sendable {
     case squarishPathMoving = 265
     case pushableMetalBox = 266
     case tiltingBowserLavaPlatform = 267
+    case lllBowserPuzzle = 268
 }
 
 struct SM64BehaviorDispatchEvent: Equatable, Sendable {
@@ -289,6 +290,7 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let squarishPathMovingEffects: [SM64SquarishPathMovingObjectEffectRecord]
     let pushableMetalBoxEffects: [SM64PushableMetalBoxObjectEffectRecord]
     let tiltingBowserLavaPlatformEffects: [SM64TiltingBowserLavaPlatformObjectEffectRecord]
+    let lllBowserPuzzleEffects: [SM64LllBowserPuzzleObjectEffectRecord]
     let decorativePendulumEffects: [SM64DecorativePendulumObjectEffectRecord]
     let decorativePendulumDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let respawnerEffects: [SM64RespawnerObjectEffectRecord]
@@ -813,6 +815,7 @@ final class SM64BehaviorDispatchBridge {
     let squarishPathMoving: SM64SquarishPathMovingObjectBridge
     let pushableMetalBox: SM64PushableMetalBoxObjectBridge
     let tiltingBowserLavaPlatform: SM64TiltingBowserLavaPlatformObjectBridge
+    let lllBowserPuzzle: SM64LllBowserPuzzleObjectBridge
     let strongWindParticle: SM64StrongWindParticleObjectBridge
     let waterParticle: SM64WaterParticleObjectBridge
     let plungeBubble: SM64PlungeBubbleObjectBridge
@@ -1048,6 +1051,7 @@ final class SM64BehaviorDispatchBridge {
         self.squarishPathMoving = SM64SquarishPathMovingObjectBridge()
         self.pushableMetalBox = SM64PushableMetalBoxObjectBridge()
         self.tiltingBowserLavaPlatform = SM64TiltingBowserLavaPlatformObjectBridge()
+        self.lllBowserPuzzle = SM64LllBowserPuzzleObjectBridge()
         self.strongWindParticle = SM64StrongWindParticleObjectBridge()
         self.waterParticle = SM64WaterParticleObjectBridge(waterSplashBridge: self.waterSplash)
         self.plungeBubble = SM64PlungeBubbleObjectBridge(waterParticleBridge: self.waterParticle)
@@ -1696,6 +1700,9 @@ final class SM64BehaviorDispatchBridge {
             return .pushableMetalBox
         case SM64TiltingBowserLavaPlatformObjectBridge.defaultBehaviorIdentity:
             return .tiltingBowserLavaPlatform
+        case SM64LllBowserPuzzleObjectBridge.puzzleBehaviorIdentity,
+             SM64LllBowserPuzzleObjectBridge.pieceBehaviorIdentity:
+            return .lllBowserPuzzle
         case SM64StrongWindParticleObjectBridge.visibleBehaviorIdentity,
              SM64StrongWindParticleObjectBridge.tinyBehaviorIdentity:
             return .strongWindParticle
@@ -2229,6 +2236,7 @@ final class SM64BehaviorDispatchBridge {
         for id in squarishPathMoving.registeredIDs { squarishPathMoving.remove(id) }
         for id in pushableMetalBox.registeredIDs { pushableMetalBox.remove(id) }
         for id in tiltingBowserLavaPlatform.registeredIDs { tiltingBowserLavaPlatform.remove(id) }
+        for id in lllBowserPuzzle.registeredIDs { lllBowserPuzzle.remove(id) }
         for id in strongWindParticle.registeredIDs { strongWindParticle.remove(id) }
         for id in waterParticle.registeredIDs { waterParticle.remove(id) }
         for id in plungeBubble.registeredIDs { plungeBubble.remove(id) }
@@ -2535,6 +2543,7 @@ final class SM64BehaviorDispatchBridge {
         squarishPathMoving.beginExternalTick()
         pushableMetalBox.beginExternalTick()
         tiltingBowserLavaPlatform.beginExternalTick()
+        lllBowserPuzzle.beginExternalTick()
         strongWindParticle.beginExternalTick()
         waterParticle.beginExternalTick()
         plungeBubble.beginExternalTick()
@@ -2952,6 +2961,36 @@ final class SM64BehaviorDispatchBridge {
             in: engineState,
             position: position,
             faceAngles: faceAngles,
+            model: model
+        )
+    }
+
+    @discardableResult
+    func spawnLllBowserPuzzle(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        distanceToMario: Float = 19_000,
+        model: UInt32 = SM64LllBowserPuzzleObjectBridge.defaultModel
+    ) throws -> SM64ObjectID {
+        try lllBowserPuzzle.spawnPuzzle(
+            in: engineState,
+            position: position,
+            distanceToMario: distanceToMario,
+            model: model
+        )
+    }
+
+    @discardableResult
+    func spawnLllBowserPuzzlePiece(
+        in engineState: SM64SwiftEngineState,
+        parent: SM64ObjectID,
+        sourceIndex: Int,
+        model: UInt32? = nil
+    ) throws -> SM64ObjectID {
+        try lllBowserPuzzle.spawnPiece(
+            in: engineState,
+            parent: parent,
+            sourceIndex: sourceIndex,
             model: model
         )
     }
@@ -6238,6 +6277,7 @@ final class SM64BehaviorDispatchBridge {
         squarishPathMoving.beginExternalTick()
         pushableMetalBox.beginExternalTick()
         tiltingBowserLavaPlatform.beginExternalTick()
+        lllBowserPuzzle.beginExternalTick()
         strongWindParticle.beginExternalTick()
         waterParticle.beginExternalTick()
         plungeBubble.beginExternalTick()
@@ -6593,6 +6633,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.pushableMetalBox.updateInline(id, state: engineState)
             case .tiltingBowserLavaPlatform:
                 _ = self.tiltingBowserLavaPlatform.updateInline(id, state: engineState)
+            case .lllBowserPuzzle:
+                _ = self.lllBowserPuzzle.updateInline(id, state: engineState)
             case .staticCheckeredPlatform:
                 _ = self.staticCheckeredPlatform.updateInline(id, state: engineState)
             case .bbhTiltingTrapPlatform:
@@ -7191,6 +7233,7 @@ final class SM64BehaviorDispatchBridge {
             toadMessage.remove(id)
             menuButton.remove(id)
             tiltingBowserLavaPlatform.remove(id)
+            lllBowserPuzzle.remove(id)
             strongWindParticle.remove(id)
             waterParticle.remove(id)
             plungeBubble.remove(id)
@@ -7580,6 +7623,7 @@ final class SM64BehaviorDispatchBridge {
         toadMessage.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         menuButton.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         tiltingBowserLavaPlatform.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        lllBowserPuzzle.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         for id in Array(sushiWaterLevels.keys) where engineState.objects.record(for: id) == nil {
             sushiWaterLevels.removeValue(forKey: id)
         }
@@ -7717,6 +7761,7 @@ final class SM64BehaviorDispatchBridge {
             squarishPathMovingEffects: squarishPathMoving.effectLog,
             pushableMetalBoxEffects: pushableMetalBox.effectLog,
             tiltingBowserLavaPlatformEffects: tiltingBowserLavaPlatform.effectLog,
+            lllBowserPuzzleEffects: lllBowserPuzzle.effectLog,
             decorativePendulumEffects: decorativePendulum.effectLog,
             decorativePendulumDeliveries: decorativePendulum.deliveryLog,
             respawnerEffects: respawner.effectLog,

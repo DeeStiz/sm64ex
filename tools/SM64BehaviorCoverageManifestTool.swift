@@ -50,6 +50,8 @@ struct SM64BehaviorCoverageManifestTool {
         "bhvMenuButtonManager": ("MenuButtonObjectBridge", "file-select menu manager owner route"),
         "bhvPushableMetalBox": ("PushableMetalBoxObjectBridge", "pushable metal box value/owner route"),
         "bhvTiltingBowserLavaPlatform": ("TiltingBowserLavaPlatformObjectBridge", "Bowser 2 tilting lava platform value/owner route"),
+        "bhvLllBowserPuzzle": ("LllBowserPuzzleObjectBridge", "LLL Bowser puzzle spawner/coin owner route"),
+        "bhvLllBowserPuzzlePiece": ("LllBowserPuzzleObjectBridge", "LLL Bowser puzzle surface-list piece owner route"),
         "bhvMadPiano": ("MadPianoObjectBridge", "Mad Piano value kernel plus generation-safe owner bridge"),
         "bhvActSelector": ("ActSelectorObjectBridge", "act-selector parent/child value/owner route"),
         "bhvArrowLift": ("ArrowLiftObjectBridge", "arrow-lift value kernel plus owner route"),
