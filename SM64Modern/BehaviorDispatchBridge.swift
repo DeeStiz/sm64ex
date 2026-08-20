@@ -260,6 +260,7 @@ enum SM64BehaviorDispatchRoute: UInt16, Equatable, Sendable {
     case snowmanHead = 256
     case madPiano = 257
     case actSelector = 258
+    case sushiShark = 259
 }
 
 struct SM64BehaviorDispatchEvent: Equatable, Sendable {
@@ -487,6 +488,7 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let piranhaPlantWakingBubbleEffects: [SM64PiranhaPlantWakingBubbleObjectEffectRecord]
     let piranhaPlantBubbleEffects: [SM64PiranhaPlantBubbleObjectEffectRecord]
     let waveTrailEffects: [SM64WaveTrailObjectEffectRecord]
+    let sushiSharkEffects: [SM64SushiSharkObjectEffectRecord]
     let strongWindParticleEffects: [SM64StrongWindParticleObjectEffectRecord]
     let waterParticleEffects: [SM64WaterParticleObjectEffectRecord]
     let plungeBubbleEffects: [SM64PlungeBubbleObjectEffectRecord]
@@ -785,6 +787,7 @@ final class SM64BehaviorDispatchBridge {
     let piranhaPlantWakingBubble: SM64PiranhaPlantWakingBubbleObjectBridge
     let piranhaPlantBubble: SM64PiranhaPlantBubbleObjectBridge
     let waveTrail: SM64WaveTrailObjectBridge
+    let sushiShark: SM64SushiSharkObjectBridge
     let strongWindParticle: SM64StrongWindParticleObjectBridge
     let waterParticle: SM64WaterParticleObjectBridge
     let plungeBubble: SM64PlungeBubbleObjectBridge
@@ -899,6 +902,7 @@ final class SM64BehaviorDispatchBridge {
     let textSurface: SM64TextSurfaceObjectBridge
     let grandStar: SM64GrandStarObjectBridge
     let betaBowserAnchor: SM64BetaBowserAnchorObjectBridge
+    private var sushiWaterLevels: [SM64ObjectID: Float] = [:]
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
@@ -1010,6 +1014,7 @@ final class SM64BehaviorDispatchBridge {
         self.piranhaPlantWakingBubble = SM64PiranhaPlantWakingBubbleObjectBridge()
         self.piranhaPlantBubble = SM64PiranhaPlantBubbleObjectBridge(wakingBubbleBridge: self.piranhaPlantWakingBubble)
         self.waveTrail = SM64WaveTrailObjectBridge()
+        self.sushiShark = SM64SushiSharkObjectBridge()
         self.strongWindParticle = SM64StrongWindParticleObjectBridge()
         self.waterParticle = SM64WaterParticleObjectBridge(waterSplashBridge: self.waterSplash)
         self.plungeBubble = SM64PlungeBubbleObjectBridge(waterParticleBridge: self.waterParticle)
@@ -1636,6 +1641,9 @@ final class SM64BehaviorDispatchBridge {
         case SM64WaveTrailObjectBridge.marioBehaviorIdentity,
              SM64WaveTrailObjectBridge.objectBehaviorIdentity:
             return .waveTrail
+        case SM64SushiSharkObjectBridge.sushiBehaviorIdentity,
+             SM64SushiSharkObjectBridge.collisionChildBehaviorIdentity:
+            return .sushiShark
         case SM64StrongWindParticleObjectBridge.visibleBehaviorIdentity,
              SM64StrongWindParticleObjectBridge.tinyBehaviorIdentity:
             return .strongWindParticle
@@ -1997,6 +2005,7 @@ final class SM64BehaviorDispatchBridge {
 
     func reset() {
         eventLog.removeAll(keepingCapacity: true)
+        sushiWaterLevels.removeAll(keepingCapacity: true)
         for id in decorativePendulum.registeredIDs { decorativePendulum.remove(id) }
         for id in respawner.registeredIDs { respawner.remove(id) }
         for id in amp.registeredIDs { amp.remove(id) }
@@ -2159,6 +2168,7 @@ final class SM64BehaviorDispatchBridge {
         for id in piranhaPlantWakingBubble.registeredIDs { piranhaPlantWakingBubble.remove(id) }
         for id in piranhaPlantBubble.registeredIDs { piranhaPlantBubble.remove(id) }
         for id in waveTrail.registeredIDs { waveTrail.remove(id) }
+        for id in sushiShark.registeredIDs { sushiShark.remove(id) }
         for id in strongWindParticle.registeredIDs { strongWindParticle.remove(id) }
         for id in waterParticle.registeredIDs { waterParticle.remove(id) }
         for id in plungeBubble.registeredIDs { plungeBubble.remove(id) }
@@ -2456,6 +2466,7 @@ final class SM64BehaviorDispatchBridge {
         piranhaPlantWakingBubble.beginExternalTick()
         piranhaPlantBubble.beginExternalTick()
         waveTrail.beginExternalTick()
+        sushiShark.beginExternalTick()
         strongWindParticle.beginExternalTick()
         waterParticle.beginExternalTick()
         plungeBubble.beginExternalTick()
@@ -3608,6 +3619,25 @@ final class SM64BehaviorDispatchBridge {
             initialScale: initialScale,
             parent: parent
         )
+    }
+
+    @discardableResult
+    func spawnSushiShark(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        orbitAngle: Int32 = 0,
+        waterLevel: Float = 0,
+        marioY: Float = 10_000
+    ) throws -> SM64ObjectID {
+        let id = try sushiShark.spawnSushi(
+            in: engineState,
+            position: position,
+            orbitAngle: orbitAngle,
+            waterLevel: waterLevel,
+            marioY: marioY
+        )
+        sushiWaterLevels[id] = waterLevel
+        return id
     }
 
     @discardableResult
@@ -6504,6 +6534,21 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.piranhaPlantBubble.updateInline(id, state: engineState)
             case .waveTrail:
                 _ = self.waveTrail.updateInline(id, state: engineState)
+            case .sushiShark:
+                if self.sushiShark.updateInline(id, state: engineState),
+                   let effect = self.sushiShark.effectLog.last,
+                   effect.objectID == id,
+                   effect.output.spawnWaveTrail {
+                    _ = try? self.waveTrail.spawnTrail(
+                        in: engineState,
+                        kind: .object,
+                        position: effect.output.position,
+                        waterLevel: self.sushiWaterLevels[id] ?? 100,
+                        globalFrame: engineState.globals.frame,
+                        initialScale: 4,
+                        parent: id
+                    )
+                }
             case .strongWindParticle:
                 _ = self.strongWindParticle.updateInline(id, state: engineState)
             case .waterParticle:
@@ -6922,6 +6967,7 @@ final class SM64BehaviorDispatchBridge {
             piranhaPlantWakingBubble.remove(id)
             piranhaPlantBubble.remove(id)
             waveTrail.remove(id)
+            sushiWaterLevels.removeValue(forKey: id)
             strongWindParticle.remove(id)
             waterParticle.remove(id)
             plungeBubble.remove(id)
@@ -7302,6 +7348,10 @@ final class SM64BehaviorDispatchBridge {
         piranhaPlantWakingBubble.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         piranhaPlantBubble.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         waveTrail.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        sushiShark.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        for id in Array(sushiWaterLevels.keys) where engineState.objects.record(for: id) == nil {
+            sushiWaterLevels.removeValue(forKey: id)
+        }
         strongWindParticle.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         waterParticle.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         plungeBubble.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
@@ -7643,6 +7693,7 @@ final class SM64BehaviorDispatchBridge {
             piranhaPlantWakingBubbleEffects: piranhaPlantWakingBubble.effectLog,
             piranhaPlantBubbleEffects: piranhaPlantBubble.effectLog,
             waveTrailEffects: waveTrail.effectLog,
+            sushiSharkEffects: sushiShark.effectLog,
             strongWindParticleEffects: strongWindParticle.effectLog,
             waterParticleEffects: waterParticle.effectLog,
             plungeBubbleEffects: plungeBubble.effectLog,

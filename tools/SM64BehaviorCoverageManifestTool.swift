@@ -181,6 +181,8 @@ struct SM64BehaviorCoverageManifestTool {
         "bhvPiranhaPlantBubble": ("PiranhaPlantBubbleObjectBridge", "Piranha Plant parent bubble action route"),
         "bhvWaveTrail": ("WaveTrailObjectBridge", "Mario water wave trail route"),
         "bhvObjectWaveTrail": ("WaveTrailObjectBridge", "object-created water wave trail route"),
+        "bhvSushiShark": ("SushiSharkObjectBridge", "Sushi shark movement/collision/effect route"),
+        "bhvSushiSharkCollisionChild": ("SushiSharkObjectBridge", "Sushi shark invisible collision child route"),
         "bhvStrongWindParticle": ("StrongWindParticleObjectBridge", "strong wind hazard particle route"),
         "bhvTinyStrongWindParticle": ("StrongWindParticleObjectBridge", "tiny strong wind visual particle route"),
         "bhvSmallParticle": ("WaterParticleObjectBridge", "small water particle route"),

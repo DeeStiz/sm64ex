@@ -13,15 +13,18 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 
 ## Current status
 
-The status below is pinned to `nightly` commit `6f586de9` (2026-08-20).
+The status below is pinned to `nightly` continuation commit `98bcbcf5`
+(2026-08-20).
 
-* **M33nk** is the latest behavior-qualification slice. It adds the Snowman
-  Head owner route (`bhvSnowmansHead`) with focused contract
-  `0x2eb225e676e807a4`.
-* The deterministic behavior manifest contains **534 rows**: **488 Swift
-  value/owner routes** and **46 explicit C adapters**. Its current fingerprint
-  is `0x315aaf6ce5ab1f31`.
-* **M34b** is the latest validated Metal 4 production slice. Its two-pass
+* **M33nk** remains the latest numbered behavior-qualification slice. The
+  continuation has centrally promoted Sushi Shark and its collision child
+  (`bhvSushiShark`, `bhvSushiSharkCollisionChild`) through route 259, with
+  focused contract `0x829e2dcf1c565b1a`.
+* The deterministic behavior manifest contains **534 rows**: **492 Swift
+  value/owner routes** and **42 explicit C adapters**. Its current fingerprint
+  is `0xa610f82db91e28f6`.
+* **M34c** is the latest Metal 4 implementation checkpoint; **M34b** remains
+  the latest validated production/capture slice. Its two-pass
   harness keeps API/shader validation separate from GPU capture and exercises
   a real `CAMetalLayer`, resize/pause stress, three captured MTL4 command
   buffers, `BGRA8Unorm` color, and `Depth32Float` depth.
@@ -40,7 +43,7 @@ The source-of-truth tracker and the complete milestone ledger are in
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
-[`../.porting/porting-handoff-full-swift-twin-M33nk.md`](../.porting/porting-handoff-full-swift-twin-M33nk.md).
+[`../.porting/porting-handoff-full-swift-twin-phase4-sushi-integration.md`](../.porting/porting-handoff-full-swift-twin-phase4-sushi-integration.md).
 
 ## Architecture and ownership
 

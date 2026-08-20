@@ -65,12 +65,13 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-At `nightly` commit `6f586de9`, the full-Swift-twin qualification ledger has
-534 behavior rows (488 Swift owners and 46 explicit C adapters), with M33nk as
-the latest behavior slice and M34b as the latest validated Metal 4 production
-slice. Route-shard closure, physical/device/performance/thermal evidence,
-distribution, and human acceptance are still open; this is not a shipped
-full-game Swift port.
+At `nightly` continuation commit `98bcbcf5`, the full-Swift-twin
+qualification ledger has 534 behavior rows (492 Swift owners and 42 explicit C
+adapters), with M33nk as the latest numbered behavior slice, Sushi Shark as
+the latest central promotion, and M34b as the latest validated Metal 4
+production/capture slice. Route-shard closure, physical/device/performance/
+thermal evidence, distribution, and human acceptance are still open; this is
+not a shipped full-game Swift port.
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

@@ -54,6 +54,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/BehaviorDispatchBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/ActSelectorBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/ActSelectorObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SushiSharkBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/SushiSharkObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/ArrowLiftBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/ArrowLiftObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/ElevatorBehavior.swift" \

@@ -1,15 +1,14 @@
-SM64 Modern native macOS — nightly update (2026-08-20)
-1.) Advance the Swift 6 value/owner twin through the M33aa–M33nk behavior
-    batch while retaining the C engine as the parity oracle and fallback.
-2.) Add the matching fixed-width C migration seams, dispatch/manifest entries,
-    route contracts, Swift smoke tests, and generated-project integration.
-3.) Preserve 60/30 timing semantics at course-exit boundaries so one-shot
-    dialog, menu, and cutscene admissions are not lost on a held native tick.
-4.) Keep Metal 4 production evidence split between API/shader validation and
-    GPU capture, with resize/pause stress and explicit `gpudebug` inspection.
-5.) Document the native architecture, qualification commands, and the
-    remaining device, release, and human-acceptance gates in
-    `docs/SM64Modern.md`.
+SM64 Modern native macOS — nightly continuation update (2026-08-20)
+1.) Centrally promote Sushi Shark and its collision child through dispatch
+    route 259, preserving water-level propagation, generation-safe cleanup,
+    and wave-trail child spawning.
+2.) Update the deterministic behavior manifest to 534 rows, 492 Swift owners,
+    and 42 explicit C adapters at `0xa610f82db91e28f6`.
+3.) Preserve the M34c warm-pipeline and resize/pause stress evidence boundary:
+    source/build gates pass, but the three-frame display-link run does not
+    close visual/device acceptance.
+4.) Record the remaining central route promotions, 7,419-shard live closure,
+    M35 distribution, and human-acceptance gates in the goal and handoff docs.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)
