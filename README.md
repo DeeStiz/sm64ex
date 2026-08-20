@@ -66,9 +66,9 @@ gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
 At the current `nightly` continuation, the full-Swift-twin
-qualification ledger has 534 behavior rows (501 Swift owners and 33 explicit C
-adapters), with M33nk as the latest numbered behavior slice, Squarish Path
-Moving as the latest central promotion, and M34b as the latest validated Metal 4
+qualification ledger has 534 behavior rows (511 Swift owners and 23 explicit C
+adapters), with M33nk as the latest numbered behavior slice, Treasure Chest
+route 270 as the latest central promotion, and M34b as the latest validated Metal 4
 production/capture slice. The bounded live-shard executor is now present, but
 route-shard closure, physical/device/performance/thermal evidence,
 distribution, and human acceptance are still open; this is not a shipped

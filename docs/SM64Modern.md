@@ -17,12 +17,12 @@ The status below is pinned to the current `nightly` continuation
 (2026-08-20).
 
 * **M33nk** remains the latest numbered behavior-qualification slice. The
-  continuation has centrally promoted Sushi Shark/collision child and the
-  NPC/menu family (routes 259–264); the NPC/menu focused contract is
-  `0x4ff30b57a3db6922`.
-* The deterministic behavior manifest contains **534 rows**: **501 Swift
-  value/owner routes** and **33 explicit C adapters**. Its current fingerprint
-  is `0x8c31511e7a1aa76c`.
+  continuation has centrally promoted every Phase 2/3 route-local owner
+  through Treasure Chest route 270; the latest focused contract is
+  `0x2dc072092ddbe3ed`.
+* The deterministic behavior manifest contains **534 rows**: **511 Swift
+  value/owner routes** and **23 explicit C adapters**. Its current fingerprint
+  is `0x5e5d8c00a7fab8a3`.
 * **M34c** is the latest Metal 4 implementation checkpoint; **M34b** remains
   the latest validated production/capture slice. Its two-pass
   harness keeps API/shader validation separate from GPU capture and exercises
@@ -43,7 +43,7 @@ The source-of-truth tracker and the complete milestone ledger are in
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
-[`../.porting/porting-handoff-full-swift-twin-phase5-squarish-path.md`](../.porting/porting-handoff-full-swift-twin-phase5-squarish-path.md).
+[`../.porting/porting-handoff-full-swift-twin-phase9-central-route-closure.md`](../.porting/porting-handoff-full-swift-twin-phase9-central-route-closure.md).
 
 ## Architecture and ownership
 
