@@ -40,6 +40,14 @@ struct SM64BehaviorCoverageManifestTool {
 
     private static let swiftRoutes: [String: (owner: String, reason: String)] = [
         "bhvAmp": ("AmpObjectBridge", "value kernel plus generation-safe owner bridge"),
+        "bhvUkiki": ("UkikiObjectBridge", "Ukiki value kernel plus generation-safe owner bridge"),
+        "bhvMacroUkiki": ("UkikiObjectBridge", "shared Macro Ukiki identity on the Ukiki owner route"),
+        "bhvUkikiCage": ("UkikiCageObjectBridge", "Ukiki cage value/owner route"),
+        "bhvUkikiCageStar": ("UkikiCageObjectBridge", "Ukiki cage star child/effect route"),
+        "bhvMips": ("MipsObjectBridge", "MIPS value kernel plus generation-safe owner bridge"),
+        "bhvToadMessage": ("ToadMessageObjectBridge", "Toad message value/owner route"),
+        "bhvMenuButton": ("MenuButtonObjectBridge", "file-select menu button value/owner route"),
+        "bhvMenuButtonManager": ("MenuButtonObjectBridge", "file-select menu manager owner route"),
         "bhvMadPiano": ("MadPianoObjectBridge", "Mad Piano value kernel plus generation-safe owner bridge"),
         "bhvActSelector": ("ActSelectorObjectBridge", "act-selector parent/child value/owner route"),
         "bhvArrowLift": ("ArrowLiftObjectBridge", "arrow-lift value kernel plus owner route"),

@@ -261,6 +261,11 @@ enum SM64BehaviorDispatchRoute: UInt16, Equatable, Sendable {
     case madPiano = 257
     case actSelector = 258
     case sushiShark = 259
+    case ukiki = 260
+    case ukikiCage = 261
+    case mips = 262
+    case toadMessage = 263
+    case menuButton = 264
 }
 
 struct SM64BehaviorDispatchEvent: Equatable, Sendable {
@@ -272,6 +277,12 @@ struct SM64BehaviorDispatchEvent: Equatable, Sendable {
 struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let scheduler: SM64ObjectSchedulerTickResult
     let events: [SM64BehaviorDispatchEvent]
+    let ukikiEffects: [SM64UkikiObjectEffect]
+    let ukikiCageEffects: [SM64UkikiCageObjectEffect]
+    let mipsEffects: [SM64MipsObjectEffect]
+    let toadMessageEffects: [SM64ToadMessageObjectEffect]
+    let menuButtonEffects: [SM64MenuButtonObjectEffect]
+    let menuButtonManagerEffects: [SM64MenuButtonManagerObjectEffect]
     let decorativePendulumEffects: [SM64DecorativePendulumObjectEffectRecord]
     let decorativePendulumDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let respawnerEffects: [SM64RespawnerObjectEffectRecord]
@@ -788,6 +799,11 @@ final class SM64BehaviorDispatchBridge {
     let piranhaPlantBubble: SM64PiranhaPlantBubbleObjectBridge
     let waveTrail: SM64WaveTrailObjectBridge
     let sushiShark: SM64SushiSharkObjectBridge
+    let ukiki: SM64UkikiObjectBridge
+    let ukikiCage: SM64UkikiCageObjectBridge
+    let mips: SM64MipsObjectBridge
+    let toadMessage: SM64ToadMessageObjectBridge
+    let menuButton: SM64MenuButtonObjectBridge
     let strongWindParticle: SM64StrongWindParticleObjectBridge
     let waterParticle: SM64WaterParticleObjectBridge
     let plungeBubble: SM64PlungeBubbleObjectBridge
@@ -1015,6 +1031,11 @@ final class SM64BehaviorDispatchBridge {
         self.piranhaPlantBubble = SM64PiranhaPlantBubbleObjectBridge(wakingBubbleBridge: self.piranhaPlantWakingBubble)
         self.waveTrail = SM64WaveTrailObjectBridge()
         self.sushiShark = SM64SushiSharkObjectBridge()
+        self.ukiki = SM64UkikiObjectBridge(scheduler: scheduler)
+        self.ukikiCage = SM64UkikiCageObjectBridge(scheduler: scheduler)
+        self.mips = SM64MipsObjectBridge(scheduler: scheduler)
+        self.toadMessage = SM64ToadMessageObjectBridge(scheduler: scheduler)
+        self.menuButton = SM64MenuButtonObjectBridge(scheduler: scheduler)
         self.strongWindParticle = SM64StrongWindParticleObjectBridge()
         self.waterParticle = SM64WaterParticleObjectBridge(waterSplashBridge: self.waterSplash)
         self.plungeBubble = SM64PlungeBubbleObjectBridge(waterParticleBridge: self.waterParticle)
@@ -1644,6 +1665,19 @@ final class SM64BehaviorDispatchBridge {
         case SM64SushiSharkObjectBridge.sushiBehaviorIdentity,
              SM64SushiSharkObjectBridge.collisionChildBehaviorIdentity:
             return .sushiShark
+        case SM64UkikiObjectBridge.ukikiBehaviorIdentity,
+             SM64UkikiObjectBridge.macroUkikiBehaviorIdentity:
+            return .ukiki
+        case SM64UkikiCageObjectBridge.cageBehaviorIdentity,
+             SM64UkikiCageObjectBridge.starBehaviorIdentity:
+            return .ukikiCage
+        case SM64MipsObjectBridge.defaultBehaviorIdentity:
+            return .mips
+        case SM64ToadMessageObjectBridge.defaultBehaviorIdentity:
+            return .toadMessage
+        case SM64MenuButtonObjectBridge.buttonBehaviorIdentity,
+             SM64MenuButtonObjectBridge.managerBehaviorIdentity:
+            return .menuButton
         case SM64StrongWindParticleObjectBridge.visibleBehaviorIdentity,
              SM64StrongWindParticleObjectBridge.tinyBehaviorIdentity:
             return .strongWindParticle
@@ -2169,6 +2203,11 @@ final class SM64BehaviorDispatchBridge {
         for id in piranhaPlantBubble.registeredIDs { piranhaPlantBubble.remove(id) }
         for id in waveTrail.registeredIDs { waveTrail.remove(id) }
         for id in sushiShark.registeredIDs { sushiShark.remove(id) }
+        for id in ukiki.registeredIDs { ukiki.remove(id) }
+        for id in ukikiCage.registeredIDs { ukikiCage.remove(id) }
+        for id in mips.registeredIDs { mips.remove(id) }
+        for id in toadMessage.registeredIDs { toadMessage.remove(id) }
+        for id in menuButton.registeredIDs { menuButton.remove(id) }
         for id in strongWindParticle.registeredIDs { strongWindParticle.remove(id) }
         for id in waterParticle.registeredIDs { waterParticle.remove(id) }
         for id in plungeBubble.registeredIDs { plungeBubble.remove(id) }
@@ -2467,6 +2506,11 @@ final class SM64BehaviorDispatchBridge {
         piranhaPlantBubble.beginExternalTick()
         waveTrail.beginExternalTick()
         sushiShark.beginExternalTick()
+        ukiki.beginExternalTick()
+        ukikiCage.beginExternalTick()
+        mips.beginExternalTick()
+        toadMessage.beginExternalTick()
+        menuButton.beginExternalTick()
         strongWindParticle.beginExternalTick()
         waterParticle.beginExternalTick()
         plungeBubble.beginExternalTick()
@@ -5013,6 +5057,86 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnUkiki(
+        in engineState: SM64SwiftEngineState,
+        behaviorParam: Int32 = SM64UkikiBehavior.cageParam,
+        position: SM64ObjectVector3 = .zero,
+        behaviorIdentity: UInt64 = SM64UkikiObjectBridge.ukikiBehaviorIdentity
+    ) throws -> SM64ObjectID {
+        try ukiki.spawn(
+            in: engineState,
+            behaviorParam: behaviorParam,
+            position: position,
+            behaviorIdentity: behaviorIdentity
+        )
+    }
+
+    @discardableResult
+    func spawnMacroUkiki(
+        in engineState: SM64SwiftEngineState,
+        behaviorParam: Int32 = SM64UkikiBehavior.cageParam,
+        position: SM64ObjectVector3 = .zero
+    ) throws -> SM64ObjectID {
+        try spawnUkiki(
+            in: engineState,
+            behaviorParam: behaviorParam,
+            position: position,
+            behaviorIdentity: SM64UkikiObjectBridge.macroUkikiBehaviorIdentity
+        )
+    }
+
+    @discardableResult
+    func spawnUkikiCage(in engineState: SM64SwiftEngineState, position: SM64ObjectVector3 = .zero) throws -> SM64ObjectID {
+        try ukikiCage.spawnCage(in: engineState, position: position)
+    }
+
+    @discardableResult
+    func spawnUkikiCageStar(
+        in engineState: SM64SwiftEngineState,
+        parent: SM64ObjectID,
+        position: SM64ObjectVector3 = .zero
+    ) throws -> SM64ObjectID {
+        try ukikiCage.spawnStar(in: engineState, parent: parent, position: position)
+    }
+
+    @discardableResult
+    func spawnMips(
+        in engineState: SM64SwiftEngineState,
+        starCount: Int32 = 15,
+        starFlags: UInt8 = 0,
+        position: SM64ObjectVector3 = .zero
+    ) throws -> SM64ObjectID {
+        try mips.spawn(in: engineState, starCount: starCount, starFlags: starFlags, position: position)
+    }
+
+    @discardableResult
+    func spawnToadMessage(
+        in engineState: SM64SwiftEngineState,
+        dialogID: Int32,
+        starCount: Int32 = 120,
+        saveFlags: UInt32 = 0,
+        position: SM64ObjectVector3 = .zero
+    ) throws -> SM64ObjectID {
+        try toadMessage.spawn(
+            in: engineState,
+            dialogID: dialogID,
+            starCount: starCount,
+            saveFlags: saveFlags,
+            position: position
+        )
+    }
+
+    @discardableResult
+    func spawnMenuButton(in engineState: SM64SwiftEngineState, relativePosition: SM64ObjectVector3 = .zero) throws -> SM64ObjectID {
+        try menuButton.spawnButton(in: engineState, relativePosition: relativePosition)
+    }
+
+    @discardableResult
+    func spawnMenuButtonManager(in engineState: SM64SwiftEngineState) throws -> SM64ObjectID {
+        try menuButton.spawnManager(in: engineState)
+    }
+
+    @discardableResult
     func spawnBowserBodyAnchor(in engineState: SM64SwiftEngineState, parent: SM64ObjectID, position: SM64ObjectVector3 = .zero) throws -> SM64ObjectID {
         try bowserBodyAnchor.spawn(in: engineState, parent: parent, position: position)
     }
@@ -6039,6 +6163,11 @@ final class SM64BehaviorDispatchBridge {
         piranhaPlantWakingBubble.beginExternalTick()
         piranhaPlantBubble.beginExternalTick()
         waveTrail.beginExternalTick()
+        ukiki.beginExternalTick()
+        ukikiCage.beginExternalTick()
+        mips.beginExternalTick()
+        toadMessage.beginExternalTick()
+        menuButton.beginExternalTick()
         strongWindParticle.beginExternalTick()
         waterParticle.beginExternalTick()
         plungeBubble.beginExternalTick()
@@ -6549,6 +6678,16 @@ final class SM64BehaviorDispatchBridge {
                         parent: id
                     )
                 }
+            case .ukiki:
+                _ = self.ukiki.updateInline(id, state: engineState)
+            case .ukikiCage:
+                _ = self.ukikiCage.updateInline(id, state: engineState)
+            case .mips:
+                _ = self.mips.updateInline(id, state: engineState)
+            case .toadMessage:
+                _ = self.toadMessage.updateInline(id, state: engineState)
+            case .menuButton:
+                _ = self.menuButton.updateInline(id, state: engineState)
             case .strongWindParticle:
                 _ = self.strongWindParticle.updateInline(id, state: engineState)
             case .waterParticle:
@@ -6968,6 +7107,11 @@ final class SM64BehaviorDispatchBridge {
             piranhaPlantBubble.remove(id)
             waveTrail.remove(id)
             sushiWaterLevels.removeValue(forKey: id)
+            ukiki.remove(id)
+            ukikiCage.remove(id)
+            mips.remove(id)
+            toadMessage.remove(id)
+            menuButton.remove(id)
             strongWindParticle.remove(id)
             waterParticle.remove(id)
             plungeBubble.remove(id)
@@ -7349,6 +7493,11 @@ final class SM64BehaviorDispatchBridge {
         piranhaPlantBubble.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         waveTrail.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         sushiShark.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        ukiki.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        ukikiCage.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        mips.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        toadMessage.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        menuButton.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         for id in Array(sushiWaterLevels.keys) where engineState.objects.record(for: id) == nil {
             sushiWaterLevels.removeValue(forKey: id)
         }
@@ -7477,6 +7626,12 @@ final class SM64BehaviorDispatchBridge {
         return SM64BehaviorDispatchTickResult(
             scheduler: schedulerResult,
             events: eventLog,
+            ukikiEffects: ukiki.effectLog,
+            ukikiCageEffects: ukikiCage.effectLog,
+            mipsEffects: mips.effectLog,
+            toadMessageEffects: toadMessage.effectLog,
+            menuButtonEffects: menuButton.buttonEffectLog,
+            menuButtonManagerEffects: menuButton.managerEffectLog,
             decorativePendulumEffects: decorativePendulum.effectLog,
             decorativePendulumDeliveries: decorativePendulum.deliveryLog,
             respawnerEffects: respawner.effectLog,
