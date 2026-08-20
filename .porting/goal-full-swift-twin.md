@@ -66,6 +66,19 @@ memoryless Depth32Float, and `sm64_vertex / sm64_fragment` draw discovery via
 physical display, or human acceptance; M31 whole-engine authority and M33
 full-game qualification remain open.
 
+Continuation Phase 1 (2026-08-20) is checkpointed at `da4fa9ae` plus the
+current live-host control. The fresh arm64 Debug bundle built, launched through
+LaunchServices, presented Metal 4 frame one, and shut down cleanly; the earlier
+`kLSNoExecutableErr (-10827)` record is retained as historical host evidence.
+The real input-only promotion shard `0xd9446dfed10e189e` passed with
+`fixture_only=0`, exact C/Swift replay, coverage, and persistent rerun
+rejection. The serial `SM64RouteShardMergeTool` now validates isolated worker
+result files, shared fingerprints, terminal evidence, and manifest order, and
+is covered by `script/test_route_shard_merge.sh`; the route inventory, fixture
+replay, merge smoke, and full-matrix integration remain separate from the
+unstarted 7,419-shard live execution closure. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase1-route-ledger.md`.
+
 The fresh M33ne verifier cleared the complete matrix and regenerated strict
 Swift 6 Xcode build, but the host launch is currently blocked:
 focused/matrix gates matched, the regenerated Swift 6 Debug build succeeded,

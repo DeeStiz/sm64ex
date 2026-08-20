@@ -2,6 +2,24 @@
 
 ## Latest validated slices (2026-08-17)
 
+- Continuation Phase 1 (2026-08-20) froze the current qualification inputs at
+  `da4fa9ae` plus the live host control. The fresh arm64 Debug bundle built,
+  ad-hoc signed, launched through `/usr/bin/open -n`, reached
+  `application_ready`, `metal_scene_presented frame=1`, clean engine shutdown,
+  and `application_stopped`; the earlier `kLSNoExecutableErr (-10827)` is
+  retained as historical/transient LaunchServices evidence, not a current
+  source failure. `script/test_live_route_promotion.sh` passed the real
+  `fixture_only=0` shard `0xd9446dfed10e189e` with C/Swift replay, exact
+  coverage, and persistent rerun rejection. The new serial
+  `SM64RouteShardMergeTool` plus
+  `script/test_route_shard_merge.sh` rejects duplicate/unknown/missing rows,
+  invalid transitions, fixture-only evidence, and inconsistent fingerprints;
+  it preserves manifest order and emits a legacy ledger plus metadata sidecar.
+  Focused route inventory, fixture replay, merge, shell, and Markdown checks
+  pass. Full 7,419-shard live execution, sanitizer parity, Metal visual/device
+  closure, release, and human acceptance remain open. Handoff:
+  `.porting/porting-handoff-full-swift-twin-phase1-route-ledger.md`.
+
 - M33h qualifies a bounded native Mario gameplay promotion slice. The
   opt-in `SM64_MODERN_AUTOMATED_MARIO=1` owner-thread probe invokes the
   production Mario button and ground-speed callbacks after the normal C step,
