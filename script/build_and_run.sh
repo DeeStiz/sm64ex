@@ -47,6 +47,7 @@ else
   "$PROJECT_ROOT/script/test_hud_render.sh"
   "$PROJECT_ROOT/script/test_dialog.sh"
   "$PROJECT_ROOT/script/test_dialog_text_pause.sh"
+  "$PROJECT_ROOT/script/test_course_exit_cadence.sh"
   "$PROJECT_ROOT/script/test_front_end.sh"
   "$PROJECT_ROOT/script/test_front_end_render.sh"
   "$PROJECT_ROOT/script/test_frontend_migration.sh"

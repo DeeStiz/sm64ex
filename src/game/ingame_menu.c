@@ -913,10 +913,10 @@ s16 get_dialog_id(void) {
     return gDialogID;
 }
 
+// Dialog creation is a one-shot state admission.  The dialog renderer and
+// its timers remain on the legacy cadence, but the action that requests a
+// dialog may finish on the held native half of a paired step.
 void create_dialog_box(s16 dialog) {
-    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
-        return;
-    }
     if (gDialogID == -1) {
         gDialogID = dialog;
         gDialogBoxType = DIALOG_TYPE_ROTATE;
@@ -924,9 +924,6 @@ void create_dialog_box(s16 dialog) {
 }
 
 void create_dialog_box_with_var(s16 dialog, s32 dialogVar) {
-    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
-        return;
-    }
     if (gDialogID == -1) {
         gDialogID = dialog;
         gDialogVariable = dialogVar;
@@ -935,9 +932,6 @@ void create_dialog_box_with_var(s16 dialog, s32 dialogVar) {
 }
 
 void create_dialog_inverted_box(s16 dialog) {
-    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
-        return;
-    }
     if (gDialogID == -1) {
         gDialogID = dialog;
         gDialogBoxType = DIALOG_TYPE_ZOOM;
@@ -945,9 +939,6 @@ void create_dialog_inverted_box(s16 dialog) {
 }
 
 void create_dialog_box_with_response(s16 dialog) {
-    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
-        return;
-    }
     if (gDialogID == -1) {
         gDialogID = dialog;
         gDialogBoxType = DIALOG_TYPE_ROTATE;
@@ -1881,18 +1872,16 @@ void render_dialog_entries(void) {
 
 // Calls a gMenuMode value defined by render_menus_and_dialogs cases
 void set_menu_mode(s16 mode) {
-    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
-        return;
-    }
+    // This is a one-shot state admission, not a timer or input consumer.
+    // Mario's continuous action can reach a menu boundary on the held half
+    // of a 60/30 pair; dropping that request leaves time stop active with no
+    // menu to render (for example, immediately after a painting exit).
     if (gMenuMode == -1) {
         gMenuMode = mode;
     }
 }
 
 void reset_cutscene_msg_fade(void) {
-    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
-        return;
-    }
     gCutsceneMsgFade = 0;
 }
 
@@ -1957,9 +1946,6 @@ void print_credits_str_ascii(s16 x, s16 y, const char *str) {
 }
 
 void set_cutscene_message(s16 xOffset, s16 yOffset, s16 msgIndex, s16 msgDuration) {
-    if (!sm64_modern_timebase_should_advance_legacy_domain()) {
-        return;
-    }
     // is message done printing?
     if (gCutsceneMsgIndex == -1) {
         gCutsceneMsgIndex = msgIndex;
