@@ -4,6 +4,8 @@ set -euo pipefail
 # M9 is intentionally a local evidence harness. It can build, sign/package,
 # exercise the Release product, and save validation/capture/leak artifacts, but
 # it never claims Developer ID, notarization, or clean-machine acceptance.
+# The readiness mode is a read-only M35 preflight; it only checks prerequisites
+# and never submits, staples, or treats a local result as distribution proof.
 
 MODE="${1:-all}"
 APP_NAME="SM64 Modern"
@@ -26,7 +28,9 @@ PROFILE_TIMEOUT_SECONDS="${SM64_MODERN_M9_PROFILE_TIMEOUT_SECONDS:-$((PROFILE_TI
 SIGNING_IDENTITY=""
 SIGNING_STATE=""
 
-mkdir -p "$OUTPUT_DIR"
+if [[ "$MODE" != "readiness" ]]; then
+  mkdir -p "$OUTPUT_DIR"
+fi
 
 die() {
   echo "m9_release: $*" >&2
@@ -37,6 +41,209 @@ assert_no_live_app() {
   if pgrep -x "$APP_NAME" >/dev/null 2>&1; then
     die "$APP_NAME is already running; close it before collecting isolated M9 evidence"
   fi
+}
+
+readiness_blockers=()
+
+readiness_block() {
+  readiness_blockers+=("$*")
+}
+
+readiness_require_command() {
+  local command_name="$1"
+  if ! command -v "$command_name" >/dev/null 2>&1; then
+    readiness_block "missing required command: $command_name"
+  fi
+}
+
+readiness_require_xcrun_tool() {
+  local tool_name="$1"
+  local tool_path=""
+  tool_path="$(xcrun --find "$tool_name" 2>/dev/null || true)"
+  if [[ -z "$tool_path" || ! -x "$tool_path" ]]; then
+    readiness_block "xcrun tool unavailable: $tool_name"
+  fi
+}
+
+readiness_plist_value() {
+  local file_path="$1"
+  local key_path="$2"
+  if [[ ! -x /usr/libexec/PlistBuddy ]]; then
+    return 0
+  fi
+  /usr/libexec/PlistBuddy -c "Print :$key_path" "$file_path" 2>/dev/null || true
+}
+
+run_release_readiness() {
+  local selected_developer_dir=""
+  local selected_xcodebuild=""
+  local selected_sdk=""
+  local xcode_version=""
+  local selected_app=""
+  local selected_app_name=""
+  local release_task_allow=""
+  local release_sustained_execution=""
+  local debug_task_allow=""
+  local debug_sustained_execution=""
+  local identities=""
+  local requested_identity="${SM64_MODERN_CODE_SIGN_IDENTITY:-}"
+  local notary_profile="${SM64_MODERN_NOTARY_PROFILE:-${SM64_MODERN_NOTARY_KEYCHAIN_PROFILE:-${NOTARYTOOL_KEYCHAIN_PROFILE:-}}}"
+  local notary_key_id="${SM64_MODERN_NOTARY_KEY_ID:-${ASC_KEY_ID:-}}"
+  local notary_issuer_id="${SM64_MODERN_NOTARY_ISSUER_ID:-${ASC_ISSUER_ID:-}}"
+  local notary_private_key="${SM64_MODERN_NOTARY_PRIVATE_KEY:-${ASC_PRIVATE_KEY_PATH:-}}"
+  local notary_apple_id="${SM64_MODERN_NOTARY_APPLE_ID:-${APPLE_ID:-}}"
+  local notary_team_id="${SM64_MODERN_NOTARY_TEAM_ID:-${APPLE_TEAM_ID:-}}"
+  local notary_app_password="${SM64_MODERN_NOTARY_APP_PASSWORD:-${APPLE_APP_SPECIFIC_PASSWORD:-}}"
+  local notary_auth_mode=""
+
+  # Keep this mode read-only. It may inspect command output and source files,
+  # but it must not create an archive, disk image, keychain profile, or ticket.
+  printf '%s\n' 'M35 release readiness preflight (prerequisites only; no submission/stapling performed)'
+
+  readiness_require_command xcode-select
+  readiness_require_command xcrun
+  readiness_require_command xcodebuild
+  readiness_require_command security
+  readiness_require_command codesign
+  readiness_require_command plutil
+  readiness_require_command hdiutil
+  readiness_require_command ditto
+  readiness_require_command shasum
+  readiness_require_command spctl
+
+  if [[ ! -x /usr/libexec/PlistBuddy ]]; then
+    readiness_block 'missing required command: /usr/libexec/PlistBuddy'
+  fi
+
+  if command -v xcode-select >/dev/null 2>&1; then
+    selected_developer_dir="$(xcode-select --print-path 2>/dev/null || true)"
+    if [[ -z "$selected_developer_dir" || ! -d "$selected_developer_dir" ]]; then
+      readiness_block 'xcode-select does not point to an installed Developer directory'
+    else
+      case "$selected_developer_dir" in
+        */CommandLineTools*)
+          readiness_block "xcode-select points to CommandLineTools, not ordinary Xcode: $selected_developer_dir"
+          ;;
+      esac
+      if [[ "$selected_developer_dir" == */Contents/Developer ]]; then
+        selected_app="${selected_developer_dir%/Contents/Developer}"
+        selected_app_name="${selected_app##*/}"
+        if [[ "$selected_app_name" != Xcode*.app ]]; then
+          readiness_block "xcode-select points to a non-Xcode developer bundle: $selected_developer_dir"
+        fi
+        case "$selected_app_name" in
+          *[Bb]eta*|*[Ss]eed*|*[Pp]review*|*[Rr][Cc]*)
+            readiness_block "xcode-select points to a beta/preview Xcode; select ordinary Xcode.app: $selected_developer_dir"
+            ;;
+        esac
+      else
+        readiness_block "xcode-select path is not an Xcode Contents/Developer directory: $selected_developer_dir"
+      fi
+    fi
+  fi
+
+  if command -v xcrun >/dev/null 2>&1; then
+    selected_xcodebuild="$(xcrun --find xcodebuild 2>/dev/null || true)"
+    if [[ -z "$selected_xcodebuild" || ! -x "$selected_xcodebuild" ]]; then
+      readiness_block 'xcrun cannot resolve the selected xcodebuild'
+    elif [[ -n "$selected_developer_dir" && "$selected_xcodebuild" != "$selected_developer_dir/"* ]]; then
+      readiness_block "xcrun xcodebuild is not from xcode-select's developer directory: $selected_xcodebuild"
+    else
+      xcode_version="$("$selected_xcodebuild" -version 2>/dev/null || true)"
+      if [[ -z "$xcode_version" || "$xcode_version" != Xcode\ * ]]; then
+        readiness_block 'selected xcodebuild did not report an Xcode version'
+      fi
+      if grep -Eiq 'beta|seed|preview|release candidate|[[:space:]]rc([[:space:]]|$)' <<< "$xcode_version"; then
+        readiness_block "selected xcodebuild reports a beta/preview toolchain: ${xcode_version//$'\n'/ }"
+      fi
+    fi
+    selected_sdk="$(xcrun --sdk macosx --show-sdk-path 2>/dev/null || true)"
+    if [[ -z "$selected_sdk" || ! -d "$selected_sdk" ]]; then
+      readiness_block 'xcrun cannot resolve an installed macOS SDK from the selected Xcode'
+    fi
+  fi
+
+  identities="$(security find-identity -v -p codesigning 2>/dev/null || true)"
+  if ! grep -Fq 'Developer ID Application:' <<< "$identities"; then
+    readiness_block 'no valid Developer ID Application identity is available in the local keychain'
+  fi
+  if [[ "$requested_identity" == '-' ]]; then
+    readiness_block 'SM64_MODERN_CODE_SIGN_IDENTITY=- requests ad hoc signing; M35 requires Developer ID Application'
+  elif [[ -n "$requested_identity" ]]; then
+    if [[ "$requested_identity" == Developer\ ID\ Application:* ]]; then
+      if ! grep -Fq "$requested_identity" <<< "$identities"; then
+        readiness_block "requested Developer ID Application identity is not installed: $requested_identity"
+      fi
+    elif [[ "$requested_identity" =~ ^[A-Fa-f0-9]{40}$ ]]; then
+      if ! grep -F "$requested_identity" <<< "$identities" | grep -Fq 'Developer ID Application:'; then
+        readiness_block "requested signing hash is not a Developer ID Application identity: $requested_identity"
+      fi
+    else
+      readiness_block "requested signing identity is not a Developer ID Application identity: $requested_identity"
+    fi
+  fi
+
+  for entitlement_file in "$RELEASE_ENTITLEMENTS" "$LOCAL_ENTITLEMENTS"; do
+    if [[ ! -f "$entitlement_file" ]]; then
+      readiness_block "missing entitlement file: $entitlement_file"
+    elif ! plutil -lint -s "$entitlement_file" >/dev/null 2>&1; then
+      readiness_block "invalid entitlement plist: $entitlement_file"
+    fi
+  done
+  if [[ -f "$RELEASE_ENTITLEMENTS" ]]; then
+    release_task_allow="$(readiness_plist_value "$RELEASE_ENTITLEMENTS" 'com.apple.security.get-task-allow')"
+    release_sustained_execution="$(readiness_plist_value "$RELEASE_ENTITLEMENTS" 'com.apple.developer.sustained-execution')"
+    [[ "$release_task_allow" == false ]] || readiness_block "Release entitlement com.apple.security.get-task-allow must be false (found ${release_task_allow:-missing})"
+    [[ "$release_sustained_execution" == true ]] || readiness_block "Release entitlement com.apple.developer.sustained-execution must be true (found ${release_sustained_execution:-missing})"
+  fi
+  if [[ -f "$LOCAL_ENTITLEMENTS" ]]; then
+    debug_task_allow="$(readiness_plist_value "$LOCAL_ENTITLEMENTS" 'com.apple.security.get-task-allow')"
+    debug_sustained_execution="$(readiness_plist_value "$LOCAL_ENTITLEMENTS" 'com.apple.developer.sustained-execution')"
+    [[ "$debug_task_allow" == true ]] || readiness_block "Debug entitlement com.apple.security.get-task-allow must be true (found ${debug_task_allow:-missing})"
+    [[ "$debug_sustained_execution" != true ]] || readiness_block 'Debug entitlements must not carry com.apple.developer.sustained-execution'
+  fi
+  grep -Fq 'ENABLE_HARDENED_RUNTIME: YES' "$PROJECT_ROOT/project.yml" \
+    || readiness_block 'project.yml does not enable the hardened runtime'
+  grep -Fq 'CODE_SIGN_ENTITLEMENTS: SM64Modern/SM64Modern.entitlements' "$PROJECT_ROOT/project.yml" \
+    || readiness_block 'project.yml Release target is not wired to the distribution entitlement file'
+
+  if command -v xcodebuild >/dev/null 2>&1; then
+    local xcodebuild_help
+    xcodebuild_help="$(xcodebuild -help 2>&1 || true)"
+    grep -Fq -- '-archivePath' <<< "$xcodebuild_help" \
+      || readiness_block 'xcodebuild does not expose archivePath/export prerequisites'
+    grep -Fq -- '-exportArchive' <<< "$xcodebuild_help" \
+      || readiness_block 'xcodebuild does not expose exportArchive prerequisites'
+  fi
+  readiness_require_xcrun_tool notarytool
+  readiness_require_xcrun_tool stapler
+  if [[ -n "$notary_profile" ]]; then
+    notary_auth_mode='keychain profile configured (not validated)'
+  elif [[ -n "$notary_key_id" && -n "$notary_issuer_id" && -n "$notary_private_key" && -r "$notary_private_key" ]]; then
+    notary_auth_mode='App Store Connect API key configured (not validated)'
+  elif [[ -n "$notary_apple_id" && -n "$notary_team_id" && -n "$notary_app_password" ]]; then
+    notary_auth_mode='Apple ID app-specific password configured (not validated)'
+  else
+    readiness_block 'no notarytool authentication configuration was supplied (profile, API key, or Apple ID credentials)'
+  fi
+
+  printf 'xcode_developer_dir=%s\n' "${selected_developer_dir:-unavailable}"
+  printf 'xcode_sdk=%s\n' "${selected_sdk:-unavailable}"
+  printf 'notary_auth=%s\n' "${notary_auth_mode:-unavailable}"
+  printf '%s\n' 'archive_prerequisite=xcodebuild archive/export tooling checked'
+  printf '%s\n' 'dmg_prerequisite=hdiutil availability checked; disk-image creation not run'
+  printf '%s\n' 'staple_prerequisite=xcrun stapler availability checked; no ticket fetched or stapled'
+  printf '%s\n' 'zip_stapling_caveat=ZIP files cannot receive stapled tickets; staple the nested signed app before zipping and validate the DMG/app separately'
+  printf '%s\n' 'clean_machine_acceptance=not checked by this local preflight'
+
+  if (( ${#readiness_blockers[@]} > 0 )); then
+    printf 'release_readiness=BLOCKED (%d prerequisite failures)\n' "${#readiness_blockers[@]}" >&2
+    for blocker in "${readiness_blockers[@]}"; do
+      printf 'BLOCKER: %s\n' "$blocker" >&2
+    done
+    return 1
+  fi
+  printf '%s\n' 'release_readiness=PREREQUISITES_PRESENT (distribution actions and clean-machine acceptance remain unverified)'
 }
 
 select_signing_identity() {
@@ -348,6 +555,9 @@ run_bob_check() {
 }
 
 case "$MODE" in
+  readiness)
+    run_release_readiness
+    ;;
   build)
     build_release
     ;;
@@ -383,7 +593,7 @@ case "$MODE" in
     run_profile
     ;;
   *)
-    echo "usage: $0 [build|inspect|package|profile|leaks|metal-validation|capture|bob|all]" >&2
+    echo "usage: $0 [readiness|build|inspect|package|profile|leaks|metal-validation|capture|bob|all]" >&2
     exit 2
     ;;
 esac
