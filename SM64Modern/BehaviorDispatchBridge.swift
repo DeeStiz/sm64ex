@@ -258,6 +258,7 @@ enum SM64BehaviorDispatchRoute: UInt16, Equatable, Sendable {
     case endCutsceneActor = 254
     case unmigrated = 255
     case snowmanHead = 256
+    case madPiano = 257
 }
 
 struct SM64BehaviorDispatchEvent: Equatable, Sendable {
@@ -635,6 +636,7 @@ final class SM64BehaviorDispatchBridge {
     let bowserBodyAnchor: SM64BowserBodyAnchorObjectBridge
     let bowserTailAnchor: SM64BowserTailAnchorObjectBridge
     let snowmanHead: SM64SnowmanHeadObjectBridge
+    let madPiano: SM64MadPianoObjectBridge
     let betaChest: SM64BetaChestObjectBridge
     let betaTrampoline: SM64BetaTrampolineObjectBridge
     let betaHoldable: SM64BetaHoldableObjectBridge
@@ -1064,6 +1066,7 @@ final class SM64BehaviorDispatchBridge {
         self.bowserBodyAnchor = SM64BowserBodyAnchorObjectBridge()
         self.bowserTailAnchor = SM64BowserTailAnchorObjectBridge()
         self.snowmanHead = SM64SnowmanHeadObjectBridge()
+        self.madPiano = SM64MadPianoObjectBridge()
         self.betaChest = SM64BetaChestObjectBridge(waterAirBubbleBridge: self.waterAirBubble)
         self.betaTrampoline = SM64BetaTrampolineObjectBridge()
         self.betaHoldable = SM64BetaHoldableObjectBridge()
@@ -1258,6 +1261,8 @@ final class SM64BehaviorDispatchBridge {
             return .bowserTailAnchor
         case SM64SnowmanHeadObjectBridge.defaultBehaviorIdentity:
             return .snowmanHead
+        case SM64MadPianoObjectBridge.defaultBehaviorIdentity:
+            return .madPiano
         case SM64BetaChestObjectBridge.bottomBehaviorIdentity,
              SM64BetaChestObjectBridge.lidBehaviorIdentity:
             return .betaChest
@@ -2003,9 +2008,10 @@ final class SM64BehaviorDispatchBridge {
         for id in horizontalGrindel.registeredIDs { horizontalGrindel.remove(id) }
         for id in unusedParticleSpawn.registeredIDs { unusedParticleSpawn.remove(id) }
         for id in snowmanCheckpoint.registeredIDs { snowmanCheckpoint.remove(id) }
-        for id in bowserBodyAnchor.registeredIDs { bowserBodyAnchor.remove(id) }
-        for id in bowserTailAnchor.registeredIDs { bowserTailAnchor.remove(id) }
-        for id in snowmanHead.registeredIDs { snowmanHead.remove(id) }
+    for id in bowserBodyAnchor.registeredIDs { bowserBodyAnchor.remove(id) }
+    for id in bowserTailAnchor.registeredIDs { bowserTailAnchor.remove(id) }
+    for id in snowmanHead.registeredIDs { snowmanHead.remove(id) }
+    for id in madPiano.registeredIDs { madPiano.remove(id) }
         for id in betaChest.registeredIDs { betaChest.remove(id) }
         for id in betaTrampoline.registeredIDs { betaTrampoline.remove(id) }
         for id in betaHoldable.registeredIDs { betaHoldable.remove(id) }
@@ -2288,6 +2294,7 @@ final class SM64BehaviorDispatchBridge {
         bowserBodyAnchor.beginExternalTick()
         bowserTailAnchor.beginExternalTick()
         snowmanHead.beginExternalTick()
+        madPiano.beginExternalTick()
         betaChest.beginExternalTick()
         betaTrampoline.beginExternalTick()
         betaHoldable.beginExternalTick()
@@ -4946,6 +4953,15 @@ final class SM64BehaviorDispatchBridge {
     }
 
     @discardableResult
+    func spawnMadPiano(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        homePosition: SM64ObjectVector3? = nil
+    ) throws -> SM64ObjectID {
+        try madPiano.spawnPiano(in: engineState, position: position, homePosition: homePosition)
+    }
+
+    @discardableResult
     func spawnBowserBodyAnchor(in engineState: SM64SwiftEngineState, parent: SM64ObjectID, position: SM64ObjectVector3 = .zero) throws -> SM64ObjectID {
         try bowserBodyAnchor.spawn(in: engineState, parent: parent, position: position)
     }
@@ -6134,6 +6150,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.snowmanCheckpoint.updateInline(id, state: engineState)
             case .snowmanHead:
                 _ = self.snowmanHead.updateInline(id, state: engineState)
+            case .madPiano:
+                _ = self.madPiano.updateInline(id, state: engineState)
             case .bowserBodyAnchor:
                 _ = self.bowserBodyAnchor.updateInline(id, state: engineState)
             case .bowserTailAnchor:

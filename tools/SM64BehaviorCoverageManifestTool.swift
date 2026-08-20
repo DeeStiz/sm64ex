@@ -40,6 +40,7 @@ struct SM64BehaviorCoverageManifestTool {
 
     private static let swiftRoutes: [String: (owner: String, reason: String)] = [
         "bhvAmp": ("AmpObjectBridge", "value kernel plus generation-safe owner bridge"),
+        "bhvMadPiano": ("MadPianoObjectBridge", "Mad Piano value kernel plus generation-safe owner bridge"),
         "bhvArrowLift": ("ArrowLiftObjectBridge", "arrow-lift value kernel plus owner route"),
         "bhvHmcElevatorPlatform": ("ElevatorObjectBridge", "shared HMC elevator value/owner route"),
         "bhvMeshElevator": ("ElevatorObjectBridge", "shared mesh elevator value/owner route"),

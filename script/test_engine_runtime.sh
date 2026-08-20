@@ -41,6 +41,18 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/RespawnerObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/DecorativePendulumBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/DecorativePendulumObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/MadPianoBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/MadPianoObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/NpcMenuBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/NpcMenuObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/PushableMetalBoxBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/PushableMetalBoxObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SquarishPathMovingBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/SquarishPathMovingObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SushiSharkBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/SushiSharkObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/TiltingBowserLavaPlatformBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/TiltingBowserLavaPlatformObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BehaviorDispatchBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/ArrowLiftBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/ArrowLiftObjectBridge.swift" \

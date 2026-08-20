@@ -20,6 +20,20 @@
   closure, release, and human acceptance remain open. Handoff:
   `.porting/porting-handoff-full-swift-twin-phase1-route-ledger.md`.
 
+- Continuation Phase 2 bounded adapter batch (2026-08-20) adds validated
+  value/owner slices for Mad Piano (`0x02bff984a89b5be6`), Sushi Shark and its
+  collision child (`0x829e2dcf1c565b1a`), the Ukiki/Macro-Ukiki/cage/cage-star,
+  MIPS, Toad, and menu-button family (`0x4ff30b57a3db6922`), Squarish Path
+  Moving (`0x9cbe6c17eb977926`), Pushable Metal Box (`0x1f8d2f13bc790860`),
+  and Tilting Bowser Lava Platform (`0x05b5b2089849cc23`). Each focused C↔Swift
+  contract, strict Swift 6 route smoke, and owner lifecycle check passes. The
+  Mad Piano route is centrally dispatched and the manifest is now 534 rows
+  with 489 Swift owners and 45 C adapters at `0xb292402a519b1ea1`; the other
+  five slices remain local-only until their central dispatch/coverage wiring is
+  integrated. The worker-result writer and serial merge gate are also strict
+  Swift 6 smoke-tested. Full live route execution, sanitizer parity, and
+  physical/release/human gates remain open.
+
 - M33h qualifies a bounded native Mario gameplay promotion slice. The
   opt-in `SM64_MODERN_AUTOMATED_MARIO=1` owner-thread probe invokes the
   production Mario button and ground-speed callbacks after the normal C step,

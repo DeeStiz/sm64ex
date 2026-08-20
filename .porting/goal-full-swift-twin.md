@@ -79,6 +79,16 @@ replay, merge smoke, and full-matrix integration remain separate from the
 unstarted 7,419-shard live execution closure. Handoff:
 `.porting/porting-handoff-full-swift-twin-phase1-route-ledger.md`.
 
+Continuation Phase 2 is now a bounded adapter batch. Mad Piano is centrally
+dispatched and the manifest records 489 Swift owners and 45 C adapters at
+`0xb292402a519b1ea1`. Sushi Shark/collision child, the Ukiki/MIPS/Toad/menu
+family, Squarish Path Moving, Pushable Metal Box, and Tilting Bowser Lava
+Platform each have focused C↔Swift contracts and strict owner smokes, but are
+not counted as Swift-authority routes until their central dispatch and coverage
+integration is complete. The worker-result writer and serial merge gate pass
+strict Swift 6 smoke. Full live route execution, sanitizer parity, Metal
+visual/device closure, release, and human acceptance remain open.
+
 The fresh M33ne verifier cleared the complete matrix and regenerated strict
 Swift 6 Xcode build, but the host launch is currently blocked:
 focused/matrix gates matched, the regenerated Swift 6 Debug build succeeded,
