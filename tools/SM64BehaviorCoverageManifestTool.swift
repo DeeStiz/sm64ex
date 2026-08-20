@@ -71,6 +71,7 @@ struct SM64BehaviorCoverageManifestTool {
         "bhvPyramidPillarTouchDetector": ("PyramidPillarTouchDetectorObjectBridge", "pyramid pillar collision/deactivation route"),
         "bhvPyramidTop": ("PyramidTopObjectBridge", "pyramid top solve/spin/explode route"),
         "bhvTTCPitBlock": ("TTCPitBlockObjectBridge", "TTC pit-block value/owner route"),
+        "bhvSquarishPathMoving": ("SquarishPathMovingObjectBridge", "BitDW squarish path-moving platform value/owner route"),
         "bhvStaticCheckeredPlatform": ("StaticCheckeredPlatformObjectBridge", "static checkered platform value/owner route"),
         "bhvBbhTiltingTrapPlatform": ("BBHTiltingTrapPlatformObjectBridge", "BBH tilting-trap platform value/owner route"),
         "bhvLllSinkingRectangularPlatform": ("LLLSinkingPlatformObjectBridge", "LLL rectangular sinking platform value/owner route"),

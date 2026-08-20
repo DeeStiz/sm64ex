@@ -51,6 +51,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/DecorativePendulumObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/MadPianoBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/MadPianoObjectBridge.swift" \
+  "$PROJECT_ROOT/SM64Modern/SquarishPathMovingBehavior.swift" \
+  "$PROJECT_ROOT/SM64Modern/SquarishPathMovingObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/BehaviorDispatchBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/ActSelectorBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/ActSelectorObjectBridge.swift" \
