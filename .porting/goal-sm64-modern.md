@@ -4,6 +4,14 @@
 
 Complete — all planned milestones M0–M14 are complete. External and human acceptance gates that remain open are documented in `.porting/porting-memory.md` and the M14 handoff.
 
+This is the completed native-host baseline goal. Ongoing Swift ownership,
+full-game qualification, Metal production closure, and distribution work are
+tracked by the superseding
+[`goal-full-swift-twin.md`](goal-full-swift-twin.md) goal and summarized in
+[`../docs/SM64Modern.md`](../docs/SM64Modern.md). The milestone statuses below
+describe implementation/local validation; they do not waive physical-device,
+visual/performance, release, or human-acceptance gates.
+
 ## Target
 
 Create a parallel Apple-silicon macOS 27 application using Swift 6.4, AppKit, Metal 4, native Apple input/audio services, and a deterministic full-world 60 Hz simulation while preserving the legacy portable build and save compatibility.

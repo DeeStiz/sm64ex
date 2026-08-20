@@ -8,6 +8,10 @@ Please contribute **first** to the [nightly branch](https://github.com/sm64pc/sm
 
 *Read this in other languages: [Español](README_es_ES.md), [Português](README_pt_BR.md), [简体中文](README_zh_CN.md) or [Bahasa Melayu](README_ms_MY.md).*
 
+This branch also contains the native Apple-silicon **SM64 Modern** application.
+Its current architecture, build commands, qualification matrix, and evidence
+boundaries are documented in [docs/SM64Modern.md](docs/SM64Modern.md).
+
 ## New features
 
  * Options menu with various settings, including button remapping.
@@ -29,11 +33,11 @@ For building instructions, please refer to the [wiki](https://github.com/sm64pc/
 
 **Make sure you have MXE first before attempting to compile for Windows on Linux and WSL. Follow the guide on the wiki.**
 
-### macOS baseline build
+### Legacy portable macOS baseline build
 
-The macOS build uses Xcode's Apple Clang and discovers SDL2 and GLEW with
-`pkg-config`. With those dependencies installed, a legal ROM can remain outside
-the repository:
+The original portable macOS build uses Xcode's Apple Clang and discovers SDL2
+and GLEW with `pkg-config`. With those dependencies installed, a legal ROM can
+remain outside the repository:
 
 ```sh
 brew install sdl2-compat glew pkgconf mingw-w64
@@ -51,3 +55,33 @@ make DEBUG=1 SANITIZE=address BUILD_DIR_BASE=build-asan \
 the repository. `SM64_BASEROM_US`, `SM64_BASEROM_JP`, and
 `SM64_BASEROM_EU` provide the equivalent per-version environment variables for
 multi-version automation.
+
+### SM64 Modern native macOS app
+
+SM64 Modern is a parallel macOS 27 / Apple-silicon target. Swift 6 and AppKit
+own the application shell, owner thread, 60 Hz fixed-step scheduler, Apple
+input/audio services, and value-oriented migration boundaries. Metal 4 owns
+the native renderer and presentation path. The portable C engine remains the
+gameplay oracle and compatibility fallback; raw C object graphs do not cross
+the Swift concurrency boundary.
+
+At `nightly` commit `6f586de9`, the full-Swift-twin qualification ledger has
+534 behavior rows (488 Swift owners and 46 explicit C adapters), with M33nk as
+the latest behavior slice and M34b as the latest validated Metal 4 production
+slice. Route-shard closure, physical/device/performance/thermal evidence,
+distribution, and human acceptance are still open; this is not a shipped
+full-game Swift port.
+
+After extracting local assets as described above, the canonical Debug workflow
+is:
+
+```sh
+xcodegen generate --spec project.yml
+./script/build_and_run.sh run
+```
+
+`build_and_run.sh run` executes the native smoke matrix before building and
+launching the signed development bundle. For a bounded host check, use
+`./script/build_and_run.sh --verify`; for a faster unsigned Release build, use
+`./script/build_prod.sh`. See [docs/SM64Modern.md](docs/SM64Modern.md) for
+focused ABI, route, cadence, parity, and Metal validation commands.
