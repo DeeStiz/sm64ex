@@ -45,6 +45,20 @@
   sanitizer, visual/device, release, and human gates remain open. Handoff:
   `.porting/porting-handoff-full-swift-twin-phase3-route-local-batch.md`.
 
+- M34c implementation checkpoint (2026-08-20) adds packet-specific synchronous
+  Metal 4 pipeline warm-up, truthful archive/descriptor-cache telemetry,
+  post-resume drawable request IDs, owner-thread resize acknowledgement, and
+  repeated pause/resume plus optional minimize/restore stress. Metal source
+  contract and strict arm64 Debug/Release builds pass. The updated production
+  harness reached clean status-0 shutdown and zero scheduler/audio drops, but
+  the display link stopped after three initial presents; no
+  `metal_presentation_resize_ack` was emitted, so this run is not new M34
+  visual/device acceptance. The evidence directory is
+  `/var/folders/th/x9l5jv8j6n76y9n941xty1440000gn/T/sm64-modern-m34b.LtxxU0/`.
+  Archive reuse remains false with descriptor-cache fallback; a valid flushed
+  archive and a live post-resume drawable are still required. Handoff:
+  `.porting/porting-handoff-full-swift-twin-M34c-warmup-stress.md`.
+
 - M33h qualifies a bounded native Mario gameplay promotion slice. The
   opt-in `SM64_MODERN_AUTOMATED_MARIO=1` owner-thread probe invokes the
   production Mario button and ground-speed callbacks after the normal C step,

@@ -97,6 +97,15 @@ canonical manifest until central dispatch, effect aggregation, and coverage
 integration are completed. Handoff:
 `.porting/porting-handoff-full-swift-twin-phase3-route-local-batch.md`.
 
+M34c implementation work adds synchronous packet-specific pipeline warm-up,
+archive/descriptor-cache telemetry, post-resume drawable request IDs, warmed
+resize acknowledgements, repeated pause/resume, and optional minimize/restore
+stress. Metal source contracts and strict arm64 Debug/Release builds pass. The
+updated production harness still stops after three initial display-link presents
+without a post-resume acknowledgement, so M34 visual/device closure remains
+open; the run is retained as a failed evidence attempt, not a passing gate.
+Handoff: `.porting/porting-handoff-full-swift-twin-M34c-warmup-stress.md`.
+
 The fresh M33ne verifier cleared the complete matrix and regenerated strict
 Swift 6 Xcode build, but the host launch is currently blocked:
 focused/matrix gates matched, the regenerated Swift 6 Debug build succeeded,

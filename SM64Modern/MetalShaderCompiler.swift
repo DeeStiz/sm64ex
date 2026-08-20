@@ -47,6 +47,8 @@ final class MetalShaderCompiler {
     private let archiveURL: URL?
     private let descriptorCacheURL: URL?
     private let lookupArchives: [any MTL4Archive]
+    private let archiveLoaded: Bool
+    private let descriptorCacheFound: Bool
     private let compileQueue = DispatchQueue(label: "io.github.deestiz.sm64modern.metal4-pipeline", qos: .userInitiated)
     private let lock = NSLock()
     private var cache: [MetalShaderKey: CompiledPipeline] = [:]
@@ -74,24 +76,37 @@ final class MetalShaderCompiler {
         self.descriptorCacheURL = self.archiveURL?.deletingPathExtension().appendingPathExtension("mtl4-json")
 
         var archives: [any MTL4Archive] = []
-        if let archiveURL, FileManager.default.fileExists(atPath: archiveURL.path) {
+        var loadedArchive = false
+        let archiveExists = archiveURL.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
+        if let archiveURL, archiveExists {
             var error: NSError?
             if let archive = SM64ModernLoadArchive(device, archiveURL, &error) {
                 archives.append(archive)
-                metalShaderLogger.notice("metal4_archive_loaded path=\(archiveURL.path, privacy: .public)")
+                loadedArchive = true
+                metalShaderLogger.notice("metal4_archive_loaded path=\(archiveURL.path, privacy: .public) lookup_archives=1")
             } else if let error {
                 metalShaderLogger.info("metal4_archive_ignored path=\(archiveURL.path, privacy: .public) error=\(error.localizedDescription, privacy: .public)")
             }
         }
-        if let descriptorCacheURL, FileManager.default.fileExists(atPath: descriptorCacheURL.path) {
+        let descriptorCacheFound = descriptorCacheURL.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
+        if let descriptorCacheURL, descriptorCacheFound {
             metalShaderLogger.notice("metal4_descriptor_cache_found path=\(descriptorCacheURL.path, privacy: .public)")
         }
         self.lookupArchives = archives
+        self.archiveLoaded = loadedArchive
+        self.descriptorCacheFound = descriptorCacheFound
+        if loadedArchive {
+            metalShaderLogger.notice("metal4_archive_reuse enabled=true source=binary_archive")
+        } else {
+            let reason = archiveExists ? "load_failed" : "missing"
+            let fallback = descriptorCacheFound ? "descriptor_cache" : "compile"
+            metalShaderLogger.notice("metal4_archive_reuse enabled=false source=none fallback=\(fallback) reason=\(reason)")
+        }
         if serializer != nil {
             if let cacheDirectory {
                 try? FileManager.default.createDirectory(at: cacheDirectory, withIntermediateDirectories: true)
             }
-            metalShaderLogger.notice("metal4_pipeline_cache_ready schema=\(Self.rendererSchema) archive_schema=\(Self.archiveSchema) device=\(device.registryID)")
+            metalShaderLogger.notice("metal4_pipeline_cache_ready schema=\(Self.rendererSchema) archive_schema=\(Self.archiveSchema) device=\(device.registryID) archive_loaded=\(loadedArchive) lookup_archives=\(archives.count) descriptor_cache_found=\(descriptorCacheFound)")
         } else {
             metalShaderLogger.info("metal4_pipeline_cache_unavailable reason=serializer_creation_failed")
         }
@@ -103,6 +118,28 @@ final class MetalShaderCompiler {
         if let cached = cache[key] { return cached }
         if let failure = failures[key] { throw failure }
         throw MetalShaderCompilerError.pipelineNotReady(shaderID: key.shaderID)
+    }
+
+    /// Ensure the pipelines needed by the next immutable scene packet are
+    /// complete before the renderer submits a drawable. This keeps the first
+    /// captured frame source-backed instead of presenting a clear-only frame
+    /// while asynchronous Metal 4 compiler tasks are still in flight.
+    func waitUntilReady(for keys: [MetalShaderKey]) throws {
+        let uniqueKeys = Array(Set(keys))
+        guard !uniqueKeys.isEmpty else { return }
+        for key in uniqueKeys { prepare(key) }
+        SM64ModernWaitForRenderPipelineTasks()
+
+        lock.lock()
+        let failed = uniqueKeys.compactMap { key -> Error? in failures[key] }
+        let missing = uniqueKeys.first { cache[$0] == nil && failures[$0] == nil }
+        lock.unlock()
+
+        if let failure = failed.first { throw failure }
+        if let missing {
+            throw MetalShaderCompilerError.pipelineNotReady(shaderID: missing.shaderID)
+        }
+        metalShaderLogger.notice("metal4_pipeline_warmup_ready requested=\(uniqueKeys.count) archive_reuse=\(self.archiveLoaded) lookup_archives=\(self.lookupArchives.count) descriptor_cache=\(self.descriptorCacheFound)")
     }
 
     func prepare(_ key: MetalShaderKey) {
@@ -199,7 +236,7 @@ final class MetalShaderCompiler {
                 }
                 _ = library
             }
-            metalShaderLogger.debug("metal4_pipeline_compile_started shader=0x\(String(key.shaderID, radix: 16), privacy: .public)")
+            metalShaderLogger.debug("metal4_pipeline_compile_started shader=0x\(String(key.shaderID, radix: 16), privacy: .public) lookup_archives=\(self.lookupArchives.count)")
         } catch {
             finish(key: key, result: nil, error: error)
         }
@@ -215,7 +252,7 @@ final class MetalShaderCompiler {
         }
         lock.unlock()
         if let result {
-            metalShaderLogger.notice("metal4_pipeline_ready shader=0x\(String(key.shaderID, radix: 16), privacy: .public) stride=\(result.vertexStride)")
+            metalShaderLogger.notice("metal4_pipeline_ready shader=0x\(String(key.shaderID, radix: 16), privacy: .public) stride=\(result.vertexStride) archive_reuse=\(self.archiveLoaded)")
         } else {
             metalShaderLogger.error("metal4_pipeline_failed shader=0x\(String(key.shaderID, radix: 16), privacy: .public) error=\(error?.localizedDescription ?? "unknown", privacy: .public)")
         }
@@ -226,12 +263,14 @@ final class MetalShaderCompiler {
         do {
             SM64ModernWaitForRenderPipelineTasks()
             try FileManager.default.createDirectory(at: archiveURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            metalShaderLogger.notice("metal4_archive_flush_begin path=\(archiveURL.path, privacy: .public)")
             var archiveError: NSError?
             if SM64ModernFlushPipelineDataSetSerializer(serializer, archiveURL, &archiveError) {
                 metalShaderLogger.notice("metal4_archive_flushed path=\(archiveURL.path, privacy: .public)")
                 return
             }
             let archiveReason = archiveError?.localizedDescription ?? "runtime serializer returned false"
+            metalShaderLogger.info("metal4_archive_flush_failed path=\(archiveURL.path, privacy: .public) reason=\(archiveReason, privacy: .public)")
             guard let descriptorCacheURL else {
                 metalShaderLogger.info("metal4_archive_deferred reason=\(archiveReason, privacy: .public)")
                 return

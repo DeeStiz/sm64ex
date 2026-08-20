@@ -50,6 +50,12 @@ require_fixed 'pass.depthAttachment.storeAction = .dontCare' "$RENDERER"
 require_fixed 'MTL4CompilerDescriptor()' "$COMPILER"
 require_fixed 'SM64ModernMakeRenderPipelineStateAsync' "$COMPILER"
 require_fixed 'lookupArchives' "$COMPILER"
+require_fixed 'metal4_archive_loaded' "$COMPILER"
+require_fixed 'metal4_archive_reuse' "$COMPILER"
+require_fixed 'waitUntilReady(for keys: [MetalShaderKey]) throws' "$COMPILER"
+require_fixed 'metal4_pipeline_warmup_ready' "$COMPILER"
+require_fixed 'warmPipelines(packet.draws.map(\.shader), packet: packet)' "$RENDERER"
+require_fixed 'pipeline_warm=' "$RENDERER"
 require_fixed 'newRenderPipelineStateWithDescriptor:descriptor' "$BRIDGE"
 require_fixed 'metalLayer.framebufferOnly = true' "$VIEW"
 require_fixed 'metalLayer.maximumDrawableCount = 2' "$VIEW"
@@ -57,6 +63,7 @@ require_fixed 'metalLayer.displaySyncEnabled = true' "$VIEW"
 require_fixed 'metalLayer.allowsNextDrawableTimeout = true' "$VIEW"
 
 require_ordered "$RENDERER" 'commandBuffer.beginCommandBuffer(allocator: slot.allocator)' 'commandBuffer.useResidencySet(sceneResidency)'
+require_ordered "$RENDERER" 'warmPipelines(packet.draws.map(\.shader), packet: packet)' 'commandBuffer.beginCommandBuffer(allocator: slot.allocator)'
 require_ordered "$RENDERER" 'commandBuffer.useResidencySet(sceneResidency)' 'commandBuffer.pushDebugGroup'
 require_ordered "$RENDERER" 'queue.waitForDrawable(drawable)' 'queue.commit([commandBuffer])'
 require_ordered "$RENDERER" 'queue.commit([commandBuffer])' 'queue.signalDrawable(drawable)'
@@ -69,7 +76,7 @@ if rg -n --glob '*.{swift,m,h}' -- \
   exit 1
 fi
 
-if rg -n -F --glob '*.{swift,m,h}' -- 'nextDrawable' "$PROJECT_ROOT/SM64Modern"; then
+if rg -n --glob '*.{swift,m,h}' -- '\bnextDrawable\s*\(' "$PROJECT_ROOT/SM64Modern"; then
   printf '%s\n' 'Metal 4 display-link path must not acquire drawables with nextDrawable' >&2
   exit 1
 fi

@@ -1292,6 +1292,11 @@ final class EngineHost {
         let drawableSize: CGSize
     }
 
+    private struct DrawableResizeCandidate {
+        let requestID: UInt64
+        let size: CGSize
+    }
+
     private struct M9ProfileConfiguration {
         let targetSteps: UInt64
         let warmupSteps: UInt64
@@ -1350,7 +1355,20 @@ final class EngineHost {
     private var marioFacePayloadBundle: SM64MarioFacePayloadBundle?
     private var marioFaceCompositionSource: String = "fallback"
     private var pendingDrawableSize: CGSize?
+    private var pendingDrawableRequestID: UInt64 = 0
+    private var nextDrawableRequestID: UInt64 = 1
     private var pendingPresentationPause: Bool?
+    private var presentationPaused = false
+    private var presentationResumeGeneration: UInt64 = 0
+    private var presentationResumeBaselineSize: CGSize?
+    private var awaitingPostResumeResizeAcknowledgement = false
+    private var postResumeResizeCandidate: DrawableResizeCandidate?
+    private var presentedPostResumeResizeCandidate: DrawableResizeCandidate?
+    private var postResumeWarmupTicks: UInt64 = 0
+    private var lastOwnerAppliedDrawableRequestID: UInt64 = 0
+    private var pendingDrawableAgeRequestID: UInt64 = 0
+    private var pendingDrawableAgeTicks: UInt64 = 0
+    private var applyingPendingDrawableSizeAtEngineBoundary = false
     private var engineRunLoop: CFRunLoop?
     private var schedulerWakeCount: UInt64 = 0
     private var schedulerLateWakeCount: UInt64 = 0
@@ -1397,6 +1415,8 @@ final class EngineHost {
         guard size.width > 0, size.height > 0 else { return }
         let runLoop = condition.withLock { () -> CFRunLoop? in
             pendingDrawableSize = size
+            pendingDrawableRequestID = nextDrawableRequestID
+            nextDrawableRequestID &+= 1
             return engineRunLoop
         }
         if let runLoop {
@@ -1635,12 +1655,21 @@ final class EngineHost {
             return
         }
 
-        // Drain AppKit's resize publication even when the display link is
-        // paused or temporarily has no drawable. Presentation remains owned
-        // by Metal's callback; only the layer-size mutation is advanced here.
-        metalRenderer?.applyPendingDrawableSize()
         if let pause = consumePresentationPauseOnEngineThread() {
-            metalRenderer?.setPresentationPaused(pause)
+            applyPresentationPauseOnEngineThread(pause)
+        }
+        // A paused or headless display link cannot consume its callback-owned
+        // resize mailbox. Apply that fallback on the engine owner only when
+        // paused or after a short bounded age; a normal unpaused request stays
+        // queued for Metal's callback, which gives the stress gate a real
+        // post-present acknowledgement rather than a layer-only mutation.
+        let shouldDrainPendingSize = shouldDrainPendingDrawableSizeAtEngineBoundary()
+        if presentationPaused || shouldDrainPendingSize {
+            drainPendingDrawableSizeAtEngineBoundary()
+        }
+        if !presentationPaused, awaitingPostResumeResizeAcknowledgement {
+            postResumeWarmupTicks &+= 1
+            acknowledgePostResumeResizeIfWarmed()
         }
         stepCount += 1
         updateMarioFaceTransformOnEngineThread()
@@ -2057,6 +2086,64 @@ final class EngineHost {
             defer { pendingPresentationPause = nil }
             return pendingPresentationPause
         }
+    }
+
+    private func applyPresentationPauseOnEngineThread(_ paused: Bool) {
+        precondition(isCurrentEngineThread)
+        let wasPaused = presentationPaused
+        presentationPaused = paused
+        metalRenderer?.setPresentationPaused(paused)
+        guard wasPaused, !paused else { return }
+
+        presentationResumeGeneration &+= 1
+        presentationResumeBaselineSize = metalRenderer.map { renderer in
+            let dimensions = renderer.dimensions()
+            return CGSize(width: Int(dimensions.0), height: Int(dimensions.1))
+        }
+        awaitingPostResumeResizeAcknowledgement = true
+        postResumeResizeCandidate = nil
+        presentedPostResumeResizeCandidate = nil
+        postResumeWarmupTicks = 0
+        let pendingRequestID = condition.withLock { pendingDrawableRequestID }
+        engineLogger.notice(
+            "metal_presentation_resume_waiting resume=\(self.presentationResumeGeneration, privacy: .public) baseline=\(self.drawableSizeDescription(self.presentationResumeBaselineSize), privacy: .public) pending_request=\(pendingRequestID, privacy: .public)"
+        )
+    }
+
+    private func drainPendingDrawableSizeAtEngineBoundary() {
+        precondition(isCurrentEngineThread)
+        guard metalRenderer != nil else { return }
+        applyingPendingDrawableSizeAtEngineBoundary = true
+        defer { applyingPendingDrawableSizeAtEngineBoundary = false }
+        metalRenderer?.applyPendingDrawableSize()
+    }
+
+    private func shouldDrainPendingDrawableSizeAtEngineBoundary() -> Bool {
+        precondition(isCurrentEngineThread)
+        let requestID = condition.withLock { pendingDrawableRequestID }
+        guard requestID != 0 else {
+            pendingDrawableAgeRequestID = 0
+            pendingDrawableAgeTicks = 0
+            return false
+        }
+        if pendingDrawableAgeRequestID != requestID {
+            pendingDrawableAgeRequestID = requestID
+            pendingDrawableAgeTicks = 1
+        } else {
+            pendingDrawableAgeTicks &+= 1
+        }
+        return pendingDrawableAgeTicks >= 4
+    }
+
+    private func acknowledgePostResumeResizeIfWarmed() {
+        precondition(isCurrentEngineThread)
+        guard postResumeWarmupTicks >= 2,
+              let candidate = presentedPostResumeResizeCandidate else { return }
+        awaitingPostResumeResizeAcknowledgement = false
+        presentedPostResumeResizeCandidate = nil
+        engineLogger.notice(
+            "metal_presentation_resize_ack post_resume=true resume=\(self.presentationResumeGeneration, privacy: .public) request=\(candidate.requestID, privacy: .public) drawable=\(self.drawableSizeDescription(candidate.size), privacy: .public) source=display_link_presented_next_callback warmed=true warmup_ticks=\(self.postResumeWarmupTicks, privacy: .public) owner_thread=true"
+        )
     }
 
     private func requestStopCEngineOnEngineThread(reason: SM64ModernExitReason) -> SM64ModernStatus {
@@ -2619,10 +2706,78 @@ final class EngineHost {
 
     private func consumePendingDrawableSize() -> CGSize? {
         precondition(isCurrentEngineThread)
-        return condition.withLock {
-            defer { pendingDrawableSize = nil }
-            return pendingDrawableSize
+        let request = condition.withLock { () -> DrawableResizeCandidate? in
+            guard let pendingDrawableSize else { return nil }
+            let request = DrawableResizeCandidate(
+                requestID: pendingDrawableRequestID,
+                size: pendingDrawableSize
+            )
+            self.pendingDrawableSize = nil
+            self.pendingDrawableRequestID = 0
+            return request
         }
+        guard let request else { return nil }
+
+        // `MetalRenderer` invokes this closure after `drawable.present()` and
+        // before it mutates `CAMetalLayer.drawableSize` for the next frame.
+        // Reading the current dimensions here therefore identifies the
+        // drawable that was actually presented, not merely the size being
+        // staged for the next callback.
+        let presentedDrawableSize = applyingPendingDrawableSizeAtEngineBoundary
+            ? nil
+            : metalRenderer.map { renderer in
+                let dimensions = renderer.dimensions()
+                return CGSize(width: Int(dimensions.0), height: Int(dimensions.1))
+            }
+
+        if !applyingPendingDrawableSizeAtEngineBoundary,
+           !presentationPaused,
+           awaitingPostResumeResizeAcknowledgement,
+           let candidate = postResumeResizeCandidate,
+           let presentedDrawableSize,
+           presentedPostResumeResizeCandidate == nil,
+           drawableSizesMatch(presentedDrawableSize, candidate.size) {
+            postResumeResizeCandidate = nil
+            presentedPostResumeResizeCandidate = candidate
+            engineLogger.notice(
+                "metal_presentation_drawable_observed post_resume=true resume=\(self.presentationResumeGeneration, privacy: .public) request=\(candidate.requestID, privacy: .public) drawable=\(self.drawableSizeDescription(presentedDrawableSize), privacy: .public) source=display_link_presented"
+            )
+        }
+
+        if applyingPendingDrawableSizeAtEngineBoundary {
+            pendingDrawableAgeRequestID = request.requestID
+            pendingDrawableAgeTicks = 0
+            lastOwnerAppliedDrawableRequestID = max(
+                lastOwnerAppliedDrawableRequestID,
+                request.requestID
+            )
+        } else if !presentationPaused,
+                  awaitingPostResumeResizeAcknowledgement,
+                  request.requestID > lastOwnerAppliedDrawableRequestID,
+                  postResumeResizeCandidate == nil,
+                  drawableSizeChanged(request.size, from: presentationResumeBaselineSize) {
+            postResumeResizeCandidate = request
+            engineLogger.notice(
+                "metal_presentation_resize_observed post_resume=true resume=\(self.presentationResumeGeneration, privacy: .public) request=\(request.requestID, privacy: .public) drawable=\(self.drawableSizeDescription(request.size), privacy: .public) source=display_link_post_present"
+            )
+        }
+        return request.size
+    }
+
+    private func drawableSizeChanged(_ size: CGSize, from baseline: CGSize?) -> Bool {
+        guard let baseline else { return true }
+        return Int(size.width.rounded()) != Int(baseline.width.rounded())
+            || Int(size.height.rounded()) != Int(baseline.height.rounded())
+    }
+
+    private func drawableSizesMatch(_ lhs: CGSize, _ rhs: CGSize) -> Bool {
+        Int(lhs.width.rounded()) == Int(rhs.width.rounded())
+            && Int(lhs.height.rounded()) == Int(rhs.height.rounded())
+    }
+
+    private func drawableSizeDescription(_ size: CGSize?) -> String {
+        guard let size else { return "none" }
+        return "\(Int(size.width.rounded()))x\(Int(size.height.rounded()))"
     }
 
     private static func currentThreadIdentifier() -> UInt64 {

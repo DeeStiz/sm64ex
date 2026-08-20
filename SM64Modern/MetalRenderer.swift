@@ -258,6 +258,7 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private var presentedFrameCount: UInt64 = 0
     private var lastPresentedPacket: UInt64 = 0
     private var pipelineWaitLogCount: UInt64 = 0
+    private var warmedPipelineKeys: Set<MetalShaderKey> = []
     private var renderFailure: Error?
     private var isRunning = false
 
@@ -800,6 +801,15 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
                 )
             }
         }
+        if let packet, !packet.draws.isEmpty {
+            try warmPipelines(packet.draws.map(\.shader), packet: packet)
+        }
+        if marioFaceSourceGeometry != nil {
+            let shaderKey = marioFaceTextureDrawEnabled
+                ? Self.marioFaceTexturedShaderKey
+                : Self.marioFaceShaderKey
+            try warmPipelines([shaderKey], packet: packet)
+        }
         let preparedMarioFaceDraw = try prepareMarioFaceDraw(
             into: slot.transientBuffer, cursor: &cursor
         )
@@ -812,6 +822,12 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
             pipelineWaitLogCount += 1
             if pipelineWaitLogCount <= 3 || pipelineWaitLogCount.isMultiple(of: 120) {
                 metalLogger.notice("metal_scene_waiting_for_pipelines packet=\(packet?.sequence ?? 0) draws=\(packet?.draws.count ?? 0) wait_count=\(self.pipelineWaitLogCount)")
+            }
+            if packet?.draws.isEmpty == false {
+                // The readiness barrier above should make this unreachable;
+                // never submit a clear-only frame if a scene packet is waiting
+                // on a pipeline due to a compiler callback race.
+                return
             }
         }
         try ensureDepthTexture(for: colorTexture, slot: slot)
@@ -997,13 +1013,22 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         if let packet { lastPresentedPacket = packet.sequence }
         presentedFrameCount += 1
         if presentedFrameCount <= 5 || !uploads.isEmpty || presentedFrameCount.isMultiple(of: 600) {
-            metalLogger.notice("metal_scene_presented frame=\(self.presentedFrameCount) packet=\(self.lastPresentedPacket) draws=\(preparedDraws.count) uploads=\(uploads.count) drawable=\(colorTexture.width)x\(colorTexture.height) source=display_link")
+            metalLogger.notice("metal_scene_presented frame=\(self.presentedFrameCount) packet=\(self.lastPresentedPacket) draws=\(preparedDraws.count) uploads=\(uploads.count) drawable=\(colorTexture.width)x\(colorTexture.height) pipeline_warm=\(self.warmedPipelineKeys.isEmpty == false) source=display_link")
         }
         if let drawableSize = consumeDrawableSize() {
             layer.drawableSize = drawableSize
             metalLogger.notice("metal_resize_applied drawable=\(Int(drawableSize.width))x\(Int(drawableSize.height))")
         }
         frameIndex = (frameIndex + 1) % frameSlots.count
+    }
+
+    private func warmPipelines(_ keys: [MetalShaderKey], packet: MetalScenePacket?) throws {
+        let uniqueKeys = Set(keys)
+        let missingKeys = uniqueKeys.subtracting(warmedPipelineKeys)
+        guard !missingKeys.isEmpty else { return }
+        try shaderCompiler.waitUntilReady(for: Array(missingKeys))
+        warmedPipelineKeys.formUnion(missingKeys)
+        metalLogger.notice("metal_pipeline_warmup_ready packet=\(packet?.sequence ?? 0) shaders=\(missingKeys.count) total=\(self.warmedPipelineKeys.count)")
     }
 
     private func requiredTransientBytes(for packet: MetalScenePacket?) -> Int {

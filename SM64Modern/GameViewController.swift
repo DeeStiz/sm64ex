@@ -11,6 +11,7 @@ final class GameViewController: NSViewController {
     private var focusObservers: [NSObjectProtocol] = []
     private var m34StressTimer: Timer?
     private var m34StressStep = 0
+    private var m34StressMinimizeEnabled = false
 
     override var acceptsFirstResponder: Bool { true }
 
@@ -99,6 +100,10 @@ final class GameViewController: NSViewController {
     }
 
     private func armM34Stress() {
+        m34StressMinimizeEnabled = ProcessInfo.processInfo.environment["SM64_MODERN_M34_STRESS_MINIMIZE"] == "1"
+        if m34StressMinimizeEnabled, let window = view.window {
+            installM34StressWindowObservers(for: window)
+        }
         let timer = Timer(
             timeInterval: 0.25,
             target: self,
@@ -108,7 +113,7 @@ final class GameViewController: NSViewController {
         )
         m34StressTimer = timer
         RunLoop.main.add(timer, forMode: .common)
-        logger.notice("m34_stress_armed")
+        logger.notice("m34_stress_armed minimize=\(self.m34StressMinimizeEnabled)")
     }
 
     @objc private func runM34StressStep(_ timer: Timer) {
@@ -116,13 +121,14 @@ final class GameViewController: NSViewController {
             timer.invalidate()
             return
         }
+        let step = m34StressStep
         let sizes: [NSSize] = [
             NSSize(width: 800, height: 600),
             NSSize(width: 1024, height: 768),
             NSSize(width: 1280, height: 960),
             NSSize(width: 960, height: 720),
         ]
-        let size = sizes[m34StressStep % sizes.count]
+        let size = sizes[step % sizes.count]
         window.setContentSize(size)
         // AppKit may coalesce the layout pass while the test app is running
         // under a headless/open launch. Publish the intended backing-pixel
@@ -133,25 +139,99 @@ final class GameViewController: NSViewController {
             CGSize(width: size.width * backingScale, height: size.height * backingScale)
         )
         logger.notice(
-            "m34_stress_resize_requested index=\(self.m34StressStep) size=\(Int(size.width))x\(Int(size.height))"
+            "m34_stress_resize_requested index=\(step) size=\(Int(size.width))x\(Int(size.height))"
         )
-        switch m34StressStep {
+        switch step {
         case 2:
             engineHost.requestPresentationPaused(true)
-            logger.notice("m34_stress_pause_requested paused=true")
+            logger.notice("m34_stress_pause_requested paused=true cycle=1")
+        case 3:
+            // Exercise an idempotent repeated pause request while the
+            // display-link callback is quiescent.
+            engineHost.requestPresentationPaused(true)
+            logger.notice("m34_stress_pause_requested paused=true cycle=1_repeat")
         case 4:
             engineHost.requestPresentationPaused(false)
-            logger.notice("m34_stress_pause_requested paused=false")
+            logger.notice("m34_stress_pause_requested paused=false cycle=1")
+        case 5:
+            logger.notice("m34_stress_post_resume_resize_requested index=\(step)")
+        case 6:
+            engineHost.requestPresentationPaused(true)
+            logger.notice("m34_stress_pause_requested paused=true cycle=2")
+        case 7:
+            engineHost.requestPresentationPaused(false)
+            logger.notice("m34_stress_pause_requested paused=false cycle=2")
+        case 8:
+            if m34StressMinimizeEnabled {
+                window.miniaturize(nil)
+                logger.notice("m34_stress_minimize_requested")
+            } else {
+                engineHost.requestPresentationPaused(true)
+                logger.notice("m34_stress_pause_requested paused=true cycle=3")
+            }
+        case 9:
+            if m34StressMinimizeEnabled {
+                window.deminiaturize(nil)
+                logger.notice("m34_stress_restore_requested")
+            } else {
+                engineHost.requestPresentationPaused(false)
+                logger.notice("m34_stress_pause_requested paused=false cycle=3")
+            }
+        case 10:
+            logger.notice("m34_stress_post_resume_resize_requested index=\(step)")
+        case 11:
+            engineHost.requestPresentationPaused(true)
+            logger.notice("m34_stress_pause_requested paused=true cycle=4")
+        case 12:
+            engineHost.requestPresentationPaused(false)
+            logger.notice("m34_stress_pause_requested paused=false cycle=4")
+        case 13:
+            logger.notice("m34_stress_post_resume_resize_requested index=\(step)")
         default:
             break
         }
-        m34StressStep += 1
-        if m34StressStep >= 8 {
+        m34StressStep = step + 1
+        if m34StressStep >= 14 {
             timer.invalidate()
             m34StressTimer = nil
+            if m34StressMinimizeEnabled, window.isMiniaturized {
+                window.deminiaturize(nil)
+                logger.notice("m34_stress_restore_requested final=true")
+            }
             engineHost.requestPresentationPaused(false)
             logger.notice("m34_stress_finished")
         }
+    }
+
+    private func installM34StressWindowObservers(for window: NSWindow) {
+        let center = NotificationCenter.default
+        focusObservers.append(
+            center.addObserver(
+                forName: NSWindow.didMiniaturizeNotification,
+                object: window,
+                queue: .main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    guard let self, self.m34StressTimer != nil else { return }
+                    self.logger.notice("m34_stress_minimize_observed")
+                    self.engineHost.requestPresentationPaused(true)
+                }
+            }
+        )
+        focusObservers.append(
+            center.addObserver(
+                forName: NSWindow.didDeminiaturizeNotification,
+                object: window,
+                queue: .main
+            ) { [weak self] _ in
+                MainActor.assumeIsolated {
+                    guard let self, self.m34StressTimer != nil else { return }
+                    self.logger.notice("m34_stress_restore_observed")
+                    (self.view as? GameView)?.publishDrawableSize()
+                    self.engineHost.requestPresentationPaused(false)
+                }
+            }
+        )
     }
 
     private func installFocusObservers() {

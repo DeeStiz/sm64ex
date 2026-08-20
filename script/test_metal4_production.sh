@@ -79,7 +79,8 @@ launch_common() {
     --env "SM64_MODERN_SAVE_DIR=$SAVE_DIR" \
     --env "SM64_MODERN_M9_PROFILE_TICKS=$PROFILE_TICKS" \
     --env "SM64_MODERN_M9_PROFILE_WARMUP_TICKS=$WARMUP_TICKS" \
-    --env "SM64_MODERN_M34_STRESS=1" "$@"
+    --env "SM64_MODERN_M34_STRESS=1" \
+    --env "SM64_MODERN_M34_STRESS_MINIMIZE=1" "$@"
 }
 
 if pgrep -x "$APP_NAME" >/dev/null 2>&1; then
@@ -103,6 +104,28 @@ require_log() {
     || die "runtime evidence missing in $(basename "$log_path"): $needle"
 }
 
+require_count_at_least() {
+  local log_path="$1"
+  local pattern="$2"
+  local minimum="$3"
+  local count
+  count="$(rg -c -- "$pattern" "$log_path" || true)"
+  [[ "$count" =~ ^[0-9]+$ ]] || count=0
+  (( count >= minimum )) \
+    || die "runtime evidence expected at least $minimum matches for '$pattern' in $(basename "$log_path"), found $count"
+}
+
+require_ordered_log() {
+  local log_path="$1"
+  local first="$2"
+  local second="$3"
+  local first_line second_line
+  first_line="$(rg -n -F -- "$first" "$log_path" | head -n 1 | cut -d: -f1)"
+  second_line="$(rg -n -F -- "$second" "$log_path" | head -n 1 | cut -d: -f1)"
+  [[ -n "$first_line" && -n "$second_line" && "$first_line" -lt "$second_line" ]] \
+    || die "runtime evidence order failure in $(basename "$log_path"): '$first' must precede '$second'"
+}
+
 for expected in \
   "m9_profile_warmup_complete step=$WARMUP_TICKS" \
   "m9_profile_complete steps=$PROFILE_TICKS" \
@@ -110,15 +133,37 @@ for expected in \
   'audio_dropped_delta=0' \
   'm34_stress_resize_requested index=0' \
   'm34_stress_resize_requested index=7' \
+  'm34_stress_resize_requested index=13' \
+  'm34_stress_post_resume_resize_requested index=5' \
+  'm34_stress_post_resume_resize_requested index=10' \
   'm34_stress_pause_requested paused=true' \
   'm34_stress_pause_requested paused=false' \
+  'm34_stress_minimize_requested' \
+  'm34_stress_minimize_observed' \
+  'm34_stress_restore_requested' \
+  'm34_stress_restore_observed' \
   'metal_display_link_pause_state paused=true' \
   'metal_display_link_pause_state paused=false' \
+  'metal_presentation_resize_observed' \
+  'metal_presentation_drawable_observed' \
+  'source=display_link_presented' \
+  'metal_presentation_resize_ack' \
+  'post_resume=true' \
+  'source=display_link_presented_next_callback' \
+  'warmed=true' \
   'metal_shutdown_drained' \
   'engine_thread_finished status=0' \
   'application_stopped'; do
   require_log "$OUTPUT_DIR/validation.log" "$expected"
 done
+require_count_at_least "$OUTPUT_DIR/validation.log" 'm34_stress_pause_requested paused=true' 3
+require_count_at_least "$OUTPUT_DIR/validation.log" 'm34_stress_pause_requested paused=false' 3
+require_count_at_least "$OUTPUT_DIR/validation.log" 'metal_display_link_pause_state paused=true' 3
+require_count_at_least "$OUTPUT_DIR/validation.log" 'metal_display_link_pause_state paused=false' 3
+require_count_at_least "$OUTPUT_DIR/validation.log" 'metal_presentation_resize_ack' 2
+require_ordered_log "$OUTPUT_DIR/validation.log" \
+  'm34_stress_post_resume_resize_requested index=5' \
+  'metal_presentation_resize_ack'
 resize_count="$(rg -c 'metal_resize_applied drawable=' "$OUTPUT_DIR/validation.log" || true)"
 (( resize_count >= 4 )) || die "expected at least four owner-thread resize applications, found $resize_count"
 if rg -n -i -- \
@@ -161,7 +206,9 @@ test -d "$TRACE_PATH" || die "GPU capture did not produce a trace bundle"
 for expected in \
   'metal_scene_initialized' \
   'metal_scene_presented frame=1' \
-  'm34_stress_resize_requested index=7' \
+  'm34_stress_resize_requested index=13' \
+  'metal_presentation_resize_ack' \
+  'source=display_link_presented_next_callback' \
   'metal_shutdown_drained' \
   'engine_thread_finished status=0' \
   'application_stopped'; do
@@ -190,6 +237,6 @@ for expected in \
     || die "GPU trace inspection missing: $expected"
 done
 
-printf 'M34b_RESULT validation=pass capture=pass resize_pause=pass trace=%s\n' "$TRACE_PATH"
+printf 'M34b_RESULT validation=pass capture=pass resize_pause=pass post_resume_presentation=pass trace=%s\n' "$TRACE_PATH"
 printf 'validation_log=%s\ncapture_log=%s\ngpudebug=%s\n' \
   "$OUTPUT_DIR/validation.log" "$OUTPUT_DIR/capture.log" "$OUTPUT_DIR/gpudebug.txt"
