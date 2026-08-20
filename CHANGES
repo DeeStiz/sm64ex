@@ -1,9 +1,9 @@
 SM64 Modern native macOS — nightly continuation update (2026-08-20)
-1.) Centrally promote Sushi Shark/collision child and the NPC/menu family
-    through dispatch routes 259–264, preserving generation-safe ownership and
-    effect delivery.
-2.) Update the deterministic behavior manifest to 534 rows, 500 Swift owners,
-    and 34 explicit C adapters at `0xaffa1724f93c6e44`.
+1.) Centrally promote Sushi Shark/collision child, the NPC/menu family, and
+    Squarish Path Moving through dispatch routes 259–265, preserving
+    generation-safe ownership and effect delivery.
+2.) Update the deterministic behavior manifest to 534 rows, 501 Swift owners,
+    and 33 explicit C adapters at `0x8c31511e7a1aa76c`.
 3.) Add a bounded live route-shard executor that requires record-mode live
     traces, rejects fixture/missing/reused evidence, and emits isolated worker
     results for canonical batches up to 256 rows.

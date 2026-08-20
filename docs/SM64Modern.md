@@ -20,9 +20,9 @@ The status below is pinned to the current `nightly` continuation
   continuation has centrally promoted Sushi Shark/collision child and the
   NPC/menu family (routes 259–264); the NPC/menu focused contract is
   `0x4ff30b57a3db6922`.
-* The deterministic behavior manifest contains **534 rows**: **500 Swift
-  value/owner routes** and **34 explicit C adapters**. Its current fingerprint
-  is `0xaffa1724f93c6e44`.
+* The deterministic behavior manifest contains **534 rows**: **501 Swift
+  value/owner routes** and **33 explicit C adapters**. Its current fingerprint
+  is `0x8c31511e7a1aa76c`.
 * **M34c** is the latest Metal 4 implementation checkpoint; **M34b** remains
   the latest validated production/capture slice. Its two-pass
   harness keeps API/shader validation separate from GPU capture and exercises
@@ -43,7 +43,7 @@ The source-of-truth tracker and the complete milestone ledger are in
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
-[`../.porting/porting-handoff-full-swift-twin-phase5-npc-menu-integration.md`](../.porting/porting-handoff-full-swift-twin-phase5-npc-menu-integration.md).
+[`../.porting/porting-handoff-full-swift-twin-phase5-squarish-path.md`](../.porting/porting-handoff-full-swift-twin-phase5-squarish-path.md).
 
 ## Architecture and ownership
 
@@ -149,6 +149,7 @@ gates before recording a milestone handoff.
 | Deterministic replay | `./script/build_and_run.sh --parity-verify` | 90-tick record/replay with no first divergence |
 | Native host | `./script/build_and_run.sh --verify` | Layer/device/bridge/frame-one/start/stop telemetry when the host can launch |
 | Metal 4 production | `./script/test_metal4_production.sh` | Separate API/shader-validation and GPU-capture passes plus `gpudebug` inspection |
+| M35 readiness | `./script/m9_release.sh readiness` or `./script/test_m9_release_readiness.sh` | Read-only distribution prerequisite check; it fails closed without Developer ID/notary/toolchain prerequisites |
 
 `test_metal4_production.sh` requires the macOS Metal capture/debug tools and
 uses a new output directory by default; it refuses to overwrite an existing

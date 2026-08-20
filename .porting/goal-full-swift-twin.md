@@ -3,8 +3,8 @@
 ## Status
 
 M33nk remains the latest numbered behavior-qualification slice; the
-continuation promotion now centrally wires Sushi Shark/collision child and
-the NPC/menu family. M34c remains the latest Metal 4 implementation checkpoint, while M34b
+continuation promotion now centrally wires Sushi Shark/collision child, the
+NPC/menu family, and Squarish Path Moving. M34c remains the latest Metal 4 implementation checkpoint, while M34b
 is the latest validated production/capture slice. The squishable-platform, LLL
 drawbridge, shared water-wave, waterfall, volcano sound-loop, and tumbling
 bridge, WDW/JRB floating-platform, packed sliding-platform, small-water-wave,
@@ -49,8 +49,8 @@ tilting-pyramid, Boo-with-cage, bookend, book-switch, generic-fish group,
 cannon-barrel, cannon-parent, Ghost Hunt Boo shared-script, Merry-Go-Round Boo
 shared-script, Boo-manager, Bubba, Bowling Ball, TTM/THI Bowling Ball spawners, pit Bowling Ball, Metal Cap, Vanish Cap, Wing Cap, SSL pyramid wall, THI huge/tiny island tops, pyramid top fragments, pyramid pillar detectors, Pyramid Top, DDD pole, Donut Platform, Courtyard Boo Triplet, Falling Bowser Platform, Giant Pole, End Cutscene Actor, End Birds, Beginning Peach, Haunted Bookshelf, Haunted Bookshelf Manager, JRB Floating Box, JRB Sliding Box, Jet Stream, Jet Stream Water Ring, Jet Stream Ring Spawner, Manta Ray Water Ring, Haunted Chair, Whirlpool, Manta Ray, Jumping Box, Kickable Board, Koopa Flag, Pole Grabbing, Tree, Koopa Race Endpoint, WF Breakable Wall, Unused Poundable Platform, Yellow Background Menu, Snow Mound, RR Cruiser Wing, Spindrift, Spindel, RR Rotating Bridge Platform, Snowman Wind, Snowman Head, Mr Blizzard Snowball, unlock-door star, platform-on-track child, volcano falling-trap, TTM/LLL rolling-log, Tox Box, and Mr. I blue-coin child routes are now
 Swift 6 value/owner paths with checked C parity contracts and strict
-dispatch/manifest coverage. The manifest is 534 rows with 500 Swift routes
-and 34 explicit C adapters at `0xaffa1724f93c6e44`; the focused Bubba
+dispatch/manifest coverage. The manifest is 534 rows with 501 Swift routes
+and 33 explicit C adapters at `0x8c31511e7a1aa76c`; the focused Bubba
 contract is `0x0b48c789602881e2` and the Bowling Ball contract is
 `0x88570fdd4c786c82`; the DDD pole contract is `0xdd1cacb7655e0161`; the Donut Platform contract is `0x6eaf95309fdb0276`; the Courtyard Boo Triplet contract is `0xc7156d87ae802621`; the Falling Bowser Platform contract is `0xd083c6e2b90b4fc4`; the Giant Pole contract is `0xfa62f431d9f8d801`; the End Cutscene Actor contract is `0xf1db9ac56ad3bbe6`; the End Birds contract is `0x1320d37d6d85bfb9`; the Beginning Peach contract is `0x4cb2b11640e9f51b`; the Haunted Bookshelf contract is `0x4254bbcb9d4a35c7`; the Haunted Bookshelf Manager contract is `0x391346c3d3849a04`; the JRB Floating Box contract is `0x775ddf4e9c1eab53`; the JRB Sliding Box contract is `0x00f003b059ed44bb`; the Jet Stream contract is `0xd378e30e1b7f6c9d`; the Jet Stream Water Ring contract is `0x555f966268de8e68`; the Jet Stream Ring Spawner contract is `0xd2754d36b2625378`; the Manta Ray Water Ring contract is `0x3642be0555c82298`; the Haunted Chair contract is `0x7381c9aed05b4b42`; the Whirlpool contract is `0x61362df8181e01ae`; the Manta Ray contract is `0x0b08fed50dda5e32`; the Jumping Box contract is `0x5c2b7dd16ac14cca`; the Kickable Board contract is `0xaebbcf560ba239a1`; the Koopa Flag, Pole Grabbing, and Tree contracts share `0xbade382be297f52c`; the Koopa Race Endpoint contract is `0xa651adf251518d63`; the WF Breakable Wall contract is `0x8330c26af29f2b62`; the Unused Poundable Platform contract is `0x961f8e9cf67ce60b`; the Yellow Background Menu contract is `0x52a54fdc3009b604`; the Snow Mound contract is `0x3065533e47dbdaa9`; the RR Cruiser Wing contract is `0xe22b35ba86dc9748`; the Spindrift contract is `0x9ac8294303fff174`; the Spindel contract is `0x2f02c221a0c4104e`; the RR Rotating Bridge Platform contract is `0xa474c104378973c3`; the Snowman Wind contract is `0x0bb6ba5b32436749`; the Mr Blizzard Snowball contract is `0x6153d13d64702c49`;
 the Unlock Door Star contract is `0xa818fe2cbab2403f`; the Track Ball contract is `0x7f3cd721bf073d7f`; the Volcano Falling Trap contract is `0x7d60df81755c4d3d`; the Rolling Log contract is `0x8ceff3be0ab6b31e`; the Tox Box contract is `0x94a72bac32bcb54b`; the Metal Cap contract is `0x7d801e7751989d7e`; the Vanish Cap contract is `0xbdb3f6492e88f4fa`; the Wing Cap contract is `0xbe5f068bbc416fc6`; the Snowman Head contract is `0x2eb225e676e807a4`; the SSL wall contract is `0x303f2d4f9153d591`; the THI island-top contract is `0xaf302a9065f8736c`; the Pyramid Top Fragment contract is `0xe99b6f194e4e8396`; the Pyramid Pillar Detector contract is `0xbe7829c4abd81985`; the Pyramid Top contract is `0xbcc9c4f70394755f`; the Mr. I blue-coin mapping reuses the existing `MrIObjectBridge` owner; the expanded cloud
@@ -152,6 +152,24 @@ strict Swift 6 smoke and the existing merge/worker-result gates pass. Handoff:
 `.porting/porting-handoff-full-swift-twin-phase6-live-shard-executor.md`. This
 is execution infrastructure only: actual gameplay launching, C/Swift oracle
 comparison, and zero-unexecuted closure for all 7,419 shards remain open.
+
+Continuation Phase 7 adds a read-only M35 release-readiness preflight. The
+contract checks ordinary (non-beta) Xcode selection, Developer ID identity,
+release/debug entitlements, archive/export tools, DMG/stapler availability,
+notary authentication configuration, and the ZIP stapling caveat without
+submitting or stapling anything. The preflight contract and shell checks pass,
+while the current environment correctly reports beta Xcode, no Developer ID
+identity, a Release `get-task-allow` mismatch, and no notary credentials.
+
+Continuation Phase 8 centrally promotes `bhvSquarishPathMoving` through route
+265. Its focused contract is `0x9cbe6c17eb977926`; the manifest is now 534 rows
+with 501 Swift owners and 33 explicit C adapters at
+`0x8c31511e7a1aa76c`. Focused, manifest, coverage, dispatch, engine-runtime,
+live-route input-only replay, strict Debug Xcode build, and hygiene gates pass.
+Handoff: `.porting/porting-handoff-full-swift-twin-phase5-squarish-path.md`.
+Pushable Metal Box, Tilting Bowser Lava Platform, LLL Bowser Puzzle, Snowman
+Bottom, Treasure Chest, full live shards, M34, M35, and human acceptance remain
+open.
 
 The fresh M33ne verifier cleared the complete matrix and regenerated strict
 Swift 6 Xcode build, but the host launch is currently blocked:
@@ -5704,7 +5722,7 @@ Implement one Swift codec for the existing C save format, including checksums, s
 | M33nk: Snowman Head | `bhvSnowmansHead` must preserve 0.7 scale, gravity/friction/buoyancy initialization, dialog action gates, falling collision transition, -994 Y clamp, explosion/jingle edge, and post-dialog mist/star intent. | Implemented locally — focused contract `0x2eb225e676e807a4`, explicit snowman-head dispatch/owner bridge, aggregate/runtime/live/Metal gates, manifest `0x315aaf6ce5ab1f31` with 534 rows (`488` Swift, `46` C adapters), XcodeGen regeneration, shell syntax, and `git diff --check` pass; the latest full host verifier remains blocked by LaunchServices `-10827`, while prior M33nc host proof is retained |
 | M33md: Haunted Chair | `bhvHauntedChair` must preserve piano/free initialization state, 31-frame lift admission, 50-frame rise, 40-frame launch countdown, launch velocity/sound edge, hitbox setup, and ground/wall retirement. | Implemented locally — focused Swift/C contract `0x7381c9aed05b4b42`, dispatch/lift/launch smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0x37c9138dc04c8a14` with 534 rows (`445` Swift, `89` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
 | M33me: Whirlpool | `bhvWhirlpool` must preserve the 5,000-unit visibility/bubble gate, source orientation values, yaw rotation cadence, water-sound intent, and whirlpool hitbox ownership. | Implemented locally — focused Swift/C contract `0x61362df8181e01ae`, dispatch/shared-wind/bubble/rotation smoke, manifest, Metal source, engine runtime, live-route oracle, regenerated strict Swift 6 Xcode Debug build, shell syntax, and `git diff --check` pass; behavior manifest `0xe887dabeda31e43b` with 534 rows (`446` Swift, `88` C adapters); fresh full-verifier rerun after this slice and physical visual/performance/thermal/device, release, audio/effect parity, and human acceptance remain open |
-| M33 continuation: central route promotion | Phase 2/3 route-local owners become central Swift-authority routes with dispatch, effect aggregation, manifest, and strict-build proof. | In progress — Act Selector, Sushi Shark, and NPC/menu are promoted; Squarish Path, Pushable Metal Box, Tilting Bowser platform, LLL Bowser Puzzle, Snowman Bottom, and Treasure Chest remain |
+| M33 continuation: central route promotion | Phase 2/3 route-local owners become central Swift-authority routes with dispatch, effect aggregation, manifest, and strict-build proof. | In progress — Act Selector, Sushi Shark, NPC/menu, and Squarish Path are promoted; Pushable Metal Box, Tilting Bowser platform, LLL Bowser Puzzle, Snowman Bottom, and Treasure Chest remain |
 | M33: Automated full-game qualification | Route shards cover every level, star, behavior, action, camera, transition, menu, audio sequence, and save mutation with exact parity. | In progress — M33a inventory contract is complete; shard execution, C-vs-Swift schema-4 byte comparison, zero-unexecuted closure, and sanitizer reruns remain |
 | M34a: Metal 4 command/residency contract | Every reusable MTL4 command buffer redeclares scene/layer residency after begin; legacy binding APIs and display-link drawable acquisition are rejected; explicit barrier and presentation ordering remain checked. | Complete locally — focused Metal 4 source/scene smokes, 140-script matrix (`runs=140 failures=0`), regenerated native Swift 6 Debug build, bounded API/GPU validation run with clean normal shutdown, 8.3 MiB `gpucapture` plus `gpudebug` inspection, and `git diff --check` pass; sustained capture, resize/pause stress, visual parity, and physical/human acceptance remain open |
 | M34: Metal 4 production closure | Visible captures, Metal validation, GPU inspection, pipeline readiness, and device/schema archive reuse pass without display-link compilation. | In progress — M34a closes the source/resource contract and M34b closes separate API/shader-validation plus GPU-capture passes; M34c adds warmup/resize stress and four-run diagnosis finds host/compositor throttling rather than a source fault, but warmed post-resume presentation, archive-reuse proof, physical display behavior, and human acceptance remain |
@@ -5724,8 +5742,8 @@ route is never counted as migrated because a Swift file exists; it is counted
 only after the value kernel, owner bridge, C oracle, dispatch identity,
 manifest row, live trace, and strict build all agree. The current numbered
 checkpoint is M33nk; the continuation ledger is at 534 reachable declarations,
-500 Swift-owned rows, and 34 explicit C adapters after Sushi and NPC/menu
-promotion.
+501 Swift-owned rows, and 33 explicit C adapters after Sushi, NPC/menu, and
+Squarish promotion.
 Matrix/build are green, while the external LaunchServices host gate is pending
 recovery. The
 host result is still not physical visual, performance, thermal, release, or
