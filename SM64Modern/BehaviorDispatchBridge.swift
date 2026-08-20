@@ -267,6 +267,7 @@ enum SM64BehaviorDispatchRoute: UInt16, Equatable, Sendable {
     case toadMessage = 263
     case menuButton = 264
     case squarishPathMoving = 265
+    case pushableMetalBox = 266
 }
 
 struct SM64BehaviorDispatchEvent: Equatable, Sendable {
@@ -285,6 +286,7 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let menuButtonEffects: [SM64MenuButtonObjectEffect]
     let menuButtonManagerEffects: [SM64MenuButtonManagerObjectEffect]
     let squarishPathMovingEffects: [SM64SquarishPathMovingObjectEffectRecord]
+    let pushableMetalBoxEffects: [SM64PushableMetalBoxObjectEffectRecord]
     let decorativePendulumEffects: [SM64DecorativePendulumObjectEffectRecord]
     let decorativePendulumDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let respawnerEffects: [SM64RespawnerObjectEffectRecord]
@@ -807,6 +809,7 @@ final class SM64BehaviorDispatchBridge {
     let toadMessage: SM64ToadMessageObjectBridge
     let menuButton: SM64MenuButtonObjectBridge
     let squarishPathMoving: SM64SquarishPathMovingObjectBridge
+    let pushableMetalBox: SM64PushableMetalBoxObjectBridge
     let strongWindParticle: SM64StrongWindParticleObjectBridge
     let waterParticle: SM64WaterParticleObjectBridge
     let plungeBubble: SM64PlungeBubbleObjectBridge
@@ -1040,6 +1043,7 @@ final class SM64BehaviorDispatchBridge {
         self.toadMessage = SM64ToadMessageObjectBridge(scheduler: scheduler)
         self.menuButton = SM64MenuButtonObjectBridge(scheduler: scheduler)
         self.squarishPathMoving = SM64SquarishPathMovingObjectBridge()
+        self.pushableMetalBox = SM64PushableMetalBoxObjectBridge()
         self.strongWindParticle = SM64StrongWindParticleObjectBridge()
         self.waterParticle = SM64WaterParticleObjectBridge(waterSplashBridge: self.waterSplash)
         self.plungeBubble = SM64PlungeBubbleObjectBridge(waterParticleBridge: self.waterParticle)
@@ -1684,6 +1688,8 @@ final class SM64BehaviorDispatchBridge {
             return .menuButton
         case SM64SquarishPathMovingObjectBridge.defaultBehaviorIdentity:
             return .squarishPathMoving
+        case SM64PushableMetalBoxObjectBridge.defaultBehaviorIdentity:
+            return .pushableMetalBox
         case SM64StrongWindParticleObjectBridge.visibleBehaviorIdentity,
              SM64StrongWindParticleObjectBridge.tinyBehaviorIdentity:
             return .strongWindParticle
@@ -2215,6 +2221,7 @@ final class SM64BehaviorDispatchBridge {
         for id in toadMessage.registeredIDs { toadMessage.remove(id) }
         for id in menuButton.registeredIDs { menuButton.remove(id) }
         for id in squarishPathMoving.registeredIDs { squarishPathMoving.remove(id) }
+        for id in pushableMetalBox.registeredIDs { pushableMetalBox.remove(id) }
         for id in strongWindParticle.registeredIDs { strongWindParticle.remove(id) }
         for id in waterParticle.registeredIDs { waterParticle.remove(id) }
         for id in plungeBubble.registeredIDs { plungeBubble.remove(id) }
@@ -2519,6 +2526,7 @@ final class SM64BehaviorDispatchBridge {
         toadMessage.beginExternalTick()
         menuButton.beginExternalTick()
         squarishPathMoving.beginExternalTick()
+        pushableMetalBox.beginExternalTick()
         strongWindParticle.beginExternalTick()
         waterParticle.beginExternalTick()
         plungeBubble.beginExternalTick()
@@ -2908,6 +2916,19 @@ final class SM64BehaviorDispatchBridge {
             in: engineState,
             position: position,
             behaviorByte: behaviorByte,
+            model: model
+        )
+    }
+
+    @discardableResult
+    func spawnPushableMetalBox(
+        in engineState: SM64SwiftEngineState,
+        position: SM64ObjectVector3 = .zero,
+        model: UInt32 = SM64PushableMetalBoxObjectBridge.defaultModel
+    ) throws -> SM64ObjectID {
+        try pushableMetalBox.spawn(
+            in: engineState,
+            position: position,
             model: model
         )
     }
@@ -6192,6 +6213,7 @@ final class SM64BehaviorDispatchBridge {
         toadMessage.beginExternalTick()
         menuButton.beginExternalTick()
         squarishPathMoving.beginExternalTick()
+        pushableMetalBox.beginExternalTick()
         strongWindParticle.beginExternalTick()
         waterParticle.beginExternalTick()
         plungeBubble.beginExternalTick()
@@ -6543,6 +6565,8 @@ final class SM64BehaviorDispatchBridge {
                 _ = self.ttcPitBlock.updateInline(id, state: engineState)
             case .squarishPathMoving:
                 _ = self.squarishPathMoving.updateInline(id, state: engineState)
+            case .pushableMetalBox:
+                _ = self.pushableMetalBox.updateInline(id, state: engineState)
             case .staticCheckeredPlatform:
                 _ = self.staticCheckeredPlatform.updateInline(id, state: engineState)
             case .bbhTiltingTrapPlatform:
@@ -7078,6 +7102,7 @@ final class SM64BehaviorDispatchBridge {
             pyramidElevator.remove(id)
             ttcPitBlock.remove(id)
             squarishPathMoving.remove(id)
+            pushableMetalBox.remove(id)
             staticCheckeredPlatform.remove(id)
             bbhTiltingTrapPlatform.remove(id)
             lllSinkingPlatform.remove(id)
@@ -7462,6 +7487,7 @@ final class SM64BehaviorDispatchBridge {
         pyramidTop.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         ttcPitBlock.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         squarishPathMoving.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
+        pushableMetalBox.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         staticCheckeredPlatform.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         bbhTiltingTrapPlatform.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
         lllSinkingPlatform.pruneExternal(unloaded: schedulerResult.unloaded, pool: engineState.objects)
@@ -7661,6 +7687,7 @@ final class SM64BehaviorDispatchBridge {
             menuButtonEffects: menuButton.buttonEffectLog,
             menuButtonManagerEffects: menuButton.managerEffectLog,
             squarishPathMovingEffects: squarishPathMoving.effectLog,
+            pushableMetalBoxEffects: pushableMetalBox.effectLog,
             decorativePendulumEffects: decorativePendulum.effectLog,
             decorativePendulumDeliveries: decorativePendulum.deliveryLog,
             respawnerEffects: respawner.effectLog,

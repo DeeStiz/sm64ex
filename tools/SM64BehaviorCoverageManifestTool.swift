@@ -48,6 +48,7 @@ struct SM64BehaviorCoverageManifestTool {
         "bhvToadMessage": ("ToadMessageObjectBridge", "Toad message value/owner route"),
         "bhvMenuButton": ("MenuButtonObjectBridge", "file-select menu button value/owner route"),
         "bhvMenuButtonManager": ("MenuButtonObjectBridge", "file-select menu manager owner route"),
+        "bhvPushableMetalBox": ("PushableMetalBoxObjectBridge", "pushable metal box value/owner route"),
         "bhvMadPiano": ("MadPianoObjectBridge", "Mad Piano value kernel plus generation-safe owner bridge"),
         "bhvActSelector": ("ActSelectorObjectBridge", "act-selector parent/child value/owner route"),
         "bhvArrowLift": ("ArrowLiftObjectBridge", "arrow-lift value kernel plus owner route"),
