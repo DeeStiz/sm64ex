@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "sm64_modern.h"
+#include "game/level_update.h"
 #include "pc/sm64_modern_gameplay_parity.h"
 #include "pc/sm64_modern_timebase.h"
 
@@ -365,6 +366,16 @@ static bool record_route(const char *trace_path, const char *save_directory) {
             lifecycle.initialize(&lifecycle_config, &platform);
         fprintf(stderr, "mario_state_route_init status=%u oracle=%u\n",
                 init_status, sm64_modern_oracle_trace_status());
+        if (gMarioState != NULL) {
+            fprintf(stderr,
+                    "mario_state_route_initial_state action=0x%08" PRIx32
+                    " flags=0x%08" PRIx32 " pos=(%.9g,%.9g,%.9g)"
+                    " floor=%.9g ceil=%.9g\n",
+                    gMarioState->action, gMarioState->flags,
+                    gMarioState->pos[0], gMarioState->pos[1],
+                    gMarioState->pos[2], gMarioState->floorHeight,
+                    gMarioState->ceilHeight);
+        }
         ok = ok && init_status == SM64_MODERN_STATUS_OK;
         sm64_modern_oracle_trace_end_tick();
         if (ok) {
@@ -374,6 +385,21 @@ static bool record_route(const char *trace_path, const char *save_directory) {
                         "mario_state_route_step index=%u status=%u oracle=%u parity=%u\n",
                         index, step_status, sm64_modern_oracle_trace_status(),
                         sm64_modern_parity_status());
+                if (gMarioState != NULL) {
+                    fprintf(stderr,
+                            "mario_state_route_state index=%u action=0x%08" PRIx32
+                            " flags=0x%08" PRIx32 " input=0x%04" PRIx16
+                            " pos=(%.9g,%.9g,%.9g) vel=(%.9g,%.9g,%.9g)"
+                            " floor=%.9g ceil=%.9g scale=%.9g timebase_tick=%" PRIu64 "\n",
+                            index, gMarioState->action, gMarioState->flags,
+                            gMarioState->input, gMarioState->pos[0],
+                            gMarioState->pos[1], gMarioState->pos[2],
+                            gMarioState->vel[0], gMarioState->vel[1],
+                            gMarioState->vel[2], gMarioState->floorHeight,
+                            gMarioState->ceilHeight,
+                            sm64_modern_timebase_native_step_scale(),
+                            sm64_modern_timebase_simulation_tick());
+                }
                 ok = ok && step_status == SM64_MODERN_STATUS_OK;
             }
             ok = lifecycle.shutdown() == SM64_MODERN_STATUS_OK && ok;

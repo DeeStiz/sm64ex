@@ -7,6 +7,9 @@ private let routeInputSeed: UInt64 = 0x6b39_a105_2551_fd60
 private let routeSaveSeed: UInt64 = 0x59a2_b6ab_37c5_b109
 private let routeFirstRecord: UInt64 = 100
 private let routeLastRecord: UInt64 = 118
+private let routeNativeStepScale: Float = 0.5
+private let routeCeilingMissHeight: Float = 20_000
+private let routeAirStepArgument: UInt32 = 0x3
 
 private func update(_ initial: UInt64, _ value: UInt64) -> UInt64 {
     var hash = initial
@@ -120,15 +123,15 @@ private func sourceBackedStates() throws -> [SM64MarioState] {
         vertex2: SM64SurfaceVec3s(x: -8_000, y: 0, z: 8_000),
         vertex3: SM64SurfaceVec3s(x: 8_000, y: 0, z: -8_000),
         normal: SM64SurfaceVec3f(x: 0, y: 1, z: 0),
-        originOffset: 0
+        originOffset: -260
     )
     let world = try SM64SurfaceCollisionWorld(staticSurfaces: [floor])
-    let floorResult = world.findFloor(x: -1_328, y: 281, z: 4_664)
+    let floorResult = world.findFloor(x: -1_328, y: 260, z: 4_664)
     let marioID = SM64ObjectID(slot: 0, generation: 1)
     var state = SM64MarioState.initialized(
         save: SM64MarioSaveState(totalStars: 0),
         spawn: SM64MarioSpawnInput(
-            position: SM64ObjectVector3(x: -1_328, y: 281, z: 4_664),
+            position: SM64ObjectVector3(x: -1_328, y: 260, z: 4_664),
             faceAngle: SM64ObjectAngles(pitch: 0, yaw: Int32(bitPattern: 0x8000), roll: 0),
             waterLevel: -11_000
         ),
@@ -155,8 +158,8 @@ private func sourceBackedStates() throws -> [SM64MarioState] {
     state.framesSinceA = firstInput.framesSinceA
     state.framesSinceB = firstInput.framesSinceB
     _ = state.setAction(SM64MarioActionID.jump)
-    state.velocity.y -= 4
-    state.position.y += state.velocity.y
+    _ = state.markSoundPlayback(actionSound: true, marioSound: true)
+    try advanceJumpTick(&state, floor: floorResult)
     var second = state
 
     let secondController = normalizer.update(
@@ -176,9 +179,57 @@ private func sourceBackedStates() throws -> [SM64MarioState] {
     second.intendedYaw = secondInput.intendedYaw
     second.framesSinceA = secondInput.framesSinceA
     second.framesSinceB = secondInput.framesSinceB
-    second.velocity.y -= 4
-    second.position.y += second.velocity.y
+    try advanceJumpTick(&second, floor: floorResult)
     return [state, second]
+}
+
+private func advanceJumpTick(
+    _ state: inout SM64MarioState,
+    floor: SM64SurfaceQueryResult
+) throws {
+    let floorProbe = SM64MarioGroundFloorProbe(
+        surfaceID: floor.surfaceID,
+        height: floor.height,
+        normalY: floor.normalY ?? 1
+    )
+    let quarterProbe = SM64MarioAirQuarterProbe(
+        floor: floorProbe,
+        ceilingHeight: routeCeilingMissHeight,
+        waterLevel: state.waterLevel,
+        upperWall: nil,
+        lowerWall: nil,
+        ledgeFloor: nil,
+        ledgePosition: .zero,
+        ledgeFloorAngle: 0,
+        ledgePresent: false
+    )
+    let input = SM64MarioAirStepInput(
+        position: state.position,
+        velocity: state.velocity,
+        floor: floorProbe,
+        facePitch: state.faceAngle.pitch,
+        faceYaw: state.faceAngle.yaw,
+        faceRoll: state.faceAngle.roll,
+        floorAngle: Int32(state.floorAngle),
+        action: state.action,
+        stepArg: routeAirStepArgument,
+        nativeStepScale: routeNativeStepScale,
+        ridingShell: false,
+        ceilPresent: false,
+        ceilType: 0,
+        quarterProbes: Array(repeating: quarterProbe, count: 4)
+    )
+    guard let result = SM64MarioAirStep.update(input) else {
+        throw SM64OracleTraceCodecError.invalidHeader
+    }
+    state.position = result.position
+    state.velocity.y = result.velocityY - 4
+    state.floorSurfaceID = result.floor.surfaceID
+    state.floorHeight = result.floor.height
+    state.floorAngle = Int16(truncatingIfNeeded: result.floorAngle)
+    state.faceAngle.pitch = result.facePitch
+    state.faceAngle.yaw = result.faceYaw
+    state.faceAngle.roll = result.faceRoll
 }
 
 private func writeTrace(to url: URL) throws {
@@ -228,8 +279,9 @@ private func audit(cURL: URL, swiftURL: URL) throws {
         .enumerated()
         .first(where: { $0.element.0 != $0.element.1 })
         .map { String($0.offset) } ?? "none"
+    let admitted = blockers.isEmpty ? 1 : 0
     print(
-        "mario_state_pairing_audit admitted=0 c_records=\(cTrace.records.count) "
+        "mario_state_pairing_audit admitted=\(admitted) c_records=\(cTrace.records.count) "
             + "swift_records=\(swiftTrace.records.count) blockers=\(blockers.joined(separator: ",")) "
             + "first_divergence=\(firstDivergence)"
     )

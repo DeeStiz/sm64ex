@@ -209,6 +209,30 @@ enum SM64MarioActionBits {
     static let unknown31: UInt32 = 0x80000000
 }
 
+extension SM64MarioState {
+    /// Mirrors the legacy `play_mario_sound` one-shot guards at the value
+    /// boundary. Sound routing remains an owner-thread effect; these flags
+    /// are the deterministic state bits that prevent a repeated action from
+    /// replaying its action or Mario voice sound.
+    @discardableResult
+    mutating func markSoundPlayback(
+        actionSound: Bool,
+        marioSound: Bool
+    ) -> (actionSoundPlayed: Bool, marioSoundPlayed: Bool) {
+        let actionSoundPlayed = actionSound
+            && (flags & SM64MarioActionBits.actionSoundPlayed) == 0
+        let marioSoundPlayed = marioSound
+            && (flags & SM64MarioActionBits.marioSoundPlayed) == 0
+        if actionSoundPlayed {
+            flags |= SM64MarioActionBits.actionSoundPlayed
+        }
+        if marioSoundPlayed {
+            flags |= SM64MarioActionBits.marioSoundPlayed
+        }
+        return (actionSoundPlayed, marioSoundPlayed)
+    }
+}
+
 struct SM64MarioHealthContext: Equatable, Sendable {
     var terrainType: UInt16
     var debugLevelSelect: Bool

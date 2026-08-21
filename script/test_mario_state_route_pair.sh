@@ -32,6 +32,8 @@ xcrun --sdk macosx clang \
   -Wall \
   -Wextra \
   -Werror \
+  -DNON_MATCHING=1 \
+  -DAVOID_UB=1 \
   -mmacosx-version-min=27.0 \
   -I"$PROJECT_ROOT" \
   -I"$PROJECT_ROOT/include" \
@@ -70,6 +72,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioGeometryInput.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioGroundStep.swift" \
+  "$PROJECT_ROOT/SM64Modern/MarioAirStep.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioInputCore.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioState.swift" \
   "$PROJECT_ROOT/SM64Modern/MarioAction.swift" \
@@ -85,7 +89,7 @@ SWIFT_LOG="$BUILD_ROOT/swift.log"
 } | tee "$SWIFT_LOG"
 grep -Fq 'swift_mario_state_route_recorded' "$SWIFT_LOG"
 grep -Fq 'records=38 ticks=2,3 coverage=0x67446c5f2e231b25' "$SWIFT_LOG"
-grep -Fq 'mario_state_pairing_audit admitted=0 c_records=38 swift_records=38 blockers=record_bytes' "$SWIFT_LOG"
+grep -Fq 'mario_state_pairing_audit admitted=1 c_records=38 swift_records=38 blockers= first_divergence=none' "$SWIFT_LOG"
 grep -Fq 'mario_state_pairing_tamper_rejected=1' "$SWIFT_LOG"
 
 git -c core.fsmonitor=false diff --check
@@ -93,4 +97,4 @@ printf '%s\n' \
   'SM64 Modern Mario-state native route repair smoke passed' \
   'native_initialization_tick=1 status4_poisoning=0' \
   'domain2_state_records=38 ids=100..118 ticks=2,3 sequence=canonical' \
-  'coverage_finalized=1 swift_trace=38_records swift_pairing=blocked_record_bytes tamper_rejected=1 ledger_mutation=0'
+  'coverage_finalized=1 swift_trace=38_records swift_pairing=exact_bytes tamper_rejected=1 ledger_mutation=0'
