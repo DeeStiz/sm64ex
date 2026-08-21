@@ -50,6 +50,39 @@ private final class CallbackRecorder {
     }
 }
 
+private func decorativePendulumProgram() throws -> SM64BehaviorScriptProgram {
+    var data = Data()
+    func appendWord(_ word: UInt32) {
+        data.append(UInt8(truncatingIfNeeded: word))
+        data.append(UInt8(truncatingIfNeeded: word >> 8))
+        data.append(UInt8(truncatingIfNeeded: word >> 16))
+        data.append(UInt8(truncatingIfNeeded: word >> 24))
+    }
+    appendWord(0x0008_0000)
+    appendWord(0x1100_0001)
+    appendWord(0x0C00_0000)
+    appendWord(0x0000_0001)
+    appendWord(0x0800_0000)
+    appendWord(0x0C00_0000)
+    appendWord(0x0000_0002)
+    appendWord(0x0900_0000)
+    return try SM64BehaviorScriptProgram(data: data)
+}
+
+private func decorativePendulumCollisionWorld() throws -> SM64SurfaceCollisionWorld {
+    try SM64SurfaceCollisionWorld(staticSurfaces: [
+        SM64Surface(
+            id: 0x44,
+            room: 7,
+            vertex1: SM64SurfaceVec3s(x: -100, y: 0, z: -100),
+            vertex2: SM64SurfaceVec3s(x: -100, y: 0, z: 100),
+            vertex3: SM64SurfaceVec3s(x: 100, y: 0, z: -100),
+            normal: SM64SurfaceVec3f(x: 0, y: 1, z: 0),
+            originOffset: 0
+        )
+    ])
+}
+
 @main
 enum SM64ModernEngineRuntimeSmoke {
     static func main() {
@@ -205,6 +238,35 @@ enum SM64ModernEngineRuntimeSmoke {
         precondition(swiftShell.swiftContext.progression.progression.coins == 0)
         precondition(swiftShell.swiftContext.state.snapshot().objects.isEmpty)
         precondition(swiftShell.shutdown() == 4)
+
+        var runtimeRouteRecords: [SM64OracleTraceRecord] = []
+        let sourceContext = SM64ModernSwiftEngineContext()
+        precondition(sourceContext.configureDecorativePendulum(
+            collisionWorld: try! decorativePendulumCollisionWorld(),
+            behaviorProgram: try! decorativePendulumProgram(),
+            schema4TraceSink: { record in
+                runtimeRouteRecords.append(record)
+                return 0
+            }
+        ))
+        precondition(sourceContext.initialize())
+        let sourcePendulum = try! sourceContext.behaviorDispatch.spawnPendulum(
+            in: sourceContext.state,
+            position: SM64ObjectVector3(x: 0, y: 200, z: 0),
+            faceRoll: 100
+        )
+        _ = sourceContext.state.objects.mutate(sourcePendulum) { record in
+            record.angleVelocity.roll = 0x18
+        }
+        precondition(sourceContext.step() != nil)
+        precondition(
+            sourceContext.lastBehaviorDispatch?.decorativePendulumEffects.first?.objectID
+                == sourcePendulum
+        )
+        precondition(runtimeRouteRecords.contains { $0.domain == 6 })
+        precondition(runtimeRouteRecords.contains { $0.domain == 7 })
+        precondition(runtimeRouteRecords.contains { $0.domain == 12 })
+        precondition(runtimeRouteRecords.allSatisfy { $0.simulationTick == 1 })
 
         var sinkRecords: [SM64OracleTraceRecord] = []
         let sinkContext = SM64ModernSwiftEngineContext(

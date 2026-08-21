@@ -151,6 +151,48 @@ final class SM64ModernSwiftEngineContext {
         return true
     }
 
+    /// Installs the source-backed decorative-pendulum owner route on the
+    /// engine owner thread. The level collision world, decoded behavior
+    /// program/target/native source, and schema-4 status sink are explicit;
+    /// identity-only pendulums remain trace-silent until this is configured.
+    @discardableResult
+    func configureDecorativePendulum(
+        collisionWorld: SM64SurfaceCollisionWorld,
+        behaviorProgram: SM64BehaviorScriptProgram,
+        behaviorIdentity: UInt64 = SM64DecorativePendulumObjectBridge.defaultBehaviorIdentity,
+        startOffset: Int = 0,
+        targetResolver: SM64BehaviorTargetResolver = SM64BehaviorTargetResolver(),
+        strictNativeCallbacks: Bool = false,
+        nativeHandler: (@Sendable (UInt64, inout SM64BehaviorObjectState) -> Void)? = nil,
+        schema4TraceSink: SM64ModernSwiftTraceSink? = nil
+    ) -> Bool {
+        guard phase == .cold || phase == .initialized else { return false }
+        behaviorDispatch.configureDecorativePendulum(
+            collisionWorld: collisionWorld,
+            behaviorProgram: behaviorProgram,
+            behaviorIdentity: behaviorIdentity,
+            startOffset: startOffset,
+            targetResolver: targetResolver,
+            strictNativeCallbacks: strictNativeCallbacks,
+            nativeHandler: nativeHandler,
+            traceSink: { [weak self] record in
+                guard let self else { return 0 }
+                let status = self.emitTrace(
+                    simulationTick: record.simulationTick,
+                    domain: record.domain,
+                    recordKind: record.recordKind,
+                    subjectID: record.subjectID,
+                    recordID: record.recordID,
+                    flags: record.flags,
+                    values: record.values
+                )
+                guard status == 0 else { return status }
+                return schema4TraceSink?(record) ?? 0
+            }
+        )
+        return true
+    }
+
     func applyProgression(
         _ event: SM64ProgressionActorEvent,
         simulationTick: UInt64? = nil
@@ -320,6 +362,11 @@ final class SM64ModernSwiftEngineContext {
         guard phase == .initialized else { return nil }
         let dispatch = behaviorDispatch.tick(state: state)
         lastBehaviorDispatch = dispatch
+        guard dispatch.decorativePendulumTraceStatus == 0 else {
+            traceStatus = dispatch.decorativePendulumTraceStatus
+            phase = .failed
+            return nil
+        }
         let result = dispatch.scheduler
         tickCount &+= 1
         let receipt = SM64ModernSwiftEngineTickReceipt(

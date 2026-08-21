@@ -280,6 +280,52 @@ struct SM64BehaviorDispatchEvent: Equatable, Sendable {
     let route: SM64BehaviorDispatchRoute
 }
 
+/// Owner-thread configuration for the source-backed decorative-pendulum route.
+/// The collision world and decoded behavior source are explicit inputs; an
+/// identity-only object remains a value-only route when this is not installed.
+typealias SM64BehaviorDispatchSchema4TraceSink =
+    (SM64OracleTraceRecord) -> Int32
+
+struct SM64DecorativePendulumDispatchConfiguration {
+    let collisionWorld: SM64SurfaceCollisionWorld
+    let behaviorSource: SM64DecorativePendulumBehaviorSource
+    let traceSink: SM64BehaviorDispatchSchema4TraceSink?
+
+    init(
+        collisionWorld: SM64SurfaceCollisionWorld,
+        behaviorSource: SM64DecorativePendulumBehaviorSource,
+        traceSink: SM64BehaviorDispatchSchema4TraceSink? = nil
+    ) {
+        self.collisionWorld = collisionWorld
+        self.behaviorSource = behaviorSource
+        self.traceSink = traceSink
+    }
+
+    init(
+        collisionWorld: SM64SurfaceCollisionWorld,
+        behaviorProgram: SM64BehaviorScriptProgram,
+        behaviorIdentity: UInt64 = SM64DecorativePendulumObjectBridge.defaultBehaviorIdentity,
+        startOffset: Int = 0,
+        targetResolver: SM64BehaviorTargetResolver = SM64BehaviorTargetResolver(),
+        strictNativeCallbacks: Bool = false,
+        nativeHandler: (@Sendable (UInt64, inout SM64BehaviorObjectState) -> Void)? = nil,
+        traceSink: SM64BehaviorDispatchSchema4TraceSink? = nil
+    ) {
+        self.init(
+            collisionWorld: collisionWorld,
+            behaviorSource: SM64DecorativePendulumBehaviorSource(
+                behaviorIdentity: behaviorIdentity,
+                program: behaviorProgram,
+                startOffset: startOffset,
+                targetResolver: targetResolver,
+                strictNativeCallbacks: strictNativeCallbacks,
+                nativeHandler: nativeHandler
+            ),
+            traceSink: traceSink
+        )
+    }
+}
+
 struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let scheduler: SM64ObjectSchedulerTickResult
     let events: [SM64BehaviorDispatchEvent]
@@ -298,6 +344,7 @@ struct SM64BehaviorDispatchTickResult: Equatable, Sendable {
     let treasureChestEffects: [SM64TreasureChestObjectEffectRecord]
     let decorativePendulumEffects: [SM64DecorativePendulumObjectEffectRecord]
     let decorativePendulumDeliveries: [SM64OwnerThreadEffectDeliveryResult]
+    let decorativePendulumTraceStatus: Int32
     let respawnerEffects: [SM64RespawnerObjectEffectRecord]
     let respawnerDeliveries: [SM64OwnerThreadEffectDeliveryResult]
     let ampEffects: [SM64AmpObjectEffectRecord]
@@ -939,6 +986,8 @@ final class SM64BehaviorDispatchBridge {
     let betaBowserAnchor: SM64BetaBowserAnchorObjectBridge
     private var sushiWaterLevels: [SM64ObjectID: Float] = [:]
     private(set) var eventLog: [SM64BehaviorDispatchEvent] = []
+    private var decorativePendulumConfiguration: SM64DecorativePendulumDispatchConfiguration?
+    private(set) var decorativePendulumTraceStatus: Int32 = 0
 
     init(scheduler: SM64ObjectScheduler = SM64ObjectScheduler()) {
         self.scheduler = scheduler
@@ -1252,6 +1301,57 @@ final class SM64BehaviorDispatchBridge {
         self.mantaRayWaterRing = SM64MantaRayWaterRingObjectBridge()
         self.whirlpool = SM64WhirlpoolObjectBridge()
         self.mantaRay = SM64MantaRayObjectBridge(ringBridge: self.mantaRayWaterRing)
+    }
+
+    /// Installs the source-backed decorative-pendulum owner seam on the
+    /// engine owner thread. The caller supplies the level collision world,
+    /// decoded behavior program/target/native source, and a status-returning
+    /// schema-4 sink; no content is synthesized when this is not called.
+    func configureDecorativePendulum(
+        _ configuration: SM64DecorativePendulumDispatchConfiguration
+    ) {
+        decorativePendulumConfiguration = configuration
+        decorativePendulumTraceStatus = 0
+        decorativePendulum.bindCollisionWorld(configuration.collisionWorld)
+        decorativePendulum.bindSchema4TraceSink { [weak self] record in
+            let status = configuration.traceSink?(record) ?? 0
+            if status != 0, let self, self.decorativePendulumTraceStatus == 0 {
+                self.decorativePendulumTraceStatus = status
+            }
+        }
+    }
+
+    /// Convenience owner API that keeps the decoded source fields explicit at
+    /// the central dispatch boundary.
+    func configureDecorativePendulum(
+        collisionWorld: SM64SurfaceCollisionWorld,
+        behaviorProgram: SM64BehaviorScriptProgram,
+        behaviorIdentity: UInt64 = SM64DecorativePendulumObjectBridge.defaultBehaviorIdentity,
+        startOffset: Int = 0,
+        targetResolver: SM64BehaviorTargetResolver = SM64BehaviorTargetResolver(),
+        strictNativeCallbacks: Bool = false,
+        nativeHandler: (@Sendable (UInt64, inout SM64BehaviorObjectState) -> Void)? = nil,
+        traceSink: SM64BehaviorDispatchSchema4TraceSink? = nil
+    ) {
+        configureDecorativePendulum(
+            SM64DecorativePendulumDispatchConfiguration(
+                collisionWorld: collisionWorld,
+                behaviorProgram: behaviorProgram,
+                behaviorIdentity: behaviorIdentity,
+                startOffset: startOffset,
+                targetResolver: targetResolver,
+                strictNativeCallbacks: strictNativeCallbacks,
+                nativeHandler: nativeHandler,
+                traceSink: traceSink
+            )
+        )
+    }
+
+    /// Alias named for call sites that treat this as a route-owner install.
+    func configureDecorativePendulumOwner(
+        _ configuration: SM64DecorativePendulumDispatchConfiguration
+    ) {
+        configureDecorativePendulum(configuration)
     }
 
     static func route(for behaviorIdentity: UInt64) -> SM64BehaviorDispatchRoute {
@@ -2081,6 +2181,7 @@ final class SM64BehaviorDispatchBridge {
     func reset() {
         eventLog.removeAll(keepingCapacity: true)
         sushiWaterLevels.removeAll(keepingCapacity: true)
+        decorativePendulumTraceStatus = 0
         for id in decorativePendulum.registeredIDs { decorativePendulum.remove(id) }
         for id in respawner.registeredIDs { respawner.remove(id) }
         for id in amp.registeredIDs { amp.remove(id) }
@@ -2684,12 +2785,14 @@ final class SM64BehaviorDispatchBridge {
     func spawnPendulum(
         in engineState: SM64SwiftEngineState,
         position: SM64ObjectVector3 = .zero,
-        faceRoll: Int32 = 0
+        faceRoll: Int32 = 0,
+        behaviorSource: SM64DecorativePendulumBehaviorSource? = nil
     ) throws -> SM64ObjectID {
         try decorativePendulum.spawnPendulum(
             in: engineState,
             position: position,
-            faceRoll: faceRoll
+            faceRoll: faceRoll,
+            behaviorSource: behaviorSource ?? decorativePendulumConfiguration?.behaviorSource
         )
     }
 
@@ -6153,6 +6256,7 @@ final class SM64BehaviorDispatchBridge {
     @discardableResult
     func tick(state engineState: SM64SwiftEngineState) -> SM64BehaviorDispatchTickResult {
         eventLog.removeAll(keepingCapacity: true)
+        decorativePendulumTraceStatus = 0
         decorativePendulum.beginExternalTick()
         respawner.beginExternalTick()
         amp.beginExternalTick()
@@ -6449,7 +6553,12 @@ final class SM64BehaviorDispatchBridge {
             )
             switch route {
             case .decorativePendulum:
-                _ = self.decorativePendulum.updateInline(id, pool: pool)
+                _ = self.decorativePendulum.updateInline(
+                    id,
+                    pool: pool,
+                    simulationTick: engineState.globals.frame,
+                    collisionWorld: self.decorativePendulumConfiguration?.collisionWorld
+                )
             case .respawner:
                 _ = self.respawner.updateInline(
                     id,
@@ -7841,6 +7950,7 @@ final class SM64BehaviorDispatchBridge {
             treasureChestEffects: treasureChest.effectLog,
             decorativePendulumEffects: decorativePendulum.effectLog,
             decorativePendulumDeliveries: decorativePendulum.deliveryLog,
+            decorativePendulumTraceStatus: decorativePendulumTraceStatus,
             respawnerEffects: respawner.effectLog,
             respawnerDeliveries: respawner.deliveryLog,
             ampEffects: amp.effectLog,

@@ -17,6 +17,39 @@ private func hashID(_ initial: UInt64, _ id: SM64ObjectID) -> UInt64 {
     return hashU64(hash, UInt64(id.generation))
 }
 
+private func decorativePendulumProgram() throws -> SM64BehaviorScriptProgram {
+    var data = Data()
+    func appendWord(_ word: UInt32) {
+        data.append(UInt8(truncatingIfNeeded: word))
+        data.append(UInt8(truncatingIfNeeded: word >> 8))
+        data.append(UInt8(truncatingIfNeeded: word >> 16))
+        data.append(UInt8(truncatingIfNeeded: word >> 24))
+    }
+    appendWord(0x0008_0000) // BEGIN(OBJ_LIST_DEFAULT)
+    appendWord(0x1100_0001) // OR_INT(oFlags, update-gfx)
+    appendWord(0x0C00_0000) // CALL_NATIVE(init)
+    appendWord(0x0000_0001)
+    appendWord(0x0800_0000) // BEGIN_LOOP()
+    appendWord(0x0C00_0000) // CALL_NATIVE(loop)
+    appendWord(0x0000_0002)
+    appendWord(0x0900_0000) // END_LOOP()
+    return try SM64BehaviorScriptProgram(data: data)
+}
+
+private func decorativePendulumCollisionWorld() throws -> SM64SurfaceCollisionWorld {
+    try SM64SurfaceCollisionWorld(staticSurfaces: [
+        SM64Surface(
+            id: 0x44,
+            room: 7,
+            vertex1: SM64SurfaceVec3s(x: -100, y: 0, z: -100),
+            vertex2: SM64SurfaceVec3s(x: -100, y: 0, z: 100),
+            vertex3: SM64SurfaceVec3s(x: 100, y: 0, z: -100),
+            normal: SM64SurfaceVec3f(x: 0, y: 1, z: 0),
+            originOffset: 0
+        )
+    ])
+}
+
 private func hashTick(
     _ initial: UInt64,
     _ tick: SM64BehaviorDispatchTickResult,
@@ -1444,6 +1477,44 @@ enum SM64ModernBehaviorDispatchBridgeSmoke {
         require(tick.bullyEffects.allSatisfy { $0.effects == [.animate, .chase, .patrol] }, "Bully patrol/chase effects are preserved")
         require(tick.bullyDeliveries.count == 2 && tick.bullyDeliveries.allSatisfy { $0.deleted.isEmpty }, "Bully owner delivery is explicit")
         require(tick.decorativePendulumEffects.first?.output.faceRoll == 124, "pendulum route executes")
+        require(
+            bridge.decorativePendulum.schema4TraceRecords.isEmpty,
+            "identity-only pendulum remains trace-silent without source configuration"
+        )
+
+        var sourceTraceRecords: [SM64OracleTraceRecord] = []
+        let sourceBridge = SM64BehaviorDispatchBridge()
+        sourceBridge.configureDecorativePendulum(
+            collisionWorld: try decorativePendulumCollisionWorld(),
+            behaviorProgram: try decorativePendulumProgram(),
+            traceSink: { record in
+                sourceTraceRecords.append(record)
+                return 0
+            }
+        )
+        let sourceEngine = SM64SwiftEngineState(objectCapacity: 4)
+        let sourcePendulum = try sourceBridge.spawnPendulum(
+            in: sourceEngine,
+            position: SM64ObjectVector3(x: 0, y: 200, z: 0),
+            faceRoll: 100
+        )
+        _ = sourceEngine.objects.mutate(sourcePendulum) { record in
+            record.angleVelocity.roll = 0x18
+        }
+        let sourceTick = sourceBridge.tick(state: sourceEngine)
+        require(
+            sourceTick.events.map(\.route) == [.decorativePendulum]
+                && sourceTick.decorativePendulumEffects.first?.objectID == sourcePendulum
+                && sourceTick.decorativePendulumTraceStatus == 0,
+            "configured source-backed pendulum dispatches through the owner"
+        )
+        require(
+            sourceTraceRecords.contains { $0.domain == 6 }
+                && sourceTraceRecords.contains { $0.domain == 7 }
+                && sourceTraceRecords.contains { $0.domain == 12 }
+                && sourceTraceRecords.allSatisfy { $0.simulationTick == sourceTick.scheduler.frame },
+            "configured dispatch forwards source, collision, effect, and simulation tick records"
+        )
         require(tick.respawnerEffects.first?.effects == [.spawnObject, .markForDeletion], "respawner route executes")
         require(tick.ampEffects.first?.effects == [.animate, .setHitbox], "Amp route executes")
         require(tick.ampEffects.first?.action == .active, "Amp state is synchronized")
