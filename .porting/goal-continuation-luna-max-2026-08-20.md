@@ -69,6 +69,7 @@ planned. Historical M33–M35 notes retain their original 7,419 baseline.
 - **[Phase 70 — current](porting-handoff-full-swift-twin-phase70-docs-refresh.md):** reconcile the latest handoffs and public ledgers,
   preserve `534/511/23` and `7,420/1/7,419`, and keep route, M34, M35, and
   human acceptance fail-closed.
+- **[Phase 71 — committed `16c7bfab`](porting-handoff-full-swift-twin-phase71-camera-route-pair.md):** the next camera-state route audit admitted no second live row; input-only still pairs, full-route coverage fails before a camera trace, and source/fixture contracts remain non-live evidence.
 
 The automatic Luna-max phase protocol is: one disjoint owner per phase;
 focused validation plus `git diff --check`; a durable handoff comment and

@@ -55,6 +55,10 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      planned; keep route pairing, M34, M35, clean-machine, and human gates
      fail-closed; link every current handoff and record the next awake-host,
      route, signing/notary, and human-acceptance sequence.
+57.) Record Phase 71's camera-state route audit. The existing input-only row
+     still pairs independently; full-route coverage fails before a camera
+     trace, and Mario-face/progression contracts remain source/fixture evidence.
+     No second live shard was admitted; the ledger remains 1/7,420.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

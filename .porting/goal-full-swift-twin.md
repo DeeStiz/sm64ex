@@ -238,6 +238,12 @@ capture. Phase 70 reconciles this documentation without changing source,
 route counters, route admission, or M34/M35/human claims. All implementation,
 release, and acceptance gates remain open.
 
+Phase 71 audited the next `oracle_hook|camera_state` route and admitted no
+second live row. The existing input-only route still pairs independently; the
+full-route coverage guard fails before a camera trace, while Mario-face and
+progression checks remain source/fixture contracts. Route qualification stays
+at 1 of 7,420.
+
 The separate progress indicators remain 511/534 behavior rows (95.693%),
 1/7,420 live-qualified route shards (0.013477%), and a conservative 0% floor
 for the full goal and acceptance. They are not an average and do not imply
@@ -316,7 +322,8 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 67b stable M34 rerun](porting-handoff-full-swift-twin-phase67b-m34-stable-rerun.md),
 [Phase 67c HUD render fix](porting-handoff-full-swift-twin-phase67c-hud-render-fix.md),
 [Phase 67d AVFAudio SDK compatibility](porting-handoff-full-swift-twin-phase67d-avfaudio-sdk-compat.md),
-and [Phase 70 documentation refresh](porting-handoff-full-swift-twin-phase70-docs-refresh.md).
+[Phase 70 documentation refresh](porting-handoff-full-swift-twin-phase70-docs-refresh.md),
+and [Phase 71 camera route pair audit](porting-handoff-full-swift-twin-phase71-camera-route-pair.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

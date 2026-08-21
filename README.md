@@ -96,6 +96,12 @@ still fails closed at `scheduler_dropped_steps=63` with the screen locked,
 three presents, and no new capture. No archive/export/DMG/ZIP/staple/
 Gatekeeper, clean-machine, or human result exists.
 
+Phase 71 audited the next `oracle_hook|camera_state` route without admitting
+it: the existing input-only row still passes independently, while the full
+route coverage guard fails before a camera trace and Mario-face/progression
+checks remain source/fixture contracts rather than live qualification. The
+route ledger remains 1 of 7,420.
+
 M34, M35, and fresh-save human 120-star acceptance remain open. These gates
 are independent from local build, source, fixture, and headless-host
 evidence; this branch is not a shipped, visual-parity, or complete full-game
@@ -258,7 +264,8 @@ for the evidence ledger and latest handoffs, including the
 [Phase 67b stable M34 rerun](.porting/porting-handoff-full-swift-twin-phase67b-m34-stable-rerun.md),
 [Phase 67c HUD render fix](.porting/porting-handoff-full-swift-twin-phase67c-hud-render-fix.md),
 [Phase 67d AVFAudio SDK compatibility](.porting/porting-handoff-full-swift-twin-phase67d-avfaudio-sdk-compat.md),
-and [Phase 70 documentation refresh](.porting/porting-handoff-full-swift-twin-phase70-docs-refresh.md).
+[Phase 70 documentation refresh](.porting/porting-handoff-full-swift-twin-phase70-docs-refresh.md),
+and [Phase 71 camera route pair audit](.porting/porting-handoff-full-swift-twin-phase71-camera-route-pair.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

@@ -29,6 +29,13 @@
   `.porting/porting-handoff-full-swift-twin-phase67d-avfaudio-sdk-compat.md`,
   and `.porting/porting-handoff-full-swift-twin-phase70-docs-refresh.md`.
 
+- **Continuation Phase 71 (2026-08-21):** The bounded camera-state route audit
+  admitted no second live shard. The input-only route still passes independent
+  C/Swift replay; the full route fails its domain-1 coverage guard before a
+  camera trace, while Mario-face/progression contracts remain source/fixture
+  evidence. The ledger stays 1/7,420. Handoff:
+  `.porting/porting-handoff-full-swift-twin-phase71-camera-route-pair.md`.
+
 - **Historical Continuation Phases 61–64 (2026-08-21):** Phase 61's canonical M34
   production harness is blocked before app launch by
   `EngineRuntime.swift:189/:366` (`SM64ModernStatus`/`Int32` type errors).
