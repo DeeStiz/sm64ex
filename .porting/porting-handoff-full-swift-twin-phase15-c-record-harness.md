@@ -16,18 +16,19 @@ Date: 2026-08-20
 ## Evidence
 
 ```text
-liveOracleTraceRecords=2839
+liveOracleTraceRecords=3151
 liveOracleTraceTicks=5
-liveOracleTraceDomains=0x000017f7
+liveOracleTraceDomains=0x00001ff7
 liveOracleAudioCallbacks=4
-liveOracleRenderDraws=0
+liveOracleRenderRecords=300
+liveOracleRenderDraws=288
 SM64 Modern live oracle lifecycle smoke passed
 ```
 
-The trace is independent native-C record evidence, not a fixture. The current
-platform capability intentionally disables C rendering frame dispatch because
-the core emits `render_finish` after closing the oracle tick; that unresolved
-ordering still returns status 4 if rendering is enabled.
+The trace is independent native-C record evidence, not a fixture. The initial
+run exposed a core ordering fault: `render_finish` occurred after the oracle
+tick closed. Commit `f5fed499` moves `gfx_end_frame()` inside the open tick;
+rendering-enabled C recording now remains status-0.
 
 ## Remaining boundary
 

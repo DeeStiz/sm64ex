@@ -202,11 +202,11 @@ external credentials/toolchain, clean-machine, and human acceptance remain
 open.
 
 Continuation Phase 15 adds an independent native-C schema-4 record harness.
-`script/test_oracle_lifecycle_record.sh` emits and rereads 2,839 records over
-five real C lifecycle ticks with canonical-hash, ordering, coverage, and
-callback validation. It is a prerequisite for C/Swift live pairing, not a
-route-shard pass: rendering frame dispatch currently remains disabled because
-the core closes the oracle tick before `render_finish`, and a matching Swift
+`script/test_oracle_lifecycle_record.sh` emits and rereads 3,151 records over
+five real C lifecycle ticks, including 300 render-domain records/288 draws,
+with canonical-hash, ordering, coverage, and callback validation. Commit
+`f5fed499` corrects the C `render_finish`/oracle-tick ordering. This is a
+prerequisite for C/Swift live pairing, not a route-shard pass; a matching Swift
 trace is still required.
 
 Continuation Phase 8 centrally promotes `bhvSquarishPathMoving` through route

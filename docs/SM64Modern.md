@@ -58,9 +58,9 @@ The status below is pinned to the current `nightly` continuation
   hard-coded arrays, and fixture byte matches remain explicitly ineligible for
   live qualification. Further rows require independently recorded C and Swift
   traces.
-* The native-C record harness now emits 2,839 validated schema-4 records across
-  five lifecycle ticks; pairing those records with a matching Swift trace is
-  still required before any additional shard can qualify.
+* After `f5fed499`, the native-C record harness emits 3,151 validated schema-4
+  records across five lifecycle ticks, including 300 render-domain records/
+  288 draws; exact C/Swift pairing is still required.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
