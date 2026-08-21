@@ -128,6 +128,11 @@ final class MetalShaderCompiler {
         let uniqueKeys = Array(Set(keys))
         guard !uniqueKeys.isEmpty else { return }
         for key in uniqueKeys { prepare(key) }
+        // `prepare` enqueues the compiler-owned work asynchronously. Drain
+        // that enqueue barrier before waiting on Metal's compiler tasks, or a
+        // display-link callback can observe an empty task store and submit
+        // while the first scene pipeline is still compiling.
+        compileQueue.sync {}
         SM64ModernWaitForRenderPipelineTasks()
 
         lock.lock()
