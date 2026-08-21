@@ -37,6 +37,9 @@ The status below is pinned to the current `nightly` continuation
   sustained performance and thermal checks, release packaging, and human
   acceptance remain open. M35 distribution and human acceptance has not
   started.
+* The first real live shard (`0xd9446dfed10e189e`, `oracle_hook|input`) now
+  passes C/Swift replay, live executor, and worker-result validation with
+  `fixture_only=0`; **7,418** manifest rows remain planned.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
@@ -143,6 +146,7 @@ gates before recording a milestone handoff.
 | Behavior ownership | `./script/test_behavior_manifest.sh` | Reproducible 534-row manifest and matching Swift/C fingerprint |
 | Route inventory | `./script/test_route_shards.sh` | Canonical 7,419-shard inventory and ledger schema (inventory status remains planned) |
 | Live shard executor | `./script/test_route_shard_live_executor.sh` | Bounded canonical live-trace admission and isolated worker-result gate (does not launch all gameplay shards) |
+| Live shard batch | `./script/test_live_route_shard_batch.sh` | Real `oracle_hook|input` C/Swift replay plus one live worker-result; reports remaining planned rows |
 | Live route oracle | `./script/test_live_route_oracle.sh input-only` or `full` | Reachable owner-thread route execution and C/Swift oracle comparison |
 | Focused route | `./script/test_<route>.sh` | The route's C contract, Swift smoke, dispatch, and integration gates |
 | Cadence regression | `./script/test_course_exit_cadence.sh` | One-shot menu/dialog/cutscene admissions across the 60/30 pair |

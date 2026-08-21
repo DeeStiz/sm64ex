@@ -70,7 +70,8 @@ qualification ledger has 534 behavior rows (511 Swift owners and 23 explicit C
 adapters), with M33nk as the latest numbered behavior slice, Treasure Chest
 route 270 as the latest central promotion, and M34b as the latest validated Metal 4
 production/capture slice. The bounded live-shard executor is now present, but
-route-shard closure, physical/device/performance/thermal evidence,
+the first real `oracle_hook|input` shard is closed while 7,418 rows remain
+planned; route-shard closure, physical/device/performance/thermal evidence,
 distribution, and human acceptance are still open; this is not a shipped
 full-game Swift port.
 

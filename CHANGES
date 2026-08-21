@@ -7,10 +7,13 @@ SM64 Modern native macOS — nightly continuation update (2026-08-20)
 3.) Add a bounded live route-shard executor that requires record-mode live
     traces, rejects fixture/missing/reused evidence, and emits isolated worker
     results for canonical batches up to 256 rows.
-4.) Preserve the M34c warm-pipeline and resize/pause stress evidence boundary:
+4.) Close the first real `oracle_hook|input` shard (`0xd9446dfed10e189e`)
+    through C/Swift replay and the live worker-result gate, leaving 7,418
+    rows explicitly planned.
+5.) Preserve the M34c warm-pipeline and resize/pause stress evidence boundary:
     source/build gates pass, but host/compositor throttling still stops the
     visible display-link run at three frames and archive reuse is unproven.
-5.) Record the remaining central route promotions, 7,419-shard live closure,
+6.) Record the remaining central route promotions, 7,419-shard live closure,
     M35 distribution, and human-acceptance gates in the goal and handoff docs.
 
 Refresh 11
