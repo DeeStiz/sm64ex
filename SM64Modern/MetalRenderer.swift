@@ -258,6 +258,10 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     private var presentedFrameCount: UInt64 = 0
     private var lastPresentedPacket: UInt64 = 0
     private var pipelineWaitLogCount: UInt64 = 0
+    private var displayLinkCallbackCount: UInt64 = 0
+    private var displayLinkLastCallbackUptime: TimeInterval?
+    private var displayLinkLastTargetTimestamp: CFTimeInterval?
+    private var displayLinkMaxTargetGapMilliseconds: UInt64 = 0
     private var warmedPipelineKeys: Set<MetalShaderKey> = []
     private var renderFailure: Error?
     private var isRunning = false
@@ -720,6 +724,22 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
                 metalLogger.error("metal_display_link_dropped reason=unexpected_callback_thread main=\(Thread.isMainThread)")
                 return
             }
+            displayLinkCallbackCount += 1
+            let callbackUptime = ProcessInfo.processInfo.systemUptime
+            displayLinkLastCallbackUptime = callbackUptime
+            if let previousTargetTimestamp = displayLinkLastTargetTimestamp {
+                let targetGap = update.targetTimestamp - previousTargetTimestamp
+                if targetGap.isFinite, targetGap >= 0 {
+                    let targetGapMilliseconds = UInt64(targetGap * 1_000.0)
+                    displayLinkMaxTargetGapMilliseconds = max(
+                        displayLinkMaxTargetGapMilliseconds,
+                        targetGapMilliseconds
+                    )
+                }
+            }
+            if update.targetTimestamp.isFinite {
+                displayLinkLastTargetTimestamp = update.targetTimestamp
+            }
             guard isRunning, renderFailure == nil else { return }
             do { try renderSceneFrame(to: update.drawable) }
             catch {
@@ -733,6 +753,26 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
     func shutdownAndDrain() throws {
         guard isRunning else { return }
         isRunning = false
+        let wasPresentationPaused = displayLink.isPaused
+        let callbackIdleMilliseconds: UInt64
+        if let lastCallbackUptime = displayLinkLastCallbackUptime {
+            callbackIdleMilliseconds = Self.elapsedMilliseconds(
+                since: lastCallbackUptime,
+                now: ProcessInfo.processInfo.systemUptime
+            )
+        } else {
+            callbackIdleMilliseconds = 0
+        }
+        let hostCompositorEvidence = !wasPresentationPaused
+            && displayLinkCallbackCount > 0
+            && presentedFrameCount > 0
+            && renderFailure == nil
+            && callbackIdleMilliseconds >= 250
+            ? "candidate"
+            : "insufficient"
+        metalLogger.notice(
+            "metal_presentation_diagnostic callbacks=\(self.displayLinkCallbackCount) presented=\(self.presentedFrameCount) target_gap_ms=\(self.displayLinkMaxTargetGapMilliseconds) callback_idle_ms=\(callbackIdleMilliseconds) paused=\(wasPresentationPaused ? 1 : 0) render_failure=\(self.renderFailure == nil ? 0 : 1) host_compositor_evidence=\(hostCompositorEvidence, privacy: .public)"
+        )
         displayLink.invalidate()
         for slot in frameSlots where slot.completionValue != 0 { try waitForGPU(value: slot.completionValue) }
         for binding in residentTextureBindings.values {
@@ -1476,5 +1516,10 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         guard completionEvent.wait(untilSignaledValue: value, timeoutMS: Self.gpuWaitTimeoutMilliseconds) else {
             throw MetalRendererError.gpuDrainTimedOut(value: value)
         }
+    }
+
+    private static func elapsedMilliseconds(since start: TimeInterval, now: TimeInterval) -> UInt64 {
+        let elapsed = max(now - start, 0)
+        return UInt64(min(elapsed * 1_000.0, Double(UInt64.max)))
     }
 }

@@ -96,11 +96,14 @@ final class MetalShaderCompiler {
         self.archiveLoaded = loadedArchive
         self.descriptorCacheFound = descriptorCacheFound
         if loadedArchive {
-            metalShaderLogger.notice("metal4_archive_reuse enabled=true source=binary_archive")
+            metalShaderLogger.notice("metal4_archive_reuse enabled=true source=binary_archive fallback=none")
         } else {
             let reason = archiveExists ? "load_failed" : "missing"
             let fallback = descriptorCacheFound ? "descriptor_cache" : "compile"
-            metalShaderLogger.notice("metal4_archive_reuse enabled=false source=none fallback=\(fallback) reason=\(reason)")
+            metalShaderLogger.notice("metal4_archive_reuse enabled=false source=none fallback=\(fallback, privacy: .public) reason=\(reason, privacy: .public)")
+            metalShaderLogger.notice(
+                "metal4_cache_diagnostic archive_reuse=false archive_exists=\(archiveExists ? 1 : 0) descriptor_cache_fallback=\(descriptorCacheFound ? 1 : 0) load_attempted=\(archiveExists ? 1 : 0)"
+            )
         }
         if serializer != nil {
             if let cacheDirectory {
@@ -307,6 +310,9 @@ final class MetalShaderCompiler {
                 )
             }
             try script.write(to: descriptorCacheURL, options: .atomic)
+            metalShaderLogger.notice(
+                "metal4_archive_flush_result result=deferred fallback=descriptor_cache reason=serializer_false"
+            )
             metalShaderLogger.notice("metal4_descriptor_cache_flushed path=\(descriptorCacheURL.path, privacy: .public) bytes=\(script.count) archive_deferred=\(archiveReason, privacy: .public)")
         } catch {
             metalShaderLogger.error("metal4_pipeline_cache_flush_failed path=\(archiveURL.path, privacy: .public) error=\(error.localizedDescription, privacy: .public)")
