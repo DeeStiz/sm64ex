@@ -23,6 +23,12 @@ void SM64ModernMakeRenderPipelineStateAsync(
     SM64ModernRenderPipelineCompletion completion
 ) API_AVAILABLE(macos(26.0));
 
+id<MTLRenderPipelineState> _Nullable SM64ModernLookupRenderPipelineState(
+    id<MTL4Archive> archive,
+    MTL4PipelineDescriptor *descriptor,
+    NSError **error
+) API_AVAILABLE(macos(26.0));
+
 void SM64ModernWaitForRenderPipelineTasks(void) API_AVAILABLE(macos(26.0));
 
 id<MTL4PipelineDataSetSerializer> _Nullable SM64ModernMakePipelineDataSetSerializer(

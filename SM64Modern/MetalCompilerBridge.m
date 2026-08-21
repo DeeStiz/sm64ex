@@ -28,11 +28,15 @@ void SM64ModernMakeRenderPipelineStateAsync(
     SM64ModernRenderPipelineCompletion completion
 ) {
     SM64ModernEnsureCompilerTaskStore();
-    MTL4CompilerTaskOptions *options = [MTL4CompilerTaskOptions new];
-    options.lookupArchives = lookupArchives;
+    // Archive lookup is performed explicitly through
+    // SM64ModernLookupRenderPipelineState. Passing an archive array through
+    // MTL4CompilerTaskOptions triggers a host-runtime crash while Metal
+    // converts the array, so compiler fallback tasks must receive no lookup
+    // options even if an older caller supplies the parameter.
+    (void)lookupArchives;
     __block id<MTL4CompilerTask> task = nil;
     task = [compiler newRenderPipelineStateWithDescriptor:descriptor
-                                      compilerTaskOptions:options
+                                      compilerTaskOptions:nil
                                          completionHandler:^(id<MTLRenderPipelineState> state, NSError *error) {
         completion(state, error);
         [sSM64ModernCompilerTaskLock lock];
@@ -42,6 +46,14 @@ void SM64ModernMakeRenderPipelineStateAsync(
     [sSM64ModernCompilerTaskLock lock];
     [sSM64ModernCompilerTasks addObject:task];
     [sSM64ModernCompilerTaskLock unlock];
+}
+
+id<MTLRenderPipelineState> _Nullable SM64ModernLookupRenderPipelineState(
+    id<MTL4Archive> archive,
+    MTL4PipelineDescriptor *descriptor,
+    NSError **error
+) {
+    return [archive newRenderPipelineStateWithDescriptor:descriptor error:error];
 }
 
 void SM64ModernWaitForRenderPipelineTasks(void) {
@@ -62,8 +74,11 @@ id<MTL4PipelineDataSetSerializer> _Nullable SM64ModernMakePipelineDataSetSeriali
 ) {
     MTL4PipelineDataSetSerializerDescriptor *descriptor =
         [MTL4PipelineDataSetSerializerDescriptor new];
-    descriptor.configuration = MTL4PipelineDataSetSerializerConfigurationCaptureDescriptors
-        | MTL4PipelineDataSetSerializerConfigurationCaptureBinaries;
+    // CaptureBinaries is sufficient for both archive serialization and the
+    // descriptor script fallback. Combining it with CaptureDescriptors makes
+    // archive serialization return NO (without an NSError) on the current
+    // Metal 4 runtime, so keep the binary-archive path unambiguous.
+    descriptor.configuration = MTL4PipelineDataSetSerializerConfigurationCaptureBinaries;
     return [device newPipelineDataSetSerializerWithDescriptor:descriptor];
 }
 

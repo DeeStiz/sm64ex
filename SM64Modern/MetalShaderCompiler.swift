@@ -253,8 +253,26 @@ final class MetalShaderCompiler {
                 color.alphaBlendOperation = .add
             }
 
-            let archives: [any MTL4Archive]? = lookupArchives.isEmpty ? nil : lookupArchives
-            SM64ModernMakeRenderPipelineStateAsync(compiler, descriptor, archives) { [self, library] state, error in
+            if !lookupArchives.isEmpty {
+                for archive in lookupArchives {
+                    var archiveError: NSError?
+                    if let state = SM64ModernLookupRenderPipelineState(archive, descriptor, &archiveError) {
+                        metalShaderLogger.notice("metal4_archive_pipeline_hit shader=0x\(String(key.shaderID, radix: 16), privacy: .public)")
+                        finish(key: key, result: CompiledPipeline(state: state, vertexStride: Self.vertexStride(for: key)), error: nil)
+                        _ = library
+                        return
+                    }
+                    if let archiveError {
+                        metalShaderLogger.debug("metal4_archive_pipeline_miss shader=0x\(String(key.shaderID, radix: 16), privacy: .public) error=\(archiveError.localizedDescription, privacy: .public)")
+                    }
+                }
+                metalShaderLogger.debug("metal4_archive_pipeline_miss shader=0x\(String(key.shaderID, radix: 16), privacy: .public) fallback=compiler")
+            }
+            // Querying MTL4Archive directly is the documented lookup path.
+            // Passing the archive through MTL4CompilerTaskOptions.lookupArchives
+            // currently crashes on the host runtime while converting the archive
+            // array, so misses compile without that optional hint.
+            SM64ModernMakeRenderPipelineStateAsync(compiler, descriptor, nil) { [self, library] state, error in
                 if let state {
                     finish(key: key, result: CompiledPipeline(state: state, vertexStride: Self.vertexStride(for: key)), error: nil)
                 } else {
@@ -290,13 +308,22 @@ final class MetalShaderCompiler {
             SM64ModernWaitForRenderPipelineTasks()
             try FileManager.default.createDirectory(at: archiveURL.deletingLastPathComponent(), withIntermediateDirectories: true)
             metalShaderLogger.notice("metal4_archive_flush_begin path=\(archiveURL.path, privacy: .public)")
-            var archiveError: NSError?
-            if SM64ModernFlushPipelineDataSetSerializer(serializer, archiveURL, &archiveError) {
-                metalShaderLogger.notice("metal4_archive_flushed path=\(archiveURL.path, privacy: .public)")
-                return
+            let validationProfile = ["MTL_DEBUG_LAYER", "MTL_SHADER_VALIDATION"].contains { key in
+                ProcessInfo.processInfo.environment[key] == "1"
             }
-            let archiveReason = archiveError?.localizedDescription ?? "runtime serializer returned false"
-            metalShaderLogger.info("metal4_archive_flush_failed path=\(archiveURL.path, privacy: .public) reason=\(archiveReason, privacy: .public)")
+            let archiveReason: String
+            if validationProfile {
+                archiveReason = "metal_validation_profile"
+                metalShaderLogger.info("metal4_archive_flush_skipped path=\(archiveURL.path, privacy: .public) reason=\(archiveReason, privacy: .public)")
+            } else {
+                var archiveError: NSError?
+                if SM64ModernFlushPipelineDataSetSerializer(serializer, archiveURL, &archiveError) {
+                    metalShaderLogger.notice("metal4_archive_flushed path=\(archiveURL.path, privacy: .public)")
+                    return
+                }
+                archiveReason = archiveError?.localizedDescription ?? "runtime serializer returned false"
+                metalShaderLogger.info("metal4_archive_flush_failed path=\(archiveURL.path, privacy: .public) reason=\(archiveReason, privacy: .public)")
+            }
             guard let descriptorCacheURL else {
                 metalShaderLogger.info("metal4_archive_deferred reason=\(archiveReason, privacy: .public)")
                 return
@@ -311,7 +338,7 @@ final class MetalShaderCompiler {
             }
             try script.write(to: descriptorCacheURL, options: .atomic)
             metalShaderLogger.notice(
-                "metal4_archive_flush_result result=deferred fallback=descriptor_cache reason=serializer_false"
+                "metal4_archive_flush_result result=deferred fallback=descriptor_cache reason=\(archiveReason, privacy: .public)"
             )
             metalShaderLogger.notice("metal4_descriptor_cache_flushed path=\(descriptorCacheURL.path, privacy: .public) bytes=\(script.count) archive_deferred=\(archiveReason, privacy: .public)")
         } catch {
