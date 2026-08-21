@@ -37,6 +37,10 @@ The status below is pinned to the current `nightly` continuation
 * Commit `631f7c69` adds a fail-closed diagnostic smoke that distinguishes
   binary archive reuse, descriptor-cache fallback, scheduler drops, and
   host-compositor candidates without weakening the M34 production gate.
+* The retained M34 GPU trace rechecks with 3 MTL4 command buffers/draws,
+  BGRA8Unorm/Depth32Float attachments, and `sm64_vertex/sm64_fragment`; its
+  fetched color is clear-only black, so visual parity and human review remain
+  open.
 * The latest full host verifier can still be blocked before engine startup by
   LaunchServices `kLSNoExecutableErr (-10827)` (the direct AppKit diagnostic
   exits `134`). The retained complete host proof is M33nc; this is a host

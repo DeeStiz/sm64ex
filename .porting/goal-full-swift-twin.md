@@ -126,6 +126,10 @@ binary-archive reuse, descriptor-cache fallback, scheduler drops, and
 host-compositor candidates; it does not turn the baseline into acceptance.
 Commit `19413a65` hardens that parser with registration/first-frame/drain/
 status-0/application-stop ordering requirements and incomplete-log rejection.
+The retained M34 capture was re-opened with `gpudebug`: three MTL4 command
+buffers/encoders/draws, BGRA8Unorm color, Depth32Float depth, and
+`sm64_vertex/sm64_fragment` are present; fetched color is clear-only black, so
+GPU inspection still does not prove visual parity or human acceptance.
 
 M33 Act Selector central integration is now complete locally. The owner shares
 the existing star-type bridge, preserves parent-first child updates and

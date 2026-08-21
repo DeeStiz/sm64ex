@@ -63,3 +63,14 @@ same warmed Release bundle is retained at
 not validation overhead alone: registration readiness, three presented frames,
 clean drain/status-0 shutdown all hold, but the host still reports
 `scheduler_dropped_steps=58`, `presented=3`, and `archive_reuse=false`.
+
+## GPU trace recheck
+
+The retained capture `/tmp/sm64-modern-m34-runtime-current/current-capture.gputrace`
+was re-opened with `gpudebug`. It contains three MTL4 command buffers, three
+render encoders, three draw/present records, `BGRA8Unorm` color,
+`Depth32Float` depth, and `sm64_vertex / sm64_fragment` draw discovery. Fetching
+the first color/depth attachments succeeded; the fetched color is clear-only
+black. This is automated GPU evidence only and does not establish screenshot
+parity, physical display quality, performance/thermal acceptance, or human
+approval.
