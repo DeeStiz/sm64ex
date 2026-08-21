@@ -30,6 +30,23 @@ SM64 Modern native macOS — nightly continuation update (2026-08-20)
      Stable Xcode 26.6 is invocation-scoped and fail-closed; Developer ID,
      Release entitlement, notary, clean-machine, and human acceptance gates
      remain external and unclaimed.
+11.) Record Phase 25 route alignment for `oracle_hook|input`. The retained
+     1/7,419 live-qualified counter is unchanged; the new one-record attempt
+     reports `admitted=0`, `coverage_deferred`, and an incomplete route window.
+12.) Record the Phase 26 M34 locked-host capture attempt. API/shader validation
+     and capture-only passes remain separate; the host yields three callbacks,
+     `archive_reuse=false`, and clear-only black fetched attachments, so no
+     visual/device closure is claimed.
+13.) Record the Phase 27 Release entitlement correction: Release now has
+     `get-task-allow=false` with sustained execution preserved, while Debug
+     remains independently debuggable.
+14.) Record the Phase 28 stable-Xcode M35 recheck. Release entitlement is no
+     longer a blocker; exactly the Developer ID Application identity/private
+     key and notary authentication blockers remain, with no artifact mutation.
+15.) Reconcile README, SM64 Modern status, and the current Full Swift Twin
+     continuation summary without changing historical ledger entries; preserve
+     the 534/511/23 and 1/7,419 counters and keep release/visual/full-game
+     acceptance explicitly open.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)

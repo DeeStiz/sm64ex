@@ -70,18 +70,30 @@ qualification ledger has 534 behavior rows (511 Swift owners and 23 explicit C
 adapters), with M33nk as the latest numbered behavior slice, Treasure Chest
 route 270 as the latest central promotion, and M34b as the latest validated
 Metal 4 production/capture slice. One of 7,419 route shards is live-qualified
-and 7,418 remain planned. The Phase 20 one-record C/Swift common-input probe is
-bounded contract evidence only (`current_route_shard_admitted=0`); it admits no
-additional route row. The M34 closure audit leaves acceptance at the
-host/compositor, archive/tooling, visual/reference, and physical boundaries.
-M35's invocation-scoped stable-Xcode checks remain blocked by the missing
-Developer ID Application identity, Release `get-task-allow` entitlement, and
-notary authentication. Route-shard closure, physical/device/performance/
-thermal evidence, distribution, and human acceptance are still open; this is
-not a shipped full-game Swift port. See the [current status](docs/SM64Modern.md),
-[full-Swift-twin goal](.porting/goal-full-swift-twin.md), and
-[Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
-for the evidence ledger and latest handoffs.
+and 7,418 remain planned. The Phase 25 route-alignment attempt for
+`oracle_hook|input` (`0xd9446dfed10e189e`) reports
+`pairing_audit admitted=0 c_records=1 swift_records=1 c_ticks=2 swift_ticks=2 blockers=coverage_deferred`
+and `real_route_alignment_attempted=1 records=1 exact_bytes=1 common_fingerprints=5`;
+the complete coverage/multi-tick window is still missing, so
+`current_route_shard_admitted=0` and no second row was promoted. Phase 26's
+M34 attempt was host-locked/headless: the validation log reached
+`scheduler_dropped_steps=64`, while the separate capture-only pass reached
+`scheduler_dropped_steps=0` but only `callbacks=3 presented=3`,
+`archive_reuse=false`, and clear-only black fetched attachments. Phase 27
+corrected Release `com.apple.security.get-task-allow=false` while preserving
+authorized sustained execution; Phase 28's stable-Xcode recheck leaves exactly
+the missing Developer ID Application identity/private key and notary
+authentication as the two M35 blockers. Route-shard closure,
+physical/device/performance/thermal evidence, distribution, and human
+acceptance are still open; this is not a shipped full-game Swift port. See the
+[current status](docs/SM64Modern.md), [full-Swift-twin goal](.porting/goal-full-swift-twin.md),
+and [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
+for the evidence ledger and latest handoffs, including the
+[Phase 25 route alignment](.porting/porting-handoff-full-swift-twin-phase25-route-alignment.md),
+[Phase 26 M34 capture](.porting/porting-handoff-full-swift-twin-phase26-m34-visible-capture.md),
+[Phase 27 Release entitlement](.porting/porting-handoff-full-swift-twin-phase27-release-entitlement.md),
+[Phase 28 M35 recheck](.porting/porting-handoff-full-swift-twin-phase28-m35-external-recheck.md),
+and [Phase 29 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

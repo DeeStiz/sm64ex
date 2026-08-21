@@ -77,17 +77,23 @@ schema-4 record as bounded contract evidence, but explicitly reports
 21's M34 closure audit finds no source-local renderer/compiler/parser fault;
 its three-present, zero-drop, clear-only diagnostic remains bounded by the
 host/compositor, archive/tooling, visual/reference, and physical-acceptance
-boundary. Phase 22's M35 acceptance audit validates invocation-scoped stable
-Xcode 26.6 without changing global `xcode-select`, but remains blocked by no
-Developer ID Application identity, Release `get-task-allow=true`, and no
-notarytool authentication; its fail-closed distribution run performs no
-mutation. These audits do not claim a shipped or full-game Swift twin.
+boundary. Phase 25's route-alignment attempt remains non-admitted because
+`coverage_deferred` and a complete multi-tick window are missing. Phase 26's
+locked-host M34 capture remains clear-only diagnostic evidence. Phase 27
+corrects Release `get-task-allow=false`, and Phase 28 leaves exactly the
+Developer ID Application identity/private-key and notary-authentication M35
+blockers. These audits do not claim a shipped or full-game Swift twin.
 
 The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
-is subordinate to this goal. Latest evidence handoffs are [Phase 20 C/Swift
+is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
 pairing](.porting/porting-handoff-full-swift-twin-phase20-c-swift-pairing.md),
 [Phase 21 M34 closure](.porting/porting-handoff-full-swift-twin-phase21-m34-closure.md),
 and [Phase 22 M35 acceptance](.porting/porting-handoff-full-swift-twin-phase22-m35-acceptance.md).
+The later current-status handoffs are [Phase 25 route alignment](.porting/porting-handoff-full-swift-twin-phase25-route-alignment.md),
+[Phase 26 M34 capture](.porting/porting-handoff-full-swift-twin-phase26-m34-visible-capture.md),
+[Phase 27 Release entitlement](.porting/porting-handoff-full-swift-twin-phase27-release-entitlement.md),
+[Phase 28 M35 recheck](.porting/porting-handoff-full-swift-twin-phase28-m35-external-recheck.md),
+and [Phase 29 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
@@ -114,6 +120,54 @@ notarytool authentication. The distribution flow remains fail-closed and
 performs no archive/export/notarization/stapling/ZIP mutation; clean-machine
 Gatekeeper and human acceptance remain open. Handoff:
 `.porting/porting-handoff-full-swift-twin-phase22-m35-acceptance.md`.
+
+Continuation Phase 25 (2026-08-20) attempts route alignment for the retained
+`oracle_hook|input` identity `0xd9446dfed10e189e`. The C and Swift files each
+contain one record over two ticks with five aligned identity fingerprints, but
+the result remains explicitly non-admitted:
+`pairing_audit admitted=0 c_records=1 swift_records=1 c_ticks=2 swift_ticks=2 blockers=coverage_deferred`
+and `real_route_alignment_attempted=1 records=1 exact_bytes=1
+common_fingerprints=5`; the promotion gate reports
+`current_route_shard_admitted=0 synthetic_one_record_rejected=1
+coverage_or_window_gate=1 fixture_only=0`. The existing live ledger remains
+1 of 7,419; no additional row or route ledger entry changed. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase25-route-alignment.md`.
+
+Continuation Phase 26 (2026-08-20) makes one bounded M34 visible-capture
+attempt from a locked/headless host. The API/shader-validation pass reaches
+`scheduler_dropped_steps=64`; the separate capture-only pass reaches zero
+scheduler drops but only three callbacks/presents, `callback_idle_ms=9957`,
+`host_compositor_evidence=candidate`, and `archive_reuse=false`. `gpudebug`
+finds three MTL4 command buffers/draws with valid drawable/residency/present
+structure, while all fetched color/depth attachments are clear-only black.
+M34 remains open for an unlocked visible compositor, post-resume presentation,
+archive reuse, non-clear/reference pixels, physical display, and human review.
+Handoff: `.porting/porting-handoff-full-swift-twin-phase26-m34-visible-capture.md`.
+
+Continuation Phase 27 (2026-08-20) corrects the Release entitlement source:
+`SM64Modern/SM64Modern.entitlements` now has
+`com.apple.security.get-task-allow=false` while retaining
+`com.apple.developer.sustained-execution=true`; Debug remains
+`get-task-allow=true` without sustained execution. Plist/build-setting,
+readiness, and fail-closed distribution-flow checks pass. The former Release
+entitlement blocker is cleared; real signing still depends on the authorized
+provisioned App ID. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase27-release-entitlement.md`.
+
+Continuation Phase 28 (2026-08-20) rechecks M35 with invocation-scoped stable
+Xcode 26.6 and leaves exactly two active preflight blockers: no authorized
+Developer ID Application identity/private key and no notarytool authentication.
+The Release entitlement correction is confirmed, and the blocked distribution
+run reports no archive/export/DMG/ZIP/notarization/stapling mutation. Clean-
+machine Gatekeeper, physical, and human acceptance remain unstarted. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase28-m35-external-recheck.md`.
+
+Continuation Phase 29 (2026-08-20) reconciles the public README, SM64 Modern
+status, and this current continuation summary while preserving historical
+ledger text. The 534/511/23 behavior counters and 1/7,419 live-qualified route
+counter remain unchanged; Phase 25's attempted row remains non-admitted, M34
+remains diagnostic/clear-only, and M35 has exactly the two Phase 28 blockers.
+Handoff: `.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md`.
 
 Continuation Phase 1 (2026-08-20) is checkpointed at `da4fa9ae` plus the
 current live-host control. The fresh arm64 Debug bundle built, launched through

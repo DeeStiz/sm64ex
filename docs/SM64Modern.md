@@ -84,20 +84,46 @@ The status below is pinned to the current `nightly` continuation
   clear-only black attachments. This is a host/compositor, archive/tooling,
   visual/reference, and physical-acceptance boundary, not M34 closure or visual
   parity evidence.
-* The Phase 22 M35 acceptance audit validated the invocation-scoped stable
-  Xcode 26.6 path without changing global `xcode-select`, but readiness remains
-  blocked by exactly three external prerequisites: no Developer ID Application
-  identity, Release `com.apple.security.get-task-allow=true`, and no notarytool
-  authentication. The fail-closed distribution run performed no mutation;
-  clean-machine and human acceptance remain open.
+* Phase 25's route-alignment attempt for `oracle_hook|input`
+  (`0xd9446dfed10e189e`) remains non-admitted: the paired files report
+  `pairing_audit admitted=0 c_records=1 swift_records=1 c_ticks=2 swift_ticks=2 blockers=coverage_deferred`,
+  while the route gate reports
+  `current_route_shard_admitted=0 synthetic_one_record_rejected=1 coverage_or_window_gate=1 fixture_only=0`.
+  `real_route_alignment_attempted=1 records=1 exact_bytes=1 common_fingerprints=5`
+  is alignment evidence only; the complete coverage and independent multi-tick
+  window are still missing, so the live ledger remains **1 of 7,419**.
+* Phase 26's M34 visible-capture attempt was run from a locked/headless host:
+  the screen capture was black with displays asleep and the wake attempt ended
+  at the login screen. The API/shader-validation log reached
+  `scheduler_dropped_steps=64`; the separate capture-only pass reached
+  `scheduler_dropped_steps=0` but only three callbacks/presents
+  (`callback_idle_ms=9957`, `host_compositor_evidence=candidate`), with
+  `archive_reuse=false`. `gpudebug` found three MTL4 command buffers/draws and
+  valid drawable/residency/present structure, but all fetched color/depth
+  attachments were clear-only black. M34 visual/device/reference acceptance
+  remains open.
+* Phase 27 corrected the Release source entitlement to
+  `com.apple.security.get-task-allow=false` while preserving
+  `com.apple.developer.sustained-execution=true`; Debug remains
+  `get-task-allow=true` without sustained execution. Plist, build-setting,
+  readiness, and distribution-flow checks passed, and the former Release
+  entitlement blocker is cleared.
+* Phase 28 rechecked M35 with invocation-scoped stable Xcode 26.6 without
+  changing global `xcode-select`. Readiness and distribution remain fail-closed
+  with exactly two blockers: no authorized Developer ID Application identity/
+  private key and no notarytool authentication. No archive, export, DMG, ZIP,
+  notarization, stapling, Gatekeeper, physical, or human acceptance state was
+  changed or claimed; clean-machine and human acceptance remain open.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
 The proposed Luna-max continuation plan is
 [`../.porting/goal-continuation-luna-max-2026-08-20.md`](../.porting/goal-continuation-luna-max-2026-08-20.md).
-The latest bounded handoffs are [Phase 20 C/Swift pairing](../.porting/porting-handoff-full-swift-twin-phase20-c-swift-pairing.md),
-[Phase 21 M34 closure](../.porting/porting-handoff-full-swift-twin-phase21-m34-closure.md),
-and [Phase 22 M35 acceptance](../.porting/porting-handoff-full-swift-twin-phase22-m35-acceptance.md).
+The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-handoff-full-swift-twin-phase25-route-alignment.md),
+[Phase 26 M34 capture](../.porting/porting-handoff-full-swift-twin-phase26-m34-visible-capture.md),
+[Phase 27 Release entitlement](../.porting/porting-handoff-full-swift-twin-phase27-release-entitlement.md),
+[Phase 28 M35 recheck](../.porting/porting-handoff-full-swift-twin-phase28-m35-external-recheck.md),
+and [Phase 29 docs reconciliation](../.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
