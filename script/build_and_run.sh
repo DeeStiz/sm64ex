@@ -350,6 +350,7 @@ else
   "$PROJECT_ROOT/script/test_ground_particle_spawner.sh"
   "$PROJECT_ROOT/script/test_content_pack.sh"
   "$PROJECT_ROOT/script/test_oracle_trace.sh"
+  "$PROJECT_ROOT/script/test_oracle_lifecycle_record.sh"
   "$PROJECT_ROOT/script/test_oracle_trace_swift.sh"
   "$PROJECT_ROOT/script/test_oracle_bridge.sh"
   "$PROJECT_ROOT/script/test_oracle_reachability.sh"
