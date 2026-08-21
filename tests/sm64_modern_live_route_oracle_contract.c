@@ -122,8 +122,10 @@ static int load_trace(const char *path, struct FileTrace *trace, uint32_t expect
     return trace->count == expected_count;
 }
 
-static SM64ModernStatus emit_live_route_record(uint32_t index, int tamper) {
-    if (pairing_route_enabled()) {
+static SM64ModernStatus emit_live_route_record(uint32_t index,
+                                               int tamper,
+                                               int input_only) {
+    if (pairing_route_enabled() && input_only) {
         uint64_t values[] = { UINT64_C(0x8000), UINT64_C(16) };
         if (tamper && index == 1u) values[0]++;
         sm64_modern_oracle_trace_begin_tick();
@@ -144,14 +146,20 @@ static SM64ModernStatus emit_live_route_record(uint32_t index, int tamper) {
         sm64_modern_oracle_trace_end_tick();
         return status;
     }
-    static const uint32_t domains[] = { 1u, 1u, 1u, 2u, 2u, 10u, 3u, 11u };
-    static const uint32_t kinds[] = { 2u, 2u, 2u, 2u, 3u, 3u, 1u, 7u };
+    static const uint32_t domains[] = {
+        1u, 1u, 1u, 2u, 2u, 10u, 3u, 1u, 11u,
+    };
+    static const uint32_t kinds[] = {
+        2u, 2u, 2u, 2u, 3u, 3u, 1u, 2u, 7u,
+    };
     static const uint64_t record_ids[] = {
         UINT64_C(0x31000001), UINT64_C(0x31000001), UINT64_C(0x31000001),
         UINT64_C(0x32000001), UINT64_C(0x33000001), UINT64_C(0x17000002),
-        UINT64_C(0x31000002), UINT64_C(5),
+        UINT64_C(0x31000002), UINT64_C(1), UINT64_C(5),
     };
-    static const uint32_t value_counts[] = { 8u, 8u, 8u, 5u, 7u, 8u, 3u, 7u };
+    static const uint32_t value_counts[] = {
+        8u, 8u, 8u, 5u, 7u, 8u, 3u, 2u, 7u,
+    };
     static const uint64_t values[][8] = {
         { 1u, 0u, UINT64_C(0x41200000), 0u, 0x10u, 0u, 0u, 0u },
         { 1u, 1u, UINT64_C(0x41200000), 0u, 0x10u, 0u, 0u, 0u },
@@ -160,29 +168,49 @@ static SM64ModernStatus emit_live_route_record(uint32_t index, int tamper) {
         { UINT64_C(0x3000880), 0u, UINT64_C(0x3000880), 0u, 0u, 0u, 0u, 0u },
         { 2u, 1u, 0u, 1u, 0u, 0u, 0u, 0u },
         { 1u, 1u, 2u, 0u, 0u, 0u, 0u, 0u },
+        { UINT64_C(0x8000), UINT64_C(16), 0u, 0u, 0u, 0u, 0u, 0u },
         { 2u, 2u, 2u, 7u, 320u, 240u, 2u, 0u },
     };
     uint64_t actual[8];
     memcpy(actual, values[index], sizeof(actual));
-    if (tamper && index == 3u) actual[0]++;
+    uint32_t domain = domains[index];
+    uint32_t kind = kinds[index];
+    uint64_t record_id = record_ids[index];
+    uint32_t value_count = value_counts[index];
+    if (!pairing_route_enabled() && index == 7u) {
+        domain = 11u;
+        kind = 7u;
+        record_id = 5u;
+        value_count = 7u;
+        memcpy(actual, values[8], sizeof(actual));
+    }
+    if (pairing_route_enabled() && index < 3u) {
+        static const uint64_t pairing_input_values[][8] = {
+            { UINT64_C(0x8000), 0u, UINT64_C(0x41200000), 0u, 0x10u, 0u, 0u, 0u },
+            { 1u, UINT64_C(0x8001), UINT64_C(0x41200000), 0u, 0x10u, 0u, 0u, 0u },
+            { UINT64_C(0x8000), UINT64_C(0x8000), UINT64_C(0x42000000), 0u, 0x26u, 0u, 0u, 0u },
+        };
+        memcpy(actual, pairing_input_values[index], sizeof(actual));
+    }
+    if (tamper && (pairing_route_enabled() ? index == 1u : index == 3u)) actual[0]++;
+
+    if (pairing_route_enabled() && index == 7u
+        && sm64_modern_oracle_trace_mark_coverage(
+               SM64_MODERN_ORACLE_DOMAIN_INPUT, 1u)
+               != SM64_MODERN_STATUS_OK) {
+        return SM64_MODERN_STATUS_PARITY_DIVERGED;
+    }
 
     sm64_modern_oracle_trace_begin_tick();
-    if (index == 7u) {
-        const SM64ModernStatus status = sm64_modern_oracle_trace_record(
-            domains[index], kinds[index], 0, record_ids[index], 0,
-            actual, value_counts[index]);
-        sm64_modern_oracle_trace_end_tick();
-        return status;
-    }
     const SM64ModernStatus status = sm64_modern_oracle_trace_record(
-        domains[index], kinds[index], 0, record_ids[index],
+        domain, kind, 0, record_id,
         index == 5u ? UINT32_C(67174529) : 0u,
-        actual, value_counts[index]);
+        actual, value_count);
     sm64_modern_oracle_trace_end_tick();
     return status;
 }
 
-static int run_replay(struct FileTrace *trace, int tamper) {
+static int run_replay(struct FileTrace *trace, int tamper, int input_only) {
     trace->cursor = 0;
     SM64ModernOracleTraceConfigV1 config;
     memset(&config, 0, sizeof(config));
@@ -215,7 +243,7 @@ static int run_replay(struct FileTrace *trace, int tamper) {
     if (status != SM64_MODERN_STATUS_OK) return 0;
     uint32_t first_divergence = UINT32_MAX;
     for (uint32_t index = 0; index < trace->count; ++index) {
-        status = emit_live_route_record(index, tamper);
+        status = emit_live_route_record(index, tamper, input_only);
         if (status != SM64_MODERN_STATUS_OK && first_divergence == UINT32_MAX) {
             first_divergence = index;
         }
@@ -257,10 +285,14 @@ int main(int argc, char **argv) {
     }
     struct FileTrace trace;
     memset(&trace, 0, sizeof(trace));
+    const uint32_t expected_count = pairing_route_enabled()
+        ? (input_only ? 2u : 9u)
+        : (input_only ? 1u : 8u);
     if (!load_trace(argv[1], &trace,
-                    pairing_route_enabled() ? 2u : (input_only ? 1u : 8u))) {
+                    expected_count)) {
         fprintf(stderr, "expected %s schema-4 trace\n",
-                pairing_route_enabled() ? "two-record input route"
+                pairing_route_enabled() ? (input_only ? "two-record input route"
+                                                        : "nine-record full route")
                                         : (input_only ? "one-record input-only"
                                                       : "eight-record full-route"));
         return 2;
@@ -269,5 +301,5 @@ int main(int argc, char **argv) {
         fprintf(stderr, "input-only mode cannot tamper\n");
         return 2;
     }
-    return run_replay(&trace, tamper) ? 0 : 1;
+    return run_replay(&trace, tamper, input_only) ? 0 : 1;
 }
