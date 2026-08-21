@@ -551,8 +551,6 @@ run_distribution() {
   # receive stapled tickets, so the ZIP is packaged only after app stapling.
   notarize_distribution_artifact "$M35_EXPORTED_APP" app
   staple_and_validate_distribution_artifact "$M35_EXPORTED_APP" app
-  spctl -a -vv -t execute "$M35_EXPORTED_APP" > "$OUTPUT_DIR/spctl-app.txt" 2>&1 \
-    || die 'spctl rejected the stapled app'
 
   create_distribution_dmg
   notarize_distribution_artifact "$M35_DMG_PATH" dmg

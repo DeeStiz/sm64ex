@@ -160,6 +160,7 @@ gates before recording a milestone handoff.
 | Native host | `./script/build_and_run.sh --verify` | Layer/device/bridge/frame-one/start/stop telemetry when the host can launch |
 | Metal 4 production | `./script/test_metal4_production.sh` | Separate API/shader-validation and GPU-capture passes plus `gpudebug` inspection |
 | M35 readiness | `./script/m9_release.sh readiness` or `./script/test_m9_release_readiness.sh` | Read-only distribution prerequisite check; it fails closed without Developer ID/notary/toolchain prerequisites |
+| M35 distribution flow | `./script/m9_release.sh distribution` or `./script/test_m35_distribution_flow.sh` | Fail-closed archive/export/notarize/staple/DMG/ZIP flow; blocked prerequisites perform no mutation |
 
 `test_metal4_production.sh` requires the macOS Metal capture/debug tools and
 uses a new output directory by default; it refuses to overwrite an existing

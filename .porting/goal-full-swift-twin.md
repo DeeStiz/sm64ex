@@ -175,6 +175,15 @@ submitting or stapling anything. The preflight contract and shell checks pass,
 while the current environment correctly reports beta Xcode, no Developer ID
 identity, a Release `get-task-allow` mismatch, and no notary credentials.
 
+Continuation Phase 11 adds the fail-closed M35 `distribution`/`archive` flow:
+Developer ID archive/export, signature/entitlement validation, app/DMG
+notarization and stapling, Gatekeeper checks, and ZIP packaging only after app
+stapling. `script/test_m35_distribution_flow.sh` passes and current readiness
+blockers stop before mutation. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase11-m35-distribution-flow.md`;
+external credentials/toolchain, clean-machine, and human acceptance remain
+open.
+
 Continuation Phase 8 centrally promotes `bhvSquarishPathMoving` through route
 265. Its focused contract is `0x9cbe6c17eb977926`; the manifest is now 534 rows
 with 501 Swift owners and 33 explicit C adapters at

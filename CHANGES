@@ -15,6 +15,9 @@ SM64 Modern native macOS — nightly continuation update (2026-08-20)
     visible display-link run at three frames and archive reuse is unproven.
 6.) Record the remaining central route promotions, 7,419-shard live closure,
     M35 distribution, and human-acceptance gates in the goal and handoff docs.
+7.) Add a fail-closed M35 archive/export/notarize/staple/DMG/ZIP flow that
+    performs no mutation while the local Developer ID/notary prerequisites are
+    unavailable.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)
