@@ -382,6 +382,12 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
 
     func initializeScene(filteringMode: UInt32) -> SM64ModernStatus {
         metalLogger.notice("metal_scene_initialized filtering=\(filteringMode)")
+        do {
+            try shaderCompiler.waitForPreparedPipelines()
+        } catch {
+            metalLogger.error("metal_pipeline_registration_failed error=\(error.localizedDescription, privacy: .public)")
+            return SM64_MODERN_STATUS_PLATFORM_ERROR
+        }
         return SM64_MODERN_STATUS_OK
     }
 

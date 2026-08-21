@@ -147,6 +147,24 @@ final class MetalShaderCompiler {
         metalShaderLogger.notice("metal4_pipeline_warmup_ready requested=\(uniqueKeys.count) archive_reuse=\(self.archiveLoaded) lookup_archives=\(self.lookupArchives.count) descriptor_cache=\(self.descriptorCacheFound)")
     }
 
+    /// Drain every registration-time pipeline before the engine profile starts.
+    /// C shader registration intentionally remains asynchronous, but leaving
+    /// those tasks outstanding lets compiler CPU work contend with the fixed
+    /// simulation owner and manufacture scheduler drops during M34 stress.
+    func waitForPreparedPipelines() throws {
+        compileQueue.sync {}
+        SM64ModernWaitForRenderPipelineTasks()
+        lock.lock()
+        let failure = failures.values.first
+        let pendingCount = pending.count
+        lock.unlock()
+        if let failure { throw failure }
+        guard pendingCount == 0 else {
+            throw MetalShaderCompilerError.pipelineNotReady(shaderID: 0)
+        }
+        metalShaderLogger.notice("metal4_pipeline_registration_ready archive_reuse=\(self.archiveLoaded) lookup_archives=\(self.lookupArchives.count) descriptor_cache=\(self.descriptorCacheFound)")
+    }
+
     func prepare(_ key: MetalShaderKey) {
         lock.lock()
         guard cache[key] == nil, failures[key] == nil, !pending.contains(key) else {
