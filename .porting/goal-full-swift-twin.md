@@ -111,6 +111,9 @@ complete cleanly, the owner reaches 600 ticks with zero scheduler drops and
 status-0 shutdown, and host/compositor throttling accounts for the three-frame
 observation. The next capture must run from an unlocked visible GUI session
 with Screen Recording access; archive reuse remains independently unproven.
+The subsequent enqueue-barrier fix (`9509dfe0`) removed the pending-pipeline
+failure: the latest run presented three frames and drained cleanly, but still
+failed the production gate on 62 scheduler-dropped steps and no archive reuse.
 
 M33 Act Selector central integration is now complete locally. The owner shares
 the existing star-type bridge, preserves parent-first child updates and

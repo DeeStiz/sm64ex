@@ -28,6 +28,9 @@ The status below is pinned to the current `nightly` continuation
   harness keeps API/shader validation separate from GPU capture and exercises
   a real `CAMetalLayer`, resize/pause stress, three captured MTL4 command
   buffers, `BGRA8Unorm` color, and `Depth32Float` depth.
+* Commit `9509dfe0` closes the compiler-queue enqueue race; the latest stress
+  run presents three frames and drains cleanly, but remains rejected for 62
+  scheduler-dropped steps, host/compositor throttling, and `archive_reuse=false`.
 * The latest full host verifier can still be blocked before engine startup by
   LaunchServices `kLSNoExecutableErr (-10827)` (the direct AppKit diagnostic
   exits `134`). The retained complete host proof is M33nc; this is a host

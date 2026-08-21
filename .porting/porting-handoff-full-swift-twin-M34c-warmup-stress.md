@@ -17,31 +17,32 @@ Passed:
 - Strict Swift 6 arm64 Debug and Release builds.
 - `bash -n` and `git diff --check`.
 
-The updated production harness ran in:
+The first warmup run exposed a real enqueue race: `waitUntilReady` could drain
+Metal compiler tasks before the Swift compiler queue had enqueued them. Commit
+`9509dfe0` adds an explicit `compileQueue.sync {}` barrier before waiting. The
+follow-up run was `/tmp/sm64-modern-m34-afterwarmup.Nw05Wx`.
 
-`/var/folders/th/x9l5jv8j6n76y9n941xty1440000gn/T/sm64-modern-m34b.LtxxU0/`
-
-The validation run reached 600 profile ticks, zero scheduler drops, zero audio
-drop delta, repeated pause/resume, minimize/restore notifications, and clean
-status-0 shutdown. It did not satisfy the new warmed presentation gate:
-the display link stopped after three initial presents, all at the initial
-drawable size, and no `metal_presentation_resize_ack` was emitted. The harness
-therefore stopped before accepting the capture pass.
+After the fix, Release reached three real presented frames, four resize/pause
+cycles, post-resume resize observation, and clean Metal drain/status-0
+shutdown. It no longer reports `metal_frame_failed` or a pending pipeline.
+The harness still rejects the run because host/compositor pressure produced
+`scheduler_dropped_steps=62` and presentation stopped at three frames after
+the initial callbacks.
 
 ## Evidence boundary and blocker
 
 This is an implementation/build/validation attempt, not new M34 visual or
 physical acceptance. The current run reports
 `metal4_archive_reuse enabled=false` with descriptor-cache fallback; a valid
-flushed archive was not loaded. The remaining issue is live display-link/
-compositor presentation after the initial three frames, not a claimed gameplay
-or shader failure. Preserve this as a failed gate and recapture on a host where
-post-resume drawable callbacks are observable.
+flushed archive was not loaded. The remaining issue is host/compositor
+presentation and scheduler pressure after the initial callbacks, not a
+pipeline-readiness or shader failure. Preserve this as a failed gate and
+recapture on an unlocked visible GUI host with Screen Recording access.
 
 ## Next actions
 
-1. Reproduce the M34 stress harness with a live post-resume drawable callback
-   and prove at least two `metal_presentation_resize_ack` records.
+1. Reproduce the M34 stress harness on a host without scheduler drops and
+   prove at least two `metal_presentation_resize_ack` records after resume.
 2. Produce and reload a valid MTL4 archive so `archive_reuse enabled=true` is
    observed in a second isolated run.
 3. Capture and inspect the warmed resized framebuffer with `gpudebug`; compare
