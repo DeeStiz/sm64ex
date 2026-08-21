@@ -44,24 +44,22 @@ shard_id="${line%%|*}"
 
 "$PROJECT_ROOT/script/test_live_route_oracle.sh" input-only >"$BUILD_ROOT/live-route.log"
 [[ -s "$TRACE" ]] || { echo "live input-only trace was not emitted" >&2; exit 1; }
-"$PROMOTION_TOOL" \
+if promotion_output="$("$PROMOTION_TOOL" \
   --manifest "$MANIFEST" \
   --shard-id "$shard_id" \
   --trace "$TRACE" \
-  --report "$REPORT"
-
-if "$PROMOTION_TOOL" \
-  --manifest "$MANIFEST" \
-  --shard-id "$shard_id" \
-  --trace "$TRACE" \
-  --report "$REPORT" >/dev/null 2>&1; then
-  echo "persisted live shard was allowed to rerun" >&2
+  --report "$REPORT" 2>&1)"; then
+  echo "synthetic one-record route probe was admitted" >&2
   exit 1
 fi
-
-[[ "$(awk -F'|' -v id="$shard_id" '$1 == id { print $2 }' "$REPORT")" == "passed" ]] || {
-  echo "live promotion did not persist passed state" >&2
+grep -Eq 'nonzero coverage fingerprint|multi-tick window' <<<"$promotion_output" || {
+  printf '%s\n' "$promotion_output" >&2
+  echo "synthetic route rejection omitted its admission blocker" >&2
+  exit 1
+}
+[[ ! -e "$REPORT" ]] || {
+  echo "rejected synthetic route mutated the promotion report" >&2
   exit 1
 }
 
-printf 'SM64 Modern live route promotion smoke passed shard=%s c_swift_replay=1 coverage=1 persistent_rerun_rejected=1 fixture_only=0\n' "$shard_id"
+printf 'SM64 Modern live route promotion smoke passed shard=%s current_route_shard_admitted=0 synthetic_one_record_rejected=1 coverage_or_window_gate=1 fixture_only=0\n' "$shard_id"

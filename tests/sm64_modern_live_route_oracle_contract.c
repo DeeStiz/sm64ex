@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,6 +7,11 @@
 #include "sm64_modern.h"
 
 #define TRACE_CAPACITY 16u
+#define PAIRING_ROUTE_SHARD_ID UINT64_C(0xd9446dfed10e189e)
+#define PAIRING_ROUTE_INPUT_SEED UINT64_C(0x2029a018ec09ef5a)
+#define PAIRING_ROUTE_SAVE_SEED UINT64_C(0x4736724b767444c3)
+#define PAIRING_FNV_OFFSET UINT64_C(1469598103934665603)
+#define PAIRING_FNV_PRIME UINT64_C(1099511628211)
 
 struct FileTrace {
     SM64ModernOracleTraceConfigV1 config;
@@ -13,6 +19,47 @@ struct FileTrace {
     uint32_t count;
     uint32_t cursor;
 };
+
+static bool pairing_route_enabled(void) {
+    const char *value = getenv("SM64_MODERN_PAIRING_ROUTE");
+    return value && strcmp(value, "1") == 0;
+}
+
+static uint64_t hash_u64(uint64_t hash, uint64_t value) {
+    for (uint32_t byte = 0; byte < 8u; ++byte) {
+        hash ^= (value >> (byte * 8u)) & UINT64_C(0xff);
+        hash *= PAIRING_FNV_PRIME;
+    }
+    return hash;
+}
+
+static uint64_t hash_u32(uint64_t hash, uint32_t value) {
+    for (uint32_t byte = 0; byte < 4u; ++byte) {
+        hash ^= (value >> (byte * 8u)) & UINT64_C(0xff);
+        hash *= PAIRING_FNV_PRIME;
+    }
+    return hash;
+}
+
+static uint64_t hash_string(const char *value) {
+    uint64_t hash = PAIRING_FNV_OFFSET;
+    for (const unsigned char *cursor = (const unsigned char *) value;
+         cursor && *cursor;
+         ++cursor) {
+        hash ^= *cursor;
+        hash *= PAIRING_FNV_PRIME;
+    }
+    return hash;
+}
+
+static uint64_t pairing_timebase_fingerprint(void) {
+    uint64_t hash = PAIRING_FNV_OFFSET;
+    const uint32_t values[] = { 3u, 60u, 1u, 30u, 1u, 2u, 2u };
+    for (size_t index = 0; index < sizeof(values) / sizeof(values[0]); ++index) {
+        hash = hash_u32(hash, values[index]);
+    }
+    return hash;
+}
 
 static SM64ModernStatus read_header(void *context,
                                     SM64ModernOracleTraceConfigV1 *out_config) {
@@ -57,6 +104,21 @@ static int load_trace(const char *path, struct FileTrace *trace, uint32_t expect
 }
 
 static SM64ModernStatus emit_live_route_record(uint32_t index, int tamper) {
+    if (pairing_route_enabled()) {
+        const uint64_t values[] = { UINT64_C(0x8000), UINT64_C(16) };
+        sm64_modern_oracle_trace_begin_tick();
+        sm64_modern_oracle_trace_begin_tick();
+        const SM64ModernStatus status = sm64_modern_oracle_trace_record(
+            SM64_MODERN_ORACLE_DOMAIN_INPUT,
+            SM64_MODERN_ORACLE_RECORD_INPUT,
+            0,
+            1,
+            0,
+            values,
+            2);
+        sm64_modern_oracle_trace_end_tick();
+        return status;
+    }
     static const uint32_t domains[] = { 1u, 1u, 1u, 2u, 2u, 10u, 3u, 11u };
     static const uint32_t kinds[] = { 2u, 2u, 2u, 2u, 3u, 3u, 1u, 7u };
     static const uint64_t record_ids[] = {
@@ -104,11 +166,24 @@ static int run_replay(struct FileTrace *trace, int tamper) {
     config.schema_version = SM64_MODERN_ORACLE_TRACE_SCHEMA_VERSION;
     config.region_code = UINT32_C(0x5553);
     config.mode = SM64_MODERN_ORACLE_TRACE_REPLAY;
-    config.build_fingerprint = UINT64_C(0x4d33c001);
-    config.content_fingerprint = UINT64_C(0x4d33c002);
-    config.timebase_fingerprint = UINT64_C(0x4d33c003);
-    config.configuration_fingerprint = UINT64_C(0x4d33c004);
-    config.initial_save_fingerprint = UINT64_C(0x4d33c005);
+    if (pairing_route_enabled()) {
+        config.build_fingerprint = hash_u64(PAIRING_FNV_OFFSET,
+                                            PAIRING_ROUTE_SHARD_ID);
+        config.content_fingerprint = hash_u64(PAIRING_FNV_OFFSET,
+                                              PAIRING_ROUTE_INPUT_SEED);
+        config.timebase_fingerprint = pairing_timebase_fingerprint();
+        config.configuration_fingerprint = hash_string(
+            "region=5553;fullscreen=off;skip_intro=1;native_tick=1;legacy_tick=1;"
+            "shard=0xd9446dfed10e189e");
+        config.initial_save_fingerprint = hash_u64(PAIRING_FNV_OFFSET,
+                                                   PAIRING_ROUTE_SAVE_SEED);
+    } else {
+        config.build_fingerprint = UINT64_C(0x4d33c001);
+        config.content_fingerprint = UINT64_C(0x4d33c002);
+        config.timebase_fingerprint = UINT64_C(0x4d33c003);
+        config.configuration_fingerprint = UINT64_C(0x4d33c004);
+        config.initial_save_fingerprint = UINT64_C(0x4d33c005);
+    }
     SM64ModernOracleTraceStreamApiV1 stream = make_stream(trace);
     SM64ModernStatus status = sm64_modern_oracle_trace_begin(&config, &stream);
     if (status != SM64_MODERN_STATUS_OK) return 0;
@@ -154,7 +229,8 @@ int main(int argc, char **argv) {
     }
     struct FileTrace trace;
     memset(&trace, 0, sizeof(trace));
-    if (!load_trace(argv[1], &trace, input_only ? 1u : 8u)) {
+    if (!load_trace(argv[1], &trace,
+                    pairing_route_enabled() ? 1u : (input_only ? 1u : 8u))) {
         fprintf(stderr, "expected %s schema-4 trace\n",
                 input_only ? "one-record input-only" : "eight-record full-route");
         return 2;

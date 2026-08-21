@@ -10,6 +10,8 @@ struct SM64RouteShardPromotionTool {
         case invalidArguments
         case missingArgument(String)
         case wrongTraceMode(SM64OracleTraceMode)
+        case coverageFingerprintDeferred
+        case incompleteWindow(UInt64)
         case incompleteCoverage(String)
         case reportRequired
 
@@ -21,6 +23,10 @@ struct SM64RouteShardPromotionTool {
                 return "missing argument " + name
             case let .wrongTraceMode(mode):
                 return "live promotion requires a record trace, got " + String(describing: mode)
+            case .coverageFingerprintDeferred:
+                return "live promotion requires a nonzero coverage fingerprint"
+            case let .incompleteWindow(count):
+                return "live promotion requires an independently recorded multi-tick window (records=\(count))"
             case let .incompleteCoverage(reason):
                 return "live trace coverage incomplete: " + reason
             case .reportRequired:
@@ -62,6 +68,12 @@ struct SM64RouteShardPromotionTool {
             let trace = try SM64OracleTraceFile.read(from: options.trace)
             guard trace.configuration.mode == .record else {
                 throw ToolError.wrongTraceMode(trace.configuration.mode)
+            }
+            guard trace.configuration.coverageFingerprint != 0 else {
+                throw ToolError.coverageFingerprintDeferred
+            }
+            guard trace.records.count >= 2 else {
+                throw ToolError.incompleteWindow(UInt64(trace.records.count))
             }
             let coverage = SM64RouteShardFixture.coverage(for: shard, records: trace.records)
             guard coverage.isComplete else {

@@ -7,8 +7,15 @@
 #include <string.h>
 
 #include "sm64_modern.h"
+#include "pc/sm64_modern_timebase.h"
 
 #define TRACE_STEPS 4u
+
+#define PAIRING_ROUTE_SHARD_ID UINT64_C(0xd9446dfed10e189e)
+#define PAIRING_ROUTE_INPUT_SEED UINT64_C(0x2029a018ec09ef5a)
+#define PAIRING_ROUTE_SAVE_SEED UINT64_C(0x4736724b767444c3)
+#define PAIRING_FNV_OFFSET UINT64_C(1469598103934665603)
+#define PAIRING_FNV_PRIME UINT64_C(1099511628211)
 
 struct TraceFile {
     FILE *file;
@@ -19,6 +26,7 @@ struct TraceFile {
     uint64_t last_tick[SM64_MODERN_ORACLE_TRACE_DOMAIN_COUNT];
     uint32_t last_sequence[SM64_MODERN_ORACLE_TRACE_DOMAIN_COUNT];
     uint32_t failures;
+    bool input_only;
 };
 
 struct HarnessState {
@@ -65,6 +73,30 @@ static bool write_bytes(struct TraceFile *trace, const void *data, size_t size) 
     return trace && trace->file && fwrite(data, 1, size, trace->file) == size;
 }
 
+static uint64_t hash_u64(uint64_t hash, uint64_t value) {
+    for (uint32_t byte = 0; byte < 8u; ++byte) {
+        hash ^= (value >> (byte * 8u)) & UINT64_C(0xff);
+        hash *= PAIRING_FNV_PRIME;
+    }
+    return hash;
+}
+
+static uint64_t hash_string(const char *value) {
+    uint64_t hash = PAIRING_FNV_OFFSET;
+    for (const unsigned char *cursor = (const unsigned char *) value;
+         cursor && *cursor;
+         ++cursor) {
+        hash ^= *cursor;
+        hash *= PAIRING_FNV_PRIME;
+    }
+    return hash;
+}
+
+static bool pairing_route_enabled(void) {
+    const char *value = getenv("SM64_MODERN_PAIRING_ROUTE");
+    return value && strcmp(value, "1") == 0;
+}
+
 static bool valid_record(const SM64ModernOracleTraceRecordV1 *record) {
     return record
         && record->header.abi_version == SM64_MODERN_ABI_VERSION_1
@@ -100,6 +132,14 @@ static SM64ModernStatus trace_write_record(
     if (!trace || !valid_record(record)) {
         if (trace) trace->failures++;
         return SM64_MODERN_STATUS_INVALID_ARGUMENT;
+    }
+
+    // The route attempt executes the complete native owner tick, but the
+    // selected manifest row is the input receipt. Keep unrelated observed
+    // domains out of this row's independent artifact; the oracle still tracks
+    // their coverage internally and leaves the admission fingerprint deferred.
+    if (trace->input_only && record->domain != SM64_MODERN_ORACLE_DOMAIN_INPUT) {
+        return SM64_MODERN_STATUS_OK;
     }
 
     const uint32_t domain = record->domain;
@@ -150,6 +190,13 @@ static SM64ModernStatus input_read(void *context,
     snapshot->header.abi_version = SM64_MODERN_ABI_VERSION_1;
     snapshot->header.struct_size = sizeof(*snapshot);
     snapshot->last_virtual_key = SM64_MODERN_INPUT_NO_KEY;
+    if (pairing_route_enabled()) {
+        // The checked-in US config binds A to virtual key 0x26. The modern
+        // input adapter consumes left-stick values in 1/256 units, so 4096
+        // becomes the same raw N64 stick sample (+16) used by Swift.
+        snapshot->keyboard_keys[0x26u / 32u] |= UINT32_C(1) << (0x26u % 32u);
+        snapshot->left_stick_x = INT16_C(4096);
+    }
     return SM64_MODERN_STATUS_OK;
 }
 
@@ -437,6 +484,18 @@ static SM64ModernOracleTraceConfigV1 make_oracle_config(void) {
     config.schema_version = SM64_MODERN_ORACLE_TRACE_SCHEMA_VERSION;
     config.region_code = UINT32_C(0x5553);
     config.mode = SM64_MODERN_ORACLE_TRACE_RECORD;
+    if (pairing_route_enabled()) {
+        config.build_fingerprint = hash_u64(PAIRING_FNV_OFFSET,
+                                            PAIRING_ROUTE_SHARD_ID);
+        config.content_fingerprint = hash_u64(PAIRING_FNV_OFFSET,
+                                              PAIRING_ROUTE_INPUT_SEED);
+        config.timebase_fingerprint = sm64_modern_timebase_fingerprint();
+        config.configuration_fingerprint = hash_string(
+            "region=5553;fullscreen=off;skip_intro=1;native_tick=1;legacy_tick=1;"
+            "shard=0xd9446dfed10e189e");
+        config.initial_save_fingerprint = hash_u64(PAIRING_FNV_OFFSET,
+                                                   PAIRING_ROUTE_SAVE_SEED);
+    }
     return config;
 }
 
@@ -505,6 +564,8 @@ int main(int argc, char **argv) {
     struct TraceFile trace;
     memset(&state, 0, sizeof(state));
     memset(&trace, 0, sizeof(trace));
+    const bool pairing_route = pairing_route_enabled();
+    trace.input_only = pairing_route;
     trace.file = fopen(trace_path, "wb");
     if (!trace.file) {
         fprintf(stderr, "could not open '%s'\n", trace_path);
@@ -517,6 +578,24 @@ int main(int argc, char **argv) {
     const SM64ModernAudioMigrationApiV1 audio = make_audio_api(&state);
     expect_status("install audio", sm64_modern_install_audio_migration_api(&audio),
                   SM64_MODERN_STATUS_OK);
+    if (pairing_route) {
+        SM64ModernTimebaseApiV1 timebase;
+        memset(&timebase, 0, sizeof(timebase));
+        expect_status("get pairing timebase", sm64_modern_get_timebase_api(
+                          SM64_MODERN_ABI_VERSION_1, sizeof(timebase), &timebase),
+                      SM64_MODERN_STATUS_OK);
+        SM64ModernTimebaseConfigV1 timebase_config;
+        memset(&timebase_config, 0, sizeof(timebase_config));
+        timebase_config.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+        timebase_config.header.struct_size = sizeof(timebase_config);
+        timebase_config.simulation_rate_numerator = 60u;
+        timebase_config.simulation_rate_denominator = 1u;
+        timebase_config.legacy_rate_numerator = 30u;
+        timebase_config.legacy_rate_denominator = 1u;
+        timebase_config.max_catch_up_steps = 2u;
+        expect_status("configure pairing timebase", timebase.configure(&timebase_config),
+                      SM64_MODERN_STATUS_OK);
+    }
     const SM64ModernOracleTraceConfigV1 oracle_config = make_oracle_config();
     const SM64ModernOracleTraceStreamApiV1 stream = make_trace_stream(&trace);
     expect_status("begin oracle", sm64_modern_oracle_trace_begin(&oracle_config, &stream),
@@ -548,7 +627,8 @@ int main(int argc, char **argv) {
         expect_status("running state", lifecycle.get_state(&lifecycle_state),
                       SM64_MODERN_STATUS_OK);
         expect_true("lifecycle running", lifecycle_state == SM64_MODERN_LIFECYCLE_RUNNING);
-        for (uint32_t index = 0; index < TRACE_STEPS; ++index) {
+        const uint32_t trace_steps = pairing_route ? 1u : TRACE_STEPS;
+        for (uint32_t index = 0; index < trace_steps; ++index) {
             expect_status("lifecycle step", lifecycle.step(), SM64_MODERN_STATUS_OK);
         }
     }
@@ -569,20 +649,22 @@ int main(int argc, char **argv) {
     expect_true("oracle result status", result.status == SM64_MODERN_STATUS_OK);
     expect_true("oracle records", result.actual_records > 0u);
     expect_true("oracle coverage", result.coverage_entries > 0u);
-    const uint32_t required_domains =
-        (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_GLOBAL)
-        | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_INPUT)
-        | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_AUDIO)
-        | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_RENDER);
+    const uint32_t required_domains = pairing_route
+        ? (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_INPUT)
+        : (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_GLOBAL)
+          | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_INPUT)
+          | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_AUDIO)
+          | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_RENDER);
     expect_true("required oracle domains",
                 (trace.domains & required_domains) == required_domains);
     expect_true("render domain records",
-                trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_RENDER] > 0u);
+                pairing_route
+                    || trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_RENDER] > 0u);
     expect_true("platform callbacks", state.platform_initialize == 1u
                 && state.platform_shutdown == 1u);
-    expect_true("input callbacks", state.input_reads >= TRACE_STEPS);
-    expect_true("audio callbacks", state.audio_play >= TRACE_STEPS
-                && state.audio_sequence > 0u);
+    expect_true("input callbacks", state.input_reads >= (pairing_route ? 1u : TRACE_STEPS));
+    expect_true("audio callbacks", pairing_route
+                || (state.audio_play >= TRACE_STEPS && state.audio_sequence > 0u));
     expect_true("render installation callbacks", state.render_initialize == 1u
                 && state.render_shutdown == 1u);
     expect_true("platform errors", state.errors == 0u);
@@ -603,16 +685,19 @@ int main(int argc, char **argv) {
     expect_true("validate file trace",
                 validate_file(trace_path, &trace, &file_records,
                               &file_last_tick, &file_domains));
-    expect_true("file lifecycle ticks", file_last_tick >= TRACE_STEPS + 1u);
+    expect_true("file lifecycle ticks",
+                file_last_tick >= (pairing_route ? 1u : TRACE_STEPS + 1u));
     expect_true("file domain mask", file_domains == trace.domains);
     printf("liveOracleTraceRecords=%" PRIu64
            " liveOracleTraceTicks=%" PRIu64
            " liveOracleTraceDomains=0x%08" PRIx32
            " liveOracleAudioCallbacks=%u"
+           " liveOracleInputRecords=%" PRIu64
            " liveOracleRenderRecords=%" PRIu64
            " liveOracleRenderDraws=%u\n",
            file_records, file_last_tick, file_domains,
            state.audio_play,
+           trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_INPUT],
            trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_RENDER],
            state.render_draw);
 

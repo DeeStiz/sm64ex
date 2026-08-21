@@ -17,6 +17,11 @@ TAMPERED_TRACE="$BUILD_ROOT/swift-pairing.tampered.trace"
 CURRENT_C_TRACE="$PROJECT_ROOT/build/sm64-modern-debug/live-schema4.trace"
 CURRENT_SWIFT_TRACE="$PROJECT_ROOT/build/sm64-modern-live-route-oracle/input-only.trace"
 
+# The route attempt uses the real manifest input row and runs both sides with
+# the same route identity. The C lifecycle still observes other domains, so
+# coverage remains deliberately deferred and cannot promote this row.
+export SM64_MODERN_PAIRING_ROUTE=1
+
 mkdir -p "$BUILD_ROOT/module-cache"
 
 make -C "$PROJECT_ROOT" \
@@ -65,7 +70,32 @@ audit_output="$($SWIFT_OUTPUT audit "$CURRENT_C_TRACE" "$CURRENT_SWIFT_TRACE" --
 printf '%s\n' "$audit_output"
 grep -Fq 'pairing_audit admitted=0' <<<"$audit_output"
 grep -Fq 'coverage_deferred' <<<"$audit_output"
-grep -Fq 'record_count' <<<"$audit_output"
+if grep -Fq 'record_count' <<<"$audit_output" \
+  || grep -Fq 'record_bytes' <<<"$audit_output" \
+  || grep -Fq 'trace_bytes' <<<"$audit_output"; then
+  echo 'independent route input windows did not align byte-for-byte' >&2
+  exit 1
+fi
+grep -Fq 'build_fingerprint' <<<"$audit_output" && {
+  echo 'route identity build fingerprint did not align' >&2
+  exit 1
+}
+grep -Fq 'content_fingerprint' <<<"$audit_output" && {
+  echo 'route identity content fingerprint did not align' >&2
+  exit 1
+}
+grep -Fq 'timebase_fingerprint' <<<"$audit_output" && {
+  echo 'route identity timebase fingerprint did not align' >&2
+  exit 1
+}
+grep -Fq 'configuration_fingerprint' <<<"$audit_output" && {
+  echo 'route identity configuration fingerprint did not align' >&2
+  exit 1
+}
+grep -Fq 'initial_save_fingerprint' <<<"$audit_output" && {
+  echo 'route identity save fingerprint did not align' >&2
+  exit 1
+}
 
 "$C_OUTPUT" record "$C_TRACE"
 "$SWIFT_OUTPUT" write "$SWIFT_TRACE"
@@ -84,4 +114,6 @@ grep -Fq 'c_pairing_replay_failed' "$BUILD_ROOT/c-tamper.log"
 printf '%s\n' \
   'SM64 Modern C/Swift pairing audit passed' \
   'current_route_shard_admitted=0' \
+  'real_route_alignment_attempted=1 records=1 exact_bytes=1 common_fingerprints=5' \
+  'route_admission_blocker=coverage_deferred_and_complete_window_not_proven' \
   'bounded_common_input_admitted=1 records=1 exact_bytes=1 coverage=1 c_replay=1 swift_tamper=1 c_tamper=1'

@@ -36,7 +36,11 @@ LOG="$BUILD_ROOT/live-oracle-lifecycle-record.log"
 SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
   "$OUTPUT" "$TRACE" "$SAVE_ROOT" | tee "$LOG"
 
-grep -Eq 'liveOracleRenderRecords=[1-9][0-9]*' "$LOG"
+if [[ "${SM64_MODERN_PAIRING_ROUTE:-0}" == "1" ]]; then
+  grep -Eq 'liveOracleInputRecords=[1-9][0-9]*' "$LOG"
+else
+  grep -Eq 'liveOracleRenderRecords=[1-9][0-9]*' "$LOG"
+fi
 
 test -s "$TRACE"
 TRACE_HEADER_HEX="$(od -An -tx1 -N8 "$TRACE" | tr -d '[:space:]')"
