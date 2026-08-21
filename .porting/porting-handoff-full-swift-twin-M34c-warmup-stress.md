@@ -38,6 +38,11 @@ flushed archive was not loaded. The remaining issue is host/compositor
 presentation and scheduler pressure after the initial callbacks, not a
 pipeline-readiness or shader failure. Preserve this as a failed gate and
 recapture on an unlocked visible GUI host with Screen Recording access.
+Commit `055b577e` additionally drains all registration-time pipeline tasks
+before the profile starts. The latest validation log records
+`metal4_pipeline_registration_ready` before the first scene packet; the same
+host still reports 62 scheduler-dropped steps under API/shader validation, so
+this improves readiness truthfulness without clearing the runtime gate.
 
 ## Next actions
 

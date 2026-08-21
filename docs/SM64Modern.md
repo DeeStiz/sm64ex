@@ -31,6 +31,9 @@ The status below is pinned to the current `nightly` continuation
 * Commit `9509dfe0` closes the compiler-queue enqueue race; the latest stress
   run presents three frames and drains cleanly, but remains rejected for 62
   scheduler-dropped steps, host/compositor throttling, and `archive_reuse=false`.
+* Commit `055b577e` drains registration-time compiler work before the profile;
+  the latest log proves registration readiness, while the same scheduler,
+  presentation, and archive-reuse gates remain open.
 * The latest full host verifier can still be blocked before engine startup by
   LaunchServices `kLSNoExecutableErr (-10827)` (the direct AppKit diagnostic
   exits `134`). The retained complete host proof is M33nc; this is a host
