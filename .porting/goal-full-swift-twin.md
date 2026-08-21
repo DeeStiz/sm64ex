@@ -121,6 +121,9 @@ An isolated no-validation baseline (`/tmp/sm64-modern-m34-baseline-203801.log`)
 still reports 58 scheduler-dropped steps and three presented frames, confirming
 the remaining presentation/scheduling boundary is host-side rather than only
 Metal validation overhead.
+Commit `631f7c69` adds a fail-closed diagnostic parser and stable telemetry for
+binary-archive reuse, descriptor-cache fallback, scheduler drops, and
+host-compositor candidates; it does not turn the baseline into acceptance.
 
 M33 Act Selector central integration is now complete locally. The owner shares
 the existing star-type bridge, preserves parent-first child updates and

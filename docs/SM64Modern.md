@@ -34,6 +34,9 @@ The status below is pinned to the current `nightly` continuation
 * Commit `055b577e` drains registration-time compiler work before the profile;
   the latest log proves registration readiness, while the same scheduler,
   presentation, and archive-reuse gates remain open.
+* Commit `631f7c69` adds a fail-closed diagnostic smoke that distinguishes
+  binary archive reuse, descriptor-cache fallback, scheduler drops, and
+  host-compositor candidates without weakening the M34 production gate.
 * The latest full host verifier can still be blocked before engine startup by
   LaunchServices `kLSNoExecutableErr (-10827)` (the direct AppKit diagnostic
   exits `134`). The retained complete host proof is M33nc; this is a host
