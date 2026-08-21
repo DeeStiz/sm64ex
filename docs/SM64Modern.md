@@ -63,6 +63,10 @@ readiness contracts pass, but Developer ID signing, notary authentication,
 distribution artifacts, clean-machine Gatekeeper, and human acceptance remain
 unavailable.
 
+Phase 74 adds a read-only M34 host gate; the current console is locked and
+both online displays are asleep, so it reports `m34_host_ready=0` without
+attempting wake, unlock, or power-state changes.
+
 M34, M35, and fresh-save human 120-star acceptance remain open. These gates
 are independent from local build, source, fixture, and headless-host
 evidence; this is not a shipped, visual-parity, or complete full-game Swift
@@ -367,7 +371,8 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 71 camera route pair audit](../.porting/porting-handoff-full-swift-twin-phase71-camera-route-pair.md),
 [Phase 72 full-route coverage](../.porting/porting-handoff-full-swift-twin-phase72-full-route-coverage.md),
 [Phase 73 full C sidecar contract](../.porting/porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md),
-and [Phase 75 M35 post-SDK preflight](../.porting/porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md).
+[Phase 75 M35 post-SDK preflight](../.porting/porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md),
+and [Phase 74 M34 host readiness](../.porting/porting-handoff-full-swift-twin-phase74-m34-host-readiness.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is

@@ -50,6 +50,11 @@
   no distribution artifact, clean-machine, or human evidence exists.
   Handoff: `.porting/porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md`.
 
+- **Continuation Phase 74 (2026-08-21):** Added a read-only M34 host gate.
+  Current state is `m34_host_ready=0`: online displays are asleep and the
+  console is locked; the script never attempts wake/unlock/power changes.
+  Handoff: `.porting/porting-handoff-full-swift-twin-phase74-m34-host-readiness.md`.
+
 - **Historical Continuation Phases 61–64 (2026-08-21):** Phase 61's canonical M34
   production harness is blocked before app launch by
   `EngineRuntime.swift:189/:366` (`SM64ModernStatus`/`Int32` type errors).

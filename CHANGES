@@ -67,6 +67,9 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
 60.) Record Phase 75's post-SDK M35 preflight: stable generic Release and the
      readiness/distribution contracts pass, while Developer ID/notary,
      artifact, clean-machine, and human gates remain open.
+61.) Record Phase 74's read-only M34 host gate: the console is locked and both
+     online displays are asleep, so `m34_host_ready=0` and no wake/unlock or
+     power-state mutation is attempted.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
