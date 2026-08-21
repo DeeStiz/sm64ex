@@ -41,6 +41,10 @@ The status below is pinned to the current `nightly` continuation
   BGRA8Unorm/Depth32Float attachments, and `sm64_vertex/sm64_fragment`; its
   fetched color is clear-only black, so visual parity and human review remain
   open.
+* A fresh bounded capture recheck proves zero scheduler/catch-up drops over 240
+  steps and valid residency/present structure, but still has only three display
+  callbacks, no post-resume acknowledgement, descriptor-cache fallback, and
+  clear-only black attachments.
 * The latest full host verifier can still be blocked before engine startup by
   LaunchServices `kLSNoExecutableErr (-10827)` (the direct AppKit diagnostic
   exits `134`). The retained complete host proof is M33nc; this is a host
@@ -61,6 +65,9 @@ The status below is pinned to the current `nightly` continuation
 * After `f5fed499`, the native-C record harness emits 3,151 validated schema-4
   records across five lifecycle ticks, including 300 render-domain records/
   288 draws; exact C/Swift pairing is still required.
+* The C/Swift pairing audit found mismatched framing/fingerprints, timebases,
+  save/configuration inputs, and selected render records; no additional live
+  route row was admitted.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).

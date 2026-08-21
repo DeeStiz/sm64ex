@@ -130,6 +130,10 @@ The retained M34 capture was re-opened with `gpudebug`: three MTL4 command
 buffers/encoders/draws, BGRA8Unorm color, Depth32Float depth, and
 `sm64_vertex/sm64_fragment` are present; fetched color is clear-only black, so
 GPU inspection still does not prove visual parity or human acceptance.
+Fresh bounded capture `/tmp/sm64-modern-m34-recheck.p8V35S/` adds zero
+scheduler/catch-up drops over 240 steps and confirms drawable/residency/present
+structure, but still shows only three callbacks, ~3.9s idle, no post-resume
+acknowledgement, descriptor-cache fallback, and clear-only black attachments.
 
 M33 Act Selector central integration is now complete locally. The owner shares
 the existing star-type bridge, preserves parent-first child updates and
@@ -208,6 +212,11 @@ with canonical-hash, ordering, coverage, and callback validation. Commit
 `f5fed499` corrects the C `render_finish`/oracle-tick ordering. This is a
 prerequisite for C/Swift live pairing, not a route-shard pass; a matching Swift
 trace is still required.
+
+Continuation Phase 16 audits C/Swift trace pairing and admits no new row:
+headers/fingerprints, 30/30 versus 60/30 timebases, save/configuration inputs,
+and selected render records differ. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase16-c-swift-pairing.md`.
 
 Continuation Phase 8 centrally promotes `bhvSquarishPathMoving` through route
 265. Its focused contract is `0x9cbe6c17eb977926`; the manifest is now 534 rows

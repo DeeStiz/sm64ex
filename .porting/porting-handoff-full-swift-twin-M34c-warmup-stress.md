@@ -74,3 +74,15 @@ the first color/depth attachments succeeded; the fetched color is clear-only
 black. This is automated GPU evidence only and does not establish screenshot
 parity, physical display quality, performance/thermal acceptance, or human
 approval.
+
+## Fresh bounded capture recheck
+
+The fresh artifact directory `/tmp/sm64-modern-m34-recheck.p8V35S/` contains a
+19 MiB `m34-recheck.gputrace`, diagnostic parser output, gpudebug summaries,
+and three fetched color/depth attachment pairs. The bounded 240-step runtime
+recorded zero scheduler/catch-up drops and clean status-0 shutdown. gpudebug
+confirmed three MTL4 command buffers/encoders/draws, six-vertex/two-triangle
+draws, argument tables, residency sets, drawable waits/signals, and presents.
+The display link still produced only three callbacks/presents followed by
+approximately 3.9 seconds idle; no post-resume acknowledgement occurred,
+archive reuse remained false, and fetched colors were clear-only black.
