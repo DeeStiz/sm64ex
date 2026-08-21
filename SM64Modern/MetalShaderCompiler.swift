@@ -49,6 +49,7 @@ final class MetalShaderCompiler {
     private let lookupArchives: [any MTL4Archive]
     private let archiveLoaded: Bool
     private let descriptorCacheFound: Bool
+    private let captureArchiveBypassed: Bool
     private let compileQueue = DispatchQueue(label: "io.github.deestiz.sm64modern.metal4-pipeline", qos: .userInitiated)
     private let lock = NSLock()
     private var cache: [MetalShaderKey: CompiledPipeline] = [:]
@@ -56,6 +57,7 @@ final class MetalShaderCompiler {
     private var failures: [MetalShaderKey: Error] = [:]
 
     init(device: any MTLDevice) throws {
+        let captureArchiveBypassed = ProcessInfo.processInfo.environment["MTL_CAPTURE_ENABLED"] == "1"
         let descriptor = MTL4CompilerDescriptor()
         descriptor.label = "SM64 Modern Dynamic MSL Compiler"
         let serializer = SM64ModernMakePipelineDataSetSerializer(device)
@@ -74,11 +76,17 @@ final class MetalShaderCompiler {
             isDirectory: false
         )
         self.descriptorCacheURL = self.archiveURL?.deletingPathExtension().appendingPathExtension("mtl4-json")
+        self.captureArchiveBypassed = captureArchiveBypassed
 
         var archives: [any MTL4Archive] = []
         var loadedArchive = false
         let archiveExists = archiveURL.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
-        if let archiveURL, archiveExists {
+        let descriptorCacheFound = descriptorCacheURL.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
+        if captureArchiveBypassed {
+            metalShaderLogger.notice(
+                "metal4_archive_capture_bypass enabled=true reason=MTL_CAPTURE_ENABLED archive_exists=\(archiveExists ? 1 : 0) descriptor_cache_found=\(descriptorCacheFound ? 1 : 0) lookup_archives=0 compiler_fallback=enabled"
+            )
+        } else if let archiveURL, archiveExists {
             var error: NSError?
             if let archive = SM64ModernLoadArchive(device, archiveURL, &error) {
                 archives.append(archive)
@@ -88,7 +96,6 @@ final class MetalShaderCompiler {
                 metalShaderLogger.info("metal4_archive_ignored path=\(archiveURL.path, privacy: .public) error=\(error.localizedDescription, privacy: .public)")
             }
         }
-        let descriptorCacheFound = descriptorCacheURL.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
         if let descriptorCacheURL, descriptorCacheFound {
             metalShaderLogger.notice("metal4_descriptor_cache_found path=\(descriptorCacheURL.path, privacy: .public)")
         }
@@ -98,11 +105,17 @@ final class MetalShaderCompiler {
         if loadedArchive {
             metalShaderLogger.notice("metal4_archive_reuse enabled=true source=binary_archive fallback=none")
         } else {
-            let reason = archiveExists ? "load_failed" : "missing"
+            let reason: String
+            if captureArchiveBypassed {
+                reason = "capture_enabled"
+            } else {
+                reason = archiveExists ? "load_failed" : "missing"
+            }
             let fallback = descriptorCacheFound ? "descriptor_cache" : "compile"
+            let loadAttempted = captureArchiveBypassed ? 0 : (archiveExists ? 1 : 0)
             metalShaderLogger.notice("metal4_archive_reuse enabled=false source=none fallback=\(fallback, privacy: .public) reason=\(reason, privacy: .public)")
             metalShaderLogger.notice(
-                "metal4_cache_diagnostic archive_reuse=false archive_exists=\(archiveExists ? 1 : 0) descriptor_cache_fallback=\(descriptorCacheFound ? 1 : 0) load_attempted=\(archiveExists ? 1 : 0)"
+                "metal4_cache_diagnostic archive_reuse=false archive_exists=\(archiveExists ? 1 : 0) descriptor_cache_fallback=\(descriptorCacheFound ? 1 : 0) load_attempted=\(loadAttempted)"
             )
         }
         if serializer != nil {
@@ -304,6 +317,10 @@ final class MetalShaderCompiler {
 
     private func flushArchive() {
         guard let serializer, let archiveURL else { return }
+        if captureArchiveBypassed {
+            metalShaderLogger.notice("metal4_archive_flush_skipped path=\(archiveURL.path, privacy: .public) reason=capture_enabled")
+            return
+        }
         do {
             SM64ModernWaitForRenderPipelineTasks()
             try FileManager.default.createDirectory(at: archiveURL.deletingLastPathComponent(), withIntermediateDirectories: true)

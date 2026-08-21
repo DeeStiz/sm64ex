@@ -69,7 +69,7 @@ classify_log() {
   local diagnostic_line diagnostic_count presented_event_count
   local drain_line drain_count thread_line thread_count
   local archive_state scheduler_state presentation_state drain_state
-  local archive_enabled archive_source archive_fallback
+  local archive_enabled archive_source archive_fallback archive_reason
   local cache_archive_reuse cache_archive_exists cache_descriptor_fallback cache_load_attempted
   local dropped profile_steps callbacks presented paused render_failure host_evidence callback_idle
   local shutdown_frames shutdown_completion thread_status thread_steps
@@ -85,6 +85,7 @@ classify_log() {
     archive_enabled="${BASH_REMATCH[1]}"
     archive_source="${BASH_REMATCH[2]}"
     archive_fallback="${BASH_REMATCH[3]}"
+    archive_reason="$(sed -nE 's/.*[[:space:]]reason=([^[:space:]]+).*/\1/p' <<<"$archive_line")"
   else
     fail "$label archive-reuse line is not machine-readable"
     return 1
@@ -118,8 +119,15 @@ classify_log() {
       fail "$label cache diagnostic is not machine-readable"
       return 1
     fi
-    [[ "$cache_archive_reuse" == "false" && "$cache_load_attempted" == "$cache_archive_exists" ]] \
-      || { fail "$label cache diagnostic disagrees with archive-reuse/load-attempt state"; return 1; }
+    if [[ "$archive_reason" == "capture_enabled" ]]; then
+      [[ "$cache_archive_reuse" == "false" && "$cache_load_attempted" == "0" ]] \
+        || { fail "$label capture archive bypass must not attempt archive loading"; return 1; }
+      [[ "$(line_count 'metal4_archive_capture_bypass ' "$log_path")" == "1" ]] \
+        || { fail "$label capture archive bypass requires exactly one explicit bypass event"; return 1; }
+    else
+      [[ "$cache_archive_reuse" == "false" && "$cache_load_attempted" == "$cache_archive_exists" ]] \
+        || { fail "$label cache diagnostic disagrees with archive-reuse/load-attempt state"; return 1; }
+    fi
     if [[ "$archive_state" == "descriptor_cache_fallback" ]]; then
       [[ "$cache_descriptor_fallback" == "1" ]] \
         || { fail "$label archive line claims descriptor-cache fallback but cache diagnostic disagrees"; return 1; }
