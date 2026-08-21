@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-21).
 
-### Phase 77 current status
+### Phase 80 current status
 
 The authoritative current counters are **534 behavior rows** (511 Swift
 value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
@@ -77,6 +77,15 @@ missing. The triage was read-only (`promoted_rows=0`, `ledger_mutated=0`), so
 live admission remains 1 of 7,420. Phase 77 reconciles these findings without
 changing source or the route ledger.
 
+Phase 79 attempted a source-backed native owner harness for the generated
+`oracle_hook|mario_state` row. The harness compiled and initialized the real
+native lifecycle, but every real step returned `status=4` and the parity oracle
+ended with `status=10` before any required domain-2/state records were written.
+The debug prototype was removed after the bounded audit; no Swift pair,
+manifest or ledger mutation, route promotion, or partial contract was
+retained. The row remains planned until the native owner/parity boundary is
+repaired and independent C/Swift traces satisfy the schema-4 admission gates.
+
 M34, M35, and fresh-save human 120-star acceptance remain open. These gates
 are independent from local build, source, fixture, and headless-host
 evidence; this is not a shipped, visual-parity, or complete full-game Swift
@@ -94,10 +103,11 @@ override the current 7,420-row inventory.
    awake, unlocked visible GUI host; require zero scheduler/catch-up drops,
    sustained callbacks, post-resume drawable acknowledgement, archive reuse,
    non-clear fetched pixels, and retained GPU/FPS/memory/thermal evidence.
-2. **Route qualification:** keep C/Swift recording independent and fail closed;
-   align common fingerprints and tick windows, then admit only exact
-   schema-4 parity with a terminal worker result. The ledger remains 1/7,420
-   until that evidence exists.
+2. **Route qualification:** repair the native Mario-state owner/parity boundary,
+   then keep C/Swift recording independent and fail closed; align common
+   fingerprints and tick windows, then admit only exact schema-4 parity with a
+   terminal worker result. The ledger remains 1/7,420 until that evidence
+   exists.
 3. **M35 signing/notary:** after M34, obtain Developer ID Application
    credentials and one supported `notarytool` authentication mode; rerun
    readiness, archive/export, notarization/stapling, and clean-machine
@@ -385,7 +395,9 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 75 M35 post-SDK preflight](../.porting/porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md),
 and [Phase 74 M34 host readiness](../.porting/porting-handoff-full-swift-twin-phase74-m34-host-readiness.md),
 [Phase 76 route-admission triage](../.porting/porting-handoff-full-swift-twin-phase76-route-admission-triage.md),
-and [Phase 77 docs/route triage](../.porting/porting-handoff-full-swift-twin-phase77-docs-route-triage.md).
+and [Phase 77 docs/route triage](../.porting/porting-handoff-full-swift-twin-phase77-docs-route-triage.md),
+[Phase 79 Mario-state route attempt](../.porting/porting-handoff-full-swift-twin-phase79-mario-state-route-pair.md),
+and [Phase 80 docs/Mario-state block](../.porting/porting-handoff-full-swift-twin-phase80-docs-mario-state-block.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is

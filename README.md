@@ -65,7 +65,7 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 77 current status
+### Phase 80 current status
 
 The authoritative current ledger has 534 behavior rows (511 Swift owners and
 23 explicit C adapters) and 7,420 route shards: one live-qualified row and
@@ -126,6 +126,15 @@ missing. The triage was read-only (`promoted_rows=0`, `ledger_mutated=0`), so
 live admission remains 1 of 7,420. Phase 77 reconciles these findings without
 changing source or the route ledger.
 
+Phase 79 attempted a source-backed native owner harness for the generated
+`oracle_hook|mario_state` row. The harness compiled and initialized the real
+native lifecycle, but every real step returned `status=4` and the parity oracle
+ended with `status=10` before any required domain-2/state records were written.
+The debug prototype was removed after the bounded audit; no Swift pair,
+manifest or ledger mutation, route promotion, or partial contract was
+retained. The row remains planned until the native owner/parity boundary is
+repaired and independent C/Swift traces satisfy the schema-4 admission gates.
+
 M34, M35, and fresh-save human 120-star acceptance remain open. These gates
 are independent from local build, source, fixture, and headless-host
 evidence; this branch is not a shipped, visual-parity, or complete full-game
@@ -142,8 +151,9 @@ the current `1 of 7,420` ledger.
 1. Repeat M34 on an awake, unlocked visible host and require zero scheduler
    drops, sustained presents, post-resume acknowledgement, archive reuse,
    non-clear pixels, and independent GPU/FPS/memory/thermal evidence.
-2. Keep route pairing fail-closed: align common C/Swift fingerprints and tick
-   windows, then admit only exact schema-4 parity; the ledger remains 1/7,420.
+2. Keep route pairing fail-closed: repair the native Mario-state owner/parity
+   boundary, align common C/Swift fingerprints and tick windows, then admit
+   only exact schema-4 parity; the ledger remains 1/7,420.
 3. With M34 evidence, obtain Developer ID Application and notary credentials,
    produce signed/stapled artifacts, and verify clean-machine Gatekeeper.
 4. Finish the fresh-save human 120-star controls, camera, collision, audio,
@@ -296,7 +306,9 @@ for the evidence ledger and latest handoffs, including the
 [Phase 75 M35 post-SDK preflight](.porting/porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md),
 and [Phase 74 M34 host readiness](.porting/porting-handoff-full-swift-twin-phase74-m34-host-readiness.md),
 [Phase 76 route-admission triage](.porting/porting-handoff-full-swift-twin-phase76-route-admission-triage.md),
-and [Phase 77 docs/route triage](.porting/porting-handoff-full-swift-twin-phase77-docs-route-triage.md).
+and [Phase 77 docs/route triage](.porting/porting-handoff-full-swift-twin-phase77-docs-route-triage.md),
+and [Phase 79 Mario-state route attempt](.porting/porting-handoff-full-swift-twin-phase79-mario-state-route-pair.md),
+and [Phase 80 docs/Mario-state block](.porting/porting-handoff-full-swift-twin-phase80-docs-mario-state-block.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

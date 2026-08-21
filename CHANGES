@@ -82,6 +82,15 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      host evidence, stable generic Release/M35 contract pass, and the open
      awake-host, independent-route, signing/notary, clean-machine, and human
      acceptance gates. No source or ledger mutation is implied.
+64.) Reconcile Phase 79's Mario-state route attempt. The source-backed native
+     harness compiled and initialized, but real lifecycle steps returned
+     `status=4` and the parity oracle ended `status=10` before required
+     domain-2/state records; the prototype was removed, with no Swift pair,
+     manifest/ledger mutation, route promotion, or partial contract retained.
+     Preserve 534/511/23, 7,420/1/7,419, the locked/asleep M34 host, and the
+     Developer ID/notary, signed-artifact, clean-machine, and human-acceptance
+     blockers. Link the Phase 79 and Phase 80 handoffs and keep the native
+     owner/parity repair ahead of independent C/Swift route admission.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

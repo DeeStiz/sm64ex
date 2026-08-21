@@ -77,6 +77,8 @@ planned. Historical M33–M35 notes retain their original 7,419 baseline.
 - **[Phase 74b — committed `4c9cbfd2`](porting-handoff-full-swift-twin-phase74b-host-gate-parser.md):** the read-only host parser now reports `IOConsoleLocked=Yes` and `session_locked=Yes`; both displays remain asleep and `m34_host_ready=0`.
 - **[Phase 76 — current evidence](porting-handoff-full-swift-twin-phase76-route-admission-triage.md):** read-only triage scanned all 7,420 manifest rows against the retained nine-record composite trace, listed 6,206 fully key-covered candidates, and found 0 admissible rows because the trace is unbound to a manifest identity and per-row independent C/Swift evidence is missing. No ledger mutation occurred.
 - **[Phase 77 — documentation reconciliation](porting-handoff-full-swift-twin-phase77-docs-route-triage.md):** reconciles the Phase 74b host parser, Phase 75 M35 preflight, and Phase 76 triage without changing source, the behavior manifest, or route admission; preserve `534/511/23` and `7,420/1/7,419`.
+- **[Phase 79 — Mario-state route attempt](porting-handoff-full-swift-twin-phase79-mario-state-route-pair.md):** the source-backed native owner harness compiled and initialized the real lifecycle, but every step returned `status=4` and the parity oracle ended `status=10` before required domain-2/state records. The prototype was removed; no Swift pair, manifest/ledger mutation, route promotion, or partial contract was retained.
+- **[Phase 80 — documentation/Mario-state reconciliation](porting-handoff-full-swift-twin-phase80-docs-mario-state-block.md):** reconciles the Phase 79 block across the public and continuation ledgers, preserves `534/511/23` and `7,420/1/7,419`, and keeps native owner/parity repair ahead of independent C/Swift route admission. M34 remains locked/asleep and M35 remains credential/artifact/clean-machine/human gated.
 
 The automatic Luna-max phase protocol is: one disjoint owner per phase;
 focused validation plus `git diff --check`; a durable handoff comment and
@@ -96,9 +98,10 @@ and human families are not closed. These are separate ledgers, not an average.
    unlocked visible host; require zero scheduler/catch-up drops, sustained
    callbacks/presents, post-resume drawable acknowledgement, archive reuse,
    non-clear fetched pixels, and independent GPU/FPS/memory/thermal evidence.
-2. **Route qualification:** independently record C and Swift with common
-   fingerprints and tick windows; admit only exact schema-4 parity with a
-   terminal worker result. Keep the ledger at 1/7,420 until then.
+2. **Route qualification:** repair the native Mario-state owner/parity
+   boundary, then independently record C and Swift with common fingerprints and
+   tick windows; admit only exact schema-4 parity with a terminal worker
+   result. Keep the ledger at 1/7,420 until then.
 3. **M35 signing/notary:** once M34 is proven, obtain Developer ID Application
    credentials and one supported `notarytool` authentication mode, then run
    readiness, archive/export, notarization/stapling, and clean-machine checks.
