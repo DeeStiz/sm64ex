@@ -2,7 +2,7 @@
 set -euo pipefail
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-decorative-pendulum-object-bridge"
+BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-decorative-pendulum-owner"
 mkdir -p "$BUILD_ROOT"
 
 xcrun swiftc \
@@ -27,21 +27,13 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/OracleTrace.swift" \
   "$PROJECT_ROOT/SM64Modern/DecorativePendulumBehavior.swift" \
   "$PROJECT_ROOT/SM64Modern/DecorativePendulumObjectBridge.swift" \
-  "$PROJECT_ROOT/tests/sm64_modern_decorative_pendulum_object_bridge_smoke.swift" \
-  -o "$BUILD_ROOT/sm64-modern-decorative-pendulum-object-bridge-smoke"
-SWIFT_OUTPUT="$($BUILD_ROOT/sm64-modern-decorative-pendulum-object-bridge-smoke)"
-printf '%s\n' "$SWIFT_OUTPUT"
+  "$PROJECT_ROOT/tests/sm64_modern_decorative_pendulum_owner_smoke.swift" \
+  -o "$BUILD_ROOT/smoke"
+"$BUILD_ROOT/smoke"
 
 xcrun clang -std=c11 \
-  "$PROJECT_ROOT/tests/sm64_modern_decorative_pendulum_object_bridge_contract.c" \
-  -o "$BUILD_ROOT/sm64-modern-decorative-pendulum-object-bridge-contract"
-C_OUTPUT="$($BUILD_ROOT/sm64-modern-decorative-pendulum-object-bridge-contract)"
-printf '%s\n' "$C_OUTPUT"
-
-SWIFT_FINGERPRINT="$(printf '%s\n' "$SWIFT_OUTPUT" | sed -n 's/^decorativePendulumObjectBridgeFingerprint=//p')"
-C_FINGERPRINT="$(printf '%s\n' "$C_OUTPUT" | sed -n 's/^decorativePendulumObjectBridgeFingerprint=//p')"
-[[ -n "$SWIFT_FINGERPRINT" && "$SWIFT_FINGERPRINT" == "$C_FINGERPRINT" ]] || {
-  echo "Swift/C decorative pendulum object bridge fingerprint mismatch: Swift=$SWIFT_FINGERPRINT C=$C_FINGERPRINT" >&2
-  exit 1
-}
-printf '%s\n' "Swift/C decorative pendulum object bridge contract matched"
+  -I"$PROJECT_ROOT/include" \
+  -I"$PROJECT_ROOT/src" \
+  "$PROJECT_ROOT/tests/sm64_modern_decorative_pendulum_owner_contract.c" \
+  -o "$BUILD_ROOT/contract"
+"$BUILD_ROOT/contract"

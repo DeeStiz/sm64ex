@@ -24,6 +24,8 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/EngineState.swift" \
   "$PROJECT_ROOT/SM64Modern/DeterministicPrimitives.swift" \
   "$PROJECT_ROOT/SM64Modern/GeneratedTrigTables.swift" \
+  "$PROJECT_ROOT/SM64Modern/BehaviorScript.swift" \
+  "$PROJECT_ROOT/SM64Modern/BehaviorScriptVM.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectTransform.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectScheduler.swift" \
   "$PROJECT_ROOT/SM64Modern/ProgressionState.swift" \

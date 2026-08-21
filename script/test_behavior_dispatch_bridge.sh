@@ -12,6 +12,8 @@ xcrun swiftc \
   -module-cache-path "$BUILD_ROOT/module-cache" \
   "$PROJECT_ROOT/SM64Modern/GeneratedTrigTables.swift" \
   "$PROJECT_ROOT/SM64Modern/DeterministicPrimitives.swift" \
+  "$PROJECT_ROOT/SM64Modern/BehaviorScript.swift" \
+  "$PROJECT_ROOT/SM64Modern/BehaviorScriptVM.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectPool.swift" \
   "$PROJECT_ROOT/SM64Modern/MemoryArena.swift" \
   "$PROJECT_ROOT/SM64Modern/ObjectTransform.swift" \
@@ -534,6 +536,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/SM64Modern/WaterBombObjectBridge.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfacePartition.swift" \
   "$PROJECT_ROOT/SM64Modern/SurfaceCollision.swift" \
+  "$PROJECT_ROOT/SM64Modern/OracleTrace.swift" \
   "$PROJECT_ROOT/SM64Modern/EyerokBoss.swift" \
   "$PROJECT_ROOT/SM64Modern/EyerokHand.swift" \
   "$PROJECT_ROOT/SM64Modern/EyerokHandCollision.swift" \
