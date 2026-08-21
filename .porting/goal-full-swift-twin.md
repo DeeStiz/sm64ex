@@ -2,7 +2,7 @@
 
 ## Status
 
-### Phase 60 current status
+### Phase 64 current status
 
 The authoritative current counters are **534 behavior rows** (511 Swift
 value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
@@ -208,9 +208,23 @@ sound threshold occurs on a held native step, so forcing an audio sink, room,
 or graph flag would be synthetic evidence. No route promotion or ledger
 mutation occurred.
 
-Phase 60 is a documentation/completion audit only. It reconciles these current
-facts and preserves fail-closed M34/M35/human gates; it does not change source,
-the route ledger, or the behavior manifest.
+Phase 60 was a documentation/completion audit only. Phases 61 and 62 then
+recorded the current production/release blockers without changing source, the
+route ledger, or the behavior manifest. Phase 61's canonical M34 production
+harness failed before app launch at `EngineRuntime.swift:189/:366` because
+`SM64ModernStatus` and `Int32` do not match. The retained `gpudebug` trace is
+structural/clear-only and provides no new visible-layer, post-resume,
+archive-reuse, FPS, GPU-time, memory, or thermal evidence. Phase 62 confirms
+that ordinary Xcode 26.6 works through an invocation override, but no
+Developer ID Application identity/private key or notary authentication is
+available; no archive/export/DMG/ZIP/staple/Gatekeeper, clean-machine, or
+human result exists. Phase 64 closes the documentation index only and keeps
+all implementation, release, and acceptance gates open.
+
+The separate progress indicators remain 511/534 behavior rows (95.693%),
+1/7,420 live-qualified route shards (0.013477%), and a conservative 0% floor
+for the full goal and acceptance. They are not an average and do not imply
+completion.
 
 The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
 is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
@@ -258,7 +272,10 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 57 native object-domain parity](.porting/porting-handoff-full-swift-twin-phase57-native-pendulum-parity.md),
 [Phase 58 canonical Castle warp](.porting/porting-handoff-full-swift-twin-phase58-canonical-warp.md),
 [Phase 59 pendulum pairing](.porting/porting-handoff-full-swift-twin-phase59-pendulum-pair.md),
-and [Phase 60 completion audit](.porting/porting-handoff-full-swift-twin-phase60-completion-audit.md).
+[Phase 60 completion audit](.porting/porting-handoff-full-swift-twin-phase60-completion-audit.md),
+[Phase 61 M34 production audit](.porting/porting-handoff-full-swift-twin-phase61-m34-production-audit.md),
+[Phase 62 M35 release preflight](.porting/porting-handoff-full-swift-twin-phase62-m35-release-preflight.md),
+and [Phase 64 documentation closeout](.porting/porting-handoff-full-swift-twin-phase64-docs-closeout.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

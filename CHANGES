@@ -19,6 +19,19 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      post-resume, archive-reuse, visual/FPS/memory/thermal; M35 Developer ID,
      notary, signed/stapled artifact, and clean-machine; and human 120-star
      acceptance gates remain explicitly open.
+47.) Record Phase 61's M34 production audit. The canonical production harness
+     stops before app launch on `EngineRuntime.swift:189/:366` because
+     `SM64ModernStatus` and `Int32` do not match. The retained `gpudebug`
+     trace is structural/clear-only and adds no visible-layer, post-resume,
+     archive-reuse, FPS, GPU-time, memory, or thermal evidence.
+48.) Record Phase 62's M35 release preflight. Ordinary Xcode 26.6 works via an
+     invocation override, but no Developer ID Application identity/private key
+     or notary authentication is available; no archive/export/DMG/ZIP/staple/
+     Gatekeeper, clean-machine, or human result exists.
+49.) Close Phase 64 documentation indexes without changing source or route
+     admission. Preserve 534 behavior rows (511 Swift owners, 23 C adapters),
+     7,420 total route shards (1 live, 7,419 planned), separate 95.693% and
+     0.013477% indicators, and the conservative 0% full-goal floor.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

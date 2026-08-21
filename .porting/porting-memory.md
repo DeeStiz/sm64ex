@@ -2,6 +2,23 @@
 
 ## Latest validated slices (2026-08-21)
 
+- **Continuation Phases 61–64 (2026-08-21):** Phase 61's canonical M34
+  production harness is blocked before app launch by
+  `EngineRuntime.swift:189/:366` (`SM64ModernStatus`/`Int32` type errors).
+  The retained `gpudebug` trace is structural/clear-only and adds no new
+  visible-layer, post-resume, archive-reuse, FPS, GPU-time, memory, or thermal
+  evidence. Phase 62 confirms ordinary Xcode 26.6 works through an invocation
+  override, but no Developer ID Application identity/private key or notary
+  authentication is available; no archive/export/DMG/ZIP/staple/Gatekeeper,
+  clean-machine, or human result exists. Phase 64 is documentation closeout
+  only. Preserve 534 behavior rows (511 Swift owners, 23 C adapters), 7,420
+  route shards (1 live-qualified, 7,419 planned), separate 95.693% mapping and
+  0.013477% live-route indicators, and the conservative 0% full-goal floor.
+  Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase61-m34-production-audit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase62-m35-release-preflight.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase64-docs-closeout.md`.
+
 - **Continuation Phases 57–60 (2026-08-21):** Phase 57 repaired native
   Castle schema-4 object-domain snapshots and retained 64 real slot-37
   object-state records plus six nonzero route fingerprints. Phase 58 changed

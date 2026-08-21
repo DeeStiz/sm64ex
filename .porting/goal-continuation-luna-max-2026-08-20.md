@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the retained live row remains 1 of 7,420 and 7,419 remain
 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 58–60 execution checkpoint
+### Phase 58–64 execution checkpoint
 
 - **Phase 58 — committed `ab253acd`:** the opt-in native Castle route now
   selects the authored area-2 `WARP_NODE(0x35)` through the existing
@@ -32,9 +32,22 @@ planned. Historical M33–M35 notes retain their original 7,419 baseline.
   domain-3 record diverges, and all six independent header fingerprints still
   differ. Worker-result, merge, tamper, replay, and persistent-rerun fences
   pass, but admission remains `0` and the shard is terminally blocked.
-- **Phase 60 — current:** reconcile README/status/goal/memory/CHANGES and
-  record the evidence boundary. This phase may not mutate the route ledger,
-  promote the pendulum shard, or imply M34/M35/human acceptance.
+- **Phase 60 — committed `5bd4eee9`:** reconciled the current documentation
+  and completion boundary without mutating source, the route ledger, or the
+  behavior manifest.
+- **[Phase 61 — committed `50c462cf`](.porting/porting-handoff-full-swift-twin-phase61-m34-production-audit.md):** the canonical M34 production harness
+  is blocked before app launch by `EngineRuntime.swift:189/:366`
+  (`SM64ModernStatus`/`Int32` type errors). The retained `gpudebug` trace is
+  structural/clear-only and adds no new visible-layer, post-resume,
+  archive-reuse, FPS, GPU-time, memory, or thermal evidence.
+- **[Phase 62 — committed `2180ae7b`](.porting/porting-handoff-full-swift-twin-phase62-m35-release-preflight.md):** ordinary Xcode 26.6 works through an
+  invocation override, but no Developer ID Application identity/private key
+  or notary authentication is available. No archive/export/DMG/ZIP/staple/
+  Gatekeeper, clean-machine, or human result exists.
+- **[Phase 64 — current](.porting/porting-handoff-full-swift-twin-phase64-docs-closeout.md):** reconcile README, SM64 Modern status, CHANGES, the
+  two goal ledgers, porting memory, and the closeout handoff. This phase may
+  not change source, route counters, route admission, or any M34/M35/human
+  acceptance claim.
 
 The automatic Luna-max phase protocol is: one disjoint owner per phase;
 focused validation plus `git diff --check`; a durable handoff comment and

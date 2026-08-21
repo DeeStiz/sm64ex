@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-21).
 
-### Phase 60 current status
+### Phase 64 current status
 
 The authoritative current counters are **534 behavior rows** (511 Swift
 value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
@@ -33,13 +33,21 @@ sound threshold is reached on a held native step, so a direct sink, room, or
 graph-flag override would fabricate evidence; no route promotion or ledger
 mutation occurred.
 
-M34 still lacks reliable visible-layer, post-resume, archive-reuse, visual,
-FPS, memory, and thermal evidence. M35 still lacks an authorized Developer ID
-identity, notary authentication, clean-machine Gatekeeper, and real
-signed/stapled artifact evidence. Fresh-save human 120-star acceptance remains
-unrun. These gates are independent from local build, source, fixture, and
-headless-host evidence; this is not a shipped, visual-parity, or complete
-full-game Swift port.
+Phase 61's canonical M34 production harness is blocked before app launch by
+`EngineRuntime.swift:189/:366` (`SM64ModernStatus`/`Int32` type errors). The
+retained `gpudebug` trace is structural and clear-only; it adds no new
+visible-layer, post-resume, archive-reuse, FPS, GPU-time, memory, or thermal
+evidence. Phase 62 confirms that an ordinary Xcode 26.6 invocation override
+works, but no Developer ID Application identity/private key or notary
+authentication is available; no archive/export/DMG/ZIP/staple/Gatekeeper,
+clean-machine, or human result exists.
+
+M34, M35, and fresh-save human 120-star acceptance remain open. These gates
+are independent from local build, source, fixture, and headless-host
+evidence; this is not a shipped, visual-parity, or complete full-game Swift
+port. The mapping/live-route indicators remain separate: 511/534 behavior
+rows (95.693%), 1/7,420 live-qualified route shards (0.013477%), and a
+conservative full-goal/acceptance floor of 0%.
 
 The older Phase 20–55 bullets below are retained as historical evidence. Any
 pre-Phase-55 `7,419` denominator in those notes is historical and does not
@@ -306,7 +314,10 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 57 native object-domain parity](../.porting/porting-handoff-full-swift-twin-phase57-native-pendulum-parity.md),
 [Phase 58 canonical Castle warp](../.porting/porting-handoff-full-swift-twin-phase58-canonical-warp.md),
 [Phase 59 pendulum pairing](../.porting/porting-handoff-full-swift-twin-phase59-pendulum-pair.md),
-and [Phase 60 completion audit](../.porting/porting-handoff-full-swift-twin-phase60-completion-audit.md).
+[Phase 60 completion audit](../.porting/porting-handoff-full-swift-twin-phase60-completion-audit.md),
+[Phase 61 M34 production audit](../.porting/porting-handoff-full-swift-twin-phase61-m34-production-audit.md),
+[Phase 62 M35 release preflight](../.porting/porting-handoff-full-swift-twin-phase62-m35-release-preflight.md),
+and [Phase 64 documentation closeout](../.porting/porting-handoff-full-swift-twin-phase64-docs-closeout.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
