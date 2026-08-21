@@ -11,6 +11,13 @@ MODE="${1:-all}"
 APP_NAME="SM64 Modern"
 BUNDLE_ID="io.github.deestiz.sm64modern"
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# M35 may be run with a stable Xcode without changing the machine-wide
+# xcode-select choice. The project-specific name is convenient for scripted
+# release runs; the standard DEVELOPER_DIR remains supported for direct use.
+DEVELOPER_DIR_OVERRIDE="${SM64_MODERN_M35_DEVELOPER_DIR:-${DEVELOPER_DIR:-}}"
+if [[ -n "$DEVELOPER_DIR_OVERRIDE" ]]; then
+  export DEVELOPER_DIR="$DEVELOPER_DIR_OVERRIDE"
+fi
 DERIVED_DATA="${SM64_MODERN_M9_DERIVED_DATA:-$PROJECT_ROOT/build/xcode-derived-m9-release}"
 APP_BUNDLE="$DERIVED_DATA/Build/Products/Release/$APP_NAME.app"
 APP_BINARY="$APP_BUNDLE/Contents/MacOS/$APP_NAME"
@@ -82,9 +89,12 @@ readiness_plist_value() {
 
 run_release_readiness() {
   local selected_developer_dir=""
+  local developer_dir_source="xcode-select"
+  local developer_dir_selected=0
   local selected_xcodebuild=""
   local selected_sdk=""
   local xcode_version=""
+  local xcode_version_report=""
   local selected_app=""
   local selected_app_name=""
   local release_task_allow=""
@@ -121,29 +131,36 @@ run_release_readiness() {
     readiness_block 'missing required command: /usr/libexec/PlistBuddy'
   fi
 
-  if command -v xcode-select >/dev/null 2>&1; then
+  if [[ -n "$DEVELOPER_DIR_OVERRIDE" ]]; then
+    selected_developer_dir="$DEVELOPER_DIR_OVERRIDE"
+    developer_dir_source='environment override'
+    developer_dir_selected=1
+  elif command -v xcode-select >/dev/null 2>&1; then
     selected_developer_dir="$(xcode-select --print-path 2>/dev/null || true)"
+    developer_dir_selected=1
+  fi
+  if (( developer_dir_selected == 1 )); then
     if [[ -z "$selected_developer_dir" || ! -d "$selected_developer_dir" ]]; then
-      readiness_block 'xcode-select does not point to an installed Developer directory'
+      readiness_block "${developer_dir_source} does not point to an installed Developer directory: ${selected_developer_dir:-unavailable}"
     else
       case "$selected_developer_dir" in
         */CommandLineTools*)
-          readiness_block "xcode-select points to CommandLineTools, not ordinary Xcode: $selected_developer_dir"
+          readiness_block "${developer_dir_source} points to CommandLineTools, not ordinary Xcode: $selected_developer_dir"
           ;;
       esac
       if [[ "$selected_developer_dir" == */Contents/Developer ]]; then
         selected_app="${selected_developer_dir%/Contents/Developer}"
         selected_app_name="${selected_app##*/}"
         if [[ "$selected_app_name" != Xcode*.app ]]; then
-          readiness_block "xcode-select points to a non-Xcode developer bundle: $selected_developer_dir"
+          readiness_block "${developer_dir_source} points to a non-Xcode developer bundle: $selected_developer_dir"
         fi
         case "$selected_app_name" in
           *[Bb]eta*|*[Ss]eed*|*[Pp]review*|*[Rr][Cc]*)
-            readiness_block "xcode-select points to a beta/preview Xcode; select ordinary Xcode.app: $selected_developer_dir"
+            readiness_block "${developer_dir_source} points to a beta/preview Xcode; select ordinary Xcode.app: $selected_developer_dir"
             ;;
         esac
       else
-        readiness_block "xcode-select path is not an Xcode Contents/Developer directory: $selected_developer_dir"
+        readiness_block "${developer_dir_source} path is not an Xcode Contents/Developer directory: $selected_developer_dir"
       fi
     fi
   fi
@@ -153,7 +170,7 @@ run_release_readiness() {
     if [[ -z "$selected_xcodebuild" || ! -x "$selected_xcodebuild" ]]; then
       readiness_block 'xcrun cannot resolve the selected xcodebuild'
     elif [[ -n "$selected_developer_dir" && "$selected_xcodebuild" != "$selected_developer_dir/"* ]]; then
-      readiness_block "xcrun xcodebuild is not from xcode-select's developer directory: $selected_xcodebuild"
+      readiness_block "xcrun xcodebuild is not from ${developer_dir_source}: $selected_xcodebuild"
     else
       xcode_version="$("$selected_xcodebuild" -version 2>/dev/null || true)"
       if [[ -z "$xcode_version" || "$xcode_version" != Xcode\ * ]]; then
@@ -213,9 +230,10 @@ run_release_readiness() {
   grep -Fq 'CODE_SIGN_ENTITLEMENTS: SM64Modern/SM64Modern.entitlements' "$PROJECT_ROOT/project.yml" \
     || readiness_block 'project.yml Release target is not wired to the distribution entitlement file'
 
-  if command -v xcodebuild >/dev/null 2>&1; then
+  if [[ -n "$selected_xcodebuild" && -x "$selected_xcodebuild" ]]; then
     local xcodebuild_help
-    xcodebuild_help="$(xcodebuild -help 2>&1 || true)"
+    # This is the selected Xcode's xcodebuild -help output, not PATH's tool.
+    xcodebuild_help="$("$selected_xcodebuild" -help 2>&1 || true)"
     grep -Fq -- '-archivePath' <<< "$xcodebuild_help" \
       || readiness_block 'xcodebuild does not expose archivePath/export prerequisites'
     grep -Fq -- '-exportArchive' <<< "$xcodebuild_help" \
@@ -233,7 +251,10 @@ run_release_readiness() {
     readiness_block 'no notarytool authentication configuration was supplied (profile, API key, or Apple ID credentials)'
   fi
 
+  xcode_version_report="${xcode_version//$'\n'/ | }"
   printf 'xcode_developer_dir=%s\n' "${selected_developer_dir:-unavailable}"
+  printf 'xcode_developer_dir_source=%s\n' "$developer_dir_source"
+  printf 'xcode_version=%s\n' "${xcode_version_report:-unavailable}"
   printf 'xcode_sdk=%s\n' "${selected_sdk:-unavailable}"
   printf 'notary_auth=%s\n' "${notary_auth_mode:-unavailable}"
   printf '%s\n' 'archive_prerequisite=xcodebuild archive/export tooling checked'

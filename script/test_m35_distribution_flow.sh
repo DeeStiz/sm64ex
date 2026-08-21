@@ -15,6 +15,8 @@ require_contract() {
 for required in \
   'distribution|archive)' \
   'run_distribution' \
+  'SM64_MODERN_M35_DEVELOPER_DIR' \
+  'DEVELOPER_DIR' \
   '-archivePath' \
   'archive' \
   'CODE_SIGNING_ALLOWED=YES' \
@@ -39,6 +41,13 @@ scratch_log="$scratch_dir/distribution.log"
 scratch_output="$scratch_dir/output"
 trap 'rm -f "$scratch_log"; rmdir "$scratch_output" 2>/dev/null || true; rmdir "$scratch_dir"' EXIT
 
+stable_developer_dir="/Applications/Xcode.app/Contents/Developer"
+developer_dir_override=()
+if [[ -x "$stable_developer_dir/usr/bin/xcodebuild" ]] && \
+  [[ "$("$stable_developer_dir/usr/bin/xcodebuild" -version 2>/dev/null || true)" == Xcode\ 26.6* ]]; then
+  developer_dir_override+=("DEVELOPER_DIR=$stable_developer_dir")
+fi
+
 set +e
 env \
   -u SM64_MODERN_NOTARY_PROFILE \
@@ -56,6 +65,7 @@ env \
   -u APPLE_TEAM_ID \
   -u SM64_MODERN_NOTARY_APP_PASSWORD \
   -u APPLE_APP_SPECIFIC_PASSWORD \
+  "${developer_dir_override[@]}" \
   SM64_MODERN_CODE_SIGN_IDENTITY=- \
   SM64_MODERN_M9_OUTPUT_DIR="$scratch_output" \
   "$RELEASE_SCRIPT" distribution > "$scratch_log" 2>&1
@@ -69,5 +79,13 @@ set -e
 rg -Fq 'BLOCKER:' "$scratch_log"
 rg -Fq 'distribution=BLOCKED' "$scratch_log"
 rg -Fq 'no archive, export, DMG, notarization, stapling, or ZIP mutation was performed' "$scratch_log"
+if (( ${#developer_dir_override[@]} > 0 )); then
+  rg -Fq "xcode_developer_dir=$stable_developer_dir" "$scratch_log"
+  rg -Fq 'xcode_developer_dir_source=environment override' "$scratch_log"
+  rg -Fq 'xcode_version=Xcode 26.6' "$scratch_log"
+  ! rg -Fq 'beta/preview Xcode' "$scratch_log"
+  rg -Fq 'no valid Developer ID Application identity' "$scratch_log"
+  rg -Fq 'no notarytool authentication configuration' "$scratch_log"
+fi
 
 printf '%s\n' 'SM64 Modern M35 distribution-flow contract passed'
