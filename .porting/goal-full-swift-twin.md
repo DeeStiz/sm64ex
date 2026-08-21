@@ -117,6 +117,10 @@ failed the production gate on 62 scheduler-dropped steps and no archive reuse.
 Commit `055b577e` also drains registration-time compiler work before the M34
 profile; the latest log proves registration readiness before the first packet,
 but the host still fails the scheduler-drop/presentation gate.
+An isolated no-validation baseline (`/tmp/sm64-modern-m34-baseline-203801.log`)
+still reports 58 scheduler-dropped steps and three presented frames, confirming
+the remaining presentation/scheduling boundary is host-side rather than only
+Metal validation overhead.
 
 M33 Act Selector central integration is now complete locally. The owner shares
 the existing star-type bridge, preserves parent-first child updates and

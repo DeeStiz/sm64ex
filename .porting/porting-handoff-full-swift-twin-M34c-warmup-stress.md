@@ -54,3 +54,12 @@ this improves readiness truthfulness without clearing the runtime gate.
    it to the C render packet/reference at a declared size.
 4. Keep physical display, FPS/GPU/RSS, thermal, controller, audio, and human
    acceptance as independent gates.
+
+## Non-validation baseline
+
+An isolated run without `MTL_DEBUG_LAYER`/`MTL_SHADER_VALIDATION` using the
+same warmed Release bundle is retained at
+`/tmp/sm64-modern-m34-baseline-203801.log`. It confirms the remaining issue is
+not validation overhead alone: registration readiness, three presented frames,
+clean drain/status-0 shutdown all hold, but the host still reports
+`scheduler_dropped_steps=58`, `presented=3`, and `archive_reuse=false`.
