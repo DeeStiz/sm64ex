@@ -92,6 +92,46 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      blockers. Link the Phase 79 and Phase 80 handoffs and keep the native
      owner/parity repair ahead of independent C/Swift route admission.
 
+65.) Record Phase 81's ready-host M34 attempt: the read-only host gate passed,
+     but the unchanged API/shader-validation profile failed closed at
+     `scheduler_dropped_steps=72` before capture. Preserve the failed artifact
+     and do not claim M34 acceptance.
+66.) Record Phase 82a's bounded scheduler fix: removing the synchronous
+     owner-thread pipeline wait produced a zero-drop validation profile while
+     capture overhead remained separate. Link the scheduler-cadence handoff.
+67.) Record Phase 82b's stable-Xcode M34 reproducibility: validation/capture
+     and noninteractive `gpudebug` structural checks passed; capture overhead,
+     screenshot/reference pixels, sustained performance, thermal, and physical
+     acceptance remain separate gates.
+68.) Record Phase 82c's M35 distribution preflight: readiness contracts pass,
+     but no Developer ID Application identity/private key or supported
+     `notarytool` authentication exists. No signed/stapled artifact, clean
+     machine, or human result exists.
+69.) Record Phase 82d/82e archive and capture boundaries: normal validation
+     proves binary archive load/reuse, while the capture interaction failed
+     until a bounded capture-specific bypass was implemented; no failed capture
+     was promoted as evidence.
+70.) Record Phase 82f's capture archive bypass: the unchanged M34 two-pass
+     harness passed validation/archive reuse, capture, resize/pause,
+     post-resume, and noninteractive `gpudebug` structural inspection. The
+     capture profile bypasses archive loading and remains subject to capture
+     overhead; visual parity is unclaimed.
+71.) Record Phase 84a's GPU attachment inspection: static trace enumeration
+     found 515 render passes and 28,216 draws, but XPC replay interruption
+     prevented attachment PNGs and any non-clear-pixel/reference-parity claim.
+72.) Record Phase 84b's bounded sustained-performance attempt: two 3,600-step
+     native Release profiles reached zero scheduler/audio drops at about
+     59.94/59.96 Hz with bounded RSS; Instruments supplied bounded encoder,
+     allocation, and nominal thermal observations only, not a 10/30-minute
+     soak or physical feel/thermal closure.
+73.) Reconcile Phase 84c documentation across README, SM64 Modern docs, both
+     goal ledgers, `CHANGES`, and porting memory. Preserve 534/511/23,
+     7,420/1/7,419, M34 archive/validation/capture/`gpudebug` evidence, the
+     Phase 84a XPC pixel blocker, Phase 84b cadence/thermal boundaries, and
+     the M35 Developer ID/notary/clean-machine/human blockers. Link Phases
+     81, 82a–82f, and 84a–84c; no source, route ledger, credential, or release
+     mutation is implied.
+
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
 are not current counters.

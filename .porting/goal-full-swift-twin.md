@@ -2,7 +2,63 @@
 
 ## Status
 
-### Phase 80 current status
+### Phase 84c current status
+
+The authoritative current counters remain **534 behavior rows** (511 Swift
+value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
+non-fixture live-qualified row and 7,419 planned. Behavior mapping is 95.693%
+and live-route qualification is 0.013477%; the conservative full-goal and
+acceptance floors remain 0%. These are separate ledgers, not an average.
+
+Phases 81–82b moved M34 from the earlier locked/asleep-host failure to a
+ready-host, zero-drop API/shader-validation pass. Phase 82a removed the
+owner-thread pipeline wait; Phase 82b reproduced the two-pass harness with a
+non-empty `.gputrace` and noninteractive `gpudebug` structural inspection.
+Capture overhead remains separate from validation cadence and is not a
+sustained-performance claim.
+
+Phase 82c leaves M35 fail-closed on exactly two external prerequisites: no
+Developer ID Application identity/private key and no supported `notarytool`
+authentication. No signed archive/export, stapled app/DMG/ZIP, clean-machine
+Gatekeeper result, or human acceptance result exists.
+
+Phase 82d proved ordinary Metal 4 binary archive load/reuse in the validation
+profile. Phase 82e retained the separate capture-tool failure. Phase 82f
+resolved that archive/capture interaction with a capture-only archive bypass:
+the unchanged production harness passed validation, capture, resize/pause,
+post-resume, and `gpudebug` structural checks. This remains structural/runtime
+evidence, not visual parity.
+
+Phase 84a statically inspected the retained trace (515 render passes and
+28,216 draws), but attachment replay failed at an XPC replayer interruption.
+No color/depth PNG was produced, so non-clear pixels and source/reference
+parity remain unknown. Phase 84b completed two bounded 3,600-step native
+Release profiles with zero scheduler/audio drops and approximately 59.94/59.96
+Hz presentation, plus a separate Instruments trace with bounded encoder,
+allocation, and nominal thermal observations. This does not prove a 10- or
+30-minute soak, complete GPU/temperature/power telemetry, direct-to-display
+output, or physical feel.
+
+The Phase 79 Mario-state route remains planned: its native owner/parity
+prototype stopped before required domain-2/state records, so no route pair or
+ledger mutation is allowed. M34 still needs functioning attachment replay,
+reference-pixel comparison, longer/complete performance and thermal evidence,
+and physical visual/feel review. M35 still needs credentials, signed/stapled
+artifacts, clean-machine checks, and the fresh-save human 120-star checklist.
+This is not a shipped, visual-parity, or complete full-game Swift port.
+
+Current bounded handoffs include [Phase 81 ready-host M34 capture](porting-handoff-full-swift-twin-phase81-m34-ready-host-capture.md),
+[Phase 82a scheduler cadence](porting-handoff-full-swift-twin-phase82a-scheduler-cadence.md),
+[Phase 82b M34 reproducibility](porting-handoff-full-swift-twin-phase82b-m34-repro-audit.md),
+[Phase 82c M35 distribution readiness](porting-handoff-full-swift-twin-phase82c-m35-distribution-readiness.md),
+[Phase 82d archive reuse](porting-handoff-full-swift-twin-phase82d-archive-reuse.md),
+[Phase 82e capture recovery](porting-handoff-full-swift-twin-phase82e-capture-recovery.md),
+[Phase 82f capture archive bypass](porting-handoff-full-swift-twin-phase82f-capture-archive-bypass.md),
+[Phase 84a GPU attachments](porting-handoff-full-swift-twin-phase84a-gpu-attachments.md),
+[Phase 84b performance/thermal](porting-handoff-full-swift-twin-phase84b-performance-thermal.md),
+and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-phase84c-docs-reconcile.md).
+
+### Historical Phase 80 status
 
 The authoritative current counters are **534 behavior rows** (511 Swift
 value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
@@ -295,21 +351,22 @@ completion.
 
 ### Next admissible gates
 
-1. **M34 awake-host rerun:** repeat the unchanged production harness on an
-   awake, unlocked visible GUI host; require zero scheduler/catch-up drops,
-   sustained callbacks/presents, post-resume drawable acknowledgement,
-   archive reuse, non-clear fetched pixels, and independent GPU/FPS/memory/
-   thermal evidence.
-2. **Route qualification:** repair the native Mario-state owner/parity
+1. **M34 attachments:** rerun attachment fetch on a host where the `gpudebug`
+   replayer loads, then inspect non-clear color/depth pixels against an
+   explicit source/reference artifact. Keep static draw/attachment facts
+   separate from pixel evidence.
+2. **M34 sustained evidence:** complete the declared longer
+   performance/thermal/direct-display evidence; do not substitute the bounded
+   3,600-step or nominal thermal runs for a 10/30-minute soak or physical
+   visual/feel review.
+3. **Route qualification:** repair the native Mario-state owner/parity
    boundary, then independently record C and Swift with common fingerprints and
    tick windows; admit only exact schema-4 parity with a terminal worker
    result. Keep the ledger at 1/7,420 until then.
-3. **M35 signing/notary:** once M34 is proven, obtain Developer ID Application
-   credentials and one supported `notarytool` authentication mode, then run
-   readiness, archive/export, notarization/stapling, and clean-machine checks.
-4. **Human acceptance:** after signed artifacts pass Gatekeeper, execute and
-   record the fresh-save 120-star controls, camera, collision, audio, haptics,
-   visual, menu, credits, ending, and recovery checklist.
+4. **M35 and human acceptance:** obtain Developer ID Application and notary
+   credentials, produce signed/stapled artifacts, verify clean-machine
+   Gatekeeper, and finish the fresh-save 120-star controls/camera/collision/
+   audio/haptics/visual/menu/credits/ending/recovery checklist.
 
 The proposed [Luna-max continuation plan](goal-continuation-luna-max-2026-08-20.md)
 is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
@@ -373,6 +430,16 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 73 full C sidecar contract](porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md),
 [Phase 75 M35 post-SDK preflight](porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md),
 and [Phase 74 M34 host readiness](porting-handoff-full-swift-twin-phase74-m34-host-readiness.md).
+The latest production and documentation handoffs are [Phase 81 ready-host M34 capture](porting-handoff-full-swift-twin-phase81-m34-ready-host-capture.md),
+[Phase 82a scheduler cadence](porting-handoff-full-swift-twin-phase82a-scheduler-cadence.md),
+[Phase 82b M34 reproducibility](porting-handoff-full-swift-twin-phase82b-m34-repro-audit.md),
+[Phase 82c M35 distribution readiness](porting-handoff-full-swift-twin-phase82c-m35-distribution-readiness.md),
+[Phase 82d archive reuse](porting-handoff-full-swift-twin-phase82d-archive-reuse.md),
+[Phase 82e capture recovery](porting-handoff-full-swift-twin-phase82e-capture-recovery.md),
+[Phase 82f capture archive bypass](porting-handoff-full-swift-twin-phase82f-capture-archive-bypass.md),
+[Phase 84a GPU attachments](porting-handoff-full-swift-twin-phase84a-gpu-attachments.md),
+[Phase 84b performance/thermal](porting-handoff-full-swift-twin-phase84b-performance-thermal.md),
+and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-phase84c-docs-reconcile.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

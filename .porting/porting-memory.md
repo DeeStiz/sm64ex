@@ -2,6 +2,38 @@
 
 ## Latest validated slices (2026-08-21)
 
+- **Continuation Phases 81–84c (2026-08-21):** Phase 81 found the ready
+  host but failed closed at 72 validation-profile scheduler drops before
+  capture. Phase 82a removed the owner-thread pipeline wait; Phase 82b
+  reproduced the two-pass M34 harness with zero-drop validation and separate
+  capture overhead. Phase 82c retains exactly two M35 external blockers: no
+  Developer ID Application identity/private key and no supported `notarytool`
+  authentication. Phase 82d proves binary archive load/reuse in ordinary
+  validation; Phase 82e retains the capture failure; Phase 82f resolves the
+  archive/capture interaction with a capture-only archive bypass and produces a
+  non-empty trace plus noninteractive `gpudebug` structural evidence. Phase
+  84a statically enumerates 515 render passes and 28,216 draws, but the XPC
+  replayer interruption prevents attachment PNGs and any non-clear-pixel or
+  source/reference-parity claim. Phase 84b records two bounded 3,600-step
+  zero scheduler/audio-drop profiles at approximately 59.94/59.96 Hz and a
+  separate Instruments trace with bounded encoder/allocation and nominal
+  thermal observations; no 10/30-minute soak, complete GPU/power/temperature
+  telemetry, direct-display, or physical-feel closure is claimed. Phase 84c
+  reconciles the public docs and final gate matrix. Preserve 534 behavior rows
+  (511 Swift owners, 23 C adapters), 7,420 route shards (1 live-qualified,
+  7,419 planned), 95.693% mapping, 0.013477% live-route qualification, and
+  the conservative 0% full-goal/acceptance floors. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-capture.md`,
+  `.porting/porting-handoff-full-swift-twin-phase82a-scheduler-cadence.md`,
+  `.porting/porting-handoff-full-swift-twin-phase82b-m34-repro-audit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase82c-m35-distribution-readiness.md`,
+  `.porting/porting-handoff-full-swift-twin-phase82d-archive-reuse.md`,
+  `.porting/porting-handoff-full-swift-twin-phase82e-capture-recovery.md`,
+  `.porting/porting-handoff-full-swift-twin-phase82f-capture-archive-bypass.md`,
+  `.porting/porting-handoff-full-swift-twin-phase84a-gpu-attachments.md`,
+  `.porting/porting-handoff-full-swift-twin-phase84b-performance-thermal.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase84c-docs-reconcile.md`.
+
 - **Continuation Phases 74b–77 (2026-08-21):** Phase 74b repairs the
   read-only M34 host parser so it reports `IOConsoleLocked=Yes` and
   `session_locked=Yes`; both displays remain asleep and `m34_host_ready=0`.

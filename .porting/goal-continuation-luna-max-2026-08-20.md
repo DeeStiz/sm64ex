@@ -19,6 +19,35 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the retained live row remains 1 of 7,420 and 7,419 remain
 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
+### Phase 81–84c current evidence checkpoint
+
+The frozen implementation counters remain **534 behavior rows** (**511 Swift
+value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
+(**1 non-fixture live-qualified**, **7,419 planned**). Behavior mapping is
+95.693%, live-route qualification is 0.013477%, and the conservative
+full-goal/acceptance floors remain 0%; these ledgers are not averaged.
+
+- **[Phase 81](porting-handoff-full-swift-twin-phase81-m34-ready-host-capture.md):** the ready-host validation profile failed closed at 72 scheduler drops before capture.
+- **[Phase 82a](porting-handoff-full-swift-twin-phase82a-scheduler-cadence.md):** the owner-thread pipeline wait was removed; separate validation reached zero scheduler drops and capture overhead remained isolated.
+- **[Phase 82b](porting-handoff-full-swift-twin-phase82b-m34-repro-audit.md):** stable-Xcode two-pass M34 reproducibility and noninteractive `gpudebug` structural inspection passed.
+- **[Phase 82c](porting-handoff-full-swift-twin-phase82c-m35-distribution-readiness.md):** M35 remains blocked by the missing Developer ID Application identity/private key and supported `notarytool` authentication; no artifact mutation occurred.
+- **[Phase 82d](porting-handoff-full-swift-twin-phase82d-archive-reuse.md):** ordinary Metal 4 validation proved binary archive load/reuse; capture interaction remained separate.
+- **[Phase 82e](porting-handoff-full-swift-twin-phase82e-capture-recovery.md):** archive-reuse validation passed, but capture failed before producing a trace.
+- **[Phase 82f](porting-handoff-full-swift-twin-phase82f-capture-archive-bypass.md):** capture-only archive bypass resolved the tooling interaction; the unchanged harness passed validation/capture/resize/pause/post-resume and `gpudebug` structural checks.
+- **[Phase 84a](porting-handoff-full-swift-twin-phase84a-gpu-attachments.md):** static inspection found 515 render passes and 28,216 draws, but XPC replay interruption prevented attachment PNGs and any pixel verdict.
+- **[Phase 84b](porting-handoff-full-swift-twin-phase84b-performance-thermal.md):** two bounded 3,600-step profiles reached zero scheduler/audio drops at approximately 59.94/59.96 Hz; separate Instruments evidence is bounded and nominal only.
+- **[Phase 84c](porting-handoff-full-swift-twin-phase84c-docs-reconcile.md):** documentation-only reconciliation records the final gate matrix and keeps all visual, physical, release, clean-machine, route, and human boundaries fail-closed.
+
+M34 now has structural/runtime evidence for validation, archive reuse,
+capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
+reference comparison, longer performance/thermal/direct-display evidence, and
+physical visual/feel review remain open. The 3,600-step runs do not prove a
+10/30-minute soak, complete GPU utilization/power/temperature telemetry, or
+thermal closure. M35 remains blocked by Developer ID/notary prerequisites,
+with signed/stapled artifacts, clean-machine Gatekeeper, and fresh-save human
+120-star acceptance still unrun. The Mario-state route remains planned after
+its native owner/parity attempt stopped before required domain-2/state records.
+
 ### Phase 58–70 execution checkpoint
 
 - **Phase 58 — committed `ab253acd`:** the opt-in native Castle route now
@@ -94,20 +123,22 @@ and human families are not closed. These are separate ledgers, not an average.
 
 ### Current admissible sequence
 
-1. **M34 awake-host rerun:** run the unchanged production harness on an awake,
-   unlocked visible host; require zero scheduler/catch-up drops, sustained
-   callbacks/presents, post-resume drawable acknowledgement, archive reuse,
-   non-clear fetched pixels, and independent GPU/FPS/memory/thermal evidence.
-2. **Route qualification:** repair the native Mario-state owner/parity
+1. **M34 attachment/pixel gate:** rerun `gpudebug` attachment fetch where the
+   replayer loads, inspect non-clear color/depth pixels against an explicit
+   source/reference artifact, and keep static trace facts separate from pixel
+   evidence.
+2. **M34 sustained/device gate:** complete longer performance/thermal and
+   direct-display evidence; the bounded 3,600-step runs and nominal thermal
+   interval do not substitute for a 10/30-minute soak or physical visual/feel
+   review.
+3. **Route qualification:** repair the native Mario-state owner/parity
    boundary, then independently record C and Swift with common fingerprints and
    tick windows; admit only exact schema-4 parity with a terminal worker
    result. Keep the ledger at 1/7,420 until then.
-3. **M35 signing/notary:** once M34 is proven, obtain Developer ID Application
-   credentials and one supported `notarytool` authentication mode, then run
-   readiness, archive/export, notarization/stapling, and clean-machine checks.
-4. **Human acceptance:** after signed artifacts pass Gatekeeper, execute and
-   record the fresh-save 120-star controls, camera, collision, audio, haptics,
-   visual, menu, credits, ending, and recovery checklist.
+4. **M35 and human acceptance:** obtain Developer ID Application and notary
+   credentials, produce signed/stapled artifacts, verify clean-machine
+   Gatekeeper, and finish the fresh-save 120-star controls/camera/collision/
+   audio/haptics/visual/menu/credits/ending/recovery checklist.
 
 ## Objective
 
