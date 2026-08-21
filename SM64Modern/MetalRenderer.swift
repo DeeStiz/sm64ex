@@ -848,13 +848,22 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
             }
         }
         if let packet, !packet.draws.isEmpty {
-            try warmPipelines(packet.draws.map(\.shader), packet: packet)
+            // The display-link callback runs on the fixed-step owner thread.
+            // Do not synchronously wait for compiler tasks here: a cold
+            // pipeline can otherwise block the scheduler for a full compile
+            // burst and manufacture dropped simulation steps. A not-yet-ready
+            // packet is retained and retried by the next callback instead.
+            guard try warmPipelines(packet.draws.map(\.shader), packet: packet) else {
+                return
+            }
         }
         if marioFaceSourceGeometry != nil {
             let shaderKey = marioFaceTextureDrawEnabled
                 ? Self.marioFaceTexturedShaderKey
                 : Self.marioFaceShaderKey
-            try warmPipelines([shaderKey], packet: packet)
+            guard try warmPipelines([shaderKey], packet: packet) else {
+                return
+            }
         }
         let preparedMarioFaceDraw = try prepareMarioFaceDraw(
             into: slot.transientBuffer, cursor: &cursor
@@ -1068,13 +1077,35 @@ final class MetalRenderer: NSObject, CAMetalDisplayLinkDelegate {
         frameIndex = (frameIndex + 1) % frameSlots.count
     }
 
-    private func warmPipelines(_ keys: [MetalShaderKey], packet: MetalScenePacket?) throws {
+    private func warmPipelines(_ keys: [MetalShaderKey], packet: MetalScenePacket?) throws -> Bool {
         let uniqueKeys = Set(keys)
         let missingKeys = uniqueKeys.subtracting(warmedPipelineKeys)
-        guard !missingKeys.isEmpty else { return }
-        try shaderCompiler.waitUntilReady(for: Array(missingKeys))
+        guard !missingKeys.isEmpty else { return true }
+        // Registration already queues these keys, but preparing here keeps
+        // this callback safe for a packet produced by a late/partial source
+        // registration. `pipeline(for:)` is intentionally a nonblocking
+        // readiness probe; a compiler miss is retried on the next callback.
+        for key in missingKeys {
+            shaderCompiler.prepare(key)
+        }
+        var allReady = true
+        for key in missingKeys {
+            do {
+                _ = try shaderCompiler.pipeline(for: key)
+            } catch MetalShaderCompilerError.pipelineNotReady {
+                allReady = false
+            }
+        }
+        guard allReady else {
+            pipelineWaitLogCount += 1
+            if pipelineWaitLogCount <= 3 || pipelineWaitLogCount.isMultiple(of: 120) {
+                metalLogger.notice("metal_scene_waiting_for_pipelines packet=\(packet?.sequence ?? 0) draws=\(packet?.draws.count ?? 0) wait_count=\(self.pipelineWaitLogCount)")
+            }
+            return false
+        }
         warmedPipelineKeys.formUnion(missingKeys)
         metalLogger.notice("metal_pipeline_warmup_ready packet=\(packet?.sequence ?? 0) shaders=\(missingKeys.count) total=\(self.warmedPipelineKeys.count)")
+        return true
     }
 
     private func requiredTransientBytes(for packet: MetalScenePacket?) -> Int {
