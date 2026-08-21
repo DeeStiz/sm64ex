@@ -57,11 +57,17 @@ The status below is pinned to the current `nightly` continuation
   but no distributable artifact or human acceptance has started.
 * The first real live shard (`0xd9446dfed10e189e`, `oracle_hook|input`) now
   passes C/Swift replay, live executor, and worker-result validation with
-  `fixture_only=0`; **7,418** manifest rows remain planned.
+  `fixture_only=0`; **1 of 7,419** manifest rows is live-qualified and **7,418**
+  remain planned.
 * No other rows are promoted from the current traces: the C contract replays
   hard-coded arrays, and fixture byte matches remain explicitly ineligible for
   live qualification. Further rows require independently recorded C and Swift
   traces.
+* Phase 20's bounded common-input probe writes byte-identical 200-byte
+  schema-4 C/Swift files with shared fingerprints, exact record parity, C/Swift
+  replay, and tamper rejection. It reports
+  `bounded_common_input_admitted=1` but
+  `current_route_shard_admitted=0`; no additional route row was admitted.
 * After `f5fed499`, the native-C record harness emits 3,151 validated schema-4
   records across five lifecycle ticks, including 300 render-domain records/
   288 draws; exact C/Swift pairing is still required.
@@ -71,9 +77,27 @@ The status below is pinned to the current `nightly` continuation
 * The independent C recorder now emits canonical schema-4 framing; M35 can use
   stable Xcode 26.6 via an invocation-scoped override, but signing, entitlement,
   and notary prerequisites remain external.
+* The Phase 21 M34 closure audit found no source-local renderer/compiler/parser
+  fault. Its fresh diagnostic reached registration/warm-up, three presents,
+  zero scheduler/catch-up drops, and clean drain, but then idled after three
+  callbacks with `archive_reuse=false`, descriptor-cache fallback, and
+  clear-only black attachments. This is a host/compositor, archive/tooling,
+  visual/reference, and physical-acceptance boundary, not M34 closure or visual
+  parity evidence.
+* The Phase 22 M35 acceptance audit validated the invocation-scoped stable
+  Xcode 26.6 path without changing global `xcode-select`, but readiness remains
+  blocked by exactly three external prerequisites: no Developer ID Application
+  identity, Release `com.apple.security.get-task-allow=true`, and no notarytool
+  authentication. The fail-closed distribution run performed no mutation;
+  clean-machine and human acceptance remain open.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
+The proposed Luna-max continuation plan is
+[`../.porting/goal-continuation-luna-max-2026-08-20.md`](../.porting/goal-continuation-luna-max-2026-08-20.md).
+The latest bounded handoffs are [Phase 20 C/Swift pairing](../.porting/porting-handoff-full-swift-twin-phase20-c-swift-pairing.md),
+[Phase 21 M34 closure](../.porting/porting-handoff-full-swift-twin-phase21-m34-closure.md),
+and [Phase 22 M35 acceptance](../.porting/porting-handoff-full-swift-twin-phase22-m35-acceptance.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is

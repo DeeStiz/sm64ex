@@ -68,12 +68,20 @@ the Swift concurrency boundary.
 At the current `nightly` continuation, the full-Swift-twin
 qualification ledger has 534 behavior rows (511 Swift owners and 23 explicit C
 adapters), with M33nk as the latest numbered behavior slice, Treasure Chest
-route 270 as the latest central promotion, and M34b as the latest validated Metal 4
-production/capture slice. The bounded live-shard executor is now present, but
-the first real `oracle_hook|input` shard is closed while 7,418 rows remain
-planned; route-shard closure, physical/device/performance/thermal evidence,
-distribution, and human acceptance are still open; this is not a shipped
-full-game Swift port.
+route 270 as the latest central promotion, and M34b as the latest validated
+Metal 4 production/capture slice. One of 7,419 route shards is live-qualified
+and 7,418 remain planned. The Phase 20 one-record C/Swift common-input probe is
+bounded contract evidence only (`current_route_shard_admitted=0`); it admits no
+additional route row. The M34 closure audit leaves acceptance at the
+host/compositor, archive/tooling, visual/reference, and physical boundaries.
+M35's invocation-scoped stable-Xcode checks remain blocked by the missing
+Developer ID Application identity, Release `get-task-allow` entitlement, and
+notary authentication. Route-shard closure, physical/device/performance/
+thermal evidence, distribution, and human acceptance are still open; this is
+not a shipped full-game Swift port. See the [current status](docs/SM64Modern.md),
+[full-Swift-twin goal](.porting/goal-full-swift-twin.md), and
+[Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
+for the evidence ledger and latest handoffs.
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

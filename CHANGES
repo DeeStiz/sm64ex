@@ -18,6 +18,18 @@ SM64 Modern native macOS — nightly continuation update (2026-08-20)
 7.) Add a fail-closed M35 archive/export/notarize/staple/DMG/ZIP flow that
     performs no mutation while the local Developer ID/notary prerequisites are
     unavailable.
+8.) Add the Phase 20 independent schema-4 C/Swift pairing audit. The
+    lifecycle/live-route captures remain rejected, while a bounded one-record
+    common-input probe matches byte-for-byte and rejects C/Swift tampering;
+    no additional route shard is admitted.
+9.) Record the Phase 21 M34 closure audit. Metal 4 source and GPU structure
+    remain healthy, but host/compositor throttling, archive reuse, clear-only
+    attachments, visual/reference, physical-device, and human gates remain
+    open.
+10.) Record the Phase 22 M35 acceptance audit and Luna-max continuation plan.
+     Stable Xcode 26.6 is invocation-scoped and fail-closed; Developer ID,
+     Release entitlement, notary, clean-machine, and human acceptance gates
+     remain external and unclaimed.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)

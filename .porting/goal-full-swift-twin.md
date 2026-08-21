@@ -69,6 +69,52 @@ memoryless Depth32Float, and `sm64_vertex / sm64_fragment` draw discovery via
 physical display, or human acceptance; M31 whole-engine authority and M33
 full-game qualification remain open.
 
+The current continuation audits preserve the live counters at 534 behavior
+rows (511 Swift owners and 23 explicit C adapters) and 1 of 7,419 qualified
+route shards. Phase 20's independent common-input probe admits one matching
+schema-4 record as bounded contract evidence, but explicitly reports
+`current_route_shard_admitted=0`; no additional route row is admitted. Phase
+21's M34 closure audit finds no source-local renderer/compiler/parser fault;
+its three-present, zero-drop, clear-only diagnostic remains bounded by the
+host/compositor, archive/tooling, visual/reference, and physical-acceptance
+boundary. Phase 22's M35 acceptance audit validates invocation-scoped stable
+Xcode 26.6 without changing global `xcode-select`, but remains blocked by no
+Developer ID Application identity, Release `get-task-allow=true`, and no
+notarytool authentication; its fail-closed distribution run performs no
+mutation. These audits do not claim a shipped or full-game Swift twin.
+
+The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
+is subordinate to this goal. Latest evidence handoffs are [Phase 20 C/Swift
+pairing](.porting/porting-handoff-full-swift-twin-phase20-c-swift-pairing.md),
+[Phase 21 M34 closure](.porting/porting-handoff-full-swift-twin-phase21-m34-closure.md),
+and [Phase 22 M35 acceptance](.porting/porting-handoff-full-swift-twin-phase22-m35-acceptance.md).
+
+Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
+probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
+with shared build/content/timebase/configuration/initial-save/coverage
+fingerprints, exact ordering and values, C/Swift replay, and tamper rejection.
+`bounded_common_input_admitted=1` is contract evidence only;
+`current_route_shard_admitted=0`, so no route row is promoted. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase20-c-swift-pairing.md`.
+
+Continuation Phase 21 (2026-08-20) audits M34 closure. Source contracts,
+parser behavior, and captured Metal structure remain healthy, while the fresh
+diagnostic reaches registration/warm-up, three presents, zero scheduler/
+catch-up drops, and clean drain before host/compositor idle. It still reports
+`archive_reuse=false`, descriptor-cache fallback, and clear-only black
+attachments; M34 remains open for visible-host/post-resume, archive reuse,
+visual/reference, physical-device, and human evidence. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase21-m34-closure.md`.
+
+Continuation Phase 22 (2026-08-20) audits M35 acceptance with the stable-Xcode
+override. Xcode 26.6 runs the readiness/distribution checks without changing
+global selection, but readiness remains blocked by exactly three prerequisites:
+no Developer ID Application identity, Release `get-task-allow=true`, and no
+notarytool authentication. The distribution flow remains fail-closed and
+performs no archive/export/notarization/stapling/ZIP mutation; clean-machine
+Gatekeeper and human acceptance remain open. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase22-m35-acceptance.md`.
+
 Continuation Phase 1 (2026-08-20) is checkpointed at `da4fa9ae` plus the
 current live-host control. The fresh arm64 Debug bundle built, launched through
 LaunchServices, presented Metal 4 frame one, and shut down cleanly; the earlier
