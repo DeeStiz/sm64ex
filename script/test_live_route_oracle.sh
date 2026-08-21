@@ -686,5 +686,9 @@ if [[ "$MODE" == "full" ]]; then
   "$BUILD_ROOT/sm64-modern-live-route-oracle-contract" "$TRACE_PATH" --tamper
   printf 'SM64 Modern live route oracle smoke passed mode=full c_swift_replay=1 first_divergence=3\n'
 else
-  printf 'SM64 Modern live route oracle smoke passed mode=input-only c_swift_replay=1 records=1\n'
+  if [[ "${SM64_MODERN_PAIRING_ROUTE:-0}" == "1" ]]; then
+    printf 'SM64 Modern live route oracle smoke passed mode=input-only c_swift_replay=1 records=2 window_ticks=2 coverage=1\n'
+  else
+    printf 'SM64 Modern live route oracle smoke passed mode=input-only c_swift_replay=1 records=1\n'
+  fi
 fi

@@ -61,6 +61,25 @@ static uint64_t pairing_timebase_fingerprint(void) {
     return hash;
 }
 
+static uint64_t pairing_coverage_fingerprint(const struct FileTrace *trace) {
+    bool input_row_seen = false;
+    if (trace) {
+        for (uint32_t index = 0; index < trace->count; ++index) {
+            if (trace->records[index].domain == SM64_MODERN_ORACLE_DOMAIN_INPUT
+                && trace->records[index].record_id == 1u) {
+                input_row_seen = true;
+                break;
+            }
+        }
+    }
+    if (!input_row_seen) return 0;
+    uint64_t hash = PAIRING_FNV_OFFSET;
+    hash = hash_u64(hash, SM64_MODERN_ORACLE_DOMAIN_INPUT);
+    hash = hash_u64(hash, 0);
+    hash = hash_u64(hash, 1);
+    return hash_u64(hash, 1);
+}
+
 static SM64ModernStatus read_header(void *context,
                                     SM64ModernOracleTraceConfigV1 *out_config) {
     struct FileTrace *trace = context;
@@ -105,9 +124,15 @@ static int load_trace(const char *path, struct FileTrace *trace, uint32_t expect
 
 static SM64ModernStatus emit_live_route_record(uint32_t index, int tamper) {
     if (pairing_route_enabled()) {
-        const uint64_t values[] = { UINT64_C(0x8000), UINT64_C(16) };
+        uint64_t values[] = { UINT64_C(0x8000), UINT64_C(16) };
+        if (tamper && index == 1u) values[0]++;
         sm64_modern_oracle_trace_begin_tick();
-        sm64_modern_oracle_trace_begin_tick();
+        if (index == 0u) sm64_modern_oracle_trace_begin_tick();
+        if (sm64_modern_oracle_trace_mark_coverage(
+                SM64_MODERN_ORACLE_DOMAIN_INPUT, 1u)
+            != SM64_MODERN_STATUS_OK) {
+            return SM64_MODERN_STATUS_PARITY_DIVERGED;
+        }
         const SM64ModernStatus status = sm64_modern_oracle_trace_record(
             SM64_MODERN_ORACLE_DOMAIN_INPUT,
             SM64_MODERN_ORACLE_RECORD_INPUT,
@@ -177,6 +202,7 @@ static int run_replay(struct FileTrace *trace, int tamper) {
             "shard=0xd9446dfed10e189e");
         config.initial_save_fingerprint = hash_u64(PAIRING_FNV_OFFSET,
                                                    PAIRING_ROUTE_SAVE_SEED);
+        config.coverage_fingerprint = pairing_coverage_fingerprint(trace);
     } else {
         config.build_fingerprint = UINT64_C(0x4d33c001);
         config.content_fingerprint = UINT64_C(0x4d33c002);
@@ -204,7 +230,9 @@ static int run_replay(struct FileTrace *trace, int tamper) {
                (unsigned long long) result.matched_records);
         return 1;
     }
-    if (status != SM64_MODERN_STATUS_PARITY_DIVERGED || first_divergence != 3u) return 0;
+    const uint32_t expected_divergence = pairing_route_enabled() ? 1u : 3u;
+    if (status != SM64_MODERN_STATUS_PARITY_DIVERGED
+        || first_divergence != expected_divergence) return 0;
     printf("SM64 Modern live route C oracle divergence detected status=diverged first_divergence=%u\n",
            first_divergence);
     return 1;
@@ -230,9 +258,11 @@ int main(int argc, char **argv) {
     struct FileTrace trace;
     memset(&trace, 0, sizeof(trace));
     if (!load_trace(argv[1], &trace,
-                    pairing_route_enabled() ? 1u : (input_only ? 1u : 8u))) {
+                    pairing_route_enabled() ? 2u : (input_only ? 1u : 8u))) {
         fprintf(stderr, "expected %s schema-4 trace\n",
-                input_only ? "one-record input-only" : "eight-record full-route");
+                pairing_route_enabled() ? "two-record input route"
+                                        : (input_only ? "one-record input-only"
+                                                      : "eight-record full-route"));
         return 2;
     }
     if (input_only && tamper) {

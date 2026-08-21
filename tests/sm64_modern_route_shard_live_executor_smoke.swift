@@ -122,9 +122,9 @@ struct SM64ModernRouteShardLiveExecutorSmoke {
             timebaseFingerprint: 0x3333333333333333,
             configurationFingerprint: 0x4444444444444444,
             initialSaveFingerprint: shard.saveSeed,
-            coverageFingerprint: 0
+            coverageFingerprint: 0x7777777777777777
         )
-        let record = try SM64OracleTraceRecord(
+        let first = try SM64OracleTraceRecord(
             simulationTick: 1,
             domain: SM64RouteShardTraceDomain.input.cDomain,
             recordKind: SM64RouteShardTraceDomain.input.cRecordKind,
@@ -133,7 +133,20 @@ struct SM64ModernRouteShardLiveExecutorSmoke {
             sequence: 0,
             values: [value]
         )
-        try SM64OracleTraceFile.write(configuration: configuration, records: [record], to: url)
+        let second = try SM64OracleTraceRecord(
+            simulationTick: 2,
+            domain: SM64RouteShardTraceDomain.input.cDomain,
+            recordKind: SM64RouteShardTraceDomain.input.cRecordKind,
+            subjectID: value,
+            recordID: 0x90000000 + value,
+            sequence: 0,
+            values: [value]
+        )
+        try SM64OracleTraceFile.write(
+            configuration: configuration,
+            records: [first, second],
+            to: url
+        )
     }
 
     private static func writeFixtureTrace(for shard: SM64RouteShard, to url: URL) throws {

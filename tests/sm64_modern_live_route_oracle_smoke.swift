@@ -21,7 +21,27 @@ private func hashString(_ value: String) -> UInt64 {
     }
 }
 
-private func pairingRouteConfiguration() -> SM64OracleTraceConfiguration {
+private func pairingRouteCoverageFingerprint(
+    from records: [SM64OracleTraceRecord]
+) -> UInt64 {
+    let observedRecordIDs = Set(
+        records
+            .filter { $0.domain == 1 && $0.recordID == 1 }
+            .map(\.recordID)
+    ).sorted()
+    guard !observedRecordIDs.isEmpty else { return 0 }
+    var hash = pairingFNVOffset
+    for recordID in observedRecordIDs {
+        hash = hashU64(hash, 1)
+        hash = hashU64(hash, 0)
+        hash = hashU64(hash, recordID)
+    }
+    return hashU64(hash, UInt64(observedRecordIDs.count))
+}
+
+private func pairingRouteConfiguration(
+    coverageFingerprint: UInt64
+) -> SM64OracleTraceConfiguration {
     SM64OracleTraceConfiguration(
         regionCode: 0x5553,
         mode: .record,
@@ -38,12 +58,13 @@ private func pairingRouteConfiguration() -> SM64OracleTraceConfiguration {
                 + "shard=0xd9446dfed10e189e"
         ),
         initialSaveFingerprint: hashU64(pairingFNVOffset, pairingRouteSaveSeed),
-        coverageFingerprint: 0
+        coverageFingerprint: coverageFingerprint
     )
 }
 
 private func pairingRouteRecord(
-    from receipt: SM64ModernSwiftInputReceipt
+    from receipt: SM64ModernSwiftInputReceipt,
+    simulationTick: UInt64
 ) throws -> SM64OracleTraceRecord {
     // This is the schema-4 C input receipt: raw button mask plus packed raw
     // axes. It is emitted from the real Swift input normalizer, not from the
@@ -54,10 +75,7 @@ private func pairingRouteRecord(
         | (UInt64(UInt8(truncatingIfNeeded: controller.extStickX)) << 16)
         | (UInt64(UInt8(truncatingIfNeeded: controller.extStickY)) << 24)
     return try SM64OracleTraceRecord(
-        // The native lifecycle performs one owner-thread setup interval before
-        // its first externally stepped tick, so the first retained C input
-        // receipt is simulation tick two.
-        simulationTick: 2,
+        simulationTick: simulationTick,
         domain: 1,
         recordKind: 2,
         recordID: 1,
@@ -82,8 +100,13 @@ struct SM64ModernLiveRouteOracleSmoke {
         ] == "1"
         let context = SM64ModernSwiftEngineContext()
         precondition(context.initialize(levelNumber: 1, areaIndex: 0))
+        let routeSample = SM64ControllerRawSample(
+            buttons: pairingRoute ? 0x8000 : 0x0001,
+            rawStickX: 16,
+            rawStickY: 0
+        )
         guard let firstInput = context.ingestInput(
-            .init(buttons: pairingRoute ? 0x8000 : 0x0001, rawStickX: 16, rawStickY: 0),
+            routeSample,
             advanceLegacyDomain: false
         ) else {
             throw NSError(domain: "SM64ModernLiveRouteOracleSmoke", code: 4)
@@ -109,24 +132,23 @@ struct SM64ModernLiveRouteOracleSmoke {
             _ = context.step()
         }
 
-        let configuration = pairingRoute
-            ? pairingRouteConfiguration()
-            : SM64OracleTraceConfiguration(
-                regionCode: 0x5553,
-                mode: .record,
-                buildFingerprint: 0x4d33_c001,
-                contentFingerprint: 0x4d33_c002,
-                timebaseFingerprint: 0x4d33_c003,
-                configurationFingerprint: 0x4d33_c004,
-                initialSaveFingerprint: 0x4d33_c005,
-                coverageFingerprint: 0
-            )
         // EngineHost forwards each Swift receipt through one C sidecar tick.
         // Normalize the internal receipt sequence/tick to that ABI boundary
         // before asking the C oracle to replay the file.
         var sidecarRecords: [SM64OracleTraceRecord]
         if pairingRoute && inputOnly {
-            sidecarRecords = [try pairingRouteRecord(from: firstInput)]
+            sidecarRecords = [try pairingRouteRecord(from: firstInput, simulationTick: 2)]
+            _ = context.step()
+            guard let secondInput = context.ingestInput(
+                routeSample,
+                advanceLegacyDomain: false
+            ) else {
+                throw NSError(domain: "SM64ModernLiveRouteOracleSmoke", code: 5)
+            }
+            sidecarRecords.append(try pairingRouteRecord(
+                from: secondInput,
+                simulationTick: 3
+            ))
         } else {
             sidecarRecords = try context.traceRecords.enumerated().map { index, record in
                 try SM64OracleTraceRecord(
@@ -150,6 +172,25 @@ struct SM64ModernLiveRouteOracleSmoke {
                 simulationTick: UInt64(sidecarRecords.count + 1),
                 sequence: 0
             ))
+        }
+        let configuration = pairingRoute
+            ? pairingRouteConfiguration(
+                coverageFingerprint: pairingRouteCoverageFingerprint(from: sidecarRecords)
+            )
+            : SM64OracleTraceConfiguration(
+                regionCode: 0x5553,
+                mode: .record,
+                buildFingerprint: 0x4d33_c001,
+                contentFingerprint: 0x4d33_c002,
+                timebaseFingerprint: 0x4d33_c003,
+                configurationFingerprint: 0x4d33_c004,
+                initialSaveFingerprint: 0x4d33_c005,
+                coverageFingerprint: 0
+            )
+        if pairingRoute {
+            guard configuration.coverageFingerprint != 0 else {
+                throw NSError(domain: "SM64ModernLiveRouteOracleSmoke", code: 6)
+            }
         }
         let output = URL(fileURLWithPath: CommandLine.arguments[1]).standardizedFileURL
         try SM64OracleTraceFile.write(

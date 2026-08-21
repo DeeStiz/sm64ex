@@ -11,7 +11,7 @@ struct SM64RouteShardPromotionTool {
         case missingArgument(String)
         case wrongTraceMode(SM64OracleTraceMode)
         case coverageFingerprintDeferred
-        case incompleteWindow(UInt64)
+        case incompleteWindow(records: UInt64, ticks: UInt64)
         case incompleteCoverage(String)
         case reportRequired
 
@@ -25,8 +25,8 @@ struct SM64RouteShardPromotionTool {
                 return "live promotion requires a record trace, got " + String(describing: mode)
             case .coverageFingerprintDeferred:
                 return "live promotion requires a nonzero coverage fingerprint"
-            case let .incompleteWindow(count):
-                return "live promotion requires an independently recorded multi-tick window (records=\(count))"
+            case let .incompleteWindow(records, ticks):
+                return "live promotion requires an independently recorded multi-tick window (records=\(records) ticks=\(ticks))"
             case let .incompleteCoverage(reason):
                 return "live trace coverage incomplete: " + reason
             case .reportRequired:
@@ -73,7 +73,17 @@ struct SM64RouteShardPromotionTool {
                 throw ToolError.coverageFingerprintDeferred
             }
             guard trace.records.count >= 2 else {
-                throw ToolError.incompleteWindow(UInt64(trace.records.count))
+                throw ToolError.incompleteWindow(
+                    records: UInt64(trace.records.count),
+                    ticks: UInt64(Set(trace.records.map(\.simulationTick)).count)
+                )
+            }
+            let tickCount = Set(trace.records.map(\.simulationTick)).count
+            guard tickCount >= 2 else {
+                throw ToolError.incompleteWindow(
+                    records: UInt64(trace.records.count),
+                    ticks: UInt64(tickCount)
+                )
             }
             let coverage = SM64RouteShardFixture.coverage(for: shard, records: trace.records)
             guard coverage.isComplete else {

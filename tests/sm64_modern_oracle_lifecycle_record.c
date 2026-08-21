@@ -16,6 +16,12 @@
 #define PAIRING_ROUTE_SAVE_SEED UINT64_C(0x4736724b767444c3)
 #define PAIRING_FNV_OFFSET UINT64_C(1469598103934665603)
 #define PAIRING_FNV_PRIME UINT64_C(1099511628211)
+#define TRACE_COVERAGE_CAPACITY 256u
+
+struct TraceCoverageKey {
+    uint32_t domain;
+    uint64_t record_id;
+};
 
 struct TraceFile {
     FILE *file;
@@ -27,6 +33,8 @@ struct TraceFile {
     uint32_t last_sequence[SM64_MODERN_ORACLE_TRACE_DOMAIN_COUNT];
     uint32_t failures;
     bool input_only;
+    struct TraceCoverageKey coverage_keys[TRACE_COVERAGE_CAPACITY];
+    uint32_t coverage_key_count;
 };
 
 struct HarnessState {
@@ -92,6 +100,38 @@ static uint64_t hash_string(const char *value) {
     return hash;
 }
 
+static uint64_t retained_coverage_fingerprint(
+    const struct TraceFile *trace,
+    uint64_t *out_entries) {
+    if (!trace) {
+        if (out_entries) *out_entries = 0;
+        return 0;
+    }
+    struct TraceCoverageKey keys[TRACE_COVERAGE_CAPACITY];
+    const uint32_t count = trace->coverage_key_count;
+    memcpy(keys, trace->coverage_keys, sizeof(keys));
+    for (uint32_t index = 1; index < count; ++index) {
+        const struct TraceCoverageKey key = keys[index];
+        uint32_t cursor = index;
+        while (cursor > 0
+               && (keys[cursor - 1].domain > key.domain
+                   || (keys[cursor - 1].domain == key.domain
+                       && keys[cursor - 1].record_id > key.record_id))) {
+            keys[cursor] = keys[cursor - 1];
+            cursor--;
+        }
+        keys[cursor] = key;
+    }
+    uint64_t hash = PAIRING_FNV_OFFSET;
+    for (uint32_t index = 0; index < count; ++index) {
+        hash = hash_u64(hash, keys[index].domain);
+        hash = hash_u64(hash, 0);
+        hash = hash_u64(hash, keys[index].record_id);
+    }
+    if (out_entries) *out_entries = count;
+    return hash_u64(hash, count);
+}
+
 static bool pairing_route_enabled(void) {
     const char *value = getenv("SM64_MODERN_PAIRING_ROUTE");
     return value && strcmp(value, "1") == 0;
@@ -125,6 +165,20 @@ static SM64ModernStatus trace_write_header(
     return SM64_MODERN_STATUS_OK;
 }
 
+static bool trace_rewrite_header(
+    struct TraceFile *trace,
+    const SM64ModernOracleTraceConfigV1 *config) {
+    if (!trace || !trace->file || !config
+        || fseek(trace->file, 0, SEEK_SET) != 0
+        || fwrite(config, 1, sizeof(*config), trace->file) != sizeof(*config)
+        || fflush(trace->file) != 0
+        || fseek(trace->file, 0, SEEK_END) != 0) {
+        if (trace) trace->failures++;
+        return false;
+    }
+    return true;
+}
+
 static SM64ModernStatus trace_write_record(
     void *context,
     const SM64ModernOracleTraceRecordV1 *record) {
@@ -136,8 +190,8 @@ static SM64ModernStatus trace_write_record(
 
     // The route attempt executes the complete native owner tick, but the
     // selected manifest row is the input receipt. Keep unrelated observed
-    // domains out of this row's independent artifact; the oracle still tracks
-    // their coverage internally and leaves the admission fingerprint deferred.
+    // domains out of this row's independent artifact while retaining every
+    // input receipt in the captured window for route coverage.
     if (trace->input_only && record->domain != SM64_MODERN_ORACLE_DOMAIN_INPUT) {
         return SM64_MODERN_STATUS_OK;
     }
@@ -164,6 +218,24 @@ static SM64ModernStatus trace_write_record(
     if (!write_bytes(trace, record, sizeof(*record))) {
         trace->failures++;
         return SM64_MODERN_STATUS_PLATFORM_ERROR;
+    }
+    bool coverage_key_seen = false;
+    for (uint32_t index = 0; index < trace->coverage_key_count; ++index) {
+        if (trace->coverage_keys[index].domain == domain
+            && trace->coverage_keys[index].record_id == record->record_id) {
+            coverage_key_seen = true;
+            break;
+        }
+    }
+    if (!coverage_key_seen) {
+        if (trace->coverage_key_count >= TRACE_COVERAGE_CAPACITY) {
+            trace->failures++;
+            return SM64_MODERN_STATUS_OUT_OF_MEMORY;
+        }
+        trace->coverage_keys[trace->coverage_key_count++] = (struct TraceCoverageKey) {
+            .domain = domain,
+            .record_id = record->record_id,
+        };
     }
     trace->records_by_domain[domain]++;
     trace->records++;
@@ -501,6 +573,7 @@ static SM64ModernOracleTraceConfigV1 make_oracle_config(void) {
 
 static bool validate_file(const char *path,
                           const struct TraceFile *expected,
+                          uint64_t expected_coverage,
                           uint64_t *out_records,
                           uint64_t *out_last_tick,
                           uint32_t *out_domains) {
@@ -512,7 +585,7 @@ static bool validate_file(const char *path,
         && config.header.struct_size >= sizeof(config)
         && config.schema_version == SM64_MODERN_ORACLE_TRACE_SCHEMA_VERSION
         && config.mode == SM64_MODERN_ORACLE_TRACE_RECORD
-        && config.coverage_fingerprint == 0;
+        && config.coverage_fingerprint == expected_coverage;
     uint64_t records = 0;
     uint64_t last_tick = 0;
     uint32_t domains = 0;
@@ -627,13 +700,31 @@ int main(int argc, char **argv) {
         expect_status("running state", lifecycle.get_state(&lifecycle_state),
                       SM64_MODERN_STATUS_OK);
         expect_true("lifecycle running", lifecycle_state == SM64_MODERN_LIFECYCLE_RUNNING);
-        const uint32_t trace_steps = pairing_route ? 1u : TRACE_STEPS;
+        const uint32_t trace_steps = pairing_route ? 2u : TRACE_STEPS;
         for (uint32_t index = 0; index < trace_steps; ++index) {
             expect_status("lifecycle step", lifecycle.step(), SM64_MODERN_STATUS_OK);
         }
     }
 
     expect_status("oracle end", sm64_modern_oracle_trace_end(), SM64_MODERN_STATUS_OK);
+    SM64ModernOracleTraceResultV1 result;
+    memset(&result, 0, sizeof(result));
+    expect_status("oracle result", sm64_modern_oracle_trace_get_result(&result),
+                  SM64_MODERN_STATUS_OK);
+    expect_true("oracle result status", result.status == SM64_MODERN_STATUS_OK);
+    expect_true("oracle records", result.actual_records > 0u);
+    expect_true("oracle coverage", result.coverage_entries > 0u);
+    uint64_t retained_coverage_entries = 0;
+    const uint64_t retained_coverage = retained_coverage_fingerprint(
+        &trace, &retained_coverage_entries);
+    if (pairing_route) {
+        expect_true("route coverage fingerprint", retained_coverage != 0);
+        expect_true("route coverage entries", retained_coverage_entries > 0);
+        SM64ModernOracleTraceConfigV1 finalized_config = oracle_config;
+        finalized_config.coverage_fingerprint = retained_coverage;
+        expect_true("finalize route coverage header",
+                    trace_rewrite_header(&trace, &finalized_config));
+    }
     if (init_status == SM64_MODERN_STATUS_OK) {
         expect_status("lifecycle shutdown", lifecycle.shutdown(), SM64_MODERN_STATUS_OK);
         SM64ModernLifecycleState lifecycle_state = SM64_MODERN_LIFECYCLE_COLD;
@@ -642,13 +733,6 @@ int main(int argc, char **argv) {
         expect_true("lifecycle stopped", lifecycle_state == SM64_MODERN_LIFECYCLE_STOPPED);
     }
 
-    SM64ModernOracleTraceResultV1 result;
-    memset(&result, 0, sizeof(result));
-    expect_status("oracle result", sm64_modern_oracle_trace_get_result(&result),
-                  SM64_MODERN_STATUS_OK);
-    expect_true("oracle result status", result.status == SM64_MODERN_STATUS_OK);
-    expect_true("oracle records", result.actual_records > 0u);
-    expect_true("oracle coverage", result.coverage_entries > 0u);
     const uint32_t required_domains = pairing_route
         ? (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_INPUT)
         : (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_GLOBAL)
@@ -662,7 +746,9 @@ int main(int argc, char **argv) {
                     || trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_RENDER] > 0u);
     expect_true("platform callbacks", state.platform_initialize == 1u
                 && state.platform_shutdown == 1u);
-    expect_true("input callbacks", state.input_reads >= (pairing_route ? 1u : TRACE_STEPS));
+    expect_true("input callbacks", state.input_reads >= (pairing_route ? 2u : TRACE_STEPS));
+    expect_true("route input window", !pairing_route
+                || trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_INPUT] >= 2u);
     expect_true("audio callbacks", pairing_route
                 || (state.audio_play >= TRACE_STEPS && state.audio_sequence > 0u));
     expect_true("render installation callbacks", state.render_initialize == 1u
@@ -683,10 +769,12 @@ int main(int argc, char **argv) {
     uint64_t file_last_tick = 0;
     uint32_t file_domains = 0;
     expect_true("validate file trace",
-                validate_file(trace_path, &trace, &file_records,
+                validate_file(trace_path, &trace,
+                              pairing_route ? retained_coverage : 0,
+                              &file_records,
                               &file_last_tick, &file_domains));
     expect_true("file lifecycle ticks",
-                file_last_tick >= (pairing_route ? 1u : TRACE_STEPS + 1u));
+                file_last_tick >= (pairing_route ? 3u : TRACE_STEPS + 1u));
     expect_true("file domain mask", file_domains == trace.domains);
     printf("liveOracleTraceRecords=%" PRIu64
            " liveOracleTraceTicks=%" PRIu64
@@ -694,11 +782,19 @@ int main(int argc, char **argv) {
            " liveOracleAudioCallbacks=%u"
            " liveOracleInputRecords=%" PRIu64
            " liveOracleRenderRecords=%" PRIu64
+           " liveOracleCoverageFingerprint=0x%016" PRIx64
+           " liveOracleCoverageEntries=%" PRIu64
+           " liveOracleObservedCoverageFingerprint=0x%016" PRIx64
+           " liveOracleObservedCoverageEntries=%" PRIu64
            " liveOracleRenderDraws=%u\n",
            file_records, file_last_tick, file_domains,
            state.audio_play,
            trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_INPUT],
            trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_RENDER],
+           retained_coverage,
+           retained_coverage_entries,
+           result.coverage_fingerprint,
+           result.coverage_entries,
            state.render_draw);
 
     if (failures != 0) {

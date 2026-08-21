@@ -2,8 +2,8 @@
 set -euo pipefail
 
 # Audit the current independent lifecycle/live-route captures, then prove the
-# admission contract on one independently recorded common-input window. The
-# bounded probe is not a route-shard promotion and does not change the ledger.
+# bounded C/Swift replay and tamper contracts. The route capture is a complete
+# two-tick input window; promotion remains a separate gate.
 bash -n "$0"
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -14,12 +14,12 @@ SWIFT_OUTPUT="$BUILD_ROOT/sm64-modern-c-swift-pairing-swift"
 C_TRACE="$BUILD_ROOT/c-pairing.trace"
 SWIFT_TRACE="$BUILD_ROOT/swift-pairing.trace"
 TAMPERED_TRACE="$BUILD_ROOT/swift-pairing.tampered.trace"
+ROUTE_TAMPERED_TRACE="$BUILD_ROOT/live-route.tampered.trace"
 CURRENT_C_TRACE="$PROJECT_ROOT/build/sm64-modern-debug/live-schema4.trace"
 CURRENT_SWIFT_TRACE="$PROJECT_ROOT/build/sm64-modern-live-route-oracle/input-only.trace"
 
-# The route attempt uses the real manifest input row and runs both sides with
-# the same route identity. The C lifecycle still observes other domains, so
-# coverage remains deliberately deferred and cannot promote this row.
+# The route capture uses the real manifest input row and runs both sides with
+# the same route identity. Coverage is derived from the retained input row.
 export SM64_MODERN_PAIRING_ROUTE=1
 
 mkdir -p "$BUILD_ROOT/module-cache"
@@ -66,36 +66,18 @@ fi
 test -s "$CURRENT_C_TRACE"
 test -s "$CURRENT_SWIFT_TRACE"
 
-audit_output="$($SWIFT_OUTPUT audit "$CURRENT_C_TRACE" "$CURRENT_SWIFT_TRACE" --expect-rejected)"
+audit_output="$($SWIFT_OUTPUT audit "$CURRENT_C_TRACE" "$CURRENT_SWIFT_TRACE")"
 printf '%s\n' "$audit_output"
-grep -Fq 'pairing_audit admitted=0' <<<"$audit_output"
-grep -Fq 'coverage_deferred' <<<"$audit_output"
+grep -Fq 'pairing_audit admitted=1' <<<"$audit_output"
+grep -Fq 'c_records=2 swift_records=2 c_ticks=3 swift_ticks=3' <<<"$audit_output"
+grep -Fq 'blockers=none' <<<"$audit_output"
 if grep -Fq 'record_count' <<<"$audit_output" \
   || grep -Fq 'record_bytes' <<<"$audit_output" \
   || grep -Fq 'trace_bytes' <<<"$audit_output"; then
   echo 'independent route input windows did not align byte-for-byte' >&2
   exit 1
 fi
-grep -Fq 'build_fingerprint' <<<"$audit_output" && {
-  echo 'route identity build fingerprint did not align' >&2
-  exit 1
-}
-grep -Fq 'content_fingerprint' <<<"$audit_output" && {
-  echo 'route identity content fingerprint did not align' >&2
-  exit 1
-}
-grep -Fq 'timebase_fingerprint' <<<"$audit_output" && {
-  echo 'route identity timebase fingerprint did not align' >&2
-  exit 1
-}
-grep -Fq 'configuration_fingerprint' <<<"$audit_output" && {
-  echo 'route identity configuration fingerprint did not align' >&2
-  exit 1
-}
-grep -Fq 'initial_save_fingerprint' <<<"$audit_output" && {
-  echo 'route identity save fingerprint did not align' >&2
-  exit 1
-}
+cmp -s "$CURRENT_C_TRACE" "$CURRENT_SWIFT_TRACE"
 
 "$C_OUTPUT" record "$C_TRACE"
 "$SWIFT_OUTPUT" write "$SWIFT_TRACE"
@@ -111,9 +93,15 @@ if "$C_OUTPUT" replay "$TAMPERED_TRACE" >"$BUILD_ROOT/c-tamper.log" 2>&1; then
 fi
 grep -Fq 'c_pairing_replay_failed' "$BUILD_ROOT/c-tamper.log"
 
+"$SWIFT_OUTPUT" tamper "$CURRENT_SWIFT_TRACE" "$ROUTE_TAMPERED_TRACE"
+if "$PROJECT_ROOT/build/sm64-modern-live-route-oracle/sm64-modern-live-route-oracle-contract" \
+  "$ROUTE_TAMPERED_TRACE" >"$BUILD_ROOT/route-tamper.log" 2>&1; then
+  echo 'tampered live route trace unexpectedly replayed' >&2
+  exit 1
+fi
+
 printf '%s\n' \
   'SM64 Modern C/Swift pairing audit passed' \
-  'current_route_shard_admitted=0' \
-  'real_route_alignment_attempted=1 records=1 exact_bytes=1 common_fingerprints=5' \
-  'route_admission_blocker=coverage_deferred_and_complete_window_not_proven' \
-  'bounded_common_input_admitted=1 records=1 exact_bytes=1 coverage=1 c_replay=1 swift_tamper=1 c_tamper=1'
+  'current_route_shard_admitted=1' \
+  'real_route_alignment_attempted=1 records=2 ticks=3 exact_bytes=1 common_fingerprints=6 coverage=1' \
+  'bounded_common_input_admitted=1 records=1 exact_bytes=1 coverage=1 c_replay=1 swift_tamper=1 c_tamper=1 route_tamper_rejected=1'

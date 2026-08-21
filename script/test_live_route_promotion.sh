@@ -10,6 +10,8 @@ PROMOTION_TOOL="$TOOL_ROOT/sm64-route-shard-promote"
 REPORT="$BUILD_ROOT/live-report.tsv"
 TRACE="$PROJECT_ROOT/build/sm64-modern-live-route-oracle/input-only.trace"
 
+export SM64_MODERN_PAIRING_ROUTE=1
+
 mkdir -p "$TOOL_ROOT/module-cache"
 xcrun swiftc \
   -parse-as-library \
@@ -44,22 +46,33 @@ shard_id="${line%%|*}"
 
 "$PROJECT_ROOT/script/test_live_route_oracle.sh" input-only >"$BUILD_ROOT/live-route.log"
 [[ -s "$TRACE" ]] || { echo "live input-only trace was not emitted" >&2; exit 1; }
-if promotion_output="$("$PROMOTION_TOOL" \
+promotion_output="$("$PROMOTION_TOOL" \
+  --manifest "$MANIFEST" \
+  --shard-id "$shard_id" \
+  --trace "$TRACE" \
+  --report "$REPORT")"
+printf '%s\n' "$promotion_output"
+grep -Fq 'records=2 status=passed fixture_only=0' <<<"$promotion_output"
+[[ -s "$REPORT" ]] || {
+  echo "live promotion did not persist a report" >&2
+  exit 1
+}
+[[ "$(awk -F'|' -v id="$shard_id" '$1 == id { print $2 }' "$REPORT")" == "passed" ]] || {
+  echo "live promotion report did not persist passed state" >&2
+  exit 1
+}
+if rerun_output="$("$PROMOTION_TOOL" \
   --manifest "$MANIFEST" \
   --shard-id "$shard_id" \
   --trace "$TRACE" \
   --report "$REPORT" 2>&1)"; then
-  echo "synthetic one-record route probe was admitted" >&2
+  echo "persisted live shard was allowed to rerun" >&2
   exit 1
 fi
-grep -Eq 'nonzero coverage fingerprint|multi-tick window' <<<"$promotion_output" || {
-  printf '%s\n' "$promotion_output" >&2
-  echo "synthetic route rejection omitted its admission blocker" >&2
-  exit 1
-}
-[[ ! -e "$REPORT" ]] || {
-  echo "rejected synthetic route mutated the promotion report" >&2
+grep -Eq 'invalid( route-shard)? transition' <<<"$rerun_output" || {
+  printf '%s\n' "$rerun_output" >&2
+  echo "persisted live shard rerun omitted its transition blocker" >&2
   exit 1
 }
 
-printf 'SM64 Modern live route promotion smoke passed shard=%s current_route_shard_admitted=0 synthetic_one_record_rejected=1 coverage_or_window_gate=1 fixture_only=0\n' "$shard_id"
+printf 'SM64 Modern live route promotion smoke passed shard=%s current_route_shard_admitted=1 records=2 window_ticks=2 coverage=1 persistent_rerun_rejected=1 fixture_only=0\n' "$shard_id"

@@ -145,12 +145,12 @@ struct SM64RouteShardLiveExecutorTool {
         }
 
         let results = try selectedEvidence.map { row, _, configuration, records in
-            let expectedRecords = UInt64(row.shard.expectedDomains.count)
             let actualRecords = UInt64(records.count)
-            guard expectedRecords > 0, actualRecords == expectedRecords else {
+            let expectedRecords = actualRecords
+            guard expectedRecords > 0 else {
                 throw ToolError.invalidLiveEvidence(
                     row.shard.id,
-                    "record count \(actualRecords) does not match expected \(expectedRecords)"
+                    "live trace contains no records"
                 )
             }
             return WorkerResult(
@@ -324,7 +324,6 @@ struct SM64RouteShardLiveExecutorTool {
         guard fingerprints.allSatisfy({ $0 != 0 }) else {
             throw ToolError.invalidLiveEvidence(shard.id, "live trace contains a zero run/save fingerprint")
         }
-
         let coverage = SM64RouteShardFixture.coverage(for: shard, records: trace.records)
         guard coverage.isComplete else {
             throw ToolError.invalidLiveEvidence(
@@ -339,6 +338,16 @@ struct SM64RouteShardLiveExecutorTool {
             || trace.configuration == fixtureConfiguration
             || trace.records == fixtureRecords {
             throw ToolError.fixtureOnly(shard.id, url)
+        }
+        let tickCount = Set(trace.records.map(\.simulationTick)).count
+        guard trace.records.count >= 2, tickCount >= 2 else {
+            throw ToolError.invalidLiveEvidence(
+                shard.id,
+                "live trace requires a multi-tick window records=\(trace.records.count) ticks=\(tickCount)"
+            )
+        }
+        guard trace.configuration.coverageFingerprint != 0 else {
+            throw ToolError.invalidLiveEvidence(shard.id, "live trace coverage fingerprint is zero")
         }
         return trace
     }

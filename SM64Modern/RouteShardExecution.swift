@@ -455,7 +455,12 @@ enum SM64RouteShardFixture {
             observedKeys: observedKeys,
             missingDomains: missingDomains,
             unexpectedKeys: unexpectedKeys,
-            recordCountMatches: records.count == shard.expectedDomains.count
+            // A live row may retain multiple observations of the same
+            // expected domain across its independent tick window. The
+            // executor/promotion gates separately require at least two
+            // distinct simulation ticks; coverage only rejects missing or
+            // unrelated row domains.
+            recordCountMatches: records.count >= shard.expectedDomains.count
         )
     }
 

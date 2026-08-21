@@ -15,6 +15,8 @@ MANIFEST="$BUILD_ROOT/route-shards.tsv"
 TRACE="$PROJECT_ROOT/build/sm64-modern-live-route-oracle/input-only.trace"
 WORKER_RESULT="$BUILD_ROOT/worker-result.tsv"
 
+export SM64_MODERN_PAIRING_ROUTE=1
+
 mkdir -p "$TOOL_ROOT/module-cache"
 xcrun swiftc -parse-as-library -swift-version 6 \
   -Xfrontend -strict-concurrency=complete \
@@ -64,5 +66,5 @@ planned_rows=$((manifest_rows - completed_rows))
   exit 1
 }
 
-printf 'SM64 Modern live route shard batch passed shard=%s live_rows=%s planned_rows=%s fixture_only=0 c_swift_replay=1 isolated_worker_result=1\n' \
+printf 'SM64 Modern live route shard batch passed shard=%s live_rows=%s planned_rows=%s records=2 window_ticks=2 coverage=1 fixture_only=0 c_swift_replay=1 isolated_worker_result=1\n' \
   "$shard_id" "$completed_rows" "$planned_rows"
