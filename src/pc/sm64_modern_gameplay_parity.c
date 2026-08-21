@@ -376,12 +376,12 @@ static SM64ModernOracleTraceDomain oracle_domain_for_subsystem(
     }
 }
 
-static void record_oracle_values(SM64ModernGameplaySubsystem subsystem,
-                                 SM64ModernGameplayRecordKind kind,
-                                 uint32_t record_id,
-                                 uint32_t subject_id,
-                                 const uint64_t *values,
-                                 uint32_t value_count) {
+static void record_oracle_domain_values(SM64ModernOracleTraceDomain domain,
+                                         SM64ModernGameplayRecordKind kind,
+                                         uint32_t record_id,
+                                         uint32_t subject_id,
+                                         const uint64_t *values,
+                                         uint32_t value_count) {
     if (!sm64_modern_oracle_trace_is_active()) {
         return;
     }
@@ -391,7 +391,6 @@ static void record_oracle_values(SM64ModernGameplaySubsystem subsystem,
     // dedicated schema-4 seams below. Inventory execution closure remains a
     // separate qualification gate.
 
-    SM64ModernOracleTraceDomain domain = oracle_domain_for_subsystem(subsystem);
     SM64ModernOracleTraceRecordKind oracle_kind = SM64_MODERN_ORACLE_RECORD_STATE;
     uint64_t oracle_record_id = record_id;
     if (kind == SM64_MODERN_GAMEPLAY_RECORD_INPUT) {
@@ -424,6 +423,20 @@ static void record_oracle_values(SM64ModernGameplaySubsystem subsystem,
     if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
         sStatus = status;
     }
+}
+
+static void record_oracle_values(SM64ModernGameplaySubsystem subsystem,
+                                 SM64ModernGameplayRecordKind kind,
+                                 uint32_t record_id,
+                                 uint32_t subject_id,
+                                 const uint64_t *values,
+                                 uint32_t value_count) {
+    record_oracle_domain_values(oracle_domain_for_subsystem(subsystem),
+                                kind,
+                                record_id,
+                                subject_id,
+                                values,
+                                value_count);
 }
 
 static void record_values(SM64ModernGameplaySubsystem subsystem,
@@ -1015,7 +1028,12 @@ static void capture_camera_snapshot(void) {
 static void capture_actor_snapshot(void) {
     const SM64ModernGameplaySubsystem subsystem = actor_subsystem_for_level();
     const bool oracle_enabled = sm64_modern_oracle_trace_is_active() != 0;
-    if (subsystem == SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL
+    // Castle actors historically remain on the schema-3 GLOBAL subsystem.
+    // Keep that authority mapping intact, but retain their object-domain
+    // snapshots for the independent schema-4 oracle. Other GLOBAL levels stay
+    // trace-silent here, as they did before the Castle route was captured.
+    const bool castle_oracle_objects = oracle_enabled && gCurrLevelNum == LEVEL_CASTLE;
+    if ((subsystem == SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL && !castle_oracle_objects)
         || (!subsystem_enabled(subsystem) && !oracle_enabled)) {
         return;
     }
@@ -1025,45 +1043,86 @@ static void capture_actor_snapshot(void) {
             continue;
         }
         const uint32_t subject = index + 1u;
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_BEHAVIOR,
-                      subject, behavior_identity(object->behavior));
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_ACTIVE_FLAGS,
-                      subject, object->activeFlags);
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_ACTION,
-                      subject, (uint32_t) object->oAction);
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_SUB_ACTION,
-                      subject, (uint32_t) object->oSubAction);
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_TIMER,
-                      subject, (uint32_t) object->oTimer);
+        const SM64ModernOracleTraceDomain oracle_domain =
+            SM64_MODERN_ORACLE_DOMAIN_OBJECT;
+#define RECORD_ACTOR_SCALAR(field, value) \
+        do { \
+            if (castle_oracle_objects) { \
+                const uint64_t actor_value = (value); \
+                record_oracle_domain_values(oracle_domain, \
+                                            SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT, \
+                                            (field), subject, &actor_value, 1); \
+            } else { \
+                record_scalar(subsystem, (field), subject, (value)); \
+            } \
+        } while (0)
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_BEHAVIOR,
+                            behavior_identity(object->behavior));
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_ACTIVE_FLAGS,
+                            object->activeFlags);
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_ACTION,
+                            (uint32_t) object->oAction);
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_SUB_ACTION,
+                            (uint32_t) object->oSubAction);
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_TIMER,
+                            (uint32_t) object->oTimer);
         const uint64_t position[3] = {
             float_bits(object->oPosX), float_bits(object->oPosY), float_bits(object->oPosZ),
         };
-        record_values(subsystem, SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
-                      SM64_MODERN_FIELD_ACTOR_POSITION, subject, position, 3);
+        if (castle_oracle_objects) {
+            record_oracle_domain_values(oracle_domain,
+                                        SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
+                                        SM64_MODERN_FIELD_ACTOR_POSITION,
+                                        subject,
+                                        position,
+                                        3);
+        } else {
+            record_values(subsystem, SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
+                          SM64_MODERN_FIELD_ACTOR_POSITION, subject, position, 3);
+        }
         const uint64_t velocity[3] = {
             float_bits(object->oVelX), float_bits(object->oVelY), float_bits(object->oVelZ),
         };
-        record_values(subsystem, SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
-                      SM64_MODERN_FIELD_ACTOR_VELOCITY, subject, velocity, 3);
+        if (castle_oracle_objects) {
+            record_oracle_domain_values(oracle_domain,
+                                        SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
+                                        SM64_MODERN_FIELD_ACTOR_VELOCITY,
+                                        subject,
+                                        velocity,
+                                        3);
+        } else {
+            record_values(subsystem, SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
+                          SM64_MODERN_FIELD_ACTOR_VELOCITY, subject, velocity, 3);
+        }
         const uint64_t angle[3] = {
             (uint32_t) object->oMoveAnglePitch,
             (uint32_t) object->oMoveAngleYaw,
             (uint32_t) object->oMoveAngleRoll,
         };
-        record_values(subsystem, SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
-                      SM64_MODERN_FIELD_ACTOR_MOVE_ANGLE, subject, angle, 3);
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_MOVE_FLAGS,
-                      subject, object->oMoveFlags);
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_INTERACTION_STATUS,
-                      subject, (uint32_t) object->oInteractStatus);
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_HELD_STATE,
-                      subject, object->oHeldState);
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_FLAGS,
-                      subject, object->oFlags);
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_FORWARD_VELOCITY,
-                      subject, float_bits(object->oForwardVel));
-        record_scalar(subsystem, SM64_MODERN_FIELD_ACTOR_GRAPH_FLAGS,
-                      subject, (uint16_t) object->header.gfx.node.flags);
+        if (castle_oracle_objects) {
+            record_oracle_domain_values(oracle_domain,
+                                        SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
+                                        SM64_MODERN_FIELD_ACTOR_MOVE_ANGLE,
+                                        subject,
+                                        angle,
+                                        3);
+        } else {
+            record_values(subsystem, SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
+                          SM64_MODERN_FIELD_ACTOR_MOVE_ANGLE, subject, angle, 3);
+        }
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_MOVE_FLAGS,
+                            object->oMoveFlags);
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_INTERACTION_STATUS,
+                            (uint32_t) object->oInteractStatus);
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_HELD_STATE,
+                            object->oHeldState);
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_FLAGS,
+                            object->oFlags);
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_FORWARD_VELOCITY,
+                            float_bits(object->oForwardVel));
+        RECORD_ACTOR_SCALAR(SM64_MODERN_FIELD_ACTOR_GRAPH_FLAGS,
+                            (uint16_t) object->header.gfx.node.flags);
+#undef RECORD_ACTOR_SCALAR
     }
 }
 

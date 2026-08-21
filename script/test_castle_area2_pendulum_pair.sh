@@ -31,7 +31,7 @@ NATIVE_SLOT="$(sed -n 's/.*castleArea2PendulumSlot=\([0-9][0-9]*\).*/\1/p' "$NAT
 }
 [[ -s "$NATIVE_TRACE" ]] || { echo "native schema-4 trace was not emitted" >&2; exit 1; }
 
-SM64_MODERN_PENDULUM_TICKS=40 \
+SM64_MODERN_PENDULUM_TICKS=64 \
   "$PROJECT_ROOT/script/test_decorative_pendulum_route.sh" \
   | tee "$SWIFT_LOG"
 SWIFT_TRACE="$(sed -n 's/.*decorativePendulumRouteSwiftCapture output=\([^ ]*\).*/\1/p' "$SWIFT_LOG" | tail -1)"
@@ -58,7 +58,8 @@ xcrun swiftc \
 grep -Fq 'canonical_route_admission=0' "$PAIR_REPORT"
 grep -Fq 'tamper_rejected=1 schema4_replay_round_trip=1' "$PAIR_REPORT"
 grep -Fq "native_slot=$NATIVE_SLOT" "$PAIR_REPORT"
-grep -Fq 'missing_native=3' "$PAIR_REPORT"
+grep -Fq 'native_domains=3,6,7' "$PAIR_REPORT"
+grep -Fq 'missing_native=12 missing_swift=' "$PAIR_REPORT"
 
 # Persist the failed/blocked evidence through the existing live-only worker
 # and merge tools. The row is terminal but cannot be promoted because the
@@ -70,6 +71,21 @@ MATCHED_RECORDS="$(sed -n 's/matched_records=\([0-9][0-9]*\).*/\1/p' "$PAIR_REPO
 DIVERGENCE="$(sed -n 's/first_divergence=//p' "$PAIR_REPORT")"
 [[ -n "$NATIVE_RECORDS" && -n "$SWIFT_RECORDS" && -n "$MATCHED_RECORDS" && -n "$DIVERGENCE" ]] || {
   echo "pair report did not expose bounded worker evidence" >&2
+  exit 1
+}
+
+# Carry the finalized native schema-4 route header into the blocked worker
+# artifact. These are the six uint64 fields after the fixed 24-byte prefix;
+# keeping them nonzero preserves the exact run identity even though pairing is
+# still blocked on the missing native effect domain and record values.
+read -r NATIVE_BUILD_FP NATIVE_CONTENT_FP NATIVE_TIMEBASE_FP \
+  NATIVE_CONFIGURATION_FP NATIVE_INITIAL_SAVE_FP NATIVE_COVERAGE_FP <<< "$(
+    od -An -tx8 -j24 -N48 "$NATIVE_TRACE" | tr '\n' ' '
+)"
+[[ -n "$NATIVE_BUILD_FP" && -n "$NATIVE_CONTENT_FP" && -n "$NATIVE_TIMEBASE_FP" \
+  && -n "$NATIVE_CONFIGURATION_FP" && -n "$NATIVE_INITIAL_SAVE_FP" \
+  && -n "$NATIVE_COVERAGE_FP" ]] || {
+  echo "native Castle schema-4 header did not expose six route fingerprints" >&2
   exit 1
 }
 
@@ -100,12 +116,12 @@ xcrun swiftc \
   --matched-records "$MATCHED_RECORDS" \
   --first-divergence "$DIVERGENCE" \
   --fixture-only 0 \
-  --build-fingerprint 0x0000000000000000 \
-  --content-fingerprint 0x0000000000000000 \
-  --timebase-fingerprint 0x0000000000000000 \
-  --configuration-fingerprint 0x0000000000000000 \
-  --initial-save-fingerprint 0x0000000000000000 \
-  --coverage-fingerprint 0x0000000000000000
+  --build-fingerprint "0x$NATIVE_BUILD_FP" \
+  --content-fingerprint "0x$NATIVE_CONTENT_FP" \
+  --timebase-fingerprint "0x$NATIVE_TIMEBASE_FP" \
+  --configuration-fingerprint "0x$NATIVE_CONFIGURATION_FP" \
+  --initial-save-fingerprint "0x$NATIVE_INITIAL_SAVE_FP" \
+  --coverage-fingerprint "0x$NATIVE_COVERAGE_FP"
 "$WORKER_TOOL" validate --require-live --result "$WORKER_RESULT"
 
 cat > "$MANIFEST" <<EOF

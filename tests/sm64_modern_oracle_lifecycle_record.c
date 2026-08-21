@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "sm64_modern.h"
+#include "audio_defines.h"
 #include "behavior_data.h"
 #include "game/area.h"
 #include "game/memory.h"
@@ -43,6 +44,9 @@ struct TraceFile {
     struct TraceCoverageKey coverage_keys[TRACE_COVERAGE_CAPACITY];
     uint32_t coverage_key_count;
     uint32_t native_behavior_records_by_slot[OBJECT_POOL_CAPACITY + 1u];
+    uint32_t native_object_state_records_by_slot[OBJECT_POOL_CAPACITY + 1u];
+    uint32_t native_sound_records_by_slot[OBJECT_POOL_CAPACITY + 1u];
+    uint32_t native_clock_sound_records_by_slot[OBJECT_POOL_CAPACITY + 1u];
 };
 
 struct HarnessState {
@@ -244,6 +248,22 @@ static SM64ModernStatus trace_write_record(
         && record->record_id == SM64_MODERN_ORACLE_SCRIPT_EVENT_NATIVE_BEHAVIOR) {
         if (record->subject_id <= OBJECT_POOL_CAPACITY) {
             trace->native_behavior_records_by_slot[record->subject_id]++;
+        }
+    }
+    if (record->domain == SM64_MODERN_ORACLE_DOMAIN_OBJECT
+        && record->record_kind == SM64_MODERN_ORACLE_RECORD_STATE
+        && record->record_id == SM64_MODERN_FIELD_ACTOR_BEHAVIOR
+        && record->subject_id <= OBJECT_POOL_CAPACITY) {
+        trace->native_object_state_records_by_slot[record->subject_id]++;
+    }
+    if (record->domain == SM64_MODERN_ORACLE_DOMAIN_EFFECT
+        && record->record_kind == SM64_MODERN_ORACLE_RECORD_EFFECT
+        && record->record_id == SM64_MODERN_EFFECT_SOUND
+        && record->subject_id <= OBJECT_POOL_CAPACITY) {
+        trace->native_sound_records_by_slot[record->subject_id]++;
+        if (record->value_count > 0u
+            && record->values[0] == (uint32_t) SOUND_GENERAL_BIG_CLOCK) {
+            trace->native_clock_sound_records_by_slot[record->subject_id]++;
         }
     }
     if (!write_bytes(trace, record, sizeof(*record))) {
@@ -598,6 +618,20 @@ static SM64ModernOracleTraceConfigV1 make_oracle_config(void) {
             "shard=0xd9446dfed10e189e");
         config.initial_save_fingerprint = hash_u64(PAIRING_FNV_OFFSET,
                                                    PAIRING_ROUTE_SAVE_SEED);
+    } else if (castle_area2_route_enabled()) {
+        // The ordinary lifecycle smoke keeps these optional route fields at
+        // zero. The opted-in Castle capture is a bounded schema-4 run and
+        // therefore publishes its real run identity before finalizing the
+        // observed coverage fingerprint.
+        config.build_fingerprint = hash_string(
+            "sm64-modern-native-castle-area2-pendulum;source-backed");
+        config.content_fingerprint = hash_string(
+            "behavior_data.c;castle_inside/areas/2;castle_inside/script.c");
+        config.timebase_fingerprint = sm64_modern_timebase_fingerprint();
+        config.configuration_fingerprint = hash_string(
+            "region=5553;fullscreen=off;skip_intro=1;native_tick=1;legacy_tick=1;castle=area2");
+        config.initial_save_fingerprint = hash_string(
+            "sm64-modern-native-castle-area2-initial-save");
     }
     return config;
 }
@@ -671,7 +705,7 @@ int main(int argc, char **argv) {
     const bool pairing_route = pairing_route_enabled();
     const bool castle_area2_route = castle_area2_route_enabled();
     const uint32_t trace_steps = pairing_route ? 2u
-                                               : (castle_area2_route ? 8u : TRACE_STEPS);
+                                               : (castle_area2_route ? 64u : TRACE_STEPS);
     trace.input_only = pairing_route;
     trace.file = fopen(trace_path, "wb");
     if (!trace.file) {
@@ -704,6 +738,7 @@ int main(int argc, char **argv) {
                       SM64_MODERN_STATUS_OK);
     }
     const SM64ModernOracleTraceConfigV1 oracle_config = make_oracle_config();
+    SM64ModernOracleTraceConfigV1 finalized_config = oracle_config;
     const SM64ModernOracleTraceStreamApiV1 stream = make_trace_stream(&trace);
     expect_status("begin oracle", sm64_modern_oracle_trace_begin(&oracle_config, &stream),
                   SM64_MODERN_STATUS_OK);
@@ -775,13 +810,26 @@ int main(int argc, char **argv) {
     uint64_t retained_coverage_entries = 0;
     const uint64_t retained_coverage = retained_coverage_fingerprint(
         &trace, &retained_coverage_entries);
-    if (pairing_route) {
+    if (pairing_route || castle_area2_route) {
         expect_true("route coverage fingerprint", retained_coverage != 0);
         expect_true("route coverage entries", retained_coverage_entries > 0);
-        SM64ModernOracleTraceConfigV1 finalized_config = oracle_config;
         finalized_config.coverage_fingerprint = retained_coverage;
         expect_true("finalize route coverage header",
                     trace_rewrite_header(&trace, &finalized_config));
+        if (castle_area2_route) {
+            expect_true("castle route build fingerprint",
+                        finalized_config.build_fingerprint != 0);
+            expect_true("castle route content fingerprint",
+                        finalized_config.content_fingerprint != 0);
+            expect_true("castle route timebase fingerprint",
+                        finalized_config.timebase_fingerprint != 0);
+            expect_true("castle route configuration fingerprint",
+                        finalized_config.configuration_fingerprint != 0);
+            expect_true("castle route initial-save fingerprint",
+                        finalized_config.initial_save_fingerprint != 0);
+            expect_true("castle route coverage fingerprint",
+                        finalized_config.coverage_fingerprint != 0);
+        }
     }
     if (init_status == SM64_MODERN_STATUS_OK) {
         expect_status("lifecycle shutdown", lifecycle.shutdown(), SM64_MODERN_STATUS_OK);
@@ -816,13 +864,24 @@ int main(int argc, char **argv) {
 
     if (castle_area2_route) {
         printf("castleArea2Loaded=%d castleArea2PendulumSlot=%u castleArea2NativeRecords=%u "
-               "castleArea2Roll=%d castleArea2Velocity=%d\n",
+               "castleArea2ObjectStateRecords=%u castleArea2SoundRecords=%u "
+               "castleArea2ClockSoundRecords=%u castleArea2Roll=%d castleArea2Velocity=%d "
+               "castleArea2MarioRoom=%d castleArea2ObjectRoom=%d castleArea2GraphFlags=0x%x\n",
                castle_area2_loaded,
                castle_area2_pendulum_slot,
                castle_area2_pendulum_slot <= OBJECT_POOL_CAPACITY
                    ? trace.native_behavior_records_by_slot[castle_area2_pendulum_slot] : 0u,
+               castle_area2_pendulum_slot <= OBJECT_POOL_CAPACITY
+                   ? trace.native_object_state_records_by_slot[castle_area2_pendulum_slot] : 0u,
+               castle_area2_pendulum_slot <= OBJECT_POOL_CAPACITY
+                   ? trace.native_sound_records_by_slot[castle_area2_pendulum_slot] : 0u,
+               castle_area2_pendulum_slot <= OBJECT_POOL_CAPACITY
+                   ? trace.native_clock_sound_records_by_slot[castle_area2_pendulum_slot] : 0u,
                castle_area2_pendulum ? castle_area2_pendulum->oFaceAngleRoll : 0,
-               castle_area2_pendulum ? castle_area2_pendulum->oAngleVelRoll : 0);
+               castle_area2_pendulum ? castle_area2_pendulum->oAngleVelRoll : 0,
+               gMarioCurrentRoom,
+               castle_area2_pendulum ? castle_area2_pendulum->oRoom : -1,
+               castle_area2_pendulum ? castle_area2_pendulum->header.gfx.node.flags : 0u);
         expect_true("castle area-2 level", gCurrLevelNum == LEVEL_CASTLE);
         expect_true("castle area-2 index", gCurrAreaIndex == 2);
         expect_true("castle area-2 current area", castle_area2_loaded
@@ -834,8 +893,28 @@ int main(int argc, char **argv) {
                     castle_area2_pendulum_slot > 0u
                     && castle_area2_pendulum_slot <= OBJECT_POOL_CAPACITY
                     && trace.native_behavior_records_by_slot[castle_area2_pendulum_slot] > 0u);
+        expect_true("castle area-2 pendulum object-state records",
+                    castle_area2_pendulum_slot > 0u
+                    && castle_area2_pendulum_slot <= OBJECT_POOL_CAPACITY
+                    && trace.native_object_state_records_by_slot[castle_area2_pendulum_slot] > 0u);
+        // The bounded owner route leaves Mario in room 1 while the real
+        // pendulum is in room 5, so the native sound gateway is expected to
+        // remain silent here. Keep the count visible and leave parity blocked
+        // until a real room-transition route supplies the effect.
         expect_true("castle area-2 schema-4 script records",
                     trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_SCRIPT] > 0u);
+        printf("castleArea2HeaderBuild=0x%016" PRIx64
+               " castleArea2HeaderContent=0x%016" PRIx64
+               " castleArea2HeaderTimebase=0x%016" PRIx64
+               " castleArea2HeaderConfiguration=0x%016" PRIx64
+               " castleArea2HeaderInitialSave=0x%016" PRIx64
+               " castleArea2HeaderCoverage=0x%016" PRIx64 "\n",
+               finalized_config.build_fingerprint,
+               finalized_config.content_fingerprint,
+               finalized_config.timebase_fingerprint,
+               finalized_config.configuration_fingerprint,
+               finalized_config.initial_save_fingerprint,
+               finalized_config.coverage_fingerprint);
     }
 
     if (state.errors != 0u) {
@@ -852,7 +931,7 @@ int main(int argc, char **argv) {
     uint32_t file_domains = 0;
     expect_true("validate file trace",
                 validate_file(trace_path, &trace,
-                              pairing_route ? retained_coverage : 0,
+                              (pairing_route || castle_area2_route) ? retained_coverage : 0,
                               &file_records,
                               &file_last_tick, &file_domains));
     expect_true("file lifecycle ticks", file_last_tick >= trace_steps + 1u);
