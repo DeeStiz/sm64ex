@@ -201,6 +201,14 @@ blockers stop before mutation. Handoff:
 external credentials/toolchain, clean-machine, and human acceptance remain
 open.
 
+Continuation Phase 15 adds an independent native-C schema-4 record harness.
+`script/test_oracle_lifecycle_record.sh` emits and rereads 2,839 records over
+five real C lifecycle ticks with canonical-hash, ordering, coverage, and
+callback validation. It is a prerequisite for C/Swift live pairing, not a
+route-shard pass: rendering frame dispatch currently remains disabled because
+the core closes the oracle tick before `render_finish`, and a matching Swift
+trace is still required.
+
 Continuation Phase 8 centrally promotes `bhvSquarishPathMoving` through route
 265. Its focused contract is `0x9cbe6c17eb977926`; the manifest is now 534 rows
 with 501 Swift owners and 33 explicit C adapters at
