@@ -19,7 +19,7 @@ THERMAL_REPORT="$(pmset -g therm 2>/dev/null || true)"
 display_count="$(printf '%s\n' "$DISPLAY_REPORT" | rg -c 'Display Type:|Chipset Model:' || true)"
 online_count="$(printf '%s\n' "$DISPLAY_REPORT" | rg -c 'Online: Yes' || true)"
 asleep_count="$(printf '%s\n' "$DISPLAY_REPORT" | rg -c 'Display Asleep: Yes' || true)"
-console_locked="$(printf '%s\n' "$ROOT_IO" | sed -n 's/.*"IOConsoleLocked" = \(Yes\|No\).*/\1/p' | tail -1)"
+console_locked="$(printf '%s\n' "$ROOT_IO" | sed -nE 's/.*"IOConsoleLocked"[[:space:]]*=[[:space:]]*(Yes|No).*/\1/p' | tail -1)"
 session_locked="$(printf '%s\n' "$ROOT_IO" | rg -o '"CGSSessionScreenIsLocked"=(Yes|No)' | tail -1 | cut -d= -f2 || true)"
 user_active="$(printf '%s\n' "$ROOT_IO" | rg -o '"UserIsActive"=(Yes|No|[01])' | tail -1 | cut -d= -f2 || true)"
 
