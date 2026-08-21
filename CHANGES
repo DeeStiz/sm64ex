@@ -92,6 +92,26 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
 28.) Add the Phase 42 completion audit, retaining the one qualified
      `oracle_hook|input` row, the locked/asleep M34 boundary, the two M35
      blockers, and the exact source/external unblocks for future work.
+29.) Record Phase 43's global-state owner boundary: the native timer,
+     level/area/act/course lifecycle, and shared random seed still lack one
+     source-backed Swift owner-thread schema-4 emitter.
+30.) Record Phase 44's real `bhvDecorativePendulum` owner seam, including the
+     explicitly bound collision world, decoded behavior program, real floor
+     query, lifecycle/script/effect/object-state records, and generation-safe
+     ownership.
+31.) Record Phase 45's central dispatch configuration for the pendulum owner;
+     configured dispatch is source-backed, while the unconfigured identity-only
+     route remains trace-silent.
+32.) Record Phase 46's source-backed Swift Castle Inside area-2 recipe from the
+     real behavior, level-script, collision, and room streams; no C pair or
+     route promotion was produced.
+33.) Record Phase 47's native-C blocker: monolithic `data/behavior_data.c`,
+     `gCurrentObject`, and the legacy level-surface/audio loader prevent a safe
+     pendulum schema-4 C owner without a narrow native adapter.
+34.) Reconcile the public/status docs and add a Phase 48 completion audit;
+     preserve the 534/511/23 and 1/7,419 counters, unchanged global-state/
+     Metal/M35 boundaries, and the no-shipped, no-visual-parity, and no-full-
+     game-Swift claims.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)

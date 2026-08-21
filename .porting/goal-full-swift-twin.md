@@ -128,7 +128,14 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 40 decorative seams](.porting/porting-handoff-full-swift-twin-phase40-decorative-seams.md),
 [Phase 41 external refresh](.porting/porting-handoff-full-swift-twin-phase41-external-refresh.md),
 [Phase 42 final reconciliation](.porting/porting-handoff-full-swift-twin-phase42-final-reconcile.md),
-and [Phase 42 completion audit](.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md).
+[Phase 42 completion audit](.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md),
+[Phase 43 global-state owner boundary](.porting/porting-handoff-full-swift-twin-phase43-global-state-owner.md),
+[Phase 44 decorative owner seam](.porting/porting-handoff-full-swift-twin-phase44-decorative-owner.md),
+[Phase 45 central dispatch](.porting/porting-handoff-full-swift-twin-phase45-decorative-dispatch.md),
+[Phase 46 source route attempt](.porting/porting-handoff-full-swift-twin-phase46-decorative-route.md),
+[Phase 47 native C route boundary](.porting/porting-handoff-full-swift-twin-phase47-native-c-route.md),
+[Phase 48 final reconciliation](.porting/porting-handoff-full-swift-twin-phase48-final-reconcile.md),
+and [Phase 48 completion audit](.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
@@ -285,6 +292,50 @@ counter remain unchanged; no shipped, visual-parity, or complete full-game
 Swift claim is made. Handoffs:
 `.porting/porting-handoff-full-swift-twin-phase42-final-reconcile.md` and
 `.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md`.
+
+Continuation Phase 43 (2026-08-21) rechecks the canonical
+`oracle_hook|global_state` owner boundary. The native timer,
+level/area/act/course lifecycle, and shared random seed still lack one
+source-backed Swift owner-thread schema-4 emitter, so the route remains
+planned/inadmissible. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase43-global-state-owner.md`.
+
+Continuation Phase 44 (2026-08-21) adds a real `bhvDecorativePendulum` Swift
+owner seam. An explicitly bound immutable collision world and decoded behavior
+program drive the real floor query, lifecycle/script events, effects, and
+object-state records through the schema-4 sink; no default floor or fixture
+owner is used. The central dispatcher was not configured by this phase.
+Handoff:
+`.porting/porting-handoff-full-swift-twin-phase44-decorative-owner.md`.
+
+Continuation Phase 45 (2026-08-21) carries that source-backed owner
+configuration through central dispatch and the engine runtime. The configured
+smoke observes lifecycle, floor, effect, and object-state records at the live
+scheduler tick; the unconfigured identity-only route remains trace-silent, and
+no live level-content loader is implied. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase45-decorative-dispatch.md`.
+
+Continuation Phase 46 (2026-08-21) adds a source-only Castle Inside area-2
+recipe from the real `bhvDecorativePendulum[]` behavior, level script,
+collision, and room streams. It remains diagnostic-only: no native C owner
+trace, C/Swift pairing, or route promotion was produced, so the live ledger
+remains 1 of 7,419. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase46-decorative-route.md`.
+
+Continuation Phase 47 (2026-08-21) confirms that the native C pair is blocked
+by the monolithic pointer-bearing `data/behavior_data.c` translation unit and
+the legacy `gCurrentObject`/level-surface/audio loader ownership. No synthetic
+loader, callback, or schema-4 sink was added; no second route is admitted.
+Handoff:
+`.porting/porting-handoff-full-swift-twin-phase47-native-c-route.md`.
+
+Continuation Phase 48 (2026-08-21) reconciles the public/status documents and
+adds a fresh completion audit after Phases 43–47 without changing historical
+ledger text. The 534/511/23 behavior counters and 1/7,419 live-qualified route
+counter remain unchanged; global-state, Metal/M34, and M35 boundaries remain
+open, with no shipped, visual-parity, or complete full-game Swift claim. Handoffs:
+`.porting/porting-handoff-full-swift-twin-phase48-final-reconcile.md` and
+`.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md`.
 
 Continuation Phase 1 (2026-08-20) is checkpointed at `da4fa9ae` plus the
 current live-host control. The fresh arm64 Debug bundle built, launched through

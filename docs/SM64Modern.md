@@ -158,6 +158,28 @@ The status below is pinned to the current `nightly` continuation
   an authorized Developer ID Application identity/private key and one supported
   notarytool authentication mode—and no artifact, Gatekeeper, physical, or
   human-acceptance state changed.
+* Phase 43 rechecked the `oracle_hook|global_state` owner boundary. The native
+  `gGlobalTimer`, live level/area/act/course lifecycle values, and shared
+  `gRandomSeed16` still have no source-backed Swift owner-thread schema-4
+  emitter; the planned route remains inadmissible.
+* Phase 44 added a real `bhvDecorativePendulum` Swift owner seam. When the
+  caller supplies the immutable collision world and decoded behavior program,
+  it emits the source-backed floor, lifecycle, script, effect, and object-state
+  records through the fixed-width schema-4 sink; no defaults stand in for the
+  missing owner inputs.
+* Phase 45 carried that explicit owner configuration through central dispatch
+  and the engine runtime. The configured smoke observes source-backed records
+  at the scheduler tick, while the unconfigured identity-only route remains
+  trace-silent and does not imply a live level-content loader.
+* Phase 46 added a source-only Castle Inside area-2 recipe from the real
+  `bhvDecorativePendulum[]` program, level script, collision, and room streams.
+  It remains diagnostic-only because no native C owner trace, C/Swift pair, or
+  route promotion was captured.
+* Phase 47 confirmed the exact native-C blocker: `data/behavior_data.c` is a
+  monolithic pointer-bearing translation unit, and the real callbacks depend on
+  `gCurrentObject`, the global level/surface loader, and global audio/effect
+  ownership. No safe C schema-4 pendulum pair exists yet; no second route is
+  admitted.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
@@ -182,7 +204,14 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 40 decorative seams](../.porting/porting-handoff-full-swift-twin-phase40-decorative-seams.md),
 [Phase 41 external refresh](../.porting/porting-handoff-full-swift-twin-phase41-external-refresh.md),
 [Phase 42 final reconciliation](../.porting/porting-handoff-full-swift-twin-phase42-final-reconcile.md),
-and [Phase 42 completion audit](../.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md).
+[Phase 42 completion audit](../.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md),
+[Phase 43 global-state owner boundary](../.porting/porting-handoff-full-swift-twin-phase43-global-state-owner.md),
+[Phase 44 decorative owner seam](../.porting/porting-handoff-full-swift-twin-phase44-decorative-owner.md),
+[Phase 45 central dispatch](../.porting/porting-handoff-full-swift-twin-phase45-decorative-dispatch.md),
+[Phase 46 source route attempt](../.porting/porting-handoff-full-swift-twin-phase46-decorative-route.md),
+[Phase 47 native C route boundary](../.porting/porting-handoff-full-swift-twin-phase47-native-c-route.md),
+[Phase 48 final reconciliation](../.porting/porting-handoff-full-swift-twin-phase48-final-reconcile.md),
+and [Phase 48 completion audit](../.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is

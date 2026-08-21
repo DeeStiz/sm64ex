@@ -91,7 +91,20 @@ confirmed that the decorative-pendulum path still has no owner-thread collision
 world/floor query, per-object behavior-VM/script-PC lifecycle plumbing, or
 shared schema-4 trace sink. Phase 41 found the M34 host still locked/asleep and
 left exactly the same two M35 blockers: no authorized Developer ID Application
-identity/private key and no notarytool authentication.
+identity/private key and no notarytool authentication. Phase 43 rechecked the
+same global-state boundary: the native timer, level/area/act/course lifecycle,
+and shared random seed still have no source-backed Swift owner-thread emitter.
+Phase 44 added a real `bhvDecorativePendulum` Swift owner seam that can bind
+the immutable collision world and decoded behavior program and emit the
+source-backed floor, lifecycle, script, effect, and object-state records when
+explicitly configured. Phase 45 carried that configuration through central
+dispatch and the engine runtime; the configured smoke is source-backed, while
+the unconfigured route remains trace-silent. Phase 46 added a source-only
+Castle Inside area-2 recipe from the real behavior, level-script, collision,
+and room inputs, but no native C pair was captured. Phase 47 confirmed that a
+safe C pair is blocked by monolithic `data/behavior_data.c` ownership and the
+legacy `gCurrentObject`/level-surface/audio loader boundary. No second route is
+admitted and no synthetic records are accepted.
 Route-shard closure, physical/device/performance/thermal evidence,
 distribution, and human acceptance are still open; this is not a shipped,
 visual-parity, or complete full-game Swift port. See the
@@ -117,7 +130,14 @@ for the evidence ledger and latest handoffs, including the
 [Phase 40 decorative seams](.porting/porting-handoff-full-swift-twin-phase40-decorative-seams.md),
 [Phase 41 external refresh](.porting/porting-handoff-full-swift-twin-phase41-external-refresh.md),
 [Phase 42 final reconciliation](.porting/porting-handoff-full-swift-twin-phase42-final-reconcile.md),
-and [Phase 42 completion audit](.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md).
+[Phase 42 completion audit](.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md),
+[Phase 43 global-state owner boundary](.porting/porting-handoff-full-swift-twin-phase43-global-state-owner.md),
+[Phase 44 decorative owner seam](.porting/porting-handoff-full-swift-twin-phase44-decorative-owner.md),
+[Phase 45 central dispatch](.porting/porting-handoff-full-swift-twin-phase45-decorative-dispatch.md),
+[Phase 46 source route attempt](.porting/porting-handoff-full-swift-twin-phase46-decorative-route.md),
+[Phase 47 native C route boundary](.porting/porting-handoff-full-swift-twin-phase47-native-c-route.md),
+[Phase 48 final reconciliation](.porting/porting-handoff-full-swift-twin-phase48-final-reconcile.md),
+and [Phase 48 completion audit](.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:
