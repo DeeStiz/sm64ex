@@ -1,6 +1,6 @@
 # Continuation Goal: SM64 Modern Full Swift Twin — Luna Max
 
-Date: 2026-08-20
+Date: 2026-08-21
 
 ## Status
 
@@ -18,6 +18,35 @@ Current denominator note (2026-08-21): Phase 55 corrected the Phase 54 route
 inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the retained live row remains 1 of 7,420 and 7,419 remain
 planned. Historical M33–M35 notes retain their original 7,419 baseline.
+
+### Phase 58–60 execution checkpoint
+
+- **Phase 58 — committed `ab253acd`:** the opt-in native Castle route now
+  selects the authored area-2 `WARP_NODE(0x35)` through the existing
+  owner-thread warp path. Native evidence resolves Mario and the pendulum to
+  room 5 with `graph_flags=0x21`; no globals, room values, or audio sinks are
+  fabricated.
+- **Phase 59 — committed `e18d8ef8`:** the independent C/Swift pair was
+  re-run on that route. Native retains domains `3,6,7` and Swift retains
+  `3,6,7,12`; native `effects` domain 12 is absent, the first canonical
+  domain-3 record diverges, and all six independent header fingerprints still
+  differ. Worker-result, merge, tamper, replay, and persistent-rerun fences
+  pass, but admission remains `0` and the shard is terminally blocked.
+- **Phase 60 — current:** reconcile README/status/goal/memory/CHANGES and
+  record the evidence boundary. This phase may not mutate the route ledger,
+  promote the pendulum shard, or imply M34/M35/human acceptance.
+
+The automatic Luna-max phase protocol is: one disjoint owner per phase;
+focused validation plus `git diff --check`; a durable handoff comment and
+artifact containing counters, fingerprints, commands, and blockers; then one
+local parent commit before the next phase is dispatched. No push, branch,
+worktree, release, or synthetic evidence is allowed.
+
+Current conservative indicators are `511/534 = 95.693%` behavior mapping and
+`1/7420 = 0.013477%` live-route qualification. The full-goal implementation
+floor remains `0%` because unqualified routes and system gates remain; the
+acceptance floor is also `0%` because independent device, release, scenario,
+and human families are not closed. These are separate ledgers, not an average.
 
 ## Objective
 

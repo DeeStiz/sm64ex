@@ -65,6 +65,35 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
+### Current Phase 60 status
+
+The authoritative current ledger has 534 behavior rows (511 Swift owners and
+23 explicit C adapters) and 7,420 route shards: one live-qualified row and
+7,419 planned. Phase 57 repaired native schema-4 object-domain routing and
+retained 64 real slot-37 object-state records plus six nonzero native
+run/header fingerprints. Phase 58 selected the authored Castle Inside area-2
+`WARP_NODE(0x35)` through the normal owner-thread warp path; Mario and the
+pendulum now both resolve to room 5 and the pendulum is render-active
+(`graph_flags=0x21`). Phase 59 re-ran the independent pair and remains
+fail-closed: native emits domains `3,6,7`, Swift emits `3,6,7,12`, native
+effect domain 12 is absent, and the first canonical divergence is still a
+domain-3 record mismatch (`native_records=1057`, `swift_records=1095`). The
+sound threshold is reached on a held native step, so forcing a sink, room, or
+graph flag would fabricate evidence; no route promotion or ledger mutation
+occurred.
+
+M34 still lacks reliable visible-layer, post-resume, archive-reuse, visual,
+FPS, memory, and thermal evidence. M35 still lacks an authorized Developer ID
+identity, notary authentication, clean-machine Gatekeeper, and real signed/
+stapled artifact evidence. Fresh-save human 120-star acceptance remains
+unrun. These gates remain independent from local build, source, fixture, and
+headless-host evidence; this branch is not a shipped, visual-parity, or
+complete full-game Swift port.
+
+The detailed phase notes below are historical through Phase 55; any pre-Phase
+55 `7,419` wording is retained as historical evidence and does not override
+the current `1 of 7,420` ledger.
+
 At the current `nightly` continuation, the full-Swift-twin
 qualification ledger has 534 behavior rows (511 Swift owners and 23 explicit C
 adapters), with M33nk as the latest numbered behavior slice, Treasure Chest
@@ -190,7 +219,11 @@ for the evidence ledger and latest handoffs, including the
 [Phase 53 pendulum pair](.porting/porting-handoff-full-swift-twin-phase53-pendulum-pair.md),
 [Phase 54 final reconciliation](.porting/porting-handoff-full-swift-twin-phase54-final-reconcile.md),
 [Phase 54 completion audit](.porting/porting-handoff-full-swift-twin-phase54-completion-audit.md),
-and [Phase 55 denominator correction](.porting/porting-handoff-full-swift-twin-phase55-denominator-fix.md).
+[Phase 55 denominator correction](.porting/porting-handoff-full-swift-twin-phase55-denominator-fix.md),
+[Phase 57 native object-domain parity](.porting/porting-handoff-full-swift-twin-phase57-native-pendulum-parity.md),
+[Phase 58 canonical Castle warp](.porting/porting-handoff-full-swift-twin-phase58-canonical-warp.md),
+[Phase 59 pendulum pairing](.porting/porting-handoff-full-swift-twin-phase59-pendulum-pair.md),
+and [Phase 60 completion audit](.porting/porting-handoff-full-swift-twin-phase60-completion-audit.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

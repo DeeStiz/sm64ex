@@ -2,6 +2,34 @@
 
 ## Status
 
+### Phase 60 current status
+
+The authoritative current counters are **534 behavior rows** (511 Swift
+value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
+non-fixture live-qualified row and 7,419 planned. Phase 57 repaired native
+schema-4 object-domain routing and retained 64 real slot-37 object-state
+records plus six nonzero native run/header fingerprints. Phase 58 selected the
+authored Castle Inside area-2 `WARP_NODE(0x35)` through the normal owner-thread
+warp path; Mario and the pendulum both resolve to room 5 and the pendulum is
+render-active (`graph_flags=0x21`). Phase 59 re-ran the independent pair and
+remains fail-closed: native emits domains `3,6,7`, Swift emits `3,6,7,12`,
+native effect domain 12 is absent, and the first canonical divergence remains a
+domain-3 record mismatch (`native_records=1057`, `swift_records=1095`). The
+sound threshold is reached on a held native step, so a direct sink, room, or
+graph-flag override would fabricate evidence; no route promotion or ledger
+mutation occurred.
+
+M34 still lacks reliable visible-layer, post-resume, archive-reuse, visual,
+FPS, memory, and thermal evidence. M35 still lacks an authorized Developer ID
+identity, notary authentication, clean-machine Gatekeeper, and real
+signed/stapled artifact evidence. Fresh-save human 120-star acceptance remains
+unrun. These gates remain independent from local build, source, fixture, and
+headless-host evidence; the goal is not complete, shipped, or visual parity.
+
+The detailed Phase 1–55 entries below are historical ledger evidence. Any
+pre-Phase-55 `7,419` denominator in those entries is historical and does not
+override the current 7,420-row inventory.
+
 M33nk remains the latest numbered behavior-qualification slice; the
 continuation promotion now centrally wires Sushi Shark/collision child, the
 NPC/menu family, Squarish Path Moving, Pushable Metal Box, Tilting Bowser Lava
@@ -165,6 +193,25 @@ fingerprints zero while Swift has nonzero values, so no C/Swift pair or route
 promotion changed. Phase 54 reconciles this status and records the fresh
 completion audit without changing the historical ledger.
 
+Phase 57 supersedes the old missing-object-domain diagnosis for the current
+route: native schema-4 Castle actor snapshots now retain 64 real slot-37
+object-state records and six nonzero run/header fingerprints. The pair remained
+blocked because native still lacked the effect domain and exact C/Swift
+record/header parity. Phase 58 selected the authored Castle Inside area-2
+`WARP_NODE(0x35)` through the normal owner-thread warp path; Mario and the
+pendulum both resolve to room 5 and the pendulum is render-active
+(`graph_flags=0x21`). Phase 59 re-ran the independent pair and retained the
+blocked result: native emits domains `3,6,7`, Swift emits `3,6,7,12`, native
+effect domain 12 is absent, and the first canonical divergence remains a
+domain-3 record mismatch (`native_records=1057`, `swift_records=1095`). The
+sound threshold occurs on a held native step, so forcing an audio sink, room,
+or graph flag would be synthetic evidence. No route promotion or ledger
+mutation occurred.
+
+Phase 60 is a documentation/completion audit only. It reconciles these current
+facts and preserves fail-closed M34/M35/human gates; it does not change source,
+the route ledger, or the behavior manifest.
+
 The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
 is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
 pairing](.porting/porting-handoff-full-swift-twin-phase20-c-swift-pairing.md),
@@ -207,7 +254,11 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 53 pendulum pair](.porting/porting-handoff-full-swift-twin-phase53-pendulum-pair.md),
 [Phase 54 final reconciliation](.porting/porting-handoff-full-swift-twin-phase54-final-reconcile.md),
 [Phase 54 completion audit](.porting/porting-handoff-full-swift-twin-phase54-completion-audit.md),
-and [Phase 55 denominator correction](.porting/porting-handoff-full-swift-twin-phase55-denominator-fix.md).
+[Phase 55 denominator correction](.porting/porting-handoff-full-swift-twin-phase55-denominator-fix.md),
+[Phase 57 native object-domain parity](.porting/porting-handoff-full-swift-twin-phase57-native-pendulum-parity.md),
+[Phase 58 canonical Castle warp](.porting/porting-handoff-full-swift-twin-phase58-canonical-warp.md),
+[Phase 59 pendulum pairing](.porting/porting-handoff-full-swift-twin-phase59-pendulum-pair.md),
+and [Phase 60 completion audit](.porting/porting-handoff-full-swift-twin-phase60-completion-audit.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

@@ -1,4 +1,29 @@
 SM64 Modern native macOS — nightly continuation update (2026-08-21)
+43.) Record Phase 57's native Castle pendulum parity repair: schema-4
+     object-domain snapshots now retain the real slot-37 actor state, six
+     native run/header fingerprints are nonzero, and the 64-step pair remains
+     blocked only by the still-missing native effect domain and exact C/Swift
+     record/header parity. No synthetic sound or route admission is allowed.
+44.) Record Phase 58's authored Castle Inside area-2 `WARP_NODE(0x35)` route.
+     The normal owner-thread warp path now places Mario and the pendulum in
+     room 5 with the pendulum render-active (`graph_flags=0x21`); the sound
+     threshold still lands on a held native step, so effect parity remains
+     blocked and no route ledger mutation occurs.
+45.) Record Phase 59's independent pendulum re-pair: native emits domains
+     `3,6,7` while Swift emits `3,6,7,12`, with `native_records=1057`,
+     `swift_records=1095`, and a first domain-3 record mismatch. Promotion is
+     not attempted; room/render evidence is retained as lifecycle evidence.
+46.) Reconcile Phase 60 current docs and completion audit. Keep authoritative
+     counters at 534 behavior rows (511 Swift owners, 23 C adapters) and
+     1/7,420 live-qualified route shards with 7,419 planned. M34 visible-layer,
+     post-resume, archive-reuse, visual/FPS/memory/thermal; M35 Developer ID,
+     notary, signed/stapled artifact, and clean-machine; and human 120-star
+     acceptance gates remain explicitly open.
+
+Historical pre-Phase-60 continuation entries (items 1–42) retain their
+original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
+are not current counters.
+
 1.) Centrally promote the remaining Phase 2/3 owners through dispatch routes
     259–270, including platform, puzzle, Snowman, and Treasure Chest families,
     preserving generation-safe ownership and effect delivery.

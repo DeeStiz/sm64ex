@@ -1,6 +1,25 @@
 # SM64 Modern Porting Memory
 
-## Latest validated slices (2026-08-17)
+## Latest validated slices (2026-08-21)
+
+- **Continuation Phases 57–60 (2026-08-21):** Phase 57 repaired native
+  Castle schema-4 object-domain snapshots and retained 64 real slot-37
+  object-state records plus six nonzero route fingerprints. Phase 58 changed
+  only the opt-in owner-thread destination to authored `WARP_NODE(0x35)`,
+  proving Mario and the pendulum both resolve to room 5 with render-active
+  flags `0x21`. Phase 59 re-ran the independent pair and preserved a
+  terminal blocked result: native domains `3,6,7`, Swift domains `3,6,7,12`,
+  native effects domain 12 absent, first domain-3 record mismatch, and
+  `canonical_route_admission=0`; the sound threshold occurs on a held native
+  step and must not be synthesized. Phase 60 reconciles current docs only.
+  Current counters are 534 behavior rows (511 Swift owners, 23 C adapters),
+  7,420 route shards, 1 live-qualified, and 7,419 planned. M34 visible-layer,
+  post-resume/archive, visual/FPS/memory/thermal; M35 signed/notarized/clean
+  machine; and fresh-save human 120-star gates remain open. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase57-native-pendulum-parity.md`,
+  `.porting/porting-handoff-full-swift-twin-phase58-canonical-warp.md`,
+  `.porting/porting-handoff-full-swift-twin-phase59-pendulum-pair.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase60-completion-audit.md`.
 
 - Continuation Phase 55 (2026-08-21) corrected the Phase 54 route denominator
   drift. The strict reachability/route-shard smoke now regenerates the
