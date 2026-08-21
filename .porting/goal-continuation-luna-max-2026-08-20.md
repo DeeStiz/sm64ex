@@ -74,6 +74,9 @@ planned. Historical M33–M35 notes retain their original 7,419 baseline.
 - **[Phase 73 — committed `c63f16c3`](porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md):** extended the C sidecar to exact nine-record full-route replay/tamper checks; no manifest row or live admission changed.
 - **[Phase 75 — committed `a5ff686f`](porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md):** stable generic Release and M35 contracts pass after SDK fixes; Developer ID/notary/artifact/clean-machine/human gates remain external.
 - **[Phase 74 — committed `be1a4f27`](porting-handoff-full-swift-twin-phase74-m34-host-readiness.md):** the non-destructive host gate reports the current console locked and both displays asleep; no wake/unlock mutation was attempted.
+- **[Phase 74b — committed `4c9cbfd2`](porting-handoff-full-swift-twin-phase74b-host-gate-parser.md):** the read-only host parser now reports `IOConsoleLocked=Yes` and `session_locked=Yes`; both displays remain asleep and `m34_host_ready=0`.
+- **[Phase 76 — current evidence](porting-handoff-full-swift-twin-phase76-route-admission-triage.md):** read-only triage scanned all 7,420 manifest rows against the retained nine-record composite trace, listed 6,206 fully key-covered candidates, and found 0 admissible rows because the trace is unbound to a manifest identity and per-row independent C/Swift evidence is missing. No ledger mutation occurred.
+- **[Phase 77 — documentation reconciliation](porting-handoff-full-swift-twin-phase77-docs-route-triage.md):** reconciles the Phase 74b host parser, Phase 75 M35 preflight, and Phase 76 triage without changing source, the behavior manifest, or route admission; preserve `534/511/23` and `7,420/1/7,419`.
 
 The automatic Luna-max phase protocol is: one disjoint owner per phase;
 focused validation plus `git diff --check`; a durable handoff comment and

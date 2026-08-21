@@ -65,7 +65,7 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 70 current status
+### Phase 77 current status
 
 The authoritative current ledger has 534 behavior rows (511 Swift owners and
 23 explicit C adapters) and 7,420 route shards: one live-qualified row and
@@ -115,6 +115,16 @@ unavailable.
 Phase 74 adds a read-only M34 host gate; the current console is locked and
 both online displays are asleep, so it reports `m34_host_ready=0` without
 attempting wake, unlock, or power-state changes.
+
+Phase 74b repaired the read-only host parser: it now reports
+`IOConsoleLocked=Yes` and `session_locked=Yes`, while the two displays remain
+asleep and `m34_host_ready=0`. Phase 76 then scanned all 7,420 manifest rows
+against the retained nine-record composite schema-4 trace. It listed 6,206
+fully key-covered candidates but found 0 admissible rows: the composite route
+is unbound to a manifest identity and independent per-row C/Swift evidence is
+missing. The triage was read-only (`promoted_rows=0`, `ledger_mutated=0`), so
+live admission remains 1 of 7,420. Phase 77 reconciles these findings without
+changing source or the route ledger.
 
 M34, M35, and fresh-save human 120-star acceptance remain open. These gates
 are independent from local build, source, fixture, and headless-host
@@ -282,8 +292,11 @@ for the evidence ledger and latest handoffs, including the
 [Phase 71 camera route pair audit](.porting/porting-handoff-full-swift-twin-phase71-camera-route-pair.md),
 [Phase 72 full-route coverage](.porting/porting-handoff-full-swift-twin-phase72-full-route-coverage.md),
 [Phase 73 full C sidecar contract](.porting/porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md),
+[Phase 74b host-gate parser](.porting/porting-handoff-full-swift-twin-phase74b-host-gate-parser.md),
 [Phase 75 M35 post-SDK preflight](.porting/porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md),
-and [Phase 74 M34 host readiness](.porting/porting-handoff-full-swift-twin-phase74-m34-host-readiness.md).
+and [Phase 74 M34 host readiness](.porting/porting-handoff-full-swift-twin-phase74-m34-host-readiness.md),
+[Phase 76 route-admission triage](.porting/porting-handoff-full-swift-twin-phase76-route-admission-triage.md),
+and [Phase 77 docs/route triage](.porting/porting-handoff-full-swift-twin-phase77-docs-route-triage.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

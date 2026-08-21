@@ -70,6 +70,18 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
 61.) Record Phase 74's read-only M34 host gate: the console is locked and both
      online displays are asleep, so `m34_host_ready=0` and no wake/unlock or
      power-state mutation is attempted.
+62.) Record Phase 76's read-only route-admission triage: all 7,420 manifest rows
+     were scanned against the retained nine-record composite trace; 6,206
+     fully key-covered candidates were listed, but 0 were admissible because
+     the trace is unbound to a manifest identity and per-row independent C/
+     Swift evidence is missing. Preserve `promoted_rows=0`, `ledger_mutated=0`,
+     and live admission at 1/7,420.
+63.) Reconcile Phase 77 documentation and handoff links. Preserve 534 behavior
+     rows (511 Swift owners, 23 explicit C adapters), 7,420 route shards
+     (1 live, 7,419 planned), the `IOConsoleLocked=Yes`/`session_locked=Yes`
+     host evidence, stable generic Release/M35 contract pass, and the open
+     awake-host, independent-route, signing/notary, clean-machine, and human
+     acceptance gates. No source or ledger mutation is implied.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

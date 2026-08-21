@@ -2,7 +2,7 @@
 
 ## Status
 
-### Phase 70 current status
+### Phase 77 current status
 
 The authoritative current counters are **534 behavior rows** (511 Swift
 value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
@@ -32,6 +32,25 @@ passes, but remains unsigned/local. The latest Phase 67b stable M34 rerun
 still fails closed at `scheduler_dropped_steps=63` with the screen locked,
 three presents, and no new capture. No archive/export/DMG/ZIP/staple/
 Gatekeeper, clean-machine, or human result exists.
+
+Phase 71–73 retained the source-backed camera/full-route receipts and the
+nine-record C sidecar tamper contract, but the composite trace has no
+manifest-bound route identity. Phase 74b now parses `IOConsoleLocked=Yes` and
+`session_locked=Yes` in the read-only M34 host gate; both displays remain
+asleep and `m34_host_ready=0`. Phase 75's stable generic Release and M35
+readiness/distribution contracts pass, while Developer ID/notary credentials,
+signed artifacts, clean-machine Gatekeeper, and human acceptance remain
+unavailable. Phase 76 scanned all 7,420 manifest rows against the retained
+nine-record composite trace: 6,206 rows were fully key-covered candidates but
+0 were admissible because the trace is unbound to a manifest identity and
+per-row independent C/Swift evidence is missing. No ledger mutation or route
+promotion occurred. Phase 77 reconciles the documentation only; live
+admission remains 1/7,420 and behavior mapping remains 534/511/23.
+
+Current bounded handoffs: [Phase 74b host-gate parser](porting-handoff-full-swift-twin-phase74b-host-gate-parser.md),
+[Phase 75 M35 preflight](porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md),
+[Phase 76 route-admission triage](porting-handoff-full-swift-twin-phase76-route-admission-triage.md),
+and [Phase 77 docs/route triage](porting-handoff-full-swift-twin-phase77-docs-route-triage.md).
 
 M34 still lacks reliable visible-layer, post-resume, archive-reuse, visual,
 FPS, memory, and thermal evidence. M35 still lacks an authorized Developer ID

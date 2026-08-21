@@ -2,6 +2,25 @@
 
 ## Latest validated slices (2026-08-21)
 
+- **Continuation Phases 74b–77 (2026-08-21):** Phase 74b repairs the
+  read-only M34 host parser so it reports `IOConsoleLocked=Yes` and
+  `session_locked=Yes`; both displays remain asleep and `m34_host_ready=0`.
+  Phase 75's stable generic Release and M35 readiness/distribution contracts
+  pass, but Developer ID/notary credentials, signed artifacts, clean-machine
+  Gatekeeper, and human acceptance remain unavailable. Phase 76 scans all
+  7,420 manifest rows against the retained nine-record composite schema-4
+  trace: 6,206 fully key-covered candidates are listed, but 0 are admissible
+  because the trace is unbound to a manifest identity and per-row independent
+  C/Swift evidence is missing; `promoted_rows=0` and `ledger_mutated=0`.
+  Phase 77 reconciles the documentation only. Preserve 534 behavior rows
+  (511 Swift owners, 23 C adapters), 7,420 route shards (1 live-qualified,
+  7,419 planned), 95.693% mapping, 0.013477% live-route qualification, and
+  the conservative 0% full-goal floor. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase74b-host-gate-parser.md`,
+  `.porting/porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md`,
+  `.porting/porting-handoff-full-swift-twin-phase76-route-admission-triage.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase77-docs-route-triage.md`.
+
 - **Continuation Phases 65–70 (2026-08-21):** Phase 65 repairs the fixed-width
   `SM64ModernStatus`/`Int32` boundary at `EngineRuntime.swift:189/:366`, and
   the beta Release build passes. Phase 66 reruns the fixed M34 harness but
