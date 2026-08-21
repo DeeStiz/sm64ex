@@ -177,7 +177,7 @@ final class SM64ModernSwiftEngineContext {
             nativeHandler: nativeHandler,
             traceSink: { [weak self] record in
                 guard let self else { return 0 }
-                let status = self.emitTrace(
+                let status: SM64ModernStatus = self.emitTrace(
                     simulationTick: record.simulationTick,
                     domain: record.domain,
                     recordKind: record.recordKind,
@@ -186,8 +186,12 @@ final class SM64ModernSwiftEngineContext {
                     flags: record.flags,
                     values: record.values
                 )
-                guard status == 0 else { return status }
-                return schema4TraceSink?(record) ?? 0
+                guard status == SM64ModernStatus(0) else {
+                    return Int32(truncatingIfNeeded: status)
+                }
+                let sinkStatus: SM64ModernStatus =
+                    schema4TraceSink?(record) ?? SM64ModernStatus(0)
+                return Int32(truncatingIfNeeded: sinkStatus)
             }
         )
         return true
@@ -363,7 +367,9 @@ final class SM64ModernSwiftEngineContext {
         let dispatch = behaviorDispatch.tick(state: state)
         lastBehaviorDispatch = dispatch
         guard dispatch.decorativePendulumTraceStatus == 0 else {
-            traceStatus = dispatch.decorativePendulumTraceStatus
+            traceStatus = SM64ModernStatus(
+                truncatingIfNeeded: dispatch.decorativePendulumTraceStatus
+            )
             phase = .failed
             return nil
         }
