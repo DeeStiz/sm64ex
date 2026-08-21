@@ -36,6 +36,14 @@
   evidence. The ledger stays 1/7,420. Handoff:
   `.porting/porting-handoff-full-swift-twin-phase71-camera-route-pair.md`.
 
+- **Continuation Phases 72–73 (2026-08-21):** Phase 72 preserved the real
+  first-input receipt in the full pairing trace. Phase 73 extended the C
+  sidecar to replay the exact nine source-backed records and reject tampering.
+  The composite trace has no canonical manifest row, so live qualification
+  remains 1/7,420. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase72-full-route-coverage.md`
+  and `.porting/porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md`.
+
 - **Historical Continuation Phases 61–64 (2026-08-21):** Phase 61's canonical M34
   production harness is blocked before app launch by
   `EngineRuntime.swift:189/:366` (`SM64ModernStatus`/`Int32` type errors).

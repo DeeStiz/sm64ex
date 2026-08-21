@@ -102,6 +102,11 @@ route coverage guard fails before a camera trace and Mario-face/progression
 checks remain source/fixture contracts rather than live qualification. The
 route ledger remains 1 of 7,420.
 
+Phase 72 retained the real full-route input receipt, and Phase 73 extended the
+C sidecar to replay all nine source-backed full-route records with exact tamper
+detection. This composite trace still has no canonical manifest row, so no
+additional live shard was admitted and the ledger remains unchanged.
+
 M34, M35, and fresh-save human 120-star acceptance remain open. These gates
 are independent from local build, source, fixture, and headless-host
 evidence; this branch is not a shipped, visual-parity, or complete full-game
@@ -265,7 +270,9 @@ for the evidence ledger and latest handoffs, including the
 [Phase 67c HUD render fix](.porting/porting-handoff-full-swift-twin-phase67c-hud-render-fix.md),
 [Phase 67d AVFAudio SDK compatibility](.porting/porting-handoff-full-swift-twin-phase67d-avfaudio-sdk-compat.md),
 [Phase 70 documentation refresh](.porting/porting-handoff-full-swift-twin-phase70-docs-refresh.md),
-and [Phase 71 camera route pair audit](.porting/porting-handoff-full-swift-twin-phase71-camera-route-pair.md).
+[Phase 71 camera route pair audit](.porting/porting-handoff-full-swift-twin-phase71-camera-route-pair.md),
+[Phase 72 full-route coverage](.porting/porting-handoff-full-swift-twin-phase72-full-route-coverage.md),
+and [Phase 73 full C sidecar contract](.porting/porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

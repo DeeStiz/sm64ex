@@ -59,6 +59,11 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      still pairs independently; full-route coverage fails before a camera
      trace, and Mario-face/progression contracts remain source/fixture evidence.
      No second live shard was admitted; the ledger remains 1/7,420.
+58.) Record Phase 72's full-route coverage repair: the real first-input receipt
+     is retained so the composite source trace reaches C replay.
+59.) Record Phase 73's independent C sidecar extension: all nine full-route
+     records replay exactly and tamper rejection passes, but the composite has
+     no canonical manifest row, so live admission remains 1/7,420.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
