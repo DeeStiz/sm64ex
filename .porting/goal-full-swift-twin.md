@@ -124,6 +124,8 @@ Metal validation overhead.
 Commit `631f7c69` adds a fail-closed diagnostic parser and stable telemetry for
 binary-archive reuse, descriptor-cache fallback, scheduler drops, and
 host-compositor candidates; it does not turn the baseline into acceptance.
+Commit `19413a65` hardens that parser with registration/first-frame/drain/
+status-0/application-stop ordering requirements and incomplete-log rejection.
 
 M33 Act Selector central integration is now complete locally. The owner shares
 the existing star-type bridge, preserves parent-first child updates and
@@ -173,6 +175,10 @@ Continuation Phase 10 closes the first real live shard using
 passes the live executor and worker-result validation with `fixture_only=0`,
 and leaves 7,418 rows explicitly planned. Handoff:
 `.porting/porting-handoff-full-swift-twin-phase10-live-first-shard.md`.
+The fresh live-trace audit confirms no additional rows are admissible: current
+full traces are Swift-produced, while the C contract replays hard-coded arrays
+and the 14 byte-identical fixture pairs are explicitly `fixture_only=1`.
+Independent record-mode C and Swift traces are required for every further row.
 
 Continuation Phase 7 adds a read-only M35 release-readiness preflight. The
 contract checks ordinary (non-beta) Xcode selection, Developer ID identity,

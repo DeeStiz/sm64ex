@@ -50,6 +50,10 @@ The status below is pinned to the current `nightly` continuation
 * The first real live shard (`0xd9446dfed10e189e`, `oracle_hook|input`) now
   passes C/Swift replay, live executor, and worker-result validation with
   `fixture_only=0`; **7,418** manifest rows remain planned.
+* No other rows are promoted from the current traces: the C contract replays
+  hard-coded arrays, and fixture byte matches remain explicitly ineligible for
+  live qualification. Further rows require independently recorded C and Swift
+  traces.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).

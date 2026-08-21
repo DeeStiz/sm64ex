@@ -229,7 +229,7 @@ classify_log() {
 
   for ordered_pair in \
     "metal4_pipeline_registration_ready |m9_profile_complete " \
-    "m9_profile_complete |metal_scene_presented frame=1 " \
+    "m9_profile_complete |metal_presentation_diagnostic " \
     "metal_scene_presented frame=1 |metal_presentation_diagnostic " \
     "metal_presentation_diagnostic |metal_shutdown_drained " \
     "metal_shutdown_drained |engine_thread_finished " \
