@@ -117,6 +117,12 @@ private func surfaceType(_ token: String) -> Int16? {
         "SURFACE_PAINTING_WARP_F1": 0x00F1,
         "SURFACE_PAINTING_WARP_F2": 0x00F2,
         "SURFACE_PAINTING_WARP_F3": 0x00F3,
+        "SURFACE_PAINTING_WARP_F7": 0x00F7,
+        "SURFACE_PAINTING_WARP_F8": 0x00F8,
+        "SURFACE_PAINTING_WARP_F9": 0x00F9,
+        "SURFACE_PAINTING_WARP_FA": 0x00FA,
+        "SURFACE_PAINTING_WARP_FB": 0x00FB,
+        "SURFACE_PAINTING_WARP_FC": 0x00FC,
         "SURFACE_TTC_PAINTING_1": 0x00F4,
         "SURFACE_TTC_PAINTING_2": 0x00F5,
         "SURFACE_TTC_PAINTING_3": 0x00F6,
@@ -154,9 +160,9 @@ private func sourceCollisionWorld(
     }
     require(vertices.count > 1_600, "decoded Castle Inside area-2 vertices")
 
-    let roomBody = roomText.components(separatedBy: "//").enumerated().map { index, part in
-        index.isMultiple(of: 2) ? part : ""
-    }.joined()
+    let roomBody = roomText.components(separatedBy: .newlines)
+        .map { $0.components(separatedBy: "//").first ?? $0 }
+        .joined(separator: "\n")
     let rooms = integers(in: roomBody)
     var triangles: [SourceTriangle] = []
     var currentType: Int16?

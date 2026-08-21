@@ -9,6 +9,7 @@ PACK_TOOL="$BUILD_ROOT/content-pack"
 PACK="$BUILD_ROOT/source-only.cpk"
 ROUTE_TOOL="$BUILD_ROOT/route-smoke"
 TRACE="$BUILD_ROOT/swift-source-route.trace"
+TICKS="${SM64_MODERN_PENDULUM_TICKS:-40}"
 
 mkdir -p "$BUILD_ROOT/module-cache"
 xcrun swiftc \
@@ -61,7 +62,7 @@ xcrun swiftc \
   "$PROJECT_ROOT/levels/castle_inside/areas/2/room.inc.c" \
   "$PROJECT_ROOT/levels/castle_inside/script.c" \
   "$TRACE" \
-  40 \
+  "$TICKS" \
   | tee "$BUILD_ROOT/swift-route.log"
 
 grep -Fq 'source_program_commands=6' "$BUILD_ROOT/swift-route.log"
