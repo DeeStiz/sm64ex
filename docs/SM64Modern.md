@@ -68,6 +68,9 @@ The status below is pinned to the current `nightly` continuation
 * The C/Swift pairing audit found mismatched framing/fingerprints, timebases,
   save/configuration inputs, and selected render records; no additional live
   route row was admitted.
+* The independent C recorder now emits canonical schema-4 framing; M35 can use
+  stable Xcode 26.6 via an invocation-scoped override, but signing, entitlement,
+  and notary prerequisites remain external.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).

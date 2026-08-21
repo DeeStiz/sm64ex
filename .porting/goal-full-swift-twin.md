@@ -218,6 +218,17 @@ headers/fingerprints, 30/30 versus 60/30 timebases, save/configuration inputs,
 and selected render records differ. Handoff:
 `.porting/porting-handoff-full-swift-twin-phase16-c-swift-pairing.md`.
 
+Continuation Phase 17 aligns the independent C recorder with canonical
+schema-4 framing (72-byte header/128-byte records), preserving hash/order/
+coverage/render validation. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase17-c-trace-format.md`; common
+C/Swift fingerprints and tick windows are still required.
+
+Continuation Phase 19 adds invocation-scoped stable-Xcode support to M35. The
+installed Xcode 26.6 override is now validated without changing global
+`xcode-select`; Developer ID, entitlement, and notary blockers remain.
+Handoff: `.porting/porting-handoff-full-swift-twin-phase19-m35-xcode-override.md`.
+
 Continuation Phase 8 centrally promotes `bhvSquarishPathMoving` through route
 265. Its focused contract is `0x9cbe6c17eb977926`; the manifest is now 534 rows
 with 501 Swift owners and 33 explicit C adapters at
