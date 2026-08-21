@@ -41,8 +41,9 @@ The status below is pinned to the current `nightly` continuation
 * The route inventory contains **7,419 reachable shards**. Full shard
   execution, sanitizer reruns, physical visual/audio/controller checks,
   sustained performance and thermal checks, release packaging, and human
-  acceptance remain open. M35 distribution and human acceptance has not
-  started.
+  acceptance remain open. M35 external distribution and human acceptance
+  remain open; local readiness and fail-closed distribution-flow checks exist,
+  but no distributable artifact or human acceptance has started.
 * The first real live shard (`0xd9446dfed10e189e`, `oracle_hook|input`) now
   passes C/Swift replay, live executor, and worker-result validation with
   `fixture_only=0`; **7,418** manifest rows remain planned.
