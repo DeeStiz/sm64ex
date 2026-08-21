@@ -9,6 +9,7 @@
 #include "sm64_modern.h"
 #include "audio_defines.h"
 #include "behavior_data.h"
+#include "engine/graph_node.h"
 #include "game/area.h"
 #include "game/memory.h"
 #include "game/object_list_processor.h"
@@ -897,10 +898,16 @@ int main(int argc, char **argv) {
                     castle_area2_pendulum_slot > 0u
                     && castle_area2_pendulum_slot <= OBJECT_POOL_CAPACITY
                     && trace.native_object_state_records_by_slot[castle_area2_pendulum_slot] > 0u);
-        // The bounded owner route leaves Mario in room 1 while the real
-        // pendulum is in room 5, so the native sound gateway is expected to
-        // remain silent here. Keep the count visible and leave parity blocked
-        // until a real room-transition route supplies the effect.
+        expect_true("castle area-2 Mario room owns pendulum",
+                    gMarioCurrentRoom == castle_area2_pendulum->oRoom
+                    && gMarioCurrentRoom == 5);
+        expect_true("castle area-2 pendulum render ownership",
+                    (castle_area2_pendulum->header.gfx.node.flags & GRAPH_RENDER_ACTIVE) != 0u);
+        // The bounded owner route uses the source-defined area-2 star-collect
+        // warp at the pendulum's room-5 position, so room/render ownership is
+        // real. The pendulum threshold callbacks occur on held native steps;
+        // play_sound is deliberately legacy-boundary-owned, so the effect
+        // domain remains silent without fabricating a direct sink call.
         expect_true("castle area-2 schema-4 script records",
                     trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_SCRIPT] > 0u);
         printf("castleArea2HeaderBuild=0x%016" PRIx64

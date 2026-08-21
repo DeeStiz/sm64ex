@@ -29,6 +29,17 @@ NATIVE_SLOT="$(sed -n 's/.*castleArea2PendulumSlot=\([0-9][0-9]*\).*/\1/p' "$NAT
   echo "native Castle area-2 lifecycle did not report a pendulum slot" >&2
   exit 1
 }
+NATIVE_MARIO_ROOM="$(sed -n 's/.*castleArea2MarioRoom=\([-0-9][0-9]*\).*/\1/p' "$NATIVE_LOG" | tail -1)"
+NATIVE_OBJECT_ROOM="$(sed -n 's/.*castleArea2ObjectRoom=\([-0-9][0-9]*\).*/\1/p' "$NATIVE_LOG" | tail -1)"
+NATIVE_GRAPH_FLAGS="$(sed -n 's/.*castleArea2GraphFlags=\(0x[[:xdigit:]]*\).*/\1/p' "$NATIVE_LOG" | tail -1)"
+[[ "$NATIVE_MARIO_ROOM" == 5 && "$NATIVE_OBJECT_ROOM" == 5 ]] || {
+  echo "native Castle area-2 route did not place Mario and pendulum in authored room 5" >&2
+  exit 1
+}
+[[ -n "$NATIVE_GRAPH_FLAGS" && $((NATIVE_GRAPH_FLAGS & 1)) -ne 0 ]] || {
+  echo "native Castle area-2 pendulum was not render-active in authored room 5" >&2
+  exit 1
+}
 [[ -s "$NATIVE_TRACE" ]] || { echo "native schema-4 trace was not emitted" >&2; exit 1; }
 
 SM64_MODERN_PENDULUM_TICKS=64 \
@@ -62,8 +73,9 @@ grep -Fq 'native_domains=3,6,7' "$PAIR_REPORT"
 grep -Fq 'missing_native=12 missing_swift=' "$PAIR_REPORT"
 
 # Persist the failed/blocked evidence through the existing live-only worker
-# and merge tools. The row is terminal but cannot be promoted because the
-# pair report contains an exact divergence and no complete native domain set.
+# and merge tools. The source-backed warp now proves room/render ownership,
+# but the row remains terminal because the pair report contains an exact
+# divergence and no complete native effect domain.
 PAIR_ID=0x0000000000000053
 NATIVE_RECORDS="$(sed -n 's/native_records=\([0-9][0-9]*\) swift_records=.*/\1/p' "$PAIR_REPORT")"
 SWIFT_RECORDS="$(sed -n 's/native_records=[0-9][0-9]* swift_records=\([0-9][0-9]*\).*/\1/p' "$PAIR_REPORT")"
@@ -146,6 +158,7 @@ fi
 
 printf '%s\n' \
   "SM64 Modern Castle area-2 pendulum pair smoke passed native_slot=$NATIVE_SLOT" \
+  "source_warp_room=5 mario_room=$NATIVE_MARIO_ROOM object_room=$NATIVE_OBJECT_ROOM graph_active=1" \
   "schema4_decode=1 complete_domain_filter=1 tamper_rejected=1 replay_round_trip=1" \
   "worker_result=1 merge=1 persistent_rerun_rejected=1 promotion=not_attempted admission=0"
 

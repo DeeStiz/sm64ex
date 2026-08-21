@@ -622,7 +622,10 @@ static void automated_castle_area2_transition_step(void) {
         return;
     }
 
-    initiate_warp(LEVEL_CASTLE, 2, 0, 0);
+    // Area-2 node 0x35 is the compiled painting-star-collect warp beside the
+    // pendulum. It keeps this opt-in route on the normal warp/spawn path while
+    // placing Mario in the pendulum's authored room for render/audio gates.
+    initiate_warp(LEVEL_CASTLE, 2, 0x35, 0);
     sAutomatedCastleArea2WarpRequested = true;
 }
 
