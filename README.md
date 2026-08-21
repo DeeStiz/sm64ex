@@ -84,6 +84,14 @@ manifest's collision-query and script-event schema domains, or
 emitter or random-seed owner. Phase 37 rechecked those source-backed seams and
 again admitted no second route: real collision and behavior-script/lifecycle
 owners are still absent, so adding those records would be synthetic evidence.
+Phase 39 confirmed that the same global-state candidate also lacks a real
+owner-thread emitter for the native global timer and shared random seed (and
+does not yet publish the live level/area/act/course lifecycle values). Phase 40
+confirmed that the decorative-pendulum path still has no owner-thread collision
+world/floor query, per-object behavior-VM/script-PC lifecycle plumbing, or
+shared schema-4 trace sink. Phase 41 found the M34 host still locked/asleep and
+left exactly the same two M35 blockers: no authorized Developer ID Application
+identity/private key and no notarytool authentication.
 Route-shard closure, physical/device/performance/thermal evidence,
 distribution, and human acceptance are still open; this is not a shipped,
 visual-parity, or complete full-game Swift port. See the
@@ -104,7 +112,12 @@ for the evidence ledger and latest handoffs, including the
 [Phase 36 completion audit](.porting/porting-handoff-full-swift-twin-phase36-completion-audit.md),
 [Phase 37 decorative pendulum seams](.porting/porting-handoff-full-swift-twin-phase37-decorative-pendulum-seams.md),
 [Phase 38 final reconciliation](.porting/porting-handoff-full-swift-twin-phase38-final-reconcile.md),
-and [Phase 38 completion audit](.porting/porting-handoff-full-swift-twin-phase38-completion-audit.md).
+[Phase 38 completion audit](.porting/porting-handoff-full-swift-twin-phase38-completion-audit.md),
+[Phase 39 global-state audit](.porting/porting-handoff-full-swift-twin-phase39-global-state.md),
+[Phase 40 decorative seams](.porting/porting-handoff-full-swift-twin-phase40-decorative-seams.md),
+[Phase 41 external refresh](.porting/porting-handoff-full-swift-twin-phase41-external-refresh.md),
+[Phase 42 final reconciliation](.porting/porting-handoff-full-swift-twin-phase42-final-reconcile.md),
+and [Phase 42 completion audit](.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

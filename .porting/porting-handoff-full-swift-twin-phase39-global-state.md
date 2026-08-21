@@ -82,8 +82,12 @@ The existing focused checks passed without source changes:
   lifecycle and receipt smoke.
 - `./script/test_oracle_trace.sh` — C schema-4 fixed-width record/replay and
   canonical-hash lifecycle smoke.
-- `./script/test_oracle_trace_swift.sh` — strict Swift schema-4 codec and
+- `./script/test_oracle_trace_swift.sh` — Swift schema-4 codec and
   cross-language trace decode/tamper smoke.
+- An explicit `xcrun swiftc -swift-version 6
+  -Xfrontend -strict-concurrency=complete` build of
+  `OracleTrace.swift` plus the same trace smoke — strict Swift 6 codec
+  evidence.
 - `git diff --check`.
 
 These checks validate the existing runtime and schema boundaries. They do not

@@ -94,6 +94,15 @@ owner or behavior-script/lifecycle owner for the required
 `oracle_hook|global_state` row still has no schema-4 global-state Swift emitter
 or random-seed owner. These audits do not claim a shipped, visual-parity, or
 full-game Swift twin.
+Phase 39 traced the global-state candidate to the native `gGlobalTimer`, live
+level/area/act/course lifecycle globals, and shared `gRandomSeed16`; no
+source-backed Swift owner-thread emitter publishes those values. Phase 40
+confirmed that the decorative-pendulum path still lacks a bound collision
+world/floor query, per-object behavior VM/script PC and lifecycle events, and a
+shared schema-4 snapshot/trace sink. Phase 41's read-only external refresh
+found the console session locked and both displays asleep; M35 remains blocked
+by exactly the same two prerequisites: an authorized Developer ID Application
+identity/private key and one supported notarytool authentication mode.
 
 The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
 is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
@@ -114,7 +123,12 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 36 completion audit](.porting/porting-handoff-full-swift-twin-phase36-completion-audit.md),
 [Phase 37 decorative pendulum seams](.porting/porting-handoff-full-swift-twin-phase37-decorative-pendulum-seams.md),
 [Phase 38 final reconciliation](.porting/porting-handoff-full-swift-twin-phase38-final-reconcile.md),
-and [Phase 38 completion audit](.porting/porting-handoff-full-swift-twin-phase38-completion-audit.md).
+[Phase 38 completion audit](.porting/porting-handoff-full-swift-twin-phase38-completion-audit.md),
+[Phase 39 global-state audit](.porting/porting-handoff-full-swift-twin-phase39-global-state.md),
+[Phase 40 decorative seams](.porting/porting-handoff-full-swift-twin-phase40-decorative-seams.md),
+[Phase 41 external refresh](.porting/porting-handoff-full-swift-twin-phase41-external-refresh.md),
+[Phase 42 final reconciliation](.porting/porting-handoff-full-swift-twin-phase42-final-reconcile.md),
+and [Phase 42 completion audit](.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
@@ -238,6 +252,39 @@ counter remain unchanged; M34 stays locked/headless/three-frame/clear-only,
 M35 has exactly the two Phase 33 blockers, and no shipped, visual-parity, or
 full-game Swift claim is made. Handoff:
 `.porting/porting-handoff-full-swift-twin-phase35-docs-reconcile.md`.
+
+Continuation Phase 39 (2026-08-21) audits the canonical
+`oracle_hook|global_state` route. The native schema-4 snapshot requires
+`global_timer`, live level/area/act/course lifecycle values, and shared
+`random_seed`; no source-backed Swift owner-thread emitter publishes the
+native `gGlobalTimer`/lifecycle globals or `gRandomSeed16`. The route remains
+planned/inadmissible, and the live ledger remains 1 of 7,419. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase39-global-state.md`.
+
+Continuation Phase 40 (2026-08-21) re-audits `bhvDecorativePendulum` and
+admits no second row. Its real Swift pair owns the fixed-point roll/object
+state and clock-sound effect, but no bound owner-thread collision world/floor
+query, per-object behavior VM/script-PC lifecycle events, or shared schema-4
+snapshot/trace sink exists for the missing domains
+`collision_queries,effects,object_state,script_events`. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase40-decorative-seams.md`.
+
+Continuation Phase 41 (2026-08-21) performs a bounded read-only M34/M35
+external refresh. The console session is locked and both displays report
+asleep, so M34 remains blocked before visible capture. M35 remains blocked by
+exactly the same two prerequisites—an authorized Developer ID Application
+identity/private key and one supported notarytool authentication mode—with no
+artifact mutation; clean-machine, physical, and human acceptance remain
+unstarted. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase41-external-refresh.md`.
+
+Continuation Phase 42 (2026-08-21) reconciles the public/status documents and
+adds a fresh completion audit after Phases 39–41 without changing historical
+ledger text. The 534/511/23 behavior counters and 1/7,419 live-qualified route
+counter remain unchanged; no shipped, visual-parity, or complete full-game
+Swift claim is made. Handoffs:
+`.porting/porting-handoff-full-swift-twin-phase42-final-reconcile.md` and
+`.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md`.
 
 Continuation Phase 1 (2026-08-20) is checkpointed at `da4fa9ae` plus the
 current live-host control. The fresh arm64 Debug bundle built, launched through

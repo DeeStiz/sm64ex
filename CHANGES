@@ -74,6 +74,24 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      `oracle_hook|input` row as the only complete route, retains the locked/
      headless M34 boundary and two M35 blockers, and leaves release, device,
      visual, full-game, and human acceptance open.
+24.) Record Phase 39's global-state trace audit: the canonical
+     `oracle_hook|global_state` row still lacks a schema-4 Swift emitter for
+     the native global timer/lifecycle values and shared random-seed owner.
+25.) Record Phase 40's decorative-pendulum seam audit: no source-backed
+     owner-thread collision world/floor query, per-object behavior-VM/script-
+     PC lifecycle plumbing, or shared schema-4 trace sink exists, so no second
+     route is admitted.
+26.) Record Phase 41's external-state refresh: M34 remains blocked by the
+     locked/asleep host, while M35 remains blocked by the same two prerequisites
+     (Developer ID Application identity/private key and notarytool auth), with
+     no artifact or human-acceptance mutation.
+27.) Reconcile README, SM64 Modern status, and the current Full Swift Twin
+     continuation summary after Phases 39–41 without changing historical ledger
+     text; preserve the 534/511/23 and 1/7,419 counters and the no-shipped,
+     no-visual-parity, and no-full-game-Swift claims.
+28.) Add the Phase 42 completion audit, retaining the one qualified
+     `oracle_hook|input` row, the locked/asleep M34 boundary, the two M35
+     blockers, and the exact source/external unblocks for future work.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)

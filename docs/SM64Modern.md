@@ -143,6 +143,21 @@ The status below is pinned to the current `nightly` continuation
   be emitted. The `oracle_hook|global_state` candidate still has no schema-4
   global-state Swift emitter or random-seed owner; adding either route would be
   synthetic evidence.
+* Phase 39 audited `oracle_hook|global_state` against the native schema-4
+  snapshot and found no source-backed Swift owner-thread emitter for the native
+  `global_timer` or shared `random_seed`; live level/area/act/course lifecycle
+  publication is also not wired. Mapping `SM64EngineGlobals.frame` or a local
+  default seed would be synthetic and remains rejected.
+* Phase 40 re-audited `bhvDecorativePendulum`. Its real Swift pair owns the
+  fixed-point roll/object state and clock-sound effect, but has no bound
+  collision world/floor query, per-object `SM64BehaviorVM`/script-PC lifecycle
+  events, or shared schema-4 snapshot/trace sink. No second route is admitted.
+* Phase 41 performed a read-only external refresh: the host reports a locked
+  console session and both displays asleep, so M34 remains blocked without a
+  visible capture. M35 remains blocked by exactly the same two prerequisites—
+  an authorized Developer ID Application identity/private key and one supported
+  notarytool authentication mode—and no artifact, Gatekeeper, physical, or
+  human-acceptance state changed.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
@@ -162,7 +177,12 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 36 completion audit](../.porting/porting-handoff-full-swift-twin-phase36-completion-audit.md),
 [Phase 37 decorative pendulum seams](../.porting/porting-handoff-full-swift-twin-phase37-decorative-pendulum-seams.md),
 [Phase 38 final reconciliation](../.porting/porting-handoff-full-swift-twin-phase38-final-reconcile.md),
-and [Phase 38 completion audit](../.porting/porting-handoff-full-swift-twin-phase38-completion-audit.md).
+[Phase 38 completion audit](../.porting/porting-handoff-full-swift-twin-phase38-completion-audit.md),
+[Phase 39 global-state audit](../.porting/porting-handoff-full-swift-twin-phase39-global-state.md),
+[Phase 40 decorative seams](../.porting/porting-handoff-full-swift-twin-phase40-decorative-seams.md),
+[Phase 41 external refresh](../.porting/porting-handoff-full-swift-twin-phase41-external-refresh.md),
+[Phase 42 final reconciliation](../.porting/porting-handoff-full-swift-twin-phase42-final-reconcile.md),
+and [Phase 42 completion audit](../.porting/porting-handoff-full-swift-twin-phase42-completion-audit.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
