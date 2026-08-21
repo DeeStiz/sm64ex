@@ -112,6 +112,15 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      preserve the 534/511/23 and 1/7,419 counters, unchanged global-state/
      Metal/M35 boundaries, and the no-shipped, no-visual-parity, and no-full-
      game-Swift claims.
+35.) Record Phase 49's native-core Castle Inside area-2 boundary: the strict
+     native archive and existing lifecycle/oracle smoke pass, but the public
+     lifecycle API has no owner-thread level/area selection entrypoint or
+     exposed `levelCommandAddr`; no pendulum route or second shard is admitted.
+36.) Reconcile the public/status docs and add a Phase 50 completion audit after
+     Phase 49 without changing historical ledger text; preserve the 534/511/23
+     and 1/7,419 counters, the Phase 44–48 owner/dispatch/source/native-C
+     boundaries, all M34/M35 boundaries, and the no-shipped, no-visual-parity,
+     and no-full-game-Swift claims.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)

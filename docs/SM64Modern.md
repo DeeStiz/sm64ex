@@ -180,6 +180,26 @@ The status below is pinned to the current `nightly` continuation
   `gCurrentObject`, the global level/surface loader, and global audio/effect
   ownership. No safe C schema-4 pendulum pair exists yet; no second route is
   admitted.
+* Phase 48 reconciled the public/status documents and retained the Phase 44–47
+  owner, dispatch, source-recipe, and native-C boundaries without changing the
+  historical ledger or route counters.
+* Phase 49 passed the strict native archive build and the existing lifecycle
+  oracle smoke, which emitted `liveOracleTraceRecords=3151`,
+  `liveOracleTraceTicks=5`, `liveOracleCoverageEntries=62`, and coverage
+  fingerprint `0x5ad92028e4bd8daf`. This is general lifecycle evidence, not a
+  Castle Inside area-2 or pendulum-owner trace; archive symbol presence for
+  `load_area`, `gAreaData`, `gCurrentArea`, `gMarioSpawnInfo`, and the pendulum
+  callbacks does not prove those owners were initialized or updated.
+* The exact Phase 49 source boundary is the missing owner-thread level/area
+  selection entrypoint. The public lifecycle API owns
+  `thread5_game_loop()`/`lifecycle_step()` but does not expose level/area
+  selection or private `levelCommandAddr`; the current bootstrap selects only
+  `LEVEL_CASTLE_GROUNDS` or `LEVEL_BOB`, not `LEVEL_CASTLE` area 2. A safe
+  unblock must select `LEVEL_CASTLE`, run its compiled level script through the
+  existing command pointer, perform the normal Mario-area transition to area 2,
+  and expose the real pendulum callback on the lifecycle owner thread while
+  retaining the existing parity sink as the sole schema-4 emitter. Direct
+  `load_area(2)` or fabricated globals would not be valid route evidence.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
@@ -211,7 +231,10 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 46 source route attempt](../.porting/porting-handoff-full-swift-twin-phase46-decorative-route.md),
 [Phase 47 native C route boundary](../.porting/porting-handoff-full-swift-twin-phase47-native-c-route.md),
 [Phase 48 final reconciliation](../.porting/porting-handoff-full-swift-twin-phase48-final-reconcile.md),
-and [Phase 48 completion audit](../.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md).
+[Phase 48 completion audit](../.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md),
+[Phase 49 native-core area boundary](../.porting/porting-handoff-full-swift-twin-phase49-native-core-area.md),
+[Phase 50 final reconciliation](../.porting/porting-handoff-full-swift-twin-phase50-final-reconcile.md),
+and [Phase 50 completion audit](../.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is

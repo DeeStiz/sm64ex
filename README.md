@@ -104,7 +104,21 @@ Castle Inside area-2 recipe from the real behavior, level-script, collision,
 and room inputs, but no native C pair was captured. Phase 47 confirmed that a
 safe C pair is blocked by monolithic `data/behavior_data.c` ownership and the
 legacy `gCurrentObject`/level-surface/audio loader boundary. No second route is
-admitted and no synthetic records are accepted.
+admitted and no synthetic records are accepted. Phase 48 reconciled the
+public/status documents without changing the historical ledger. Phase 49 then
+rechecked the native core: the strict native archive and existing lifecycle
+oracle smoke passed (`liveOracleTraceRecords=3151`,
+`liveOracleTraceTicks=5`, `liveOracleCoverageEntries=62`), but that smoke is a
+general lifecycle route, not Castle Inside area 2 or pendulum-owner evidence.
+The public lifecycle API owns `thread5_game_loop()` and `lifecycle_step()` but
+does not expose level/area selection or the private `levelCommandAddr`; the
+current bootstrap only selects `LEVEL_CASTLE_GROUNDS` or `LEVEL_BOB`. The exact
+safe unblock is an owner-thread entrypoint that selects `LEVEL_CASTLE`, runs its
+compiled level script through the existing command pointer, performs the normal
+Mario-area transition to area 2, and exposes the real pendulum callback while
+leaving the existing parity sink as the sole schema-4 emitter. Symbol presence
+for `load_area`, `gAreaData`, `gCurrentArea`, and related pendulum callbacks is
+not proof that this owner path was initialized or updated.
 Route-shard closure, physical/device/performance/thermal evidence,
 distribution, and human acceptance are still open; this is not a shipped,
 visual-parity, or complete full-game Swift port. See the
@@ -137,7 +151,10 @@ for the evidence ledger and latest handoffs, including the
 [Phase 46 source route attempt](.porting/porting-handoff-full-swift-twin-phase46-decorative-route.md),
 [Phase 47 native C route boundary](.porting/porting-handoff-full-swift-twin-phase47-native-c-route.md),
 [Phase 48 final reconciliation](.porting/porting-handoff-full-swift-twin-phase48-final-reconcile.md),
-and [Phase 48 completion audit](.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md).
+[Phase 48 completion audit](.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md),
+[Phase 49 native-core area boundary](.porting/porting-handoff-full-swift-twin-phase49-native-core-area.md),
+[Phase 50 final reconciliation](.porting/porting-handoff-full-swift-twin-phase50-final-reconcile.md),
+and [Phase 50 completion audit](.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

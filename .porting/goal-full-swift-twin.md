@@ -104,6 +104,43 @@ found the console session locked and both displays asleep; M35 remains blocked
 by exactly the same two prerequisites: an authorized Developer ID Application
 identity/private key and one supported notarytool authentication mode.
 
+Phase 43 rechecked the global-state candidate: the native timer,
+level/area/act/course lifecycle, and shared random seed still lack one
+source-backed Swift owner-thread schema-4 emitter. Phase 44 added the real
+`bhvDecorativePendulum` Swift owner seam with explicitly bound collision world
+and decoded behavior program; Phase 45 carried that configuration through
+central dispatch while keeping the unconfigured identity-only route
+trace-silent. Phase 46 added the source-backed Castle Inside area-2 recipe from
+the behavior, level-script, collision, and room streams, but no native C pair
+was captured. Phase 47 retained the native-C blocker at monolithic
+`data/behavior_data.c`, `gCurrentObject`, and the legacy level/surface/audio
+loader boundary. Phase 48 reconciled these documents without changing the
+historical ledger.
+
+Phase 49 rechecked the native core: the strict native archive build and the
+existing lifecycle/oracle smoke passed with
+`liveOracleTraceRecords=3151`, `liveOracleTraceTicks=5`,
+`liveOracleCoverageEntries=62`, and coverage fingerprint
+`0x5ad92028e4bd8daf`. This is general lifecycle evidence, not Castle Inside
+area 2 or pendulum-owner qualification. The public lifecycle API owns
+`thread5_game_loop()` and `lifecycle_step()` but exposes neither a level/area
+selection operation nor the private `levelCommandAddr`; the current bootstrap
+selects only `LEVEL_CASTLE_GROUNDS` or `LEVEL_BOB`. The exact safe unblock is a
+lifecycle owner-thread entrypoint that selects `LEVEL_CASTLE`, runs the
+compiled level script through its existing command pointer, performs the normal
+Mario-area transition to area 2, and exposes the real pendulum callback while
+leaving the existing parity sink as the sole schema-4 emitter. Calling
+`load_area(2)` directly or fabricating globals would not be route evidence.
+
+The counters remain 534 behavior rows (511 Swift owners and 23 explicit C
+adapters) and 1 of 7,419 live-qualified route shards, with 7,418 planned. M34
+still has only the bounded locked/headless three-present, clear-only capture
+with unproven archive reuse; M35 remains fail-closed on the authorized
+Developer ID Application identity/private key and notarytool authentication.
+Route closure, visible/device/performance/thermal, distribution, and human
+acceptance remain open. No shipped, visual-parity, or complete full-game Swift
+claim is made.
+
 The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
 is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
 pairing](.porting/porting-handoff-full-swift-twin-phase20-c-swift-pairing.md),
@@ -135,7 +172,10 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 46 source route attempt](.porting/porting-handoff-full-swift-twin-phase46-decorative-route.md),
 [Phase 47 native C route boundary](.porting/porting-handoff-full-swift-twin-phase47-native-c-route.md),
 [Phase 48 final reconciliation](.porting/porting-handoff-full-swift-twin-phase48-final-reconcile.md),
-and [Phase 48 completion audit](.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md).
+[Phase 48 completion audit](.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md),
+[Phase 49 native-core area boundary](.porting/porting-handoff-full-swift-twin-phase49-native-core-area.md),
+[Phase 50 final reconciliation](.porting/porting-handoff-full-swift-twin-phase50-final-reconcile.md),
+and [Phase 50 completion audit](.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
@@ -336,6 +376,28 @@ counter remain unchanged; global-state, Metal/M34, and M35 boundaries remain
 open, with no shipped, visual-parity, or complete full-game Swift claim. Handoffs:
 `.porting/porting-handoff-full-swift-twin-phase48-final-reconcile.md` and
 `.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md`.
+
+Continuation Phase 49 (2026-08-21) rechecks the native-core Castle Inside
+area-2 boundary. The strict native archive build and existing lifecycle/oracle
+smoke pass with 3,151 records across five ticks and 62 coverage entries, but
+the smoke is not an area-2 or pendulum-owner trace. The public lifecycle API
+does not expose the level/area selection operation or private `levelCommandAddr`:
+the current bootstrap selects only `LEVEL_CASTLE_GROUNDS` or `LEVEL_BOB`. The
+exact safe unblock is an owner-thread entrypoint that selects `LEVEL_CASTLE`,
+runs the compiled level script through the existing command pointer, performs
+the normal Mario-area transition to area 2, and exposes the real pendulum
+callback without replacing the existing schema-4 sink. No route row or
+promotion changed. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase49-native-core-area.md`.
+
+Continuation Phase 50 (2026-08-21) reconciles the public/status documents and
+adds a fresh completion audit after Phase 49 while preserving the historical
+ledger. The counters remain 534/511/23 and 1/7,419 (7,418 planned); the
+Phase 44–48 owner/dispatch/source-recipe/native-C boundaries, locked/headless
+M34 capture boundary, and two-prerequisite M35 boundary remain unchanged. No
+shipped, visual-parity, or complete full-game Swift claim is made. Handoffs:
+`.porting/porting-handoff-full-swift-twin-phase50-final-reconcile.md` and
+`.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md`.
 
 Continuation Phase 1 (2026-08-20) is checkpointed at `da4fa9ae` plus the
 current live-host control. The fresh arm64 Debug bundle built, launched through
