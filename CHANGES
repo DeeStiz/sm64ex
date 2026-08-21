@@ -1,4 +1,4 @@
-SM64 Modern native macOS — nightly continuation update (2026-08-20)
+SM64 Modern native macOS — nightly continuation update (2026-08-21)
 1.) Centrally promote the remaining Phase 2/3 owners through dispatch routes
     259–270, including platform, puzzle, Snowman, and Treasure Chest families,
     preserving generation-safe ownership and effect delivery.
@@ -47,6 +47,21 @@ SM64 Modern native macOS — nightly continuation update (2026-08-20)
      continuation summary without changing historical ledger entries; preserve
      the 534/511/23 and 1/7,419 counters and keep release/visual/full-game
      acceptance explicitly open.
+16.) Record Phase 31's complete independent two-tick, byte-identical C/Swift
+     window and promotion for the existing `oracle_hook|input` row; the retained
+     live-qualified ledger remains 1/7,419 and no second row is admitted.
+17.) Record Phase 32's fresh M34 host/compositor refresh: the host remains
+     locked/headless, the runtime reaches three frames, archive reuse is false,
+     and fetched color/depth attachments are clear-only black.
+18.) Record Phase 33's stable-Xcode M35 prerequisite refresh: exactly the
+     missing Developer ID Application identity/private key and notarytool
+     authentication blockers remain, with the distribution flow fail-closed.
+19.) Record Phase 34's next-route qualification boundary: neither
+     `bhvDecorativePendulum` nor `oracle_hook|global_state` can be admitted
+     without real missing schema domains or Swift emitters/owners.
+20.) Reconcile the public/status documents and current continuation summary
+     after Phases 31–34 without changing historical ledger text; preserve the
+     no-shipped, no-visual-parity, and no-full-game-Swift claims.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)

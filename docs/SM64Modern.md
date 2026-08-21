@@ -14,7 +14,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 ## Current status
 
 The status below is pinned to the current `nightly` continuation
-(2026-08-20).
+(2026-08-21).
 
 * **M33nk** remains the latest numbered behavior-qualification slice. The
   continuation has centrally promoted every Phase 2/3 route-local owner
@@ -91,7 +91,8 @@ The status below is pinned to the current `nightly` continuation
   `current_route_shard_admitted=0 synthetic_one_record_rejected=1 coverage_or_window_gate=1 fixture_only=0`.
   `real_route_alignment_attempted=1 records=1 exact_bytes=1 common_fingerprints=5`
   is alignment evidence only; the complete coverage and independent multi-tick
-  window are still missing, so the live ledger remains **1 of 7,419**.
+  window were missing from that attempt. Phase 31 later completed the same
+  existing row without changing the live ledger from **1 of 7,419**.
 * Phase 26's M34 visible-capture attempt was run from a locked/headless host:
   the screen capture was black with displays asleep and the wake attempt ended
   at the login screen. The API/shader-validation log reached
@@ -114,6 +115,27 @@ The status below is pinned to the current `nightly` continuation
   private key and no notarytool authentication. No archive, export, DMG, ZIP,
   notarization, stapling, Gatekeeper, physical, or human acceptance state was
   changed or claimed; clean-machine and human acceptance remain open.
+* Phase 31 completed the independent two-tick C/Swift window and promotion gate
+  for the existing `oracle_hook|input` row (`0xd9446dfed10e189e`): the retained
+  artifacts are byte-identical, carry complete row coverage, and pass replay,
+  tamper, worker-result, and persistent-rerun gates. This closes the existing
+  row's evidence only; the live ledger remains **1 of 7,419**, with 7,418 rows
+  still planned.
+* Phase 32 made a fresh M34 two-pass attempt from a locked/headless host. The
+  runtime stopped at three frames/presents, archive reuse remained false, and
+  all fetched color/depth attachments were clear-only black. This is structural
+  diagnostic evidence only; M34 visual, physical-device, performance, and
+  human acceptance remain open.
+* Phase 33 rechecked M35 with invocation-scoped stable Xcode 26.6 and leaves
+  exactly two blockers: no valid Developer ID Application identity/private key
+  and no notarytool authentication. The fail-closed flow performed no archive,
+  export, DMG, ZIP, notarization, or stapling mutation.
+* Phase 34 did not admit a second route. `bhvDecorativePendulum` is blocked by
+  real missing `collision_queries` and `script_events` schema domains in its
+  C/Swift owner path; `oracle_hook|global_state` is blocked by the missing
+  schema-4 global-state Swift emitter and random-seed owner. Adding either row
+  without those source-backed domains would be synthetic evidence and is
+  rejected.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
@@ -123,7 +145,13 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 26 M34 capture](../.porting/porting-handoff-full-swift-twin-phase26-m34-visible-capture.md),
 [Phase 27 Release entitlement](../.porting/porting-handoff-full-swift-twin-phase27-release-entitlement.md),
 [Phase 28 M35 recheck](../.porting/porting-handoff-full-swift-twin-phase28-m35-external-recheck.md),
-and [Phase 29 docs reconciliation](../.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md).
+[Phase 29 docs reconciliation](../.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md),
+[Phase 30 completion audit](../.porting/porting-handoff-full-swift-twin-phase30-completion-audit.md),
+[Phase 31 route window](../.porting/porting-handoff-full-swift-twin-phase31-route-multitick.md),
+[Phase 32 M34 host refresh](../.porting/porting-handoff-full-swift-twin-phase32-m34-host-refresh.md),
+[Phase 33 M35 prerequisite refresh](../.porting/porting-handoff-full-swift-twin-phase33-m35-prereq-refresh.md),
+[Phase 34 next-route qualification](../.porting/porting-handoff-full-swift-twin-phase34-next-route.md),
+and [Phase 35 docs reconciliation](../.porting/porting-handoff-full-swift-twin-phase35-docs-reconcile.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is

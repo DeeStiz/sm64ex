@@ -70,20 +70,18 @@ qualification ledger has 534 behavior rows (511 Swift owners and 23 explicit C
 adapters), with M33nk as the latest numbered behavior slice, Treasure Chest
 route 270 as the latest central promotion, and M34b as the latest validated
 Metal 4 production/capture slice. One of 7,419 route shards is live-qualified
-and 7,418 remain planned. The Phase 25 route-alignment attempt for
-`oracle_hook|input` (`0xd9446dfed10e189e`) reports
-`pairing_audit admitted=0 c_records=1 swift_records=1 c_ticks=2 swift_ticks=2 blockers=coverage_deferred`
-and `real_route_alignment_attempted=1 records=1 exact_bytes=1 common_fingerprints=5`;
-the complete coverage/multi-tick window is still missing, so
-`current_route_shard_admitted=0` and no second row was promoted. Phase 26's
-M34 attempt was host-locked/headless: the validation log reached
-`scheduler_dropped_steps=64`, while the separate capture-only pass reached
-`scheduler_dropped_steps=0` but only `callbacks=3 presented=3`,
-`archive_reuse=false`, and clear-only black fetched attachments. Phase 27
-corrected Release `com.apple.security.get-task-allow=false` while preserving
-authorized sustained execution; Phase 28's stable-Xcode recheck leaves exactly
-the missing Developer ID Application identity/private key and notary
-authentication as the two M35 blockers. Route-shard closure,
+and 7,418 remain planned. Phase 31 completed the independent two-tick,
+byte-identical C/Swift window and promotion gate for the existing
+`oracle_hook|input` row (`0xd9446dfed10e189e`); because this is the retained
+row, the live ledger remains **1 of 7,419**, not a second admission. Phase 32's
+fresh M34 attempt remained locked/headless and stopped at three presented
+frames; fetched color/depth attachments were clear-only black and archive reuse
+was false. Phase 33 leaves exactly two M35 blockers: no valid Developer ID
+Application identity/private key and no notarytool authentication. Phase 34
+could not admit `bhvDecorativePendulum` because its real owner path lacks the
+manifest's collision-query and script-event schema domains, or
+`oracle_hook|global_state` because the Swift side has no schema-4 global-state
+emitter or random-seed owner. Route-shard closure,
 physical/device/performance/thermal evidence, distribution, and human
 acceptance are still open; this is not a shipped full-game Swift port. See the
 [current status](docs/SM64Modern.md), [full-Swift-twin goal](.porting/goal-full-swift-twin.md),
@@ -93,7 +91,13 @@ for the evidence ledger and latest handoffs, including the
 [Phase 26 M34 capture](.porting/porting-handoff-full-swift-twin-phase26-m34-visible-capture.md),
 [Phase 27 Release entitlement](.porting/porting-handoff-full-swift-twin-phase27-release-entitlement.md),
 [Phase 28 M35 recheck](.porting/porting-handoff-full-swift-twin-phase28-m35-external-recheck.md),
-and [Phase 29 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md).
+[Phase 29 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md),
+[Phase 30 completion audit](.porting/porting-handoff-full-swift-twin-phase30-completion-audit.md),
+[Phase 31 route window](.porting/porting-handoff-full-swift-twin-phase31-route-multitick.md),
+[Phase 32 M34 host refresh](.porting/porting-handoff-full-swift-twin-phase32-m34-host-refresh.md),
+[Phase 33 M35 prerequisite refresh](.porting/porting-handoff-full-swift-twin-phase33-m35-prereq-refresh.md),
+[Phase 34 next-route qualification](.porting/porting-handoff-full-swift-twin-phase34-next-route.md),
+and [Phase 35 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase35-docs-reconcile.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:

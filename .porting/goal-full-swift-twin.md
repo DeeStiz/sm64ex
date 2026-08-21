@@ -82,7 +82,16 @@ boundary. Phase 25's route-alignment attempt remains non-admitted because
 locked-host M34 capture remains clear-only diagnostic evidence. Phase 27
 corrects Release `get-task-allow=false`, and Phase 28 leaves exactly the
 Developer ID Application identity/private-key and notary-authentication M35
-blockers. These audits do not claim a shipped or full-game Swift twin.
+blockers. Phase 31 then completed the independent two-tick, byte-identical
+C/Swift window and promotion gate for the existing `oracle_hook|input` row;
+the retained row is promoted, but the live ledger remains 1 of 7,419. Phase
+32's fresh M34 attempt remains locked/headless at three frames with clear-only
+black attachments and no archive reuse. Phase 33 leaves exactly the same two
+M35 blockers. Phase 34 could not admit `bhvDecorativePendulum` without its
+missing collision-query/script-event schema domains or
+`oracle_hook|global_state` without a schema-4 global-state Swift emitter and
+random-seed owner. These audits do not claim a shipped, visual-parity, or
+full-game Swift twin.
 
 The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
 is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
@@ -93,7 +102,13 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 26 M34 capture](.porting/porting-handoff-full-swift-twin-phase26-m34-visible-capture.md),
 [Phase 27 Release entitlement](.porting/porting-handoff-full-swift-twin-phase27-release-entitlement.md),
 [Phase 28 M35 recheck](.porting/porting-handoff-full-swift-twin-phase28-m35-external-recheck.md),
-and [Phase 29 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md).
+[Phase 29 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md),
+[Phase 30 completion audit](.porting/porting-handoff-full-swift-twin-phase30-completion-audit.md),
+[Phase 31 route window](.porting/porting-handoff-full-swift-twin-phase31-route-multitick.md),
+[Phase 32 M34 host refresh](.porting/porting-handoff-full-swift-twin-phase32-m34-host-refresh.md),
+[Phase 33 M35 prerequisite refresh](.porting/porting-handoff-full-swift-twin-phase33-m35-prereq-refresh.md),
+[Phase 34 next-route qualification](.porting/porting-handoff-full-swift-twin-phase34-next-route.md),
+and [Phase 35 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase35-docs-reconcile.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
@@ -168,6 +183,55 @@ ledger text. The 534/511/23 behavior counters and 1/7,419 live-qualified route
 counter remain unchanged; Phase 25's attempted row remains non-admitted, M34
 remains diagnostic/clear-only, and M35 has exactly the two Phase 28 blockers.
 Handoff: `.porting/porting-handoff-full-swift-twin-phase29-docs-reconcile.md`.
+
+Continuation Phase 30 (2026-08-20) audited the active full-Swift-twin
+acceptance matrix and confirmed that no end-to-end completion requirement is
+closed. Route closure remains 1 of 7,419; M34 remains blocked by the visible
+host/compositor, archive, and non-clear/reference evidence gates; M35 remains
+blocked by external signing/notary prerequisites; and clean-machine/human
+acceptance remains unstarted. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase30-completion-audit.md`.
+
+Continuation Phase 31 (2026-08-20) completes the independent two-tick C/Swift
+window for the existing `oracle_hook|input` identity
+`0xd9446dfed10e189e`. The retained C and Swift artifacts are byte-identical,
+carry complete nonzero row coverage, and pass promotion, replay, tamper,
+worker-result, and persistent-rerun gates. This promotes the existing row's
+evidence only; the live ledger remains 1 of 7,419 and no second manifest row
+is admitted. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase31-route-multitick.md`.
+
+Continuation Phase 32 (2026-08-20) makes a fresh M34 two-pass attempt from a
+locked/headless host. The runtime reaches only three frames/presents; archive
+reuse remains false and every fetched color/depth attachment is clear-only
+black. The trace is structural diagnostic evidence only; M34 visual,
+physical-device, performance, and human acceptance remain open. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase32-m34-host-refresh.md`.
+
+Continuation Phase 33 (2026-08-20) rechecks M35 with invocation-scoped stable
+Xcode 26.6 and leaves exactly two blockers: no valid Developer ID Application
+identity/private key and no notarytool authentication. The fail-closed
+distribution flow performs no archive/export/DMG/ZIP/notarization/stapling
+mutation. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase33-m35-prereq-refresh.md`.
+
+Continuation Phase 34 (2026-08-21) attempts the next canonical route and admits
+no second row. `bhvDecorativePendulum` requires
+`collision_queries,effects,object_state,script_events`, but its real C/Swift
+owner path emits only the latter two; `oracle_hook|global_state` has no
+schema-4 global-state Swift emitter or Swift owner for the native random-seed
+field. Adding either candidate without those source-backed domains would be
+synthetic evidence, so the ledger remains 1 of 7,419. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase34-next-route.md`.
+
+Continuation Phase 35 (2026-08-21) reconciles the public README, SM64 Modern
+status, and this current continuation summary after Phases 31–34 without
+changing implementation, generated manifests, route ledgers, or historical
+ledger text. The 534/511/23 behavior counters and 1/7,419 live-qualified route
+counter remain unchanged; M34 stays locked/headless/three-frame/clear-only,
+M35 has exactly the two Phase 33 blockers, and no shipped, visual-parity, or
+full-game Swift claim is made. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase35-docs-reconcile.md`.
 
 Continuation Phase 1 (2026-08-20) is checkpointed at `da4fa9ae` plus the
 current live-host control. The fresh arm64 Debug bundle built, launched through
