@@ -32,8 +32,11 @@ xcrun --sdk macosx clang \
   -lm \
   -lpthread
 
+LOG="$BUILD_ROOT/live-oracle-lifecycle-record.log"
 SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
-  "$OUTPUT" "$TRACE" "$SAVE_ROOT"
+  "$OUTPUT" "$TRACE" "$SAVE_ROOT" | tee "$LOG"
+
+grep -Eq 'liveOracleRenderRecords=[1-9][0-9]*' "$LOG"
 
 test -s "$TRACE"
 printf '%s\n' "SM64 Modern live oracle lifecycle file smoke passed"

@@ -15,6 +15,7 @@
 struct TraceFile {
     FILE *file;
     uint64_t records;
+    uint64_t records_by_domain[SM64_MODERN_ORACLE_TRACE_DOMAIN_COUNT];
     uint32_t domains;
     bool domain_seen[SM64_MODERN_ORACLE_TRACE_DOMAIN_COUNT];
     uint64_t last_tick[SM64_MODERN_ORACLE_TRACE_DOMAIN_COUNT];
@@ -122,6 +123,7 @@ static SM64ModernStatus trace_write_record(
         trace->failures++;
         return SM64_MODERN_STATUS_PLATFORM_ERROR;
     }
+    trace->records_by_domain[domain]++;
     trace->records++;
     return SM64_MODERN_STATUS_OK;
 }
@@ -396,12 +398,8 @@ static SM64ModernPlatformApiV1 make_platform_api(struct HarnessState *state) {
     memset(&api, 0, sizeof(api));
     api.header.abi_version = SM64_MODERN_ABI_VERSION_1;
     api.header.struct_size = sizeof(api);
-    // Install the renderer during platform initialization, but keep frame
-    // dispatch disabled for this lifecycle probe. The current lifecycle closes
-    // the parity/oracle tick before gfx_end_frame emits render-finish, so a
-    // rendering capability would poison the following tick until that core
-    // boundary is repaired.
-    api.capabilities = SM64_MODERN_PLATFORM_CAP_AUDIO
+    api.capabilities = SM64_MODERN_PLATFORM_CAP_RENDERING
+        | SM64_MODERN_PLATFORM_CAP_AUDIO
         | SM64_MODERN_PLATFORM_CAP_INPUT;
     api.context = state;
     api.initialize = platform_initialize;
@@ -575,9 +573,12 @@ int main(int argc, char **argv) {
     const uint32_t required_domains =
         (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_GLOBAL)
         | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_INPUT)
-        | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_AUDIO);
-    expect_true("global/input/audio domains",
+        | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_AUDIO)
+        | (UINT32_C(1) << SM64_MODERN_ORACLE_DOMAIN_RENDER);
+    expect_true("required oracle domains",
                 (trace.domains & required_domains) == required_domains);
+    expect_true("render domain records",
+                trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_RENDER] > 0u);
     expect_true("platform callbacks", state.platform_initialize == 1u
                 && state.platform_shutdown == 1u);
     expect_true("input callbacks", state.input_reads >= TRACE_STEPS);
@@ -609,9 +610,12 @@ int main(int argc, char **argv) {
            " liveOracleTraceTicks=%" PRIu64
            " liveOracleTraceDomains=0x%08" PRIx32
            " liveOracleAudioCallbacks=%u"
+           " liveOracleRenderRecords=%" PRIu64
            " liveOracleRenderDraws=%u\n",
            file_records, file_last_tick, file_domains,
-           state.audio_play, state.render_draw);
+           state.audio_play,
+           trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_RENDER],
+           state.render_draw);
 
     if (failures != 0) {
         fprintf(stderr, "SM64 Modern live oracle lifecycle smoke failed: %d failure(s)\n",

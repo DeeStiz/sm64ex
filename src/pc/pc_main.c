@@ -314,6 +314,13 @@ static SM64ModernStatus lifecycle_step(void) {
         sPlatform.audio_play(sPlatform.context, audio_buffer, audio_frame_count);
     }
 
+    if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING) {
+        gfx_end_frame();
+    }
+
+    // Rendering callbacks, including finish_render from gfx_end_frame(), are
+    // part of the same oracle tick as simulation/audio. Close the tick only
+    // after presentation has emitted its render-domain records.
     sm64_modern_parity_end_tick();
     const SM64ModernStatus parity_status = sm64_modern_parity_status();
     const SM64ModernStatus migration_status = sm64_modern_gameplay_migration_active_status();
@@ -321,7 +328,6 @@ static SM64ModernStatus lifecycle_step(void) {
         sm64_modern_progression_migration_active_status();
 
     if (sPlatform.capabilities & SM64_MODERN_PLATFORM_CAP_RENDERING) {
-        gfx_end_frame();
         const SM64ModernStatus rendering_status = sm64_modern_rendering_status();
         if (rendering_status != SM64_MODERN_STATUS_OK) {
             report_error(rendering_status, "The native rendering backend failed");
