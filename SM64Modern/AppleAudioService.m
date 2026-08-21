@@ -1,5 +1,6 @@
 #import "AppleAudioService.h"
 
+#include <Availability.h>
 #import <AVFAudio/AVFAudio.h>
 #import <pthread.h>
 #import <stdatomic.h>
@@ -73,29 +74,36 @@ static NSError *audio_error(SM64ModernAppleAudioErrorCode code, NSString *descri
     }
 
     SM64ModernAudioRing *renderRing = _ring;
+    AVAudioSourceNodeRenderBlock renderBlock = ^OSStatus(BOOL *isSilence,
+                                                         const AudioTimeStamp *timestamp,
+                                                         AVAudioFrameCount frameCount,
+                                                         AudioBufferList *outputData) {
+        (void) timestamp;
+        if (outputData->mNumberBuffers != 1
+            || outputData->mBuffers[0].mNumberChannels != SM64ModernAudioChannelCount
+            || !outputData->mBuffers[0].mData
+            || outputData->mBuffers[0].mDataByteSize
+                < frameCount * SM64ModernAudioChannelCount * sizeof(int16_t)) {
+            *isSilence = YES;
+            return kAudio_ParamError;
+        }
+        bool silence = false;
+        SM64ModernAudioRingRead(renderRing,
+                                outputData->mBuffers[0].mData,
+                                frameCount,
+                                &silence);
+        *isSilence = silence;
+        return noErr;
+    };
+#if defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 270000
     _sourceNode = [[AVAudioSourceNode alloc]
         initWithFormat:_sourceFormat
-        realtimeSafeRenderBlock:^OSStatus(BOOL *isSilence,
-                                           const AudioTimeStamp *timestamp,
-                                           AVAudioFrameCount frameCount,
-                                           AudioBufferList *outputData) {
-            (void) timestamp;
-            if (outputData->mNumberBuffers != 1
-                || outputData->mBuffers[0].mNumberChannels != SM64ModernAudioChannelCount
-                || !outputData->mBuffers[0].mData
-                || outputData->mBuffers[0].mDataByteSize
-                    < frameCount * SM64ModernAudioChannelCount * sizeof(int16_t)) {
-                *isSilence = YES;
-                return kAudio_ParamError;
-            }
-            bool silence = false;
-            SM64ModernAudioRingRead(renderRing,
-                                    outputData->mBuffers[0].mData,
-                                    frameCount,
-                                    &silence);
-            *isSilence = silence;
-            return noErr;
-        }];
+        realtimeSafeRenderBlock:(AVAudioSourceNodeRenderBlockRealtimeSafe)renderBlock];
+#else
+    _sourceNode = [[AVAudioSourceNode alloc]
+        initWithFormat:_sourceFormat
+        renderBlock:renderBlock];
+#endif
     if (!_sourceNode) {
         SM64ModernAudioRingDestroy(_ring);
         _ring = NULL;
@@ -242,6 +250,7 @@ static NSError *audio_error(SM64ModernAppleAudioErrorCode code, NSString *descri
         _sourceAttached = YES;
     }
 
+#if defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && __MAC_OS_X_VERSION_MAX_ALLOWED >= 270000
     NSError *connectionError = nil;
     if (![_engine connect:_sourceNode
                         to:_engine.mainMixerNode
@@ -253,6 +262,29 @@ static NSError *audio_error(SM64ModernAppleAudioErrorCode code, NSString *descri
         }
         return NO;
     }
+#else
+    // macOS 26.x SDKs expose only the legacy void connection API. Verify the
+    // resulting graph when possible; unlike the newer API, this call cannot
+    // provide an NSError for a rejected connection.
+    [_engine connect:_sourceNode
+                  to:_engine.mainMixerNode
+              format:nil];
+    BOOL sourceConnected = NO;
+    for (AVAudioConnectionPoint *connection in
+         [_engine outputConnectionPointsForNode:_sourceNode outputBus:0]) {
+        if (connection.node == _engine.mainMixerNode) {
+            sourceConnected = YES;
+            break;
+        }
+    }
+    if (!sourceConnected) {
+        if (error) {
+            *error = audio_error(SM64ModernAppleAudioErrorConnection,
+                                  @"Could not connect the audio source node");
+        }
+        return NO;
+    }
+#endif
 
     [_engine prepare];
     NSError *startError = nil;
