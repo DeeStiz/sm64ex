@@ -129,6 +129,7 @@ else
   "$PROJECT_ROOT/script/test_behavior_manifest.sh"
   "$PROJECT_ROOT/script/test_route_shards.sh"
   "$PROJECT_ROOT/script/test_route_shard_replay.sh"
+  "$PROJECT_ROOT/script/test_route_shard_live_executor.sh"
   "$PROJECT_ROOT/script/test_route_shard_worker_result.sh"
   "$PROJECT_ROOT/script/test_route_shard_merge.sh"
   "$PROJECT_ROOT/script/test_mad_piano.sh"
