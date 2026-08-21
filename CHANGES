@@ -62,6 +62,18 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
 20.) Reconcile the public/status documents and current continuation summary
      after Phases 31–34 without changing historical ledger text; preserve the
      no-shipped, no-visual-parity, and no-full-game-Swift claims.
+21.) Record Phase 37's decorative-pendulum seam audit. No second route is
+     admitted: the real Swift pair still lacks collision-query and
+     behavior-script/lifecycle owners, while global-state/random-seed ownership
+     remains absent for the next oracle row.
+22.) Reconcile README, SM64 Modern status, and the current Full Swift Twin
+     continuation summary after Phase 37 without changing historical ledger
+     text; preserve the 534/511/23 and 1/7,419 counters and the no-shipped,
+     no-visual-parity, and no-full-game-Swift claims.
+23.) Add a fresh Phase 38 completion audit that keeps the existing
+     `oracle_hook|input` row as the only complete route, retains the locked/
+     headless M34 boundary and two M35 blockers, and leaves release, device,
+     visual, full-game, and human acceptance open.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)

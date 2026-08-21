@@ -82,15 +82,17 @@ boundary. Phase 25's route-alignment attempt remains non-admitted because
 locked-host M34 capture remains clear-only diagnostic evidence. Phase 27
 corrects Release `get-task-allow=false`, and Phase 28 leaves exactly the
 Developer ID Application identity/private-key and notary-authentication M35
-blockers. Phase 31 then completed the independent two-tick, byte-identical
+blockers. Phase 31 completed the independent two-tick, byte-identical
 C/Swift window and promotion gate for the existing `oracle_hook|input` row;
 the retained row is promoted, but the live ledger remains 1 of 7,419. Phase
 32's fresh M34 attempt remains locked/headless at three frames with clear-only
 black attachments and no archive reuse. Phase 33 leaves exactly the same two
-M35 blockers. Phase 34 could not admit `bhvDecorativePendulum` without its
-missing collision-query/script-event schema domains or
-`oracle_hook|global_state` without a schema-4 global-state Swift emitter and
-random-seed owner. These audits do not claim a shipped, visual-parity, or
+M35 blockers. Phase 34 and Phase 37 could not admit
+`bhvDecorativePendulum`: its real C/Swift owner path has no collision-query
+owner or behavior-script/lifecycle owner for the required
+`collision_queries,effects,object_state,script_events` domains. The next
+`oracle_hook|global_state` row still has no schema-4 global-state Swift emitter
+or random-seed owner. These audits do not claim a shipped, visual-parity, or
 full-game Swift twin.
 
 The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
@@ -108,7 +110,11 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 32 M34 host refresh](.porting/porting-handoff-full-swift-twin-phase32-m34-host-refresh.md),
 [Phase 33 M35 prerequisite refresh](.porting/porting-handoff-full-swift-twin-phase33-m35-prereq-refresh.md),
 [Phase 34 next-route qualification](.porting/porting-handoff-full-swift-twin-phase34-next-route.md),
-and [Phase 35 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase35-docs-reconcile.md).
+[Phase 35 docs reconciliation](.porting/porting-handoff-full-swift-twin-phase35-docs-reconcile.md),
+[Phase 36 completion audit](.porting/porting-handoff-full-swift-twin-phase36-completion-audit.md),
+[Phase 37 decorative pendulum seams](.porting/porting-handoff-full-swift-twin-phase37-decorative-pendulum-seams.md),
+[Phase 38 final reconciliation](.porting/porting-handoff-full-swift-twin-phase38-final-reconcile.md),
+and [Phase 38 completion audit](.porting/porting-handoff-full-swift-twin-phase38-completion-audit.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

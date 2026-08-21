@@ -136,6 +136,13 @@ The status below is pinned to the current `nightly` continuation
   schema-4 global-state Swift emitter and random-seed owner. Adding either row
   without those source-backed domains would be synthetic evidence and is
   rejected.
+* Phase 37 rechecked the decorative-pendulum source path and still admitted no
+  second route. Its real Swift pair has object-state and clock-sound effect
+  ownership, but no terrain/collision owner or behavior-script/lifecycle owner
+  from which the required `collision_queries` and `script_events` records could
+  be emitted. The `oracle_hook|global_state` candidate still has no schema-4
+  global-state Swift emitter or random-seed owner; adding either route would be
+  synthetic evidence.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
@@ -151,7 +158,11 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 32 M34 host refresh](../.porting/porting-handoff-full-swift-twin-phase32-m34-host-refresh.md),
 [Phase 33 M35 prerequisite refresh](../.porting/porting-handoff-full-swift-twin-phase33-m35-prereq-refresh.md),
 [Phase 34 next-route qualification](../.porting/porting-handoff-full-swift-twin-phase34-next-route.md),
-and [Phase 35 docs reconciliation](../.porting/porting-handoff-full-swift-twin-phase35-docs-reconcile.md).
+[Phase 35 docs reconciliation](../.porting/porting-handoff-full-swift-twin-phase35-docs-reconcile.md),
+[Phase 36 completion audit](../.porting/porting-handoff-full-swift-twin-phase36-completion-audit.md),
+[Phase 37 decorative pendulum seams](../.porting/porting-handoff-full-swift-twin-phase37-decorative-pendulum-seams.md),
+[Phase 38 final reconciliation](../.porting/porting-handoff-full-swift-twin-phase38-final-reconcile.md),
+and [Phase 38 completion audit](../.porting/porting-handoff-full-swift-twin-phase38-completion-audit.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
