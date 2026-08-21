@@ -72,6 +72,7 @@ planned. Historical M33–M35 notes retain their original 7,419 baseline.
 - **[Phase 71 — committed `16c7bfab`](porting-handoff-full-swift-twin-phase71-camera-route-pair.md):** the next camera-state route audit admitted no second live row; input-only still pairs, full-route coverage fails before a camera trace, and source/fixture contracts remain non-live evidence.
 - **[Phase 72 — committed `21be5325`](porting-handoff-full-swift-twin-phase72-full-route-coverage.md):** retained the real full-route input receipt so the source-backed composite trace reaches C replay.
 - **[Phase 73 — committed `c63f16c3`](porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md):** extended the C sidecar to exact nine-record full-route replay/tamper checks; no manifest row or live admission changed.
+- **[Phase 75 — committed `a5ff686f`](porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md):** stable generic Release and M35 contracts pass after SDK fixes; Developer ID/notary/artifact/clean-machine/human gates remain external.
 
 The automatic Luna-max phase protocol is: one disjoint owner per phase;
 focused validation plus `git diff --check`; a durable handoff comment and

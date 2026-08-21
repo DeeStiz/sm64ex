@@ -44,6 +44,12 @@
   `.porting/porting-handoff-full-swift-twin-phase72-full-route-coverage.md`
   and `.porting/porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md`.
 
+- **Continuation Phase 75 (2026-08-21):** Post-SDK M35 preflight passes the
+  stable generic Release build and readiness/distribution contracts. No
+  Developer ID identity/private key or notary authentication is available;
+  no distribution artifact, clean-machine, or human evidence exists.
+  Handoff: `.porting/porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md`.
+
 - **Historical Continuation Phases 61–64 (2026-08-21):** Phase 61's canonical M34
   production harness is blocked before app launch by
   `EngineRuntime.swift:189/:366` (`SM64ModernStatus`/`Int32` type errors).

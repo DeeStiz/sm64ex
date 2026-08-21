@@ -249,6 +249,11 @@ C sidecar to replay all nine source-backed full-route records with exact tamper
 detection. This composite trace has no canonical manifest row, so no live
 shard was promoted and route admission remains 1 of 7,420.
 
+Phase 75 refreshed M35 after the SDK fixes: stable generic Release and both
+readiness contracts pass, while Developer ID signing, notary authentication,
+distribution artifacts, clean-machine Gatekeeper, and human acceptance remain
+open.
+
 The separate progress indicators remain 511/534 behavior rows (95.693%),
 1/7,420 live-qualified route shards (0.013477%), and a conservative 0% floor
 for the full goal and acceptance. They are not an average and do not imply
@@ -330,7 +335,8 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 70 documentation refresh](porting-handoff-full-swift-twin-phase70-docs-refresh.md),
 [Phase 71 camera route pair audit](porting-handoff-full-swift-twin-phase71-camera-route-pair.md),
 [Phase 72 full-route coverage](porting-handoff-full-swift-twin-phase72-full-route-coverage.md),
-and [Phase 73 full C sidecar contract](porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md).
+[Phase 73 full C sidecar contract](porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md),
+and [Phase 75 M35 post-SDK preflight](porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

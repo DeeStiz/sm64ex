@@ -58,6 +58,11 @@ C sidecar to replay all nine source-backed full-route records with exact tamper
 detection. This composite trace still has no canonical manifest row, so no
 additional live shard was admitted and the ledger remains unchanged.
 
+Phase 75 refreshed M35 after the SDK fixes: stable generic Release and both
+readiness contracts pass, but Developer ID signing, notary authentication,
+distribution artifacts, clean-machine Gatekeeper, and human acceptance remain
+unavailable.
+
 M34, M35, and fresh-save human 120-star acceptance remain open. These gates
 are independent from local build, source, fixture, and headless-host
 evidence; this is not a shipped, visual-parity, or complete full-game Swift
@@ -361,7 +366,8 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 70 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase70-docs-refresh.md),
 [Phase 71 camera route pair audit](../.porting/porting-handoff-full-swift-twin-phase71-camera-route-pair.md),
 [Phase 72 full-route coverage](../.porting/porting-handoff-full-swift-twin-phase72-full-route-coverage.md),
-and [Phase 73 full C sidecar contract](../.porting/porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md).
+[Phase 73 full C sidecar contract](../.porting/porting-handoff-full-swift-twin-phase73-full-c-sidecar-contract.md),
+and [Phase 75 M35 post-SDK preflight](../.porting/porting-handoff-full-swift-twin-phase75-m35-post-sdk-preflight.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
