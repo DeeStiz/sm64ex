@@ -70,7 +70,7 @@ physical display, or human acceptance; M31 whole-engine authority and M33
 full-game qualification remain open.
 
 The current continuation audits preserve the live counters at 534 behavior
-rows (511 Swift owners and 23 explicit C adapters) and 1 of 7,419 qualified
+rows (511 Swift owners and 23 explicit C adapters) and 1 of 7,420 qualified
 route shards. Phase 20's independent common-input probe admits one matching
 schema-4 record as bounded contract evidence, but explicitly reports
 `current_route_shard_admitted=0`; no additional route row is admitted. Phase
@@ -84,7 +84,7 @@ corrects Release `get-task-allow=false`, and Phase 28 leaves exactly the
 Developer ID Application identity/private-key and notary-authentication M35
 blockers. Phase 31 completed the independent two-tick, byte-identical
 C/Swift window and promotion gate for the existing `oracle_hook|input` row;
-the retained row is promoted, but the live ledger remains 1 of 7,419. Phase
+the retained row is promoted, but the live ledger remains 1 of 7,420. Phase
 32's fresh M34 attempt remains locked/headless at three frames with clear-only
 black attachments and no archive reuse. Phase 33 leaves exactly the same two
 M35 blockers. Phase 34 and Phase 37 could not admit
@@ -133,7 +133,7 @@ leaving the existing parity sink as the sole schema-4 emitter. Calling
 `load_area(2)` directly or fabricating globals would not be route evidence.
 
 The counters remain 534 behavior rows (511 Swift owners and 23 explicit C
-adapters) and 1 of 7,419 live-qualified route shards, with 7,418 planned. M34
+adapters) and 1 of 7,420 live-qualified route shards, with 7,419 planned. M34
 still has only the bounded locked/headless three-present, clear-only capture
 with unproven archive reuse; M35 remains fail-closed on the authorized
 Developer ID Application identity/private key and notarytool authentication.
@@ -145,12 +145,25 @@ Phase 50 reconciled the public/status documents and preserved the Phase 44–49
 owner, dispatch, source-recipe, native-C, and native-core boundaries. Phase 51
 then compiled and loaded the Castle Inside script and all three area definitions,
 including the real area-2 collision, room, geometry, and
-`bhvDecorativePendulum` spawn command. The owner-thread command pointer performs
-the normal area-1 initialization and enters `CALL_LOOP`, but the current
-lifecycle API has no operation to request the normal area-2 transition. Direct
-`load_area(2)` or fabricated globals would bypass that owner path and are not
-route evidence. Phase 52 reconciles this status and records the fresh completion
-audit without changing the historical ledger.
+`bhvDecorativePendulum` spawn command. Phase 52 added an opt-in owner-thread
+transition (`SM64_MODERN_AUTOMATED_CASTLE_AREA2=1`) that selects the compiled
+`LEVEL_CASTLE` script and completes the normal Mario area-2 warp path. Its native
+lifecycle smoke observes `castleArea2Loaded=1`,
+`castleArea2PendulumSlot=37`, `castleArea2NativeRecords=3`,
+`castleArea2Roll=1464`, and `castleArea2Velocity=224`; it does not call
+`load_area(2)` directly or fabricate legacy globals. This is native area-2
+lifecycle evidence, not C/Swift parity or route admission.
+
+Phase 53 pairs that real slot-37 native trace with the Phase 46 source-backed
+Swift recipe and fails closed. The filtered native trace retains 23 records over
+domains `6,7`, while Swift emits 687 records over the required `3,6,7,12`
+domains. Native is missing the `object_state` (3) and pendulum-specific
+`effects` (12) domains; the first canonical divergence is
+`missing_c tick=1 domain=3 sequence=0 kind=1 subject=37`. The native header
+leaves the five required run/content/timebase/configuration/initial-save
+fingerprints zero while Swift has nonzero values, so no C/Swift pair or route
+promotion changed. Phase 54 reconciles this status and records the fresh
+completion audit without changing the historical ledger.
 
 The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
 is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
@@ -189,7 +202,12 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 50 completion audit](.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md),
 [Phase 51 level/area entrypoint](.porting/porting-handoff-full-swift-twin-phase51-level-area-entrypoint.md),
 [Phase 52 final reconciliation](.porting/porting-handoff-full-swift-twin-phase52-final-reconcile.md),
-and [Phase 52 completion audit](.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md).
+[Phase 52 owner-thread warp](.porting/porting-handoff-full-swift-twin-phase52-warp-transition.md),
+[Phase 52 completion audit](.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md),
+[Phase 53 pendulum pair](.porting/porting-handoff-full-swift-twin-phase53-pendulum-pair.md),
+[Phase 54 final reconciliation](.porting/porting-handoff-full-swift-twin-phase54-final-reconcile.md),
+[Phase 54 completion audit](.porting/porting-handoff-full-swift-twin-phase54-completion-audit.md),
+and [Phase 55 denominator correction](.porting/porting-handoff-full-swift-twin-phase55-denominator-fix.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
@@ -430,6 +448,42 @@ boundaries remain unchanged. No shipped, visual-parity, or complete full-game
 Swift claim is made. Handoffs:
 `.porting/porting-handoff-full-swift-twin-phase52-final-reconcile.md` and
 `.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md`.
+
+Continuation Phase 53 (2026-08-21) runs the real native Castle Inside area-2
+owner transition from Phase 52 and observes the actual decorative-pendulum
+pool slot 37 (`castleArea2Loaded=1`, `castleArea2NativeRecords=3`,
+`castleArea2Roll=1464`, `castleArea2Velocity=224`). It pairs the filtered
+native trace with the Phase 46 source-backed Swift recipe and fails closed:
+native retains only domains `6,7` (23 records), while Swift emits domains
+`3,6,7,12` (687 records). Native is missing `object_state` (3) and
+pendulum-specific `effects` (12), and its five required run/content/timebase/
+configuration/initial-save fingerprints are zero versus Swift's nonzero
+values. The first divergence is the missing native domain-3 record at tick 1
+for subject 37; promotion remains `not_attempted` and the live ledger remains
+1 of 7,419. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase53-pendulum-pair.md`.
+
+Continuation Phase 54 (2026-08-21) reconciles the public/status documents and
+adds a fresh completion audit after Phases 52–53 without changing historical
+ledger text. The counters remain 534/511/23 and 1/7,419 (7,418 planned); the
+native area-2 transition and slot-37 records are retained as lifecycle evidence
+only, while the exact missing native domains and fingerprint mismatch keep the
+pendulum route blocked. M34 remains locked/headless/clear-only with archive
+reuse unproven; M35 remains fail-closed on the same two external
+prerequisites, and physical, performance, thermal, distribution, and human
+acceptance remain open. No shipped, visual-parity, or complete full-game Swift
+claim is made. Handoffs:
+`.porting/porting-handoff-full-swift-twin-phase54-final-reconcile.md` and
+`.porting/porting-handoff-full-swift-twin-phase54-completion-audit.md`.
+
+Continuation Phase 55 (2026-08-21) corrects the route denominator drift found
+by the Phase 54 inventory audit. The strict reachability and route-shard smokes
+now regenerate 7,420 rows/shards: the Phase 52 `initiate_warp` header
+declaration is excluded while the legitimate `.c` transition call sites are
+retained. The retained `oracle_hook|input` row remains the only live-qualified
+row at 1 of 7,420, with 7,419 planned; the route ledger and blocked pendulum
+status are unchanged. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase55-denominator-fix.md`.
 
 Continuation Phase 1 (2026-08-20) is checkpointed at `da4fa9ae` plus the
 current live-host control. The fresh arm64 Debug bundle built, launched through
@@ -6210,7 +6264,7 @@ human acceptance.
    terminal shard report. No fixture-only output, guessed zero, or raw C
    pointer may close a shard.
 
-3. **Close all 7,419 reachable route shards.** Generate the deterministic
+3. **Close all 7,420 reachable route shards.** Generate the deterministic
    inventory and shard manifest from the content pack; execute every course,
    area, star/red-coin path, enemy/platform/hazard family, NPC/puzzle, boss
    phase, camera/cutscene, menu/transition, audio sequence, save mutation,

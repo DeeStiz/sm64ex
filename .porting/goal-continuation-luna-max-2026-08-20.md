@@ -14,6 +14,11 @@ passing source contract, build, fixture, or host smoke can advance the
 implementation ledger only. It cannot close a physical, visual, performance,
 thermal, release, clean-machine, or human gate.
 
+Current denominator note (2026-08-21): Phase 55 corrected the Phase 54 route
+inventory drift. The authoritative regenerated inventory and shard manifest
+contain 7,420 rows; the retained live row remains 1 of 7,420 and 7,419 remain
+planned. Historical M33–M35 notes retain their original 7,419 baseline.
+
 ## Objective
 
 Finish the active Full Swift Twin for the US SM64 Modern product with Swift
@@ -54,7 +59,7 @@ phase. It is not a completion claim.
   not live-game qualification counts.
 - M33 route-shard infrastructure and the first non-fixture live
   `oracle_hook|input` shard (`0xd9446dfed10e189e`) are recorded. The retained
-  manifest has 7,419 rows: one live-qualified row and 7,418 still planned.
+  manifest has 7,420 rows: one live-qualified row and 7,419 still planned.
   Fixture pairs, generated records, and an executor smoke do not close the
   remaining rows.
 - M34a/M34b have local Metal 4 contract, validation, and capture evidence.
@@ -76,7 +81,7 @@ phase. It is not a completion claim.
 | Ledger | Evidence-backed baseline | Still open |
 |---|---|---|
 | Implementation coverage | 534 reachable behavior rows are inventoried; 511 have Swift value/owner mappings; local focused contracts and strict-build gates exist for many slices. | Remaining reachable adapters, whole-engine authority, live invocation, and system-by-system closure. |
-| Live qualification | 1 of 7,419 route rows is recorded as a non-fixture live pass. | Common C/Swift trace pairing, 7,418 route rows, sanitizer reruns, and zero-unexecuted merge closure. |
+| Live qualification | 1 of 7,420 route rows is recorded as a non-fixture live pass. | Common C/Swift trace pairing, 7,419 route rows, sanitizer reruns, and zero-unexecuted merge closure. |
 | Platform production | Metal 4 source contracts and bounded validation/capture infrastructure exist. | Reliable visible-layer frames, post-resume acknowledgements, archive reuse, GPU/reference comparison, cadence, memory, and thermal evidence. |
 | Release/human readiness | Fail-closed readiness/distribution checks and local smoke coverage exist. | Signing/notarization/stapling, clean-machine Gatekeeper, physical interaction, and fresh-save human acceptance. |
 
@@ -147,7 +152,7 @@ independently, compare byte-for-byte by tick/domain/record kind, and merge
 only terminal worker results. Keep hardware- or recipe-blocked rows explicitly
 `blocked`; never synthesize a pass.
 
-**Exit evidence:** all 7,419 rows have terminal `passed` results, no
+**Exit evidence:** all 7,420 rows have terminal `passed` results, no
 `fixture_only` result, exact record/coverage parity, no first divergence,
 reproducible isolated artifacts, and Debug, ASan/UBSan/TSan, and optimized
 reruns. Until then, the live qualification ledger is open even if behavior
@@ -335,7 +340,7 @@ Let:
 
 Report the implementation percentage as the conservative floor
 `I = min(B, R, S)`, never as an average. The observed 511/534 owner mapping
-and 1/7,419 live shard are useful counters, but neither is the Full Swift Twin
+and 1/7,420 live shard are useful counters, but neither is the Full Swift Twin
 implementation percentage. In particular, fixture rows and unexecuted rows
 cannot be credited because source code exists.
 

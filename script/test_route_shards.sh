@@ -38,8 +38,21 @@ fi
 
 inventory_count="$(awk '$0 !~ /^#/ && NF { count++ } END { print count + 0 }' "$INVENTORY")"
 manifest_count="$(awk -F'|' '$0 !~ /^#/ && NF { count++ } END { print count + 0 }' "$MANIFEST")"
+[[ "$inventory_count" -eq 7420 ]] || {
+  echo "route-shard authoritative inventory count $inventory_count does not match expected 7420" >&2
+  exit 1
+}
 [[ "$manifest_count" -eq "$inventory_count" ]] || {
   echo "route-shard manifest count $manifest_count does not match inventory $inventory_count" >&2
+  exit 1
+}
+
+if grep -Fq 'transition|initiate_warp|src/game/level_update.h|' "$INVENTORY"; then
+  echo "route-shard inventory retained the initiate_warp header declaration" >&2
+  exit 1
+fi
+grep -Eq '^transition\|initiate_warp\|src/game/[^|]+\.c\|' "$INVENTORY" || {
+  echo "route-shard inventory lost the initiate_warp C transition call site" >&2
   exit 1
 }
 

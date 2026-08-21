@@ -63,7 +63,17 @@ struct SM64OracleReachabilityTool {
         rows += callRows(files: files, domain: "render_callback", prefix: "src/pc/gfx/", pattern: #"\b(gfx_[A-Za-z0-9_]+)\s*\("#, notes: "render callback call site")
         rows += callRows(files: files, domain: "collision", prefix: "src/game/", pattern: #"\b(find_floor|find_ceil|find_wall_collisions|resolve_and_return_wall_collisions|find_water_level|find_poison_gas_level)\s*\("#, notes: "collision query call site")
         rows += callRows(files: files, domain: "rng", prefix: "src/game/", pattern: #"\b(random_[A-Za-z0-9_]+|random_u16|random_float)\s*\("#, notes: "random draw call site")
-        rows += callRows(files: files, domain: "transition", prefix: "src/game/", pattern: #"\b(warp_to_level|level_trigger_warp|initiate_warp|fade_into_special_warp|set_play_mode)\s*\("#, notes: "transition call site")
+        rows += callRows(
+            files: files,
+            domain: "transition",
+            prefix: "src/game/",
+            pattern: #"\b(warp_to_level|level_trigger_warp|initiate_warp|fade_into_special_warp|set_play_mode)\s*\("#,
+            notes: "transition call site",
+            // Phase 52 added this prototype alongside the real C transition;
+            // keep the historical header-derived rows stable while excluding
+            // the new declaration from the canonical denominator.
+            excluding: ["initiate_warp|src/game/level_update.h"]
+        )
         rows += oracleHookRows()
 
         let ordered = Array(Set(rows)).sorted()
@@ -187,13 +197,15 @@ struct SM64OracleReachabilityTool {
         domain: String,
         prefix: String,
         pattern: String,
-        notes: String
+        notes: String,
+        excluding: Set<String> = []
     ) -> [ReachabilityRow] {
         rowsFromMatches(
             files: files.filter { path, _ in path.hasPrefix(prefix) },
             domain: domain,
             pattern: pattern,
-            notes: notes
+            notes: notes,
+            excluding: excluding
         )
     }
 
@@ -201,7 +213,8 @@ struct SM64OracleReachabilityTool {
         files: [(path: String, text: String)],
         domain: String,
         pattern: String,
-        notes: String
+        notes: String,
+        excluding: Set<String> = []
     ) -> [ReachabilityRow] {
         guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
         var rows: [ReachabilityRow] = []
@@ -211,6 +224,7 @@ struct SM64OracleReachabilityTool {
                 guard match.numberOfRanges > 1,
                       let identityRange = Range(match.range(at: 1), in: text) else { continue }
                 let identity = String(text[identityRange])
+                guard !excluding.contains("\(identity)|\(path)") else { continue }
                 rows.append(ReachabilityRow(domain: domain, identity: identity, source: path, status: "declared", notes: notes))
             }
         }

@@ -49,7 +49,7 @@ The status below is pinned to the current `nightly` continuation
   LaunchServices `kLSNoExecutableErr (-10827)` (the direct AppKit diagnostic
   exits `134`). The retained complete host proof is M33nc; this is a host
   limitation, not evidence of a gameplay or Metal fault.
-* The route inventory contains **7,419 reachable shards**. Full shard
+* The route inventory contains **7,420 reachable shards**. Full shard
   execution, sanitizer reruns, physical visual/audio/controller checks,
   sustained performance and thermal checks, release packaging, and human
   acceptance remain open. M35 external distribution and human acceptance
@@ -57,7 +57,7 @@ The status below is pinned to the current `nightly` continuation
   but no distributable artifact or human acceptance has started.
 * The first real live shard (`0xd9446dfed10e189e`, `oracle_hook|input`) now
   passes C/Swift replay, live executor, and worker-result validation with
-  `fixture_only=0`; **1 of 7,419** manifest rows is live-qualified and **7,418**
+  `fixture_only=0`; **1 of 7,420** manifest rows is live-qualified and **7,419**
   remain planned.
 * No other rows are promoted from the current traces: the C contract replays
   hard-coded arrays, and fixture byte matches remain explicitly ineligible for
@@ -202,13 +202,32 @@ The status below is pinned to the current `nightly` continuation
   `load_area(2)` or fabricated globals would not be valid route evidence.
 * Phase 50 reconciled the public/status documents and retained the Phase 44–49
   owner, dispatch, source-recipe, native-C, and native-core boundaries. Phase 51
-  then compiled and loaded the Castle Inside script and all three area
-  definitions, including the real area-2 collision/room/geometry and
-  `bhvDecorativePendulum` spawn, but the current owner-thread command pointer
-  initializes area 1 and enters `CALL_LOOP` without an operation for the normal
-  area-2 transition. Direct `load_area(2)` or fabricated globals remain
-  invalid route evidence; no C/Swift pair or route promotion changed. Phase 52
-  records this blocker in a fresh reconciliation and completion audit.
+  compiled and loaded the Castle Inside script and all three area definitions,
+  including the real area-2 collision/room/geometry and
+  `bhvDecorativePendulum` spawn. Phase 52 then added an opt-in owner-thread
+  transition (`SM64_MODERN_AUTOMATED_CASTLE_AREA2=1`) that selects the compiled
+  `LEVEL_CASTLE` script and completes the normal Mario area-2 warp path. Its
+  native lifecycle smoke reports `castleArea2Loaded=1`,
+  `castleArea2PendulumSlot=37`, `castleArea2NativeRecords=3`,
+  `castleArea2Roll=1464`, and `castleArea2Velocity=224`; it does not call
+  `load_area(2)` directly or fabricate legacy globals. This is native area-2
+  lifecycle evidence, not C/Swift parity or route admission.
+* Phase 53 pairs that real slot-37 native trace with the Phase 46 source-backed
+  Swift recipe and fails closed. The filtered native trace retains 23 records
+  over domains `6,7`, while the Swift recipe emits 687 records over the
+  required `3,6,7,12` domains. Native is missing the `object_state` (3) and
+  pendulum-specific `effects` (12) domains; the first canonical divergence is
+  `missing_c tick=1 domain=3 sequence=0 kind=1 subject=37`. The native header
+  leaves the five required run/content/timebase/configuration/initial-save
+  fingerprints zero while Swift has nonzero values, so the pair is not
+  admissible and no route promotion changed. Phase 54 records this exact
+  divergence in a fresh reconciliation and completion audit.
+* Phase 55 corrected the denominator drift found in the Phase 54 inventory:
+  `./script/test_route_shards.sh` now regenerates **7,420** rows/shards,
+  excludes the Phase 52 `initiate_warp` header declaration, and retains the
+  legitimate `.c` transition call sites. The retained live row remains **1 of
+  7,420**, with **7,419** planned; no route ledger entry or pendulum admission
+  changed.
 
 The source-of-truth tracker and the complete milestone ledger are in
 [`../.porting/goal-full-swift-twin.md`](../.porting/goal-full-swift-twin.md).
@@ -246,7 +265,12 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 50 completion audit](../.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md),
 [Phase 51 level/area entrypoint](../.porting/porting-handoff-full-swift-twin-phase51-level-area-entrypoint.md),
 [Phase 52 final reconciliation](../.porting/porting-handoff-full-swift-twin-phase52-final-reconcile.md),
-and [Phase 52 completion audit](../.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md).
+[Phase 52 owner-thread warp](../.porting/porting-handoff-full-swift-twin-phase52-warp-transition.md),
+[Phase 52 completion audit](../.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md),
+[Phase 53 pendulum pair](../.porting/porting-handoff-full-swift-twin-phase53-pendulum-pair.md),
+[Phase 54 final reconciliation](../.porting/porting-handoff-full-swift-twin-phase54-final-reconcile.md),
+[Phase 54 completion audit](../.porting/porting-handoff-full-swift-twin-phase54-completion-audit.md),
+and [Phase 55 denominator correction](../.porting/porting-handoff-full-swift-twin-phase55-denominator-fix.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
@@ -348,7 +372,7 @@ gates before recording a milestone handoff.
 | --- | --- | --- |
 | C/Swift ABI | `make abi-smoke` | Versioned POD layout and callable-core contract |
 | Behavior ownership | `./script/test_behavior_manifest.sh` | Reproducible 534-row manifest and matching Swift/C fingerprint |
-| Route inventory | `./script/test_route_shards.sh` | Canonical 7,419-shard inventory and ledger schema (inventory status remains planned) |
+| Route inventory | `./script/test_route_shards.sh` | Canonical 7,420-shard inventory and ledger schema (inventory status remains planned) |
 | Live shard executor | `./script/test_route_shard_live_executor.sh` | Bounded canonical live-trace admission and isolated worker-result gate (does not launch all gameplay shards) |
 | Live shard batch | `./script/test_live_route_shard_batch.sh` | Real `oracle_hook|input` C/Swift replay plus one live worker-result; reports remaining planned rows |
 | Live route oracle | `./script/test_live_route_oracle.sh input-only` or `full` | Reachable owner-thread route execution and C/Swift oracle comparison |

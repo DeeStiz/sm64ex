@@ -131,6 +131,27 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      Phase 51 without changing historical ledger text; preserve the 534/511/23
      and 1/7,419 counters, Phase 44–50 owner/route/M34/M35 evidence, and the
      no-shipped, no-visual-parity, and no-full-game-Swift claims.
+39.) Record Phase 52's real opt-in native Castle Inside area-2 transition:
+     the compiled `LEVEL_CASTLE` script reaches area 2 through the normal warp
+     path, observes the actual decorative-pendulum pool slot 37, and emits
+     native area-2 records; no direct `load_area(2)` or fabricated globals are
+     accepted as route evidence.
+40.) Record Phase 53's exact Castle area-2 pendulum pairing boundary: the
+     filtered native slot-37 trace retains only domains 6/7 and is missing the
+     object-state (3) and pendulum-effect (12) domains emitted by the Swift
+     recipe; the required run/content/timebase/configuration/initial-save
+     fingerprints also diverge, so promotion remains unattempted.
+41.) Reconcile the public/status docs and add a Phase 54 completion audit after
+     Phases 52–53 without changing historical ledger text; preserve the
+     534/511/23 and 1/7,419 counters, unchanged M34/M35 and human-acceptance
+     boundaries, and the no-shipped, no-visual-parity, and no-full-game-Swift
+     claims.
+42.) Correct the Phase 54 route denominator drift: the regenerated source
+     inventory and deterministic shard manifest now contain 7,420 rows after
+     excluding the Phase 52 `initiate_warp` header declaration while retaining
+     legitimate `.c` transition call sites. The retained live row remains
+     1/7,420 with 7,419 planned; this correction does not mutate the ledger or
+     admit the blocked pendulum route.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)

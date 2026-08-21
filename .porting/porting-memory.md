@@ -2,6 +2,15 @@
 
 ## Latest validated slices (2026-08-17)
 
+- Continuation Phase 55 (2026-08-21) corrected the Phase 54 route denominator
+  drift. The strict reachability/route-shard smoke now regenerates the
+  authoritative 7,420-row inventory and 7,420 planned-shard manifest after
+  excluding the Phase 52 `initiate_warp` header declaration while retaining
+  legitimate `.c` transition call sites. The retained non-fixture
+  `oracle_hook|input` row remains the only live-qualified row at 1/7,420, with
+  7,419 planned; the route ledger and blocked pendulum status are unchanged.
+  Handoff: `.porting/porting-handoff-full-swift-twin-phase55-denominator-fix.md`.
+
 - Continuation Phase 1 (2026-08-20) froze the current qualification inputs at
   `da4fa9ae` plus the live host control. The fresh arm64 Debug bundle built,
   ad-hoc signed, launched through `/usr/bin/open -n`, reached

@@ -69,11 +69,11 @@ At the current `nightly` continuation, the full-Swift-twin
 qualification ledger has 534 behavior rows (511 Swift owners and 23 explicit C
 adapters), with M33nk as the latest numbered behavior slice, Treasure Chest
 route 270 as the latest central promotion, and M34b as the latest validated
-Metal 4 production/capture slice. One of 7,419 route shards is live-qualified
-and 7,418 remain planned. Phase 31 completed the independent two-tick,
+Metal 4 production/capture slice. One of 7,420 route shards is live-qualified
+and 7,419 remain planned. Phase 31 completed the independent two-tick,
 byte-identical C/Swift window and promotion gate for the existing
 `oracle_hook|input` row (`0xd9446dfed10e189e`); because this is the retained
-row, the live ledger remains **1 of 7,419**, not a second admission. Phase 32's
+row, the live ledger remains **1 of 7,420**, not a second admission. Phase 32's
 fresh M34 attempt remained locked/headless and stopped at three presented
 frames; fetched color/depth attachments were clear-only black and archive reuse
 was false. Phase 33 leaves exactly two M35 blockers: no valid Developer ID
@@ -123,11 +123,30 @@ Phase 50 reconciled the public/status documents and retained the Phase 44–49
 owner, dispatch, source-recipe, native-C, and native-core boundaries. Phase 51
 then compiled and loaded the Castle Inside script and all three area
 definitions, including the real area-2 collision/room/geometry and
-`bhvDecorativePendulum` spawn, but the current owner-thread command pointer
-initializes area 1 and enters `CALL_LOOP` without an operation for the normal
-area-2 transition. Direct `load_area(2)` or fabricated globals remain invalid
-route evidence; no C/Swift pair or route promotion changed. Phase 52 records
-this blocker in a fresh reconciliation and completion audit.
+`bhvDecorativePendulum` spawn. Phase 52 added an opt-in owner-thread transition
+(`SM64_MODERN_AUTOMATED_CASTLE_AREA2=1`) that selects the compiled
+`LEVEL_CASTLE` script and completes the normal Mario area-2 warp path. The
+native lifecycle evidence observes `castleArea2Loaded=1`, the real pendulum at
+`castleArea2PendulumSlot=37`, `castleArea2NativeRecords=3`,
+`castleArea2Roll=1464`, and `castleArea2Velocity=224`; no direct `load_area(2)`
+or fabricated globals are used. This proves native area-2 selection and
+updates, not C/Swift parity or route admission.
+Phase 53 pairs that slot-37 native trace with the Phase 46 source-backed Swift
+recipe and fails closed: native retains only domains `6,7` (23 filtered
+records), while Swift emits the required `3,6,7,12` domains (687 records).
+Native is missing the `object_state` (3) and pendulum-specific `effects` (12)
+domains; the first canonical divergence is the missing native domain-3 record
+at tick 1 for subject 37. The native header leaves the five required
+run/content/timebase/configuration/initial-save fingerprints zero while the
+Swift source header is nonzero, so no C/Swift pair or route promotion changed.
+Phase 54 records this exact divergence in a fresh reconciliation and
+completion audit.
+Phase 55 corrected the route denominator drift found in that audit: the
+regenerated inventory now has 7,420 rows/shards after excluding the Phase 52
+`initiate_warp` header declaration while retaining the legitimate `.c`
+transition call sites. The retained live row remains **1 of 7,420**, with 7,419
+planned; this is an inventory correction only and does not mutate the live
+ledger or admit the blocked pendulum route.
 Route-shard closure, physical/device/performance/thermal evidence,
 distribution, and human acceptance are still open; this is not a shipped,
 visual-parity, or complete full-game Swift port. See the
@@ -166,7 +185,12 @@ for the evidence ledger and latest handoffs, including the
 [Phase 50 completion audit](.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md),
 [Phase 51 level/area entrypoint](.porting/porting-handoff-full-swift-twin-phase51-level-area-entrypoint.md),
 [Phase 52 final reconciliation](.porting/porting-handoff-full-swift-twin-phase52-final-reconcile.md),
-and [Phase 52 completion audit](.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md).
+[Phase 52 owner-thread warp](.porting/porting-handoff-full-swift-twin-phase52-warp-transition.md),
+[Phase 52 completion audit](.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md),
+[Phase 53 pendulum pair](.porting/porting-handoff-full-swift-twin-phase53-pendulum-pair.md),
+[Phase 54 final reconciliation](.porting/porting-handoff-full-swift-twin-phase54-final-reconcile.md),
+[Phase 54 completion audit](.porting/porting-handoff-full-swift-twin-phase54-completion-audit.md),
+and [Phase 55 denominator correction](.porting/porting-handoff-full-swift-twin-phase55-denominator-fix.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:
