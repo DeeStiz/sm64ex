@@ -2,7 +2,7 @@
 
 ## Status
 
-### Phase 64 current status
+### Phase 70 current status
 
 The authoritative current counters are **534 behavior rows** (511 Swift
 value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
@@ -19,6 +19,20 @@ sound threshold is reached on a held native step, so a direct sink, room, or
 graph-flag override would fabricate evidence; no route promotion or ledger
 mutation occurred.
 
+Phase 65 fixed the `EngineRuntime.swift:189/:366`
+(`SM64ModernStatus`/`Int32`) boundary and a beta-Xcode Release build passed.
+Phase 66 reran the fixed M34 harness but failed closed at
+`scheduler_dropped_steps=65`; the host displays were asleep, only three
+presents were observed, and no capture pass ran. Phase 67's stable-Xcode M35
+preflight still finds exactly the Developer ID Application identity/private
+key and notary-authentication blockers. Phase 67c preserved the HUD
+fingerprints while fixing stable-Xcode type checking, and Phase 67d added
+macOS 26/27 AVFAudio SDK compatibility; the stable generic Release build now
+passes, but remains unsigned/local. The latest Phase 67b stable M34 rerun
+still fails closed at `scheduler_dropped_steps=63` with the screen locked,
+three presents, and no new capture. No archive/export/DMG/ZIP/staple/
+Gatekeeper, clean-machine, or human result exists.
+
 M34 still lacks reliable visible-layer, post-resume, archive-reuse, visual,
 FPS, memory, and thermal evidence. M35 still lacks an authorized Developer ID
 identity, notary authentication, clean-machine Gatekeeper, and real
@@ -33,8 +47,9 @@ override the current 7,420-row inventory.
 M33nk remains the latest numbered behavior-qualification slice; the
 continuation promotion now centrally wires Sushi Shark/collision child, the
 NPC/menu family, Squarish Path Moving, Pushable Metal Box, Tilting Bowser Lava
-Platform, LLL Bowser Puzzle, Snowman Bottom, and Treasure Chest. M34c remains the latest Metal 4 implementation checkpoint, while M34b
-is the latest validated production/capture slice. The squishable-platform, LLL
+Platform, LLL Bowser Puzzle, Snowman Bottom, and Treasure Chest. M34c remains
+the latest Metal 4 implementation checkpoint, while the latest stable rerun
+is still blocked by host scheduling. The squishable-platform, LLL
 drawbridge, shared water-wave, waterfall, volcano sound-loop, and tumbling
 bridge, WDW/JRB floating-platform, packed sliding-platform, small-water-wave,
 birds/sand ambient-sound, rotating-exclamation-mark, water-air-bubble, and
@@ -208,25 +223,44 @@ sound threshold occurs on a held native step, so forcing an audio sink, room,
 or graph flag would be synthetic evidence. No route promotion or ledger
 mutation occurred.
 
-Phase 60 was a documentation/completion audit only. Phases 61 and 62 then
-recorded the current production/release blockers without changing source, the
-route ledger, or the behavior manifest. Phase 61's canonical M34 production
-harness failed before app launch at `EngineRuntime.swift:189/:366` because
-`SM64ModernStatus` and `Int32` do not match. The retained `gpudebug` trace is
-structural/clear-only and provides no new visible-layer, post-resume,
-archive-reuse, FPS, GPU-time, memory, or thermal evidence. Phase 62 confirms
-that ordinary Xcode 26.6 works through an invocation override, but no
-Developer ID Application identity/private key or notary authentication is
-available; no archive/export/DMG/ZIP/staple/Gatekeeper, clean-machine, or
-human result exists. Phase 64 closes the documentation index only and keeps
-all implementation, release, and acceptance gates open.
+Phase 60 was a documentation/completion audit only. Phase 61's canonical M34
+production harness failed before app launch at `EngineRuntime.swift:189/:366`
+because `SM64ModernStatus` and `Int32` did not match; Phase 65 repaired that
+fixed-width boundary. Phase 66 reran the fixed harness and failed closed at
+`scheduler_dropped_steps=65` with displays asleep, three presents, and no
+capture. Phase 67's M35 preflight still found exactly the Developer ID
+Application identity/private-key and notary-authentication blockers. Phase 67c
+preserved HUD fingerprints while fixing stable-Xcode type checking; Phase 67d
+added macOS 26/27 AVFAudio compatibility and restored a stable generic Release
+build. The latest Phase 67b stable M34 rerun still failed closed at
+`scheduler_dropped_steps=63` on a locked host with three presents and no new
+capture. Phase 70 reconciles this documentation without changing source,
+route counters, route admission, or M34/M35/human claims. All implementation,
+release, and acceptance gates remain open.
 
 The separate progress indicators remain 511/534 behavior rows (95.693%),
 1/7,420 live-qualified route shards (0.013477%), and a conservative 0% floor
 for the full goal and acceptance. They are not an average and do not imply
 completion.
 
-The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
+### Next admissible gates
+
+1. **M34 awake-host rerun:** repeat the unchanged production harness on an
+   awake, unlocked visible GUI host; require zero scheduler/catch-up drops,
+   sustained callbacks/presents, post-resume drawable acknowledgement,
+   archive reuse, non-clear fetched pixels, and independent GPU/FPS/memory/
+   thermal evidence.
+2. **Route qualification:** independently record C and Swift with common
+   fingerprints and tick windows; admit only exact schema-4 parity with a
+   terminal worker result. Keep the ledger at 1/7,420 until then.
+3. **M35 signing/notary:** once M34 is proven, obtain Developer ID Application
+   credentials and one supported `notarytool` authentication mode, then run
+   readiness, archive/export, notarization/stapling, and clean-machine checks.
+4. **Human acceptance:** after signed artifacts pass Gatekeeper, execute and
+   record the fresh-save 120-star controls, camera, collision, audio, haptics,
+   visual, menu, credits, ending, and recovery checklist.
+
+The proposed [Luna-max continuation plan](goal-continuation-luna-max-2026-08-20.md)
 is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
 pairing](.porting/porting-handoff-full-swift-twin-phase20-c-swift-pairing.md),
 [Phase 21 M34 closure](.porting/porting-handoff-full-swift-twin-phase21-m34-closure.md),
@@ -275,7 +309,14 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 60 completion audit](.porting/porting-handoff-full-swift-twin-phase60-completion-audit.md),
 [Phase 61 M34 production audit](.porting/porting-handoff-full-swift-twin-phase61-m34-production-audit.md),
 [Phase 62 M35 release preflight](.porting/porting-handoff-full-swift-twin-phase62-m35-release-preflight.md),
-and [Phase 64 documentation closeout](.porting/porting-handoff-full-swift-twin-phase64-docs-closeout.md).
+[Phase 64 documentation closeout](porting-handoff-full-swift-twin-phase64-docs-closeout.md),
+[Phase 65 EngineRuntime status fix](porting-handoff-full-swift-twin-phase65-engine-runtime-status-fix.md),
+[Phase 66 fixed-build M34 rerun](porting-handoff-full-swift-twin-phase66-m34-rerun.md),
+[Phase 67 M35 current preflight](porting-handoff-full-swift-twin-phase67-m35-current-preflight.md),
+[Phase 67b stable M34 rerun](porting-handoff-full-swift-twin-phase67b-m34-stable-rerun.md),
+[Phase 67c HUD render fix](porting-handoff-full-swift-twin-phase67c-hud-render-fix.md),
+[Phase 67d AVFAudio SDK compatibility](porting-handoff-full-swift-twin-phase67d-avfaudio-sdk-compat.md),
+and [Phase 70 documentation refresh](porting-handoff-full-swift-twin-phase70-docs-refresh.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

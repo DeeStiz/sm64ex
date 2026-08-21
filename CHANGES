@@ -32,6 +32,29 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      admission. Preserve 534 behavior rows (511 Swift owners, 23 C adapters),
      7,420 total route shards (1 live, 7,419 planned), separate 95.693% and
      0.013477% indicators, and the conservative 0% full-goal floor.
+50.) Record Phase 65's fixed-width EngineRuntime status conversion. The
+     `SM64ModernStatus`/`Int32` boundary now builds under the beta Release
+     toolchain; route, M34, M35, and human acceptance claims remain open.
+51.) Record Phase 66's fixed-build M34 rerun. Release build passed, but the
+     harness failed closed at `scheduler_dropped_steps=65` on a host with
+     sleeping displays, three presents, and no capture pass.
+52.) Record Phase 67's stable-Xcode M35 preflight. Contract checks pass, while
+     Developer ID Application identity/private key and notary authentication
+     remain unavailable; no distribution artifact or acceptance claim exists.
+53.) Record Phase 67c's HUD arithmetic type-check fix with unchanged C↔Swift
+     fingerprints; retain the stable AVFAudio SDK diagnostics as the next
+     bounded build blocker.
+54.) Record Phase 67d's macOS 26/27 AVFAudio compatibility. Stable generic
+     Release build and audio contracts pass; the local product remains
+     unsigned and not distribution-ready.
+55.) Record Phase 67b's latest stable M34 rerun: the unchanged harness fails
+     closed at `scheduler_dropped_steps=63` with the screen locked, three
+     presents, and no new capture.
+56.) Reconcile Phase 70 README, SM64 Modern docs, CHANGES, both goal ledgers,
+     and porting memory. Preserve 534/511/23 and 7,420 total/1 live/7,419
+     planned; keep route pairing, M34, M35, clean-machine, and human gates
+     fail-closed; link every current handoff and record the next awake-host,
+     route, signing/notary, and human-acceptance sequence.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

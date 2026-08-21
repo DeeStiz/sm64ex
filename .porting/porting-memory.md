@@ -2,7 +2,34 @@
 
 ## Latest validated slices (2026-08-21)
 
-- **Continuation Phases 61–64 (2026-08-21):** Phase 61's canonical M34
+- **Continuation Phases 65–70 (2026-08-21):** Phase 65 repairs the fixed-width
+  `SM64ModernStatus`/`Int32` boundary at `EngineRuntime.swift:189/:366`, and
+  the beta Release build passes. Phase 66 reruns the fixed M34 harness but
+  fails closed at `scheduler_dropped_steps=65`; both displays were asleep,
+  only three presents were observed, and no capture pass ran. Phase 67's
+  stable-Xcode M35 preflight passes its contracts but retains exactly two
+  external blockers: no Developer ID Application identity/private key and no
+  notary authentication. Phase 67c preserves HUD fingerprints while fixing
+  stable-Xcode type checking; Phase 67d adds macOS 26/27 AVFAudio SDK
+  compatibility and restores the stable generic Release build. The latest
+  Phase 67b stable M34 rerun still fails closed at
+  `scheduler_dropped_steps=63` on a locked host with three presents and no
+  new capture. Phase 70 refreshes the public ledgers only. Preserve 534
+  behavior rows (511 Swift owners, 23 C adapters), 7,420 route shards (1
+  live-qualified, 7,419 planned), separate 95.693% mapping and 0.013477%
+  live-route indicators, and the conservative 0% full-goal floor. M34 visible
+  layer/post-resume/archive/FPS/GPU/memory/thermal, route pairing, M35
+  signing/notary/clean-machine, and fresh-save human acceptance remain open.
+  Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase65-engine-runtime-status-fix.md`,
+  `.porting/porting-handoff-full-swift-twin-phase66-m34-rerun.md`,
+  `.porting/porting-handoff-full-swift-twin-phase67-m35-current-preflight.md`,
+  `.porting/porting-handoff-full-swift-twin-phase67b-m34-stable-rerun.md`,
+  `.porting/porting-handoff-full-swift-twin-phase67c-hud-render-fix.md`,
+  `.porting/porting-handoff-full-swift-twin-phase67d-avfaudio-sdk-compat.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase70-docs-refresh.md`.
+
+- **Historical Continuation Phases 61–64 (2026-08-21):** Phase 61's canonical M34
   production harness is blocked before app launch by
   `EngineRuntime.swift:189/:366` (`SM64ModernStatus`/`Int32` type errors).
   The retained `gpudebug` trace is structural/clear-only and adds no new

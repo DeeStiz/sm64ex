@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the retained live row remains 1 of 7,420 and 7,419 remain
 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 58–64 execution checkpoint
+### Phase 58–70 execution checkpoint
 
 - **Phase 58 — committed `ab253acd`:** the opt-in native Castle route now
   selects the authored area-2 `WARP_NODE(0x35)` through the existing
@@ -44,10 +44,31 @@ planned. Historical M33–M35 notes retain their original 7,419 baseline.
   invocation override, but no Developer ID Application identity/private key
   or notary authentication is available. No archive/export/DMG/ZIP/staple/
   Gatekeeper, clean-machine, or human result exists.
-- **[Phase 64 — current](.porting/porting-handoff-full-swift-twin-phase64-docs-closeout.md):** reconcile README, SM64 Modern status, CHANGES, the
-  two goal ledgers, porting memory, and the closeout handoff. This phase may
-  not change source, route counters, route admission, or any M34/M35/human
-  acceptance claim.
+- **[Phase 64 — committed `cc0a8dfa`](porting-handoff-full-swift-twin-phase64-docs-closeout.md):** documentation closeout reconciled the
+  status index without changing source, route counters, route admission, or
+  any M34/M35/human acceptance claim.
+- **[Phase 65 — committed `e182aa01`](porting-handoff-full-swift-twin-phase65-engine-runtime-status-fix.md):** the fixed-width `SM64ModernStatus` /
+  `Int32` conversion at `EngineRuntime.swift:189/:366` now builds under the
+  beta Release toolchain; the fix does not close M34 or M35.
+- **[Phase 66 — committed `195cf758`](porting-handoff-full-swift-twin-phase66-m34-rerun.md):** the fixed-build M34 harness reached a
+  clean Release build but failed closed at `scheduler_dropped_steps=65`.
+  Displays were asleep, only three presents were observed, and capture did
+  not run.
+- **[Phase 67 — committed `c75e03b9`](porting-handoff-full-swift-twin-phase67-m35-current-preflight.md):** the stable-Xcode M35 preflight passed
+  its contract checks but retained exactly two external blockers: no
+  Developer ID Application identity/private key and no notary authentication.
+- **[Phase 67c — committed `466cf2c2`](porting-handoff-full-swift-twin-phase67c-hud-render-fix.md):** HUD edge arithmetic was split into
+  typed `Double` intermediates; C↔Swift HUD fingerprints were unchanged and
+  the stable generic build then exposed the AVFAudio SDK compatibility gap.
+- **[Phase 67d — committed `dcb39895`](porting-handoff-full-swift-twin-phase67d-avfaudio-sdk-compat.md):** conditional macOS 26/27 AVFAudio
+  APIs restored the stable generic Release build; audio contracts passed,
+  but the product remains unsigned/local and M34/M35 remain open.
+- **[Phase 67b — committed `698e3c8a`](porting-handoff-full-swift-twin-phase67b-m34-stable-rerun.md):** the latest stable M34 rerun still
+  failed closed at `scheduler_dropped_steps=63` on a locked host with three
+  presents and no new capture.
+- **[Phase 70 — current](porting-handoff-full-swift-twin-phase70-docs-refresh.md):** reconcile the latest handoffs and public ledgers,
+  preserve `534/511/23` and `7,420/1/7,419`, and keep route, M34, M35, and
+  human acceptance fail-closed.
 
 The automatic Luna-max phase protocol is: one disjoint owner per phase;
 focused validation plus `git diff --check`; a durable handoff comment and
@@ -60,6 +81,22 @@ Current conservative indicators are `511/534 = 95.693%` behavior mapping and
 floor remains `0%` because unqualified routes and system gates remain; the
 acceptance floor is also `0%` because independent device, release, scenario,
 and human families are not closed. These are separate ledgers, not an average.
+
+### Current admissible sequence
+
+1. **M34 awake-host rerun:** run the unchanged production harness on an awake,
+   unlocked visible host; require zero scheduler/catch-up drops, sustained
+   callbacks/presents, post-resume drawable acknowledgement, archive reuse,
+   non-clear fetched pixels, and independent GPU/FPS/memory/thermal evidence.
+2. **Route qualification:** independently record C and Swift with common
+   fingerprints and tick windows; admit only exact schema-4 parity with a
+   terminal worker result. Keep the ledger at 1/7,420 until then.
+3. **M35 signing/notary:** once M34 is proven, obtain Developer ID Application
+   credentials and one supported `notarytool` authentication mode, then run
+   readiness, archive/export, notarization/stapling, and clean-machine checks.
+4. **Human acceptance:** after signed artifacts pass Gatekeeper, execute and
+   record the fresh-save 120-star controls, camera, collision, audio, haptics,
+   visual, menu, credits, ending, and recovery checklist.
 
 ## Objective
 

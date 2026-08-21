@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-21).
 
-### Phase 64 current status
+### Phase 70 current status
 
 The authoritative current counters are **534 behavior rows** (511 Swift
 value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
@@ -33,14 +33,19 @@ sound threshold is reached on a held native step, so a direct sink, room, or
 graph-flag override would fabricate evidence; no route promotion or ledger
 mutation occurred.
 
-Phase 61's canonical M34 production harness is blocked before app launch by
-`EngineRuntime.swift:189/:366` (`SM64ModernStatus`/`Int32` type errors). The
-retained `gpudebug` trace is structural and clear-only; it adds no new
-visible-layer, post-resume, archive-reuse, FPS, GPU-time, memory, or thermal
-evidence. Phase 62 confirms that an ordinary Xcode 26.6 invocation override
-works, but no Developer ID Application identity/private key or notary
-authentication is available; no archive/export/DMG/ZIP/staple/Gatekeeper,
-clean-machine, or human result exists.
+Phase 65 fixed the `EngineRuntime.swift:189/:366`
+(`SM64ModernStatus`/`Int32`) boundary and a beta-Xcode Release build passed.
+Phase 66 reran the fixed M34 harness but failed closed at
+`scheduler_dropped_steps=65`; the host displays were asleep, only three
+presents were observed, and no capture pass ran. Phase 67's stable-Xcode M35
+preflight still finds exactly the Developer ID Application identity/private
+key and notary-authentication blockers. Phase 67c preserved the HUD
+fingerprints while fixing stable-Xcode type checking, and Phase 67d added
+macOS 26/27 AVFAudio SDK compatibility; the stable generic Release build now
+passes, but remains unsigned/local. The latest Phase 67b stable M34 rerun
+still fails closed at `scheduler_dropped_steps=63` with the screen locked,
+three presents, and no new capture. No archive/export/DMG/ZIP/staple/
+Gatekeeper, clean-machine, or human result exists.
 
 M34, M35, and fresh-save human 120-star acceptance remain open. These gates
 are independent from local build, source, fixture, and headless-host
@@ -52,6 +57,24 @@ conservative full-goal/acceptance floor of 0%.
 The older Phase 20–55 bullets below are retained as historical evidence. Any
 pre-Phase-55 `7,419` denominator in those notes is historical and does not
 override the current 7,420-row inventory.
+
+### Next admissible phase sequence
+
+1. **M34 awake-host rerun:** repeat the unchanged production harness on an
+   awake, unlocked visible GUI host; require zero scheduler/catch-up drops,
+   sustained callbacks, post-resume drawable acknowledgement, archive reuse,
+   non-clear fetched pixels, and retained GPU/FPS/memory/thermal evidence.
+2. **Route qualification:** keep C/Swift recording independent and fail closed;
+   align common fingerprints and tick windows, then admit only exact
+   schema-4 parity with a terminal worker result. The ledger remains 1/7,420
+   until that evidence exists.
+3. **M35 signing/notary:** after M34, obtain Developer ID Application
+   credentials and one supported `notarytool` authentication mode; rerun
+   readiness, archive/export, notarization/stapling, and clean-machine
+   Gatekeeper checks without mutating blocked prerequisites.
+4. **Human acceptance:** after signed artifacts pass clean-machine checks,
+   run and record the fresh-save 120-star controls, camera, collision, audio,
+   haptics, visual, menu, credits, ending, and recovery checklist.
 
 * **M33nk** remains the latest numbered behavior-qualification slice. The
   continuation has centrally promoted every Phase 2/3 route-local owner
@@ -317,7 +340,14 @@ The latest bounded handoffs are [Phase 25 route alignment](../.porting/porting-h
 [Phase 60 completion audit](../.porting/porting-handoff-full-swift-twin-phase60-completion-audit.md),
 [Phase 61 M34 production audit](../.porting/porting-handoff-full-swift-twin-phase61-m34-production-audit.md),
 [Phase 62 M35 release preflight](../.porting/porting-handoff-full-swift-twin-phase62-m35-release-preflight.md),
-and [Phase 64 documentation closeout](../.porting/porting-handoff-full-swift-twin-phase64-docs-closeout.md).
+[Phase 64 documentation closeout](../.porting/porting-handoff-full-swift-twin-phase64-docs-closeout.md),
+[Phase 65 EngineRuntime status fix](../.porting/porting-handoff-full-swift-twin-phase65-engine-runtime-status-fix.md),
+[Phase 66 fixed-build M34 rerun](../.porting/porting-handoff-full-swift-twin-phase66-m34-rerun.md),
+[Phase 67 M35 current preflight](../.porting/porting-handoff-full-swift-twin-phase67-m35-current-preflight.md),
+[Phase 67b stable M34 rerun](../.porting/porting-handoff-full-swift-twin-phase67b-m34-stable-rerun.md),
+[Phase 67c HUD render fix](../.porting/porting-handoff-full-swift-twin-phase67c-hud-render-fix.md),
+[Phase 67d AVFAudio SDK compatibility](../.porting/porting-handoff-full-swift-twin-phase67d-avfaudio-sdk-compat.md),
+and [Phase 70 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase70-docs-refresh.md).
 The compact evidence history is in
 [`../.porting/porting-memory.md`](../.porting/porting-memory.md), and the most
 recent route handoff is
