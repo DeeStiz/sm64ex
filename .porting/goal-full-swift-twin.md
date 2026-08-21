@@ -141,6 +141,17 @@ Route closure, visible/device/performance/thermal, distribution, and human
 acceptance remain open. No shipped, visual-parity, or complete full-game Swift
 claim is made.
 
+Phase 50 reconciled the public/status documents and preserved the Phase 44–49
+owner, dispatch, source-recipe, native-C, and native-core boundaries. Phase 51
+then compiled and loaded the Castle Inside script and all three area definitions,
+including the real area-2 collision, room, geometry, and
+`bhvDecorativePendulum` spawn command. The owner-thread command pointer performs
+the normal area-1 initialization and enters `CALL_LOOP`, but the current
+lifecycle API has no operation to request the normal area-2 transition. Direct
+`load_area(2)` or fabricated globals would bypass that owner path and are not
+route evidence. Phase 52 reconciles this status and records the fresh completion
+audit without changing the historical ledger.
+
 The proposed [Luna-max continuation plan](.porting/goal-continuation-luna-max-2026-08-20.md)
 is subordinate to this goal. Earlier audit handoffs are [Phase 20 C/Swift
 pairing](.porting/porting-handoff-full-swift-twin-phase20-c-swift-pairing.md),
@@ -175,7 +186,10 @@ The later current-status handoffs are [Phase 25 route alignment](.porting/portin
 [Phase 48 completion audit](.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md),
 [Phase 49 native-core area boundary](.porting/porting-handoff-full-swift-twin-phase49-native-core-area.md),
 [Phase 50 final reconciliation](.porting/porting-handoff-full-swift-twin-phase50-final-reconcile.md),
-and [Phase 50 completion audit](.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md).
+[Phase 50 completion audit](.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md),
+[Phase 51 level/area entrypoint](.porting/porting-handoff-full-swift-twin-phase51-level-area-entrypoint.md),
+[Phase 52 final reconciliation](.porting/porting-handoff-full-swift-twin-phase52-final-reconcile.md),
+and [Phase 52 completion audit](.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
@@ -398,6 +412,24 @@ M34 capture boundary, and two-prerequisite M35 boundary remain unchanged. No
 shipped, visual-parity, or complete full-game Swift claim is made. Handoffs:
 `.porting/porting-handoff-full-swift-twin-phase50-final-reconcile.md` and
 `.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md`.
+
+Continuation Phase 51 (2026-08-21) compiles and loads the Castle Inside script
+and all three area definitions, including the real area-2 collision, room,
+geometry, and `bhvDecorativePendulum` spawn command. The current owner-thread
+command pointer performs area-1 initialization and enters `CALL_LOOP`, but no
+lifecycle-owner operation requests the normal transition to area 2. Direct
+`load_area(2)` and fabricated globals remain invalid route evidence; no C/Swift
+pair or route promotion changed. Handoff:
+`.porting/porting-handoff-full-swift-twin-phase51-level-area-entrypoint.md`.
+
+Continuation Phase 52 (2026-08-21) reconciles the public/status documents and
+adds a fresh completion audit after Phase 51 without changing historical ledger
+text. The counters remain 534/511/23 and 1/7,419 (7,418 planned); the Phase
+44–50 owner/route, native-core, locked/headless M34, and two-prerequisite M35
+boundaries remain unchanged. No shipped, visual-parity, or complete full-game
+Swift claim is made. Handoffs:
+`.porting/porting-handoff-full-swift-twin-phase52-final-reconcile.md` and
+`.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md`.
 
 Continuation Phase 1 (2026-08-20) is checkpointed at `da4fa9ae` plus the
 current live-host control. The fresh arm64 Debug bundle built, launched through

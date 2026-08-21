@@ -121,6 +121,16 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      and 1/7,419 counters, the Phase 44–48 owner/dispatch/source/native-C
      boundaries, all M34/M35 boundaries, and the no-shipped, no-visual-parity,
      and no-full-game-Swift claims.
+37.) Record Phase 51's compiled Castle Inside level-script result: all three
+     area definitions load, including the real area-2 pendulum spawn, but the
+     owner-thread command pointer initializes area 1 and enters `CALL_LOOP`
+     without a normal area-2 transition operation. Direct `load_area(2)` and
+     fabricated globals remain invalid route evidence; no C/Swift pair or route
+     promotion is admitted.
+38.) Reconcile the public/status docs and add a Phase 52 completion audit after
+     Phase 51 without changing historical ledger text; preserve the 534/511/23
+     and 1/7,419 counters, Phase 44–50 owner/route/M34/M35 evidence, and the
+     no-shipped, no-visual-parity, and no-full-game-Swift claims.
 
 Refresh 11
 1.) (HEAD -> master, origin/master, origin/HEAD) Make geo_process_level_of_detail endian-independent (#1049)

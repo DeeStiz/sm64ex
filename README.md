@@ -119,6 +119,15 @@ Mario-area transition to area 2, and exposes the real pendulum callback while
 leaving the existing parity sink as the sole schema-4 emitter. Symbol presence
 for `load_area`, `gAreaData`, `gCurrentArea`, and related pendulum callbacks is
 not proof that this owner path was initialized or updated.
+Phase 50 reconciled the public/status documents and retained the Phase 44–49
+owner, dispatch, source-recipe, native-C, and native-core boundaries. Phase 51
+then compiled and loaded the Castle Inside script and all three area
+definitions, including the real area-2 collision/room/geometry and
+`bhvDecorativePendulum` spawn, but the current owner-thread command pointer
+initializes area 1 and enters `CALL_LOOP` without an operation for the normal
+area-2 transition. Direct `load_area(2)` or fabricated globals remain invalid
+route evidence; no C/Swift pair or route promotion changed. Phase 52 records
+this blocker in a fresh reconciliation and completion audit.
 Route-shard closure, physical/device/performance/thermal evidence,
 distribution, and human acceptance are still open; this is not a shipped,
 visual-parity, or complete full-game Swift port. See the
@@ -154,7 +163,10 @@ for the evidence ledger and latest handoffs, including the
 [Phase 48 completion audit](.porting/porting-handoff-full-swift-twin-phase48-completion-audit.md),
 [Phase 49 native-core area boundary](.porting/porting-handoff-full-swift-twin-phase49-native-core-area.md),
 [Phase 50 final reconciliation](.porting/porting-handoff-full-swift-twin-phase50-final-reconcile.md),
-and [Phase 50 completion audit](.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md).
+[Phase 50 completion audit](.porting/porting-handoff-full-swift-twin-phase50-completion-audit.md),
+[Phase 51 level/area entrypoint](.porting/porting-handoff-full-swift-twin-phase51-level-area-entrypoint.md),
+[Phase 52 final reconciliation](.porting/porting-handoff-full-swift-twin-phase52-final-reconcile.md),
+and [Phase 52 completion audit](.porting/porting-handoff-full-swift-twin-phase52-completion-audit.md).
 
 After extracting local assets as described above, the canonical Debug workflow
 is:
