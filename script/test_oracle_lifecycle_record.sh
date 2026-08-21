@@ -39,4 +39,6 @@ SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
 grep -Eq 'liveOracleRenderRecords=[1-9][0-9]*' "$LOG"
 
 test -s "$TRACE"
+TRACE_HEADER_HEX="$(od -An -tx1 -N8 "$TRACE" | tr -d '[:space:]')"
+test "$TRACE_HEADER_HEX" = "0100000048000000"
 printf '%s\n' "SM64 Modern live oracle lifecycle file smoke passed"

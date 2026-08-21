@@ -8,8 +8,6 @@
 
 #include "sm64_modern.h"
 
-#define TRACE_MAGIC "SM64ORC4"
-#define TRACE_MAGIC_SIZE 8u
 #define TRACE_STEPS 4u
 
 struct TraceFile {
@@ -41,6 +39,11 @@ struct HarnessState {
 };
 
 static int failures;
+
+_Static_assert(sizeof(SM64ModernOracleTraceConfigV1) == 72,
+               "schema-4 trace headers must remain 72 bytes");
+_Static_assert(sizeof(SM64ModernOracleTraceRecordV1) == 128,
+               "schema-4 trace records must remain 128 bytes");
 
 static void expect_status(const char *operation,
                           SM64ModernStatus actual,
@@ -83,8 +86,7 @@ static SM64ModernStatus trace_write_header(
         || config->coverage_fingerprint != 0) {
         return SM64_MODERN_STATUS_INVALID_ARGUMENT;
     }
-    if (!write_bytes(trace, TRACE_MAGIC, TRACE_MAGIC_SIZE)
-        || !write_bytes(trace, config, sizeof(*config))) {
+    if (!write_bytes(trace, config, sizeof(*config))) {
         trace->failures++;
         return SM64_MODERN_STATUS_PLATFORM_ERROR;
     }
@@ -445,11 +447,8 @@ static bool validate_file(const char *path,
                           uint32_t *out_domains) {
     FILE *file = fopen(path, "rb");
     if (!file) return false;
-    char magic[TRACE_MAGIC_SIZE];
     SM64ModernOracleTraceConfigV1 config;
-    bool valid = fread(magic, 1, sizeof(magic), file) == sizeof(magic)
-        && memcmp(magic, TRACE_MAGIC, sizeof(magic)) == 0
-        && fread(&config, 1, sizeof(config), file) == sizeof(config)
+    bool valid = fread(&config, 1, sizeof(config), file) == sizeof(config)
         && config.header.abi_version == SM64_MODERN_ABI_VERSION_1
         && config.header.struct_size >= sizeof(config)
         && config.schema_version == SM64_MODERN_ORACLE_TRACE_SCHEMA_VERSION
