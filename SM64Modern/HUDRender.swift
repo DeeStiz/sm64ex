@@ -28,19 +28,21 @@ struct SM64HUDLayout: Equatable, Sendable {
     var starsX: Int32 { japanese ? 73 : 78 }
 
     func leftEdge(_ offset: Int32) -> Int32 {
-        Int32(floor(
-            Double(screenWidth) / 2.0
-                - Double(screenHeight) / 2.0 * aspectRatio
-                + Double(offset)
-        ))
+        let halfWidth: Double = Double(screenWidth) / 2.0
+        let halfHeight: Double = Double(screenHeight) / 2.0
+        let horizontalExtent: Double = halfHeight * aspectRatio
+        let offsetValue: Double = Double(offset)
+        let value: Double = halfWidth - horizontalExtent + offsetValue
+        return Int32(floor(value))
     }
 
     func rightEdge(_ offset: Int32) -> Int32 {
-        Int32(ceil(
-            Double(screenWidth) / 2.0
-                + Double(screenHeight) / 2.0 * aspectRatio
-                - Double(offset)
-        ))
+        let halfWidth: Double = Double(screenWidth) / 2.0
+        let halfHeight: Double = Double(screenHeight) / 2.0
+        let horizontalExtent: Double = halfHeight * aspectRatio
+        let offsetValue: Double = Double(offset)
+        let value: Double = halfWidth + horizontalExtent - offsetValue
+        return Int32(ceil(value))
     }
 }
 
