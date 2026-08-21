@@ -12,6 +12,7 @@
 #include "buffers/zbuffer.h"
 #include "game/area.h"
 #include "engine/level_script.h"
+#include "game/level_update.h"
 #include "game_init.h"
 #include "main.h"
 #include "mario.h"
@@ -604,6 +605,26 @@ void setup_game_memory(void) {
 
 
 static struct LevelCommand *levelCommandAddr;
+static bool sAutomatedCastleArea2;
+static bool sAutomatedCastleArea2WarpRequested;
+
+/*
+ * Request the area transition only after the compiled Castle Inside script
+ * has initialized its normal area-1 Mario state. This function is called
+ * from game_loop_one_iteration(), which is the lifecycle owner thread; the
+ * next CALL_LOOP update consumes the request through warp_area().
+ */
+static void automated_castle_area2_transition_step(void) {
+    if (!sAutomatedCastleArea2 || sAutomatedCastleArea2WarpRequested
+        || gCurrLevelNum != LEVEL_CASTLE || gCurrentArea == NULL
+        || gCurrentArea->index != 1 || gMarioState == NULL
+        || gMarioState->action == ACT_UNINITIALIZED) {
+        return;
+    }
+
+    initiate_warp(LEVEL_CASTLE, 2, 0, 0);
+    sAutomatedCastleArea2WarpRequested = true;
+}
 
 // main game loop thread. runs forever as long as the game
 // continues.
@@ -625,14 +646,17 @@ void thread5_game_loop(UNUSED void *arg) {
     // Keep this strictly opt-in: normal launches retain the stock intro and
     // file-select path. The Bob-omb gate selects Battlefield while the Mario
     // gate keeps the existing castle-grounds bootstrap.
+    sAutomatedCastleArea2 = getenv("SM64_MODERN_AUTOMATED_CASTLE_AREA2") != NULL;
+    sAutomatedCastleArea2WarpRequested = false;
     const bool automatedGameplay = getenv("SM64_MODERN_AUTOMATED_GAMEPLAY") != NULL;
     const bool automatedBobomb = getenv("SM64_MODERN_AUTOMATED_BOBOMB") != NULL;
-    if (automatedGameplay || automatedBobomb) {
+    if (automatedGameplay || automatedBobomb || sAutomatedCastleArea2) {
         gCurrDemoInput = NULL;
         gCurrSaveFileNum = 1;
         gCurrActNum = 1;
         sm64_modern_level_script_set_register(
-            automatedBobomb ? LEVEL_BOB : LEVEL_CASTLE_GROUNDS);
+            automatedBobomb ? LEVEL_BOB
+                            : (sAutomatedCastleArea2 ? LEVEL_CASTLE : LEVEL_CASTLE_GROUNDS));
         levelCommandAddr = (struct LevelCommand *) level_main_scripts_entry;
     }
 
@@ -661,6 +685,7 @@ void game_loop_one_iteration(void) {
     config_gfx_pool();
     read_controller_inputs();
     levelCommandAddr = level_script_execute(levelCommandAddr);
+    automated_castle_area2_transition_step();
     sm64_modern_bobomb_release_test_step();
     sm64_modern_mario_authority_test_step();
     sm64_modern_parity_capture_snapshots();

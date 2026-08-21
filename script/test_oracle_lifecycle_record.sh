@@ -23,6 +23,11 @@ xcrun --sdk macosx clang \
   -Wall \
   -Wextra \
   -Werror \
+  -DNON_MATCHING=1 \
+  -DAVOID_UB=1 \
+  -DVERSION_US \
+  -D_LANGUAGE_C \
+  -I"$PROJECT_ROOT" \
   -I"$PROJECT_ROOT/include" \
   -I"$PROJECT_ROOT/src" \
   -I"$NATIVE_BUILD" \
@@ -33,8 +38,13 @@ xcrun --sdk macosx clang \
   -lpthread
 
 LOG="$BUILD_ROOT/live-oracle-lifecycle-record.log"
-SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
-  "$OUTPUT" "$TRACE" "$SAVE_ROOT" | tee "$LOG"
+if [[ "${SM64_MODERN_AUTOMATED_CASTLE_AREA2:-0}" == "1" ]]; then
+  SM64_MODERN_AUTOMATED_CASTLE_AREA2=1 \
+    "$OUTPUT" "$TRACE" "$SAVE_ROOT" | tee "$LOG"
+else
+  SM64_MODERN_AUTOMATED_GAMEPLAY=1 \
+    "$OUTPUT" "$TRACE" "$SAVE_ROOT" | tee "$LOG"
+fi
 
 if [[ "${SM64_MODERN_PAIRING_ROUTE:-0}" == "1" ]]; then
   grep -Eq 'liveOracleInputRecords=[1-9][0-9]*' "$LOG"

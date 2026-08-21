@@ -7,6 +7,13 @@
 #include <string.h>
 
 #include "sm64_modern.h"
+#include "behavior_data.h"
+#include "game/area.h"
+#include "game/memory.h"
+#include "game/object_list_processor.h"
+#include "object_constants.h"
+#include "object_fields.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 #include "pc/sm64_modern_timebase.h"
 
 #define TRACE_STEPS 4u
@@ -35,6 +42,7 @@ struct TraceFile {
     bool input_only;
     struct TraceCoverageKey coverage_keys[TRACE_COVERAGE_CAPACITY];
     uint32_t coverage_key_count;
+    uint32_t native_behavior_records_by_slot[OBJECT_POOL_CAPACITY + 1u];
 };
 
 struct HarnessState {
@@ -137,6 +145,22 @@ static bool pairing_route_enabled(void) {
     return value && strcmp(value, "1") == 0;
 }
 
+static bool castle_area2_route_enabled(void) {
+    const char *value = getenv("SM64_MODERN_AUTOMATED_CASTLE_AREA2");
+    return value && strcmp(value, "1") == 0;
+}
+
+static struct Object *find_decorative_pendulum(void) {
+    const BehaviorScript *target = segmented_to_virtual(bhvDecorativePendulum);
+    for (uint32_t index = 0; index < OBJECT_POOL_CAPACITY; ++index) {
+        struct Object *object = &gObjectPool[index];
+        if (object->activeFlags != ACTIVE_FLAG_DEACTIVATED && object->behavior == target) {
+            return object;
+        }
+    }
+    return NULL;
+}
+
 static bool valid_record(const SM64ModernOracleTraceRecordV1 *record) {
     return record
         && record->header.abi_version == SM64_MODERN_ABI_VERSION_1
@@ -215,6 +239,13 @@ static SM64ModernStatus trace_write_record(
     trace->last_tick[domain] = record->simulation_tick;
     trace->last_sequence[domain] = record->sequence;
     trace->domains |= UINT32_C(1) << domain;
+    if (record->domain == SM64_MODERN_ORACLE_DOMAIN_SCRIPT
+        && record->record_kind == SM64_MODERN_ORACLE_RECORD_EVENT
+        && record->record_id == SM64_MODERN_ORACLE_SCRIPT_EVENT_NATIVE_BEHAVIOR) {
+        if (record->subject_id <= OBJECT_POOL_CAPACITY) {
+            trace->native_behavior_records_by_slot[record->subject_id]++;
+        }
+    }
     if (!write_bytes(trace, record, sizeof(*record))) {
         trace->failures++;
         return SM64_MODERN_STATUS_PLATFORM_ERROR;
@@ -638,6 +669,9 @@ int main(int argc, char **argv) {
     memset(&state, 0, sizeof(state));
     memset(&trace, 0, sizeof(trace));
     const bool pairing_route = pairing_route_enabled();
+    const bool castle_area2_route = castle_area2_route_enabled();
+    const uint32_t trace_steps = pairing_route ? 2u
+                                               : (castle_area2_route ? 8u : TRACE_STEPS);
     trace.input_only = pairing_route;
     trace.file = fopen(trace_path, "wb");
     if (!trace.file) {
@@ -651,7 +685,7 @@ int main(int argc, char **argv) {
     const SM64ModernAudioMigrationApiV1 audio = make_audio_api(&state);
     expect_status("install audio", sm64_modern_install_audio_migration_api(&audio),
                   SM64_MODERN_STATUS_OK);
-    if (pairing_route) {
+    if (pairing_route || castle_area2_route) {
         SM64ModernTimebaseApiV1 timebase;
         memset(&timebase, 0, sizeof(timebase));
         expect_status("get pairing timebase", sm64_modern_get_timebase_api(
@@ -695,14 +729,38 @@ int main(int argc, char **argv) {
                   SM64_MODERN_STATUS_OK);
     sm64_modern_oracle_trace_end_tick();
 
+    bool castle_area2_loaded = false;
+    struct Object *castle_area2_pendulum = NULL;
+    s32 castle_area2_initial_roll = 0;
+    s32 castle_area2_initial_velocity = 0;
+    uint32_t castle_area2_pendulum_slot = 0;
+    bool castle_area2_pendulum_moved = false;
+
     if (init_status == SM64_MODERN_STATUS_OK) {
         SM64ModernLifecycleState lifecycle_state = SM64_MODERN_LIFECYCLE_COLD;
         expect_status("running state", lifecycle.get_state(&lifecycle_state),
                       SM64_MODERN_STATUS_OK);
         expect_true("lifecycle running", lifecycle_state == SM64_MODERN_LIFECYCLE_RUNNING);
-        const uint32_t trace_steps = pairing_route ? 2u : TRACE_STEPS;
         for (uint32_t index = 0; index < trace_steps; ++index) {
             expect_status("lifecycle step", lifecycle.step(), SM64_MODERN_STATUS_OK);
+
+            if (castle_area2_route && !castle_area2_loaded
+                && gCurrLevelNum == LEVEL_CASTLE
+                && gCurrAreaIndex == 2
+                && gCurrentArea == &gAreaData[2]) {
+                castle_area2_loaded = true;
+                castle_area2_pendulum = find_decorative_pendulum();
+                if (castle_area2_pendulum != NULL) {
+                    castle_area2_initial_roll = castle_area2_pendulum->oFaceAngleRoll;
+                    castle_area2_initial_velocity = castle_area2_pendulum->oAngleVelRoll;
+                    castle_area2_pendulum_slot = sm64_modern_parity_object_slot(
+                        castle_area2_pendulum);
+                }
+            } else if (castle_area2_route && castle_area2_pendulum != NULL) {
+                castle_area2_pendulum_moved =
+                    castle_area2_pendulum->oFaceAngleRoll != castle_area2_initial_roll
+                    || castle_area2_pendulum->oAngleVelRoll != castle_area2_initial_velocity;
+            }
         }
     }
 
@@ -746,15 +804,39 @@ int main(int argc, char **argv) {
                     || trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_RENDER] > 0u);
     expect_true("platform callbacks", state.platform_initialize == 1u
                 && state.platform_shutdown == 1u);
-    expect_true("input callbacks", state.input_reads >= (pairing_route ? 2u : TRACE_STEPS));
+    expect_true("input callbacks", state.input_reads >= trace_steps);
     expect_true("route input window", !pairing_route
                 || trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_INPUT] >= 2u);
     expect_true("audio callbacks", pairing_route
-                || (state.audio_play >= TRACE_STEPS && state.audio_sequence > 0u));
+                || (state.audio_play >= trace_steps && state.audio_sequence > 0u));
     expect_true("render installation callbacks", state.render_initialize == 1u
                 && state.render_shutdown == 1u);
     expect_true("platform errors", state.errors == 0u);
     expect_true("file callback errors", trace.failures == 0u);
+
+    if (castle_area2_route) {
+        printf("castleArea2Loaded=%d castleArea2PendulumSlot=%u castleArea2NativeRecords=%u "
+               "castleArea2Roll=%d castleArea2Velocity=%d\n",
+               castle_area2_loaded,
+               castle_area2_pendulum_slot,
+               castle_area2_pendulum_slot <= OBJECT_POOL_CAPACITY
+                   ? trace.native_behavior_records_by_slot[castle_area2_pendulum_slot] : 0u,
+               castle_area2_pendulum ? castle_area2_pendulum->oFaceAngleRoll : 0,
+               castle_area2_pendulum ? castle_area2_pendulum->oAngleVelRoll : 0);
+        expect_true("castle area-2 level", gCurrLevelNum == LEVEL_CASTLE);
+        expect_true("castle area-2 index", gCurrAreaIndex == 2);
+        expect_true("castle area-2 current area", castle_area2_loaded
+                    && gCurrentArea == &gAreaData[2]
+                    && gCurrentArea->index == 2);
+        expect_true("castle area-2 pendulum object", castle_area2_pendulum != NULL);
+        expect_true("castle area-2 pendulum callback", castle_area2_pendulum_moved);
+        expect_true("castle area-2 pendulum schema-4 callback",
+                    castle_area2_pendulum_slot > 0u
+                    && castle_area2_pendulum_slot <= OBJECT_POOL_CAPACITY
+                    && trace.native_behavior_records_by_slot[castle_area2_pendulum_slot] > 0u);
+        expect_true("castle area-2 schema-4 script records",
+                    trace.records_by_domain[SM64_MODERN_ORACLE_DOMAIN_SCRIPT] > 0u);
+    }
 
     if (state.errors != 0u) {
         fprintf(stderr, "first platform error: status=%u message=%s\n",
@@ -773,8 +855,7 @@ int main(int argc, char **argv) {
                               pairing_route ? retained_coverage : 0,
                               &file_records,
                               &file_last_tick, &file_domains));
-    expect_true("file lifecycle ticks",
-                file_last_tick >= (pairing_route ? 3u : TRACE_STEPS + 1u));
+    expect_true("file lifecycle ticks", file_last_tick >= trace_steps + 1u);
     expect_true("file domain mask", file_domains == trace.domains);
     printf("liveOracleTraceRecords=%" PRIu64
            " liveOracleTraceTicks=%" PRIu64
