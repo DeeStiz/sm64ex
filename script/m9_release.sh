@@ -25,10 +25,16 @@ PROFILE_WARMUP_TICKS="${SM64_MODERN_M9_PROFILE_WARMUP_TICKS:-600}"
 MAX_UNDERRUN_RATE_BPS="${SM64_MODERN_M9_MAX_AUDIO_UNDERRUN_RATE_BPS:-1000}"
 MAX_RSS_DELTA_BYTES="${SM64_MODERN_M9_MAX_RSS_DELTA_BYTES:-8388608}"
 PROFILE_TIMEOUT_SECONDS="${SM64_MODERN_M9_PROFILE_TIMEOUT_SECONDS:-$((PROFILE_TICKS / 30 + 30))}"
+M35_ARCHIVE_PATH="${SM64_MODERN_M35_ARCHIVE_PATH:-$OUTPUT_DIR/SM64-Modern.xcarchive}"
+M35_EXPORT_DIR="${SM64_MODERN_M35_EXPORT_DIR:-$OUTPUT_DIR/export}"
+M35_EXPORT_OPTIONS_PATH="${SM64_MODERN_M35_EXPORT_OPTIONS_PATH:-$OUTPUT_DIR/export-options.plist}"
+M35_EXPORTED_APP="$M35_EXPORT_DIR/$APP_NAME.app"
+M35_DMG_PATH="${SM64_MODERN_M35_DMG_PATH:-$OUTPUT_DIR/SM64-Modern.dmg}"
+M35_ZIP_PATH="${SM64_MODERN_M35_ZIP_PATH:-$OUTPUT_DIR/SM64-Modern.zip}"
 SIGNING_IDENTITY=""
 SIGNING_STATE=""
 
-if [[ "$MODE" != "readiness" ]]; then
+if [[ "$MODE" != "readiness" && "$MODE" != "distribution" && "$MODE" != "archive" ]]; then
   mkdir -p "$OUTPUT_DIR"
 fi
 
@@ -332,6 +338,233 @@ sign_bundle() {
   codesign --verify --deep --strict "$bundle"
 }
 
+select_distribution_signing_identity() {
+  local identities
+  select_signing_identity
+  identities="$(security find-identity -v -p codesigning 2>/dev/null || true)"
+
+  if [[ "$SIGNING_IDENTITY" == Developer\ ID\ Application:* ]]; then
+    grep -Fq "$SIGNING_IDENTITY" <<< "$identities" \
+      || die "selected Developer ID Application identity is no longer available: $SIGNING_IDENTITY"
+  elif [[ "$SIGNING_IDENTITY" =~ ^[[:xdigit:]]{40}$ ]]; then
+    grep -F "$SIGNING_IDENTITY" <<< "$identities" | grep -Fq 'Developer ID Application:' \
+      || die "selected signing hash is not a Developer ID Application identity: $SIGNING_IDENTITY"
+  else
+    die "distribution requires a Developer ID Application identity (selected: ${SIGNING_IDENTITY:-none})"
+  fi
+}
+
+assert_distribution_targets_unused() {
+  local output_path
+  for output_path in \
+    "$M35_ARCHIVE_PATH" \
+    "$M35_EXPORT_DIR" \
+    "$M35_EXPORT_OPTIONS_PATH" \
+    "$M35_DMG_PATH" \
+    "$M35_ZIP_PATH"; do
+    [[ ! -e "$output_path" ]] \
+      || die "distribution output already exists; refusing to overwrite: $output_path"
+  done
+}
+
+write_distribution_export_options() {
+  plutil -create xml1 "$M35_EXPORT_OPTIONS_PATH"
+  plutil -insert method -string developer-id "$M35_EXPORT_OPTIONS_PATH"
+  plutil -insert signingStyle -string manual "$M35_EXPORT_OPTIONS_PATH"
+  plutil -insert signingCertificate -string 'Developer ID Application' "$M35_EXPORT_OPTIONS_PATH"
+}
+
+archive_distribution() {
+  cd "$PROJECT_ROOT"
+  xcodebuild \
+    -project SM64Modern.xcodeproj \
+    -scheme SM64Modern \
+    -configuration Release \
+    -archivePath "$M35_ARCHIVE_PATH" \
+    archive \
+    CODE_SIGNING_ALLOWED=YES \
+    CODE_SIGNING_REQUIRED=YES \
+    CODE_SIGN_STYLE=Manual \
+    CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+    > "$OUTPUT_DIR/archive.log" 2>&1 || {
+      cat "$OUTPUT_DIR/archive.log" >&2
+      die "Developer ID archive failed; no distribution artifact was produced"
+    }
+  test -d "$M35_ARCHIVE_PATH" \
+    || die "xcodebuild archive did not produce the expected archive: $M35_ARCHIVE_PATH"
+}
+
+export_distribution_archive() {
+  cd "$PROJECT_ROOT"
+  xcodebuild \
+    -project SM64Modern.xcodeproj \
+    -scheme SM64Modern \
+    -configuration Release \
+    -archivePath "$M35_ARCHIVE_PATH" \
+    -exportArchive \
+    -exportPath "$M35_EXPORT_DIR" \
+    -exportOptionsPlist "$M35_EXPORT_OPTIONS_PATH" \
+    > "$OUTPUT_DIR/export.log" 2>&1 || {
+      cat "$OUTPUT_DIR/export.log" >&2
+      die "Developer ID archive export failed"
+    }
+  test -d "$M35_EXPORTED_APP" \
+    || die "xcodebuild exportArchive did not produce the expected app: $M35_EXPORTED_APP"
+}
+
+validate_distribution_bundle() {
+  local bundle="$1"
+  local label="$2"
+  local signing_report="$OUTPUT_DIR/$label-codesign.txt"
+  local entitlements_path="$OUTPUT_DIR/$label-entitlements.plist"
+  local task_allow
+  local sustained_execution
+
+  test -d "$bundle"
+  if ! codesign --verify --deep --strict --verbose=2 "$bundle" > "$signing_report" 2>&1; then
+    cat "$signing_report" >&2
+    die "$label failed strict code-signature verification"
+  fi
+  codesign --display --verbose=4 "$bundle" >> "$signing_report" 2>&1 \
+    || die "could not inspect the $label code signature"
+  grep -Fq 'Authority=Developer ID Application:' "$signing_report" \
+    || die "$label is not signed by Developer ID Application"
+
+  if ! codesign --display --entitlements :- "$bundle" > "$entitlements_path" 2>/dev/null; then
+    die "could not extract $label entitlements"
+  fi
+  plutil -lint -s "$entitlements_path" \
+    || die "$label entitlements are not a valid plist"
+  task_allow="$(readiness_plist_value "$entitlements_path" 'com.apple.security.get-task-allow')"
+  sustained_execution="$(readiness_plist_value "$entitlements_path" 'com.apple.developer.sustained-execution')"
+  [[ "$task_allow" == false ]] \
+    || die "$label entitlements must set com.apple.security.get-task-allow=false (found ${task_allow:-missing})"
+  [[ "$sustained_execution" == true ]] \
+    || die "$label entitlements must set com.apple.developer.sustained-execution=true (found ${sustained_execution:-missing})"
+}
+
+notarize_distribution_artifact() {
+  local artifact="$1"
+  local label="$2"
+  local notary_profile="${SM64_MODERN_NOTARY_PROFILE:-${SM64_MODERN_NOTARY_KEYCHAIN_PROFILE:-${NOTARYTOOL_KEYCHAIN_PROFILE:-}}}"
+  local notary_key_id="${SM64_MODERN_NOTARY_KEY_ID:-${ASC_KEY_ID:-}}"
+  local notary_issuer_id="${SM64_MODERN_NOTARY_ISSUER_ID:-${ASC_ISSUER_ID:-}}"
+  local notary_private_key="${SM64_MODERN_NOTARY_PRIVATE_KEY:-${ASC_PRIVATE_KEY_PATH:-}}"
+  local notary_apple_id="${SM64_MODERN_NOTARY_APPLE_ID:-${APPLE_ID:-}}"
+  local notary_team_id="${SM64_MODERN_NOTARY_TEAM_ID:-${APPLE_TEAM_ID:-}}"
+  local notary_app_password="${SM64_MODERN_NOTARY_APP_PASSWORD:-${APPLE_APP_SPECIFIC_PASSWORD:-}}"
+  local notary_log="$OUTPUT_DIR/$label-notarytool.txt"
+
+  if [[ -n "$notary_profile" ]]; then
+    xcrun notarytool submit "$artifact" --wait --keychain-profile "$notary_profile" \
+      > "$notary_log" 2>&1 || {
+        cat "$notary_log" >&2
+        die "notarytool rejected $label"
+      }
+  elif [[ -n "$notary_key_id" && -n "$notary_issuer_id" && -n "$notary_private_key" && -r "$notary_private_key" ]]; then
+    xcrun notarytool submit "$artifact" --wait \
+      --key "$notary_private_key" \
+      --key-id "$notary_key_id" \
+      --issuer "$notary_issuer_id" \
+      > "$notary_log" 2>&1 || {
+        cat "$notary_log" >&2
+        die "notarytool rejected $label"
+      }
+  elif [[ -n "$notary_apple_id" && -n "$notary_team_id" && -n "$notary_app_password" ]]; then
+    xcrun notarytool submit "$artifact" --wait \
+      --apple-id "$notary_apple_id" \
+      --team-id "$notary_team_id" \
+      --password "$notary_app_password" \
+      > "$notary_log" 2>&1 || {
+        cat "$notary_log" >&2
+        die "notarytool rejected $label"
+      }
+  else
+    die "notarytool authentication is unavailable; refusing to submit $label"
+  fi
+}
+
+staple_and_validate_distribution_artifact() {
+  local artifact="$1"
+  local label="$2"
+  local staple_log="$OUTPUT_DIR/$label-stapler.txt"
+  xcrun stapler staple "$artifact" > "$staple_log" 2>&1 || {
+    cat "$staple_log" >&2
+    die "stapler could not staple $label"
+  }
+  xcrun stapler validate "$artifact" >> "$staple_log" 2>&1 || {
+    cat "$staple_log" >&2
+    die "stapler validate failed for $label"
+  }
+}
+
+verify_distribution_assessment() {
+  local app="$1"
+  local dmg="$2"
+  spctl -a -vv -t execute "$app" > "$OUTPUT_DIR/spctl-app.txt" 2>&1 || {
+    cat "$OUTPUT_DIR/spctl-app.txt" >&2
+    die "spctl rejected the stapled app"
+  }
+  spctl -a -vv -t open "$dmg" > "$OUTPUT_DIR/spctl-dmg.txt" 2>&1 || {
+    cat "$OUTPUT_DIR/spctl-dmg.txt" >&2
+    die "spctl rejected the stapled DMG"
+  }
+}
+
+create_distribution_dmg() {
+  hdiutil create \
+    -volname "$APP_NAME" \
+    -srcfolder "$M35_EXPORT_DIR" \
+    -ov \
+    -format UDZO \
+    "$M35_DMG_PATH" \
+    > "$OUTPUT_DIR/dmg-create.log" 2>&1 || {
+      cat "$OUTPUT_DIR/dmg-create.log" >&2
+      die "hdiutil could not create the distribution DMG"
+    }
+  test -f "$M35_DMG_PATH" \
+    || die "hdiutil did not produce the expected DMG: $M35_DMG_PATH"
+}
+
+package_distribution_zip() {
+  /usr/bin/ditto -c -k --keepParent "$M35_EXPORTED_APP" "$M35_ZIP_PATH"
+  shasum -a 256 "$M35_ZIP_PATH" | tee "$OUTPUT_DIR/SM64-Modern.zip.sha256"
+}
+
+run_distribution() {
+  # Readiness is deliberately the first action. In particular, do not create
+  # OUTPUT_DIR until every external signing/notary prerequisite is present.
+  if ! run_release_readiness; then
+    die 'distribution=BLOCKED; no archive, export, DMG, notarization, stapling, or ZIP mutation was performed'
+  fi
+
+  select_distribution_signing_identity
+  mkdir -p "$OUTPUT_DIR"
+  assert_distribution_targets_unused
+  write_distribution_export_options
+
+  archive_distribution
+  export_distribution_archive
+  validate_distribution_bundle "$M35_EXPORTED_APP" exported-app
+
+  # Notarize and staple the app before creating the DMG. ZIP files cannot
+  # receive stapled tickets, so the ZIP is packaged only after app stapling.
+  notarize_distribution_artifact "$M35_EXPORTED_APP" app
+  staple_and_validate_distribution_artifact "$M35_EXPORTED_APP" app
+  spctl -a -vv -t execute "$M35_EXPORTED_APP" > "$OUTPUT_DIR/spctl-app.txt" 2>&1 \
+    || die 'spctl rejected the stapled app'
+
+  create_distribution_dmg
+  notarize_distribution_artifact "$M35_DMG_PATH" dmg
+  staple_and_validate_distribution_artifact "$M35_DMG_PATH" dmg
+  verify_distribution_assessment "$M35_EXPORTED_APP" "$M35_DMG_PATH"
+  package_distribution_zip
+
+  printf 'distribution_app=%s\n' "$M35_EXPORTED_APP"
+  printf 'distribution_dmg=%s\n' "$M35_DMG_PATH"
+  printf 'distribution_zip=%s\n' "$M35_ZIP_PATH"
+}
+
 inspect_release() {
   test -d "$APP_BUNDLE"
   {
@@ -558,6 +791,9 @@ case "$MODE" in
   readiness)
     run_release_readiness
     ;;
+  distribution|archive)
+    run_distribution
+    ;;
   build)
     build_release
     ;;
@@ -593,7 +829,7 @@ case "$MODE" in
     run_profile
     ;;
   *)
-    echo "usage: $0 [readiness|build|inspect|package|profile|leaks|metal-validation|capture|bob|all]" >&2
+    echo "usage: $0 [readiness|distribution|archive|build|inspect|package|profile|leaks|metal-validation|capture|bob|all]" >&2
     exit 2
     ;;
 esac
