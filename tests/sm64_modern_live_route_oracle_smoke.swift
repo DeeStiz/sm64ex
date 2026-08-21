@@ -162,6 +162,12 @@ struct SM64ModernLiveRouteOracleSmoke {
                     values: record.values
                 )
             }
+            if pairingRoute {
+                sidecarRecords.append(try pairingRouteRecord(
+                    from: firstInput,
+                    simulationTick: UInt64(sidecarRecords.count + 1)
+                ))
+            }
         }
         if !inputOnly {
             guard let route = SM64MarioFaceRouteResourceCatalog.route(.marioNormal) else {
