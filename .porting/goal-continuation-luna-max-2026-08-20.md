@@ -21,24 +21,21 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
-### Phase 85f96 current evidence checkpoint
+### Phase 85f97 current evidence checkpoint
 
-Phase 85f96 completed the next source-route discovery for Whomp's Fortress'
-authored `bhvWhompKingBoss` route row `0x28e0617bfc286cbe`. The source
-behavior script creates the King Whomp subject for `ACT_1` as the first
-area-1 entry (source ordinal 0, `MODEL_WHOMP`, position `(0,3584,0)`,
-behavior parameter `0`); the ordinary Castle Inside painting nodes `0x06`,
-`0x07`, and `0x08` target WF area 1. The source owner contains the King
-action, collision, interaction, cutscene, effect, and reward lifecycle, while
-`WhompEnemy` and `WhompObjectBridge` preserve copied King state and the
-semantic reward child without exposing native pointers. The generated row
-declares `collision_queries,effects,object_state,script_events` and remains
-exactly one `planned` row.
+Phase 85f97 committed the source-owned Whomp King receipt seam in commit
+`66ca1911` for authored `bhvWhompKingBoss` route row
+`0x28e0617bfc286cbe`. The seam preserves schema-4 script/object/collision/
+effect records, semantic King and reward-child identities, and pointer-free
+source state for the selected route row.
 
-This is discovery/static owner evidence only. No native WF load, direct helper
-call, synthetic Whomp spawn, object injection, trace, route record, source
-edit, manifest/report/ledger mutation, or admission occurred. Phase 85f97
-remains pending because no completed handoff exists.
+The authored Castle→WF route followed the ordinary lifecycle only and
+remained at `level=1 area=1 whomps=0`; the route-pair matrix exited `77`
+before creating a trace or admitting a route (`trace=not-created`,
+`records=0`, `admission=0`). The selected row remains planned. No direct WF
+load, helper call, synthetic Whomp spawn, object injection, small-Whomp
+substitution, coordinate selection, synthetic trace, manifest/report/ledger
+mutation, or canonical publication occurred.
 
 The designated local canonical route evidence remains
 `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
@@ -732,8 +729,9 @@ broad/physical/release/human gates are open.
 - **[Phase 85f94](porting-handoff-full-swift-twin-phase85f94-docs-refresh.md):** refreshes the six first-party status surfaces with the f92 discovery and f93 seam result; its stale f93-pending wording is corrected by Phase 85f95.
 - **[Phase 85f95](porting-handoff-full-swift-twin-phase85f95-docs-treasure-correction.md):** corrects the f93 status across the six first-party surfaces and existing f94 handoff while preserving exact counters, hashes, percentages, and 0% floors.
 - **[Phase 85f96](porting-handoff-full-swift-twin-phase85f96-next-route-discovery.md):** discovers Whomp's Fortress' authored `bhvWhompKingBoss` row `0x28e0617bfc286cbe`; the first WF area-1 `ACT_1` King subject remains planned because no native route lifecycle, trace, or admission was produced.
-- **Phase 85f97:** remains pending because no completed handoff exists.
-- **[Phase 85f98](porting-handoff-full-swift-twin-phase85f98-docs-refresh.md):** records the f96 Whomp discovery across the six first-party status surfaces while preserving the designated 26/7,394 and backup 25/7,395 evidence, exact hashes/percentages, and 0% floors.
+- **[Phase 85f97](porting-handoff-full-swift-twin-phase85f97-whomp-seam-execute.md):** commits the source-owned Whomp King receipt seam (`66ca1911`), but the authored Castle→WF route remains at `level=1 area=1 whomps=0` and exits 77 before trace or admission.
+- **[Phase 85f98](porting-handoff-full-swift-twin-phase85f98-docs-refresh.md):** records the f96 Whomp discovery and f97 seam result across the six first-party status surfaces while preserving the designated 26/7,394 and backup 25/7,395 evidence, exact hashes/percentages, and 0% floors.
+- **[Phase 85f99](porting-handoff-full-swift-twin-phase85f99-docs-whomp-correction.md):** corrects the stale f97-pending wording across the six first-party surfaces and existing f98 handoff while preserving exact counters, hashes, percentages, and 0% floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/

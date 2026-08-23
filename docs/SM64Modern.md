@@ -16,24 +16,21 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-23).
 
-### Phase 85f96 current status
+### Phase 85f97 current status
 
-Phase 85f96 completed the next source-route discovery for Whomp's Fortress'
-authored `bhvWhompKingBoss` route row `0x28e0617bfc286cbe`. The source
-behavior script creates the King Whomp subject for `ACT_1` as the first
-area-1 entry (source ordinal 0, `MODEL_WHOMP`, position `(0,3584,0)`,
-behavior parameter `0`); the ordinary Castle Inside painting nodes `0x06`,
-`0x07`, and `0x08` target WF area 1. The source owner contains the King
-action, collision, interaction, cutscene, effect, and reward lifecycle, while
-`WhompEnemy` and `WhompObjectBridge` preserve copied King state and the
-semantic reward child without exposing native pointers. The generated row
-declares `collision_queries,effects,object_state,script_events` and remains
-exactly one `planned` row.
+Phase 85f97 committed the source-owned Whomp King receipt seam in commit
+`66ca1911` for authored `bhvWhompKingBoss` route row
+`0x28e0617bfc286cbe`. The seam preserves schema-4 script/object/collision/
+effect records, semantic King and reward-child identities, and pointer-free
+source state for the selected route row.
 
-This is discovery/static owner evidence only. No native WF load, direct helper
-call, synthetic Whomp spawn, object injection, trace, route record, source
-edit, manifest/report/ledger mutation, or admission occurred. Phase 85f97
-remains pending because no completed handoff exists.
+The authored Castle→WF route followed the ordinary lifecycle only and
+remained at `level=1 area=1 whomps=0`; the route-pair matrix exited `77`
+before creating a trace or admitting a route (`trace=not-created`,
+`records=0`, `admission=0`). The selected row remains planned. No direct WF
+load, helper call, synthetic Whomp spawn, object injection, small-Whomp
+substitution, coordinate selection, synthetic trace, manifest/report/ledger
+mutation, or canonical publication occurred.
 
 The designated local canonical route evidence remains
 `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
@@ -1325,8 +1322,9 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f94 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f94-docs-refresh.md),
 [Phase 85f95 JRB documentation correction](../.porting/porting-handoff-full-swift-twin-phase85f95-docs-treasure-correction.md),
 [Phase 85f96 Whomp discovery](../.porting/porting-handoff-full-swift-twin-phase85f96-next-route-discovery.md),
-Phase 85f97 remains pending because no completed handoff exists, and
-[Phase 85f98 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f98-docs-refresh.md).
+[Phase 85f97 Whomp King seam execute](../.porting/porting-handoff-full-swift-twin-phase85f97-whomp-seam-execute.md),
+[Phase 85f98 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f98-docs-refresh.md), and
+[Phase 85f99 Whomp documentation correction](../.porting/porting-handoff-full-swift-twin-phase85f99-docs-whomp-correction.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),

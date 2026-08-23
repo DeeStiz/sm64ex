@@ -2,21 +2,15 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f98 Whomp discovery documentation refresh (2026-08-23):** records
-  the Phase 85f96 source-route discovery for Whomp's Fortress' authored
-  `bhvWhompKingBoss` row `0x28e0617bfc286cbe`. The source-authored subject is
-  the first area-1 `ACT_1` entry (source ordinal 0, `MODEL_WHOMP`, position
-  `(0,3584,0)`, behavior parameter `0`) reached by the ordinary Castle Inside
-  painting nodes `0x06`/`0x07`/`0x08` into WF area 1. The source owner contains
-  the King action, collision, interaction, cutscene, effect, and reward
-  lifecycle, while `WhompEnemy`/`WhompObjectBridge` preserve copied state and
-  the semantic reward child without native pointers. The generated row declares
-  `collision_queries,effects,object_state,script_events` and remains planned;
-  discovery produced no native WF load, helper call, synthetic spawn, object
-  injection, trace, route record, source edit, manifest/report/ledger mutation,
-  or admission. Phase 85f97 remains pending because no completed handoff
-  exists. Preserve the designated local 26/7,394 report at
-  `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
+- **Phase 85f99 Whomp documentation correction (2026-08-23):** corrects the
+  stale Phase 85f97-pending wording across the six first-party status surfaces
+  and existing Phase 85f98 handoff. It records the committed source-owned
+  Whomp King receipt seam (`66ca1911`) for authored
+  `bhvWhompKingBoss` row `0x28e0617bfc286cbe`; the authored Castle→WF route
+  remains at `level=1 area=1 whomps=0` and exits `77` before creating a trace
+  or admitting a route (`trace=not-created`, `records=0`, `admission=0`). The
+  selected row remains planned. Preserve the designated local 26/7,394 report
+  at `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
   with SHA-256
   `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
   `26/7420 = 0.350404313%`, separate from the byte-identical 25/7,395 backup
@@ -26,9 +20,10 @@
   `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
   behavior mapping 95.693%, and M34/M35/human-acceptance/implementation/
   full-goal floors remain 0%. Handoffs:
-  `.porting/porting-handoff-full-swift-twin-phase85f96-next-route-discovery.md`
-  and `.porting/porting-handoff-full-swift-twin-phase85f98-docs-refresh.md`;
-  no f97 handoff exists.
+  `.porting/porting-handoff-full-swift-twin-phase85f96-next-route-discovery.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f97-whomp-seam-execute.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f98-docs-refresh.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f99-docs-whomp-correction.md`.
 
 - **Phase 85f95 JRB treasure documentation correction (2026-08-23):** corrects
   stale Phase 85f93-pending wording across the six first-party status surfaces
