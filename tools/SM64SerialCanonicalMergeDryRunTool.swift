@@ -127,11 +127,12 @@ struct SM64SerialCanonicalMergeDryRunTool {
 
     private static func run(arguments: [String]) throws {
         let options = try parse(arguments: arguments)
-        try preflight(options)
+        let proofArtifacts = try preflight(options)
 
         let immutablePaths = [options.manifest]
             + options.pairs.flatMap { [$0.report, $0.proof] }
             + [options.introReport, options.introProof]
+            + proofArtifacts
         let beforeHashes = try Dictionary(uniqueKeysWithValues: immutablePaths.map { ($0.path, try sha256($0)) })
 
         var firstArguments: [String] = ["--manifest", options.manifest.path]
@@ -207,7 +208,7 @@ struct SM64SerialCanonicalMergeDryRunTool {
         print("retained_pair_hashes \(reportSummary)")
     }
 
-    private static func preflight(_ options: Options) throws {
+    private static func preflight(_ options: Options) throws -> [URL] {
         for tool in [options.canonicalTool, options.introTool] {
             guard FileManager.default.fileExists(atPath: tool.path) else { throw DryRunError.missingInput(tool) }
             guard FileManager.default.isExecutableFile(atPath: tool.path) else { throw DryRunError.nonExecutable(tool) }
@@ -257,6 +258,7 @@ struct SM64SerialCanonicalMergeDryRunTool {
         guard actualManifestHash == manifestHash else {
             throw DryRunError.manifestHashMismatch(manifestHash, actualManifestHash)
         }
+        return proofArtifacts
     }
 
     private static func parse(arguments: [String]) throws -> Options {
