@@ -693,6 +693,29 @@ SM64 Modern native macOS — nightly continuation update (2026-08-22)
       Phase 85aw 15/7,420 counter is restored, `gputoolsserviced` wording is
       corrected, and the f-series handoff indexes are serialized without
       changing source, canonical manifests, or reports.
+200.) Record Phase 85f18's authored DDD Sushi source-seam retry. No qualifying
+      pointer-free owner/query receipt exists; shard `0x023fe9bb4409460b`
+      remains planned and no synthetic route or canonical artifact changed.
+201.) Record Phase 85f19's authored BBH display-list seam retry. No
+      source-defined pointer-free owner/packet receipt exists; candidate
+      `0x000670ec2a57dfa8` remains planned and no route or manifest changed.
+202.) Record Phase 85f20's M34 production re-audit. One detected display is
+      offline (`online=0`), `gputoolsserviced` is not running, no GPU session
+      is active, and thermal state is unknown (`0xe00002bc`); no replay,
+      capture, pixel, soak, or direct-display evidence is claimable.
+203.) Record Phase 85f21's M35 distribution preflight. Ordinary Xcode 26.6 and
+      the readiness/distribution contracts pass, but no Developer ID identity/
+      private key or supported `notarytool` authentication exists; no artifact,
+      Gatekeeper, or human-acceptance result exists.
+204.) Record Phase 85f22's canonical route audit. Fresh deterministic manifest
+      regeneration matches 7,420 rows and SHA `23c9d3f1…2b715`; the retained
+      report remains 25/7,395 with SHA `aa8eadcb…bf87c3d`. Full replay stopped
+      because the transient pendulum artifact expired; no canonical state changed.
+205.) Reconcile Phase 85f23 current-status documentation. Preserve the exact
+      7,420 manifest, 25/7,395 report, 0.336927224% live-route rate, 95.693%
+      behavior mapping, and 0% conservative floors while linking Phases 85f18–
+      85f22 in order. No source, manifest, route report, or acceptance claim
+      changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f11 current evidence checkpoint
+### Phase 85f22 current evidence checkpoint
 
 The frozen implementation counters remain **534 behavior rows** (**511 Swift
 value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
@@ -62,6 +62,24 @@ pointer-free ownership, independent parity, four-way configuration parity, and
 admission gates. Phase 85f11 confirms DDD source-reaches two authored Sushi
 objects and `find_water_level`, but no pointer-free owner/query receipt exists;
 shard `0x023fe9bb4409460b` remains planned without synthetic instrumentation.
+
+Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
+pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
+Phase 85f19 rechecked the authored BBH display-list seam and found no
+source-defined pointer-free owner/packet receipt; candidate
+`0x000670ec2a57dfa8` remains planned. Phase 85f20 re-audited M34 with one
+detected display offline (`online=0`), `gputoolsserviced` not running, no active
+GPU session, and thermal state unknown (`0xe00002bc`); no replay, capture,
+pixel, soak, or direct-display evidence is claimable. Phase 85f21 rechecked
+M35 under ordinary Xcode 26.6: the readiness/distribution contracts pass, but
+no Developer ID identity/private key or supported `notarytool` authentication
+exists, so no distribution artifact or Gatekeeper/human result exists.
+Phase 85f22 regenerated the 7,420-row manifest twice with byte-identical
+outputs (`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`),
+verified the retained 25/7,395 report
+(`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`), and
+confirmed the historical full replay cannot be rerun because its transient
+pendulum artifact expired. No canonical route or manifest state changed.
 
 Phase 85ct source-proved the next full-trace actor seam: subject 31 is the
 authored `bhvDeathWarp` at `levels/castle_inside/script.c:62`, with semantic
@@ -163,6 +181,12 @@ broad/physical/release/human gates are open.
 - **[Phase 85ap](porting-handoff-full-swift-twin-phase85ap-docs-route-update.md):** reconciles the public docs and ledgers after the fifteen-row merge; it does not claim closure.
 - **[Phase 85f11](porting-handoff-full-swift-twin-phase85f11-ddd-sushi-route.md):** DDD source-reaches two authored Sushi objects and `find_water_level`, but no pointer-free owner/query receipt exists; shard `0x023fe9bb4409460b` remains planned.
 - **[Phase 85f17](porting-handoff-full-swift-twin-phase85f17-docs-reconciliation.md):** reconciles the current headings, ordered f-series indexes, Phase 85aw historical counter, and host-service wording without changing route or canonical artifacts.
+- **[Phase 85f18](porting-handoff-full-swift-twin-phase85f18-sushi-seam.md):** rechecks the authored DDD Sushi owner/query seam; no qualifying pointer-free receipt exists and the shard remains planned.
+- **[Phase 85f19](porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md):** rechecks the authored BBH display-list owner/packet seam; no source-defined pointer-free receipt exists and the candidate remains planned.
+- **[Phase 85f20](porting-handoff-full-swift-twin-phase85f20-m34-reaudit.md):** re-audits M34 with an offline display, stopped `gputoolsserviced`, no active GPU session, and unknown thermal state; no runtime or pixel evidence is claimable.
+- **[Phase 85f21](porting-handoff-full-swift-twin-phase85f21-m35-preflight.md):** rechecks M35 under ordinary Xcode 26.6; contracts pass, but Developer ID and notary prerequisites remain absent.
+- **[Phase 85f22](porting-handoff-full-swift-twin-phase85f22-canonical-audit.md):** regenerates the manifest deterministically and verifies the retained 25/7,395 report; the full replay is not rerun because its transient pendulum artifact expired.
+- **[Phase 85f23](porting-handoff-full-swift-twin-phase85f23-docs-current-refresh.md):** refreshes the current-status surfaces and ordered f-series index without changing source, manifest, route report, or acceptance claims.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1179,7 +1203,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f11 entry are authoritative for the latest checkpoint.
+and the Phase 85f22 entry are authoritative for the latest checkpoint.
 
 ### 85du — Tank-fish mapping — complete / fail-closed
 

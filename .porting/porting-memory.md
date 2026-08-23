@@ -2,6 +2,31 @@
 
 ## Latest validated slices (2026-08-22)
 
+- **Phase 85f22 current checkpoint (2026-08-22):** the authoritative current
+  state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
+  7,420 route rows with 25 terminal / 7,395 planned; live-route qualification
+  is `25/7,420 = 0.336927224%`, behavior mapping is 95.693%, and conservative
+  implementation and acceptance floors remain 0%. Phase 85f18's DDD Sushi seam
+  remains planned without a pointer-free owner/query receipt; Phase 85f19's BBH
+  display-list seam remains planned without a source-defined pointer-free
+  owner/packet receipt. Phase 85f20 finds one display offline,
+  `gputoolsserviced` stopped, no active GPU session, and thermal state unknown;
+  Phase 85f21's ordinary-Xcode 26.6 M35 contracts pass but Developer ID/notary
+  prerequisites are absent. Phase 85f22 regenerated the manifest
+  deterministically with SHA
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`, verified
+  the retained report SHA
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`, and
+  found the historical full replay's transient pendulum artifact expired.
+  Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f20-m34-reaudit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f21-m35-preflight.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f22-canonical-audit.md`, and
+  this current-status refresh is recorded in
+  `.porting/porting-handoff-full-swift-twin-phase85f23-docs-current-refresh.md`.
+
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
   7,420 route rows with 25 terminal / 7,395 planned; live-route qualification is
@@ -487,7 +512,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f11
+The repeated route notes below preserve prior phase evidence; the Phase 85f22
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`

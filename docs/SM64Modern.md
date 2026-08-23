@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-22).
 
-### Phase 85f11 current status
+### Phase 85f22 current status
 
 The authoritative current counters remain **534 behavior rows** (511 Swift
 value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -24,6 +24,24 @@ twenty-five non-fixture terminal passed rows and 7,395 planned. Behavior mapping
 is 95.693% and live-route qualification is 0.336927224%; the conservative
 full-goal and acceptance floors remain 0%. These are separate ledgers, not an
 average.
+
+Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
+pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
+Phase 85f19 rechecked the authored BBH display-list seam and found no
+source-defined pointer-free owner/packet receipt; candidate
+`0x000670ec2a57dfa8` remains planned. Phase 85f20 re-audited M34 with one
+detected display offline (`online=0`), `gputoolsserviced` not running, no active
+GPU session, and thermal state unknown (`0xe00002bc`); no replay, capture,
+pixel, soak, or direct-display evidence is claimable. Phase 85f21 rechecked
+M35 under ordinary Xcode 26.6: the readiness/distribution contracts pass, but
+no Developer ID identity/private key or supported `notarytool` authentication
+exists, so no distribution artifact or Gatekeeper/human result exists.
+Phase 85f22 regenerated the 7,420-row manifest twice with byte-identical
+outputs (`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`),
+verified the retained 25/7,395 report
+(`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`), and
+confirmed the historical full replay cannot be rerun because its transient
+pendulum artifact expired. No canonical route or manifest state changed.
 
 Phases 85aq–85as used disjoint Luna-max workers to triage remaining route
 families and replay authored level/transition recipes. Camera `find_floor`,
@@ -756,7 +774,13 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f9 water-level reachability](../.porting/porting-handoff-full-swift-twin-phase85f9-water-level-reachability.md),
 [Phase 85f10 route-breadth audit](../.porting/porting-handoff-full-swift-twin-phase85f10-route-breadth.md),
 [Phase 85f11 DDD Sushi discovery](../.porting/porting-handoff-full-swift-twin-phase85f11-ddd-sushi-route.md),
-and [Phase 85f17 documentation reconciliation](../.porting/porting-handoff-full-swift-twin-phase85f17-docs-reconciliation.md),
+[Phase 85f17 documentation reconciliation](../.porting/porting-handoff-full-swift-twin-phase85f17-docs-reconciliation.md),
+[Phase 85f18 DDD Sushi source seam](../.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md),
+[Phase 85f19 BBH display-list seam retry](../.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md),
+[Phase 85f20 M34 production re-audit](../.porting/porting-handoff-full-swift-twin-phase85f20-m34-reaudit.md),
+[Phase 85f21 M35 distribution preflight](../.porting/porting-handoff-full-swift-twin-phase85f21-m35-preflight.md),
+[Phase 85f22 canonical route audit](../.porting/porting-handoff-full-swift-twin-phase85f22-canonical-audit.md),
+and [Phase 85f23 current-status documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f23-docs-current-refresh.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),
