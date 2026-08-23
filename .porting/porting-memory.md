@@ -2,6 +2,34 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f122 door-contract documentation refresh (2026-08-23):** carries
+  the Phase 85f121 source contract into the first-party status surfaces. The
+  authored Castle Grounds special-object preset `0x88` maps to
+  `MODEL_CASTLE_CASTLE_DOOR` and `bhvDoorWarp`, which sets
+  `INTERACT_WARP_DOOR`; the common door contract is `hitbox radius=80
+  height=100` with collision distance `1000`. `interact_warp_door` runs only
+  in `ACT_WALKING` or `ACT_DECELERATING`, after actual contact, then computes
+  `should_push_or_pull_door`, stores the interaction object, and enters the
+  pulling/pushing action. No A-button press is required for this interaction.
+  The authored centers are `(-76,803,-3155)` and `(77,803,-3155)`; the best
+  fixed samples remain `(-311,803,-3054)` and `(504,803,-3054)`, outside the
+  nearest 80-unit radius. The route remains `LEVEL_CASTLE_GROUNDS` (level 16)
+  area 1 after 3,600 steps with exit `77`, no trace/receipt/runtime pair, and
+  no admission. Preserve the designated 26/7,394 report at SHA-256
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
+  byte-identical 25/7,395 backup at SHA-256
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+  unchanged route manifest SHA-256
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+  behavior manifest SHA-256
+  `83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`,
+  95.693% behavior mapping, and 0% M34/M35/human/implementation/full-goal
+  floors. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f119-castle-door-final-variant.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f121-castle-door-contract-analysis.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f122-docs-door-contract.md`.
+
 - **Phase 85f120 final-door-variant documentation refresh (2026-08-23):**
   records Phase 85f119's final fixed lateral input after the refined
   `(-311,803,-3054)` approach. The game still ended in

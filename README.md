@@ -65,19 +65,28 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 85f120 current status
+### Phase 85f122 current status
 
-Phase 85f119 combined the Phase 85f117 authored-door approach with a fixed
-lateral input after the `(-311,803,-3054)` sample. The final fixed lateral
-variant still never crossed the authored castle-door warp: the game remained
-`LEVEL_CASTLE_GROUNDS` (level 16) area 1 for all 3,600 steps and exited `77`.
-No trace, native receipt, C/Swift runtime pair, route admission,
-report/ledger/manifest mutation, or canonical promotion exists. No direct
-level load/warp, behavior helper, object injection, coordinate selection, or
-synthetic trace data was used.
+Phase 85f121 records the authored Castle Grounds special-object contract:
+preset `0x88` maps to `MODEL_CASTLE_CASTLE_DOOR` and `bhvDoorWarp`, which sets
+`INTERACT_WARP_DOOR`. The common door collision contract is `hitbox radius=80
+height=100` with collision distance `1000`. `interact_warp_door` runs only
+when Mario is `ACT_WALKING` or `ACT_DECELERATING`, after actual contact with
+the object; it computes `should_push_or_pull_door`, stores the interaction
+object, and enters the pulling/pushing action. No A-button press is required
+for the warp-door interaction itself.
 
-Blind fixed-input expansion stops here. The next gate is authored door
-interaction/facing analysis from the source collision/interaction contract, or
+The authored door centers are `(-76,803,-3155)` and `(77,803,-3155)`. The
+best fixed samples from Phases 85f116–85f119 were `(-311,803,-3054)` and
+`(504,803,-3054)`, still outside the nearest 80-unit collision radius. The
+final fixed lateral variant therefore remained `LEVEL_CASTLE_GROUNDS` (level
+16) area 1 for all 3,600 steps and exited `77`; no trace, native receipt,
+C/Swift runtime pair, route admission, report/ledger/manifest mutation, or
+canonical promotion exists. No direct level load/warp, behavior helper,
+object injection, coordinate selection, or synthetic trace data was used.
+
+The route remains contact-gated. The next traversal attempt must reach within
+the authored hitbox through a source-faithful fixed-input recipe, or use
 explicit authorization for a different traversal mechanism. Once Castle
 Inside and SSL area 1 are reached, real Pokey C/Swift Debug/ASan/Release/rerun
 parity receipts remain required before admission.
@@ -117,7 +126,9 @@ Ordered handoffs: [Phase 85f110 Pokey runtime route](.porting/porting-handoff-fu
 [Phase 85f117 Castle-door refinement](.porting/porting-handoff-full-swift-twin-phase85f117-castle-door-refinement.md), and
 [Phase 85f118 documentation/Castle-door refinement](.porting/porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md),
 [Phase 85f119 final fixed lateral variant](.porting/porting-handoff-full-swift-twin-phase85f119-castle-door-final-variant.md), and
-[Phase 85f120 documentation/final door variant](.porting/porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md).
+[Phase 85f120 documentation/final door variant](.porting/porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md),
+[Phase 85f121 Castle-door contract analysis](.porting/porting-handoff-full-swift-twin-phase85f121-castle-door-contract-analysis.md), and
+[Phase 85f122 documentation/door contract](.porting/porting-handoff-full-swift-twin-phase85f122-docs-door-contract.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 
