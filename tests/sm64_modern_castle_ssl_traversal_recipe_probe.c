@@ -32,6 +32,7 @@ struct HarnessState {
     int16_t right_x;
     int16_t right_y;
     uint32_t gamepad_buttons;
+    uint32_t recipe_mode;
 };
 
 static SM64ModernStatus input_read(
@@ -149,6 +150,36 @@ static void recipe_input(struct HarnessState *state, uint32_t step) {
      * stick remains the only movement source.
      */
     memset(state, 0, sizeof(*state));
+    const char *recipe = getenv("SM64_CASTLE_SSL_RECIPE");
+    const bool hold_backward = recipe
+        && (strcmp(recipe, "hold-backward") == 0
+            || strcmp(recipe, "hold-backward-nojump") == 0);
+    if (hold_backward) {
+        state->left_y = 32767;
+        if (strcmp(recipe, "hold-backward") == 0 && pulse_a(step)) {
+            state->gamepad_buttons = UINT32_C(1);
+        }
+        return;
+    }
+    const bool turn_right = recipe
+        && strcmp(recipe, "backward-turn-right") == 0;
+    const bool turn_left = recipe
+        && strcmp(recipe, "backward-turn-left") == 0;
+    const bool door_left = recipe
+        && strcmp(recipe, "backward-turn-left-door") == 0;
+    const bool door_right = recipe
+        && strcmp(recipe, "backward-turn-left-door-right") == 0;
+    if (turn_right || turn_left || door_left || door_right) {
+        state->left_y = 32767;
+        if (step >= 360u && step < 1200u) {
+            state->right_x = turn_right ? 32767 : -32768;
+        }
+        if ((door_left || door_right) && step >= 1200u) {
+            state->left_y = 0;
+            state->left_x = door_right ? 32767 : -32768;
+        }
+        return;
+    }
     const uint32_t phase = step / 600u;
     switch (phase % 6u) {
         case 0u:
