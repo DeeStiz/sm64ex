@@ -5,27 +5,32 @@ Date: 2026-08-23
 ## Verdict
 
 **DOCUMENTATION REFRESHED / PHASE 85f92 JRB TREASURE DISCOVERY RECORDED /
-PHASE 85f93 PENDING.** The six first-party status surfaces now record the
-Phase 85f92 source-route discovery for Jolly Roger Bay's authored treasure
-chest root. Phase 85f93 remains pending because no completed handoff exists.
-No source, behavior manifest, designated or backup report, canonical route
-ledger, fixture, release artifact, or unrelated worktree change was modified
-by this documentation refresh.
+PHASE 85f93 SEAM IMPLEMENTED WITH FAIL-CLOSED REACHABILITY.** The six
+first-party status surfaces now record the Phase 85f92 source-route discovery
+and committed Phase 85f93 source-owned JRB treasure-chest receipt seam. The
+seam is implemented in commit `904bffa3`, but the authored Castle→JRB route
+remained at `level=1 area=1 roots=0 bottoms=0 tops=0`; the route-pair matrix
+exited `77` before creating a trace or admitting a route
+(`trace=not-created`, `records=0`, `admission=0`). No source, behavior
+manifest, designated or backup report, canonical route ledger, fixture,
+release artifact, or unrelated worktree change was modified by this
+documentation refresh.
 
-## Phase 85f92 JRB treasure discovery
+## Phase 85f93 JRB treasure-chest seam result
 
-Phase 85f92 selected the authored `bhvTreasureChestsJrb` root at route row
-`0x246e8a98cbad9a7a`. The Jolly Roger Bay area-1 source script creates the
-four-step treasure-chest puzzle through the source root and its four
-source-owned bottom/top children. The existing pointer-free Swift
-`TreasureChestBehavior`/`TreasureChestObjectBridge` owner preserves the JRB
-variant, source child order, scalar puzzle state, interaction results, and
-effect intents.
+Phase 85f93 committed the source-owned receipt seam for the authored
+`bhvTreasureChestsJrb` route row `0x246e8a98cbad9a7a`. The seam preserves
+semantic root/bottom/top identities, source child ordinals 1 through 4,
+authored scalar state, interaction outcomes, and effect intents without
+exposing native pointers.
 
-This is gameplay-puzzle lifecycle evidence, not a generic-water query. The
-discovery phase produced no native JRB load, direct helper call, synthetic
-child, object injection, trace, source edit, manifest/report/ledger mutation,
-route admission, or canonical publication. The selected row remains planned.
+The ordinary Castle→JRB route followed the normal lifecycle only and remained
+at `level=1 area=1 roots=0 bottoms=0 tops=0`. The bounded route-pair matrix
+failed closed with exit `77` before creating a trace or admitting a route
+(`trace=not-created`, `records=0`, `admission=0`). No direct JRB load, chest
+helper call, child injection, variant substitution, coordinate selection, or
+synthetic trace was used. The selected row remains planned. No
+manifest/report/ledger mutation or canonical publication occurred.
 
 ## Retained canonical boundary
 
@@ -54,8 +59,9 @@ human-acceptance, implementation, and full-goal floors remain 0%.
 - [Phase 85f90 documentation refresh](porting-handoff-full-swift-twin-phase85f90-docs-refresh.md)
 - [Phase 85f91 Snowman wind documentation correction](porting-handoff-full-swift-twin-phase85f91-docs-snowman-wind-correction.md)
 - [Phase 85f92 JRB treasure discovery](porting-handoff-full-swift-twin-phase85f92-next-route-discovery.md)
-- Phase 85f93 remains pending; no completed handoff exists.
+- [Phase 85f93 JRB treasure-chest seam execute](porting-handoff-full-swift-twin-phase85f93-treasure-chest-seam-execute.md)
 - this Phase 85f94 documentation refresh
+- [Phase 85f95 JRB treasure documentation correction](porting-handoff-full-swift-twin-phase85f95-docs-treasure-correction.md)
 
 ## Documentation files changed
 
