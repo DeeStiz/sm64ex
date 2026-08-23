@@ -21,24 +21,25 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
-### Phase 85f102 current evidence checkpoint
+### Phase 85f105 current evidence checkpoint
 
-Phase 85f100 identified Tiny-Huge Island's authored `bhvFirePiranhaPlant`
-group as the next source-route candidate at route row
-`0x783b75ac5fc8435f`; discovery was recorded in commit `d746b151`. Phase
-85f101 then committed the static source-contract seam in `7541ed67`. Its
-static-only verdict is **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO
-ADMISSION**, with exact contract fingerprint
-`0xab99743d61a6e50a`. The seam retains semantic `bhvFirePiranhaPlant`,
-`bhvSmallPiranhaFlame`, and `bhvStar` identities plus the authored THI
-area-1 tuple, source ordinals 4–8, hitboxes, flame parameters, and reward
-position. No runtime receipt or admission exists.
+Phase 85f103 selected Rainbow Ride's authored `bhvDonutPlatformSpawner` at
+route row `0x0114376397887ece`. The discovery froze the source parent and its
+31-child position table, plus the ordinary Castle Inside painting boundary at
+node `0x2A` to `LEVEL_RR` area 1. Phase 85f104 then committed the static
+source-contract seam in `ea1e4772`. Its exact verdict is **STATIC SEAM COMPLETE
+/ RUNTIME RECEIPT ABSENT / NO ADMISSION**, with static contract fingerprint
+`0x8470fe2a9a74008b`. The seam preserves the semantic
+`bhvDonutPlatformSpawner`/`bhvDonutPlatform` identities, source 31-child
+table, parent bitmask, squared-distance gate, collision identity, and
+effect/deletion lifecycle scalars without crossing native pointers. No runtime
+receipt or admission exists; the selected row remains planned.
 
 The only acceptable next runtime evidence is the ordinary Castle Inside
-painting route through nodes `0x27`, `0x28`, or `0x29` into THI area 1. No
-direct THI load or warp, synthetic plant or flame, object injection, helper
-or probe call, trace, manifest/report/ledger mutation, or admission was
-performed. The selected row remains planned.
+painting route through node `0x2A` into RR area 1, observing the authored
+parent and source-ordered children. No direct RR load or warp, synthetic
+parent or child, object injection, helper or probe call, coordinate selection,
+trace, manifest/report/ledger mutation, or admission was performed.
 
 The designated local canonical route evidence remains
 `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
@@ -740,6 +741,9 @@ broad/physical/release/human gates are open.
 - **[Phase 85f100](porting-handoff-full-swift-twin-phase85f100-next-route-discovery.md):** discovers the authored Tiny-Huge Island `bhvFirePiranhaPlant` group at route row `0x783b75ac5fc8435f`; the selected row remains planned.
 - **[Phase 85f101](porting-handoff-full-swift-twin-phase85f101-fire-piranha-seam-execute.md):** commits the pointer-free static Fire Piranha Plant source-contract seam (`7541ed67`), but no runtime receipt or admission exists.
 - **[Phase 85f102](porting-handoff-full-swift-twin-phase85f102-docs-refresh.md):** reconciles all first-party status surfaces with the static-only verdict, exact counters/hashes, and ordered f100–f102 handoffs.
+- **[Phase 85f103](porting-handoff-full-swift-twin-phase85f103-next-route-discovery.md):** discovers the authored Rainbow Ride `bhvDonutPlatformSpawner` at route row `0x0114376397887ece`; the selected row remains planned.
+- **[Phase 85f104](porting-handoff-full-swift-twin-phase85f104-donut-platform-seam-execute.md):** commits the static Donut Platform parent/31-child source-contract seam (`ea1e4772`), but no runtime receipt or admission exists.
+- **[Phase 85f105](porting-handoff-full-swift-twin-phase85f105-docs-refresh.md):** reconciles all first-party status surfaces with the Donut Platform static-only verdict, exact counters/hashes, Castle node `0x2A` boundary, and ordered f103–f105 handoffs.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/

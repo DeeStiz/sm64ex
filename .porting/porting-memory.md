@@ -2,6 +2,22 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f105 Donut Platform documentation refresh (2026-08-23):** records
+  Phase 85f103's Rainbow Ride `bhvDonutPlatformSpawner` discovery at row
+  `0x0114376397887ece` and Phase 85f104's static seam (`ea1e4772`) with
+  fingerprint `0x8470fe2a9a74008b`. The verdict remains **STATIC SEAM COMPLETE /
+  RUNTIME RECEIPT ABSENT / NO ADMISSION**; Castle node `0x2A` -> RR area 1 is
+  the only permitted next runtime path. Preserve the designated 26/7,394
+  report SHA `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+  the byte-identical 25/7,395 backup SHA
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+  route manifest SHA `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+  behavior manifest SHA `83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`,
+  behavior mapping 95.693%, and 0% M34/M35/human/full floors. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f103-next-route-discovery.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f104-donut-platform-seam-execute.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f105-docs-refresh.md`.
+
 - **Phase 85f102 Fire Piranha Plant documentation refresh (2026-08-23):**
   records Phase 85f100's Tiny-Huge Island source-route discovery in commit
   `d746b151` and Phase 85f101's static source-contract seam in commit

@@ -2,24 +2,25 @@
 
 ## Status
 
-### Phase 85f102 current status
+### Phase 85f105 current status
 
-Phase 85f100 identified Tiny-Huge Island's authored `bhvFirePiranhaPlant`
-group as the next source-route candidate at route row
-`0x783b75ac5fc8435f`; discovery was recorded in commit `d746b151`. Phase
-85f101 then committed the static source-contract seam in `7541ed67`. Its
-static-only verdict is **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO
-ADMISSION**, with exact contract fingerprint
-`0xab99743d61a6e50a`. The seam retains semantic `bhvFirePiranhaPlant`,
-`bhvSmallPiranhaFlame`, and `bhvStar` identities plus the authored THI
-area-1 tuple, source ordinals 4–8, hitboxes, flame parameters, and reward
-position. No runtime receipt or admission exists.
+Phase 85f103 selected Rainbow Ride's authored `bhvDonutPlatformSpawner` at
+route row `0x0114376397887ece`. The discovery froze the source parent and its
+31-child position table, plus the ordinary Castle Inside painting boundary at
+node `0x2A` to `LEVEL_RR` area 1. Phase 85f104 then committed the static
+source-contract seam in `ea1e4772`. Its exact verdict is **STATIC SEAM COMPLETE
+/ RUNTIME RECEIPT ABSENT / NO ADMISSION**, with static contract fingerprint
+`0x8470fe2a9a74008b`. The seam preserves the semantic
+`bhvDonutPlatformSpawner`/`bhvDonutPlatform` identities, source 31-child
+table, parent bitmask, squared-distance gate, collision identity, and
+effect/deletion lifecycle scalars without crossing native pointers. No runtime
+receipt or admission exists; the selected row remains planned.
 
 The only acceptable next runtime evidence is the ordinary Castle Inside
-painting route through nodes `0x27`, `0x28`, or `0x29` into THI area 1. No
-direct THI load or warp, synthetic plant or flame, object injection, helper
-or probe call, trace, manifest/report/ledger mutation, or admission was
-performed. The selected row remains planned.
+painting route through node `0x2A` into RR area 1, observing the authored
+parent and source-ordered children. No direct RR load or warp, synthetic
+parent or child, object injection, helper or probe call, coordinate selection,
+trace, manifest/report/ledger mutation, or admission was performed.
 
 The designated local canonical route evidence remains
 `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
@@ -1400,8 +1401,11 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f98 documentation refresh](porting-handoff-full-swift-twin-phase85f98-docs-refresh.md), and
 [Phase 85f99 Whomp documentation correction](porting-handoff-full-swift-twin-phase85f99-docs-whomp-correction.md),
 [Phase 85f100 Fire Piranha Plant discovery](porting-handoff-full-swift-twin-phase85f100-next-route-discovery.md),
-[Phase 85f101 Fire Piranha Plant static seam](porting-handoff-full-swift-twin-phase85f101-fire-piranha-seam-execute.md), and
-[Phase 85f102 documentation refresh](porting-handoff-full-swift-twin-phase85f102-docs-refresh.md).
+[Phase 85f101 Fire Piranha Plant static seam](porting-handoff-full-swift-twin-phase85f101-fire-piranha-seam-execute.md),
+[Phase 85f102 documentation refresh](porting-handoff-full-swift-twin-phase85f102-docs-refresh.md),
+[Phase 85f103 Donut Platform discovery](porting-handoff-full-swift-twin-phase85f103-next-route-discovery.md),
+[Phase 85f104 Donut Platform static seam](porting-handoff-full-swift-twin-phase85f104-donut-platform-seam-execute.md), and
+[Phase 85f105 documentation refresh](porting-handoff-full-swift-twin-phase85f105-docs-refresh.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
