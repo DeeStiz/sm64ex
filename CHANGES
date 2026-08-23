@@ -868,9 +868,21 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       `canonical_ledger_mutation=0`, `manifest_mutation=0`, exit 77,
       `trace=not-created`), preserve the exact canonical 25/7,395 and isolated
       26/7,394 counters/hashes/percentages and 0% M34/M35/human floors, retain
-      authored `bhvTTC2DRotator` row `0x1af5669b06931d93` as planned, and mark
-      Phase 85f53 explicitly pending. No source, manifest, report, route
-      ledger, or acceptance state changed.
+      authored `bhvTTC2DRotator` row `0x1af5669b06931d93` as planned, and note
+      that no f53 completion handoff was present at that refresh. No source,
+      manifest, report, route ledger, or acceptance state changed.
+232.) Record Phase 85f53's committed TTC 2D rotator seam and correct the
+      superseded status wording. The authored Castle Inside painting route lands in
+      `level=14 (LEVEL_TTC), area=2` with `hands=0`; the matrix fails closed
+      with exit 77 before a trace or admission, and no route record, manifest,
+      retained report, or canonical ledger mutation occurred. Preserve the
+      exact retained 25/7,395 and isolated 26/7,394 counters, hashes,
+      percentages, and 0% M34/M35/human-acceptance/full-goal floors while
+      linking the ordered handoffs in `f53 -> f54 -> f55` sequence:
+      `porting-handoff-full-swift-twin-phase85f53-ttc-rotator-seam-execute.md`,
+      `porting-handoff-full-swift-twin-phase85f54-docs-refresh.md`, and
+      `porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md`. No
+      source, manifest, report, route ledger, or acceptance state changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

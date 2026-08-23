@@ -7,10 +7,11 @@ Date: 2026-08-23
 **DOCUMENTATION REFRESHED / RETAINED CANONICAL STATE PRESERVED.** The
 first-party status surfaces now record the actual Phase 85f49 WDW area-2
 reachability blocker, the Phase 85f50/f51 documentation correction history,
-and the Phase 85f52 authored TTC 2D rotator discovery. Phase 85f53 is marked
-pending because no completed handoff or route evidence is present at this
-refresh. No source, code, manifest, retained report, canonical route ledger,
-or vendored provenance was changed.
+and the Phase 85f52 authored TTC 2D rotator discovery. The committed Phase
+85f53 TTC 2D rotator seam is now recorded: its authored route lands in
+`level=14 (LEVEL_TTC), area=2` with `hands=0`, so the matrix fails closed with
+exit 77 before a trace or admission. No source, code, manifest, retained
+report, canonical route ledger, or vendored provenance was changed.
 
 ## Retained canonical boundary
 
@@ -57,8 +58,15 @@ nodes `0x21`–`0x23`. The existing Swift value owner and isolated C contract
 are present, but no native TTC lifecycle probe, schema-4 pair, admission, or
 canonical mutation was performed; the candidate remains planned.
 
-Phase 85f53 is explicitly pending. No completed handoff, native TTC lifecycle
-probe, route pair, admission, or canonical mutation is recorded for it.
+## Phase 85f53 actual result
+
+Phase 85f53 committed the source-owned TTC 2D rotator receipt seam, semantic
+behavior identity, pointer-free schema-4 C producer, independent Swift
+decoder/mirror, focused contract, and fail-closed matrix. The authored Castle
+Inside painting route lands in `level=14 (LEVEL_TTC), area=2` with `hands=0`.
+The matrix exits 77 before a trace or admission; no route record, manifest,
+retained report, or canonical ledger mutation occurred. No cog/static sibling
+substitution or synthetic trace was used.
 
 ## Documentation files changed
 

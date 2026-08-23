@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f54 current checkpoint (2026-08-23):** the retained checked-in
+- **Phase 85f55 current checkpoint (2026-08-23):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -91,7 +91,13 @@
   clock hand (`MODEL_TTC_CLOCK_HAND`, `oBehParams2ndByte=0`) through Castle
   Inside painting nodes `0x21`–`0x23`; no native TTC lifecycle pair, admission,
   or canonical mutation was performed, so the row remains planned. Phase 85f53
-  is explicitly pending, with no completed handoff or route evidence recorded.
+  committed the source-owned TTC 2D rotator receipt seam, semantic behavior
+  identity, pointer-free schema-4 C producer, independent Swift decoder/mirror,
+  focused contract, and fail-closed matrix. The authored Castle Inside
+  painting route lands in `level=14 (LEVEL_TTC), area=2` with `hands=0`, so the
+  matrix exits 77 before a trace or admission; no route record, manifest,
+  retained report, or canonical ledger mutation occurred. No cog/static sibling
+  substitution or synthetic trace was used.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -125,8 +131,9 @@
   `.porting/porting-handoff-full-swift-twin-phase85f50-docs-refresh.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f51-docs-f49-correction.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f52-next-route-discovery.md`,
-  Phase 85f53 pending (no completion handoff), and
-  `.porting/porting-handoff-full-swift-twin-phase85f54-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f53-ttc-rotator-seam-execute.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f54-docs-refresh.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and

@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f54 current evidence checkpoint
+### Phase 85f55 current evidence checkpoint
 
 The retained checked-in canonical state remains **534 behavior rows** (**511
 Swift value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
@@ -166,8 +166,13 @@ nodes `0x21`–`0x23`; the existing Swift value owner and isolated C contract
 are present. No native TTC lifecycle probe, schema-4 pair, admission, or
 canonical mutation was performed, so the candidate remains planned.
 
-Phase 85f53 is explicitly pending: no completed handoff, native TTC lifecycle
-probe, route pair, admission, or canonical mutation is recorded for it.
+Phase 85f53 committed the source-owned TTC 2D rotator receipt seam, semantic
+behavior identity, pointer-free schema-4 C producer, independent Swift
+decoder/mirror, focused contract, and fail-closed matrix. The authored Castle
+Inside painting route lands in `level=14 (LEVEL_TTC), area=2` with `hands=0`,
+so the matrix exits 77 before a trace or admission; no route record, manifest,
+retained report, or canonical ledger mutation occurred. No cog/static sibling
+substitution or synthetic trace was used.
 
 Phases 85aq–85as completed disjoint Luna-max route-family triage and authored
 level/transition reachability attempts without promoting a row. Phase 85ar
@@ -374,8 +379,9 @@ broad/physical/release/human gates are open.
 - **[Phase 85f50](porting-handoff-full-swift-twin-phase85f50-docs-refresh.md):** documentation refresh preserving the retained canonical state; its earlier f49 boundary is superseded by the actual f49 reachability handoff above.
 - **[Phase 85f51](porting-handoff-full-swift-twin-phase85f51-docs-f49-correction.md):** corrects the f49 status wording and ordering while preserving the retained 25/7,395, isolated 26/7,394, and 0% floors.
 - **[Phase 85f52](porting-handoff-full-swift-twin-phase85f52-next-route-discovery.md):** discovers authored `bhvTTC2DRotator` row `0x1af5669b06931d93` and selects the first TTC area-1 clock hand; the native lifecycle pair and admission remain pending.
-- **Phase 85f53 pending:** no completed handoff or route evidence is recorded for this phase.
+- **[Phase 85f53](porting-handoff-full-swift-twin-phase85f53-ttc-rotator-seam-execute.md):** implements the source-owned TTC 2D rotator receipt seam, but the authored route lands in TTC area 2 with `hands=0`; the matrix exits 77 before trace or admission.
 - **[Phase 85f54](porting-handoff-full-swift-twin-phase85f54-docs-refresh.md):** refreshes the current checkpoint and ordered index while preserving canonical counters and external acceptance floors.
+- **[Phase 85f55](porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md):** corrects the superseded f53 status wording with the committed TTC seam result while preserving canonical counters and external acceptance floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
