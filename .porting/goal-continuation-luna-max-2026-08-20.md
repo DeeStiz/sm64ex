@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f34 current evidence checkpoint
+### Phase 85f36 current evidence checkpoint
 
 The retained checked-in canonical state remains **534 behavior rows** (**511
 Swift value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
@@ -46,6 +46,18 @@ rows with SHA-256
 `0x9a0f7b4f7ecf6c41 -> 0xca33981b30cb7815`; this
 isolated result is not the checked-in canonical state, and no canonical
 manifest or retained report was overwritten.
+
+Phase 85f35 performed a bounded authored DDD camera-water reachability check.
+The ordinary owner-thread lifecycle failed closed with exit 77: zero retained
+event-307 route records (`retained=0`), no non-recipe records, and no route
+admission. The C trace and blocked rerun are both header-only 72-byte files
+with identical SHA-256 `a00652d483085b681254ca74c782bbe5e7bdc9d2672ff724ebd3735a3d706512`;
+the Swift witness is negative-fence machinery, not native DDD evidence. The
+exact unblock is a normal source-authored owner-thread traversal from an
+existing startup route into Castle area 3's DDD painting and then DDD area 1,
+without direct level register/load, forced camera mode, Sushi injection,
+coordinate reuse, or a direct `find_water_level` helper call. No canonical
+manifest or retained report changed.
 
 Phases 85aq–85as completed disjoint Luna-max route-family triage and authored
 level/transition reachability attempts without promoting a row. Phase 85ar
@@ -234,6 +246,8 @@ broad/physical/release/human gates are open.
 - **[Phase 85f32](porting-handoff-full-swift-twin-phase85f32-intro-transition-admission.md):** admits authored intro shard `0x9a0f7b4f7ecf6c41` in an isolated root without mutating canonical artifacts.
 - **[Phase 85f33](porting-handoff-full-swift-twin-phase85f33-intro-transition-canonical-merge.md):** passes a guarded phase-local merge with an isolated 26/7,394 report, SHA `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, and mapping to canonical ID `0xca33981b30cb7815`; checked-in canonical state remains 25/7,395.
 - **[Phase 85f34](porting-handoff-full-swift-twin-phase85f34-docs-refresh.md):** refreshes current-status surfaces and ordered links while preserving the retained canonical state and 0% M34/M35/human floors.
+- **[Phase 85f35](porting-handoff-full-swift-twin-phase85f35-ddd-camera-reachability.md):** fails closed with exit 77 because the ordinary owner-thread lifecycle retains zero event-307 records; the C trace and blocked rerun are identical 72-byte header-only files, and the exact unblock is an authored Castle area 3 DDD-painting traversal into DDD area 1.
+- **[Phase 85f36](porting-handoff-full-swift-twin-phase85f36-docs-refresh.md):** refreshes current-status surfaces and ordered links while preserving the retained canonical state, isolated intro result, and 0% M34/M35/human floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1250,7 +1264,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f34 entry are authoritative for the latest checkpoint.
+and the Phase 85f36 entry are authoritative for the latest checkpoint.
 
 ### 85du — Tank-fish mapping — complete / fail-closed
 

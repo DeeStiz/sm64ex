@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-22).
 
-### Phase 85f34 current status
+### Phase 85f36 current status
 
 The retained checked-in canonical state remains **534 behavior rows** (511
 Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -43,6 +43,18 @@ rows with SHA-256
 `0x9a0f7b4f7ecf6c41 -> 0xca33981b30cb7815`; this
 isolated result is not the checked-in canonical state, and no canonical
 manifest or retained report was overwritten.
+
+Phase 85f35 performed a bounded authored DDD camera-water reachability check.
+The ordinary owner-thread lifecycle failed closed with exit 77: zero retained
+event-307 route records (`retained=0`), no non-recipe records, and no route
+admission. The C trace and blocked rerun are both header-only 72-byte files
+with identical SHA-256 `a00652d483085b681254ca74c782bbe5e7bdc9d2672ff724ebd3735a3d706512`;
+the Swift witness is negative-fence machinery, not native DDD evidence. The
+exact unblock is a normal source-authored owner-thread traversal from an
+existing startup route into Castle area 3's DDD painting and then DDD area 1,
+without direct level register/load, forced camera mode, Sushi injection,
+coordinate reuse, or a direct `find_water_level` helper call. No canonical
+manifest or retained report changed.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -826,7 +838,9 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f31 camera-water seam](../.porting/porting-handoff-full-swift-twin-phase85f31-camera-water-seam-execute.md),
 [Phase 85f32 intro transition isolated admission](../.porting/porting-handoff-full-swift-twin-phase85f32-intro-transition-admission.md),
 [Phase 85f33 intro transition phase-local guarded merge](../.porting/porting-handoff-full-swift-twin-phase85f33-intro-transition-canonical-merge.md),
-and [Phase 85f34 current-status documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f34-docs-refresh.md).
+[Phase 85f34 current-status documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f34-docs-refresh.md),
+[Phase 85f35 DDD camera reachability](../.porting/porting-handoff-full-swift-twin-phase85f35-ddd-camera-reachability.md),
+and [Phase 85f36 current-status documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f36-docs-refresh.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),

@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-22)
 
-- **Phase 85f34 current checkpoint (2026-08-22):** the retained checked-in
+- **Phase 85f36 current checkpoint (2026-08-22):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -21,6 +21,17 @@
   `26/7420 = 0.350404313%`, with phase-local canonical ID mapping
   `0x9a0f7b4f7ecf6c41 -> 0xca33981b30cb7815`. The isolated result is not
   checked-in canonical state and did not overwrite the retained manifest/report.
+  Phase 85f35 then performed a bounded authored DDD camera-water reachability
+  check that failed closed with exit 77: zero retained event-307 route records
+  (`retained=0`), no non-recipe records, and no route admission. The C trace and
+  blocked rerun are identical 72-byte header-only files with SHA-256
+  `a00652d483085b681254ca74c782bbe5e7bdc9d2672ff724ebd3735a3d706512`; its
+  Swift witness is negative-fence machinery, not native DDD evidence. The exact
+  unblock is a normal source-authored owner-thread traversal from an existing
+  startup route into Castle area 3's DDD painting and then DDD area 1, without
+  direct level register/load, forced camera mode, Sushi injection, coordinate
+  reuse, or a direct `find_water_level` helper call. No canonical manifest or
+  retained report changed.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -36,8 +47,10 @@
   `.porting/porting-handoff-full-swift-twin-phase85f31-camera-water-seam-execute.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f32-intro-transition-admission.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f33-intro-transition-canonical-merge.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f34-docs-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f35-ddd-camera-reachability.md`,
   and this refresh is recorded in
-  `.porting/porting-handoff-full-swift-twin-phase85f34-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f36-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -524,7 +537,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f34
+The repeated route notes below preserve prior phase evidence; the Phase 85f36
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`
