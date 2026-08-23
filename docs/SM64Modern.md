@@ -16,15 +16,24 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-23).
 
-### Phase 85f108 current status
+### Phase 85f107 current status
 
 Phase 85f106 selected the SSL area-1 authored Pokey parent row
-`0x132a22db8f8e0945` and body-part child row `0x41715ab876625588`; Phase
-85f107 committed static seam `22d44cba` with fingerprint
-`0x26090919531bbf4d`. The verdict is **STATIC SEAM COMPLETE / RUNTIME RECEIPT
-ABSENT / NO ADMISSION**. The macro tuples, five child offsets/models, alive
-mask, and semantic parent/child identities are frozen; only Castle→SSL area 1
-may provide next runtime evidence. No receipt or admission exists.
+`0x132a22db8f8e0945` and body-part child row `0x41715ab876625588`. Phase
+85f107's strengthened static schema-4 seam is recorded by `8af9167a` on top
+of the initial seam `22d44cba`; its independent fingerprints are C
+`0x82add98bad10547e` and Swift `0x6276741935432706`. The pair reports
+`schema4=1`, a generation-safe parent link, all four authored `macro_pokey`
+parent tuples, five source-ordered child tuples, and source event ordering
+`attack → replenish → unload → collision → effect → deletion`. The verdict
+remains **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION**.
+
+The C validator and Swift mirror remain fixed-width value contracts only; no
+runtime receipt, C/Swift runtime pairing, or admission exists. Only the
+ordinary Castle→SSL area-1 route may provide next runtime evidence. No direct
+SSL load/warp, synthetic child, object injection, helper/probe call, trace,
+manifest/report/ledger mutation, or admission was performed; the parent and
+child rows remain planned.
 
 ### Phase 85f105 current status
 
@@ -1349,7 +1358,8 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f105 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f105-docs-refresh.md),
 [Phase 85f106 Pokey discovery](../.porting/porting-handoff-full-swift-twin-phase85f106-next-route-discovery.md),
 [Phase 85f107 Pokey static seam](../.porting/porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md), and
-[Phase 85f108 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f108-docs-refresh.md).
+[Phase 85f108 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f108-docs-refresh.md), and
+[Phase 85f109 Pokey documentation correction](../.porting/porting-handoff-full-swift-twin-phase85f109-docs-pokey-correction.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),

@@ -2,16 +2,20 @@
 
 ## Status
 
-### Phase 85f108 current status
+### Phase 85f107 current status
 
 Phase 85f106 selected the SSL Pokey parent/body-part rows
-`0x132a22db8f8e0945` and `0x41715ab876625588`; Phase 85f107 committed static
-seam `22d44cba` with fingerprint `0x26090919531bbf4d`. Its verdict is
-**STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION**. The source
-macro tuples, five child offsets/models, alive mask, and semantic identities
-remain frozen, while Castle→SSL area-1 runtime evidence is still required.
-Both rows remain planned; no report/ledger/manifest mutation occurred and
-all conservative floors remain 0%.
+`0x132a22db8f8e0945` and `0x41715ab876625588`. Phase 85f107's strengthened
+static schema-4 seam is recorded by `8af9167a` on top of `22d44cba`, with
+independent C and Swift fingerprints `0x82add98bad10547e` and
+`0x6276741935432706`. It reports `schema4=1`, a generation-safe parent link,
+four authored `macro_pokey` parent tuples, five source-ordered child tuples,
+and source event ordering `attack → replenish → unload → collision → effect →
+deletion`. The verdict remains **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT /
+NO ADMISSION**. Both rows remain planned; the ordinary Castle→SSL area-1
+route is the only acceptable next runtime evidence. No runtime receipt,
+report/ledger/manifest mutation, or admission occurred, and all conservative
+floors remain 0%.
 
 ### Phase 85f105 current status
 
@@ -1419,7 +1423,8 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f105 documentation refresh](porting-handoff-full-swift-twin-phase85f105-docs-refresh.md),
 [Phase 85f106 Pokey discovery](porting-handoff-full-swift-twin-phase85f106-next-route-discovery.md),
 [Phase 85f107 Pokey static seam](porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md), and
-[Phase 85f108 documentation refresh](porting-handoff-full-swift-twin-phase85f108-docs-refresh.md).
+[Phase 85f108 documentation refresh](porting-handoff-full-swift-twin-phase85f108-docs-refresh.md), and
+[Phase 85f109 Pokey documentation correction](porting-handoff-full-swift-twin-phase85f109-docs-pokey-correction.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

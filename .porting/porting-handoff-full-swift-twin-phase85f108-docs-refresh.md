@@ -4,12 +4,25 @@ Date: 2026-08-23
 
 ## Verdict
 
-**DOCUMENTATION RECONCILED / NO ROUTE PROMOTION.** The first-party status
-surfaces now identify Phase 85f106 as the SSL Pokey parent/body-part discovery,
-Phase 85f107 as the static-only five-child source seam, and this phase as the
-current documentation checkpoint. The exact seam verdict remains **STATIC
-SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION** with fingerprint
-`0x26090919531bbf4d`.
+**DOCUMENTATION RECONCILED / STRENGTHENED PHASE 85f107 STATIC PAIR RECORDED /
+NO ROUTE PROMOTION.** The first-party status surfaces identify Phase 85f106 as
+the SSL Pokey parent/body-part discovery, Phase 85f107 as the strengthened
+schema-4 C/Swift static seam, and this phase as the documentation checkpoint.
+The initial seam was `22d44cba`; correction commit `8af9167a` records the
+independent C fingerprint `0x82add98bad10547e` and Swift fingerprint
+`0x6276741935432706`. The exact seam verdict remains **STATIC SEAM COMPLETE /
+RUNTIME RECEIPT ABSENT / NO ADMISSION**.
+
+## Phase 85f107 strengthened static pair
+
+The independent C validator and Swift mirror report `schema4=1`, a
+generation-safe parent link, all four authored `macro_pokey` parent tuples,
+five source-ordered child tuples, and source event ordering
+`attack → replenish → unload → collision → effect → deletion`. Both sides are
+fixed-width value contracts; no native pointer, behavior address, helper call,
+child injection, coordinate selection, or Mario state crosses the boundary.
+No runtime receipt, C/Swift runtime pairing, or admission exists. The only
+acceptable next evidence remains the ordinary Castle→SSL area-1 route.
 
 ## Updated surfaces
 
@@ -21,9 +34,9 @@ SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION** with fingerprint
 - `CHANGES`
 - this handoff
 
-The ordered indexes include f106 discovery, f107 static seam, and f108
-refresh. No runtime receipt, canonical promotion, release, store publication,
-push, or human acceptance is implied.
+The ordered indexes include f106 discovery, f107 static seam, f108 refresh,
+and f109 correction. No runtime receipt, canonical promotion, release, store
+publication, push, or human acceptance is implied.
 
 ## Counter and hash reconciliation
 

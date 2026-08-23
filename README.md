@@ -65,21 +65,25 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 85f108 current status
+### Phase 85f107 current status
 
 Phase 85f106 selected the SSL area-1 authored Pokey parent row
 `0x132a22db8f8e0945` and body-part child row `0x41715ab876625588`. Phase
-85f107 committed the static parent/child seam in `22d44cba`; its exact
-fingerprint is `0x26090919531bbf4d` and its verdict is **STATIC SEAM COMPLETE /
-RUNTIME RECEIPT ABSENT / NO ADMISSION**. The seam preserves the four authored
-macro tuples, five child ordinals, head/body models, offsets, alive mask, and
-semantic identities. No runtime receipt or admission exists.
+85f107's strengthened static schema-4 seam is recorded by `8af9167a` on top
+of the initial seam `22d44cba`; its independent fingerprints are C
+`0x82add98bad10547e` and Swift `0x6276741935432706`. The pair reports
+`schema4=1`, a generation-safe parent link, all four authored `macro_pokey`
+parent tuples, five source-ordered child tuples, and source event ordering
+`attack → replenish → unload → collision → effect → deletion`. The verdict
+remains **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION**.
 
-The only acceptable next evidence is the ordinary Castle→SSL area-1 route.
-No direct SSL load/warp, synthetic child, object injection, helper/probe
-call, trace, manifest/report/ledger mutation, or admission was performed; the
-parent and child rows remain planned. Canonical/backup counters remain
-26/7,394 and 25/7,395, and M34/M35/human/full floors remain 0%.
+The C validator and Swift mirror remain fixed-width value contracts only; no
+runtime receipt, C/Swift runtime pairing, or admission exists. The only
+acceptable next evidence is the ordinary Castle→SSL area-1 route. No direct
+SSL load/warp, synthetic child, object injection, helper/probe call, trace,
+manifest/report/ledger mutation, or admission was performed; the parent and
+child rows remain planned. Canonical/backup counters remain 26/7,394 and
+25/7,395, and M34/M35/human/full floors remain 0%.
 
 ### Phase 85f105 current status
 
@@ -983,7 +987,8 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f105 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f105-docs-refresh.md),
 [Phase 85f106 Pokey discovery](.porting/porting-handoff-full-swift-twin-phase85f106-next-route-discovery.md),
 [Phase 85f107 Pokey static seam](.porting/porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md), and
-[Phase 85f108 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f108-docs-refresh.md).
+[Phase 85f108 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f108-docs-refresh.md), and
+[Phase 85f109 Pokey documentation correction](.porting/porting-handoff-full-swift-twin-phase85f109-docs-pokey-correction.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).

@@ -2,18 +2,23 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f108 Pokey documentation refresh (2026-08-23):** records Phase
-  85f106's SSL `bhvPokey`/`bhvPokeyBodyPart` discovery at rows
-  `0x132a22db8f8e0945` and `0x41715ab876625588`, and Phase 85f107's static seam
-  (`22d44cba`) with fingerprint `0x26090919531bbf4d`. The verdict remains
-  **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION**; only the
-  ordinary Castle→SSL area-1 route may provide next runtime evidence. Preserve
-  the designated 26/7,394 and backup 25/7,395 reports, unchanged manifest
-  hashes, behavior mapping 95.693%, and 0% M34/M35/human/full floors.
-  Handoffs:
+- **Phase 85f109 Pokey documentation correction (2026-08-23):** corrects the
+  Phase 85f108 status surfaces and existing f108 handoff with Phase 85f107's
+  strengthened static schema-4 C/Swift pair. The initial seam is `22d44cba`;
+  correction commit `8af9167a` reports C fingerprint
+  `0x82add98bad10547e` and Swift fingerprint `0x6276741935432706`, with
+  `schema4=1`, a generation-safe parent link, four authored `macro_pokey`
+  parent tuples, five source-ordered child tuples, and source event ordering
+  `attack → replenish → unload → collision → effect → deletion`. The verdict
+  remains **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION**;
+  no runtime receipt or admission exists and only the ordinary Castle→SSL
+  area-1 route may provide next evidence. Preserve the designated 26/7,394
+  and backup 25/7,395 reports, unchanged manifest hashes, behavior mapping
+  95.693%, and 0% M34/M35/human/full floors. Handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f106-next-route-discovery.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md`,
-  and `.porting/porting-handoff-full-swift-twin-phase85f108-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f108-docs-refresh.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f109-docs-pokey-correction.md`.
 
 - **Phase 85f105 Donut Platform documentation refresh (2026-08-23):** records
   Phase 85f103's Rainbow Ride `bhvDonutPlatformSpawner` discovery at row
