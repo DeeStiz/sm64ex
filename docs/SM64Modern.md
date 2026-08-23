@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-23).
 
-### Phase 85f70 current status
+### Phase 85f74 current status
 
 The retained checked-in canonical state remains **534 behavior rows** (511
 Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -266,6 +266,29 @@ output fences all passed; retained manifest/report/proof mutation and
 canonical-ledger overwrite remained 0. The final output is phase-local only:
 the retained canonical state remains 25/7,395 at
 `25/7420 = 0.336927224%`, and no canonical publication was performed.
+
+Phase 85f71 discovered the next disjoint source-owned candidate,
+`bhvSpindrift`, at route row `0x028a122a6b0f0fa2`. The selected subject is the
+first authored Snowman's Land area-1 Spindrift macro (source order 0,
+position `(-3760,1120,1240)`) reached through the normal Castle Inside
+painting route. The existing fixed-width Swift value/owner route has contract
+`0x9ac8294303fff174`, but the source semantic identity/receipt seam, native
+lifecycle pair, and admission remain pending; the row remains planned. No
+direct level load, object injection, sibling substitution, synthetic trace,
+native lifecycle probe, or manifest/report/ledger mutation was performed.
+
+Phase 85f72 established publication-ready evidence in an isolated serial
+rerun without publishing it. Its first-stage output preserves 25/7,395 with
+the retained report SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`; the
+exact phase-local final output is 26/7,394 with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`.
+The manifest remains
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`;
+immutable inputs were unchanged, retained artifacts were not mutated, and
+`canonical_ledger_overwrite=0`. Explicit authorization is still required
+before canonical promotion. Phase 85f73 publication execution remains
+pending because no completed f73 handoff exists.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -1085,7 +1108,11 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f67 pendulum evidence refresh](../.porting/porting-handoff-full-swift-twin-phase85f67-pendulum-evidence-refresh.md),
 [Phase 85f68 dry-run immutability fix](../.porting/porting-handoff-full-swift-twin-phase85f68-dryrun-immutability-fix.md),
 [Phase 85f69 serial dry-run fence fix](../.porting/porting-handoff-full-swift-twin-phase85f69-serial-dryrun-fence-fix.md),
-and [Phase 85f70 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f70-docs-refresh.md).
+[Phase 85f70 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f70-docs-refresh.md),
+[Phase 85f71 Spindrift discovery](../.porting/porting-handoff-full-swift-twin-phase85f71-next-route-discovery.md),
+[Phase 85f72 serial publication readiness](../.porting/porting-handoff-full-swift-twin-phase85f72-serial-publication-readiness.md),
+Phase 85f73 publication execution remains pending because no completed handoff exists, and
+[Phase 85f74 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f74-docs-refresh.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),

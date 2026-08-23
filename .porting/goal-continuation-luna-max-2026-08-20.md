@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f70 current evidence checkpoint
+### Phase 85f74 current evidence checkpoint
 
 The retained checked-in canonical state remains **534 behavior rows** (**511
 Swift value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
@@ -272,6 +272,30 @@ the retained canonical state remains 25/7,395 at
 `25/7420 = 0.336927224%`, and no canonical publication was performed. M34,
 M35, human-acceptance, and implementation/full-goal floors remain 0%.
 
+Phase 85f71 discovered the next disjoint source-owned candidate,
+`bhvSpindrift`, at route row `0x028a122a6b0f0fa2`. The selected subject is the
+first authored Snowman's Land area-1 Spindrift macro (source order 0,
+position `(-3760,1120,1240)`) reached through the normal Castle Inside
+painting route. The existing fixed-width Swift value/owner route has contract
+`0x9ac8294303fff174`, but the source semantic identity/receipt seam, native
+lifecycle pair, and admission remain pending; the row remains planned. No
+direct level load, object injection, sibling substitution, synthetic trace,
+native lifecycle probe, or manifest/report/ledger mutation was performed.
+
+Phase 85f72 established publication-ready evidence in an isolated serial
+rerun without publishing it. Its first-stage output preserves 25/7,395 with
+the retained report SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`; the
+exact phase-local final output is 26/7,394 with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`.
+The manifest remains
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`;
+immutable inputs were unchanged, retained artifacts were not mutated, and
+`canonical_ledger_overwrite=0`. Explicit authorization is still required
+before canonical promotion. Phase 85f73 publication execution remains
+pending because no completed f73 handoff exists. M34, M35, human-acceptance,
+and implementation/full-goal floors remain 0%.
+
 Phases 85aq–85as completed disjoint Luna-max route-family triage and authored
 level/transition reachability attempts without promoting a row. Phase 85ar
 added bounded pendulum, camera `find_floor`, and audio-asset seams/probes, but
@@ -495,6 +519,10 @@ broad/physical/release/human gates are open.
 - **[Phase 85f68](porting-handoff-full-swift-twin-phase85f68-dryrun-immutability-fix.md):** extends dry-run immutability snapshots to every retained proof artifact, including trace/log URLs; no canonical artifact or publication changes.
 - **[Phase 85f69](porting-handoff-full-swift-twin-phase85f69-serial-dryrun-fence-fix.md):** passes the green two-stage serial dry-run at 25/7,395 then phase-local 26/7,394 with all negative fences and retained-artifact mutation guards passing; publication remains deferred.
 - **[Phase 85f70](porting-handoff-full-swift-twin-phase85f70-docs-refresh.md):** refreshes the six first-party status surfaces with f67–f69 evidence while preserving exact canonical/isolated counters, hashes, percentages, and 0% floors.
+- **[Phase 85f71](porting-handoff-full-swift-twin-phase85f71-next-route-discovery.md):** discovers the authored Snowman's Land area-1 `bhvSpindrift` candidate at route row `0x028a122a6b0f0fa2`; the source identity/receipt seam, native pair, and admission remain pending.
+- **[Phase 85f72](porting-handoff-full-swift-twin-phase85f72-serial-publication-readiness.md):** establishes isolated serial-publication readiness at retained 25/7,395 and phase-local 26/7,394 with immutable inputs and canonical-ledger overwrite fences passing; promotion remains deferred pending explicit authorization.
+- **Phase 85f73 publication execution:** pending; no completed f73 handoff exists.
+- **[Phase 85f74](porting-handoff-full-swift-twin-phase85f74-docs-refresh.md):** refreshes the six first-party status surfaces with f71/f72 evidence while preserving exact canonical/isolated counters, hashes, percentages, and 0% floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1511,7 +1539,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f70 entry are authoritative for the latest checkpoint.
+and the Phase 85f74 entry are authoritative for the latest checkpoint.
 
 ### 85du — Tank-fish mapping — complete / fail-closed
 

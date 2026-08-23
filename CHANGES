@@ -975,6 +975,25 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       and `porting-handoff-full-swift-twin-phase85f70-docs-refresh.md`. No
       source, manifest, report, fixture, route ledger, publication, or
       acceptance state changed.
+237.) Reconcile Phase 85f74 documentation after the Phase 85f71 Spindrift
+      discovery and Phase 85f72 serial-publication readiness audit. The
+      source-authored `bhvSpindrift` row
+      `0x028a122a6b0f0fa2` remains planned; the f72 isolated serial result
+      preserves retained 25/7,395 with report SHA-256
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`
+      and phase-local 26/7,394 with SHA-256
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+      while manifest SHA-256 remains
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+      Preserve `25/7420 = 0.336927224%`, `26/7420 = 0.350404313%`, behavior
+      mapping 95.693%, and 0% M34/M35/human-acceptance/full-goal floors.
+      Phase 85f73 publication execution remains pending because no completed
+      f73 handoff exists. Link the ordered f71 -> f72 -> f74 handoffs:
+      `porting-handoff-full-swift-twin-phase85f71-next-route-discovery.md`,
+      `porting-handoff-full-swift-twin-phase85f72-serial-publication-readiness.md`,
+      and `porting-handoff-full-swift-twin-phase85f74-docs-refresh.md`. No
+      source, manifest, report, route ledger, publication, or acceptance state
+      changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

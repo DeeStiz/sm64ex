@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f70 current checkpoint (2026-08-23):** the retained checked-in
+- **Phase 85f74 current checkpoint (2026-08-23):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -162,6 +162,26 @@
   mutation guards passed; the retained canonical state remains 25/7,395 at
   `25/7420 = 0.336927224%`, no publication occurred, and M34, M35,
   human-acceptance, and implementation/full-goal floors remain 0%.
+  Phase 85f71 discovered the next disjoint source-owned candidate,
+  `bhvSpindrift`, at route row `0x028a122a6b0f0fa2`. The selected subject is
+  the first authored Snowman's Land area-1 Spindrift macro (source order 0,
+  position `(-3760,1120,1240)`) reached through the normal Castle Inside
+  painting route. The existing fixed-width Swift value/owner route has
+  contract `0x9ac8294303fff174`, but the source semantic identity/receipt
+  seam, native lifecycle pair, and admission remain pending; the row remains
+  planned. No direct level load, object injection, sibling substitution,
+  synthetic trace, native lifecycle probe, or manifest/report/ledger mutation
+  was performed. Phase 85f72 established publication-ready evidence in an
+  isolated serial rerun without publishing it: first-stage 25/7,395 retains
+  report SHA `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+  phase-local final stage is 26/7,394 with SHA
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, and
+  the manifest remains
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+  Immutable inputs and retained artifacts were unchanged and
+  `canonical_ledger_overwrite=0`; explicit authorization remains required
+  before promotion. Phase 85f73 publication execution remains pending because
+  no completed f73 handoff exists.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -211,8 +231,12 @@
   `.porting/porting-handoff-full-swift-twin-phase85f66-docs-refresh.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f67-pendulum-evidence-refresh.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f68-dryrun-immutability-fix.md`,
-  `.porting/porting-handoff-full-swift-twin-phase85f69-serial-dryrun-fence-fix.md`, and
-  `.porting/porting-handoff-full-swift-twin-phase85f70-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f69-serial-dryrun-fence-fix.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f70-docs-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f71-next-route-discovery.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f72-serial-publication-readiness.md`,
+  Phase 85f73 publication execution (pending; no completed handoff), and
+  `.porting/porting-handoff-full-swift-twin-phase85f74-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -699,7 +723,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f70
+The repeated route notes below preserve prior phase evidence; the Phase 85f74
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`
