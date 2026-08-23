@@ -2,6 +2,27 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f82 designated local canonical transition (2026-08-23):** the
+  committed Phase 85f81 write-once designation is now the designated local
+  canonical route evidence at
+  `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`,
+  SHA-256
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, with
+  7,420 rows, 26 terminal `passed`, and 7,394 `planned`
+  (`26/7420 = 0.350404313%`). The old retained report remains byte-identical
+  in the write-once backup at
+  `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/pre-publication-backup/canonical-route-ledger.tsv`,
+  SHA-256
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`, with
+  25/7,395; it is historical backup evidence, not the designated report. The
+  manifest remains unchanged at SHA-256
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+  Behavior mapping remains 95.693%, M34/M35/human-acceptance/full-goal floors
+  remain 0%, and no push, release, store publication, or human-acceptance
+  result is claimed. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f81-serial-canonical-designation.md`
+  and `.porting/porting-handoff-full-swift-twin-phase85f82-docs-canonical-transition.md`.
+
 - **Phase 85f80 Spindel documentation correction (2026-08-23):** records
   the committed Phase 85f78 source-owned Spindel receipt seam (`91e53c7f`).
   The authored Castle→SSL route remains at `level=1 area=1 spindels=0` and

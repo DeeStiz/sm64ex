@@ -16,8 +16,33 @@ thermal, release, clean-machine, or human gate.
 
 Current denominator note (2026-08-22): Phase 55 corrected the Phase 54 route
 inventory drift. The authoritative regenerated inventory and shard manifest
-contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
-7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
+contain 7,420 rows; the designated local canonical report now contains 26
+terminal rows with 7,394 planned. Its write-once backup preserves the prior
+25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
+original 7,419 baseline.
+
+### Phase 85f82 current evidence checkpoint
+
+Following the committed Phase 85f81 write-once designation, the designated
+local canonical route evidence is
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`.
+It is SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
+contains 7,420 rows: 26 non-fixture terminal `passed` and 7,394 `planned`
+(`26/7420 = 0.350404313%`). This is local route evidence only; it does not
+claim a push, release, store publication, or human acceptance.
+
+The old retained report is preserved byte-for-byte as the write-once backup at
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/pre-publication-backup/canonical-route-ledger.tsv`,
+with SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d` and
+25 terminal `passed` / 7,395 `planned` rows; it is historical backup evidence,
+not the designated report. The source manifest remains unchanged at 7,420
+rows with SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+Behavior mapping remains 95.693%, and the conservative M34, M35,
+human-acceptance, and full-goal floors remain 0%. No source, manifest, old
+retained report, release, store, or external publication state changed.
 
 ### Phase 85f80 current evidence checkpoint
 
@@ -336,6 +361,21 @@ Phase 85f80 documentation update. Retained live-route qualification remains
 `26/7420 = 0.350404313%`, behavior mapping remains 95.693%, and M34, M35,
 human-acceptance, and full-goal floors remain 0%.
 
+Phase 85f81 then completed the write-once local designation after re-reading
+the exact candidate, old retained report, and manifest. The designated report
+is the 7,420-row `26/7,394` report at
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
+with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`. The old
+25/7,395 report remains byte-identical in the designated root's
+`pre-publication-backup` at SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`; the
+manifest remains unchanged at SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+Phase 85f82 records this status transition only: source, manifest, old
+retained report, push, release, store publication, and human-acceptance state
+were not changed. M34, M35, human-acceptance, and full-goal floors remain 0%.
+
 Phases 85aq–85as completed disjoint Luna-max route-family triage and authored
 level/transition reachability attempts without promoting a row. Phase 85ar
 added bounded pendulum, camera `find_floor`, and audio-asset seams/probes, but
@@ -569,6 +609,8 @@ broad/physical/release/human gates are open.
 - **[Phase 85f78](porting-handoff-full-swift-twin-phase85f78-spindel-seam-execute.md):** commits the Spindel receipt seam (`91e53c7f`), but the authored Castle→SSL route remains at `level=1 area=1 spindels=0` and exits 77 with no trace or admission.
 - **[Phase 85f79](porting-handoff-full-swift-twin-phase85f79-docs-refresh.md):** refreshes the six first-party status surfaces with f76/f77 evidence while preserving exact counters, hashes, percentages, and 0% floors; its stale f78-pending wording is corrected by Phase 85f80.
 - **[Phase 85f80](porting-handoff-full-swift-twin-phase85f80-docs-spindel-correction.md):** corrects the f78 status across the six first-party surfaces and existing f79 handoff while preserving the retained 25/7,395 and isolated 26/7,394 evidence, exact hashes/percentages, and 0% floors.
+- **[Phase 85f81](porting-handoff-full-swift-twin-phase85f81-serial-canonical-designation.md):** completes the fresh write-once local designation at `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`, preserving the old retained report as the byte-identical backup; no status publication is performed by that phase.
+- **[Phase 85f82](porting-handoff-full-swift-twin-phase85f82-docs-canonical-transition.md):** records the designated local 26/7,394 report and separates it from the old 25/7,395 backup while preserving the manifest hash and 0% M34/M35/human floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1585,7 +1627,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f80 entry are authoritative for the latest checkpoint. Phase
+and the Phase 85f82 entry are authoritative for the latest checkpoint. Phase
 85f78 implemented the Spindel seam but remains fail-closed at authored
 reachability.
 

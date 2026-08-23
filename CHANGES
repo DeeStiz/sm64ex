@@ -1062,6 +1062,22 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       `porting-handoff-full-swift-twin-phase85f80-docs-spindel-correction.md`.
       No source, manifest, report, route ledger, publication, or acceptance
       state changed.
+241.) Record the Phase 85f81 committed write-once designation and Phase 85f82
+      first-party status transition. The designated local canonical report is
+      `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
+      with 7,420 rows, 26 terminal `passed`, 7,394 `planned`, and SHA-256
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`.
+      Preserve the old retained report as the byte-identical write-once backup
+      with SHA-256
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`
+      and the unchanged manifest SHA-256
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+      Keep the designated local evidence separate from the historical backup;
+      do not claim push, release, store publication, or human acceptance.
+      Preserve M34, M35, human-acceptance, and full-goal floors at 0%, link
+      `porting-handoff-full-swift-twin-phase85f81-serial-canonical-designation.md`
+      and `porting-handoff-full-swift-twin-phase85f82-docs-canonical-transition.md`,
+      and leave source, manifest, and old retained report unchanged.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
