@@ -5,16 +5,17 @@ Date: 2026-08-23
 ## Verdict
 
 **DOCUMENTATION REFRESHED / PHASE 85f88 SNOWMAN WIND DISCOVERY RECORDED /
-PHASE 85f89 PENDING.** The six first-party status surfaces now record the
-Phase 85f88 source-route discovery for Snowman's Land's authored
-`bhvSLSnowmanWind` owner. The route remains planned: discovery produced no
-source observer, native lifecycle probe, C or Swift trace, route record, or
-admission. Phase 85f89 has no completed handoff in `.porting` and remains
-pending. No source, behavior manifest, designated or backup report, canonical
-route ledger, fixture, release artifact, or unrelated worktree change was
-modified by this documentation phase.
+PHASE 85f89 SEAM IMPLEMENTED WITH FAIL-CLOSED REACHABILITY.** The six
+first-party status surfaces now record the Phase 85f88 source-route discovery
+and committed Phase 85f89 source-owned Snowman wind receipt seam. The seam is
+implemented in commit `8e2ab88b`, but the authored Castle Inside Snowman's
+Land route remained at `level=1 area=1 wind=0`; the route-pair matrix exited
+`77` before creating a trace or admitting a route (`trace=not-created`,
+`records=0`, `admission=0`). No source, behavior manifest, designated or
+backup report, canonical route ledger, fixture, release artifact, or
+unrelated worktree change was modified by this documentation refresh.
 
-## Phase 85f88 Snowman wind discovery
+## Phase 85f89 Snowman wind seam result
 
 The generated source route row `0xa98dae7d4d4559ab` resolves exactly once to
 the authored `bhvSLSnowmanWind` program in `data/behavior_data.c`. Its direct
@@ -29,10 +30,11 @@ manifest. Its isolated value contract fingerprint is
 `0x0bb6ba5b32436749`; this is static owner evidence, not source-authored
 lifecycle or route admission evidence.
 
-This phase did not direct-load Snowman's Land, inject an object, call the
-behavior helper, substitute a sibling or generic wind record, synthesize a
-trace, add a source observer, mutate the behavior manifest, update either
-canonical report, or publish a route. The selected row remains planned.
+The source-owned receipt seam is present for the selected row, but this phase
+did not direct-load Snowman's Land, inject an object, call the behavior helper,
+substitute a sibling or generic wind record, synthesize a trace, mutate the
+behavior manifest, update either canonical report, or publish a route. The
+selected row remains planned.
 
 ## Retained canonical boundary
 
@@ -65,8 +67,9 @@ M35, human-acceptance, implementation, and full-goal floors remain 0%.
 - [Phase 85f86 Spindrift reachability recheck](porting-handoff-full-swift-twin-phase85f86-spindrift-reachability-recheck.md)
 - [Phase 85f87 documentation refresh](porting-handoff-full-swift-twin-phase85f87-docs-refresh.md)
 - [Phase 85f88 Snowman wind discovery](porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md)
-- Phase 85f89 pending; no completed handoff exists.
+- [Phase 85f89 Snowman wind seam execute](porting-handoff-full-swift-twin-phase85f89-snowman-wind-seam-execute.md)
 - this Phase 85f90 documentation refresh
+- [Phase 85f91 Snowman wind documentation correction](porting-handoff-full-swift-twin-phase85f91-docs-snowman-wind-correction.md)
 
 ## Documentation files changed
 

@@ -2,23 +2,17 @@
 
 ## Status
 
-### Phase 85f88 current status
+### Phase 85f89 current status
 
-Phase 85f88 completed source-route discovery for Snowman's Land's authored
-`bhvSLSnowmanWind` owner. The generated route row `0xa98dae7d4d4559ab`
-resolves exactly once to the source-authored behavior program; its direct
-subject is the area-1 `MODEL_NONE` Snowman wind object in
-`script_func_local_3` (`source_order=1`, position `(700,3428,700)`,
-face_yaw=30, parameter `0`) reached through the ordinary Castle Inside
-Snowman's Land painting route. The existing pointer-free Swift value/owner
-pair (`SnowmanWindBehavior`/`SnowmanWindObjectBridge`) is mapped exactly once
-in the behavior manifest.
-
-This was discovery only. No source observer, native SL lifecycle probe, C or
-Swift trace, route record, or admission was produced; no direct level load,
-object injection, synthetic trace, sibling substitution, manifest/report/
-ledger mutation, or canonical publication occurred. The row remains planned.
-Phase 85f89 is pending; no completed handoff exists.
+Phase 85f89 committed the source-owned Snowman wind receipt seam for authored
+`bhvSLSnowmanWind` route row `0xa98dae7d4d4559ab` in commit `8e2ab88b`. The
+seam is implemented, but the authored Castle Inside Snowman's Land route
+remained at `level=1 area=1 wind=0`; the route-pair matrix exited `77` before
+creating a trace or admitting a route (`trace=not-created`, `records=0`,
+`admission=0`). The selected row remains planned. No direct Snowman's Land
+selection, helper call, object injection, sibling or coordinate substitution,
+synthetic trace, manifest/report/ledger mutation, or canonical publication
+occurred.
 
 The designated local canonical route evidence remains
 `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`.
@@ -1348,8 +1342,10 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f85 Bob reachability recheck](porting-handoff-full-swift-twin-phase85f85-bob-reachability-recheck.md),
 [Phase 85f86 Spindrift reachability recheck](porting-handoff-full-swift-twin-phase85f86-spindrift-reachability-recheck.md),
 [Phase 85f87 documentation refresh](porting-handoff-full-swift-twin-phase85f87-docs-refresh.md), and
-[Phase 85f88 Snowman wind discovery](porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md).
-Phase 85f89 remains pending; no completed handoff exists.
+[Phase 85f88 Snowman wind discovery](porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md),
+[Phase 85f89 Snowman wind seam execute](porting-handoff-full-swift-twin-phase85f89-snowman-wind-seam-execute.md),
+[Phase 85f90 documentation refresh](porting-handoff-full-swift-twin-phase85f90-docs-refresh.md), and
+[Phase 85f91 Snowman wind documentation correction](porting-handoff-full-swift-twin-phase85f91-docs-snowman-wind-correction.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

@@ -21,23 +21,17 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
-### Phase 85f88 current evidence checkpoint
+### Phase 85f89 current evidence checkpoint
 
-Phase 85f88 completed source-route discovery for Snowman's Land's authored
-`bhvSLSnowmanWind` owner. The generated route row `0xa98dae7d4d4559ab`
-resolves exactly once to the source-authored behavior program; its direct
-subject is the area-1 `MODEL_NONE` Snowman wind object in
-`script_func_local_3` (`source_order=1`, position `(700,3428,700)`,
-face_yaw=30, parameter `0`) reached through the ordinary Castle Inside
-Snowman's Land painting route. The existing pointer-free Swift value/owner
-pair (`SnowmanWindBehavior`/`SnowmanWindObjectBridge`) is mapped exactly once
-in the behavior manifest.
-
-This was discovery only. No source observer, native SL lifecycle probe, C or
-Swift trace, route record, or admission was produced; no direct level load,
-object injection, synthetic trace, sibling substitution, manifest/report/
-ledger mutation, or canonical publication occurred. The row remains planned.
-Phase 85f89 is pending; no completed handoff exists.
+Phase 85f89 committed the source-owned Snowman wind receipt seam for authored
+`bhvSLSnowmanWind` route row `0xa98dae7d4d4559ab` in commit `8e2ab88b`. The
+seam is implemented, but the authored Castle Inside Snowman's Land route
+remained at `level=1 area=1 wind=0`; the route-pair matrix exited `77` before
+creating a trace or admitting a route (`trace=not-created`, `records=0`,
+`admission=0`). The selected row remains planned. No direct Snowman's Land
+selection, helper call, object injection, sibling or coordinate substitution,
+synthetic trace, manifest/report/ledger mutation, or canonical publication
+occurred.
 
 The designated local canonical route evidence remains
 `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`,
@@ -686,8 +680,10 @@ broad/physical/release/human gates are open.
 - **[Phase 85f85](porting-handoff-full-swift-twin-phase85f85-bob-reachability-recheck.md):** fresh authored Bob seesaw reachability remains blocked at `level=1 area=1 object=0`; the matrix exits 77 with no trace or admission.
 - **[Phase 85f86](porting-handoff-full-swift-twin-phase85f86-spindrift-reachability-recheck.md):** fresh authored Spindrift reachability remains blocked at `level=1 area=1 spindrifts=0`; the matrix exits 77 with no trace or admission.
 - **[Phase 85f87](porting-handoff-full-swift-twin-phase85f87-docs-refresh.md):** reconciles the four fresh reachability rechecks across the six first-party status surfaces, preserving the designated local 26/7,394 report, byte-identical 25/7,395 backup, exact hashes/percentages, and 0% M34/M35/human floors.
-- **[Phase 85f88](porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md):** discovers the authored Snowman's Land area-1 `bhvSLSnowmanWind` row `0xa98dae7d4d4559ab`; the source observer, native lifecycle pair, and admission remain pending.
-- **Phase 85f89:** pending; no completed handoff exists.
+- **[Phase 85f88](porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md):** discovers the authored Snowman's Land area-1 `bhvSLSnowmanWind` row `0xa98dae7d4d4559ab`.
+- **[Phase 85f89](porting-handoff-full-swift-twin-phase85f89-snowman-wind-seam-execute.md):** commits the source-owned Snowman wind receipt seam (`8e2ab88b`), but the authored route remains at `level=1 area=1 wind=0` and exits 77 before trace or admission.
+- **[Phase 85f90](porting-handoff-full-swift-twin-phase85f90-docs-refresh.md):** refreshes the six first-party status surfaces with the f88 discovery; its stale f89-pending wording is corrected by Phase 85f91.
+- **[Phase 85f91](porting-handoff-full-swift-twin-phase85f91-docs-snowman-wind-correction.md):** corrects the f89 status across the six first-party surfaces and existing f90 handoff while preserving exact counters, hashes, percentages, and 0% floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
