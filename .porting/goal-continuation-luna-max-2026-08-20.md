@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f22 current evidence checkpoint
+### Phase 85f27 current evidence checkpoint
 
 The frozen implementation counters remain **534 behavior rows** (**511 Swift
 value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
@@ -80,6 +80,24 @@ verified the retained 25/7,395 report
 (`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`), and
 confirmed the historical full replay cannot be rerun because its transient
 pendulum artifact expired. No canonical route or manifest state changed.
+
+Phase 85f24 audited the authored environment-effect modes. Five of six
+planned envfx rows have source-authored level/geo reachability across the lava,
+whirlpool, jet-stream, and snow modes, while the flower mode is unused. No
+pointer-free value receipt exists for the RNG, floor, or water-query state, so
+no route row or canonical artifact changed.
+
+Phase 85f25 reached the authored intro `SET_TRANSITION` route at the real
+155-step owner-thread window (251 script records, transition ID 3 present),
+but the existing Swift script observer rejects the intro trace as
+`out_of_order` because its contract expects the first record at tick 2. No
+independent C/Swift pair or route admission is claimed.
+
+Phase 85f26 identified authored DDD outward-radial and JRB default-camera
+`find_water_level` candidates. The shared generic collision receipt lacks the
+camera owner, call site, mode, and query-position identity needed to qualify
+either candidate; the existing camera `find_floor` row remains current and no
+manifest/report mutation occurred.
 
 Phase 85ct source-proved the next full-trace actor seam: subject 31 is the
 authored `bhvDeathWarp` at `levels/castle_inside/script.c:62`, with semantic
@@ -187,6 +205,10 @@ broad/physical/release/human gates are open.
 - **[Phase 85f21](porting-handoff-full-swift-twin-phase85f21-m35-preflight.md):** rechecks M35 under ordinary Xcode 26.6; contracts pass, but Developer ID and notary prerequisites remain absent.
 - **[Phase 85f22](porting-handoff-full-swift-twin-phase85f22-canonical-audit.md):** regenerates the manifest deterministically and verifies the retained 25/7,395 report; the full replay is not rerun because its transient pendulum artifact expired.
 - **[Phase 85f23](porting-handoff-full-swift-twin-phase85f23-docs-current-refresh.md):** refreshes the current-status surfaces and ordered f-series index without changing source, manifest, route report, or acceptance claims.
+- **[Phase 85f24](porting-handoff-full-swift-twin-phase85f24-envfx-rng-route.md):** finds authored envfx reachability in five of six planned rows, but no pointer-free RNG/floor/water value receipt exists; no row is promoted.
+- **[Phase 85f25](porting-handoff-full-swift-twin-phase85f25-transition-route.md):** reaches the authored intro transition at the 155-step window, but Swift rejects the trace as `out_of_order` at its tick-2 ordering contract; no pair or admission is claimed.
+- **[Phase 85f26](porting-handoff-full-swift-twin-phase85f26-camera-floor-route.md):** identifies authored DDD/JRB camera-water candidates, but the generic collision receipt lacks camera call-site identity; no new route qualifies.
+- **[Phase 85f27](porting-handoff-full-swift-twin-phase85f27-docs-refresh.md):** refreshes current-status surfaces and ordered f-series links without changing source, manifest, route report, or acceptance claims.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1203,7 +1225,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f22 entry are authoritative for the latest checkpoint.
+and the Phase 85f27 entry are authoritative for the latest checkpoint.
 
 ### 85du — Tank-fish mapping — complete / fail-closed
 

@@ -2,7 +2,7 @@
 
 ## Status
 
-### Phase 85f22 current status
+### Phase 85f27 current status
 
 The authoritative current counters remain **534 behavior rows** (511 Swift
 value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -28,6 +28,24 @@ verified the retained 25/7,395 report
 (`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`), and
 confirmed the historical full replay cannot be rerun because its transient
 pendulum artifact expired. No canonical route or manifest state changed.
+
+Phase 85f24 audited the authored environment-effect modes. Five of six
+planned envfx rows have source-authored level/geo reachability across the lava,
+whirlpool, jet-stream, and snow modes, while the flower mode is unused. No
+pointer-free value receipt exists for the RNG, floor, or water-query state, so
+no route row or canonical artifact changed.
+
+Phase 85f25 reached the authored intro `SET_TRANSITION` route at the real
+155-step owner-thread window (251 script records, transition ID 3 present),
+but the existing Swift script observer rejects the intro trace as
+`out_of_order` because its contract expects the first record at tick 2. No
+independent C/Swift pair or route admission is claimed.
+
+Phase 85f26 identified authored DDD outward-radial and JRB default-camera
+`find_water_level` candidates. The shared generic collision receipt lacks the
+camera owner, call site, mode, and query-position identity needed to qualify
+either candidate; the existing camera `find_floor` row remains current and no
+manifest/report mutation occurred.
 
 Phases 85aq–85as used disjoint Luna-max workers to triage remaining route
 families and replay authored level/transition recipes. Camera `find_floor`,
@@ -849,7 +867,11 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f20 M34 production re-audit](porting-handoff-full-swift-twin-phase85f20-m34-reaudit.md),
 [Phase 85f21 M35 distribution preflight](porting-handoff-full-swift-twin-phase85f21-m35-preflight.md),
 [Phase 85f22 canonical route audit](porting-handoff-full-swift-twin-phase85f22-canonical-audit.md),
-and [Phase 85f23 current-status documentation refresh](porting-handoff-full-swift-twin-phase85f23-docs-current-refresh.md).
+[Phase 85f23 current-status documentation refresh](porting-handoff-full-swift-twin-phase85f23-docs-current-refresh.md),
+[Phase 85f24 envfx RNG route discovery](porting-handoff-full-swift-twin-phase85f24-envfx-rng-route.md),
+[Phase 85f25 authored transition route](porting-handoff-full-swift-twin-phase85f25-transition-route.md),
+[Phase 85f26 camera/water route discovery](porting-handoff-full-swift-twin-phase85f26-camera-floor-route.md),
+and [Phase 85f27 current-status documentation refresh](porting-handoff-full-swift-twin-phase85f27-docs-refresh.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

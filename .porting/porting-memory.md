@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-22)
 
-- **Phase 85f22 current checkpoint (2026-08-22):** the authoritative current
+- **Phase 85f27 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
   7,420 route rows with 25 terminal / 7,395 planned; live-route qualification
   is `25/7,420 = 0.336927224%`, behavior mapping is 95.693%, and conservative
@@ -18,14 +18,26 @@
   the retained report SHA
   `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`, and
   found the historical full replay's transient pendulum artifact expired.
+  Phase 85f24 found authored reachability in five of six environment-effect
+  rows but no pointer-free RNG/floor/water value receipt. Phase 85f25 reached
+  the authored intro transition at 155 owner steps, while the existing Swift
+  script observer rejected the trace as `out_of_order` at its tick-2 contract.
+  Phase 85f26 identified authored DDD/JRB camera-water candidates, but the
+  generic collision receipt lacks camera call-site identity; no new route
+  qualifies. The Phase 85f23–85f26 evidence and this refresh are recorded in
+  the ordered handoffs below.
   Handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f20-m34-reaudit.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f21-m35-preflight.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f22-canonical-audit.md`, and
-  this current-status refresh is recorded in
-  `.porting/porting-handoff-full-swift-twin-phase85f23-docs-current-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f23-docs-current-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f24-envfx-rng-route.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f25-transition-route.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f26-camera-floor-route.md`,
+  and this current-status refresh is recorded in
+  `.porting/porting-handoff-full-swift-twin-phase85f27-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -512,7 +524,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f22
+The repeated route notes below preserve prior phase evidence; the Phase 85f27
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`
