@@ -948,6 +948,33 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       and `porting-handoff-full-swift-twin-phase85f66-docs-refresh.md`. No
       source, manifest, report, fixture, route ledger, publication, or
       acceptance state changed.
+236.) Reconcile Phase 85f70 documentation after the fresh Phase 85f67 pendulum
+      evidence, Phase 85f68 immutability fix, and green Phase 85f69 two-stage
+      serial dry-run. The fresh four-way pendulum matrix and isolated admission
+      pass with 1,056 records/matches per run, semantic identity
+      `0x6268765f647065`, coverage `0x680ff75430bf24ff`, and unchanged
+      canonical manifest; f68 now hashes every retained proof-artifact URL,
+      including trace/log paths, before and after dry-run. F69 passes first
+      stage 25/7,395 with report SHA
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d` and
+      final phase-local stage 26/7,394 with SHA
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, or
+      `26/7420 = 0.350404313%`; all negative fences and retained-artifact
+      mutation guards pass. Preserve retained canonical 25/7,395 at
+      `25/7420 = 0.336927224%`, manifest SHA
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+      behavior mapping 95.693%, and 0% M34/M35/human-acceptance/full-goal
+      floors. Link the ordered `f63 -> f70` handoffs:
+      `porting-handoff-full-swift-twin-phase85f63-docs-refresh.md`,
+      `porting-handoff-full-swift-twin-phase85f64-serial-merge-dryrun.md`,
+      `porting-handoff-full-swift-twin-phase85f65-timebase-fixture-proposal.md`,
+      `porting-handoff-full-swift-twin-phase85f66-docs-refresh.md`,
+      `porting-handoff-full-swift-twin-phase85f67-pendulum-evidence-refresh.md`,
+      `porting-handoff-full-swift-twin-phase85f68-dryrun-immutability-fix.md`,
+      `porting-handoff-full-swift-twin-phase85f69-serial-dryrun-fence-fix.md`,
+      and `porting-handoff-full-swift-twin-phase85f70-docs-refresh.md`. No
+      source, manifest, report, fixture, route ledger, publication, or
+      acceptance state changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

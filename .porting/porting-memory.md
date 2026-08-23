@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f66 current checkpoint (2026-08-23):** the retained checked-in
+- **Phase 85f70 current checkpoint (2026-08-23):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -139,7 +139,29 @@
   on exactly two intentional deltas: `object_timer` 715 -> 718 matches and
   `random_calls` 289 -> 290 inventory matches. The WDW/TTC receipt fields
   account for the drift, actual RNG-call syntax remains 289, and the fixture
-  update was not applied.
+  update was not applied. Phase 85f67 refreshed the pendulum evidence in a
+  new build root: the Debug/ASan/Release/independent-rerun matrix and isolated
+  admission are byte-identical at pair-report level with 1,056 records and
+  matches per run, semantic identity `0x6268765f647065`, coverage
+  `0x680ff75430bf24ff`, and all tamper/replay/rerun/separation/fixture/freshness
+  fences passing. The fresh debug, pair, isolated-report, and proof hashes are
+  `0e27c4232d1895425555cd0d7e0e4dbe38a1d8e2a368c77ade81508dc607057d`,
+  `9a71e388901d1b6991782941e634852dbcbb98838d7b2d4b7736e4124f1afc1a`,
+  `6f66939fa025efb520cbeeffe04d6144c8dc099232de0e5b37dbc8d10127aaeb`, and
+  `6522bc3e07ac384d287a3ebb6b4a382e874f6b31084788066a39ab095a7b2e7a`;
+  the canonical manifest hash remained unchanged before/after admission and
+  merge stayed deferred. Phase 85f68 fixed the serial coordinator's
+  immutability snapshot to hash every retained proof-artifact URL, including
+  trace/log paths, before and after dry-run; strict Swift 6 typechecking,
+  shell syntax, and diff checks passed with no canonical mutation. Phase 85f69
+  then passed the two-stage serial dry-run: first stage 25/7,395 with report
+  SHA `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+  final phase-local stage 26/7,394 with SHA
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, or
+  `26/7420 = 0.350404313%`. All negative fences and retained artifact
+  mutation guards passed; the retained canonical state remains 25/7,395 at
+  `25/7420 = 0.336927224%`, no publication occurred, and M34, M35,
+  human-acceptance, and implementation/full-goal floors remain 0%.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -186,7 +208,11 @@
   `.porting/porting-handoff-full-swift-twin-phase85f63-docs-refresh.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f64-serial-merge-dryrun.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f65-timebase-fixture-proposal.md`, and
-  `.porting/porting-handoff-full-swift-twin-phase85f66-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f66-docs-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f67-pendulum-evidence-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f68-dryrun-immutability-fix.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f69-serial-dryrun-fence-fix.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f70-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -673,7 +699,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f66
+The repeated route notes below preserve prior phase evidence; the Phase 85f70
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`

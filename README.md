@@ -65,7 +65,7 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 85f66 current status
+### Phase 85f70 current status
 
 The retained checked-in canonical state remains 534 behavior rows (511 Swift
 owners and 23 explicit C adapters) and 7,420 route shards: 25 non-fixture
@@ -280,6 +280,41 @@ The three WDW/TTC timer receipt fields and one TTC `.random_u16` receipt label
 account for those rows; actual RNG-call syntax remains 289. The proposal
 changes only those two fixture rows and was not applied, so the retained
 fixture and audit remain unchanged.
+
+Phase 85f67 refreshed the pendulum evidence in a new build root. The Debug,
+ASan, Release, and independent-rerun four-way matrix plus isolated admission
+are byte-identical at the pair-report level: `records_each=1056`,
+`matched_each=1056`, semantic identity `0x6268765f647065`, coverage
+`0x680ff75430bf24ff`, `header_parity=1`, and all tamper, schema-4 replay,
+persistent-rerun, artifact-separation, fixture, and freshness fences passed.
+The fresh debug/pair/isolated/proof SHA-256 values are
+`0e27c4232d1895425555cd0d7e0e4dbe38a1d8e2a368c77ade81508dc607057d`,
+`9a71e388901d1b6991782941e634852dbcbb98838d7b2d4b7736e4124f1afc1a`,
+`6f66939fa025efb520cbeeffe04d6144c8dc099232de0e5b37dbc8d10127aaeb`, and
+`6522bc3e07ac384d287a3ebb6b4a382e874f6b31084788066a39ab095a7b2e7a`.
+The canonical manifest remained byte-identical before and after admission
+(`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`), so
+canonical merge remained deferred.
+
+Phase 85f68 fixed the serial coordinator's immutability snapshot so every
+retained proof-artifact URL returned by preflight, including trace and log
+paths, is hashed before and after the dry-run. Strict Swift 6 typechecking,
+shell syntax, and diff checks passed; no source, manifest, report, route
+ledger, fixture, or canonical artifact changed, and publication remained
+deferred.
+
+Phase 85f69 then passed the two-stage serial dry-run using the retained inputs
+and fresh Phase 85f67 pendulum admission. The first stage passed 25 of 7,395
+planned rows with SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`; the
+phase-local final stage passed 26 of 7,394 planned rows with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, or
+`26/7420 = 0.350404313%`. Duplicate/conflict, fixture-only, missing-artifact,
+manifest/report mismatch, output-collision, terminal-rerun, and deterministic
+output fences all passed; retained manifest/report/proof mutation and
+canonical-ledger overwrite remained 0. The final output is phase-local only:
+the retained canonical state remains 25/7,395 at
+`25/7420 = 0.336927224%`, and no canonical publication was performed.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -674,7 +709,11 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f63 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f63-docs-refresh.md),
 [Phase 85f64 serial merge dry-run](.porting/porting-handoff-full-swift-twin-phase85f64-serial-merge-dryrun.md),
 [Phase 85f65 timebase fixture proposal](.porting/porting-handoff-full-swift-twin-phase85f65-timebase-fixture-proposal.md),
-and [Phase 85f66 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f66-docs-refresh.md).
+[Phase 85f66 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f66-docs-refresh.md),
+[Phase 85f67 pendulum evidence refresh](.porting/porting-handoff-full-swift-twin-phase85f67-pendulum-evidence-refresh.md),
+[Phase 85f68 dry-run immutability fix](.porting/porting-handoff-full-swift-twin-phase85f68-dryrun-immutability-fix.md),
+[Phase 85f69 serial dry-run fence fix](.porting/porting-handoff-full-swift-twin-phase85f69-serial-dryrun-fence-fix.md),
+and [Phase 85f70 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f70-docs-refresh.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).
