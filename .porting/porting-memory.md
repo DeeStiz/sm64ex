@@ -2,6 +2,41 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f102 Fire Piranha Plant documentation refresh (2026-08-23):**
+  records Phase 85f100's Tiny-Huge Island source-route discovery in commit
+  `d746b151` and Phase 85f101's static source-contract seam in commit
+  `7541ed67` for authored route row `0x783b75ac5fc8435f`. The exact verdict is
+  **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION**, with
+  contract fingerprint `0xab99743d61a6e50a`; the seam preserves semantic
+  `bhvFirePiranhaPlant`, `bhvSmallPiranhaFlame`, and `bhvStar` identities plus
+  the authored THI area-1 tuple, source ordinals 4–8, hitboxes, flame
+  parameters, and reward position. No runtime receipt or admission exists;
+  the selected row remains planned. The only acceptable next evidence is the
+  ordinary Castle Inside painting route through nodes `0x27`, `0x28`, or `0x29`
+  into THI area 1. No direct THI load/warp, synthetic plant or flame, object
+  injection, helper/probe call, trace, manifest/report/ledger mutation, or
+  admission was performed. Preserve the designated local canonical report at
+  `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
+  with SHA-256
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+  containing 26 terminal `passed` and 7,394 `planned`
+  (`26/7420 = 0.350404313%`), separate from the byte-identical write-once
+  backup at
+  `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/pre-publication-backup/canonical-route-ledger.tsv`
+  with SHA-256
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+  containing 25 terminal `passed` and 7,395 `planned`
+  (`25/7420 = 0.336927224%`). The source route manifest remains unchanged at
+  7,420 rows with SHA-256
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`, and
+  the behavior manifest remains unchanged at 534 rows with SHA-256
+  `83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`.
+  Behavior mapping remains 95.693%; conservative M34, M35,
+  human-acceptance, implementation, and full-goal floors remain 0%. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f100-next-route-discovery.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f101-fire-piranha-seam-execute.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f102-docs-refresh.md`.
+
 - **Phase 85f99 Whomp documentation correction (2026-08-23):** corrects the
   stale Phase 85f97-pending wording across the six first-party status surfaces
   and existing Phase 85f98 handoff. It records the committed source-owned

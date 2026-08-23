@@ -16,21 +16,24 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-23).
 
-### Phase 85f97 current status
+### Phase 85f102 current status
 
-Phase 85f97 committed the source-owned Whomp King receipt seam in commit
-`66ca1911` for authored `bhvWhompKingBoss` route row
-`0x28e0617bfc286cbe`. The seam preserves schema-4 script/object/collision/
-effect records, semantic King and reward-child identities, and pointer-free
-source state for the selected route row.
+Phase 85f100 identified Tiny-Huge Island's authored `bhvFirePiranhaPlant`
+group as the next source-route candidate at route row
+`0x783b75ac5fc8435f`; discovery was recorded in commit `d746b151`. Phase
+85f101 then committed the static source-contract seam in `7541ed67`. Its
+static-only verdict is **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO
+ADMISSION**, with exact contract fingerprint
+`0xab99743d61a6e50a`. The seam retains semantic `bhvFirePiranhaPlant`,
+`bhvSmallPiranhaFlame`, and `bhvStar` identities plus the authored THI
+area-1 tuple, source ordinals 4–8, hitboxes, flame parameters, and reward
+position. No runtime receipt or admission exists.
 
-The authored Castle→WF route followed the ordinary lifecycle only and
-remained at `level=1 area=1 whomps=0`; the route-pair matrix exited `77`
-before creating a trace or admitting a route (`trace=not-created`,
-`records=0`, `admission=0`). The selected row remains planned. No direct WF
-load, helper call, synthetic Whomp spawn, object injection, small-Whomp
-substitution, coordinate selection, synthetic trace, manifest/report/ledger
-mutation, or canonical publication occurred.
+The only acceptable next runtime evidence is the ordinary Castle Inside
+painting route through nodes `0x27`, `0x28`, or `0x29` into THI area 1. No
+direct THI load or warp, synthetic plant or flame, object injection, helper
+or probe call, trace, manifest/report/ledger mutation, or admission was
+performed. The selected row remains planned.
 
 The designated local canonical route evidence remains
 `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
@@ -44,9 +47,11 @@ with SHA-256
 `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`. It
 contains 25 terminal `passed` and 7,395 `planned`
 (`25/7420 = 0.336927224%`); it is historical backup evidence, not the
-designated report. The source manifest remains unchanged at 7,420 rows with
-SHA-256
-`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+designated report. The source route manifest remains unchanged at 7,420
+rows with SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`, and
+the behavior manifest remains unchanged at 534 rows with SHA-256
+`83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`.
 Behavior mapping remains 95.693%, and the conservative M34, M35,
 human-acceptance, implementation, and full-goal floors remain 0%. No source,
 manifest, designated or backup report, route ledger, release, store, or
@@ -1324,7 +1329,10 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f96 Whomp discovery](../.porting/porting-handoff-full-swift-twin-phase85f96-next-route-discovery.md),
 [Phase 85f97 Whomp King seam execute](../.porting/porting-handoff-full-swift-twin-phase85f97-whomp-seam-execute.md),
 [Phase 85f98 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f98-docs-refresh.md), and
-[Phase 85f99 Whomp documentation correction](../.porting/porting-handoff-full-swift-twin-phase85f99-docs-whomp-correction.md).
+[Phase 85f99 Whomp documentation correction](../.porting/porting-handoff-full-swift-twin-phase85f99-docs-whomp-correction.md),
+[Phase 85f100 Fire Piranha Plant discovery](../.porting/porting-handoff-full-swift-twin-phase85f100-next-route-discovery.md),
+[Phase 85f101 Fire Piranha Plant static seam](../.porting/porting-handoff-full-swift-twin-phase85f101-fire-piranha-seam-execute.md), and
+[Phase 85f102 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f102-docs-refresh.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),
