@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f57 current checkpoint (2026-08-23):** the retained checked-in
+- **Phase 85f63 current checkpoint (2026-08-23):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -109,6 +109,29 @@
   No cog/static sibling substitution or synthetic receipt was used, and the
   TTC row `0x1af5669b06931d93` remains planned pending a genuine authored
   painting route into TTC area 1.
+  Phase 85f58 discovered the next disjoint source-owned candidate, the Bob
+  area-1 `bhvSeesawPlatform` row `0xb280cfa26a343b48`; its authored object,
+  level lifecycle, fixed-width Swift owner route, and semantic identity are
+  present, but no native lifecycle pair or admission was performed. Phase
+  85f59 audited serial publication read-only and found a wrapper contract
+  mismatch: `tools/SM64CanonicalRouteLedgerMergeTool.swift` is a 25-target,
+  104-token path, while `script/test_canonical_route_ledger_merge.sh` still
+  supplies 23 report/proof pairs (50 tokens) and asserts the stale 23-row
+  output. No canonical publication was authorized or performed. Phase 85f60
+  rechecked acceptance state: the M34 visible-host gate remains blocked by an
+  offline/asleep display and locked console, M35 distribution remains blocked
+  by missing Developer ID identity/notary authentication, and the timebase
+  audit fails closed on retained `object_timer=166 files/715 matches` and
+  `random_calls=79 files/289 matches` versus current `166/718` and `79/290`;
+  the fixture was not updated. Phase 85f61 attributed those deltas to
+  intentional WDW/TTC receipt fields (including the TTC `random_u16` receipt
+  field); actual random-call syntax remains 289 matches and a fixture update
+  was not authorized. Phase 85f62 implemented the source-owned Bob seesaw
+  receipt seam and semantic identity, but the focused runtime matrix failed
+  closed at `level=1 area=1 object=0` with exit 77; no source-reachable
+  receipt, C/Swift pair, admission, route record, manifest/report mutation,
+  or canonical ledger mutation was produced. M34, M35, human-acceptance, and
+  implementation/full-goal floors remain 0%.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -145,8 +168,14 @@
   `.porting/porting-handoff-full-swift-twin-phase85f53-ttc-rotator-seam-execute.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f54-docs-refresh.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md`,
-  `.porting/porting-handoff-full-swift-twin-phase85f56-ttc-area1-reachability.md`, and
-  `.porting/porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f56-ttc-area1-reachability.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f58-next-route-discovery.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f59-publication-wrapper-audit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f60-acceptance-state-audit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f61-timebase-drift-diagnosis.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f62-seesaw-seam-execute.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f63-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -633,7 +662,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f54
+The repeated route notes below preserve prior phase evidence; the Phase 85f63
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`

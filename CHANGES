@@ -903,6 +903,30 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       `porting-handoff-full-swift-twin-phase85f56-ttc-area1-reachability.md`
       and `porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md`.
       No source, manifest, report, route ledger, or acceptance state changed.
+234.) Reconcile Phase 85f63 documentation after the f59 publication-wrapper
+      audit, f60 acceptance/timebase audit, f61 drift attribution, and f62 Bob
+      seesaw seam. The current merge tool expects 25 generated targets and 104
+      tokens while its wrapper still supplies 23 report/proof pairs and 50
+      tokens, so no serial publication was authorized or performed. M34/M35
+      remain blocked; the timebase fixture still records 715 object-timer and
+      289 inventory matches versus current 718 and 290, while actual RNG-call
+      syntax remains 289 and the fixture update is unauthorized. Bob runtime
+      fails closed at `level=1 area=1 object=0` with exit 77 and no admission.
+      Preserve retained canonical 25/7,395 with manifest SHA-256
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+      report SHA-256
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+      `25/7420 = 0.336927224%`, isolated intro 26/7,394 with SHA-256
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+      `26/7420 = 0.350404313%`, and 0% M34/M35/human-acceptance/full-goal
+      floors while linking the ordered `f58 -> f63` handoffs:
+      `porting-handoff-full-swift-twin-phase85f58-next-route-discovery.md`,
+      `porting-handoff-full-swift-twin-phase85f59-publication-wrapper-audit.md`,
+      `porting-handoff-full-swift-twin-phase85f60-acceptance-state-audit.md`,
+      `porting-handoff-full-swift-twin-phase85f61-timebase-drift-diagnosis.md`,
+      `porting-handoff-full-swift-twin-phase85f62-seesaw-seam-execute.md`, and
+      `porting-handoff-full-swift-twin-phase85f63-docs-refresh.md`. No source,
+      manifest, report, route ledger, or acceptance state changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

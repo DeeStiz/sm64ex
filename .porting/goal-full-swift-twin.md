@@ -2,7 +2,7 @@
 
 ## Status
 
-### Phase 85f57 current status
+### Phase 85f63 current status
 
 The retained checked-in canonical state remains **534 behavior rows** (511
 Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -168,6 +168,40 @@ record, manifest, retained report, or canonical ledger mutation occurred.
 No cog/static sibling substitution or synthetic receipt was used, and the
 TTC row `0x1af5669b06931d93` remains planned pending a genuine authored
 painting route into TTC area 1.
+
+Phase 85f58 discovered the next disjoint source-owned candidate, the Bob
+area-1 `bhvSeesawPlatform` row `0xb280cfa26a343b48`. Its authored object,
+level lifecycle, fixed-width Swift owner route, and semantic identity are
+present, but no native lifecycle pair or admission was performed.
+
+Phase 85f59 audited serial publication read-only and found a wrapper contract
+mismatch: `tools/SM64CanonicalRouteLedgerMergeTool.swift` is a 25-target,
+104-token path, while `script/test_canonical_route_ledger_merge.sh` still
+supplies 23 report/proof pairs (50 tokens) and asserts the stale 23-row output.
+The wrapper therefore cannot perform the current merge; no canonical
+publication was authorized or performed. The retained 25/7,395 report and
+isolated intro 26/7,394 result remain unchanged.
+
+Phase 85f60 rechecked acceptance state. The M34 visible-host gate remains
+blocked by an offline/asleep display and locked console, while M35 distribution
+remains blocked by missing Developer ID identity and notary authentication.
+The timebase audit also fails closed because the retained fixture reports
+`object_timer=166 files/715 matches` and `random_calls=79 files/289 matches`,
+while current source reports `166/718` and `79/290`; the fixture was not
+updated. M34, M35, human-acceptance, and full-goal floors remain 0%.
+
+Phase 85f61 attributed the timebase drift to intentional WDW/TTC receipt
+fields: the WDW elevator timer copy, TTC pre/post timer fields, and TTC
+`random_u16` receipt field. The actual random-call syntax remains unchanged at
+289 matches; this is fixture drift, not a new RNG call, and a fixture update
+was not authorized.
+
+Phase 85f62 implemented the source-owned Bob seesaw receipt seam and semantic
+identity, but its focused runtime matrix failed closed at
+`level=1 area=1 object=0` with exit 77. No source-reachable receipt, C/Swift
+pair, admission, route record, manifest/report mutation, or canonical ledger
+mutation was produced; no direct level load, object injection, variant
+substitution, or synthetic trace was used.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -1057,7 +1091,13 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f54 documentation refresh](porting-handoff-full-swift-twin-phase85f54-docs-refresh.md),
 [Phase 85f55 documentation correction](porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md),
 [Phase 85f56 TTC area-1 reachability audit](porting-handoff-full-swift-twin-phase85f56-ttc-area1-reachability.md),
-and [Phase 85f57 documentation refresh](porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md).
+[Phase 85f57 documentation refresh](porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md),
+[Phase 85f58 Bob seesaw discovery](porting-handoff-full-swift-twin-phase85f58-next-route-discovery.md),
+[Phase 85f59 publication-wrapper audit](porting-handoff-full-swift-twin-phase85f59-publication-wrapper-audit.md),
+[Phase 85f60 acceptance-state audit](porting-handoff-full-swift-twin-phase85f60-acceptance-state-audit.md),
+[Phase 85f61 timebase-drift diagnosis](porting-handoff-full-swift-twin-phase85f61-timebase-drift-diagnosis.md),
+[Phase 85f62 Bob seesaw seam](porting-handoff-full-swift-twin-phase85f62-seesaw-seam-execute.md),
+and [Phase 85f63 documentation refresh](porting-handoff-full-swift-twin-phase85f63-docs-refresh.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

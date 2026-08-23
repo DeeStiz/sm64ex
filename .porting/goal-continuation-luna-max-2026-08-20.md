@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f57 current evidence checkpoint
+### Phase 85f63 current evidence checkpoint
 
 The retained checked-in canonical state remains **534 behavior rows** (**511
 Swift value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
@@ -185,6 +185,40 @@ record, manifest, retained report, or canonical ledger mutation occurred.
 No cog/static sibling substitution or synthetic receipt was used, and the
 TTC row `0x1af5669b06931d93` remains planned pending a genuine authored
 painting route into TTC area 1.
+
+Phase 85f58 discovered the next disjoint source-owned candidate, the Bob
+area-1 `bhvSeesawPlatform` row `0xb280cfa26a343b48`. Its authored object,
+level lifecycle, fixed-width Swift owner route, and semantic identity are
+present, but no native lifecycle pair or admission was performed.
+
+Phase 85f59 audited serial publication read-only and found a wrapper contract
+mismatch: `tools/SM64CanonicalRouteLedgerMergeTool.swift` is a 25-target,
+104-token path, while `script/test_canonical_route_ledger_merge.sh` still
+supplies 23 report/proof pairs (50 tokens) and asserts the stale 23-row output.
+The wrapper therefore cannot perform the current merge; no canonical
+publication was authorized or performed. The retained 25/7,395 report and
+isolated intro 26/7,394 result remain unchanged.
+
+Phase 85f60 rechecked acceptance state. The M34 visible-host gate remains
+blocked by an offline/asleep display and locked console, while M35 distribution
+remains blocked by missing Developer ID identity and notary authentication.
+The timebase audit also fails closed because the retained fixture reports
+`object_timer=166 files/715 matches` and `random_calls=79 files/289 matches`,
+while current source reports `166/718` and `79/290`; the fixture was not
+updated. M34, M35, human-acceptance, and full-goal floors remain 0%.
+
+Phase 85f61 attributed the timebase drift to intentional WDW/TTC receipt
+fields: the WDW elevator timer copy, TTC pre/post timer fields, and TTC
+`random_u16` receipt field. The actual random-call syntax remains unchanged at
+289 matches; this is fixture drift, not a new RNG call, and a fixture update
+was not authorized.
+
+Phase 85f62 implemented the source-owned Bob seesaw receipt seam and semantic
+identity, but its focused runtime matrix failed closed at
+`level=1 area=1 object=0` with exit 77. No source-reachable receipt, C/Swift
+pair, admission, route record, manifest/report mutation, or canonical ledger
+mutation was produced; no direct level load, object injection, variant
+substitution, or synthetic trace was used.
 
 Phases 85aq–85as completed disjoint Luna-max route-family triage and authored
 level/transition reachability attempts without promoting a row. Phase 85ar
@@ -396,6 +430,12 @@ broad/physical/release/human gates are open.
 - **[Phase 85f55](porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md):** corrects the superseded f53 status wording with the committed TTC seam result while preserving canonical counters and external acceptance floors.
 - **[Phase 85f56](porting-handoff-full-swift-twin-phase85f56-ttc-area1-reachability.md):** the bounded owner-thread probe ends at TTC `level=14`, `area=2`, `hands=0`, exits 77, and creates no trace, pairing, or admission; its direct gate bypasses the authored Castle Inside painting nodes `0x21`–`0x23`, so the TTC row remains planned.
 - **[Phase 85f57](porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md):** refreshes the six first-party status surfaces and f55 handoff with the f56 blocker while preserving canonical counters and external acceptance floors.
+- **[Phase 85f58](porting-handoff-full-swift-twin-phase85f58-next-route-discovery.md):** discovers authored Bob area-1 `bhvSeesawPlatform` row `0xb280cfa26a343b48`; the native lifecycle pair and admission remain pending.
+- **[Phase 85f59](porting-handoff-full-swift-twin-phase85f59-publication-wrapper-audit.md):** finds the 25-target/104-token merge tool versus 23-pair/50-token wrapper mismatch; serial publication is not authorized or performed.
+- **[Phase 85f60](porting-handoff-full-swift-twin-phase85f60-acceptance-state-audit.md):** rechecks M34/M35 acceptance blockers and records timebase fixture drift (`715 -> 718` object-timer matches, `289 -> 290` inventory matches) without changing the fixture; conservative floors remain 0%.
+- **[Phase 85f61](porting-handoff-full-swift-twin-phase85f61-timebase-drift-diagnosis.md):** attributes the added inventory matches to intentional WDW/TTC receipt fields; actual RNG-call syntax remains unchanged and fixture update is unauthorized.
+- **[Phase 85f62](porting-handoff-full-swift-twin-phase85f62-seesaw-seam-execute.md):** implements the Bob seesaw receipt seam, but runtime remains unreachable at `level=1 area=1 object=0` with exit 77 and no admission.
+- **[Phase 85f63](porting-handoff-full-swift-twin-phase85f63-docs-refresh.md):** refreshes the six first-party status surfaces while preserving canonical counters, isolated intro evidence, exact hashes/percentages, and 0% acceptance floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1412,7 +1452,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f54 entry are authoritative for the latest checkpoint.
+and the Phase 85f63 entry are authoritative for the latest checkpoint.
 
 ### 85du — Tank-fish mapping — complete / fail-closed
 
