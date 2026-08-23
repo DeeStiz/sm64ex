@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-22).
 
-### Phase 85f38 current status
+### Phase 85f43 current status
 
 The retained checked-in canonical state remains **534 behavior rows** (511
 Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -66,6 +66,42 @@ header-only files with SHA-256
 `a00652d483085b681254ca74c782bbe5e7bdc9d2672ff724ebd3735a3d706512`;
 static chain evidence is not runtime traversal evidence. Canonical manifest,
 retained report, and route ledger state remain unchanged.
+
+Phase 85f39 audited the committed Phase 85f33 serial-publication evidence. The
+isolated report is valid at 26 terminal / 7,394 planned rows with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, or
+`26/7420 = 0.350404313%`; its target report and proof hashes are
+`6563b63155e1b5f4465b30dd51c5c60a02bfe08459f8e6885549ed716ceef7d2` and
+`c6de62ac55499a20d92ac5d7ec67cb328d569df276219bfde53f95b85900fc51`.
+The retained checked-in canonical report remains 25/7,395 with SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`, or
+`25/7420 = 0.336927224%`; canonical intro row
+`0xca33981b30cb7815` remains planned. A canonical route-ledger
+merge/publication requires explicit authorization and was not performed; no
+manifest, retained report, or ledger state changed.
+
+Phase 85f40 confirmed that the static Castle-to-DDD source chain still lacks a
+complete deterministic owner-thread input recipe through the authored basement
+door, Castle area 3, and the DDD painting into DDD area 1. The bounded probe
+failed closed with exit 77, retained `event-307=0`, and produced no route
+record or admission. The known C trace remains a 72-byte header-only artifact
+with SHA-256
+`a00652d483085b681254ca74c782bbe5e7bdc9d2672ff724ebd3735a3d706512`;
+canonical artifacts remain unchanged.
+
+Phase 85f41's fresh read-only M34 re-audit leaves `m34_host_ready=0`: one
+detected display is offline (`online=0`), the console/session is locked,
+`gputoolsserviced` is not running, no GPU session is active, and thermal state
+is unknown (`0xe00002bc`). Fresh traces were absent and screenshot, replay,
+pixel, cadence, soak, direct-display, physical visual/feel, and human-
+acceptance evidence were not admissible. The M34 floor remains 0%.
+
+Phase 85f42's fresh read-only M35 re-audit confirms ordinary Xcode 26.6 and
+the readiness/distribution contracts pass, but `security find-identity` finds
+zero valid identities and notary authentication is unavailable. Readiness and
+distribution remain blocked on those two prerequisites; no archive, export,
+DMG, ZIP, notarization, stapling, Gatekeeper, or human-acceptance artifact
+exists. The M35 and human-acceptance floors remain 0%.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -853,7 +889,12 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f35 DDD camera reachability](../.porting/porting-handoff-full-swift-twin-phase85f35-ddd-camera-reachability.md),
 [Phase 85f36 current-status documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f36-docs-refresh.md),
 [Phase 85f37 Castle-to-DDD traversal discovery](../.porting/porting-handoff-full-swift-twin-phase85f37-castle-ddd-traversal.md),
-and [Phase 85f38 final documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f38-docs-final-refresh.md).
+[Phase 85f38 final documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f38-docs-final-refresh.md),
+[Phase 85f39 serial-publication audit](../.porting/porting-handoff-full-swift-twin-phase85f39-serial-publication-audit.md),
+[Phase 85f40 Castle-to-DDD recipe audit](../.porting/porting-handoff-full-swift-twin-phase85f40-castle-ddd-recipe-audit.md),
+[Phase 85f41 M34 host/production re-audit](../.porting/porting-handoff-full-swift-twin-phase85f41-m34-reaudit.md),
+[Phase 85f42 M35 distribution re-audit](../.porting/porting-handoff-full-swift-twin-phase85f42-m35-reaudit.md),
+and [Phase 85f43 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f43-docs-refresh.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),

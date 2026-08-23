@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-22)
 
-- **Phase 85f38 current checkpoint (2026-08-22):** the retained checked-in
+- **Phase 85f43 current checkpoint (2026-08-22):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -38,7 +38,24 @@
   identical 72-byte header-only files with the same SHA-256
   `a00652d483085b681254ca74c782bbe5e7bdc9d2672ff724ebd3735a3d706512`.
   Static chain evidence is not runtime traversal evidence; canonical manifest,
-  retained report, and route ledger state remain unchanged.
+  retained report, and route ledger state remain unchanged. Phase 85f39 audited
+  the committed serial-publication evidence: the isolated 26 terminal / 7,394
+  planned report is valid with SHA
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, or
+  `26/7420 = 0.350404313%`; target report/proof SHA values are
+  `6563b63155e1b5f4465b30dd51c5c60a02bfe08459f8e6885549ed716ceef7d2` and
+  `c6de62ac55499a20d92ac5d7ec67cb328d569df276219bfde53f95b85900fc51`.
+  The retained canonical state remains 25/7,395 at
+  `25/7420 = 0.336927224%`, with explicit authorization required before a
+  canonical merge/publication. Phase 85f40 rechecked the Castle-to-DDD
+  traversal blocker: no deterministic authored owner-thread input recipe
+  crosses the basement door into the DDD painting, the bounded probe fails
+  closed with exit 77 and `event-307=0`, and no route admission occurs.
+  Phase 85f41's fresh M34 re-audit leaves `m34_host_ready=0` with an offline
+  display, locked session, stopped GPU tooling, absent fresh traces, and
+  unknown thermal state. Phase 85f42's fresh M35 re-audit leaves distribution
+  blocked by zero valid Developer ID identities and unavailable notary auth.
+  M34, M35, and human-acceptance floors remain 0%.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -58,8 +75,13 @@
   `.porting/porting-handoff-full-swift-twin-phase85f35-ddd-camera-reachability.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f36-docs-refresh.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f37-castle-ddd-traversal.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f38-docs-final-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f39-serial-publication-audit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f40-castle-ddd-recipe-audit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f41-m34-reaudit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f42-m35-reaudit.md`,
   and this refresh is recorded in
-  `.porting/porting-handoff-full-swift-twin-phase85f38-docs-final-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f43-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -546,7 +568,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f38
+The repeated route notes below preserve prior phase evidence; the Phase 85f43
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`

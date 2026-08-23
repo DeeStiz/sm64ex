@@ -780,6 +780,41 @@ SM64 Modern native macOS — nightly continuation update (2026-08-22)
       26/7,394 result, and 0% M34/M35/human-acceptance floors while linking
       Phases 85f36–85f37 and this refresh in order. No source, report, route
       ledger, or acceptance claim changed.
+219.) Record committed Phase 85f39's serial-publication audit. The isolated
+      Phase85f33 report is valid at 26 terminal / 7,394 planned with SHA
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, or
+      `26/7420 = 0.350404313%`; target report/proof SHA values are
+      `6563b63155e1b5f4465b30dd51c5c60a02bfe08459f8e6885549ed716ceef7d2` and
+      `c6de62ac55499a20d92ac5d7ec67cb328d569df276219bfde53f95b85900fc51`.
+      The retained canonical state remains 25/7,395 at
+      `25/7420 = 0.336927224%`; explicit authorization is required before
+      canonical route-ledger publication, and no canonical artifact changed.
+220.) Record committed Phase 85f40's Castle-to-DDD recipe blocker. The static
+      source chain is present, but no deterministic authored owner-thread input
+      recipe crosses the basement door into Castle area 3 and DDD area 1; the
+      bounded probe fails closed with exit 77, retains `event-307=0`, and
+      produces no route admission. The known C trace remains the identical
+      72-byte header-only artifact with SHA
+      `a00652d483085b681254ca74c782bbe5e7bdc9d2672ff724ebd3735a3d706512`.
+221.) Record committed Phase 85f41's fresh M34 re-audit. The host gate remains
+      `m34_host_ready=0` with one offline display, a locked console/session,
+      stopped `gputoolsserviced`, no active GPU session, absent fresh traces,
+      and unknown thermal state (`0xe00002bc`); replay, pixels, cadence, soak,
+      direct-display, physical visual/feel, and human-acceptance evidence are
+      not claimable, so the M34 floor remains 0%.
+222.) Record committed Phase 85f42's fresh M35 re-audit. Ordinary Xcode 26.6
+      and the readiness/distribution contracts pass, but zero valid Developer
+      ID identities and no notary authentication leave distribution blocked;
+      no archive/export/DMG/ZIP/notarization/stapling/Gatekeeper or
+      human-acceptance artifact exists, so M35 and human-acceptance floors
+      remain 0%.
+223.) Reconcile Phase 85f43 first-party documentation. Preserve the exact
+      retained manifest/report hashes, canonical 25/7,395 and isolated 26/7,394
+      percentages, the explicit publication-authorization boundary, the
+      Castle-to-DDD traversal blocker, fresh M34/M35 blockers, and 0% M34/M35/
+      human-acceptance floors while linking Phases 85f39–85f42 and this refresh
+      in order. No source, manifest, report, route ledger, or acceptance claim
+      changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
