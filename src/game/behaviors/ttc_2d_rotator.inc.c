@@ -1,4 +1,7 @@
 
+#include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_ttc_rotator_route_identity.h"
+
 /**
  * Behavior for bhvTTC2DRotator.
  * This includes the hand (in TTC, not the clock in the castle), as well as the
@@ -48,7 +51,16 @@ void bhv_ttc_2d_rotator_init(void) {
  * turn, then increment the target yaw and possibly change direction.
  */
 void bhv_ttc_2d_rotator_update(void) {
-    s32 startYaw = o->oFaceAngleYaw;
+    const s32 startYaw = o->oFaceAngleYaw;
+    const s32 targetYawBefore = o->oTTC2DRotatorTargetYaw;
+    const s32 incrementBefore = o->oTTC2DRotatorIncrement;
+    const s32 minTimeBefore = o->oTTC2DRotatorMinTimeUntilNextTurn;
+    const s32 randomDirectionBefore = o->oTTC2DRotatorRandomDirTimer;
+    const s32 timerBefore = o->oTimer;
+    u32 randomU16 = UINT32_MAX;
+    u32 randomSpeedTimer = UINT32_MAX;
+    u32 randomReverseTimer = UINT32_MAX;
+    u32 randomMinTime = UINT32_MAX;
 
     if (o->oTTC2DRotatorRandomDirTimer != 0) {
         o->oTTC2DRotatorRandomDirTimer -= 1;
@@ -67,16 +79,20 @@ void bhv_ttc_2d_rotator_update(void) {
                 // If ready for a change in direction, then pick a new
                 // direction
                 if (o->oTTC2DRotatorRandomDirTimer == 0) {
-                    if (random_u16() & 0x3) {
+                    randomU16 = random_u16();
+                    if (randomU16 & 0x3) {
                         o->oTTC2DRotatorIncrement = o->oTTC2DRotatorSpeed;
-                        o->oTTC2DRotatorRandomDirTimer = random_mod_offset(90, 60, 4);
+                        randomSpeedTimer = random_mod_offset(90, 60, 4);
+                        o->oTTC2DRotatorRandomDirTimer = randomSpeedTimer;
                     } else {
                         o->oTTC2DRotatorIncrement = -o->oTTC2DRotatorSpeed;
-                        o->oTTC2DRotatorRandomDirTimer = random_mod_offset(30, 30, 3);
+                        randomReverseTimer = random_mod_offset(30, 30, 3);
+                        o->oTTC2DRotatorRandomDirTimer = randomReverseTimer;
                     }
                 }
 
-                o->oTTC2DRotatorMinTimeUntilNextTurn = random_mod_offset(10, 20, 3);
+                randomMinTime = random_mod_offset(10, 20, 3);
+                o->oTTC2DRotatorMinTimeUntilNextTurn = randomMinTime;
             }
         }
     }
@@ -84,5 +100,46 @@ void bhv_ttc_2d_rotator_update(void) {
     o->oAngleVelYaw = o->oFaceAngleYaw - startYaw;
     if (o->oBehParams2ndByte == TTC_2D_ROTATOR_BP_HAND) {
         load_object_collision_model();
+
+        union {
+            f32 value;
+            u32 bits;
+        } collisionDistance = { o->oCollisionDistance };
+        union {
+            f32 value;
+            u32 bits;
+        } distanceToMario = { o->oDistanceToMario };
+
+        SM64ModernTtcRotatorRouteInputV1 routeInput = {
+            .source_subject = sm64_modern_parity_object_slot(o),
+            .source_generation = 1u,
+            .model = MODEL_TTC_CLOCK_HAND,
+            .behavior_parameter = (u32) o->oBehParams2ndByte,
+            .speed_setting = (u32) gTTCSpeedSetting,
+            .timer_before = (u32) timerBefore,
+            .timer_after = (u32) o->oTimer,
+            .min_time_before = (u32) minTimeBefore,
+            .min_time_after = (u32) o->oTTC2DRotatorMinTimeUntilNextTurn,
+            .face_yaw_before = startYaw,
+            .face_yaw_after = o->oFaceAngleYaw,
+            .target_yaw_before = targetYawBefore,
+            .target_yaw_after = o->oTTC2DRotatorTargetYaw,
+            .increment_before = incrementBefore,
+            .increment_after = o->oTTC2DRotatorIncrement,
+            .speed = o->oTTC2DRotatorSpeed,
+            .random_direction_before = (u32) randomDirectionBefore,
+            .random_direction_after = (u32) o->oTTC2DRotatorRandomDirTimer,
+            .random_u16 = randomU16,
+            .random_speed_timer = randomSpeedTimer,
+            .random_reverse_timer = randomReverseTimer,
+            .random_min_time = randomMinTime,
+            .angle_velocity_yaw = o->oAngleVelYaw,
+            .collision_model_loaded = 1u,
+            .render_active = (o->header.gfx.node.flags & GRAPH_RENDER_ACTIVE) != 0,
+            .object_flags = o->oFlags,
+            .collision_distance_bits = collisionDistance.bits,
+            .distance_to_mario_bits = distanceToMario.bits,
+        };
+        (void) sm64_modern_ttc_rotator_route_observe(&routeInput);
     }
 }
