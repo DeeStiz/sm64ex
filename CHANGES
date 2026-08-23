@@ -1018,8 +1018,9 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       discovery and Phase 85f77 read-only publication-action audit. Preserve
       the authored SSL area-2 `bhvSpindel` row
       `0xdc93743116807bec` as planned with Swift owner contract
-      `0x2f02c221a0c4104e`; no source receipt seam, native lifecycle pair, or
-      admission exists. The f77 f72/f69 serial outputs are byte-identical, but
+      `0x2f02c221a0c4104e`; the f78 source receipt seam is now committed, but
+      no native lifecycle pair or admission exists. The f77 f72/f69 serial
+      outputs are byte-identical, but
       no write-once designation or canonical publication was performed.
       Preserve retained 25/7,395 with report SHA-256
       `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
@@ -1029,13 +1030,38 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
       percentages `25/7420 = 0.336927224%` and
       `26/7420 = 0.350404313%`, behavior mapping 95.693%, and 0% M34/M35/
-      human-acceptance/full-goal floors. Phase 85f78 is pending because no
-      completed handoff exists. Link the ordered f76 -> f79 sequence:
+      human-acceptance/full-goal floors. Phase 85f78 committed the Spindel seam
+      (`91e53c7f`); the authored Castle→SSL route remained at
+      `level=1 area=1 spindels=0`, exited 77, and produced no trace or
+      admission. Link the ordered f76 -> f79 sequence:
       `porting-handoff-full-swift-twin-phase85f76-next-route-discovery.md`,
       `porting-handoff-full-swift-twin-phase85f77-publication-action-audit.md`,
-      pending Phase 85f78, and
+      `porting-handoff-full-swift-twin-phase85f78-spindel-seam-execute.md`, and
       `porting-handoff-full-swift-twin-phase85f79-docs-refresh.md`. No source,
       manifest, report, route ledger, publication, or acceptance state changed.
+
+240.) Correct the stale Phase 85f78 status wording across the six first-party
+      status surfaces and the existing Phase 85f79 handoff. Record the
+      committed Spindel seam (`91e53c7f`), the authored Castle→SSL route
+      result `level=1 area=1 spindels=0`, exit 77, and
+      `trace=not-created`, `records=0`, `admission=0`. Preserve retained
+      25/7,395 with report SHA-256
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+      isolated 26/7,394 with SHA-256
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+      manifest SHA-256
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+      percentages `25/7420 = 0.336927224%` and
+      `26/7420 = 0.350404313%`, behavior mapping 95.693%, and 0% M34/M35/
+      human-acceptance/full-goal floors. Link the ordered f76 -> f80
+      handoffs:
+      `porting-handoff-full-swift-twin-phase85f76-next-route-discovery.md`,
+      `porting-handoff-full-swift-twin-phase85f77-publication-action-audit.md`,
+      `porting-handoff-full-swift-twin-phase85f78-spindel-seam-execute.md`,
+      `porting-handoff-full-swift-twin-phase85f79-docs-refresh.md`, and
+      `porting-handoff-full-swift-twin-phase85f80-docs-spindel-correction.md`.
+      No source, manifest, report, route ledger, publication, or acceptance
+      state changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

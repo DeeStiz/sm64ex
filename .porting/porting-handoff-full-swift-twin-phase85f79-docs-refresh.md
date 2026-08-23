@@ -4,15 +4,17 @@ Date: 2026-08-23
 
 ## Verdict
 
-**DOCUMENTATION REFRESHED / SPINDEL DISCOVERY AND PUBLICATION-ACTION AUDIT
-SURFACED / F78 PENDING.** The six first-party status surfaces now carry the
-Phase 85f76 `bhvSpindel` discovery and the read-only Phase 85f77
-publication-action audit in order. No completed Phase 85f78 handoff exists,
-so f78 remains explicitly pending and no f78 result is claimed. The retained
-canonical state remains 25/7,395; the isolated 26/7,394 output remains
-phase-local and eligible only for separately authorized designation. No
-source, behavior manifest, retained report, canonical route ledger, fixture,
-release artifact, or unrelated worktree change was modified.
+**DOCUMENTATION REFRESHED / SPINDEL DISCOVERY, PUBLICATION-ACTION AUDIT,
+AND COMMITTED SEAM RESULT RECORDED.** The six first-party status surfaces
+carry the Phase 85f76 `bhvSpindel` discovery, the read-only Phase 85f77
+publication-action audit, and the actual Phase 85f78 committed seam result in
+order. Phase 85f78 implemented the source-owned Spindel receipt seam in commit
+`91e53c7f`; the authored Castle→SSL route remained at
+`level=1 area=1 spindels=0` and exited 77 without a trace or admission. The
+retained canonical state remains 25/7,395; the isolated 26/7,394 output
+remains phase-local and eligible only for separately authorized designation.
+No source, behavior manifest, retained report, canonical route ledger,
+fixture, release artifact, or unrelated worktree change was modified.
 
 ## Retained canonical boundary
 
@@ -63,18 +65,25 @@ write-once designation with the retained report preserved as backup. No
 designation, report replacement, manifest mutation, ledger mutation, status
 publication, staging, commit, or push was performed by f77.
 
-## Phase 85f78 pending
+## Phase 85f78 actual committed result
 
-No completed Phase 85f78 handoff exists in `.porting/`. The status surfaces
-therefore mark f78 pending and do not infer a publication, implementation,
-route admission, or acceptance result for that phase.
+Phase 85f78 committed the source-owned Spindel receipt seam in commit
+`91e53c7f`, including the semantic `bhvSpindel` identity, pointer-free schema-4
+observer, independent Swift mirror, focused C/Swift route pair, and
+fail-closed matrix. The authored Castle→SSL route remained at
+`level=1 area=1 spindels=0`; the matrix exited 77 with
+`trace=not-created`, `records=0`, and `admission=0`. No route record,
+manifest, retained report, canonical route ledger, or acceptance state
+changed. The seam is implemented, but authored reachability remains the
+fail-closed gate; no route admission or canonical publication was performed.
 
 ## Ordered handoffs
 
 - [Phase 85f76 Spindel discovery](porting-handoff-full-swift-twin-phase85f76-next-route-discovery.md)
 - [Phase 85f77 publication-action audit](porting-handoff-full-swift-twin-phase85f77-publication-action-audit.md)
-- Phase 85f78 pending (no completed handoff exists)
+- [Phase 85f78 Spindel seam execute](porting-handoff-full-swift-twin-phase85f78-spindel-seam-execute.md)
 - this Phase 85f79 documentation refresh
+- [Phase 85f80 Spindel documentation correction](porting-handoff-full-swift-twin-phase85f80-docs-spindel-correction.md)
 
 ## Documentation files changed
 

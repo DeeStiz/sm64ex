@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-23).
 
-### Phase 85f79 current status
+### Phase 85f80 current status
 
 The retained checked-in canonical state remains **534 behavior rows** (511
 Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -317,12 +317,18 @@ retained canonical report remains 25 terminal / 7,395 planned with SHA-256
 `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
 The f72/f69 outputs are byte-identical and eligible only for a separately
 authorized write-once designation; no report, manifest, ledger, or status
-publication was performed. Phase 85f78 is pending: no completed handoff
-exists, so no f78 result is claimed. The f79 refresh changes documentation
-only; retained live-route qualification remains `25/7420 = 0.336927224%`,
-the isolated qualification remains `26/7420 = 0.350404313%`, behavior mapping
-remains 95.693%, and M34, M35, human-acceptance, and full-goal floors remain
-0%.
+publication was performed. Phase 85f78 committed the source-owned Spindel
+receipt seam in commit `91e53c7f`, including the semantic `bhvSpindel`
+identity, pointer-free schema-4 observer, independent Swift mirror, focused
+C/Swift route pair, and fail-closed matrix. The authored Castle→SSL route
+remained at `level=1 area=1 spindels=0`; the matrix exited 77 with
+`trace=not-created`, `records=0`, and `admission=0`. No route record,
+manifest, retained report, canonical route ledger, or acceptance state
+changed. The f79 refresh's stale f78-pending wording is corrected by this
+Phase 85f80 documentation update. Retained live-route qualification remains
+`25/7420 = 0.336927224%`, the isolated qualification remains
+`26/7420 = 0.350404313%`, behavior mapping remains 95.693%, and M34, M35,
+human-acceptance, and full-goal floors remain 0%.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -1150,8 +1156,9 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f75 Spindrift documentation correction](../.porting/porting-handoff-full-swift-twin-phase85f75-docs-spindrift-correction.md),
 [Phase 85f76 Spindel discovery](../.porting/porting-handoff-full-swift-twin-phase85f76-next-route-discovery.md),
 [Phase 85f77 publication-action audit](../.porting/porting-handoff-full-swift-twin-phase85f77-publication-action-audit.md),
-Phase 85f78 pending (no completed handoff exists), and
-[Phase 85f79 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f79-docs-refresh.md).
+[Phase 85f78 Spindel seam execute](../.porting/porting-handoff-full-swift-twin-phase85f78-spindel-seam-execute.md),
+[Phase 85f79 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f79-docs-refresh.md), and
+[Phase 85f80 Spindel documentation correction](../.porting/porting-handoff-full-swift-twin-phase85f80-docs-spindel-correction.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),
