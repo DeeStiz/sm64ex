@@ -2,13 +2,16 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f91 Snowman wind documentation correction (2026-08-23):** records
-  the committed Phase 85f89 source-owned Snowman wind receipt seam
-  (`8e2ab88b`). The authored Castle Inside Snowman's Land route remains at
-  `level=1 area=1 wind=0` and exits 77 before creating a trace or admitting a
-  route (`trace=not-created`, `records=0`, `admission=0`); no route record or
-  canonical artifact was created or mutated. Preserve the designated local
-  26/7,394 report at
+- **Phase 85f92 JRB treasure discovery (2026-08-23):** source-route discovery
+  selected the authored Jolly Roger Bay `bhvTreasureChestsJrb` root at route
+  row `0x246e8a98cbad9a7a`. Its area-1 script creates the four-step puzzle
+  through the source root and four source-owned children; the pointer-free
+  `TreasureChestBehavior`/`TreasureChestObjectBridge` owner preserves the JRB
+  variant, source child order, scalar puzzle state, interaction results, and
+  effect intents. This is a gameplay puzzle route, not a generic-water query;
+  discovery only left the row planned, with no native load/helper call,
+  synthetic child/object injection, trace, source edit, or manifest/report/
+  ledger mutation. Preserve the designated local 26/7,394 report at
   `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
   with SHA-256
   `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
@@ -22,7 +25,9 @@
   `.porting/porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f89-snowman-wind-seam-execute.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f90-docs-refresh.md`, and
-  `.porting/porting-handoff-full-swift-twin-phase85f91-docs-snowman-wind-correction.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f91-docs-snowman-wind-correction.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f92-next-route-discovery.md`.
+  Phase 85f93 remains pending; no completed handoff exists.
 
 - **Phase 85f87 authored-reachability rechecks (2026-08-23):** fresh WDW
   express-elevator, TTC 2D rotator, Bob seesaw, and Spindrift route-pair

@@ -2,17 +2,18 @@
 
 ## Status
 
-### Phase 85f89 current status
+### Phase 85f92 current status
 
-Phase 85f89 committed the source-owned Snowman wind receipt seam for authored
-`bhvSLSnowmanWind` route row `0xa98dae7d4d4559ab` in commit `8e2ab88b`. The
-seam is implemented, but the authored Castle Inside Snowman's Land route
-remained at `level=1 area=1 wind=0`; the route-pair matrix exited `77` before
-creating a trace or admitting a route (`trace=not-created`, `records=0`,
-`admission=0`). The selected row remains planned. No direct Snowman's Land
-selection, helper call, object injection, sibling or coordinate substitution,
-synthetic trace, manifest/report/ledger mutation, or canonical publication
-occurred.
+Phase 85f92 completed source-route discovery for Jolly Roger Bay's authored
+`bhvTreasureChestsJrb` root at route row `0x246e8a98cbad9a7a`. The source
+area-1 script creates the four-step JRB treasure-chest puzzle through the
+source root and its four source-owned bottom/top children; the existing
+pointer-free Swift `TreasureChestBehavior`/`TreasureChestObjectBridge` route
+preserves the JRB variant, source child order, scalar puzzle state, interaction
+results, and effect intents. This is a gameplay puzzle route, not a generic
+water query. Discovery only: the selected row remains planned. No native JRB
+load, direct helper call, synthetic child or object injection, trace, source
+edit, manifest/report/ledger mutation, or admission occurred.
 
 The designated local canonical route evidence remains
 `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`.
@@ -32,7 +33,8 @@ SHA-256
 Behavior mapping remains 95.693%, and the conservative M34, M35,
 human-acceptance, implementation, and full-goal floors remain 0%. No source,
 manifest, designated or backup report, route ledger, release, store, or
-external publication state changed.
+external publication state changed. Phase 85f93 remains pending; no completed
+handoff exists.
 
 ### Phase 85f87 current status
 
@@ -1345,7 +1347,9 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f88 Snowman wind discovery](porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md),
 [Phase 85f89 Snowman wind seam execute](porting-handoff-full-swift-twin-phase85f89-snowman-wind-seam-execute.md),
 [Phase 85f90 documentation refresh](porting-handoff-full-swift-twin-phase85f90-docs-refresh.md), and
-[Phase 85f91 Snowman wind documentation correction](porting-handoff-full-swift-twin-phase85f91-docs-snowman-wind-correction.md).
+[Phase 85f91 Snowman wind documentation correction](porting-handoff-full-swift-twin-phase85f91-docs-snowman-wind-correction.md), and
+[Phase 85f92 JRB treasure discovery](porting-handoff-full-swift-twin-phase85f92-next-route-discovery.md).
+Phase 85f93 remains pending; no completed handoff exists.
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
