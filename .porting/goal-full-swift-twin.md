@@ -2,7 +2,7 @@
 
 ## Status
 
-### Phase 85f48 current status
+### Phase 85f50 current status
 
 The retained checked-in canonical state remains **534 behavior rows** (511
 Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -114,9 +114,18 @@ session, stopped GPU tooling, and unknown thermal state. Release launch,
 capture/replay, attachment/pixel, cadence/soak, and direct-display evidence
 were not admissible; M34 remains 0% and no Simulator substitute was used.
 
-**Phase 85f47 pending:** no Phase 85f47 handoff or result is present in this
-worktree, so no f47 outcome, counter, or acceptance claim is asserted here.
-Its result must be added in sequence when available.
+Phase 85f47 committed the source-owned WDW express-elevator receipt seam
+(commit `380f14ae`). The dynamic `bhvWdwExpressElevator` observer, pointer-free
+schema-4 route packet, independent Swift mirror, and focused C/Swift contract
+are implemented, but the real authored Castle-to-WDW lifecycle reaches
+`level=11 (LEVEL_WDW), area=2` before the dynamic object can emit a receipt.
+The matrix therefore fails closed with `dynamic=0`, `static=0`, and exit 77;
+no route record, admission, manifest, retained report, or canonical ledger
+mutation occurred, and the static sibling was not substituted. Runtime
+reachability remains blocked at WDW area 2.
+
+**Phase 85f49 pending:** no Phase 85f49 handoff or result is present in this
+worktree, so no f49 outcome, counter, or acceptance claim is asserted here.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -996,8 +1005,10 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f44 isolated-admission inventory](porting-handoff-full-swift-twin-phase85f44-isolated-admission-inventory.md),
 [Phase 85f45 WDW elevator discovery](porting-handoff-full-swift-twin-phase85f45-next-route-discovery.md),
 [Phase 85f46 Metal 4 contract re-audit](porting-handoff-full-swift-twin-phase85f46-metal4-contract-reaudit.md),
-Phase 85f47 result (pending; no handoff present), and [Phase 85f48
-documentation refresh](porting-handoff-full-swift-twin-phase85f48-docs-refresh.md).
+[Phase 85f47 WDW elevator seam](porting-handoff-full-swift-twin-phase85f47-wdw-elevator-seam-execute.md),
+[Phase 85f48 documentation refresh](porting-handoff-full-swift-twin-phase85f48-docs-refresh.md),
+Phase 85f49 result (pending; no handoff present), and [Phase 85f50
+documentation refresh](porting-handoff-full-swift-twin-phase85f50-docs-refresh.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

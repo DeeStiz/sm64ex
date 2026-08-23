@@ -1,4 +1,4 @@
-SM64 Modern native macOS — nightly continuation update (2026-08-22)
+SM64 Modern native macOS — nightly continuation update (2026-08-23)
 43.) Record Phase 57's native Castle pendulum parity repair: schema-4
      object-domain snapshots now retain the real slot-37 actor state, six
      native run/header fingerprints are nonzero, and the 64-step pair remains
@@ -841,6 +841,22 @@ SM64 Modern native macOS — nightly continuation update (2026-08-22)
       pending because no handoff/result is present; no f47 outcome, counter, or
       acceptance claim is asserted. No source, manifest, report, route ledger,
       or acceptance state changed.
+228.) Record committed Phase 85f47's WDW express-elevator receipt seam. The
+      source-owned dynamic observer, pointer-free schema-4 packet, independent
+      Swift mirror, and focused C/Swift contract are implemented, but the
+      authored Castle-to-WDW lifecycle reaches `level=11 (LEVEL_WDW), area=2`
+      before a dynamic receipt is emitted. The matrix fails closed with
+      `dynamic=0`, `static=0`, and exit 77; no route record, admission,
+      manifest, retained report, or canonical ledger mutation occurred, and
+      the static sibling was not substituted. Runtime remains blocked at WDW
+      area 2.
+229.) Reconcile Phase 85f50 first-party documentation. Preserve exact retained
+      25/7,395 and isolated 26/7,394 facts, all hashes and percentages, and the
+      0% M34/M35/human-acceptance floors while linking the f47 seam, prior f48
+      refresh, and this refresh in order. Phase 85f49 has no handoff or result
+      in this worktree, so no f49 outcome, counter, or acceptance claim is
+      asserted. No source, manifest, report, route ledger, or acceptance state
+      changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

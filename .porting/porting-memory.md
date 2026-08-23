@@ -1,8 +1,8 @@
 # SM64 Modern Porting Memory
 
-## Latest validated slices (2026-08-22)
+## Latest validated slices (2026-08-23)
 
-- **Phase 85f48 current checkpoint (2026-08-22):** the retained checked-in
+- **Phase 85f50 current checkpoint (2026-08-23):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -67,8 +67,16 @@
   Metal 4 source/archive/presentation/capture/M9/timebase contracts; they pass,
   but the visible-host gate remains `m34_host_ready=0` with no admissible
   launch, capture, pixel, cadence, soak, or direct-display evidence, so M34
-  remains 0%. Phase 85f47 is pending: no handoff or result is present and no
-  f47 outcome or counter is asserted.
+  remains 0%. Phase 85f47 committed the source-owned WDW express-elevator
+  receipt seam (commit `380f14ae`): the dynamic observer, pointer-free schema-4
+  packet, independent Swift mirror, and focused C/Swift contract are present.
+  The authored Castle-to-WDW lifecycle reaches `level=11 (LEVEL_WDW), area=2`
+  before the dynamic object emits a receipt, so the matrix fails closed with
+  `dynamic=0`, `static=0`, and exit 77; no route record, admission, manifest,
+  retained report, or canonical ledger mutation occurred, and the static
+  sibling was not substituted. Runtime reachability remains blocked at WDW
+  area 2. Phase 85f49 is pending: no handoff or result is present and no f49
+  outcome or counter is asserted.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -96,8 +104,10 @@
   `.porting/porting-handoff-full-swift-twin-phase85f44-isolated-admission-inventory.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f45-next-route-discovery.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f46-metal4-contract-reaudit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f47-wdw-elevator-seam-execute.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f48-docs-refresh.md`,
   and this refresh is recorded in
-  `.porting/porting-handoff-full-swift-twin-phase85f48-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f50-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -584,7 +594,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f48
+The repeated route notes below preserve prior phase evidence; the Phase 85f50
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`

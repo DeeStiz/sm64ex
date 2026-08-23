@@ -1,6 +1,6 @@
 # Continuation Goal: SM64 Modern Full Swift Twin — Luna Max
 
-Date: 2026-08-22
+Date: 2026-08-23
 
 ## Status
 
@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f48 current evidence checkpoint
+### Phase 85f50 current evidence checkpoint
 
 The retained checked-in canonical state remains **534 behavior rows** (**511
 Swift value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
@@ -131,9 +131,18 @@ session, stopped GPU tooling, and unknown thermal state. Release launch,
 capture/replay, attachment/pixel, cadence/soak, and direct-display evidence
 were not admissible; M34 remains 0% and no Simulator substitute was used.
 
-**Phase 85f47 pending:** no Phase 85f47 handoff or result is present in this
-worktree, so no f47 outcome, counter, or acceptance claim is asserted here.
-Its result must be added in sequence when available.
+Phase 85f47 committed the source-owned WDW express-elevator receipt seam
+(commit `380f14ae`). The dynamic `bhvWdwExpressElevator` observer, pointer-free
+schema-4 route packet, independent Swift mirror, and focused C/Swift contract
+are implemented, but the real authored Castle-to-WDW lifecycle reaches
+`level=11 (LEVEL_WDW), area=2` before the dynamic object can emit a receipt.
+The matrix therefore fails closed with `dynamic=0`, `static=0`, and exit 77;
+no route record, admission, manifest, retained report, or canonical ledger
+mutation occurred, and the static sibling was not substituted. Runtime
+reachability remains blocked at WDW area 2.
+
+**Phase 85f49 pending:** no Phase 85f49 handoff or result is present in this
+worktree, so no f49 outcome, counter, or acceptance claim is asserted here.
 
 Phases 85aq–85as completed disjoint Luna-max route-family triage and authored
 level/transition reachability attempts without promoting a row. Phase 85ar
@@ -334,8 +343,10 @@ broad/physical/release/human gates are open.
 - **[Phase 85f44](porting-handoff-full-swift-twin-phase85f44-isolated-admission-inventory.md):** inventories isolated admissions, retaining exactly 25/7,395 and one guarded Phase 85f33 intro candidate; no canonical artifact changes.
 - **[Phase 85f45](porting-handoff-full-swift-twin-phase85f45-next-route-discovery.md):** discovers the authored dynamic WDW express elevator route while excluding its static sibling; no live pair or admission exists.
 - **[Phase 85f46](porting-handoff-full-swift-twin-phase85f46-metal4-contract-reaudit.md):** re-audits Metal 4 contracts successfully but remains fail-closed at the visible-host gate, with M34 at 0%.
-- **Phase 85f47:** pending; no handoff or result is present, so no outcome or counter is asserted.
-- **[Phase 85f48](porting-handoff-full-swift-twin-phase85f48-docs-refresh.md):** this documentation refresh records the ordered f44–f46 evidence and the explicit f47 pending boundary.
+- **[Phase 85f47](porting-handoff-full-swift-twin-phase85f47-wdw-elevator-seam-execute.md):** implements the source-owned dynamic WDW express-elevator receipt seam, but the authored lifecycle reaches WDW area 2 before the dynamic object emits a receipt; the matrix fails closed with exit 77 and no admission or ledger mutation.
+- **[Phase 85f48](porting-handoff-full-swift-twin-phase85f48-docs-refresh.md):** prior documentation refresh, retained for provenance; its f47-pending boundary is superseded by the committed f47 result above.
+- **Phase 85f49:** pending; no handoff or result is present, so no outcome or counter is asserted.
+- **[Phase 85f50](porting-handoff-full-swift-twin-phase85f50-docs-refresh.md):** this documentation refresh records the f47 seam result and explicit f49 pending boundary.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1352,7 +1363,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f48 entry are authoritative for the latest checkpoint.
+and the Phase 85f50 entry are authoritative for the latest checkpoint.
 
 ### 85du — Tank-fish mapping — complete / fail-closed
 
