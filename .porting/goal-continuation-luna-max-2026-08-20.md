@@ -21,14 +21,18 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
-### Phase 85f113 current evidence checkpoint
+### Phase 85f115 current evidence checkpoint
 
-Phase 85f110 ran the real source-backed Castle→SSL owner-thread probe for
-1,800 steps. It stayed at `level=16 area=1` (Castle Grounds), observed
-`pokey_objects=0`, and exited `77`; no trace, native receipt, C/Swift runtime
-pair, route admission, report/ledger/manifest mutation, or canonical promotion
-exists. The strengthened f109 static pair remains static-only; no direct SSL
-load/warp, synthetic object, or helper/probe substitution was used.
+Phase 85f114 ran a source-neutral, fixed 3,600-step owner-thread traversal
+recipe from the ordinary Castle Grounds bootstrap. It used fixed analog
+movement, bounded right-stick camera turns, and short A-button jump pulses;
+it did not branch on coordinates or destination state. The probe reported
+`castle_ssl_recipe reachability=0 castle_inside_step=3600 ssl_step=3600`, ended
+at `final_level=16 final_area=1`, and exited `77`: Castle Inside and SSL area 1
+were unreached. No trace, native receipt, C/Swift runtime pair, route
+admission, report/ledger/manifest mutation, or canonical promotion exists.
+No direct level load/warp, behavior helper, object injection, or coordinate
+selection was used.
 
 Phase 85f111's read-only M34 audit leaves `m34_host_ready=0` because the
 display is offline, the console session is locked, and `gputoolsserviced`/GPU
@@ -58,7 +62,9 @@ human-acceptance, implementation, and full-goal floors remain 0%.
 Ordered handoffs: [Phase 85f110 Pokey runtime route](porting-handoff-full-swift-twin-phase85f110-pokey-runtime-route.md),
 [Phase 85f111 M34 production audit](porting-handoff-full-swift-twin-phase85f111-m34-production-audit.md),
 [Phase 85f112 M35 distribution audit](porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md), and
-[Phase 85f113 documentation/M34/M35 route](porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md).
+[Phase 85f113 documentation/M34/M35 route](porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md),
+[Phase 85f114 Castle→SSL traversal recipe](porting-handoff-full-swift-twin-phase85f114-castle-ssl-traversal-recipe.md), and
+[Phase 85f115 documentation/traversal recipe](porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 
@@ -808,6 +814,8 @@ broad/physical/release/human gates are open.
 - **[Phase 85f111](porting-handoff-full-swift-twin-phase85f111-m34-production-audit.md):** rechecks M34 with `m34_host_ready=0` from the offline display, locked console, unavailable GPU tooling, and unknown thermal state.
 - **[Phase 85f112](porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md):** rechecks M35 contracts; no Developer ID identity/private key or notary authentication exists, so no distribution or human evidence is available.
 - **[Phase 85f113](porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md):** reconciles the current route/M34/M35 checkpoint, exact counters/hashes, and 0% floors across the first-party surfaces.
+- **[Phase 85f114](porting-handoff-full-swift-twin-phase85f114-castle-ssl-traversal-recipe.md):** runs the fixed 3,600-step analog/camera/jump recipe; it ends at `level=16 area=1`, leaves Castle Inside and SSL unreached, exits 77, and creates no trace, receipt, or admission.
+- **[Phase 85f115](porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md):** reconciles the traversal block across the first-party surfaces while preserving exact counters, hashes, 95.693% mapping, M34/M35 blockers, and 0% floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/

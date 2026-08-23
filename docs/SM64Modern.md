@@ -16,14 +16,18 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-23).
 
-### Phase 85f113 current status
+### Phase 85f115 current status
 
-Phase 85f110 ran the real source-backed Castle→SSL owner-thread probe for
-1,800 steps. It stayed at `level=16 area=1` (Castle Grounds), observed
-`pokey_objects=0`, and exited `77`; no trace, native receipt, C/Swift runtime
-pair, route admission, report/ledger/manifest mutation, or canonical promotion
-exists. The strengthened f109 static pair remains static-only; no direct SSL
-load/warp, synthetic object, or helper/probe substitution was used.
+Phase 85f114 ran a source-neutral, fixed 3,600-step owner-thread traversal
+recipe from the ordinary Castle Grounds bootstrap. It used fixed analog
+movement, bounded right-stick camera turns, and short A-button jump pulses;
+it did not branch on coordinates or destination state. The probe reported
+`castle_ssl_recipe reachability=0 castle_inside_step=3600 ssl_step=3600`, ended
+at `final_level=16 final_area=1`, and exited `77`: Castle Inside and SSL area 1
+were unreached. No trace, native receipt, C/Swift runtime pair, route
+admission, report/ledger/manifest mutation, or canonical promotion exists.
+No direct level load/warp, behavior helper, object injection, or coordinate
+selection was used.
 
 Phase 85f111's read-only M34 audit leaves `m34_host_ready=0` because the
 display is offline, the console session is locked, and `gputoolsserviced`/GPU
@@ -53,7 +57,9 @@ human-acceptance, implementation, and full-goal floors remain 0%.
 Ordered handoffs: [Phase 85f110 Pokey runtime route](../.porting/porting-handoff-full-swift-twin-phase85f110-pokey-runtime-route.md),
 [Phase 85f111 M34 production audit](../.porting/porting-handoff-full-swift-twin-phase85f111-m34-production-audit.md),
 [Phase 85f112 M35 distribution audit](../.porting/porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md), and
-[Phase 85f113 documentation/M34/M35 route](../.porting/porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md).
+[Phase 85f113 documentation/M34/M35 route](../.porting/porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md),
+[Phase 85f114 Castle→SSL traversal recipe](../.porting/porting-handoff-full-swift-twin-phase85f114-castle-ssl-traversal-recipe.md), and
+[Phase 85f115 documentation/traversal recipe](../.porting/porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 
@@ -1404,7 +1410,9 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f110 Pokey runtime route](../.porting/porting-handoff-full-swift-twin-phase85f110-pokey-runtime-route.md),
 [Phase 85f111 M34 production audit](../.porting/porting-handoff-full-swift-twin-phase85f111-m34-production-audit.md),
 [Phase 85f112 M35 distribution audit](../.porting/porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md), and
-[Phase 85f113 documentation/M34/M35 route](../.porting/porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md).
+[Phase 85f113 documentation/M34/M35 route](../.porting/porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md),
+[Phase 85f114 Castle→SSL traversal recipe](../.porting/porting-handoff-full-swift-twin-phase85f114-castle-ssl-traversal-recipe.md), and
+[Phase 85f115 documentation/traversal recipe](../.porting/porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),
