@@ -757,6 +757,8 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f10 route-breadth audit](../.porting/porting-handoff-full-swift-twin-phase85f10-route-breadth.md),
 [Phase 85f11 DDD Sushi discovery](../.porting/porting-handoff-full-swift-twin-phase85f11-ddd-sushi-route.md),
 and [Phase 85f17 documentation reconciliation](../.porting/porting-handoff-full-swift-twin-phase85f17-docs-reconciliation.md),
+Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
+85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),
 [Phase 85b Mario parity repair](../.porting/porting-handoff-full-swift-twin-phase85b-mario-parity-repair.md),
 [Phase 85c Mario admission](../.porting/porting-handoff-full-swift-twin-phase85c-mario-state-route-admission.md),

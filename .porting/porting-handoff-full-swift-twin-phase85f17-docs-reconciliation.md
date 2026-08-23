@@ -52,7 +52,9 @@ The following local checks passed after the reconciliation:
 
 ```text
 Markdown local-link target audit for the six scoped documents and this handoff
+local_markdown_links_checked=685
 Trailing-whitespace audit for the same seven files
+new_handoff_whitespace=pass
 git -c core.fsmonitor=false diff --check -- README.md docs/SM64Modern.md \
   .porting/goal-full-swift-twin.md \
   .porting/goal-continuation-luna-max-2026-08-20.md \
@@ -70,7 +72,7 @@ verify the exact docs handoff before its commit attempt:
 
 ```text
 README.md: bdffb5c86d85aecc39ac857128d6d7d913451aaaa6d12b39062f6a139b52325c
-docs/SM64Modern.md: 5eb35dd72ea503c27a021c014cd182ddc01115351d620ca603e3f1430ffe33b8
+docs/SM64Modern.md: 19a704269ab5c75e701fa47711ab9b937d99bb97a289793097d56b549922a034
 .porting/goal-full-swift-twin.md: ffb0e288ff906eac8752e06b4d43225327117f613f4918567469d98e51f6650a
 .porting/goal-continuation-luna-max-2026-08-20.md: 3421b35a09ff7424ff499cf6e8649ce0b7b3c2edce8650066c433945ecb72eed
 .porting/porting-memory.md: 751dc974cd85c5f452fe41e28df7b81c53aaa6089b0a4489eb9bee96c1446682
