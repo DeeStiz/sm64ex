@@ -65,7 +65,7 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 85f50 current status
+### Phase 85f51 current status
 
 The retained checked-in canonical state remains 534 behavior rows (511 Swift
 owners and 23 explicit C adapters) and 7,420 route shards: 25 non-fixture
@@ -187,8 +187,14 @@ no route record, admission, manifest, retained report, or canonical ledger
 mutation occurred, and the static sibling was not substituted. Runtime
 reachability remains blocked at WDW area 2.
 
-**Phase 85f49 pending:** no Phase 85f49 handoff or result is present in this
-worktree, so no f49 outcome, counter, or acceptance claim is asserted here.
+Phase 85f49 committed the authored Castle-to-WDW painting route to warp node
+`0x0A`. The normal owner-thread lifecycle lands in WDW area 2 before the
+dynamic `bhvWdwExpressElevator` can tick, so the matrix fails closed with
+`dynamic=0`, `static=0`, and exit 77. No trace was created, no route record or
+admission was produced, and the static sibling was not substituted. The
+retained canonical report remains 25 terminal / 7,395 planned, the isolated
+Phase 85f33 result remains 26 terminal / 7,394 planned, and the M34, M35,
+human-acceptance, and full-goal floors remain 0%.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -566,8 +572,9 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f46 Metal 4 contract re-audit](.porting/porting-handoff-full-swift-twin-phase85f46-metal4-contract-reaudit.md),
 [Phase 85f47 WDW elevator seam](.porting/porting-handoff-full-swift-twin-phase85f47-wdw-elevator-seam-execute.md),
 [Phase 85f48 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f48-docs-refresh.md),
-Phase 85f49 result (pending; no handoff present), and [Phase 85f50
-documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f50-docs-refresh.md).
+[Phase 85f49 WDW area-1 reachability audit](.porting/porting-handoff-full-swift-twin-phase85f49-wdw-area1-reachability.md),
+[Phase 85f50 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f50-docs-refresh.md),
+and [Phase 85f51 f49 documentation correction](.porting/porting-handoff-full-swift-twin-phase85f51-docs-f49-correction.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).

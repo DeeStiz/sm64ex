@@ -853,10 +853,15 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
 229.) Reconcile Phase 85f50 first-party documentation. Preserve exact retained
       25/7,395 and isolated 26/7,394 facts, all hashes and percentages, and the
       0% M34/M35/human-acceptance floors while linking the f47 seam, prior f48
-      refresh, and this refresh in order. Phase 85f49 has no handoff or result
-      in this worktree, so no f49 outcome, counter, or acceptance claim is
-      asserted. No source, manifest, report, route ledger, or acceptance state
-      changed.
+      refresh, committed f49 handoff, and this refresh in order. No source,
+      manifest, report, route ledger, or acceptance state changed.
+230.) Reconcile Phase 85f51 first-party documentation after committed Phase
+      85f49's WDW reachability audit. The authored Castle-to-WDW painting route
+      targets warp node `0x0A` but lands in WDW area 2 before the dynamic
+      elevator can tick; the matrix fails closed with `dynamic=0`, `static=0`,
+      and exit 77, with no trace, route record, or admission. Preserve the
+      retained 25/7,395 and isolated 26/7,394 facts and the 0% M34/M35/
+      human-acceptance/full-goal floors while linking f47–f51 in order.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

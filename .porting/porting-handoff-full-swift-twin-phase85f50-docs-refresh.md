@@ -5,12 +5,12 @@ Date: 2026-08-23
 ## Verdict
 
 **DOCUMENTATION REFRESHED / RETAINED CANONICAL STATE PRESERVED.** The
-first-party status surfaces now record the committed Phase 85f47 WDW
+first-party status surfaces record the committed Phase 85f47 WDW
 express-elevator receipt seam and its runtime reachability blocker, followed
-by the explicit Phase 85f49 absent-result boundary. Phase 85f49 has no handoff
-or result in this worktree, so no f49 outcome, counter, or acceptance claim is
-asserted. No source, code, manifest, retained report, canonical route ledger,
-or vendored provenance was changed.
+by the committed Phase 85f49 WDW area-1 reachability result. The later Phase
+85f51 correction records the f49 handoff in the ordered index and removes the
+outdated boundary wording. No source, code, manifest, retained report,
+canonical route ledger, or vendored provenance was changed.
 
 ## Retained canonical boundary
 
@@ -38,11 +38,17 @@ emit its receipt. The fail-closed matrix reports `dynamic=0`, `static=0`,
 77. No route record or admission was produced, the static sibling was not
 substituted, and runtime reachability remains blocked at WDW area 2.
 
-## Phase 85f49 boundary
+## Phase 85f49 WDW area-1 reachability result
 
-No `phase85f49` handoff or result file is present in the current worktree.
-The documentation therefore leaves f49 pending and does not infer a route
-result, counter change, M34/M35 state, or human-acceptance state.
+The authored Castle-to-WDW painting route targets warp node `0x0A`. The normal
+owner-thread lifecycle lands in WDW area 2 before the dynamic
+`bhvWdwExpressElevator` can tick, so the fail-closed matrix reports
+`dynamic=0`, `static=0`, `admission=0`, `canonical_ledger_mutation=0`,
+`manifest_mutation=0`, and exit 77. No trace was created, no route record or
+admission was produced, and the static sibling was not substituted. The
+retained canonical report remains 25 terminal / 7,395 planned, the isolated
+Phase 85f33 result remains 26 terminal / 7,394 planned, and the M34, M35,
+human-acceptance, and full-goal floors remain 0%.
 
 ## Documentation files changed
 
