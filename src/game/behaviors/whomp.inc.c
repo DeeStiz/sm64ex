@@ -1,5 +1,16 @@
 // whomp.c.inc
 
+#include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_whomp_king_route_identity.h"
+
+static u32 sm64_modern_whomp_king_float_bits(f32 value) {
+    union {
+        f32 value;
+        u32 bits;
+    } encoded = { value };
+    return encoded.bits;
+}
+
 void whomp_play_sfx_from_pound_animation(void) {
     UNUSED s32 sp2C = o->header.gfx.unk38.animFrame;
     s32 sp28 = 0;
@@ -242,9 +253,24 @@ void (*sWhompActions[])(void) = {
 
 // MM
 void bhv_whomp_loop(void) {
+    const u32 timerBefore = (u32) o->oTimer;
+    const u32 actionBefore = (u32) o->oAction;
+    const s32 subActionBefore = o->oSubAction;
+    const s32 healthBefore = o->oHealth;
+    const s32 moveYawBefore = o->oMoveAngleYaw;
+    const s32 facePitchBefore = o->oFaceAnglePitch;
+    const s32 angleVelocityPitchBefore = o->oAngleVelPitch;
+    const f32 positionXBefore = o->oPosX;
+    const f32 positionYBefore = o->oPosY;
+    const f32 positionZBefore = o->oPosZ;
+    const f32 forwardVelocityBefore = o->oForwardVel;
+    const f32 velocityYBefore = o->oVelY;
+    const u32 moveFlagsBefore = o->oMoveFlags;
+
     cur_obj_update_floor_and_walls();
     cur_obj_call_action_function(sWhompActions);
     cur_obj_move_standard(-20);
+    u32 collisionModelLoaded = 0;
     if (o->oAction != 9) {
 #ifndef NODRAWINGDISTANCE
         // o->oBehParams2ndByte here seems to be a flag
@@ -255,5 +281,136 @@ void bhv_whomp_loop(void) {
             cur_obj_hide_if_mario_far_away_y(1000.0f);
 #endif
         load_object_collision_model();
+        collisionModelLoaded = 1;
     }
+
+    u32 effectFlags = 0;
+    const u32 actionAfter = (u32) o->oAction;
+    const s32 subActionAfter = o->oSubAction;
+    const s32 healthAfter = o->oHealth;
+    const u32 rewardSpawned =
+        actionBefore == 8u && actionAfter == 9u ? 1u : 0u;
+    if (o->oBehParams2ndByte != 0u) {
+        if (actionBefore == 0u) {
+            effectFlags |= SM64_MODERN_WHOMP_KING_EFFECT_CAMERA_FOCUS
+                | SM64_MODERN_WHOMP_KING_EFFECT_SCALE;
+            if (subActionBefore == 0 && subActionAfter == 1)
+                effectFlags |= SM64_MODERN_WHOMP_KING_EFFECT_BOSS_MUSIC_START;
+        }
+        if (actionBefore == 5u && (moveFlagsBefore & OBJ_MOVE_LANDED) != 0u
+            && subActionAfter != subActionBefore) {
+            effectFlags |= SM64_MODERN_WHOMP_KING_EFFECT_LAND_SOUND
+                | SM64_MODERN_WHOMP_KING_EFFECT_SHAKE;
+        }
+        if (healthAfter < healthBefore) {
+            effectFlags |= SM64_MODERN_WHOMP_KING_EFFECT_DAMAGE
+                | SM64_MODERN_WHOMP_KING_EFFECT_DEATH_SOUND;
+            if (healthAfter != 0)
+                effectFlags |= SM64_MODERN_WHOMP_KING_EFFECT_MIST
+                    | SM64_MODERN_WHOMP_KING_EFFECT_TRIANGLE_BREAK
+                    | SM64_MODERN_WHOMP_KING_EFFECT_SHAKE;
+        }
+        if (rewardSpawned != 0u) {
+            effectFlags |= SM64_MODERN_WHOMP_KING_EFFECT_HIDE
+                | SM64_MODERN_WHOMP_KING_EFFECT_INTANGIBLE
+                | SM64_MODERN_WHOMP_KING_EFFECT_MIST
+                | SM64_MODERN_WHOMP_KING_EFFECT_TRIANGLE_BREAK
+                | SM64_MODERN_WHOMP_KING_EFFECT_SHAKE
+                | SM64_MODERN_WHOMP_KING_EFFECT_REWARD_STAR
+                | SM64_MODERN_WHOMP_KING_EFFECT_DEATH_SOUND;
+        }
+        if (actionBefore == 9u && timerBefore == 60u)
+            effectFlags |= SM64_MODERN_WHOMP_KING_EFFECT_BOSS_MUSIC_STOP;
+    }
+
+    /*
+     * This is a scalar receipt taken after the source floor/action/movement
+     * order and after the source collision-model load.  The reward fields are
+     * a semantic child intent for the source star helper; no spawned object or
+     * parent pointer is published here.
+     */
+    const SM64ModernWhompKingRouteInputV1 routeInput = {
+        .source_subject = sm64_modern_parity_object_slot(o),
+        .source_generation = 1u,
+        .source_order = SM64_MODERN_WHOMP_KING_ROUTE_SOURCE_ORDER,
+        .model = MODEL_WHOMP,
+        .behavior_parameter = 0u,
+        .king_variant = (u32) o->oBehParams2ndByte,
+        .act = (u32) gCurrActNum,
+        .source_face_yaw = o->oFaceAngleYaw,
+        .home_x_bits = sm64_modern_whomp_king_float_bits(o->oHomeX),
+        .home_y_bits = sm64_modern_whomp_king_float_bits(o->oHomeY),
+        .home_z_bits = sm64_modern_whomp_king_float_bits(o->oHomeZ),
+        .position_x_before_bits =
+            sm64_modern_whomp_king_float_bits(positionXBefore),
+        .position_y_before_bits =
+            sm64_modern_whomp_king_float_bits(positionYBefore),
+        .position_z_before_bits =
+            sm64_modern_whomp_king_float_bits(positionZBefore),
+        .position_x_after_bits = sm64_modern_whomp_king_float_bits(o->oPosX),
+        .position_y_after_bits = sm64_modern_whomp_king_float_bits(o->oPosY),
+        .position_z_after_bits = sm64_modern_whomp_king_float_bits(o->oPosZ),
+        .timer_before = timerBefore,
+        .timer_after = (u32) o->oTimer,
+        .action_before = actionBefore,
+        .action_after = actionAfter,
+        .sub_action_before = subActionBefore,
+        .sub_action_after = subActionAfter,
+        .health_before = healthBefore,
+        .health_after = healthAfter,
+        .move_yaw_before = moveYawBefore,
+        .move_yaw_after = o->oMoveAngleYaw,
+        .face_pitch_before = facePitchBefore,
+        .face_pitch_after = o->oFaceAnglePitch,
+        .angle_velocity_pitch_before = angleVelocityPitchBefore,
+        .angle_velocity_pitch_after = o->oAngleVelPitch,
+        .forward_velocity_before_bits =
+            sm64_modern_whomp_king_float_bits(forwardVelocityBefore),
+        .forward_velocity_after_bits =
+            sm64_modern_whomp_king_float_bits(o->oForwardVel),
+        .velocity_y_before_bits =
+            sm64_modern_whomp_king_float_bits(velocityYBefore),
+        .velocity_y_after_bits = sm64_modern_whomp_king_float_bits(o->oVelY),
+        .move_flags_before = moveFlagsBefore,
+        .move_flags_after = o->oMoveFlags,
+        .floor_height_bits = sm64_modern_whomp_king_float_bits(o->oFloorHeight),
+        .floor_type = (u32) (u16) o->oFloorType,
+        .floor_room = (u32) (u16) o->oFloorRoom,
+        .room = (u32) o->oRoom,
+        .distance_to_mario_bits =
+            sm64_modern_whomp_king_float_bits(o->oDistanceToMario),
+        .angle_to_mario = o->oAngleToMario,
+        .lateral_distance_home_bits = 0u,
+        .mario_ground_pound = healthAfter < healthBefore ? 1u : 0u,
+        .mario_on_platform =
+            gMarioObject != NULL && gMarioObject->platform == o ? 1u : 0u,
+        .landed = (o->oMoveFlags & OBJ_MOVE_LANDED) != 0u,
+        .on_ground = (o->oMoveFlags & OBJ_MOVE_ON_GROUND) != 0u,
+        .mario_squished =
+            gMarioState != NULL && gMarioState->action == ACT_SQUISHED,
+        .mario_far_below = actionBefore == 2u && actionAfter == 0u,
+        .dialog_complete =
+            (actionBefore == 0u && actionAfter == 2u) || rewardSpawned,
+        .hidden = (o->header.gfx.node.flags & GRAPH_RENDER_INVISIBLE) != 0u,
+        .tangible = o->oIntangibleTimer == 0 ? 1u : 0u,
+        .marked_for_deletion = o->activeFlags == ACTIVE_FLAG_DEACTIVATED,
+        .effect_flags = effectFlags,
+        .collision_model_identity =
+            SM64_MODERN_WHOMP_KING_ROUTE_COLLISION_IDENTITY,
+        .collision_model_loaded = collisionModelLoaded,
+        .reward_spawned = rewardSpawned,
+        .reward_child_ordinal = rewardSpawned
+            ? SM64_MODERN_WHOMP_KING_ROUTE_REWARD_ORDINAL : 0u,
+        .reward_child_model = rewardSpawned
+            ? SM64_MODERN_WHOMP_KING_ROUTE_REWARD_MODEL : 0u,
+        .reward_child_behavior_identity = rewardSpawned
+            ? SM64_MODERN_WHOMP_KING_ROUTE_REWARD_BEHAVIOR_ID : 0u,
+        .reward_position_x_bits = rewardSpawned
+            ? SM64_MODERN_WHOMP_KING_ROUTE_REWARD_X_BITS : 0u,
+        .reward_position_y_bits = rewardSpawned
+            ? SM64_MODERN_WHOMP_KING_ROUTE_REWARD_Y_BITS : 0u,
+        .reward_position_z_bits = rewardSpawned
+            ? SM64_MODERN_WHOMP_KING_ROUTE_REWARD_Z_BITS : 0u,
+    };
+    (void) sm64_modern_whomp_king_route_observe(&routeInput);
 }
