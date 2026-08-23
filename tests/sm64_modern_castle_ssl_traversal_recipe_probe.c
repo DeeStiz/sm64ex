@@ -175,8 +175,11 @@ static void recipe_input(struct HarnessState *state, uint32_t step) {
         && strcmp(recipe, "backward-turn-left-door-correct-back") == 0;
     const bool door_correct_back_right = recipe
         && strcmp(recipe, "backward-turn-left-door-correct-back-right") == 0;
+    const bool door_correct_back_left = recipe
+        && strcmp(recipe, "backward-turn-left-door-correct-back-left") == 0;
     if (turn_right || turn_left || door_left || door_right || door_correct
-        || door_correct_back || door_correct_back_right) {
+        || door_correct_back || door_correct_back_right
+        || door_correct_back_left) {
         state->left_y = 32767;
         if (step >= 360u && step < 1200u) {
             state->right_x = turn_right ? 32767 : -32768;
@@ -187,13 +190,15 @@ static void recipe_input(struct HarnessState *state, uint32_t step) {
         } else if ((door_correct || door_correct_back)
                    && step >= 1320u && step < 1800u) {
             state->left_y = door_correct_back ? -32768 : 32767;
-        } else if (door_correct_back_right && step >= 1320u
+        } else if ((door_correct_back_right || door_correct_back_left)
+                   && step >= 1320u
                    && step < 1560u) {
             state->left_y = -32768;
-        } else if (door_correct_back_right && step >= 1560u
+        } else if ((door_correct_back_right || door_correct_back_left)
+                   && step >= 1560u
                    && step < 1920u) {
             state->left_y = 0;
-            state->left_x = 32767;
+            state->left_x = door_correct_back_left ? -32768 : 32767;
         } else if ((door_left || door_right) && step >= 1200u) {
             state->left_y = 0;
             state->left_x = door_right ? 32767 : -32768;
