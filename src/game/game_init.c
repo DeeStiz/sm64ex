@@ -607,6 +607,15 @@ void setup_game_memory(void) {
 static struct LevelCommand *levelCommandAddr;
 static bool sAutomatedCastleArea2;
 static bool sAutomatedCastleArea2WarpRequested;
+static bool sAutomatedCastleWdwElevator;
+static bool sAutomatedCastleWdwElevatorArea2Requested;
+static bool sAutomatedCastleWdwElevatorWarpRequested;
+static bool sAutomatedCotmcLevelScript;
+static bool sAutomatedBbhGeo;
+static bool sAutomatedRrDonut;
+static bool sAutomatedJrbBreakParticles;
+static bool sAutomatedHmcPlatform;
+static bool sAutomatedSlMoneybag;
 
 /*
  * Request the area transition only after the compiled Castle Inside script
@@ -629,6 +638,42 @@ static void automated_castle_area2_transition_step(void) {
     sAutomatedCastleArea2WarpRequested = true;
 }
 
+/*
+ * Keep the WDW route on the authored Castle Inside painting-warp lifecycle.
+ * This is an opt-in owner-thread recipe for the focused route contract; it
+ * requests the compiled painting node and lets the normal warp/load path
+ * create WDW area 1 and its source object list.
+ */
+static void automated_castle_wdw_elevator_transition_step(void) {
+    if (!sAutomatedCastleWdwElevator || gCurrentArea == NULL
+        || gMarioState == NULL || gMarioState->action == ACT_UNINITIALIZED) {
+        return;
+    }
+
+    if (!sAutomatedCastleWdwElevatorArea2Requested
+        && gCurrLevelNum == LEVEL_CASTLE && gCurrentArea->index == 1) {
+        // The WDW painting nodes are authored in Castle Inside area 2.  Enter
+        // that room through its normal source warp before consuming node 0x18.
+        initiate_warp(LEVEL_CASTLE, 2, 0x35, 0);
+        sAutomatedCastleWdwElevatorArea2Requested = true;
+    } else if (!sAutomatedCastleWdwElevatorWarpRequested
+               && sAutomatedCastleWdwElevatorArea2Requested
+               && gCurrLevelNum == LEVEL_CASTLE
+               && gCurrentArea->index == 2) {
+        // Node 0x18 is the compiled WDW painting destination in the
+        // area-2 source list: LEVEL_WDW / area 1 / node 0x0A.
+        initiate_warp(LEVEL_WDW, 1, 0x0A, 0);
+        sCurrPlayMode = 4; /* PLAY_MODE_CHANGE_LEVEL (level_update.c) */
+        D_80339ECA = 0;
+        /* Keep the destination authoritative until the normal level-change
+         * owner consumes it; Mario's ordinary area update can otherwise
+         * publish a stale Castle warp during the fade. */
+        if (gCurrLevelNum == LEVEL_WDW) {
+            sAutomatedCastleWdwElevatorWarpRequested = true;
+        }
+    }
+}
+
 // main game loop thread. runs forever as long as the game
 // continues.
 void thread5_game_loop(UNUSED void *arg) {
@@ -647,19 +692,51 @@ void thread5_game_loop(UNUSED void *arg) {
     // The bounded gameplay gates run headlessly and must exercise real game
     // objects instead of depending on a window receiving title-screen input.
     // Keep this strictly opt-in: normal launches retain the stock intro and
-    // file-select path. The Bob-omb gate selects Battlefield while the Mario
-    // gate keeps the existing castle-grounds bootstrap.
+    // file-select path. The Bob-omb gate selects Battlefield, the level-script
+    // route selects the authored CotMC entry, the geo route selects authored
+    // BBH area 1, the Donut route selects the authored RR entry, the HMC
+    // platform route selects the authored HMC entry, the RNG route selects
+    // JRB act 4, and the Mario gate keeps the existing castle-grounds
+    // bootstrap.
     sAutomatedCastleArea2 = getenv("SM64_MODERN_AUTOMATED_CASTLE_AREA2") != NULL;
     sAutomatedCastleArea2WarpRequested = false;
+    sAutomatedCastleWdwElevator =
+        getenv("SM64_MODERN_AUTOMATED_CASTLE_WDW_ELEVATOR") != NULL;
+    sAutomatedCastleWdwElevatorArea2Requested = false;
+    sAutomatedCastleWdwElevatorWarpRequested = false;
     const bool automatedGameplay = getenv("SM64_MODERN_AUTOMATED_GAMEPLAY") != NULL;
     const bool automatedBobomb = getenv("SM64_MODERN_AUTOMATED_BOBOMB") != NULL;
-    if (automatedGameplay || automatedBobomb || sAutomatedCastleArea2) {
+    sAutomatedCotmcLevelScript =
+        getenv("SM64_MODERN_AUTOMATED_COTMC_LEVEL_SCRIPT") != NULL;
+    sAutomatedBbhGeo = getenv("SM64_MODERN_AUTOMATED_BBH_GEO") != NULL;
+    sAutomatedRrDonut = getenv("SM64_MODERN_AUTOMATED_RR_DONUT") != NULL;
+    sAutomatedJrbBreakParticles =
+        getenv("SM64_MODERN_AUTOMATED_JRB_BREAK_PARTICLES") != NULL;
+    sAutomatedHmcPlatform =
+        getenv("SM64_MODERN_AUTOMATED_HMC_PLATFORM") != NULL;
+    sAutomatedSlMoneybag =
+        getenv("SM64_MODERN_AUTOMATED_SL_MONEYBAG") != NULL;
+    if (automatedGameplay || automatedBobomb || sAutomatedCastleArea2
+        || sAutomatedCastleWdwElevator
+        || sAutomatedCotmcLevelScript || sAutomatedBbhGeo || sAutomatedRrDonut
+        || sAutomatedJrbBreakParticles || sAutomatedHmcPlatform
+        || sAutomatedSlMoneybag) {
         gCurrDemoInput = NULL;
         gCurrSaveFileNum = 1;
-        gCurrActNum = 1;
+        gCurrActNum = sAutomatedJrbBreakParticles ? 4 : 1;
         sm64_modern_level_script_set_register(
-            automatedBobomb ? LEVEL_BOB
-                            : (sAutomatedCastleArea2 ? LEVEL_CASTLE : LEVEL_CASTLE_GROUNDS));
+            sAutomatedSlMoneybag ? LEVEL_SL
+                            : (sAutomatedRrDonut ? LEVEL_RR
+                            : (automatedBobomb ? LEVEL_BOB
+                            : (sAutomatedCotmcLevelScript ? LEVEL_COTMC
+                                                          : (sAutomatedBbhGeo ? LEVEL_BBH
+                                                                              : (sAutomatedHmcPlatform ? LEVEL_HMC
+                                                                                 : ((sAutomatedCastleArea2
+                                                                                    || sAutomatedCastleWdwElevator)
+                                                                                 ? LEVEL_CASTLE
+                                                                                     : (sAutomatedJrbBreakParticles
+                                                                                        ? LEVEL_JRB
+                                                                                        : LEVEL_CASTLE_GROUNDS))))))));
         levelCommandAddr = (struct LevelCommand *) level_main_scripts_entry;
     }
 
@@ -689,6 +766,7 @@ void game_loop_one_iteration(void) {
     read_controller_inputs();
     levelCommandAddr = level_script_execute(levelCommandAddr);
     automated_castle_area2_transition_step();
+    automated_castle_wdw_elevator_transition_step();
     sm64_modern_bobomb_release_test_step();
     sm64_modern_mario_authority_test_step();
     sm64_modern_parity_capture_snapshots();
