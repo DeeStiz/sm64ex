@@ -65,7 +65,7 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 85f75 current status
+### Phase 85f79 current status
 
 The retained checked-in canonical state remains 534 behavior rows (511 Swift
 owners and 23 explicit C adapters) and 7,420 route shards: 25 non-fixture
@@ -347,6 +347,31 @@ fail-closed matrix. The authored Castle Inside painting route reached
 manifest, retained report, canonical route ledger, or acceptance state
 changed. Phase 85f74's earlier f73 status wording is corrected by this Phase
 85f75 documentation update.
+
+Phase 85f76 discovered the next disjoint source-owned candidate,
+`bhvSpindel`, at route row `0xdc93743116807bec`. The authored subject is the
+SSL area-2 `MODEL_SSL_SPINDEL` object in `script_func_local_4`, reached through
+the normal Castle Inside SSL painting route and its authored area-1 warp. The
+existing pointer-free Swift owner has contract `0x2f02c221a0c4104e`, but the
+source identity/receipt seam, native lifecycle pair, and admission remain
+pending; the row remains planned. The regenerated inventory remains 7,420
+rows with manifest SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715` and no
+manifest, report, ledger, or source mutation was performed.
+
+Phase 85f77 performed a read-only publication-action audit. The isolated
+serial candidate remains 26 terminal / 7,394 planned with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`; the
+retained canonical report remains 25 terminal / 7,395 planned with SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
+The f72/f69 outputs are byte-identical and eligible only for a separately
+authorized write-once designation; no report, manifest, ledger, or status
+publication was performed. Phase 85f78 is pending: no completed handoff
+exists, so no f78 result is claimed. The f79 refresh changes documentation
+only; retained live-route qualification remains `25/7420 = 0.336927224%`,
+the isolated qualification remains `26/7420 = 0.350404313%`, behavior mapping
+remains 95.693%, and M34, M35, human-acceptance, and full-goal floors remain
+0%.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -750,7 +775,11 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f72 serial publication readiness](.porting/porting-handoff-full-swift-twin-phase85f72-serial-publication-readiness.md),
 [Phase 85f73 Spindrift seam execute](.porting/porting-handoff-full-swift-twin-phase85f73-spindrift-seam-execute.md),
 [Phase 85f74 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f74-docs-refresh.md), and
-[Phase 85f75 Spindrift documentation correction](.porting/porting-handoff-full-swift-twin-phase85f75-docs-spindrift-correction.md).
+[Phase 85f75 Spindrift documentation correction](.porting/porting-handoff-full-swift-twin-phase85f75-docs-spindrift-correction.md),
+[Phase 85f76 Spindel discovery](.porting/porting-handoff-full-swift-twin-phase85f76-next-route-discovery.md),
+[Phase 85f77 publication-action audit](.porting/porting-handoff-full-swift-twin-phase85f77-publication-action-audit.md),
+Phase 85f78 pending (no completed handoff exists), and
+[Phase 85f79 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f79-docs-refresh.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).

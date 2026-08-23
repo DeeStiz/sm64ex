@@ -2,6 +2,29 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f79 documentation refresh (2026-08-23):** surfaces the Phase
+  85f76 authored SSL area-2 `bhvSpindel` discovery at route row
+  `0xdc93743116807bec` and the Phase 85f77 read-only publication-action audit.
+  The Spindel row remains planned: the existing pointer-free Swift owner has
+  contract `0x2f02c221a0c4104e`, but its source identity/receipt seam, native
+  lifecycle pair, and admission are pending. The f77 f72/f69 serial outputs
+  are byte-identical and remain eligible only for separately authorized
+  write-once designation; no designation or canonical publication occurred.
+  Phase 85f78 is pending because no completed handoff exists. Preserve the
+  retained 534 behavior rows (511 Swift owners, 23 explicit C adapters),
+  7,420 route rows with 25 terminal / 7,395 planned, manifest SHA-256
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+  retained report SHA-256
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+  isolated report SHA-256
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+  qualifications `25/7420 = 0.336927224%` and `26/7420 = 0.350404313%`,
+  behavior mapping 95.693%, and 0% M34/M35/human-acceptance/implementation
+  floors. Handoffs: `.porting/porting-handoff-full-swift-twin-phase85f76-next-route-discovery.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f77-publication-action-audit.md`,
+  pending Phase 85f78, and
+  `.porting/porting-handoff-full-swift-twin-phase85f79-docs-refresh.md`.
+
 - **Phase 85f75 current checkpoint (2026-08-23):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
@@ -732,8 +755,9 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f75
-checkpoint at the top of this section is the current ordered status.
+The repeated route notes below preserve prior phase evidence; the Phase 85f79
+checkpoint at the top of this section is the current ordered status. Phase
+85f78 remains pending because no completed handoff exists.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`
   identity is exact across the effect matrix and fences; parity next fails at
