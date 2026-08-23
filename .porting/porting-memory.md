@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f55 current checkpoint (2026-08-23):** the retained checked-in
+- **Phase 85f57 current checkpoint (2026-08-23):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -98,6 +98,17 @@
   matrix exits 77 before a trace or admission; no route record, manifest,
   retained report, or canonical ledger mutation occurred. No cog/static sibling
   substitution or synthetic trace was used.
+  Phase 85f56 ran the bounded TTC area-1 reachability audit. The owner-thread
+  probe ended at `level=14 (LEVEL_TTC), area=2, hands=0` and exited 77. Its
+  direct gate first enters Castle area 2 and then calls `initiate_warp` directly
+  for TTC node `0x0A`, bypassing the authored Castle Inside painting nodes
+  `0x21`–`0x23`; it therefore does not establish a source-authored TTC area-1
+  lifecycle. No C trace was opened or Swift trace written
+  (`trace=not-created`, `records=0`), and no C/Swift pairing, admission, route
+  record, manifest, retained report, or canonical ledger mutation occurred.
+  No cog/static sibling substitution or synthetic receipt was used, and the
+  TTC row `0x1af5669b06931d93` remains planned pending a genuine authored
+  painting route into TTC area 1.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -132,8 +143,10 @@
   `.porting/porting-handoff-full-swift-twin-phase85f51-docs-f49-correction.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f52-next-route-discovery.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f53-ttc-rotator-seam-execute.md`,
-  `.porting/porting-handoff-full-swift-twin-phase85f54-docs-refresh.md`, and
-  `.porting/porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f54-docs-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f56-ttc-area1-reachability.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and

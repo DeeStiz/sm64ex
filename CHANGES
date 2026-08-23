@@ -883,6 +883,26 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       `porting-handoff-full-swift-twin-phase85f54-docs-refresh.md`, and
       `porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md`. No
       source, manifest, report, route ledger, or acceptance state changed.
+233.) Reconcile Phase 85f57 documentation after the committed Phase 85f56
+      TTC area-1 reachability audit. The bounded owner-thread probe ends at
+      `level=14 (LEVEL_TTC), area=2, hands=0` and exits 77; its direct gate
+      bypasses authored Castle Inside painting nodes `0x21`–`0x23`, so it does
+      not establish a source-authored TTC area-1 lifecycle. No C trace was
+      opened or Swift trace written (`trace=not-created`, `records=0`), and
+      no C/Swift pairing, admission, route record, manifest, retained report,
+      or canonical ledger mutation occurred; TTC row
+      `0x1af5669b06931d93` remains planned. Preserve retained canonical
+      25/7,395 with manifest SHA-256
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+      report SHA-256
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+      `25/7420 = 0.336927224%`, isolated 26/7,394 with SHA-256
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+      `26/7420 = 0.350404313%`, and 0% M34/M35/human-acceptance/full-goal
+      floors while linking the ordered `f56 -> f57` handoffs:
+      `porting-handoff-full-swift-twin-phase85f56-ttc-area1-reachability.md`
+      and `porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md`.
+      No source, manifest, report, route ledger, or acceptance state changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

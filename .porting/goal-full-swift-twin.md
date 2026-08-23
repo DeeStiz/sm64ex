@@ -2,7 +2,7 @@
 
 ## Status
 
-### Phase 85f55 current status
+### Phase 85f57 current status
 
 The retained checked-in canonical state remains **534 behavior rows** (511
 Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -156,6 +156,18 @@ Inside painting route lands in `level=14 (LEVEL_TTC), area=2` with `hands=0`,
 so the matrix exits 77 before a trace or admission; no route record, manifest,
 retained report, or canonical ledger mutation occurred. No cog/static sibling
 substitution or synthetic trace was used.
+
+Phase 85f56 ran the bounded TTC area-1 reachability audit. The owner-thread
+probe ended at `level=14 (LEVEL_TTC), area=2, hands=0` and exited 77. Its
+direct gate first enters Castle area 2 and then calls `initiate_warp` directly
+for TTC node `0x0A`, bypassing the authored Castle Inside painting nodes
+`0x21`–`0x23`; it therefore does not establish a source-authored TTC area-1
+lifecycle. No C trace was opened or Swift trace written
+(`trace=not-created`, `records=0`), and no C/Swift pairing, admission, route
+record, manifest, retained report, or canonical ledger mutation occurred.
+No cog/static sibling substitution or synthetic receipt was used, and the
+TTC row `0x1af5669b06931d93` remains planned pending a genuine authored
+painting route into TTC area 1.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -1043,7 +1055,9 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f52 TTC 2D rotator discovery](porting-handoff-full-swift-twin-phase85f52-next-route-discovery.md),
 [Phase 85f53 TTC 2D rotator seam](porting-handoff-full-swift-twin-phase85f53-ttc-rotator-seam-execute.md),
 [Phase 85f54 documentation refresh](porting-handoff-full-swift-twin-phase85f54-docs-refresh.md),
-and [Phase 85f55 documentation correction](porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md).
+[Phase 85f55 documentation correction](porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md),
+[Phase 85f56 TTC area-1 reachability audit](porting-handoff-full-swift-twin-phase85f56-ttc-area1-reachability.md),
+and [Phase 85f57 documentation refresh](porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

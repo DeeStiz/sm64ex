@@ -43,7 +43,9 @@ synthetic trace was used.
 
 The ordered correction history is [Phase 85f53 TTC 2D rotator seam](porting-handoff-full-swift-twin-phase85f53-ttc-rotator-seam-execute.md),
 [Phase 85f54 documentation refresh](porting-handoff-full-swift-twin-phase85f54-docs-refresh.md),
-and [Phase 85f55 TTC documentation correction](porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md).
+[Phase 85f55 TTC documentation correction](porting-handoff-full-swift-twin-phase85f55-docs-ttc-correction.md),
+[Phase 85f56 TTC area-1 reachability audit](porting-handoff-full-swift-twin-phase85f56-ttc-area1-reachability.md),
+and [Phase 85f57 documentation refresh](porting-handoff-full-swift-twin-phase85f57-docs-ttc-blocker-refresh.md).
 
 ## Documentation files changed
 
