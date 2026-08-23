@@ -6,11 +6,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "behavior_data.h"
 #include "game/area.h"
 #include "game/game_init.h"
 #include "game/level_update.h"
 #include "game/mario.h"
+#include "game/object_list_processor.h"
 #include "level_table.h"
+#include "object_constants.h"
+#include "object_fields.h"
 #include "pc/sm64_modern_timebase.h"
 #include "sm64_modern.h"
 
@@ -236,16 +240,40 @@ static void log_state(uint32_t step) {
     const int level = gCurrLevelNum;
     const int area = gCurrentArea ? gCurrentArea->index : -1;
     const struct MarioState *mario = gMarioState;
+    const BehaviorScript *door_warp = segmented_to_virtual(bhvDoorWarp);
+    uint32_t door_count = 0u;
+    float nearest_door_distance_sq = -1.0f;
+    for (uint32_t index = 0; index < OBJECT_POOL_CAPACITY; ++index) {
+        const struct Object *object = &gObjectPool[index];
+        if ((object->activeFlags & ACTIVE_FLAG_ACTIVE) == 0
+            || object->behavior != door_warp) {
+            continue;
+        }
+        door_count++;
+        if (gMarioState) {
+            const float dx = gMarioState->pos[0] - object->oPosX;
+            const float dy = gMarioState->pos[1] - object->oPosY;
+            const float dz = gMarioState->pos[2] - object->oPosZ;
+            const float distance_sq = dx * dx + dy * dy + dz * dz;
+            if (nearest_door_distance_sq < 0.0f
+                || distance_sq < nearest_door_distance_sq) {
+                nearest_door_distance_sq = distance_sq;
+            }
+        }
+    }
     fprintf(stdout,
             "castle_ssl_recipe_step=%u level=%d area=%d action=0x%08" PRIx32
-            " pos=(%.1f,%.1f,%.1f) face_yaw=%d camera_yaw=%d floor_type=%d\n",
+            " pos=(%.1f,%.1f,%.1f) face_yaw=%d camera_yaw=%d floor_type=%d"
+            " door_warps=%u nearest_door_distance_sq=%.1f collided=0x%08" PRIx32 "\n",
             step, level, area, mario ? mario->action : 0u,
             mario ? mario->pos[0] : 0.0f,
             mario ? mario->pos[1] : 0.0f,
             mario ? mario->pos[2] : 0.0f,
             mario ? mario->faceAngle[1] : 0,
             gCurrentArea && gCurrentArea->camera ? gCurrentArea->camera->yaw : 0,
-            mario && mario->floor ? mario->floor->type : -1);
+            mario && mario->floor ? mario->floor->type : -1,
+            door_count, nearest_door_distance_sq,
+            mario && mario->marioObj ? mario->marioObj->collidedObjInteractTypes : 0u);
 }
 
 static int run_route(const char *save_directory) {
