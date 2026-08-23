@@ -19,13 +19,33 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f27 current evidence checkpoint
+### Phase 85f34 current evidence checkpoint
 
-The frozen implementation counters remain **534 behavior rows** (**511 Swift
-value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
-(**25 non-fixture terminal passed**, **7,395 planned**). Behavior mapping is
-95.693%, live-route qualification is 0.336927224%, and the conservative
-full-goal/acceptance floors remain 0%; these ledgers are not averaged.
+The retained checked-in canonical state remains **534 behavior rows** (**511
+Swift value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
+(**25 non-fixture terminal passed**, **7,395 planned**). Its manifest SHA-256 is
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`, and its
+retained cumulative report SHA-256 is
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
+Retained live-route qualification is `25/7420 = 0.336927224%`; behavior
+mapping is 95.693%, and the conservative M34, M35, human-acceptance, and
+full-goal floors remain 0%; these ledgers are not averaged.
+
+Phase 85f30 committed the source-authored intro transition pair with exact
+C/Swift/ASan/Release/rerun evidence; canonical admission was deferred at that
+stage. Phase 85f31 committed the source-owned camera-water seam, but runtime
+remains blocked: the ordinary owner-thread recipe did not reach authored DDD
+area 1; the focused gate failed closed with exit 77 and emitted no route
+record or admission.
+Phase 85f32 then admitted the authored intro shard
+`0x9a0f7b4f7ecf6c41` in an isolated root. Phase 85f33 performed a guarded,
+phase-local merge: its isolated report contains 26 terminal and 7,394 planned
+rows with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, for
+`26/7420 = 0.350404313%`. The phase-local canonical ID mapping is
+`0x9a0f7b4f7ecf6c41 -> 0xca33981b30cb7815`; this
+isolated result is not the checked-in canonical state, and no canonical
+manifest or retained report was overwritten.
 
 Phases 85aq–85as completed disjoint Luna-max route-family triage and authored
 level/transition reachability attempts without promoting a row. Phase 85ar
@@ -209,6 +229,11 @@ broad/physical/release/human gates are open.
 - **[Phase 85f25](porting-handoff-full-swift-twin-phase85f25-transition-route.md):** reaches the authored intro transition at the 155-step window, but Swift rejects the trace as `out_of_order` at its tick-2 ordering contract; no pair or admission is claimed.
 - **[Phase 85f26](porting-handoff-full-swift-twin-phase85f26-camera-floor-route.md):** identifies authored DDD/JRB camera-water candidates, but the generic collision receipt lacks camera call-site identity; no new route qualifies.
 - **[Phase 85f27](porting-handoff-full-swift-twin-phase85f27-docs-refresh.md):** refreshes current-status surfaces and ordered f-series links without changing source, manifest, route report, or acceptance claims.
+- **[Phase 85f30](porting-handoff-full-swift-twin-phase85f30-transition-seam-execute.md):** commits the source-authored intro transition pair with exact C/Swift/ASan/Release/rerun evidence; canonical admission is deferred.
+- **[Phase 85f31](porting-handoff-full-swift-twin-phase85f31-camera-water-seam-execute.md):** commits the camera-water seam but fails closed because the ordinary lifecycle does not reach authored DDD area 1; no route record or admission is produced.
+- **[Phase 85f32](porting-handoff-full-swift-twin-phase85f32-intro-transition-admission.md):** admits authored intro shard `0x9a0f7b4f7ecf6c41` in an isolated root without mutating canonical artifacts.
+- **[Phase 85f33](porting-handoff-full-swift-twin-phase85f33-intro-transition-canonical-merge.md):** passes a guarded phase-local merge with an isolated 26/7,394 report, SHA `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, and mapping to canonical ID `0xca33981b30cb7815`; checked-in canonical state remains 25/7,395.
+- **[Phase 85f34](porting-handoff-full-swift-twin-phase85f34-docs-refresh.md):** refreshes current-status surfaces and ordered links while preserving the retained canonical state and 0% M34/M35/human floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1225,7 +1250,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f27 entry are authoritative for the latest checkpoint.
+and the Phase 85f34 entry are authoritative for the latest checkpoint.
 
 ### 85du — Tank-fish mapping — complete / fail-closed
 

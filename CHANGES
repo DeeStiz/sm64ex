@@ -733,6 +733,29 @@ SM64 Modern native macOS — nightly continuation update (2026-08-22)
       `aa8eadcb…bf87c3d`, 0.336927224% live-route rate, 95.693% behavior
       mapping, and 0% conservative floors while linking Phases 85f23–85f26 in
       order. No source, manifest, route report, or acceptance claim changed.
+210.) Record committed Phase 85f30's source-authored intro transition pair.
+      The exact C/Swift/ASan/Release/rerun seam passes, while canonical
+      admission remains deferred and no manifest, report, or ledger changes.
+211.) Record committed Phase 85f31's source-owned camera-water seam. Runtime
+      remains blocked: the ordinary owner-thread recipe does not reach authored
+      DDD area 1, so the focused gate fails closed with exit 77 and emits no
+      route record or admission; canonical artifacts remain unchanged.
+212.) Record committed Phase 85f32's isolated admission of authored intro
+      shard `0x9a0f7b4f7ecf6c41`; the isolated report/proof and phase-local
+      fences pass without mutating the checked-in manifest, report, or ledger.
+213.) Record committed Phase 85f33's guarded phase-local merge. The isolated
+      report is 26 terminal / 7,394 planned with SHA
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, or
+      `26/7420 = 0.350404313%`; phase-local canonical ID mapping is
+      `0x9a0f7b4f7ecf6c41 -> 0xca33981b30cb7815`. The retained checked-in
+      canonical state remains 25/7,395 with report SHA `aa8eadcb…bf87c3d` and
+      manifest SHA `23c9d3f1…2b715`; the isolated result is not checked-in
+      canonical state.
+214.) Reconcile Phase 85f34 documentation. Preserve the retained canonical
+      7,420-row manifest, 25/7,395 report, exact retained rate
+      `25/7420 = 0.336927224%`, isolated rate `26/7420 = 0.350404313%`, and
+      0% M34/M35/human-acceptance floors while linking Phases 85f30–85f33 in
+      order. No source, manifest, retained report, or acceptance claim changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

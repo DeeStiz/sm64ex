@@ -2,42 +2,42 @@
 
 ## Latest validated slices (2026-08-22)
 
-- **Phase 85f27 current checkpoint (2026-08-22):** the authoritative current
-  state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
-  7,420 route rows with 25 terminal / 7,395 planned; live-route qualification
-  is `25/7,420 = 0.336927224%`, behavior mapping is 95.693%, and conservative
-  implementation and acceptance floors remain 0%. Phase 85f18's DDD Sushi seam
-  remains planned without a pointer-free owner/query receipt; Phase 85f19's BBH
-  display-list seam remains planned without a source-defined pointer-free
-  owner/packet receipt. Phase 85f20 finds one display offline,
-  `gputoolsserviced` stopped, no active GPU session, and thermal state unknown;
-  Phase 85f21's ordinary-Xcode 26.6 M35 contracts pass but Developer ID/notary
-  prerequisites are absent. Phase 85f22 regenerated the manifest
-  deterministically with SHA
-  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`, verified
-  the retained report SHA
-  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`, and
-  found the historical full replay's transient pendulum artifact expired.
-  Phase 85f24 found authored reachability in five of six environment-effect
-  rows but no pointer-free RNG/floor/water value receipt. Phase 85f25 reached
-  the authored intro transition at 155 owner steps, while the existing Swift
-  script observer rejected the trace as `out_of_order` at its tick-2 contract.
-  Phase 85f26 identified authored DDD/JRB camera-water candidates, but the
-  generic collision receipt lacks camera call-site identity; no new route
-  qualifies. The Phase 85f23–85f26 evidence and this refresh are recorded in
-  the ordered handoffs below.
-  Handoffs:
+- **Phase 85f34 current checkpoint (2026-08-22):** the retained checked-in
+  canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
+  adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
+  manifest SHA is
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`; the
+  retained report SHA is
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`;
+  retained live-route qualification is `25/7420 = 0.336927224%`, behavior
+  mapping is 95.693%, and conservative M34, M35, human-acceptance, and
+  implementation floors remain 0%. Phase 85f30 committed the exact
+  source-authored intro transition pair. Phase 85f31 committed the
+  camera-water seam but runtime remains blocked: it failed closed with exit 77
+  because the ordinary lifecycle did not reach authored DDD area 1. Phase 85f32
+  admitted intro shard `0x9a0f7b4f7ecf6c41` in isolation; Phase 85f33's guarded
+  phase-local merge produced 26 terminal / 7,394 planned with SHA
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, or
+  `26/7420 = 0.350404313%`, with phase-local canonical ID mapping
+  `0x9a0f7b4f7ecf6c41 -> 0xca33981b30cb7815`. The isolated result is not
+  checked-in canonical state and did not overwrite the retained manifest/report.
+  Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f20-m34-reaudit.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f21-m35-preflight.md`,
-  `.porting/porting-handoff-full-swift-twin-phase85f22-canonical-audit.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f22-canonical-audit.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f23-docs-current-refresh.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f24-envfx-rng-route.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f25-transition-route.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f26-camera-floor-route.md`,
-  and this current-status refresh is recorded in
-  `.porting/porting-handoff-full-swift-twin-phase85f27-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f27-docs-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f30-transition-seam-execute.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f31-camera-water-seam-execute.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f32-intro-transition-admission.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f33-intro-transition-canonical-merge.md`,
+  and this refresh is recorded in
+  `.porting/porting-handoff-full-swift-twin-phase85f34-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -524,7 +524,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f27
+The repeated route notes below preserve prior phase evidence; the Phase 85f34
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`

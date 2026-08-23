@@ -16,14 +16,33 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-22).
 
-### Phase 85f27 current status
+### Phase 85f34 current status
 
-The authoritative current counters remain **534 behavior rows** (511 Swift
-value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
-twenty-five non-fixture terminal passed rows and 7,395 planned. Behavior mapping
-is 95.693% and live-route qualification is 0.336927224%; the conservative
-full-goal and acceptance floors remain 0%. These are separate ledgers, not an
-average.
+The retained checked-in canonical state remains **534 behavior rows** (511
+Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
+25 non-fixture terminal passed rows and 7,395 planned. Its manifest SHA-256 is
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`, and its
+retained cumulative report SHA-256 is
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
+Retained live-route qualification is `25/7420 = 0.336927224%`; behavior
+mapping is 95.693%, and the conservative M34, M35, human-acceptance, and
+full-goal floors remain 0%. These are separate ledgers, not an average.
+
+Phase 85f30 committed the source-authored intro transition pair with exact
+C/Swift/ASan/Release/rerun evidence; canonical admission was deferred at that
+stage. Phase 85f31 committed the source-owned camera-water seam, but runtime
+remains blocked: the ordinary owner-thread recipe did not reach authored DDD
+area 1; the focused gate failed closed with exit 77 and emitted no route
+record or admission.
+Phase 85f32 then admitted the authored intro shard
+`0x9a0f7b4f7ecf6c41` in an isolated root. Phase 85f33 performed a guarded,
+phase-local merge: its isolated report contains 26 terminal and 7,394 planned
+rows with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, for
+`26/7420 = 0.350404313%`. The phase-local canonical ID mapping is
+`0x9a0f7b4f7ecf6c41 -> 0xca33981b30cb7815`; this
+isolated result is not the checked-in canonical state, and no canonical
+manifest or retained report was overwritten.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -802,7 +821,12 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f24 envfx RNG route discovery](../.porting/porting-handoff-full-swift-twin-phase85f24-envfx-rng-route.md),
 [Phase 85f25 authored transition route](../.porting/porting-handoff-full-swift-twin-phase85f25-transition-route.md),
 [Phase 85f26 camera/water route discovery](../.porting/porting-handoff-full-swift-twin-phase85f26-camera-floor-route.md),
-and [Phase 85f27 current-status documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f27-docs-refresh.md).
+[Phase 85f27 current-status documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f27-docs-refresh.md),
+[Phase 85f30 intro transition seam pair](../.porting/porting-handoff-full-swift-twin-phase85f30-transition-seam-execute.md),
+[Phase 85f31 camera-water seam](../.porting/porting-handoff-full-swift-twin-phase85f31-camera-water-seam-execute.md),
+[Phase 85f32 intro transition isolated admission](../.porting/porting-handoff-full-swift-twin-phase85f32-intro-transition-admission.md),
+[Phase 85f33 intro transition phase-local guarded merge](../.porting/porting-handoff-full-swift-twin-phase85f33-intro-transition-canonical-merge.md),
+and [Phase 85f34 current-status documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f34-docs-refresh.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),
