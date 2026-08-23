@@ -65,7 +65,7 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 85f63 current status
+### Phase 85f66 current status
 
 The retained checked-in canonical state remains 534 behavior rows (511 Swift
 owners and 23 explicit C adapters) and 7,420 route shards: 25 non-fixture
@@ -265,6 +265,21 @@ identity, but its focused runtime matrix failed closed at
 pair, admission, route record, manifest/report mutation, or canonical ledger
 mutation was produced; no direct level load, object injection, variant
 substitution, or synthetic trace was used.
+
+Phase 85f64 ran the non-destructive serial canonical-merge dry-run. Its
+preflight fails closed because four retained Phase 85f4 pendulum proof
+artifacts have expired, so no first-stage or final output was written and no
+publication was performed. No retained proof, report, manifest, route ledger,
+or other canonical artifact was substituted or rewritten.
+
+Phase 85f65 performed an isolated timebase-fixture proposal. The retained
+audit still fails on exactly two intentional inventory deltas:
+`object_timer` is `166 files/715 matches` in the fixture versus `166/718`
+currently, and `random_calls` is `79 files/289 matches` versus `79/290`.
+The three WDW/TTC timer receipt fields and one TTC `.random_u16` receipt label
+account for those rows; actual RNG-call syntax remains 289. The proposal
+changes only those two fixture rows and was not applied, so the retained
+fixture and audit remain unchanged.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -656,7 +671,10 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f60 acceptance-state audit](.porting/porting-handoff-full-swift-twin-phase85f60-acceptance-state-audit.md),
 [Phase 85f61 timebase-drift diagnosis](.porting/porting-handoff-full-swift-twin-phase85f61-timebase-drift-diagnosis.md),
 [Phase 85f62 Bob seesaw seam](.porting/porting-handoff-full-swift-twin-phase85f62-seesaw-seam-execute.md),
-and [Phase 85f63 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f63-docs-refresh.md).
+[Phase 85f63 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f63-docs-refresh.md),
+[Phase 85f64 serial merge dry-run](.porting/porting-handoff-full-swift-twin-phase85f64-serial-merge-dryrun.md),
+[Phase 85f65 timebase fixture proposal](.porting/porting-handoff-full-swift-twin-phase85f65-timebase-fixture-proposal.md),
+and [Phase 85f66 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f66-docs-refresh.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).

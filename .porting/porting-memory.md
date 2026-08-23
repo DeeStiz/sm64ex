@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f63 current checkpoint (2026-08-23):** the retained checked-in
+- **Phase 85f66 current checkpoint (2026-08-23):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -131,7 +131,15 @@
   closed at `level=1 area=1 object=0` with exit 77; no source-reachable
   receipt, C/Swift pair, admission, route record, manifest/report mutation,
   or canonical ledger mutation was produced. M34, M35, human-acceptance, and
-  implementation/full-goal floors remain 0%.
+  implementation/full-goal floors remain 0%. Phase 85f64 ran the
+  non-destructive serial canonical-merge dry-run, but preflight failed closed
+  because four retained Phase 85f4 pendulum proof artifacts had expired; no
+  first-stage/final output or publication was produced. Phase 85f65 validated
+  an isolated timebase-fixture proposal while the retained audit still fails
+  on exactly two intentional deltas: `object_timer` 715 -> 718 matches and
+  `random_calls` 289 -> 290 inventory matches. The WDW/TTC receipt fields
+  account for the drift, actual RNG-call syntax remains 289, and the fixture
+  update was not applied.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -174,8 +182,11 @@
   `.porting/porting-handoff-full-swift-twin-phase85f59-publication-wrapper-audit.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f60-acceptance-state-audit.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f61-timebase-drift-diagnosis.md`,
-  `.porting/porting-handoff-full-swift-twin-phase85f62-seesaw-seam-execute.md`, and
-  `.porting/porting-handoff-full-swift-twin-phase85f63-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f62-seesaw-seam-execute.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f63-docs-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f64-serial-merge-dryrun.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f65-timebase-fixture-proposal.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f66-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -662,7 +673,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f63
+The repeated route notes below preserve prior phase evidence; the Phase 85f66
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`

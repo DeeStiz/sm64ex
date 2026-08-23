@@ -927,6 +927,27 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       `porting-handoff-full-swift-twin-phase85f62-seesaw-seam-execute.md`, and
       `porting-handoff-full-swift-twin-phase85f63-docs-refresh.md`. No source,
       manifest, report, route ledger, or acceptance state changed.
+235.) Reconcile Phase 85f66 documentation after the f64 serial-merge dry-run
+      and f65 timebase-fixture proposal. The non-destructive serial dry-run
+      fails closed because four retained Phase 85f4 pendulum proof artifacts
+      expired; no first-stage/final output or publication was produced. The
+      retained timebase audit still fails on exactly two intentional deltas:
+      `object_timer` 715 -> 718 and `random_calls` 289 -> 290 inventory
+      matches; actual RNG-call syntax remains 289 and the fixture update was
+      not applied. Preserve retained canonical 25/7,395 with manifest SHA-256
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+      report SHA-256
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+      `25/7420 = 0.336927224%`, isolated intro 26/7,394 with SHA-256
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+      `26/7420 = 0.350404313%`, and 0% M34/M35/human-acceptance/full-goal
+      floors while linking the ordered `f63 -> f64 -> f65 -> f66` handoffs:
+      `porting-handoff-full-swift-twin-phase85f63-docs-refresh.md`,
+      `porting-handoff-full-swift-twin-phase85f64-serial-merge-dryrun.md`,
+      `porting-handoff-full-swift-twin-phase85f65-timebase-fixture-proposal.md`,
+      and `porting-handoff-full-swift-twin-phase85f66-docs-refresh.md`. No
+      source, manifest, report, fixture, route ledger, publication, or
+      acceptance state changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
