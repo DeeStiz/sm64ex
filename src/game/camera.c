@@ -30,6 +30,8 @@
 #include "level_table.h"
 #include "pc/configfile.h"
 #include "pc/sm64_modern_camera_migration.h"
+#include "pc/sm64_modern_camera_find_floor_route_identity.h"
+#include "pc/sm64_modern_camera_water_route_identity.h"
 
 #define CBUTTON_MASK (U_CBUTTONS | D_CBUTTONS | L_CBUTTONS | R_CBUTTONS)
 
@@ -2466,6 +2468,20 @@ static s32 sm64_modern_camera_evaluate_callback(
         } else {
             input.water_height = find_water_level(
                 sMarioCamState->pos[0], sMarioCamState->pos[2]);
+            (void) sm64_modern_camera_water_route_observe(
+                mode,
+                gCurrLevelNum,
+                gCurrAreaIndex,
+                pos[0], pos[1], pos[2],
+                sMarioCamState->pos[0],
+                sMarioCamState->pos[1],
+                sMarioCamState->pos[2],
+                sMarioCamState->pos[0],
+                sMarioCamState->pos[2],
+                input.water_height,
+                SM64_MODERN_CAMERA_WATER_ROUTE_FLAG_QUERY_EXECUTED
+                    | ((input.water_height > -11000.f)
+                        ? SM64_MODERN_CAMERA_WATER_ROUTE_FLAG_HAS_HEIGHT : 0u));
             if (input.water_height > -11000.f) {
                 input.geometry_flags |=
                     SM64_MODERN_CAMERA_CALLBACK_HAS_WATER_HEIGHT;

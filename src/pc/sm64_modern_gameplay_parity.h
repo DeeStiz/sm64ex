@@ -42,6 +42,7 @@ void sm64_modern_parity_record_rng_draw(uint32_t event_id,
 #define SM64_MODERN_ORACLE_COLLISION_EVENT_CEIL 2u
 #define SM64_MODERN_ORACLE_COLLISION_EVENT_WALL 3u
 #define SM64_MODERN_ORACLE_COLLISION_EVENT_ENVIRONMENT 4u
+#define SM64_MODERN_ORACLE_CAMERA_EVENT_WATER_QUERY 307u
 void sm64_modern_parity_record_collision_query(uint32_t event_id,
                                                const uint64_t *values,
                                                uint32_t value_count);

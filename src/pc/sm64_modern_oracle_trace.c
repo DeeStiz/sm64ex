@@ -1,9 +1,11 @@
 #include <stdbool.h>
 #include <stddef.h>
+#include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 
 #include "sm64_modern.h"
+#include "pc/sm64_modern_gameplay_parity.h"
 
 #define ORACLE_FNV_OFFSET UINT64_C(1469598103934665603)
 #define ORACLE_FNV_PRIME UINT64_C(1099511628211)
@@ -79,6 +81,8 @@ static const OracleInventoryRaw sInventory[] = {
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_CAMERA, SM64_MODERN_FIELD_CAMERA_NEXT_YAW),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_CAMERA, SM64_MODERN_FIELD_CAMERA_FOCUS),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_CAMERA, SM64_MODERN_FIELD_CAMERA_POSITION),
+    INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_CAMERA,
+                    SM64_MODERN_ORACLE_CAMERA_EVENT_WATER_QUERY),
 
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_SCRIPT, 1u),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_SCRIPT, 2u),
@@ -484,6 +488,11 @@ uint32_t sm64_modern_oracle_trace_is_active(void) {
 
 uint64_t sm64_modern_oracle_trace_simulation_tick(void) {
     return sSimulationTick;
+}
+
+uint32_t sm64_modern_oracle_trace_next_sequence(
+    SM64ModernOracleTraceDomain domain) {
+    return valid_domain(domain) ? sSequence[domain] : 0u;
 }
 
 uint32_t sm64_modern_oracle_inventory_count(void) {
