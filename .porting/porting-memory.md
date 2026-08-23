@@ -2,6 +2,23 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f113 documentation/M34/M35 route (2026-08-23):** records the
+  real Castle→SSL owner-thread probe from Phase 85f110: 1,800 steps stayed at
+  `level=16 area=1` with `pokey_objects=0`, exited `77`, and created no trace,
+  receipt, C/Swift runtime pair, or admission. Phase 85f111 leaves the M34
+  host gate at `m34_host_ready=0` because the display is offline, the console
+  is locked, and `gputoolsserviced`/GPU tooling is unavailable; thermal state
+  is unknown. Phase 85f112's M35 contracts pass, but no Developer ID
+  identity/private key or supported notary authentication exists, so no
+  archive/export/notarization/stapling/clean-machine/human evidence exists.
+  Preserve the designated 26/7,394 and backup 25/7,395 reports at their
+  existing hashes, route and behavior manifest hashes, 95.693% mapping, and
+  0% M34/M35/human/full floors. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f110-pokey-runtime-route.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f111-m34-production-audit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md`.
+
 - **Phase 85f109 Pokey documentation correction (2026-08-23):** corrects the
   Phase 85f108 status surfaces and existing f108 handoff with Phase 85f107's
   strengthened static schema-4 C/Swift pair. The initial seam is `22d44cba`;

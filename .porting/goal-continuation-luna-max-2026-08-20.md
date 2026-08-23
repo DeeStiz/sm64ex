@@ -21,6 +21,47 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
+### Phase 85f113 current evidence checkpoint
+
+Phase 85f110 ran the real source-backed Castle→SSL owner-thread probe for
+1,800 steps. It stayed at `level=16 area=1` (Castle Grounds), observed
+`pokey_objects=0`, and exited `77`; no trace, native receipt, C/Swift runtime
+pair, route admission, report/ledger/manifest mutation, or canonical promotion
+exists. The strengthened f109 static pair remains static-only; no direct SSL
+load/warp, synthetic object, or helper/probe substitution was used.
+
+Phase 85f111's read-only M34 audit leaves `m34_host_ready=0` because the
+display is offline, the console session is locked, and `gputoolsserviced`/GPU
+tooling is unavailable. Thermal state is unknown. No current Release launch,
+capture/replay, attachment/pixel, cadence/soak, direct-display, physical, or
+human evidence is admissible.
+
+Phase 85f112's M35 readiness and distribution contracts pass, but no valid
+Developer ID Application identity/private-key pair or supported `notarytool`
+authentication is present. No archive/export, notarization/stapling, signed
+DMG/ZIP, clean-machine Gatekeeper/first-launch, or human acceptance evidence
+exists.
+
+The designated local canonical report remains 7,420 rows with 26 terminal
+`passed` and 7,394 `planned` (`26/7394`; `26/7420 = 0.350404313%`) at
+SHA-256 `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`.
+The byte-identical write-once backup remains 25 terminal `passed` and 7,395
+`planned` (`25/7395`; `25/7420 = 0.336927224%`) at SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
+The route manifest remains unchanged at SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`, and
+the behavior manifest remains unchanged at SHA-256
+`83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`.
+Behavior mapping remains 95.693%, and the conservative M34, M35,
+human-acceptance, implementation, and full-goal floors remain 0%.
+
+Ordered handoffs: [Phase 85f110 Pokey runtime route](porting-handoff-full-swift-twin-phase85f110-pokey-runtime-route.md),
+[Phase 85f111 M34 production audit](porting-handoff-full-swift-twin-phase85f111-m34-production-audit.md),
+[Phase 85f112 M35 distribution audit](porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md), and
+[Phase 85f113 documentation/M34/M35 route](porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md).
+No source, report, route ledger, manifest, release, store, credential,
+publication, or acceptance state changed.
+
 ### Phase 85f107 current evidence checkpoint
 
 Phase 85f106 selected SSL `bhvPokey` parent row `0x132a22db8f8e0945` and
@@ -763,6 +804,10 @@ broad/physical/release/human gates are open.
 - **[Phase 85f107](porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md):** commits the static Pokey parent/child source-contract seam (`22d44cba`), but no runtime receipt or admission exists.
 - **[Phase 85f108](porting-handoff-full-swift-twin-phase85f108-docs-refresh.md):** reconciles all first-party status surfaces with the Pokey static-only verdict, exact counters/hashes, and ordered f106–f108 handoffs.
 - **[Phase 85f109](porting-handoff-full-swift-twin-phase85f109-docs-pokey-correction.md):** corrects the f107 static seam record with the strengthened C/Swift schema-4 pair, exact fingerprints, source tuple/event-order evidence, and unchanged counters/hashes/floors.
+- **[Phase 85f110](porting-handoff-full-swift-twin-phase85f110-pokey-runtime-route.md):** runs the real Castle→SSL owner-thread probe for 1,800 steps; it stays at `level=16 area=1`, observes `pokey_objects=0`, exits 77, and creates no trace, receipt, or admission.
+- **[Phase 85f111](porting-handoff-full-swift-twin-phase85f111-m34-production-audit.md):** rechecks M34 with `m34_host_ready=0` from the offline display, locked console, unavailable GPU tooling, and unknown thermal state.
+- **[Phase 85f112](porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md):** rechecks M35 contracts; no Developer ID identity/private key or notary authentication exists, so no distribution or human evidence is available.
+- **[Phase 85f113](porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md):** reconciles the current route/M34/M35 checkpoint, exact counters/hashes, and 0% floors across the first-party surfaces.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
