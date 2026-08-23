@@ -66,7 +66,8 @@ Trailing-whitespace audit for the same seven files
 git -c core.fsmonitor=false diff --check -- README.md docs/SM64Modern.md \
   .porting/goal-full-swift-twin.md \
   .porting/goal-continuation-luna-max-2026-08-20.md \
-  .porting/porting-memory.md CHANGES
+  .porting/porting-memory.md CHANGES \
+  .porting/porting-handoff-full-swift-twin-phase85f38-docs-final-refresh.md
 ```
 
 No build, runtime, route-pair, sanitizer, manifest, report, M34, M35, or
