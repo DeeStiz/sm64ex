@@ -815,6 +815,32 @@ SM64 Modern native macOS — nightly continuation update (2026-08-22)
       human-acceptance floors while linking Phases 85f39–85f42 and this refresh
       in order. No source, manifest, report, route ledger, or acceptance claim
       changed.
+224.) Record Phase 85f44's isolated-admission inventory. The retained report
+      remains exactly 25 terminal / 7,395 planned; one unrepresented,
+      source-authored, `fixture_only=0`, hash-valid candidate is the Phase
+      85f33 intro report, guarded from local ID `0x9a0f7b4f7ecf6c41` to
+      canonical ID `0xca33981b30cb7815`. Its phase-local report remains
+      26/7,394, no other isolated evidence is admissible, and no canonical
+      artifact changed.
+225.) Record Phase 85f45's authored WDW express-elevator discovery. Dynamic
+      `bhvWdwExpressElevator` candidate `0x6e6c6a0fc1b92a45` has an authored
+      area-1 lifecycle and an existing Swift value/owner route; static sibling
+      `0xd52a32f6de0311da` is excluded. A source-bound C observer/semantic
+      identity and live C/Swift pair remain required; no admission or merge
+      occurred.
+226.) Record Phase 85f46's bounded Metal 4 contract re-audit. Source,
+      archive/presentation, capture-archive guard, M9 readiness, timebase, and
+      shell contracts pass, but the visible-host gate remains
+      `m34_host_ready=0` with an offline display, locked session, no GPU
+      session, stopped GPU tooling, and unknown thermal state. Runtime capture,
+      replay, pixel, cadence, soak, and direct-display evidence remain
+      inadmissible; M34 remains 0%.
+227.) Reconcile Phase 85f48 first-party documentation. Preserve exact retained
+      25/7,395 and isolated 26/7,394 facts, the 0% M34/M35/human-acceptance
+      floors, and ordered Phase 85f44–85f46 links. Phase 85f47 is explicitly
+      pending because no handoff/result is present; no f47 outcome, counter, or
+      acceptance claim is asserted. No source, manifest, report, route ledger,
+      or acceptance state changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-22)
 
-- **Phase 85f43 current checkpoint (2026-08-22):** the retained checked-in
+- **Phase 85f48 current checkpoint (2026-08-22):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -55,7 +55,20 @@
   display, locked session, stopped GPU tooling, absent fresh traces, and
   unknown thermal state. Phase 85f42's fresh M35 re-audit leaves distribution
   blocked by zero valid Developer ID identities and unavailable notary auth.
-  M34, M35, and human-acceptance floors remain 0%.
+  M34, M35, and human-acceptance floors remain 0%. Phase 85f44's isolated
+  admission inventory found exactly one unrepresented source-authored,
+  `fixture_only=0`, hash-valid candidate: the Phase 85f33 intro report mapped
+  from local ID `0x9a0f7b4f7ecf6c41` to canonical ID `0xca33981b30cb7815`;
+  the phase-local result remains 26 terminal / 7,394 planned and canonical
+  state remains unchanged. Phase 85f45 discovered authored WDW area-1
+  `bhvWdwExpressElevator` candidate `0x6e6c6a0fc1b92a45`; its static sibling
+  `0xd52a32f6de0311da` is excluded, and a source-bound C observer/identity is
+  still required before any pair or admission. Phase 85f46 re-audited the
+  Metal 4 source/archive/presentation/capture/M9/timebase contracts; they pass,
+  but the visible-host gate remains `m34_host_ready=0` with no admissible
+  launch, capture, pixel, cadence, soak, or direct-display evidence, so M34
+  remains 0%. Phase 85f47 is pending: no handoff or result is present and no
+  f47 outcome or counter is asserted.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -80,8 +93,11 @@
   `.porting/porting-handoff-full-swift-twin-phase85f40-castle-ddd-recipe-audit.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f41-m34-reaudit.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f42-m35-reaudit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f44-isolated-admission-inventory.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f45-next-route-discovery.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f46-metal4-contract-reaudit.md`,
   and this refresh is recorded in
-  `.porting/porting-handoff-full-swift-twin-phase85f43-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f48-docs-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -568,7 +584,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f43
+The repeated route notes below preserve prior phase evidence; the Phase 85f48
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`

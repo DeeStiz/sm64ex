@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-22).
 
-### Phase 85f43 current status
+### Phase 85f48 current status
 
 The retained checked-in canonical state remains **534 behavior rows** (511
 Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -102,6 +102,35 @@ zero valid identities and notary authentication is unavailable. Readiness and
 distribution remain blocked on those two prerequisites; no archive, export,
 DMG, ZIP, notarization, stapling, Gatekeeper, or human-acceptance artifact
 exists. The M35 and human-acceptance floors remain 0%.
+
+Phase 85f44 performed a read-only inventory of isolated admission evidence.
+The retained canonical report remains exactly 25 terminal `passed` and 7,395
+`planned` rows. Exactly one unrepresented, source-authored,
+`fixture_only=0`, hash-valid candidate was found: the Phase 85f33 intro
+transition report, whose local ID `0x9a0f7b4f7ecf6c41` maps under the guarded
+crosswalk to canonical ID `0xca33981b30cb7815`. Its phase-local result remains
+26 terminal / 7,394 planned; no other isolated evidence is admissible and no
+manifest, retained report, or route ledger state changed.
+
+Phase 85f45 discovered the next disjoint authored route: dynamic WDW area-1
+`bhvWdwExpressElevator`, candidate
+`0x6e6c6a0fc1b92a45`. The authored object lifecycle and existing Swift
+value/owner route are present, while the adjacent static-platform identity
+`0xd52a32f6de0311da` is deliberately excluded. A source-bound C observer and
+semantic identity are still required; no native lifecycle pair, admission, or
+canonical merge was performed, so the candidate remains planned.
+
+Phase 85f46 completed a bounded read-only Metal 4 contract re-audit. The
+source, archive/presentation, capture-archive guard, M9 readiness, timebase,
+and shell contracts passed, but the visible-host gate remains
+`m34_host_ready=0` with an offline display, locked session, no active GPU
+session, stopped GPU tooling, and unknown thermal state. Release launch,
+capture/replay, attachment/pixel, cadence/soak, and direct-display evidence
+were not admissible; M34 remains 0% and no Simulator substitute was used.
+
+**Phase 85f47 pending:** no Phase 85f47 handoff or result is present in this
+worktree, so no f47 outcome, counter, or acceptance claim is asserted here.
+Its result must be added in sequence when available.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -894,7 +923,12 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f40 Castle-to-DDD recipe audit](../.porting/porting-handoff-full-swift-twin-phase85f40-castle-ddd-recipe-audit.md),
 [Phase 85f41 M34 host/production re-audit](../.porting/porting-handoff-full-swift-twin-phase85f41-m34-reaudit.md),
 [Phase 85f42 M35 distribution re-audit](../.porting/porting-handoff-full-swift-twin-phase85f42-m35-reaudit.md),
-and [Phase 85f43 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f43-docs-refresh.md).
+[Phase 85f43 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f43-docs-refresh.md),
+[Phase 85f44 isolated-admission inventory](../.porting/porting-handoff-full-swift-twin-phase85f44-isolated-admission-inventory.md),
+[Phase 85f45 WDW elevator discovery](../.porting/porting-handoff-full-swift-twin-phase85f45-next-route-discovery.md),
+[Phase 85f46 Metal 4 contract re-audit](../.porting/porting-handoff-full-swift-twin-phase85f46-metal4-contract-reaudit.md),
+Phase 85f47 result (pending; no handoff present), and [Phase 85f48
+documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f48-docs-refresh.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),

@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f43 current evidence checkpoint
+### Phase 85f48 current evidence checkpoint
 
 The retained checked-in canonical state remains **534 behavior rows** (**511
 Swift value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
@@ -105,6 +105,35 @@ zero valid identities and notary authentication is unavailable. Readiness and
 distribution remain blocked on those two prerequisites; no archive, export,
 DMG, ZIP, notarization, stapling, Gatekeeper, or human-acceptance artifact
 exists. The M35 and human-acceptance floors remain 0%.
+
+Phase 85f44 performed a read-only inventory of isolated admission evidence.
+The retained canonical report remains exactly 25 terminal `passed` and 7,395
+`planned` rows. Exactly one unrepresented, source-authored,
+`fixture_only=0`, hash-valid candidate was found: the Phase 85f33 intro
+transition report, whose local ID `0x9a0f7b4f7ecf6c41` maps under the guarded
+crosswalk to canonical ID `0xca33981b30cb7815`. Its phase-local result remains
+26 terminal / 7,394 planned; no other isolated evidence is admissible and no
+manifest, retained report, or route ledger state changed.
+
+Phase 85f45 discovered the next disjoint authored route: dynamic WDW area-1
+`bhvWdwExpressElevator`, candidate
+`0x6e6c6a0fc1b92a45`. The authored object lifecycle and existing Swift
+value/owner route are present, while the adjacent static-platform identity
+`0xd52a32f6de0311da` is deliberately excluded. A source-bound C observer and
+semantic identity are still required; no native lifecycle pair, admission, or
+canonical merge was performed, so the candidate remains planned.
+
+Phase 85f46 completed a bounded read-only Metal 4 contract re-audit. The
+source, archive/presentation, capture-archive guard, M9 readiness, timebase,
+and shell contracts passed, but the visible-host gate remains
+`m34_host_ready=0` with an offline display, locked session, no active GPU
+session, stopped GPU tooling, and unknown thermal state. Release launch,
+capture/replay, attachment/pixel, cadence/soak, and direct-display evidence
+were not admissible; M34 remains 0% and no Simulator substitute was used.
+
+**Phase 85f47 pending:** no Phase 85f47 handoff or result is present in this
+worktree, so no f47 outcome, counter, or acceptance claim is asserted here.
+Its result must be added in sequence when available.
 
 Phases 85aq–85as completed disjoint Luna-max route-family triage and authored
 level/transition reachability attempts without promoting a row. Phase 85ar
@@ -302,6 +331,11 @@ broad/physical/release/human gates are open.
 - **[Phase 85f41](porting-handoff-full-swift-twin-phase85f41-m34-reaudit.md):** fresh M34 host/production re-audit remains fail-closed with no online display, locked session, stopped GPU tooling, absent traces, and unknown thermal state.
 - **[Phase 85f42](porting-handoff-full-swift-twin-phase85f42-m35-reaudit.md):** fresh M35 re-audit remains blocked by absent Developer ID identity/private key and notary authentication; no distribution or human-acceptance artifact exists.
 - **[Phase 85f43](porting-handoff-full-swift-twin-phase85f43-docs-refresh.md):** refreshes first-party status surfaces and ordered links while preserving canonical 25/7,395, isolated 26/7,394, and 0% M34/M35/human floors.
+- **[Phase 85f44](porting-handoff-full-swift-twin-phase85f44-isolated-admission-inventory.md):** inventories isolated admissions, retaining exactly 25/7,395 and one guarded Phase 85f33 intro candidate; no canonical artifact changes.
+- **[Phase 85f45](porting-handoff-full-swift-twin-phase85f45-next-route-discovery.md):** discovers the authored dynamic WDW express elevator route while excluding its static sibling; no live pair or admission exists.
+- **[Phase 85f46](porting-handoff-full-swift-twin-phase85f46-metal4-contract-reaudit.md):** re-audits Metal 4 contracts successfully but remains fail-closed at the visible-host gate, with M34 at 0%.
+- **Phase 85f47:** pending; no handoff or result is present, so no outcome or counter is asserted.
+- **[Phase 85f48](porting-handoff-full-swift-twin-phase85f48-docs-refresh.md):** this documentation refresh records the ordered f44–f46 evidence and the explicit f47 pending boundary.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1318,7 +1352,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f43 entry are authoritative for the latest checkpoint.
+and the Phase 85f48 entry are authoritative for the latest checkpoint.
 
 ### 85du — Tank-fish mapping — complete / fail-closed
 
