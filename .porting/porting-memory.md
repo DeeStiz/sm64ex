@@ -2,20 +2,20 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f122 door-contract documentation refresh (2026-08-23):** carries
-  the Phase 85f121 source contract into the first-party status surfaces. The
-  authored Castle Grounds special-object preset `0x88` maps to
-  `MODEL_CASTLE_CASTLE_DOOR` and `bhvDoorWarp`, which sets
-  `INTERACT_WARP_DOOR`; the common door contract is `hitbox radius=80
-  height=100` with collision distance `1000`. `interact_warp_door` runs only
-  in `ACT_WALKING` or `ACT_DECELERATING`, after actual contact, then computes
-  `should_push_or_pull_door`, stores the interaction object, and enters the
-  pulling/pushing action. No A-button press is required for this interaction.
-  The authored centers are `(-76,803,-3155)` and `(77,803,-3155)`; the best
-  fixed samples remain `(-311,803,-3054)` and `(504,803,-3054)`, outside the
-  nearest 80-unit radius. The route remains `LEVEL_CASTLE_GROUNDS` (level 16)
-  area 1 after 3,600 steps with exit `77`, no trace/receipt/runtime pair, and
-  no admission. Preserve the designated 26/7,394 report at SHA-256
+- **Phase 85f125 contact-vector documentation refresh (2026-08-23):** records
+  the Phase 85f123 owner-thread diagnostic and Phase 85f124 fixed contact
+  vector. The observation-only diagnostic saw `door_warps=3`, nearest squared
+  distance `64969.9` (approximately 255 units), and `collided=0`; the sample
+  remains outside the authored 80-unit contact radius. The fixed vector after
+  `(-310,803,-3054)` still ended in `LEVEL_CASTLE_GROUNDS` (level 16) area 1
+  after 3,600 steps and exited `77`, with no trace, receipt, C/Swift runtime
+  pair, route admission, or canonical mutation. No coordinate feedback,
+  direct warp/load, helper call, object injection, synthetic trace, or
+  canonical mutation was used. The source-faithful physical-input search
+  stops for this evidence pass; any next attempt needs a newly justified
+  source recipe entering the 80-unit radius or explicit traversal
+  instrumentation authorization. Preserve the designated 26/7,394 report at
+  SHA-256
   `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
   byte-identical 25/7,395 backup at SHA-256
   `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
@@ -28,7 +28,10 @@
   `.porting/porting-handoff-full-swift-twin-phase85f119-castle-door-final-variant.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f121-castle-door-contract-analysis.md`,
-  and `.porting/porting-handoff-full-swift-twin-phase85f122-docs-door-contract.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f122-docs-door-contract.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f123-castle-door-distance-diagnostic.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f124-castle-door-contact-vector.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f125-docs-contact-vector.md`.
 
 - **Phase 85f120 final-door-variant documentation refresh (2026-08-23):**
   records Phase 85f119's final fixed lateral input after the refined

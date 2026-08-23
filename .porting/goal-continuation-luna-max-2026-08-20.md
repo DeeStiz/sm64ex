@@ -21,31 +21,31 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
-### Phase 85f122 current evidence checkpoint
+### Phase 85f125 current evidence checkpoint
 
-Phase 85f121 records the authored Castle Grounds special-object contract:
-preset `0x88` maps to `MODEL_CASTLE_CASTLE_DOOR` and `bhvDoorWarp`, which sets
-`INTERACT_WARP_DOOR`. The common door collision contract is `hitbox radius=80
-height=100` with collision distance `1000`. `interact_warp_door` runs only
-when Mario is `ACT_WALKING` or `ACT_DECELERATING`, after actual contact with
-the object; it computes `should_push_or_pull_door`, stores the interaction
-object, and enters the pulling/pushing action. No A-button press is required
-for the warp-door interaction itself.
+Phase 85f123's owner-thread diagnostic observes only live authored
+`bhvDoorWarp` objects, nearest squared distance, and Mario's copied
+interaction flags. It does not steer, branch on coordinates, invoke helpers,
+inject objects, or create traces. At the best fixed approach it saw
+`door_warps=3`, `nearest_door_distance_sq=64969.9` (approximately 255 units),
+and `collided=0`; the sample is outside the authored 80-unit contact radius.
 
-The authored door centers are `(-76,803,-3155)` and `(77,803,-3155)`. The
-best fixed samples from Phases 85f116–85f119 were `(-311,803,-3054)` and
-`(504,803,-3054)`, still outside the nearest 80-unit collision radius. The
-final fixed lateral variant therefore remained `LEVEL_CASTLE_GROUNDS` (level
-16) area 1 for all 3,600 steps and exited `77`; no trace, native receipt,
-C/Swift runtime pair, route admission, report/ledger/manifest mutation, or
-canonical promotion exists. No direct level load/warp, behavior helper,
-object injection, coordinate selection, or synthetic trace data was used.
+Phase 85f124 applied a fixed contact vector derived from the measured door
+center after the `(-310,803,-3054)` approach. The live diagnostic still saw
+three door warps and `collided=0`; the run remained
+`LEVEL_CASTLE_GROUNDS` (level 16) area 1 for all 3,600 steps and exited `77`,
+with no trace, native receipt, C/Swift runtime pair, route admission,
+report/ledger/manifest mutation, or canonical promotion. No coordinate
+feedback was used to branch, and no direct level load/warp, helper call,
+object injection, synthetic trace, or canonical mutation occurred.
 
-The route remains contact-gated. The next traversal attempt must reach within
-the authored hitbox through a source-faithful fixed-input recipe, or use
-explicit authorization for a different traversal mechanism. Once Castle
-Inside and SSL area 1 are reached, real Pokey C/Swift Debug/ASan/Release/rerun
-parity receipts remain required before admission.
+The source-faithful physical-input search stops for this evidence pass. Any
+next attempt requires either a newly justified source-faithful fixed-input
+recipe that enters the authored 80-unit contact radius or explicit
+authorization for traversal instrumentation or another traversal mechanism;
+the source-recipe/authorization gate is explicit. Once Castle Inside and SSL
+area 1 are reached, real Pokey C/Swift Debug/ASan/Release/rerun parity
+receipts remain required before admission.
 
 Phase 85f111's read-only M34 audit leaves `m34_host_ready=0` because the
 display is offline, the console session is locked, and `gputoolsserviced`/GPU
@@ -84,7 +84,10 @@ Ordered handoffs: [Phase 85f110 Pokey runtime route](porting-handoff-full-swift-
 [Phase 85f119 final fixed lateral variant](porting-handoff-full-swift-twin-phase85f119-castle-door-final-variant.md), and
 [Phase 85f120 documentation/final door variant](porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md),
 [Phase 85f121 Castle-door contract analysis](porting-handoff-full-swift-twin-phase85f121-castle-door-contract-analysis.md), and
-[Phase 85f122 documentation/door contract](porting-handoff-full-swift-twin-phase85f122-docs-door-contract.md).
+[Phase 85f122 documentation/door contract](porting-handoff-full-swift-twin-phase85f122-docs-door-contract.md),
+[Phase 85f123 Castle-door distance diagnostic](porting-handoff-full-swift-twin-phase85f123-castle-door-distance-diagnostic.md),
+[Phase 85f124 Castle-door contact vector](porting-handoff-full-swift-twin-phase85f124-castle-door-contact-vector.md), and
+[Phase 85f125 documentation/contact vector](porting-handoff-full-swift-twin-phase85f125-docs-contact-vector.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 
