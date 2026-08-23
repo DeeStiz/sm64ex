@@ -2,6 +2,30 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f88 Snowman wind discovery (2026-08-23):** source-route
+  discovery selected the authored Snowman's Land area-1 `bhvSLSnowmanWind`
+  row `0xa98dae7d4d4559ab`, whose direct `MODEL_NONE` subject is
+  `script_func_local_3` source order 1 at `(700,3428,700)`, face yaw 30,
+  parameter 0, reached through the ordinary Castle Inside painting route.
+  The pointer-free `SnowmanWindBehavior`/`SnowmanWindObjectBridge` value owner
+  is mapped exactly once, but no source observer, native lifecycle probe,
+  C/Swift trace, route record, or admission was produced; no direct level
+  load, object injection, synthetic trace, sibling substitution, or canonical
+  mutation occurred, and the row remains planned. Preserve the designated
+  local 26/7,394 report at
+  `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
+  with SHA-256
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
+  `26/7420 = 0.350404313%`, separate from the byte-identical 25/7,395 backup
+  with SHA-256
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d` and
+  `25/7420 = 0.336927224%`. The manifest remains SHA-256
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+  behavior mapping 95.693%, and M34/M35/human-acceptance/implementation/
+  full-goal floors remain 0%. Handoff:
+  `.porting/porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md`.
+  Phase 85f89 remains pending; no completed handoff exists.
+
 - **Phase 85f87 authored-reachability rechecks (2026-08-23):** fresh WDW
   express-elevator, TTC 2D rotator, Bob seesaw, and Spindrift route-pair
   rechecks all remain fail-closed: WDW observed `level=11 area=2 dynamic=0

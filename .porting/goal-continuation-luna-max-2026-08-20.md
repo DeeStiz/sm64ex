@@ -21,6 +21,43 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
+### Phase 85f88 current evidence checkpoint
+
+Phase 85f88 completed source-route discovery for Snowman's Land's authored
+`bhvSLSnowmanWind` owner. The generated route row `0xa98dae7d4d4559ab`
+resolves exactly once to the source-authored behavior program; its direct
+subject is the area-1 `MODEL_NONE` Snowman wind object in
+`script_func_local_3` (`source_order=1`, position `(700,3428,700)`,
+face_yaw=30, parameter `0`) reached through the ordinary Castle Inside
+Snowman's Land painting route. The existing pointer-free Swift value/owner
+pair (`SnowmanWindBehavior`/`SnowmanWindObjectBridge`) is mapped exactly once
+in the behavior manifest.
+
+This was discovery only. No source observer, native SL lifecycle probe, C or
+Swift trace, route record, or admission was produced; no direct level load,
+object injection, synthetic trace, sibling substitution, manifest/report/
+ledger mutation, or canonical publication occurred. The row remains planned.
+Phase 85f89 is pending; no completed handoff exists.
+
+The designated local canonical route evidence remains
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`,
+SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, with
+7,420 rows, 26 non-fixture terminal `passed`, and 7,394 `planned`
+(`26/7420 = 0.350404313%`). The old retained report remains byte-identical
+as the write-once backup at
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/pre-publication-backup/canonical-route-ledger.tsv`,
+SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`, with
+25 terminal `passed` and 7,395 `planned`
+(`25/7420 = 0.336927224%`); it is historical backup evidence, not the
+designated report. The manifest remains unchanged at SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+Behavior mapping remains 95.693%, and the conservative M34, M35,
+human-acceptance, implementation, and full-goal floors remain 0%. No source,
+manifest, designated or backup report, route ledger, release, store, or
+external publication state changed.
+
 ### Phase 85f87 current evidence checkpoint
 
 Fresh Phase 85f83–85f86 authored-reachability rechecks remain fail-closed.
@@ -649,6 +686,8 @@ broad/physical/release/human gates are open.
 - **[Phase 85f85](porting-handoff-full-swift-twin-phase85f85-bob-reachability-recheck.md):** fresh authored Bob seesaw reachability remains blocked at `level=1 area=1 object=0`; the matrix exits 77 with no trace or admission.
 - **[Phase 85f86](porting-handoff-full-swift-twin-phase85f86-spindrift-reachability-recheck.md):** fresh authored Spindrift reachability remains blocked at `level=1 area=1 spindrifts=0`; the matrix exits 77 with no trace or admission.
 - **[Phase 85f87](porting-handoff-full-swift-twin-phase85f87-docs-refresh.md):** reconciles the four fresh reachability rechecks across the six first-party status surfaces, preserving the designated local 26/7,394 report, byte-identical 25/7,395 backup, exact hashes/percentages, and 0% M34/M35/human floors.
+- **[Phase 85f88](porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md):** discovers the authored Snowman's Land area-1 `bhvSLSnowmanWind` row `0xa98dae7d4d4559ab`; the source observer, native lifecycle pair, and admission remain pending.
+- **Phase 85f89:** pending; no completed handoff exists.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/

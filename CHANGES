@@ -1102,6 +1102,28 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       No source, manifest, report, route ledger, release, publication, or
       acceptance state changed.
 
+243.) Reconcile Phase 85f88 across the six first-party status surfaces.
+      Record source-route discovery for the authored Snowman's Land area-1
+      `bhvSLSnowmanWind` row `0xa98dae7d4d4559ab`, whose direct `MODEL_NONE`
+      subject is `script_func_local_3` source order 1 at `(700,3428,700)`,
+      face yaw 30, parameter 0, reached through the ordinary Castle Inside
+      painting route. The pointer-free Swift value/owner pair is mapped once,
+      but no source observer, native lifecycle probe, C/Swift trace, route
+      record, or admission was produced; the row remains planned. Preserve
+      the designated local 26/7,394 report SHA-256
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`
+      and `26/7420 = 0.350404313%` separately from the byte-identical
+      25/7,395 backup SHA-256
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`
+      and `25/7420 = 0.336927224%`; retain manifest SHA-256
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+      behavior mapping 95.693%, and 0% M34/M35/human-acceptance/
+      implementation/full-goal floors. Link the Phase 85f88 discovery
+      handoff `porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md`;
+      Phase 85f89 remains pending because no completed handoff exists. No
+      source, manifest, report, route ledger, release, publication, or
+      acceptance state changed.
+
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
 are not current counters.

@@ -2,6 +2,44 @@
 
 ## Status
 
+### Phase 85f88 current status
+
+Phase 85f88 completed source-route discovery for Snowman's Land's authored
+`bhvSLSnowmanWind` owner. The generated route row `0xa98dae7d4d4559ab`
+resolves exactly once to the source-authored behavior program; its direct
+subject is the area-1 `MODEL_NONE` Snowman wind object in
+`script_func_local_3` (`source_order=1`, position `(700,3428,700)`,
+face_yaw=30, parameter `0`) reached through the ordinary Castle Inside
+Snowman's Land painting route. The existing pointer-free Swift value/owner
+pair (`SnowmanWindBehavior`/`SnowmanWindObjectBridge`) is mapped exactly once
+in the behavior manifest.
+
+This was discovery only. No source observer, native SL lifecycle probe, C or
+Swift trace, route record, or admission was produced; no direct level load,
+object injection, synthetic trace, sibling substitution, manifest/report/
+ledger mutation, or canonical publication occurred. The row remains planned.
+Phase 85f89 is pending; no completed handoff exists.
+
+The designated local canonical route evidence remains
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`.
+It is SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
+contains 7,420 rows: 26 non-fixture terminal `passed` and 7,394 `planned`
+(`26/7420 = 0.350404313%`). The old retained report remains byte-identical
+as the write-once backup at
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/pre-publication-backup/canonical-route-ledger.tsv`,
+with SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d` and
+25 terminal `passed` / 7,395 `planned` rows
+(`25/7420 = 0.336927224%`); it is historical backup evidence, not the
+designated report. The source manifest remains unchanged at 7,420 rows with
+SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+Behavior mapping remains 95.693%, and the conservative M34, M35,
+human-acceptance, implementation, and full-goal floors remain 0%. No source,
+manifest, designated or backup report, route ledger, release, store, or
+external publication state changed.
+
 ### Phase 85f87 current status
 
 Fresh Phase 85f83–85f86 authored-reachability rechecks remain fail-closed.
@@ -1308,8 +1346,10 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f83 WDW reachability recheck](porting-handoff-full-swift-twin-phase85f83-wdw-reachability-recheck.md),
 [Phase 85f84 TTC reachability recheck](porting-handoff-full-swift-twin-phase85f84-ttc-reachability-recheck.md),
 [Phase 85f85 Bob reachability recheck](porting-handoff-full-swift-twin-phase85f85-bob-reachability-recheck.md),
-[Phase 85f86 Spindrift reachability recheck](porting-handoff-full-swift-twin-phase85f86-spindrift-reachability-recheck.md), and
-[Phase 85f87 documentation refresh](porting-handoff-full-swift-twin-phase85f87-docs-refresh.md).
+[Phase 85f86 Spindrift reachability recheck](porting-handoff-full-swift-twin-phase85f86-spindrift-reachability-recheck.md),
+[Phase 85f87 documentation refresh](porting-handoff-full-swift-twin-phase85f87-docs-refresh.md), and
+[Phase 85f88 Snowman wind discovery](porting-handoff-full-swift-twin-phase85f88-next-route-discovery.md).
+Phase 85f89 remains pending; no completed handoff exists.
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
