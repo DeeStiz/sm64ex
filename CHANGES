@@ -987,13 +987,32 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
       Preserve `25/7420 = 0.336927224%`, `26/7420 = 0.350404313%`, behavior
       mapping 95.693%, and 0% M34/M35/human-acceptance/full-goal floors.
-      Phase 85f73 publication execution remains pending because no completed
-      f73 handoff exists. Link the ordered f71 -> f72 -> f74 handoffs:
+      Phase 85f73 then committed the Spindrift receipt seam (`eb3fbf8a`):
+      the authored route reached `level=1 area=1 spindrifts=0`, exited 77,
+      and produced no trace or admission. Link the ordered f71 -> f74
+      handoffs:
       `porting-handoff-full-swift-twin-phase85f71-next-route-discovery.md`,
       `porting-handoff-full-swift-twin-phase85f72-serial-publication-readiness.md`,
+      `porting-handoff-full-swift-twin-phase85f73-spindrift-seam-execute.md`,
       and `porting-handoff-full-swift-twin-phase85f74-docs-refresh.md`. No
       source, manifest, report, route ledger, publication, or acceptance state
       changed.
+
+238.) Correct the stale Phase 85f73 status wording across the six first-party
+      status surfaces. Record the committed Spindrift seam (`eb3fbf8a`), the
+      authored `level=1 area=1 spindrifts=0` result, exit 77, and
+      `trace=not-created`, `records=0`, `admission=0`. Preserve retained
+      25/7,395 with report SHA-256
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+      isolated 26/7,394 with SHA-256
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+      manifest SHA-256
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+      percentages `25/7420 = 0.336927224%` and `26/7420 = 0.350404313%`,
+      behavior mapping 95.693%, and 0% M34/M35/human-acceptance/full-goal
+      floors. Link the ordered f71 -> f75 handoffs, including the existing
+      f74 handoff and the new
+      `porting-handoff-full-swift-twin-phase85f75-docs-spindrift-correction.md`.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

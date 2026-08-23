@@ -4,12 +4,14 @@ Date: 2026-08-23
 
 ## Verdict
 
-**DOCUMENTATION REFRESHED / SPINDRIFT DISCOVERY AND SERIAL PUBLICATION
-READINESS SURFACED.** The six first-party status surfaces now identify Phase
-85f74 as current and carry the ordered Phase 85f71–85f74 sequence. They
-surface the planned Snowman's Land Spindrift discovery from Phase 85f71, the
-isolated serial-publication readiness result from Phase 85f72, and the fact
-that Phase 85f73 remains pending because no completed f73 handoff exists.
+**DOCUMENTATION REFRESHED / SPINDRIFT DISCOVERY, SERIAL PUBLICATION
+READINESS, AND COMMITTED SEAM RESULT SURFACED.** The six first-party status
+surfaces identify Phase 85f74 as the historical refresh and carry the ordered
+Phase 85f71–85f74 sequence. They surface the planned Snowman's Land Spindrift
+discovery from Phase 85f71, the isolated serial-publication readiness result
+from Phase 85f72, and the committed Phase 85f73 Spindrift seam. The f73
+authored route reached `level=1 area=1 spindrifts=0` and exited 77 without a
+trace or admission; the stale f73 status wording is corrected by Phase 85f75.
 Retained canonical evidence remains 25/7,395; the isolated phase-local result
 remains 26/7,394. No source, behavior manifest, retained report, canonical
 route ledger, timebase fixture, release artifact, or unrelated worktree
@@ -71,8 +73,16 @@ terminal-rerun, and deterministic-output rejection fences all passed. This
 establishes readiness for an explicitly authorized scoped promotion; it does
 not itself publish the phase-local report or mutate canonical state.
 
-Phase 85f73 publication execution remains **pending**. No completed f73
-handoff exists in `.porting/`, so no f73 publication or result is claimed.
+## Phase 85f73 committed Spindrift seam
+
+Phase 85f73 committed the source-owned Spindrift receipt seam in commit
+`eb3fbf8a`, including the semantic `bhvSpindrift` identity, pointer-free
+schema-4 observer, independent Swift mirror, focused C/Swift route pair, and
+fail-closed matrix. The authored Castle Inside painting route reached
+`level=1 area=1 spindrifts=0`; the matrix exited 77 with
+`trace=not-created`, `records=0`, and `admission=0`. No route record,
+manifest, retained report, canonical route ledger, or acceptance state
+changed.
 
 ## Documentation files changed
 
@@ -84,9 +94,9 @@ handoff exists in `.porting/`, so no f73 publication or result is claimed.
 - `CHANGES`
 - this handoff
 
-The existing Phase 85f71 and Phase 85f72 handoffs remain intact as source
-evidence and are linked in order. Phase 85f73 is recorded as pending without
-a link because no completed handoff exists. No code, behavior manifest,
+The existing Phase 85f71, Phase 85f72, and Phase 85f73 handoffs remain intact
+as source evidence and are linked in order. Phase 85f75 records the correction
+to this handoff's stale f73 status wording. No code, behavior manifest,
 retained report, canonical route ledger, fixture, release artifact, or
 unrelated handoff was changed.
 

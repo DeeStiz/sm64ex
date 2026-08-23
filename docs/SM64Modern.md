@@ -16,7 +16,7 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-23).
 
-### Phase 85f74 current status
+### Phase 85f75 current status
 
 The retained checked-in canonical state remains **534 behavior rows** (511
 Swift value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
@@ -287,8 +287,17 @@ The manifest remains
 `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`;
 immutable inputs were unchanged, retained artifacts were not mutated, and
 `canonical_ledger_overwrite=0`. Explicit authorization is still required
-before canonical promotion. Phase 85f73 publication execution remains
-pending because no completed f73 handoff exists.
+before canonical promotion.
+
+Phase 85f73 committed the source-owned Spindrift receipt seam in commit
+`eb3fbf8a`, including the semantic `bhvSpindrift` identity, pointer-free
+schema-4 observer, independent Swift mirror, focused C/Swift route pair, and
+fail-closed matrix. The authored Castle Inside painting route reached
+`level=1 area=1 spindrifts=0`; the matrix exited 77 with
+`trace=not-created`, `records=0`, and `admission=0`. No route record,
+manifest, retained report, canonical route ledger, or acceptance state
+changed. Phase 85f74's earlier f73 status wording is corrected by this Phase
+85f75 documentation update.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -1111,8 +1120,9 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f70 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f70-docs-refresh.md),
 [Phase 85f71 Spindrift discovery](../.porting/porting-handoff-full-swift-twin-phase85f71-next-route-discovery.md),
 [Phase 85f72 serial publication readiness](../.porting/porting-handoff-full-swift-twin-phase85f72-serial-publication-readiness.md),
-Phase 85f73 publication execution remains pending because no completed handoff exists, and
-[Phase 85f74 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f74-docs-refresh.md).
+[Phase 85f73 Spindrift seam execute](../.porting/porting-handoff-full-swift-twin-phase85f73-spindrift-seam-execute.md),
+[Phase 85f74 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f74-docs-refresh.md), and
+[Phase 85f75 Spindrift documentation correction](../.porting/porting-handoff-full-swift-twin-phase85f75-docs-spindrift-correction.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),

@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f74 current checkpoint (2026-08-23):** the retained checked-in
+- **Phase 85f75 current checkpoint (2026-08-23):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -180,8 +180,16 @@
   `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
   Immutable inputs and retained artifacts were unchanged and
   `canonical_ledger_overwrite=0`; explicit authorization remains required
-  before promotion. Phase 85f73 publication execution remains pending because
-  no completed f73 handoff exists.
+  before promotion. Phase 85f73 committed the source-owned Spindrift receipt
+  seam in commit `eb3fbf8a`, including the semantic `bhvSpindrift` identity,
+  pointer-free schema-4 observer, independent Swift mirror, focused C/Swift
+  route pair, and fail-closed matrix. The authored Castle Inside painting
+  route reached `level=1 area=1 spindrifts=0`; the matrix exited 77 with
+  `trace=not-created`, `records=0`, and `admission=0`. No route record,
+  manifest, retained report, canonical route ledger, or acceptance state
+  changed. Phase 85f74's earlier f73 status wording is corrected by Phase
+  85f75. M34, M35, human-acceptance, and implementation/full-goal floors
+  remain 0%.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -235,8 +243,9 @@
   `.porting/porting-handoff-full-swift-twin-phase85f70-docs-refresh.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f71-next-route-discovery.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f72-serial-publication-readiness.md`,
-  Phase 85f73 publication execution (pending; no completed handoff), and
-  `.porting/porting-handoff-full-swift-twin-phase85f74-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f73-spindrift-seam-execute.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f74-docs-refresh.md`, and
+  `.porting/porting-handoff-full-swift-twin-phase85f75-docs-spindrift-correction.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -723,7 +732,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f74
+The repeated route notes below preserve prior phase evidence; the Phase 85f75
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`
