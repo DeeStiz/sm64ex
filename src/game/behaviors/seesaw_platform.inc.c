@@ -3,6 +3,9 @@
  * Behavior for bhvSeesawPlatform.
  */
 
+#include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_seesaw_platform_route_identity.h"
+
 /**
  * Collision models for the different seesaw platforms.
  */
@@ -29,11 +32,18 @@ void bhv_seesaw_platform_init(void) {
  * Update function for bhvSeesawPlatform.
  */
 void bhv_seesaw_platform_update(void) {
-    UNUSED s32 startPitch = o->oFaceAnglePitch;
+    const s32 startPitch = o->oFaceAnglePitch;
+    const f32 pitchVelocityBefore = o->oSeesawPlatformPitchVel;
+    const u32 marioOnPlatform = gMarioObject->platform == o ? 1u : 0u;
+    const u32 model = o->header.gfx.sharedChild
+            == gLoadedGraphNodes[MODEL_BOB_SEESAW_PLATFORM]
+        ? MODEL_BOB_SEESAW_PLATFORM : 0u;
+    u32 soundPlayed = 0;
     o->oFaceAnglePitch += (s32) o->oSeesawPlatformPitchVel;
 
     if (absf(o->oSeesawPlatformPitchVel) > 10.0f) {
         cur_obj_play_sound_1(SOUND_ENV_BOAT_ROCKING1);
+        soundPlayed = 1u;
     }
 
     if (gMarioObject->platform == o) {
@@ -60,4 +70,27 @@ void bhv_seesaw_platform_update(void) {
             /* accel          */ 3.0f,
             /* slowdown       */ 3.0f);
     }
+
+    /* Copy the authored owner state after the source reducer has completed.
+     * The route receives only scalar values; object, graph, Mario, and
+     * collision pointers remain entirely inside the C owner. */
+    (void) sm64_modern_seesaw_platform_route_observe(
+        sm64_modern_parity_object_slot(o),
+        model,
+        (uint32_t) o->oBehParams2ndByte,
+        (uint32_t) o->oBehParams2ndByte,
+        o->oCollisionDistance,
+        o->oPosX,
+        o->oPosY,
+        o->oPosZ,
+        o->oFaceAngleYaw,
+        startPitch,
+        o->oFaceAnglePitch,
+        pitchVelocityBefore,
+        o->oSeesawPlatformPitchVel,
+        o->oDistanceToMario,
+        o->oAngleToMario,
+        o->oMoveAngleYaw,
+        marioOnPlatform,
+        soundPlayed);
 }
