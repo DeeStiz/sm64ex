@@ -2,16 +2,17 @@
 
 ## Latest validated slices (2026-08-23)
 
-- **Phase 85f118 Castle-door refinement documentation refresh (2026-08-23):**
-  records Phase 85f116's fixed opposite-direction, turn, lateral-door, and
-  no-jump input variants plus Phase 85f117's refined authored-door approach.
-  The best fixed-input samples were `(504,803,-3054)`, `(-16,803,-2399)`, and
-  `(-311,803,-3054)`. The game remained `LEVEL_CASTLE_GROUNDS` (level 16)
-  area 1 for all 3,600 steps and exited `77`; Castle Inside and SSL area 1
-  were not entered, with no trace, receipt, C/Swift runtime pair, route
-  admission, or canonical mutation. No direct load/warp, behavior helper,
-  object injection, or coordinate branch was used. Preserve the designated
-  26 terminal / 7,394 planned report (`26/7394`, SHA-256
+- **Phase 85f120 final-door-variant documentation refresh (2026-08-23):**
+  records Phase 85f119's final fixed lateral input after the refined
+  `(-311,803,-3054)` approach. The game still ended in
+  `LEVEL_CASTLE_GROUNDS` (level 16) area 1 after all 3,600 steps and exited
+  `77`; no trace, receipt, C/Swift runtime pair, route admission, or canonical
+  mutation exists. No direct load/warp, behavior helper, object injection,
+  coordinate branch, or synthetic trace data was used. Blind fixed-input
+  expansion stops; the next gate is authored door interaction/facing analysis
+  from the source collision/interaction contract or explicit authorization for
+  a different traversal mechanism. Preserve the designated 26 terminal /
+  7,394 planned report (`26/7394`, SHA-256
   `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`), the
   byte-identical 25 terminal / 7,395 planned backup (`25/7395`, SHA-256
   `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`),
@@ -28,7 +29,9 @@
   `.porting/porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f116-castle-door-input-variants.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f117-castle-door-refinement.md`,
-  and `.porting/porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f119-castle-door-final-variant.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md`.
 
 - **Phase 85f113 documentation/M34/M35 route (2026-08-23):** records the
   real Castle→SSL owner-thread probe from Phase 85f110: 1,800 steps stayed at

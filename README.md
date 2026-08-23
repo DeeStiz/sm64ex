@@ -65,21 +65,22 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 85f118 current status
+### Phase 85f120 current status
 
-Phase 85f116 extended the source-neutral Castle Grounds traversal with fixed
-input variants: opposite-direction holds, bounded left/right turns, lateral
-door approaches, and no-jump variants. Phase 85f117 refined the ordinary
-approach to the authored castle-door line without branching on Mario
-coordinates or destination state. The best fixed-input samples were
-`(504,803,-3054)`, `(-16,803,-2399)`, and `(-311,803,-3054)`.
+Phase 85f119 combined the Phase 85f117 authored-door approach with a fixed
+lateral input after the `(-311,803,-3054)` sample. The final fixed lateral
+variant still never crossed the authored castle-door warp: the game remained
+`LEVEL_CASTLE_GROUNDS` (level 16) area 1 for all 3,600 steps and exited `77`.
+No trace, native receipt, C/Swift runtime pair, route admission,
+report/ledger/manifest mutation, or canonical promotion exists. No direct
+level load/warp, behavior helper, object injection, coordinate selection, or
+synthetic trace data was used.
 
-Despite those authored-door-line samples, the game remained
-`LEVEL_CASTLE_GROUNDS` (level 16) area 1 for all 3,600 steps and exited `77`;
-Castle Inside and SSL area 1 were not entered. No trace, native receipt,
-C/Swift runtime pair, route admission, report/ledger/manifest mutation, or
-canonical promotion exists. No direct level load/warp, behavior helper,
-object injection, or coordinate selection was used.
+Blind fixed-input expansion stops here. The next gate is authored door
+interaction/facing analysis from the source collision/interaction contract, or
+explicit authorization for a different traversal mechanism. Once Castle
+Inside and SSL area 1 are reached, real Pokey C/Swift Debug/ASan/Release/rerun
+parity receipts remain required before admission.
 
 Phase 85f111's read-only M34 audit leaves `m34_host_ready=0` because the
 display is offline, the console session is locked, and `gputoolsserviced`/GPU
@@ -114,7 +115,9 @@ Ordered handoffs: [Phase 85f110 Pokey runtime route](.porting/porting-handoff-fu
 [Phase 85f115 documentation/traversal recipe](.porting/porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md),
 [Phase 85f116 Castle-door input variants](.porting/porting-handoff-full-swift-twin-phase85f116-castle-door-input-variants.md),
 [Phase 85f117 Castle-door refinement](.porting/porting-handoff-full-swift-twin-phase85f117-castle-door-refinement.md), and
-[Phase 85f118 documentation/Castle-door refinement](.porting/porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md).
+[Phase 85f118 documentation/Castle-door refinement](.porting/porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md),
+[Phase 85f119 final fixed lateral variant](.porting/porting-handoff-full-swift-twin-phase85f119-castle-door-final-variant.md), and
+[Phase 85f120 documentation/final door variant](.porting/porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 
@@ -1050,7 +1053,9 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f115 documentation/traversal recipe](.porting/porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md),
 [Phase 85f116 Castle-door input variants](.porting/porting-handoff-full-swift-twin-phase85f116-castle-door-input-variants.md),
 [Phase 85f117 Castle-door refinement](.porting/porting-handoff-full-swift-twin-phase85f117-castle-door-refinement.md), and
-[Phase 85f118 documentation/Castle-door refinement](.porting/porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md).
+[Phase 85f118 documentation/Castle-door refinement](.porting/porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md),
+[Phase 85f119 final fixed lateral variant](.porting/porting-handoff-full-swift-twin-phase85f119-castle-door-final-variant.md), and
+[Phase 85f120 documentation/final door variant](.porting/porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).

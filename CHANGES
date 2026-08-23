@@ -1,4 +1,33 @@
 SM64 Modern native macOS — nightly continuation update (2026-08-23)
+256.) Reconcile Phase 85f120 documentation after the Phase 85f119 final
+      fixed lateral Castle-door variant. Record that the final variant after
+      `(-311,803,-3054)` still ended in `LEVEL_CASTLE_GROUNDS` (level 16) area
+      1 after all 3,600 steps and exited 77, with no trace, receipt, runtime
+      pair, route admission, or canonical mutation. Stop blind fixed-input
+      expansion; the next gate is authored door interaction/facing analysis
+      from the source collision/interaction contract or explicit authorization
+      for a different traversal mechanism. Keep the designated 26/7,394 and
+      backup 25/7,395 counters, report hashes
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+      route/behavior manifest hashes
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715` and
+      `83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`,
+      95.693% behavior mapping, and 0% M34/M35/human-acceptance/
+      implementation/full-goal floors. Preserve M34 `m34_host_ready=0` from
+      the offline display, locked console, unavailable GPU tooling, and
+      unknown thermal state; M35 remains blocked by absent Developer ID
+      identity/private key and supported notary authentication. Link the
+      ordered f116 -> f120 handoffs, including
+      `porting-handoff-full-swift-twin-phase85f116-castle-door-input-variants.md`,
+      `porting-handoff-full-swift-twin-phase85f117-castle-door-refinement.md`,
+      `porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md`,
+      `porting-handoff-full-swift-twin-phase85f119-castle-door-final-variant.md`,
+      and
+      `porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md`.
+      No source, report, route ledger, manifest, release, publication, or
+      acceptance state changed.
+
 255.) Reconcile Phase 85f118 documentation after the Phase 85f116 fixed
       Castle-door input variants and Phase 85f117 approach refinement. Record
       the best fixed-input samples `(504,803,-3054)`, `(-16,803,-2399)`, and
