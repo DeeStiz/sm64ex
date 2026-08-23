@@ -1,4 +1,4 @@
-SM64 Modern native macOS — nightly continuation update (2026-08-21)
+SM64 Modern native macOS — nightly continuation update (2026-08-22)
 43.) Record Phase 57's native Castle pendulum parity repair: schema-4
      object-domain snapshots now retain the real slot-37 actor state, six
      native run/header fingerprints are nonzero, and the 64-step pair remains
@@ -131,6 +131,568 @@ SM64 Modern native macOS — nightly continuation update (2026-08-21)
      the M35 Developer ID/notary/clean-machine/human blockers. Link Phases
      81, 82a–82f, and 84a–84c; no source, route ledger, credential, or release
      mutation is implied.
+74.) Record Phase 85a/b's Mario-state owner repair and exact C/Swift/ASan
+     schema-4 parity. The native lifecycle now retains 38 domain-2 records
+     across ticks 2 and 3, with the first source-backed divergence repaired;
+     route admission remained separate until the canonical row gate.
+75.) Record Phase 85c's canonical Mario-state admission. The independent
+     C/Swift/ASan traces passed exact byte parity, tamper and rerun fences, and
+     one `oracle_hook|mario_state` row (`0x88d04246f94ce9f8`) moved to terminal
+     passed without fixture or manifest mutation.
+76.) Record Phase 85d–85f's camera route pair and source-backed repairs. The
+     focus and camera-position/Lakitu path now matches all 14 schema-4 records
+     byte-for-byte; the separate camera admission gate remained fail-closed
+     until Phase 85g.
+77.) Record Phase 85g's canonical camera-state admission. The independent
+     C/Swift/ASan traces passed exact parity, tamper and rerun fences, and one
+     `oracle_hook|camera_state` row (`0x4eb19b71d76be0d4`) moved to terminal
+     passed without fixture or manifest mutation.
+78.) Record Phase 85h's cumulative ledger merge. The authoritative manifest
+     remains 7,420 rows; the cumulative report has 3 terminal passed rows and
+     7,417 planned, with report SHA-256
+     `d9b9927ebf0e49d9ba9c0bf62dab322fddd43e7899642f0716071a1a948c4312`.
+     M34 pixel/soak/direct-display, M35 Developer ID/notary/clean-machine, and
+     human acceptance remain open.
+79.) Record Phase 85i's reconciliation of Phase 85a–85h across the public docs
+     and ledgers. Link every
+     scoped handoff, preserve the cumulative 3/7,420 route truth and
+     7,417 planned rows, and keep all remaining route, Metal visual/soak,
+     distribution, clean-machine, and human gates fail-closed. No source,
+     manifest, route ledger, credential, or release mutation is implied.
+80.) Record Phase 85j's source-backed global-state owner publication boundary:
+     the native C lifecycle publishes the real timer/level/area/act/course/RNG
+     snapshot synchronously to the Swift owner mirror, preserving the exact
+     12-record route pair without changing C authority or the route ledger.
+81.) Record Phase 85k's canonical global-state admission. Independent C,
+     Swift, and ASan traces plus publication snapshots passed exact parity,
+     tamper/rerun, and `fixture_only=0` fences for row
+     `0xb123ff3e997bdc78`; the isolated global report SHA-256 is
+     `c64d6cff061bcd43df5fa1b5551f8d49d0e80be352d51756a471186cc03f0e2e`.
+82.) Record Phase 85l's four-row cumulative merge. The authoritative manifest
+     remains 7,420 rows; the cumulative report now has 4 terminal passed rows
+     and 7,416 planned, with report SHA-256
+     `139cf48c3768d205f82531d47ae4bcbb20cca6ce178eeb0a0384a99e9453e979`.
+     M34 pixel/soak/direct-display, M35 Developer ID/notary/clean-machine, and
+     human acceptance remain open.
+83.) Record Phase 85m's documentation reconciliation across README, SM64
+     Modern docs, both goal ledgers, `CHANGES`, and porting memory. Preserve
+     the four-row cumulative truth, global and cumulative report hashes, all
+     Phase 85j–85l handoffs, and fail-closed remaining route/M34/M35/human
+     gates. No source, manifest, route ledger, credential, or release mutation
+     is implied.
+84.) Record Phase 85n's object-state and script-events route pairs. The
+     source-backed independent pairs retain 28 object-state records and 1,272
+     script-event records over ticks 2 and 3; the effects audit remains
+     blocked because native retains 58 records while Swift currently emits 2.
+     No effects admission or ledger mutation is allowed.
+85.) Record Phase 85o's isolated admission of the canonical object-state row
+     `0x862c3d78b60d657c` and script-events row `0x2b0f6063b5463e9c`, including
+     independent C/Swift/ASan parity, tamper/rerun fences, and
+     `fixture_only=0` proof. The effects row remains planned.
+86.) Record Phase 85p's six-row cumulative merge. The authoritative manifest
+     remains 7,420 rows; the cumulative report now has 6 terminal passed rows
+     and 7,414 planned, with report SHA-256
+     `e406840d88f1d3ff99109c20cc6e75c164a1da8978350d12265260b8be02baf1`.
+     M34 pixel/soak/direct-display, M35 Developer ID/notary/clean-machine, and
+     human acceptance remain open.
+87.) Record Phase 85q's documentation reconciliation across README, SM64
+     Modern docs, both goal ledgers, `CHANGES`, and porting memory. Preserve
+     the six-row cumulative truth, the effects 58-versus-2 blocker, all
+     Phase 85n–85p handoffs, and fail-closed remaining route/M34/M35/human
+     gates. No source, manifest, route ledger, credential, or release mutation
+     is implied.
+88.) Record the Phase 85q collision-query and RNG-draw source-backed pairs:
+     204 domain-7 collision records and 168 domain-8 RNG records, each with
+     exact independent C/Swift/ASan parity, tamper rejection, and optimized
+     evidence. The effects row remains blocked and unadmitted.
+89.) Record Phase 85r's isolated admission of collision-query row
+     `0xc3294578ae77bee8` and RNG-draw row `0x7632df135b85e448`; preserve the
+     independent artifact hashes, report hashes, and rerun/partial/duplicate
+     fences without mutating the cumulative ledger.
+90.) Record Phase 85s's eight-row cumulative merge. The authoritative manifest
+     remains 7,420 rows; the cumulative report now has 8 terminal passed rows
+     and 7,412 planned, with report SHA-256
+     `91632bff276e0ecc99e845532f6b4d876a80ad237fbb660364a575313cbdc412`.
+     Phase 85t reconciles the docs while preserving the effects 58-versus-2
+     blocker and the M34/M35/clean-machine/human acceptance gates.
+91.) Record the Phase 85u audio-sequence and save-bytes source-backed pairs:
+     four domain-9 audio receipts and four domain-10/save receipts with exact
+     C/Swift/ASan/optimized parity and matching save sidecars. Keep native PCM,
+     device audio, effects, and full persistence authority separate.
+92.) Record Phase 85v's isolated admission of the canonical audio-sequence row
+     `0xbe184196f54f8216` and save-bytes row `0x4e5552533aaa717d`, including
+     independent artifact, tamper, partial, rerun, and `fixture_only=0` fences.
+     The effects and `audio_pcm` rows remain planned.
+93.) Record Phase 85w's ten-row cumulative merge. The authoritative manifest
+     remains 7,420 rows; the cumulative report now has 10 terminal passed rows
+     and 7,410 planned, with report SHA-256
+     `693e70c316756c369577ccdf263f8b40f6d0b0766f92195b23cb4c979a9ccc35`.
+     Phase 85x reconciles the docs while preserving the effects 58-versus-2,
+     audio PCM, and M34/M35/human acceptance boundaries.
+94.) Record Phase 85z's render-packet and audio-PCM boundary. The independent
+     render pair contains 8 domain-11 records and exact C/Swift/ASan/Release
+     trace SHA-256 `379fc6cc84990d2ed67223df19dc78d540b3f7ba1768abc2ebad7a61eea01179`;
+     the PCM audit reaches two real pre-device callbacks but zero canonical
+     domain-9/kind-5 receipts, so `audio_pcm` remains planned.
+95.) Record Phase 85aa's isolated render-packet admission and explicit
+     `gpu_capture=separate`, `pixel_acceptance=unverified`, and
+     `visual_acceptance=unverified` boundaries. No cumulative ledger or GPU
+     acceptance mutation is implied.
+96.) Record Phase 85ab's eleven-row cumulative merge. The authoritative
+     manifest remains 7,420 rows; the cumulative report now has 11 terminal
+     passed rows and 7,409 planned, with report SHA-256
+     `a67d6b3415a9327ac73c8fc37d9b529c3edce6fe4aae56c9d08c80f72b59d5d3`.
+     Phase 85ac reconciles the docs while preserving effects/PCM and
+     M34/M35/visual/physical/human acceptance boundaries.
+97.) Record Phase 85ac's owner-thread fixed-width PCM receipt seam after
+     native synthesis and before device playback. Raw PCM bytes, AVAudio
+     pointers, and realtime callback instrumentation remain outside Swift.
+98.) Record Phase 85ad's isolated admission of the canonical `audio_pcm` row
+     `0x4aa75cc09d180fce`, with two exact domain-9/kind-5 receipts,
+     C/Swift/ASan/Release trace equality, receipt equality, and all tamper,
+     partial, single-artifact, and rerun fences. Audible/device parity remains
+     unverified.
+99.) Record Phase 85ae's twelve-row cumulative merge. The authoritative
+     manifest remains 7,420 rows; the cumulative report now has 12 terminal
+     passed rows and 7,408 planned, with report SHA-256
+     `5afa6c4b80f75fa70d18bfc4aab9b499266e69a8fdb61e11bc9a24a18a6cc958`.
+     Phase 85af reconciles the docs while preserving the effects, audible/
+     device, visual, M34/M35, physical, and human acceptance boundaries.
+100.) Record Phase 85af's interaction-state source-backed pair. The observed
+      empty-start window retains 14 domain-4/state records over ticks 2 and 3;
+      Swift serializes only fixed-width interaction values while C retains
+      collision and interaction authority and effects remain unadmitted.
+101.) Record Phase 85ag's isolated admission of interaction-state row
+      `0x3e1cdaca08b21f54`, report SHA-256
+      `2b8916452ceb54cf85fd18defcc883d211a5f1da41f04fd16c665d5dd5040457`,
+      with C/Swift/ASan/Release equality, tamper/partial/single-artifact and
+      terminal rerun fences. No cumulative ledger mutation is implied.
+102.) Record Phase 85ah's thirteen-row cumulative merge. The authoritative
+      manifest remains 7,420 rows; the cumulative report now has 13 terminal
+      passed rows and 7,407 planned, with report SHA-256
+      `ac3e2c19162fdcab8c938497d48398dbac8eb03004d2918a4524292573f9d8ad`.
+      Phase 85ai reconciles the docs while preserving the effects, interaction
+      authority, audible/device, visual, M34/M35, physical, and human gates.
+103.) Record Phase 85ai's effects receipt parity repair. Native publishes the
+      fixed-width owner-thread receipt before the schema-4 effect record;
+      Swift independently reconstructs all 58 records while raw PCM and
+      realtime AVAudio pointers remain outside the seam.
+104.) Record Phase 85aj's isolated admission of effects row
+      `0x3951f0333dc3c5da`, isolated report SHA-256
+      `0c3fa33cd0d219a0e5347d6131397301e48699f91ee17a82c0c029607115a93d`,
+      and trace SHA-256
+      `68329f0a22e7d20f5ddb3b22777d74e626523d5c0467ccac569566eb6c998226`.
+      Device effects, haptic feel, audible output, and human acceptance remain
+      unverified.
+105.) Record Phase 85ak's fourteen-row cumulative merge. The authoritative
+      manifest remains 7,420 rows; the cumulative report now has 14 terminal
+      passed rows and 7,406 planned, with report SHA-256
+      `4eccd90e978fbcd0cad42f8f64ba96c25774698c49b919ba1e3fdb020b1e0cd2`.
+      Phase 85al reconciles the docs while preserving device/haptic/audible,
+      visual, M34/M35, physical, and human acceptance boundaries.
+106.) Record Phase 85am's level-script, save-mutation, and transition route
+      work. Save mutation reaches source-backed global/save receipts and an
+      isolated admission; the authored level-script pair emits no transition,
+      and the bounded no-floor transition probe remains blocked without a
+      source-authored recipe.
+107.) Record Phase 85am's save-mutation admission for row
+      `0x022fbda0ff7f2dd1`, isolated report SHA-256
+      `19dc977d7b8927089f7f22d22e1c35f5ab961ccc0a3c8ba62f741e6f221c29d6`,
+      with exact 16-record C/Swift/ASan/Release and sidecar/snapshot equality.
+      Level-script and transition rows remain unadmitted.
+108.) Record Phase 85ao's fifteen-row cumulative merge. The authoritative
+      manifest remains 7,420 rows; the cumulative report now has 15 terminal
+      passed rows and 7,405 planned, with report SHA-256
+      `dfa2dd3c56fa8e5a97e1f1b699843b40aec24dfbcb8d3094825a8ace2cbd5c7c`.
+      Phase 85ap reconciles the docs while preserving level/transition
+      blockers and M34/M35/device/audible/visual/physical/human gates.
+109.) Record Phase 85aq's disjoint Luna-max route-family and production-gate
+      triage. Behavior, display-list, geo/collision, render/audio, and
+      level/transition candidates remain planned; M34 is blocked by the locked
+      offline host/GPU-tools service and M35 by signing/notary prerequisites.
+      No manifest, cumulative ledger, or release artifact changed.
+110.) Record Phase 85ar's first source-bound route batch. The pendulum native
+      seam retains 64 authored ticks and two clock receipts but cadence-aware
+      Swift domains do not yet pair; the `find_floor` call-site is unreached;
+      and the selected audio asset has no authored sequence-12/PCM identity.
+      No route row was promoted.
+111.) Record Phase 85as's authored level-script/transition investigation. The
+      CotMC pair remains exact for 505 global/script records with transition=0;
+      all initialized movement probes retain floor, and the alternate death
+      warp is not the `mario.c:1778` no-floor branch.
+112.) Record Phase 85at's M34 production retry. The read-only host gate reports
+      no online display and a locked console; `gputoolsserviced`, pixel PNGs,
+      long-soak metrics, direct-display interaction, and physical acceptance
+      remain unavailable.
+113.) Record Phase 85au's M35 readiness retry. Ordinary Xcode 26.6 and the M9/
+      M35 contracts pass, but no Developer ID identity/private key or supported
+      `notarytool` credentials exist; no archive/export/notarization/stapling,
+      clean-machine Gatekeeper, or human acceptance result exists.
+114.) Record Phase 85av's canonical audit and docs reconciliation. The
+      authoritative manifest remains 7,420 rows; the cumulative report remains
+      15 terminal passed and 7,405 planned with report SHA-256
+      `dfa2dd3c56fa8e5a97e1f1b699843b40aec24dfbcb8d3094825a8ace2cbd5c7c`.
+      All per-phase local commit attempts are retained as blocked while the
+      managed checkout rejects `.git/index.lock` writes.
+115.) Record Phase 85aw's final conservative audit. Strict Swift 6,
+      C/Swift route-pair, sanitizer/Release, and Metal 4 source/archive/scene
+      contracts pass; route qualification remains 15/7,420 = 0.202156334%.
+      M34 device/pixel/soak, M35 release/Gatekeeper, and fresh-save human
+      acceptance remain blocked or not-run, so the implementation and
+      acceptance floors stay 0%.
+116.) Record Phase 85bb's canonical merge of the display-list and
+      render-callback admissions. The authoritative manifest remains 7,420
+      rows; the cumulative report now has 18 terminal passed and 7,402 planned,
+      with report SHA-256
+      `c5c6377b5a2378bd996d91a9d231d0c94070edd623e2b8019f0eeac626ebac74`.
+      M34/M35 and human acceptance remain separate external gates.
+117.) Record Phase 85bd's final audit. Strict Swift/Metal and acceptance
+      contract checks pass or fail closed as expected, but the current camera
+      `find_floor` rerun drifts from the retained admission (`actual=11383`
+      versus `11391`, coverage `0x9a76a4bb357f867e` versus `0x1c41224c64ab005f`).
+      Camera reproducibility repair is required before refreshed promotion.
+118.) Record Phase 85be's camera reproducibility repair. Direct pair runs now
+      use fresh build roots and restore exact 30-record C/Swift/ASan/Release
+      parity for `0x1e3500f9eb2b95d4`, with coverage
+      `0x1c41224c64ab005f` and all rerun/negative fences passing.
+119.) Record Phase 85bf's fail-closed route-breadth attempts. Native-only RNG
+      receipts were retained; text asset generation and RR behavior entry did
+      not reach live C/Swift pairing. The canonical state remains 18 terminal /
+      7,402 planned.
+120.) Record Phase 85bg's exact JRB RNG pair: 40 receipts at tick 2084 with
+      C/Swift/ASan/Release byte equality and tamper rejection. Admission fences
+      remain outstanding and the canonical row stays planned; water-level
+      remains unreachable in the authored JRB recipe.
+121.) Record Phase 85bh's corrected RNG admission and canonical merge. The
+      instrumentation-only `random_seed_get` row was removed from the generated
+      inventory, the manifest remains 7,420 rows, and the report now has 19
+      terminal passed / 7,401 planned with SHA-256
+      `e21b7c385df0bba86431634b99b04d0e92f188bbe9294912aa4f3f4fc988842c`.
+122.) Record Phase 85bj's authored text-save admission and canonical merge.
+      The manifest remains 7,420 rows; the report now has 20 terminal passed /
+      7,400 planned with SHA-256
+      `d9d932987046f489b81110c58668aa5a7359d8bbeeb8d895bea10e135e004b2f`.
+123.) Record Phase 85bk's second authored inside-castle display-list pair and
+      the fail-closed SL RNG-float reachability probe. The pair is not yet
+      admitted; no canonical row changed.
+124.) Record Phase 85bl's second display-list admission and current-build
+      repair. The canonical report now has 21 terminal passed / 7,399 planned
+      with SHA-256
+      `071c6bd6e9d15cdf379a2602072ba24fe0d689205baed6744f84f4b142b9c82b`.
+125.) Record Phase 85bn's current 21-row audit. Object-state `actual=2965`
+      and camera `actual=11391` are aligned; strict route/Metal contracts pass,
+      while broad legacy parity and M34/M35/human gates remain open.
+126.) Record Phase 85bq's isolated admission of the authored inside-castle
+      display-list shard `0x009e431051dba428` (`inside_castle_seg7_dl_07043A68`).
+      C/Swift/ASan/Release/rerun traces and packet sidecars are byte-identical;
+      the isolated report SHA-256 is
+      `6b346ddd8660ce96ae42069bd8cadae06efc1668809762f0e709cb2975700c0a`.
+127.) Record Phase 85br's canonical merge of the inside-castle admission. The
+      authoritative manifest remains 7,420 rows; the cumulative report now
+      has 22 terminal passed and 7,398 planned, with report SHA-256
+      `7cbfe09e0b8ecce06908701fb12f66e528d8963a13a2b8b10eebe0795d3639e3`.
+      M34/M35 distribution and human acceptance remain separate open gates.
+128.) Record Phase 85bs/85bt's authored wooden-door display-list pair and
+      isolated admission. `door_seg3_dl_03014EF0` reaches through its authored
+      parent `door_seg3_dl_03014F98`; C/Swift/ASan/Release/rerun and all
+      negative fences pass. Admission report SHA-256 is
+      `2ce9528e63c43da26617ebef3b2260c826a2914838fc0e3bf3aaf915071e6ebb`.
+129.) Record Phase 85bu's canonical merge of the door admission. The
+      authoritative manifest remains 7,420 rows; the cumulative report now
+      has 23 terminal passed and 7,397 planned, with report SHA-256
+      `af0068294ae4506f8456a2bb54659745cbc16fb2f4e33466ab4c2a53decff28e`.
+      M34/M35 distribution and human acceptance remain separate open gates.
+130.) Record Phase 85bw's read-only M34 event-gate audit. `gputoolsserviced`
+      is launchd-running, but the GUI remains locked, no display is online,
+      no GPU replay session exists, and thermal queries still return
+      `0xe00002bc`; no pixel, soak, or physical acceptance claim changed.
+131.) Record Phase 85bv's fail-closed authored pendulum behavior triage. Castle
+      Inside area 2 reaches native slot 37, but native emits 1,059 records over
+      ticks 2–65 versus Swift's 1,056 over ticks 1–64; identity-normalized
+      diagnostics still diverge on source-object position. No route promotion
+      or canonical ledger mutation is allowed until those contracts align.
+132.) Record Phase 85bx's fail-closed HMC elevator behavior candidate. The
+      authored area-1 route reaches the area, but native reports
+      `hmcPlatformSlot=0`, no object-domain records, and no target identity;
+      the standalone Swift/C kernel fingerprint and strict/ASan/optimized
+      checks pass without producing an admissible schema-4 route pair.
+133.) Record Phase 85by's fail-closed authored intro transition probe. The
+      real recipe emits 195 script records over ticks 3–241 with no failures,
+      but transition ID 3 remains absent because 120 owner steps cover only 60
+      legacy frames before the authored `SLEEP(75)` completes. No synthetic
+      transition or canonical route promotion is allowed.
+134.) Record Phase 85ca's 150-step authored intro retry. The isolated Debug
+      native run emits 240 script records with zero failures/errors, but still
+      reaches zero transition-ID-3 records; no Swift pair or canonical route
+      promotion is allowed.
+135.) Record Phase 85cc's fail-closed render/audio candidate. Native lifecycle
+      evidence retains 289,362 schema-4 records, 720 PCM receipts/callbacks,
+      and 391,680 frames for sequence asset `0x12`, but zero sequence-12
+      records. Swift source-header and negative fences pass; exact C/Swift
+      pairing and canonical promotion remain deferred until an authored
+      high-score recipe reaches `play_star_fanfare()`.
+136.) Record Phase 85cd's authored high-score audio reachability. The
+      `SM64_MODERN_AUTOMATED_CASTLE_AREA2=1` route reaches sequence `0x12` at
+      tick 63 with 720 PCM receipts and 391,680 playback frames. Exact C/Swift
+      per-PCM binding remains deferred, so no canonical route promotion occurs.
+137.) Record Phase 85ce's exact source-bound PCM pairing. Sequence `0x12`
+      matches across C/Swift/ASan/Release for 720 PCM records/receipts/
+      callbacks and 391,680 frames with all negative fences. The full
+      476,365-record trace still diverges outside the PCM projection at record
+      355, so canonical admission remains deferred.
+138.) Record Phase 85cf's full-trace reconciliation. The divergence is now
+      localized to record 355, byte offset 45576, in a domain-12/kind-4
+      non-PCM payload (`tick=1`, `subject=11`, `record_id=4`, `sequence=10`).
+      The 720-record PCM contract remains exact, but non-PCM provenance must be
+      resolved before canonical admission.
+139.) Record Phase 85cg2's static audio payload provenance. Record 355 offset
+      45576 is `OBJECT_SPAWN` `values[1]`, a behavior identity; unknown scripts
+      use an anchor-relative pointer delta that varies across build layouts.
+      The exact authored subject-11 behavior remains unproven, so whole-trace
+      admission stays fail-closed.
+140.) Record Phase 85ch's source behavior identity proof. Source ordering proves
+      subject 11 is the first Castle Inside area-1 macro sign using authored
+      `bhvSignOnWall`; its expected semantic FNV identity is
+      `0x58c5c9f354614b2d`. Build-layout pointer identities remain unstable, so
+      semantic mapping and exact full-trace parity remain required.
+141.) Record Phase 85ci's source-bound `bhvSignOnWall` semantic mapping. Subject
+      11 now matches identity `0x58c5c9f354614b2d` across Debug/ASan/Release,
+      but whole native traces still diverge at record 361/offset 64 with
+      layout-dependent values. Full C/Swift pairing and canonical admission
+      remain deferred.
+142.) Record Phase 85cj's audio full-trace provenance. Record 361 `values[1]`
+      maps to authored `bhvOneCoin` for macro-yellow-coin subjects 17–20, with
+      expected semantic identity `0xa4425fa3db847308`; build-layout fallback
+      values remain unstable, so full parity and admission are deferred.
+
+143.) Record Phase 85ck's source-bound `bhvOneCoin` semantic mapping
+      (`0xa4425fa3db847308`). Syntax compilation passed while fresh full-trace
+      parity and negative fences did not complete in the bounded run; retained
+      pre-change traces are not current evidence and canonical admission stays
+      deferred.
+144.) Record Phase 85cl's fresh full audio parity audit. Debug/ASan/Release/
+      Rerun retain 476,365 records, sequence 12 at tick 63, and exact PCM
+      parity, but cross-build full parity diverges on `bhvFloorTrapInCastle`
+      and `bhvCastleFloorTrap` pointer identities. Correct `bhvOneCoin` FNV is
+      `0xc4e3fcc926a6842`; prior `0xa442...` evidence is stale.
+145.) Record Phase 85cm's floor-trap semantic mapping. `bhvFloorTrapInCastle`
+      (`0xccb7e7b3ab117769`) and `bhvCastleFloorTrap`
+      (`0x0c688e3d5e7a403e`) stabilize floor-trap records, but ASan later
+      diverges at object-despawn identity and Release at `bhvPaintingDeathWarp`;
+      full audio admission remains fail-closed.
+
+146.) Record Phase 85cn's despawn/painting identity mapping. Subject 54 is
+      authored `bhvBooInCastle` (`0xa63b55d3bf9ba914`) and subject 23 is
+      `bhvPaintingDeathWarp` (`0xe53422734eda5e67`), but retained build values
+      remain layout-dependent; fresh rerun/fences are required before admission.
+147.) Record Phase 85co's mapped audio rerun harness. Strict Swift verifier,
+      shell syntax, semantic identity encoding, and truncated-artifact rejection
+      pass, but no fresh native rerun completed; canonical promotion remains
+      deferred on the latest retained layout-dependent divergence.
+
+148.) Record Phase 85cp's fail-closed native audio rerun. Execution stopped
+      during the Debug native-core build before any route probe, so no fresh
+      traces, PCM receipts, parity, or negative-fence result exists; the
+      canonical 23/7,397 state is unchanged.
+149.) Record Phase 85cq's completed fresh Debug audio route. The trace is
+      60,974,792 bytes with 476,365 records and ASan/Release/rerun sidecars,
+      but Swift projection stops at a `bhvSignOnWall` mapping mismatch; the
+      first cross-build divergence is record 1426/domain 3 subject 27. No
+      parity or canonical admission claim is allowed.
+150.) Record Phase 85cr's source mapping for record 1426. Subject 27 is
+      authored `bhvPaintingStarCollectWarp` (`0xc00b59b883354537`) with
+      subjects 27–30 bound to Castle painting star-collect warp coordinates;
+      Release/rerun/Swift fences did not finish, so parity and admission remain
+      deferred.
+
+151.) Record Phase 85cs's fresh subject-27 audio parity. Subjects 27–30 match
+      `bhvPaintingStarCollectWarp` and PCM/receipt projections across builds,
+      but full parity fails at record 1482/offset 189824 for subject 31 actor
+      identity; canonical admission remains deferred.
+152.) Record Phase 85ct's source-authored subject-31 identity. Subject 31 is
+      `bhvDeathWarp` at `levels/castle_inside/script.c:62` with semantic identity
+      `0xa22b7ff16730e047`; focused C/Swift/ASan/Release/rerun and negative
+      fences pass, but the next mismatch is record 1496/byte 191617, subject 32
+      (`bhvAirborneStarCollectWarp`). Canonical audio admission remains deferred.
+153.) Record Phase 85cv's M34 host gate recheck. One display is detected but
+      offline, no `gpudebug` session is active, and thermal telemetry fails with
+      `0xe00002bc`; replay, pixels, soak, direct-display, and physical acceptance
+      remain unclaimed.
+154.) Record Phase 85cw's M35 distribution gate recheck. Stable Xcode 26.6 and
+      both distribution contracts pass, but no valid signing identity, Developer
+      ID certificate/private key, or notary credentials exist; no archive/export,
+      notarization, clean-machine Gatekeeper, or human acceptance evidence exists.
+155.) Record Phase 85cx's subject-32 source triage. The actor is the authored
+      90-degree `bhvAirborneStarCollectWarp` at `levels/castle_inside/script.c:61`
+      with expected semantic identity `0xa85510394290b349`; retained values are
+      layout-dependent and a fresh full matrix is required before promotion.
+156.) Record Phase 85cz's canonical audit. The 7,420-row manifest and 23/7,397
+      report remain byte-stable (`23c9d3f1…2b715` / `af006829…ff28e`), all
+      duplicate/conflict/fixture-only/terminal-rerun fences pass, and the
+      object/camera markers remain `actual=2965` / `actual=11391`.
+157.) Record Phase 85cy's airborne-star mapping. The source-bound
+      `bhvAirborneStarCollectWarp` identity is `0xa85510394290b349`; exact
+      C/Swift/rerun, PCM, receipt, and negative-fence seams pass, but parity
+      fails next at record 1524/byte 195201 for unresolved subject 34.
+158.) Record Phase 85da's launch-death source triage. Subject 34 is authored
+      `bhvLaunchDeathWarp` at `levels/castle_inside/script.c:59` with semantic
+      identity `0xbe5dc4c2a1630b6a`; subject 35 is the adjacent launch-star
+      warp, and the owner mapping/full parity rerun remain required.
+159.) Record Phase 85db's launch-death mapping attempt. The semantic owner
+      mapping is present and Debug/ASan traces plus PCM/receipts are complete,
+      but the bounded Release build stopped before Release/Swift/rerun/negative
+      fences; no parity or canonical promotion is claimed.
+160.) Record Phase 85dc's completed launch-death rerun. Corrected
+      Debug/ASan/Release/rerun/Swift, PCM/receipt, and negative fences pass for
+      subject 34; whole-trace parity advances to record 1538/byte 196992,
+      subject 35 `bhvLaunchStarCollectWarp`.
+161.) Record Phase 85dd's Release-build diagnosis. A fresh Release native-core
+      build exits 0 in 24.6 seconds with a valid 355-member archive; earlier
+      stops were bounded-interruption artifacts, not a reproduced build error.
+162.) Record Phase 85de's launch-star mapping. Subject 35 matches semantic
+      `bhvLaunchStarCollectWarp` (`0x0b9ebb9260f83fe`) across the complete matrix,
+      PCM/receipts, and negative fences; parity fails next at record 1566/byte
+      200576 for subject 37 and no canonical row moved.
+163.) Record Phase 85df's hard-air source triage. Subject 37 is authored
+      `bhvHardAirKnockBackWarp` at `levels/castle_inside/script.c:56` with
+      semantic identity `0x53f6c1e071460d11`; mapping and full rerun remain
+      required.
+164.) Record Phase 85dg's hard-air mapping. Subject 37 matches semantic
+      `bhvHardAirKnockBackWarp` across the complete matrix, PCM/receipts, and
+      negative fences; parity fails next at record 1580/byte 202368 for subject
+      38 and no canonical row moved.
+165.) Record Phase 85dh's airborne-death source triage. Subject 38 is authored
+      `bhvAirborneDeathWarp` at `levels/castle_inside/script.c:55` with semantic
+      identity `0x53e013ea7d7cc8b5`; mapping and full rerun remain required.
+166.) Record Phase 85di's airborne-death mapping. Subject 38 matches semantic
+      `bhvAirborneDeathWarp` across the complete matrix, PCM/receipts, and
+      negative fences; parity fails next at record 1594/byte 204160 for subject
+      39 and no canonical row moved.
+167.) Record Phase 85dj's airborne-warp source triage. Subject 39 is authored
+      `bhvAirborneWarp` at `levels/castle_inside/script.c:54` with semantic
+      identity `0x3e6af9ed47c59929`; mapping and full rerun remain required.
+168.) Record Phase 85dk's airborne-warp mapping. Subject 39 matches semantic
+      `bhvAirborneWarp` across the complete matrix, PCM/receipts, and negative
+      fences; parity fails next at record 1608/byte 205953 for subject 40 and no
+      canonical row moved.
+169.) Record Phase 85dl's instant-active source triage. Subject 40 is authored
+      `bhvInstantActiveWarp` at `levels/castle_inside/script.c:53` with semantic
+      identity `0xf961678fe6b653ea`; mapping and full rerun remain required.
+170.) Record Phase 85dm's instant-active mapping. Subjects 40–41 match semantic
+      `bhvInstantActiveWarp` across the complete matrix, PCM/receipts, and
+      negative fences; parity fails next at record 1636/byte 209536 for subject
+      42 and no canonical row moved.
+171.) Record Phase 85dn's warp source triage. Subject 42 is authored `bhvWarp`
+      at `levels/castle_inside/script.c:49` with semantic identity
+      `0x2b006194588201ff`; mapping and full rerun remain required.
+172.) Record Phase 85do's warp mapping. Subject 42 matches semantic `bhvWarp`
+      (`0x2b006194588201ff`) across the complete matrix, PCM/receipts, and
+      negative fences; parity fails next at record 1734/byte 222080 for subject
+      49 and no canonical row moved.
+173.) Record Phase 85dp's star-door source triage. Subject 49 is the second
+      authored eight-star `bhvStarDoor` at `levels/castle_inside/script.c:24`
+      with semantic identity `0xda6397948f7ac5cd`; mapping and full rerun remain
+      required.
+174.) Record Phase 85dq's star-door mapping. Subject 49 matches semantic
+      `bhvStarDoor` across the complete matrix, PCM/receipts, and negative
+      fences; parity fails next at record 1762/byte 225664 for subject 51 and no
+      canonical row moved.
+175.) Record Phase 85dr's Toad-message source triage. Subject 51 is authored
+      `bhvToadMessage` at `levels/castle_inside/script.c:262` with semantic
+      identity `0x00c91057a2eb6ffc`; mapping and full rerun remain required.
+176.) Record Phase 85ds's Toad-message mapping. Subject 51 matches semantic
+      `bhvToadMessage` across the complete matrix, PCM/receipts, and negative
+      fences; parity fails next at record 1804/byte 231040 for subject 55 and no
+      canonical row moved.
+177.) Record Phase 85dt's Tank-fish source triage. Subject 55 is authored
+      `bhvTankFishGroup` at `levels/castle_inside/script.c:258` with semantic
+      identity `0x82764ca860723a66`; mapping and full rerun remain required.
+178.) Record Phase 85du's Tank-fish mapping. Subject 55 matches semantic
+      `bhvTankFishGroup` across the complete matrix, PCM/receipts, and negative
+      fences; parity fails next at record 1860/byte 238208 for subject 59 and no
+      canonical row moved.
+179.) Record Phase 85dv's Fish-group mapping. Subject 59 matches semantic
+      `bhvFishGroup` across the complete matrix, PCM/receipts, and negative
+      fences; parity fails next at dynamic sparkle-spawner effect record
+      3244/byte 415368 and no canonical row moved.
+180.) Record Phase 85dw's sparkle-spawner mapping. The dynamic
+      `bhvSparkleParticleSpawner` identity is exact across the effect matrix and
+      fences; parity fails next at tick 3 record 3347/byte 428552 for `bhvCloud`.
+181.) Record Phase 85dx's Cloud mapping. Dynamic `bhvCloud` identity is exact
+      across the effect matrix and fences; parity fails next at tick 3 record
+      3413/byte 437000 for a `bhvCloudPart` child.
+182.) Record Phase 85dy's Cloud-part mapping. Dynamic `bhvCloudPart` identity
+      is exact across the effect matrix and fences; parity fails next at tick 3
+      record 3865/byte 494848 for `bhvClockMinuteHand`.
+183.) Record Phase 85dz's Clock-minute mapping. Dynamic `bhvClockMinuteHand`
+      identity is exact across the matrix and fences; parity fails next at tick
+      3 record 3879/byte 496640 for `bhvClockHourHand`.
+184.) Record Phase 85ea's final Clock-hour route evidence. All five 476,365-
+      record full traces are byte-identical (`15273415…198e5d`), PCM/receipts
+      and negative fences pass; canonical admission remains the next phase.
+185.) Record Phase 85eb's fail-closed audio-route admission. The exact trace
+      matrix is not promoted because coverage is deferred (`coverage_fingerprint=0`)
+      and the stream contains unrelated domains; a source-backed audio-only
+      capture with nonzero coverage is required.
+186.) Record Phase 85ef's source-backed audio-only coverage repair. The runtime
+      emits 1,084 audio-only records with coverage `0x553ab8ef49275722`; C/Swift/
+      ASan/Release/rerun, PCM/receipts, and fences pass; canonical admission is next.
+187.) Complete Phase 85f0 isolated canonical admission for audio-asset shard
+      `0x03345fc560c65b75`. Independent trace/PCM/receipt artifacts and the
+      proof sidecar pass all phase-local negative fences; report SHA is
+      `7c22c62f13e25c430069bdfe1c77840fd5f6751737a3c63b3ff6361e88bdb19d`,
+      proof SHA is `6dda3168db361324d0283056476be0cef7dc95c249225d757d874303c4bb2081`,
+      and the 23/7,397 canonical report remained unchanged at that isolated
+      phase pending Phase 85f1.
+188.) Complete Phase 85f1's cumulative audio-asset merge. The isolated row
+      `0x03345fc560c65b75` joins the 23 prior terminal rows for 24 terminal /
+      7,396 planned; merged report SHA is
+      `9a68a65a3e20838fab76d35014fd46172e9435de00e8e5b2148d44c0eee4985f`.
+      The manifest SHA remains `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+189.) Record Phase 85f2's bounded pendulum route attempt and M34 re-audit.
+      The pendulum remains fail-closed at 1,087 native versus 1,056 Swift
+      records with identity/coverage divergence; M34 remains blocked by the
+      locked console, offline display, no active GPU session, and thermal
+      error `0xe00002bc`.
+190.) Record Phase 85g2's M35 distribution re-audit. Stable Xcode 26.6 and
+      readiness/distribution contracts pass, but Developer ID identity/private
+      key and supported notary authentication are absent; no release,
+      Gatekeeper, or human-acceptance result exists.
+191.) Record Phase 85f3's pendulum lifecycle repair and four-way matrix.
+      Debug/ASan/Release/rerun pairs each contain 1,056 matched records with
+      semantic identity `0x6268765f647065` and coverage
+      `0x680ff75430bf24ff`; the route remains planned pending admission.
+192.) Complete Phase 85f4/85f5 pendulum admission and canonical merge. The
+      pendulum row is now cumulative terminal evidence 25/7,395; merged report
+      SHA is `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
+193.) Record Phase 85f6 isolated admission for authored JRB `random_u16` row
+      `0x00576356a427dbc2`. Exact 40-record C/Swift/ASan/Release parity and
+      negative fences pass; the row was already terminal in the cumulative
+      ledger and the isolated report SHA is
+      `3055c4bc5f492a0b8779c45129727dbf2e90da76edea1a5e53352209f729d0ea`.
+194.) Record Phase 85f6 BBH display-list discovery. Candidate
+      `0x000670ec2a57dfa8` is reachable/source-authored but stays planned
+      because no pointer-free BBH packet seam exists and nested display-list
+      provenance is unresolved.
+195.) Record Phase 85f8 RNG-float reachability. The authored Moneybag source
+      exists, but the initialized lifecycle remains in area 2 with zero runtime
+      Moneybags and zero source-owned route receipts; no Swift pair or
+      canonical mutation is permitted.
+196.) Record Phase 85f9 water-level reachability. JRB environmental water data
+      is present, but no authored Sushi object reaches `find_water_level`; shard
+      `0x023fe9bb4409460b` remains planned and no synthetic route is allowed.
+197.) Record Phase 85f10 route-breadth audit. No new candidate met authored
+      reachability, pointer-free ownership, independent C/Swift parity,
+      four-way configuration parity, and admission gates; route state remains
+      25 terminal / 7,395 planned.
+198.) Record Phase 85f11 DDD Sushi discovery. DDD reaches two authored Sushi
+      objects and `find_water_level` statically, but no pointer-free owner/query
+      receipt exists; shard `0x023fe9bb4409460b` remains planned.
+199.) Record Phase 85f17's documentation reconciliation after the Phase 85f14
+      audit. Current status headings now point to Phase 85f11, the historical
+      Phase 85aw 15/7,420 counter is restored, `gputoolsserviced` wording is
+      corrected, and the f-series handoff indexes are serialized without
+      changing source, canonical manifests, or reports.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they

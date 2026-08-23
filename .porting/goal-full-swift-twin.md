@@ -2,13 +2,206 @@
 
 ## Status
 
-### Phase 84c current status
+### Phase 85f11 current status
 
 The authoritative current counters remain **534 behavior rows** (511 Swift
-value/owner rows and 23 explicit C adapters) and **7,420 route shards**: one
-non-fixture live-qualified row and 7,419 planned. Behavior mapping is 95.693%
-and live-route qualification is 0.013477%; the conservative full-goal and
-acceptance floors remain 0%. These are separate ledgers, not an average.
+value/owner rows and 23 explicit C adapters) and **7,420 route shards**:
+twenty-five non-fixture terminal passed rows and 7,395 planned. Behavior mapping
+is 95.693% and live-route qualification is 0.336927224%; the conservative
+full-goal and acceptance floors remain 0%. These are separate ledgers, not an
+average.
+
+Phases 85aq–85as used disjoint Luna-max workers to triage remaining route
+families and replay authored level/transition recipes. Camera `find_floor`,
+display-list, and render-callback now have source-bound terminal rows; pendulum,
+audio-asset, geo/collision, and level/transition candidates remain fail-closed
+because exact parity or an authored branch is missing. Phase 85av
+re-ran the canonical merge audit with byte-identical manifest/report hashes
+(`23c9d3f1…` / `dfa2dd3c…`) and preserved 15 terminal rows.
+
+Phase 85at retried M34 attachment replay, cadence/thermal soak, and
+direct-display evidence. The host was locked with no online display,
+`gputoolsserviced` is launchd-running again, but the GUI session remains locked,
+no display is online, and `gpudebug --list-sessions` reports no active session;
+no PNG, pixel verdict, long soak, or physical visual/feel result exists. Phase 85au rechecked M35 with ordinary
+Xcode 26.6; contracts pass, but no Developer ID identity/private key or
+`notarytool` credentials are present, so no archive/export/notarization,
+clean-machine Gatekeeper, or human acceptance result exists.
+
+Phase 85aw's final audit passes strict Swift 6, focused C/Swift route-pair,
+ASan/UBSan/Release, and Metal 4 source/archive/scene contracts. The separate
+conservative floors remain 0%: M34 device/pixel/soak evidence is blocked by
+the locked/offline host, no active GPU session, and missing visible-display
+evidence, M35 release/Gatekeeper
+evidence is blocked by missing Developer ID/notary credentials, and the fresh-
+save human 120-star checklist is not run. The historical Phase 85aw route
+qualification was 15/7,420 = 0.202156334%, with 7,405 planned; later route
+admissions are recorded separately below. The conservative floors remain
+historical 0% gates, not a closure claim.
+
+Phase 85bu extended the canonical report to 23 terminal rows and 7,397 planned;
+Phase 85f5 later added the pendulum row, producing 25 terminal / 7,395 planned
+and report SHA
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
+Phase 85ct source-proved subject 31 as the authored `bhvDeathWarp` at
+`levels/castle_inside/script.c:62`, with semantic identity
+`0xa22b7ff16730e047`. Debug/ASan/Release/rerun/Swift traces and PCM/receipt
+sidecars pass their focused gates, but whole-trace parity was still fail-closed
+at record 1496 / byte 191617 for subject 32, `bhvAirborneStarCollectWarp`; this
+is historical pre-audio evidence.
+No canonical audio row moved. Phase 85cv independently rechecked M34 and
+confirmed the detected display is offline, no GPU session is active, and
+thermal telemetry fails with `0xe00002bc`; replay/pixel/soak/physical evidence
+is still not claimable.
+Phase 85cx source-triaged subject 32 as the authored 90°
+`bhvAirborneStarCollectWarp` at `levels/castle_inside/script.c:61`, with
+expected semantic identity `0xa85510394290b349`; a fresh full matrix remains
+required before promotion.
+Phase 85cz re-ran the pre-audio canonical ledger audit without mutation:
+manifest/report SHAs then remained `23c9d3f1…2b715` / `af006829…ff28e`, with
+23 terminal / 7,397 planned and all duplicate/conflict/fixture-only/
+terminal-rerun fences passing. Object/camera markers remain `actual=2965` and
+`actual=11391`.
+Phase 85cy added the source-bound `bhvAirborneStarCollectWarp` identity
+`0xa85510394290b349` and completed the isolated full matrix; C/Swift/rerun,
+PCM, receipt, and negative-fence seams pass, but whole-trace parity fails at
+record 1524 / byte 195201 for unresolved subject 34. No audio row moved.
+Phase 85da source-proved subject 34 as `bhvLaunchDeathWarp` at
+`levels/castle_inside/script.c:59`, with semantic identity
+`0xbe5dc4c2a1630b6a`; subject 35 is the adjacent line-58
+`bhvLaunchStarCollectWarp`. The owner mapping and fresh parity rerun remain
+required.
+Phase 85db added that narrow owner mapping and produced complete Debug/ASan
+artifacts with matching PCM/receipt sidecars, but Release/Swift/rerun/
+negative-fence evidence is absent after the bounded Release build stop. No
+parity or canonical promotion is claimed.
+Phase 85dc completed the corrected Debug/ASan/Release/rerun/Swift matrix,
+PCM/receipt pairing, and negative fences. Subject 34 now matches
+`bhvLaunchDeathWarp` across all five traces, but parity fails next at record
+1538 / byte 196992 for subject 35, the adjacent `bhvLaunchStarCollectWarp`;
+no audio row moved.
+Phase 85dd confirmed a fresh Release native-core build exits 0 in 24.6 seconds
+with a valid 355-member archive; earlier stops were bounded-interruption
+artifacts, not compiler/linker/resource/permission failures.
+Phase 85de added `bhvLaunchStarCollectWarp` (`0x0b9ebb9260f83fe`) and passed
+the complete matrix plus PCM/receipt/negative fences for subject 35; parity
+now fails at record 1566 / byte 200576 for subject 37. No audio row moved.
+Phase 85df source/symbol triage identifies subject 37 as
+`bhvHardAirKnockBackWarp` at `levels/castle_inside/script.c:56`, semantic
+identity `0x53f6c1e071460d11`; mapping/rerun remain required.
+Phase 85dg added that mapping and passed the complete matrix plus PCM/receipt/
+negative fences for subject 37; parity now fails at record 1580 / byte 202368
+for subject 38. No audio row moved.
+Phase 85dh source/symbol triage identifies subject 38 as
+`bhvAirborneDeathWarp` at `levels/castle_inside/script.c:55`, semantic identity
+`0x53e013ea7d7cc8b5`; mapping/rerun remain required.
+Phase 85di added that mapping and passed the complete matrix plus PCM/receipt/
+negative fences for subject 38; parity now fails at record 1594 / byte 204160
+for subject 39. No audio row moved.
+Phase 85dj source/symbol triage identifies subject 39 as `bhvAirborneWarp` at
+`levels/castle_inside/script.c:54`, semantic identity `0x3e6af9ed47c59929`;
+mapping/rerun remain required.
+Phase 85du added that mapping and passed the complete matrix plus PCM/receipt/
+negative fences for subject 55; parity now fails at record 1860 / byte 238208
+for subject 59. No audio row moved.
+Phase 85dv added `bhvFishGroup` (`0xc6155cb64739208a`) and passed the complete
+matrix plus PCM/receipt/negative fences for subject 59; parity now fails at
+dynamic sparkle-spawner effect record 3244 / byte 415368.
+Phase 85dw added `bhvSparkleParticleSpawner` (`0x592bd9fc97e8d9cd`) and passed
+the complete effect matrix/fences; parity then advanced to dynamic `bhvCloud`.
+Phase 85dx added `bhvCloud` (`0xd5ddc2c0adf7ebee`) and passed the complete
+dynamic effect matrix/fences; parity now fails at tick 3 record 3413 / byte
+437000 for a dynamic `bhvCloudPart` child.
+Phase 85dy added `bhvCloudPart` (`0x38efdd59a4a22407`) and passed the complete
+effect matrix/fences; parity now fails at tick 3 record 3865 / byte 494848 for
+dynamic `bhvClockMinuteHand`.
+Phase 85ea added `bhvClockHourHand` (`0x670a6acb648286ae`) and closed the full
+Castle audio/effect matrix with byte-identical five-trace SHA
+`15273415…198e5d`, exact PCM/receipts, and passing negative fences. Canonical
+admission remains separate. Phase 85eb kept the audio-asset candidate
+fail-closed because the original header deferred coverage and the stream
+included unrelated domains. Phase 85ef repaired that boundary in the native
+producer: opt-in audio-only capture now emits 1,084 records with coverage
+`0x553ab8ef49275722`; independent C/Swift/ASan/Release/rerun traces, PCM/
+receipts, and negative fences pass. Phase 85f0 then completed isolated
+admission of manifest row `0x03345fc560c65b75` with report SHA
+`7c22c62f13e25c430069bdfe1c77840fd5f6751737a3c63b3ff6361e88bdb19d` and proof
+SHA `6dda3168db361324d0283056476be0cef7dc95c249225d757d874303c4bb2081`.
+Phase 85f1 merged that isolated row into cumulative evidence: 24 terminal /
+7,396 planned, report SHA
+`9a68a65a3e20838fab76d35014fd46172e9435de00e8e5b2148d44c0eee4985f`.
+Phase 85f2 re-audited M34 and the pendulum route without promotion: the host is
+locked/offline with no active GPU session and thermal telemetry error
+`0xe00002bc`, while pendulum native/Swift records and identities diverge.
+Phase 85g2 re-audited M35; stable Xcode 26.6 contracts pass, but Developer ID
+and notary prerequisites remain absent.
+Phase 85f3 repaired the pendulum lifecycle boundary and passed exact
+Debug/ASan/Release/rerun pairing at 1,056 matched records per matrix with
+semantic identity `0x6268765f647065`; Phases 85f4 and 85f5 then admitted and
+merged the row into cumulative evidence, now 25/7,395.
+Phase 85f6 independently admitted the authored JRB `random_u16` route with
+exact 40-record C/Swift/ASan/Release parity; the row was already terminal in
+the cumulative ledger, so no duplicate merge occurred.
+Phase 85f8 attempted the planned Snowman’s Land `random_float` route but the
+initialized lifecycle remained in area 2 with no runtime Moneybag or receipt;
+the route remains fail-closed.
+Phase 85f10 route-breadth audit found no new candidate meeting source
+reachability, pointer-free ownership, independent parity, four-way parity, and
+admission gates; the cumulative route state remains 25/7,395.
+Phase 85f11 confirms DDD is source-reachable for `find_water_level` through two
+authored Sushi objects, but no pointer-free owner/query receipt exists yet; the
+row remains planned without synthetic instrumentation.
+Phase 85dt source/symbol triage identifies subject 55 as `bhvTankFishGroup` at
+`levels/castle_inside/script.c:258`, semantic identity `0x82764ca860723a66`;
+mapping/rerun remain required.
+Phase 85dk added that mapping and passed the complete matrix plus PCM/receipt/
+negative fences for subject 39; parity now fails at record 1608 / byte 205953
+for subject 40. No audio row moved.
+Phase 85dl source/symbol triage identifies subject 40 as
+`bhvInstantActiveWarp` at `levels/castle_inside/script.c:53`, semantic identity
+`0xf961678fe6b653ea`; mapping/rerun remain required.
+Phase 85dm added that mapping and passed the complete matrix plus PCM/receipt/
+negative fences for subjects 40–41; parity now fails at record 1636 / byte
+209536 for subject 42. The additional 85do Warp mapping advances the first
+remaining mismatch to subject 49 at record 1734 / byte 222080. No audio row
+moved.
+Phase 85do added `bhvWarp` (`0x2b006194588201ff`) and passed the complete matrix
+plus PCM/receipt/negative fences through subject 42.
+Phase 85dp source/symbol triage identifies subject 49 as the second authored
+8-star `bhvStarDoor` at `levels/castle_inside/script.c:24`, semantic identity
+`0xda6397948f7ac5cd`; mapping/rerun remain required.
+Phase 85dq added that mapping and passed the complete matrix plus PCM/receipt/
+negative fences for subject 49; parity now fails at record 1762 / byte 225664
+for subject 51. No audio row moved.
+Phase 85dr source/symbol triage identifies subject 51 as `bhvToadMessage` at
+`levels/castle_inside/script.c:262`, semantic identity `0x00c91057a2eb6ffc`;
+mapping/rerun remain required.
+Phase 85ds added that mapping and passed the complete matrix plus PCM/receipt/
+negative fences for subject 51; parity now fails at record 1804 / byte 231040
+for subject 55. No audio row moved.
+Phase 85dn source/symbol triage identifies subject 42 as `bhvWarp` at
+`levels/castle_inside/script.c:49`, semantic identity `0x2b006194588201ff`;
+mapping/rerun remain required.
+Phase 85cw rechecked M35: stable Xcode 26.6 and both distribution contracts
+pass, but no valid signing identity, Developer ID certificate/private key, or
+notary credentials exist; no archive/export/notarization, clean-machine
+Gatekeeper, or human acceptance evidence is claimable.
+Phase 85be restored current camera `find_floor` reproducibility with a fresh
+build root: `actual=11391`, coverage `0x1c41224c64ab005f`, and exact
+Debug/ASan/Release/rerun parity. The retained camera admission is current
+again; remaining planned rows and external gates stay fail-closed.
+Phase 85bf added native-only RNG receipts and prepared text/behavior seams.
+Phase 85bg/85bh have an exact 40-record RNG C/Swift/ASan/Release pair and
+canonical admission; Phase 85bi/85bj add the authored text row canonically.
+Phase 85bk/85bl add and canonically admit a second exact inside-castle
+display-list pair; its RNG-float candidate remains unreachable in authored SL
+area 1. Phase 85bq independently admits the authored
+`inside_castle_seg7_dl_07043A68` shard with byte-identical C/Swift/ASan/Release
+traces and packet sidecars. Phase 85br canonically merges it. Phase 85bs/85bt
+qualify and admit the authored door leaf `door_seg3_dl_03014EF0`; Phase 85bu
+canonically merges it. Current object-state full-stream markers are aligned to
+`actual=2965`, camera `actual=11391`, and broad legacy C/Swift pairing plus
+external M34/M35/human gates remain open.
 
 Phases 81–82b moved M34 from the earlier locked/asleep-host failure to a
 ready-host, zero-drop API/shader-validation pass. Phase 82a removed the
@@ -39,13 +232,93 @@ allocation, and nominal thermal observations. This does not prove a 10- or
 30-minute soak, complete GPU/temperature/power telemetry, direct-to-display
 output, or physical feel.
 
-The Phase 79 Mario-state route remains planned: its native owner/parity
-prototype stopped before required domain-2/state records, so no route pair or
-ledger mutation is allowed. M34 still needs functioning attachment replay,
-reference-pixel comparison, longer/complete performance and thermal evidence,
-and physical visual/feel review. M35 still needs credentials, signed/stapled
-artifacts, clean-machine checks, and the fresh-save human 120-star checklist.
-This is not a shipped, visual-parity, or complete full-game Swift port.
+Phases 85a and 85b repaired the native Mario-state owner lifecycle and then
+qualified exact C/Swift/ASan schema-4 parity for the two-tick, 38-record state
+stream. Phase 85c admitted the canonical `oracle_hook|mario_state` row
+(`0x88d04246f94ce9f8`) exactly once. Phases 85d–85f independently repaired the
+camera focus and position path until all 14 camera records matched byte-for-byte;
+Phase 85g admitted the canonical `oracle_hook|camera_state` row
+(`0x4eb19b71d76be0d4`) exactly once. Phase 85h merged the real input, Mario,
+and camera terminal results into one cumulative 7,420-row report: 3 terminal
+passed and 7,417 planned, report SHA-256
+`d9b9927ebf0e49d9ba9c0bf62dab322fddd43e7899642f0716071a1a948c4312`.
+Phase 85j added the source-backed global-state owner publication boundary;
+Phase 85k independently admitted the canonical `oracle_hook|global_state`
+row (`0xb123ff3e997bdc78`) with 12 exact records and global report SHA-256
+`c64d6cff061bcd43df5fa1b5551f8d49d0e80be352d51756a471186cc03f0e2e`.
+Phase 85l merged all four terminal rows into the current cumulative report:
+4 terminal passed and 7,416 planned, cumulative report SHA-256
+`139cf48c3768d205f82531d47ae4bcbb20cca6ce178eeb0a0384a99e9453e979`.
+Phase 85n produced exact source-backed object-state and script-events pairs
+(28 and 1,272 records respectively), while the effects audit remains blocked:
+the native window has 58 records and the independent Swift sink has only 2,
+so no effects admission was attempted. Phase 85o admitted the object-state
+(`0x862c3d78b60d657c`) and script-events (`0x2b0f6063b5463e9c`) rows. Phase
+85p merged all six terminal rows into the current cumulative report: 6 terminal
+passed and 7,414 planned, cumulative report SHA-256
+`e406840d88f1d3ff99109c20cc6e75c164a1da8978350d12265260b8be02baf1`.
+Phases 85q and 85r produced and admitted exact collision-query and RNG-draw
+pairs: 204 domain-7 records for collision queries and 168 domain-8 records for
+RNG draws, each with independent C/Swift/ASan parity and rerun/tamper fences.
+Phase 85s merged all eight terminal rows into the current cumulative report:
+8 terminal passed and 7,412 planned, cumulative report SHA-256
+`91632bff276e0ecc99e845532f6b4d876a80ad237fbb660364a575313cbdc412`.
+Phases 85u and 85v produced and admitted exact audio-sequence and save-bytes
+pairs: 4 domain-9 audio receipts and 4 domain-10/save receipts, with matching
+C/Swift/ASan/optimized traces and save sidecars. Phase 85w merged all ten
+terminal rows into the current cumulative report: 10 terminal passed and 7,410
+planned, cumulative report SHA-256
+`693e70c316756c369577ccdf263f8b40f6d0b0766f92195b23cb4c979a9ccc35`.
+Phase 85z audited the native PCM pre-device handoff without retaining PCM
+bytes: schema-4 `audio_pcm` receipts remain absent, so the row stays planned.
+The same phase produced an exact source-backed render-packet pair with 8
+domain-11 records; Phase 85aa admitted that row with GPU/pixel acceptance
+explicitly unverified. Phase 85ab merged all eleven terminal rows into the
+current cumulative report: 11 terminal passed and 7,409 planned, cumulative
+report SHA-256
+`a67d6b3415a9327ac73c8fc37d9b529c3edce6fe4aae56c9d08c80f72b59d5d3`.
+The render C/Swift/ASan/Release trace SHA-256 is
+`379fc6cc84990d2ed67223df19dc78d540b3f7ba1768abc2ebad7a61eea01179`.
+Phase 85ac added the owner-thread fixed-width PCM receipt seam after native
+synthesis and before device playback; Phase 85ad independently admitted the
+two-record `audio_pcm` row with exact C/Swift/ASan/Release and receipt parity.
+Phase 85ae merged all twelve terminal rows into the current cumulative report:
+12 terminal passed and 7,408 planned, cumulative report SHA-256
+`5afa6c4b80f75fa70d18bfc4aab9b499266e69a8fdb61e11bc9a24a18a6cc958`.
+This is deterministic pre-device receipt evidence, not audible/device PCM
+parity. Phase 85af added an exact source-backed interaction-state pair with 14
+domain-4 records; Phase 85ag independently admitted row
+`0x3e1cdaca08b21f54` with report SHA-256
+`2b8916452ceb54cf85fd18defcc883d211a5f1da41f04fd16c665d5dd5040457`.
+Phase 85ah merged all thirteen terminal rows into the current cumulative
+report: 13 terminal passed and 7,407 planned, cumulative report SHA-256
+`ac3e2c19162fdcab8c938497d48398dbac8eb03004d2918a4524292573f9d8ad`.
+Phase 85ai repaired the effects receipt parity seam; Phase 85aj independently
+admitted the canonical effects row `0x3951f0333dc3c5da` with isolated report
+SHA-256 `0c3fa33cd0d219a0e5347d6131397301e48699f91ee17a82c0c029607115a93d` and
+trace SHA-256 `68329f0a22e7d20f5ddb3b22777d74e626523d5c0467ccac569566eb6c998226`.
+Phase 85ak merged all fourteen terminal rows into the current cumulative
+report: 14 terminal passed and 7,406 planned, cumulative report SHA-256
+`4eccd90e978fbcd0cad42f8f64ba96c25774698c49b919ba1e3fdb020b1e0cd2`.
+Phase 85am added source-backed level-script, save-mutation, and transition
+route probes. The save-mutation row was admitted; its isolated report SHA-256
+is `19dc977d7b8927089f7f22d22e1c35f5ab961ccc0a3c8ba62f741e6f221c29d6`.
+The authored level-script pair reached global/script records but no transition
+record, and the transition reachability probe did not trigger the no-floor warp;
+both routes remain blocked and unadmitted. Phase 85ao merged all fifteen
+terminal rows into the current cumulative report: 15 terminal passed and 7,405
+planned, cumulative report SHA-256
+`dfa2dd3c56fa8e5a97e1f1b699843b40aec24dfbcb8d3094825a8ace2cbd5c7c`.
+Effects admission remains fixed-width source/value evidence only; device
+effects, haptic feel, audible output, visual output, and human acceptance remain
+unverified. The remaining rows still require independent route evidence; no
+full-game, physical, release, or human-acceptance claim follows.
+
+M34 still needs functioning attachment replay, reference-pixel comparison,
+longer/complete performance and thermal evidence, and physical visual/feel
+review. M35 still needs credentials, signed/stapled artifacts, clean-machine
+checks, and the fresh-save human 120-star checklist. This is not a shipped,
+visual-parity, or complete full-game Swift port.
 
 Current bounded handoffs include [Phase 81 ready-host M34 capture](porting-handoff-full-swift-twin-phase81-m34-ready-host-capture.md),
 [Phase 82a scheduler cadence](porting-handoff-full-swift-twin-phase82a-scheduler-cadence.md),
@@ -56,7 +329,69 @@ Current bounded handoffs include [Phase 81 ready-host M34 capture](porting-hando
 [Phase 82f capture archive bypass](porting-handoff-full-swift-twin-phase82f-capture-archive-bypass.md),
 [Phase 84a GPU attachments](porting-handoff-full-swift-twin-phase84a-gpu-attachments.md),
 [Phase 84b performance/thermal](porting-handoff-full-swift-twin-phase84b-performance-thermal.md),
-and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-phase84c-docs-reconcile.md).
+and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-phase84c-docs-reconcile.md),
+[Phase 85a Mario owner repair](porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),
+[Phase 85b Mario parity repair](porting-handoff-full-swift-twin-phase85b-mario-parity-repair.md),
+[Phase 85c Mario admission](porting-handoff-full-swift-twin-phase85c-mario-state-route-admission.md),
+[Phase 85d camera route pair](porting-handoff-full-swift-twin-phase85d-camera-state-route-pair.md),
+[Phase 85e camera focus repair](porting-handoff-full-swift-twin-phase85e-camera-focus-repair.md),
+[Phase 85f camera position repair](porting-handoff-full-swift-twin-phase85f-camera-position-repair.md),
+[Phase 85g camera admission](porting-handoff-full-swift-twin-phase85g-camera-state-route-admission.md),
+[Phase 85h cumulative ledger merge](porting-handoff-full-swift-twin-phase85h-canonical-ledger-merge.md),
+[Phase 85i documentation reconciliation](porting-handoff-full-swift-twin-phase85i-docs-route-update.md),
+[Phase 85j global-state owner route](porting-handoff-full-swift-twin-phase85j-global-state-route.md),
+[Phase 85k global-state admission](porting-handoff-full-swift-twin-phase85k-global-state-route-admission.md),
+[Phase 85l four-row cumulative merge](porting-handoff-full-swift-twin-phase85l-canonical-ledger-merge.md),
+[Phase 85m documentation reconciliation](porting-handoff-full-swift-twin-phase85m-docs-route-update.md),
+[Phase 85n object-state route](porting-handoff-full-swift-twin-phase85n-object-state-route.md),
+[Phase 85n effects audit](porting-handoff-full-swift-twin-phase85n-effects-route.md),
+[Phase 85n script-events pair](porting-handoff-full-swift-twin-phase85n-script-events-route-pair.md),
+[Phase 85o object/script admission](porting-handoff-full-swift-twin-phase85o-object-script-route-admission.md),
+[Phase 85p six-row cumulative merge](porting-handoff-full-swift-twin-phase85p-six-row-canonical-ledger-merge.md),
+[Phase 85q documentation reconciliation](porting-handoff-full-swift-twin-phase85q-docs-route-update.md),
+[Phase 85q collision-query pair](porting-handoff-full-swift-twin-phase85q-collision-queries-route-pair.md),
+[Phase 85q RNG-draw pair](porting-handoff-full-swift-twin-phase85q-rng-draws-route-pair.md),
+[Phase 85r collision/RNG admission](porting-handoff-full-swift-twin-phase85r-collision-rng-route-admission.md),
+[Phase 85s eight-row cumulative merge](porting-handoff-full-swift-twin-phase85s-eight-row-canonical-ledger-merge.md),
+[Phase 85t documentation reconciliation](porting-handoff-full-swift-twin-phase85t-docs-route-update.md),
+[Phase 85u audio-sequence pair](porting-handoff-full-swift-twin-phase85u-audio-sequence-route.md),
+[Phase 85u save-bytes pair](porting-handoff-full-swift-twin-phase85u-save-bytes-route-pair.md),
+[Phase 85v audio/save admission](porting-handoff-full-swift-twin-phase85v-audio-save-route-admission.md),
+[Phase 85w ten-row cumulative merge](porting-handoff-full-swift-twin-phase85w-ten-row-canonical-ledger-merge.md),
+[Phase 85x documentation reconciliation](porting-handoff-full-swift-twin-phase85x-docs-route-update.md),
+[Phase 85z render-packet route](porting-handoff-full-swift-twin-phase85z-render-packet-route.md),
+[Phase 85z audio-PCM audit](porting-handoff-full-swift-twin-phase85z-audio-pcm-route-audit.md),
+[Phase 85aa render-packet admission](porting-handoff-full-swift-twin-phase85aa-render-packet-route-admission.md),
+[Phase 85ab eleven-row cumulative merge](porting-handoff-full-swift-twin-phase85ab-eleven-row-canonical-ledger-merge.md),
+[Phase 85ac documentation reconciliation](porting-handoff-full-swift-twin-phase85ac-docs-route-update.md),
+[Phase 85ac PCM receipt seam](porting-handoff-full-swift-twin-phase85ac-pcm-receipt-seam.md),
+[Phase 85ad audio-PCM admission](porting-handoff-full-swift-twin-phase85ad-audio-pcm-route-admission.md),
+[Phase 85ae twelve-row cumulative merge](porting-handoff-full-swift-twin-phase85ae-twelve-row-canonical-ledger-merge.md),
+[Phase 85af documentation reconciliation](porting-handoff-full-swift-twin-phase85af-docs-route-update.md),
+[Phase 85af interaction-state route](porting-handoff-full-swift-twin-phase85af-interaction-state-route.md),
+[Phase 85ag interaction-state admission](porting-handoff-full-swift-twin-phase85ag-interaction-state-route-admission.md),
+[Phase 85ah thirteen-row cumulative merge](porting-handoff-full-swift-twin-phase85ah-thirteen-row-canonical-ledger-merge.md),
+[Phase 85ai documentation reconciliation](porting-handoff-full-swift-twin-phase85ai-docs-route-update.md),
+[Phase 85ai effects parity repair](porting-handoff-full-swift-twin-phase85ai-effects-parity-repair.md),
+[Phase 85aj effects receipt admission](porting-handoff-full-swift-twin-phase85aj-effects-receipt-route-admission.md),
+[Phase 85ak fourteen-row cumulative merge](porting-handoff-full-swift-twin-phase85ak-fourteen-row-canonical-ledger-merge.md),
+[Phase 85al documentation reconciliation](porting-handoff-full-swift-twin-phase85al-docs-route-update.md),
+[Phase 85am level-script route](porting-handoff-full-swift-twin-phase85am-level-script-route.md),
+[Phase 85am save-mutation route](porting-handoff-full-swift-twin-phase85am-save-mutation-route.md),
+[Phase 85am save-mutation admission](porting-handoff-full-swift-twin-phase85am-save-mutation-route-admission.md),
+[Phase 85am transition reachability](porting-handoff-full-swift-twin-phase85am-transition-route.md),
+[Phase 85ao fifteen-row cumulative merge](porting-handoff-full-swift-twin-phase85ao-fifteen-row-canonical-ledger-merge.md),
+and [Phase 85ap documentation reconciliation](porting-handoff-full-swift-twin-phase85ap-docs-route-update.md),
+[Phase 85aq route-family triage](porting-handoff-full-swift-twin-phase85aq-route-family-triage.md),
+[Phase 85ar route batch](porting-handoff-full-swift-twin-phase85ar-route-batch.md),
+[Phase 85as level/transition reachability](porting-handoff-full-swift-twin-phase85as-level-transition.md),
+[Phase 85at M34 production retry](porting-handoff-full-swift-twin-phase85at-m34-production.md),
+[Phase 85au M35 readiness](porting-handoff-full-swift-twin-phase85au-m35-readiness.md),
+and [Phase 85av canonical audit](porting-handoff-full-swift-twin-phase85av-canonical-audit.md).
+The final conservative audit is
+[Phase 85aw final audit](porting-handoff-full-swift-twin-phase85aw-final-audit.md).
+The 18-row merge is recorded in
+[Phase 85bb canonical merge](porting-handoff-full-swift-twin-phase85bb-canonical-merge.md).
 
 ### Historical Phase 80 status
 
@@ -439,7 +774,58 @@ The latest production and documentation handoffs are [Phase 81 ready-host M34 ca
 [Phase 82f capture archive bypass](porting-handoff-full-swift-twin-phase82f-capture-archive-bypass.md),
 [Phase 84a GPU attachments](porting-handoff-full-swift-twin-phase84a-gpu-attachments.md),
 [Phase 84b performance/thermal](porting-handoff-full-swift-twin-phase84b-performance-thermal.md),
-and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-phase84c-docs-reconcile.md).
+and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-phase84c-docs-reconcile.md),
+[Phase 85ct subject-31 identity](porting-handoff-full-swift-twin-phase85ct-subject31-identity.md),
+[Phase 85cv M34 host gate](porting-handoff-full-swift-twin-phase85cv-m34-gate.md),
+[Phase 85cw M35 gate](porting-handoff-full-swift-twin-phase85cw-m35-gate.md),
+[Phase 85cx subject-32 triage](porting-handoff-full-swift-twin-phase85cx-next-audio-identity.md),
+[Phase 85cy airborne-star mapping](porting-handoff-full-swift-twin-phase85cy-airborne-star-mapping.md),
+[Phase 85cz canonical audit](porting-handoff-full-swift-twin-phase85cz-canonical-audit.md),
+[Phase 85da launch-warp triage](porting-handoff-full-swift-twin-phase85da-launch-warp-triage.md),
+[Phase 85db launch-death mapping](porting-handoff-full-swift-twin-phase85db-launch-death-mapping.md),
+[Phase 85dc launch-death rerun](porting-handoff-full-swift-twin-phase85dc-launch-death-rerun.md),
+[Phase 85dd Release-build diagnosis](porting-handoff-full-swift-twin-phase85dd-release-build-diagnosis.md),
+[Phase 85de launch-star mapping](porting-handoff-full-swift-twin-phase85de-launch-star-mapping.md),
+[Phase 85df hard-air triage](porting-handoff-full-swift-twin-phase85df-hard-air-triage.md),
+[Phase 85dg hard-air mapping](porting-handoff-full-swift-twin-phase85dg-hard-air-mapping.md),
+[Phase 85dh airborne-death triage](porting-handoff-full-swift-twin-phase85dh-airborne-death-triage.md),
+[Phase 85di airborne-death mapping](porting-handoff-full-swift-twin-phase85di-airborne-death-mapping.md),
+[Phase 85dj airborne-warp triage](porting-handoff-full-swift-twin-phase85dj-airborne-warp-triage.md),
+[Phase 85dk airborne-warp mapping](porting-handoff-full-swift-twin-phase85dk-airborne-warp-mapping.md),
+[Phase 85dl instant-active triage](porting-handoff-full-swift-twin-phase85dl-instant-active-triage.md),
+[Phase 85dm instant-active mapping](porting-handoff-full-swift-twin-phase85dm-instant-active-mapping.md),
+[Phase 85dn warp triage](porting-handoff-full-swift-twin-phase85dn-warp-triage.md),
+[Phase 85do warp mapping](porting-handoff-full-swift-twin-phase85do-warp-mapping.md),
+[Phase 85dp star-door triage](porting-handoff-full-swift-twin-phase85dp-star-door-triage.md),
+[Phase 85dq star-door mapping](porting-handoff-full-swift-twin-phase85dq-star-door-mapping.md),
+[Phase 85dr Toad-message triage](porting-handoff-full-swift-twin-phase85dr-toad-message-triage.md),
+[Phase 85ds Toad-message mapping](porting-handoff-full-swift-twin-phase85ds-toad-message-mapping.md),
+[Phase 85dt Tank-fish triage](porting-handoff-full-swift-twin-phase85dt-tank-fish-triage.md),
+[Phase 85du Tank-fish mapping](porting-handoff-full-swift-twin-phase85du-tank-fish-mapping.md),
+[Phase 85dv Fish-group mapping](porting-handoff-full-swift-twin-phase85dv-fish-group-mapping.md),
+[Phase 85dw Sparkle-spawner mapping](porting-handoff-full-swift-twin-phase85dw-sparkle-spawner-mapping.md),
+[Phase 85dx Cloud mapping](porting-handoff-full-swift-twin-phase85dx-cloud-mapping.md),
+[Phase 85dy Cloud-part mapping](porting-handoff-full-swift-twin-phase85dy-cloud-part-mapping.md),
+[Phase 85dz Clock-minute mapping](porting-handoff-full-swift-twin-phase85dz-clock-minute-mapping.md),
+[Phase 85ea Clock-hour mapping](porting-handoff-full-swift-twin-phase85ea-clock-hour-mapping.md),
+[Phase 85eb audio-route admission](porting-handoff-full-swift-twin-phase85eb-audio-route-admission.md),
+[Phase 85ed audio-only coverage](porting-handoff-full-swift-twin-phase85ed-audio-only-coverage.md),
+[Phase 85ef source-backed audio coverage repair](porting-handoff-full-swift-twin-phase85ef-audio-coverage-source-repair.md),
+[Phase 85f0 audio-asset admission](porting-handoff-full-swift-twin-phase85f0-audio-asset-admission.md),
+[Phase 85f1 audio-asset canonical merge](porting-handoff-full-swift-twin-phase85f1-audio-asset-canonical-merge.md),
+[Phase 85f2 pendulum route attempt](porting-handoff-full-swift-twin-phase85f2-pendulum-route.md),
+[Phase 85f2 M34 production re-audit](porting-handoff-full-swift-twin-phase85f2-m34-production-reaudit.md),
+[Phase 85g2 M35 distribution re-audit](porting-handoff-full-swift-twin-phase85g2-m35-distribution-reaudit.md),
+[Phase 85f3 pendulum four-way matrix](porting-handoff-full-swift-twin-phase85f3-pendulum-matrix.md),
+[Phase 85f4 pendulum isolated admission](porting-handoff-full-swift-twin-phase85f4-pendulum-admission.md),
+[Phase 85f5 pendulum canonical merge](porting-handoff-full-swift-twin-phase85f5-pendulum-canonical-merge.md),
+[Phase 85f6 RNG break-particles admission](porting-handoff-full-swift-twin-phase85f6-rng-break-particles-admission.md),
+[Phase 85f6 BBH display-list discovery](porting-handoff-full-swift-twin-phase85f6-bbh-displaylist-discovery.md),
+[Phase 85f8 RNG-float reachability](porting-handoff-full-swift-twin-phase85f8-rng-float-reachability.md),
+[Phase 85f9 water-level reachability](porting-handoff-full-swift-twin-phase85f9-water-level-reachability.md),
+[Phase 85f10 route-breadth audit](porting-handoff-full-swift-twin-phase85f10-route-breadth.md),
+[Phase 85f11 DDD Sushi discovery](porting-handoff-full-swift-twin-phase85f11-ddd-sushi-route.md),
+and [Phase 85f17 documentation reconciliation](porting-handoff-full-swift-twin-phase85f17-docs-reconciliation.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
