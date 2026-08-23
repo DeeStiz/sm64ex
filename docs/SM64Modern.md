@@ -16,6 +16,43 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-23).
 
+### Phase 85f87 current status
+
+Fresh Phase 85f83–85f86 authored-reachability rechecks remain fail-closed.
+The WDW express-elevator, TTC 2D rotator, Bob seesaw, and Spindrift route
+pairs each ran from a fresh build root against their committed source-owned
+seams. Every route exited `77`, created no C or Swift trace, and produced no
+route record or admission. No static sibling or variant substitution,
+synthetic trace, direct level load, object injection, or canonical mutation
+was used.
+
+The WDW recheck observed `level=11 area=2 dynamic=0 static=0`; the TTC
+recheck observed `level=14 area=2 hands=0`; the Bob recheck observed
+`level=1 area=1 object=0`; and the Spindrift recheck observed
+`level=1 area=1 spindrifts=0`. Their fresh matrices therefore ended with
+`trace=not-created` (no trace files), `records=0` where reported, and
+`admission=0`.
+
+The designated local canonical route evidence remains
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`.
+It is SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
+contains 7,420 rows: 26 non-fixture terminal `passed` and 7,394 `planned`
+(`26/7420 = 0.350404313%`). The old retained report remains byte-identical
+as the write-once backup at
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/pre-publication-backup/canonical-route-ledger.tsv`,
+with SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d` and
+25 terminal `passed` / 7,395 `planned` rows
+(`25/7420 = 0.336927224%`); it is historical backup evidence, not the
+designated report. The source manifest remains unchanged at 7,420 rows with
+SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+Behavior mapping remains 95.693%, and the conservative M34, M35,
+human-acceptance, implementation, and full-goal floors remain 0%. No source,
+manifest, designated or backup report, route ledger, release, store, or
+external publication state changed.
+
 ### Phase 85f82 current status
 
 Following the committed Phase 85f81 write-once designation, the designated
@@ -1198,7 +1235,12 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f79 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f79-docs-refresh.md), and
 [Phase 85f80 Spindel documentation correction](../.porting/porting-handoff-full-swift-twin-phase85f80-docs-spindel-correction.md),
 [Phase 85f81 serial canonical designation](../.porting/porting-handoff-full-swift-twin-phase85f81-serial-canonical-designation.md), and
-[Phase 85f82 canonical status transition](../.porting/porting-handoff-full-swift-twin-phase85f82-docs-canonical-transition.md).
+[Phase 85f82 canonical status transition](../.porting/porting-handoff-full-swift-twin-phase85f82-docs-canonical-transition.md),
+[Phase 85f83 WDW reachability recheck](../.porting/porting-handoff-full-swift-twin-phase85f83-wdw-reachability-recheck.md),
+[Phase 85f84 TTC reachability recheck](../.porting/porting-handoff-full-swift-twin-phase85f84-ttc-reachability-recheck.md),
+[Phase 85f85 Bob reachability recheck](../.porting/porting-handoff-full-swift-twin-phase85f85-bob-reachability-recheck.md),
+[Phase 85f86 Spindrift reachability recheck](../.porting/porting-handoff-full-swift-twin-phase85f86-spindrift-reachability-recheck.md), and
+[Phase 85f87 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f87-docs-refresh.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),

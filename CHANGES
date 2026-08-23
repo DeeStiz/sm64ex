@@ -1079,6 +1079,29 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       and `porting-handoff-full-swift-twin-phase85f82-docs-canonical-transition.md`,
       and leave source, manifest, and old retained report unchanged.
 
+242.) Reconcile Phase 85f83–85f87 across the six first-party status surfaces.
+      Record the fresh authored-reachability rechecks: WDW
+      `level=11 area=2 dynamic=0 static=0`, TTC `level=14 area=2 hands=0`,
+      Bob `level=1 area=1 object=0`, and Spindrift
+      `level=1 area=1 spindrifts=0`; each exits 77 with no C/Swift trace,
+      route record, or admission. Preserve the designated local 26/7,394
+      report SHA-256
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`
+      and `26/7420 = 0.350404313%` separately from the byte-identical
+      25/7,395 backup SHA-256
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`
+      and `25/7420 = 0.336927224%`; retain manifest SHA-256
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+      behavior mapping 95.693%, and 0% M34/M35/human-acceptance/
+      implementation/full-goal floors. Link the ordered f81 -> f87 handoffs,
+      including `porting-handoff-full-swift-twin-phase85f83-wdw-reachability-recheck.md`,
+      `porting-handoff-full-swift-twin-phase85f84-ttc-reachability-recheck.md`,
+      `porting-handoff-full-swift-twin-phase85f85-bob-reachability-recheck.md`,
+      `porting-handoff-full-swift-twin-phase85f86-spindrift-reachability-recheck.md`,
+      and `porting-handoff-full-swift-twin-phase85f87-docs-refresh.md`.
+      No source, manifest, report, route ledger, release, publication, or
+      acceptance state changed.
+
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
 are not current counters.

@@ -2,6 +2,31 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f87 authored-reachability rechecks (2026-08-23):** fresh WDW
+  express-elevator, TTC 2D rotator, Bob seesaw, and Spindrift route-pair
+  rechecks all remain fail-closed: WDW observed `level=11 area=2 dynamic=0
+  static=0`, TTC `level=14 area=2 hands=0`, Bob `level=1 area=1 object=0`,
+  and Spindrift `level=1 area=1 spindrifts=0`. Each exited 77 with no C or
+  Swift trace (`trace=not-created`/no trace files), no route record, and
+  `admission=0`; no sibling/variant substitution, synthetic trace, direct
+  level load, object injection, or canonical mutation was used. Preserve the
+  designated local 26/7,394 report at
+  `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
+  with SHA-256
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
+  `26/7420 = 0.350404313%`, separate from the byte-identical 25/7,395 backup
+  with SHA-256
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d` and
+  `25/7420 = 0.336927224%`. The manifest remains SHA-256
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+  behavior mapping 95.693%, and M34/M35/human-acceptance/full-goal floors
+  remain 0%. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f83-wdw-reachability-recheck.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f84-ttc-reachability-recheck.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f85-bob-reachability-recheck.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f86-spindrift-reachability-recheck.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f87-docs-refresh.md`.
+
 - **Phase 85f82 designated local canonical transition (2026-08-23):** the
   committed Phase 85f81 write-once designation is now the designated local
   canonical route evidence at
