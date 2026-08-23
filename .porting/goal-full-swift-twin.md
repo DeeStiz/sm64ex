@@ -2,18 +2,21 @@
 
 ## Status
 
-### Phase 85f115 current status
+### Phase 85f118 current status
 
-Phase 85f114 ran a source-neutral, fixed 3,600-step owner-thread traversal
-recipe from the ordinary Castle Grounds bootstrap. It used fixed analog
-movement, bounded right-stick camera turns, and short A-button jump pulses;
-it did not branch on coordinates or destination state. The probe reported
-`castle_ssl_recipe reachability=0 castle_inside_step=3600 ssl_step=3600`, ended
-at `final_level=16 final_area=1`, and exited `77`: Castle Inside and SSL area 1
-were unreached. No trace, native receipt, C/Swift runtime pair, route
-admission, report/ledger/manifest mutation, or canonical promotion exists.
-No direct level load/warp, behavior helper, object injection, or coordinate
-selection was used.
+Phase 85f116 extended the source-neutral Castle Grounds traversal with fixed
+input variants: opposite-direction holds, bounded left/right turns, lateral
+door approaches, and no-jump variants. Phase 85f117 refined the ordinary
+approach to the authored castle-door line without branching on Mario
+coordinates or destination state. The best fixed-input samples were
+`(504,803,-3054)`, `(-16,803,-2399)`, and `(-311,803,-3054)`.
+
+Despite those authored-door-line samples, the game remained
+`LEVEL_CASTLE_GROUNDS` (level 16) area 1 for all 3,600 steps and exited `77`;
+Castle Inside and SSL area 1 were not entered. No trace, native receipt,
+C/Swift runtime pair, route admission, report/ledger/manifest mutation, or
+canonical promotion exists. No direct level load/warp, behavior helper,
+object injection, or coordinate selection was used.
 
 Phase 85f111's read-only M34 audit leaves `m34_host_ready=0` because the
 display is offline, the console session is locked, and `gputoolsserviced`/GPU
@@ -45,7 +48,10 @@ Ordered handoffs: [Phase 85f110 Pokey runtime route](porting-handoff-full-swift-
 [Phase 85f112 M35 distribution audit](porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md), and
 [Phase 85f113 documentation/M34/M35 route](porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md),
 [Phase 85f114 Castle→SSL traversal recipe](porting-handoff-full-swift-twin-phase85f114-castle-ssl-traversal-recipe.md), and
-[Phase 85f115 documentation/traversal recipe](porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md).
+[Phase 85f115 documentation/traversal recipe](porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md),
+[Phase 85f116 Castle-door input variants](porting-handoff-full-swift-twin-phase85f116-castle-door-input-variants.md),
+[Phase 85f117 Castle-door refinement](porting-handoff-full-swift-twin-phase85f117-castle-door-refinement.md), and
+[Phase 85f118 documentation/Castle-door refinement](porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 
@@ -1477,7 +1483,10 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f112 M35 distribution audit](porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md), and
 [Phase 85f113 documentation/M34/M35 route](porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md),
 [Phase 85f114 Castle→SSL traversal recipe](porting-handoff-full-swift-twin-phase85f114-castle-ssl-traversal-recipe.md), and
-[Phase 85f115 documentation/traversal recipe](porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md).
+[Phase 85f115 documentation/traversal recipe](porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md),
+[Phase 85f116 Castle-door input variants](porting-handoff-full-swift-twin-phase85f116-castle-door-input-variants.md),
+[Phase 85f117 Castle-door refinement](porting-handoff-full-swift-twin-phase85f117-castle-door-refinement.md), and
+[Phase 85f118 documentation/Castle-door refinement](porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files
