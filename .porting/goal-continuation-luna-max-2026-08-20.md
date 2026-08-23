@@ -241,12 +241,12 @@ pixel acceptance remain unverified.
 - **Phase 60 — committed `5bd4eee9`:** reconciled the current documentation
   and completion boundary without mutating source, the route ledger, or the
   behavior manifest.
-- **[Phase 61 — committed `50c462cf`](.porting/porting-handoff-full-swift-twin-phase61-m34-production-audit.md):** the canonical M34 production harness
+- **[Phase 61 — committed `50c462cf`](porting-handoff-full-swift-twin-phase61-m34-production-audit.md):** the canonical M34 production harness
   is blocked before app launch by `EngineRuntime.swift:189/:366`
   (`SM64ModernStatus`/`Int32` type errors). The retained `gpudebug` trace is
   structural/clear-only and adds no new visible-layer, post-resume,
   archive-reuse, FPS, GPU-time, memory, or thermal evidence.
-- **[Phase 62 — committed `2180ae7b`](.porting/porting-handoff-full-swift-twin-phase62-m35-release-preflight.md):** ordinary Xcode 26.6 works through an
+- **[Phase 62 — committed `2180ae7b`](porting-handoff-full-swift-twin-phase62-m35-release-preflight.md):** ordinary Xcode 26.6 works through an
   invocation override, but no Developer ID Application identity/private key
   or notary authentication is available. No archive/export/DMG/ZIP/staple/
   Gatekeeper, clean-machine, or human result exists.
