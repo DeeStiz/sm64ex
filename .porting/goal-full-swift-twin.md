@@ -2,49 +2,31 @@
 
 ## Status
 
-### Phase 85f125 current status
+### Phase 85f129 current status
 
-Phase 85f123's owner-thread diagnostic observes only live authored
-`bhvDoorWarp` objects, nearest squared distance, and Mario's copied
-interaction flags. It does not steer, branch on coordinates, invoke helpers,
-inject objects, or create traces. At the best fixed approach it saw
-`door_warps=3`, `nearest_door_distance_sq=64969.9` (approximately 255 units),
-and `collided=0`; the sample is outside the authored 80-unit contact radius.
+Phase 85f126's read-only canonical merge-readiness audit found 13 pristine
+`planned` candidate rows across 11 route families and zero newly admissible
+rows. No candidate has the independent Debug C, Swift, ASan, Release,
+fresh-rerun, and admission proof required for serial canonical merge, so the
+merge remains unauthorized.
 
-Phase 85f124 applied a fixed contact vector derived from the measured door
-center after the `(-310,803,-3054)` approach. The live diagnostic still saw
-three door warps and `collided=0`; the run remained
-`LEVEL_CASTLE_GROUNDS` (level 16) area 1 for all 3,600 steps and exited `77`,
-with no trace, native receipt, C/Swift runtime pair, route admission,
-report/ledger/manifest mutation, or canonical promotion. No coordinate
-feedback was used to branch, and no direct level load/warp, helper call,
-object injection, synthetic trace, or canonical mutation occurred.
+Phase 85f127 rechecked the M34 host and tools. `m34_host_ready=0` remains in
+force because the only display is offline/asleep, the console session is
+locked, no active GPU capture/debug session exists, and thermal telemetry is
+unknown. No release launch, capture/replay, attachment/pixel, cadence/soak,
+direct-display, physical, or human evidence is admissible.
 
-The source-faithful physical-input search stops for this evidence pass. Any
-next attempt requires either a newly justified source-faithful fixed-input
-recipe that enters the authored 80-unit contact radius or explicit
-authorization for traversal instrumentation or another traversal mechanism;
-the source-recipe/authorization gate is explicit. Once Castle Inside and SSL
-area 1 are reached, real Pokey C/Swift Debug/ASan/Release/rerun parity
-receipts remain required before admission.
-
-Phase 85f111's read-only M34 audit leaves `m34_host_ready=0` because the
-display is offline, the console session is locked, and `gputoolsserviced`/GPU
-tooling is unavailable. Thermal state is unknown. No current Release launch,
-capture/replay, attachment/pixel, cadence/soak, direct-display, physical, or
-human evidence is admissible.
-
-Phase 85f112's M35 readiness and distribution contracts pass, but no valid
-Developer ID Application identity/private-key pair or supported `notarytool`
-authentication is present. No archive/export, notarization/stapling, signed
-DMG/ZIP, clean-machine Gatekeeper/first-launch, or human acceptance evidence
-exists.
+Phase 85f128 rechecked stable-Xcode M35 readiness and distribution contracts;
+both contracts pass, but no valid Developer ID Application identity/private-
+key pair or supported `notarytool` authentication is present. No fresh
+archive/export, signed/notarized/stapled app, DMG/ZIP, clean-machine, or human
+acceptance artifact exists.
 
 The designated local canonical report remains 7,420 rows with 26 terminal
-`passed` and 7,394 `planned` (`26/7394`; `26/7420 = 0.350404313%`) at
-SHA-256 `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`.
-The byte-identical write-once backup remains 25 terminal `passed` and 7,395
-`planned` (`25/7395`; `25/7420 = 0.336927224%`) at SHA-256
+`passed` and 7,394 `planned` (`26/7420 = 0.350404313%`) at SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`; the
+byte-identical write-once backup remains 25 terminal `passed` and 7,395
+`planned` (`25/7420 = 0.336927224%`) at SHA-256
 `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
 The route manifest remains unchanged at SHA-256
 `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`, and
@@ -53,22 +35,10 @@ the behavior manifest remains unchanged at SHA-256
 Behavior mapping remains 95.693%, and the conservative M34, M35,
 human-acceptance, implementation, and full-goal floors remain 0%.
 
-Ordered handoffs: [Phase 85f110 Pokey runtime route](porting-handoff-full-swift-twin-phase85f110-pokey-runtime-route.md),
-[Phase 85f111 M34 production audit](porting-handoff-full-swift-twin-phase85f111-m34-production-audit.md),
-[Phase 85f112 M35 distribution audit](porting-handoff-full-swift-twin-phase85f112-m35-distribution-audit.md), and
-[Phase 85f113 documentation/M34/M35 route](porting-handoff-full-swift-twin-phase85f113-docs-route-m34-m35.md),
-[Phase 85f114 Castle→SSL traversal recipe](porting-handoff-full-swift-twin-phase85f114-castle-ssl-traversal-recipe.md), and
-[Phase 85f115 documentation/traversal recipe](porting-handoff-full-swift-twin-phase85f115-docs-traversal-recipe.md),
-[Phase 85f116 Castle-door input variants](porting-handoff-full-swift-twin-phase85f116-castle-door-input-variants.md),
-[Phase 85f117 Castle-door refinement](porting-handoff-full-swift-twin-phase85f117-castle-door-refinement.md), and
-[Phase 85f118 documentation/Castle-door refinement](porting-handoff-full-swift-twin-phase85f118-docs-castle-door-refinement.md),
-[Phase 85f119 final fixed lateral variant](porting-handoff-full-swift-twin-phase85f119-castle-door-final-variant.md), and
-[Phase 85f120 documentation/final door variant](porting-handoff-full-swift-twin-phase85f120-docs-final-door-variant.md),
-[Phase 85f121 Castle-door contract analysis](porting-handoff-full-swift-twin-phase85f121-castle-door-contract-analysis.md), and
-[Phase 85f122 documentation/door contract](porting-handoff-full-swift-twin-phase85f122-docs-door-contract.md),
-[Phase 85f123 Castle-door distance diagnostic](porting-handoff-full-swift-twin-phase85f123-castle-door-distance-diagnostic.md),
-[Phase 85f124 Castle-door contact vector](porting-handoff-full-swift-twin-phase85f124-castle-door-contact-vector.md), and
-[Phase 85f125 documentation/contact vector](porting-handoff-full-swift-twin-phase85f125-docs-contact-vector.md).
+Ordered handoffs: [Phase 85f126 canonical merge-readiness audit](porting-handoff-full-swift-twin-phase85f126-canonical-merge-readiness-audit.md),
+[Phase 85f127 M34 host recheck](porting-handoff-full-swift-twin-phase85f127-m34-host-recheck.md),
+[Phase 85f128 M35 readiness recheck](porting-handoff-full-swift-twin-phase85f128-m35-readiness-recheck.md), and
+[Phase 85f129 documentation/audit refresh](porting-handoff-full-swift-twin-phase85f129-docs-audits.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 

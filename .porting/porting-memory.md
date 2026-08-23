@@ -2,6 +2,19 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f129 canonical/M34/M35 audit documentation (2026-08-23):** records
+  13 planned candidates across 11 route families with zero newly admissible
+  rows; designated report, backup, and manifests remain byte-identical.
+  M34 remains `m34_host_ready=0` with offline display, locked console, no GPU
+  session, and unknown thermal state. M35 contracts pass, but Developer ID
+  identity/private key and notary authentication remain absent. Preserve exact
+  26/7,394 and 25/7,395 evidence, 95.693% mapping, and 0% M34/M35/human/full
+  floors. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f126-canonical-merge-readiness-audit.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f127-m34-host-recheck.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f128-m35-readiness-recheck.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f129-docs-audits.md`.
+
 - **Phase 85f125 contact-vector documentation refresh (2026-08-23):** records
   the Phase 85f123 owner-thread diagnostic and Phase 85f124 fixed contact
   vector. The observation-only diagnostic saw `door_warps=3`, nearest squared
