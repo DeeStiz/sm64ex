@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-22)
 
-- **Phase 85f36 current checkpoint (2026-08-22):** the retained checked-in
+- **Phase 85f38 current checkpoint (2026-08-22):** the retained checked-in
   canonical state remains 534 behavior rows (511 Swift owners, 23 explicit C
   adapters) and 7,420 route rows with 25 terminal / 7,395 planned. The
   manifest SHA is
@@ -31,7 +31,14 @@
   startup route into Castle area 3's DDD painting and then DDD area 1, without
   direct level register/load, forced camera mode, Sushi injection, coordinate
   reuse, or a direct `find_water_level` helper call. No canonical manifest or
-  retained report changed.
+  retained report changed. Phase 85f37 committed the static Castle-to-DDD
+  traversal discovery: the authored chain is present, but no deterministic
+  owner-thread input recipe crosses it. The bounded probe fails closed with
+  exit 77, retains `event-307=0`, and its C trace and blocked rerun remain
+  identical 72-byte header-only files with the same SHA-256
+  `a00652d483085b681254ca74c782bbe5e7bdc9d2672ff724ebd3735a3d706512`.
+  Static chain evidence is not runtime traversal evidence; canonical manifest,
+  retained report, and route ledger state remain unchanged.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f18-sushi-seam.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f19-bbh-seam-retry.md`,
@@ -49,8 +56,10 @@
   `.porting/porting-handoff-full-swift-twin-phase85f33-intro-transition-canonical-merge.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f34-docs-refresh.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f35-ddd-camera-reachability.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f36-docs-refresh.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f37-castle-ddd-traversal.md`,
   and this refresh is recorded in
-  `.porting/porting-handoff-full-swift-twin-phase85f36-docs-refresh.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f38-docs-final-refresh.md`.
 
 - **Phase 85f11 current checkpoint (2026-08-22):** the authoritative current
   state remains 534 behavior rows (511 Swift owners, 23 explicit C adapters) and
@@ -537,7 +546,7 @@
 
 ## Historical phase records retained
 
-The repeated route notes below preserve prior phase evidence; the Phase 85f36
+The repeated route notes below preserve prior phase evidence; the Phase 85f38
 checkpoint at the top of this section is the current ordered status.
 
 - **Phase 85dy Cloud-part mapping (2026-08-22):** dynamic `bhvCloudPart`

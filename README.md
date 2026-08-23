@@ -65,7 +65,7 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 85f36 current status
+### Phase 85f38 current status
 
 The retained checked-in canonical state remains 534 behavior rows (511 Swift
 owners and 23 explicit C adapters) and 7,420 route shards: 25 non-fixture
@@ -104,6 +104,17 @@ existing startup route into Castle area 3's DDD painting and then DDD area 1,
 without direct level register/load, forced camera mode, Sushi injection,
 coordinate reuse, or a direct `find_water_level` helper call. No canonical
 manifest or retained report changed.
+
+Phase 85f37 committed the Castle-to-DDD traversal discovery. The static
+source-authored chain through Castle Grounds, Castle area 1, Castle area 3's
+DDD painting, and DDD area 1 is present, but no deterministic authored
+owner-thread input recipe currently crosses it. The bounded probe therefore
+failed closed with exit 77, retained `event-307=0`, and produced no route
+record or admission. Its C trace and blocked rerun remain identical 72-byte
+header-only files with SHA-256
+`a00652d483085b681254ca74c782bbe5e7bdc9d2672ff724ebd3735a3d706512`;
+static chain evidence is not runtime traversal evidence. Canonical manifest,
+retained report, and route ledger state remain unchanged.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -468,7 +479,9 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f33 intro transition phase-local guarded merge](.porting/porting-handoff-full-swift-twin-phase85f33-intro-transition-canonical-merge.md),
 [Phase 85f34 current-status documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f34-docs-refresh.md),
 [Phase 85f35 DDD camera reachability](.porting/porting-handoff-full-swift-twin-phase85f35-ddd-camera-reachability.md),
-and [Phase 85f36 current-status documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f36-docs-refresh.md).
+[Phase 85f36 current-status documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f36-docs-refresh.md),
+[Phase 85f37 Castle-to-DDD traversal discovery](.porting/porting-handoff-full-swift-twin-phase85f37-castle-ddd-traversal.md),
+and [Phase 85f38 final documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f38-docs-final-refresh.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).
