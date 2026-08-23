@@ -65,7 +65,7 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
-### Phase 85f51 current status
+### Phase 85f54 current status
 
 The retained checked-in canonical state remains 534 behavior rows (511 Swift
 owners and 23 explicit C adapters) and 7,420 route shards: 25 non-fixture
@@ -187,14 +187,33 @@ no route record, admission, manifest, retained report, or canonical ledger
 mutation occurred, and the static sibling was not substituted. Runtime
 reachability remains blocked at WDW area 2.
 
-Phase 85f49 committed the authored Castle-to-WDW painting route to warp node
-`0x0A`. The normal owner-thread lifecycle lands in WDW area 2 before the
-dynamic `bhvWdwExpressElevator` can tick, so the matrix fails closed with
-`dynamic=0`, `static=0`, and exit 77. No trace was created, no route record or
+Phase 85f49's actual authored Castle-to-WDW reachability result targets warp
+node `0x0A`, but the normal owner-thread lifecycle lands in WDW area 2 before
+the dynamic `bhvWdwExpressElevator` can tick. The matrix therefore fails
+closed with `dynamic=0`, `static=0`, `admission=0`,
+`canonical_ledger_mutation=0`, `manifest_mutation=0`, and exit 77. No C or
+Swift trace was created (`trace=not-created`, `records=0`), no route record or
 admission was produced, and the static sibling was not substituted. The
 retained canonical report remains 25 terminal / 7,395 planned, the isolated
 Phase 85f33 result remains 26 terminal / 7,394 planned, and the M34, M35,
 human-acceptance, and full-goal floors remain 0%.
+
+Phase 85f50 refreshed the first-party status surfaces while preserving the
+retained canonical state. Phase 85f51 corrected the f49 ordering and status
+wording so the actual f49 reachability blocker supersedes the earlier f47-
+pending description; neither correction changed a manifest, report, route
+ledger, or acceptance state.
+
+Phase 85f52 discovered the next disjoint source-owned candidate,
+`bhvTTC2DRotator`, at route row `0x1af5669b06931d93`. The selected authored
+subject is the first TTC area-1 clock hand (`MODEL_TTC_CLOCK_HAND`,
+`oBehParams2ndByte=0`) reached through the normal Castle Inside TTC painting
+nodes `0x21`–`0x23`; the existing Swift value owner and isolated C contract
+are present. No native TTC lifecycle probe, schema-4 pair, admission, or
+canonical mutation was performed, so the candidate remains planned.
+
+Phase 85f53 is explicitly pending: no completed handoff, native TTC lifecycle
+probe, route pair, admission, or canonical mutation is recorded for it.
 
 Phase 85f18 rechecked the authored DDD Sushi seam and found no qualifying
 pointer-free owner/query receipt; shard `0x023fe9bb4409460b` remains planned.
@@ -574,7 +593,10 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f48 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f48-docs-refresh.md),
 [Phase 85f49 WDW area-1 reachability audit](.porting/porting-handoff-full-swift-twin-phase85f49-wdw-area1-reachability.md),
 [Phase 85f50 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f50-docs-refresh.md),
-and [Phase 85f51 f49 documentation correction](.porting/porting-handoff-full-swift-twin-phase85f51-docs-f49-correction.md).
+[Phase 85f51 f49 documentation correction](.porting/porting-handoff-full-swift-twin-phase85f51-docs-f49-correction.md),
+[Phase 85f52 TTC 2D rotator discovery](.porting/porting-handoff-full-swift-twin-phase85f52-next-route-discovery.md),
+Phase 85f53 pending (no completion handoff), and [Phase 85f54 documentation
+refresh](.porting/porting-handoff-full-swift-twin-phase85f54-docs-refresh.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).

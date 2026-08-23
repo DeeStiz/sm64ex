@@ -19,7 +19,7 @@ inventory drift. The authoritative regenerated inventory and shard manifest
 contain 7,420 rows; the current cumulative ledger is 25 terminal rows with
 7,395 planned. Historical M33–M35 notes retain their original 7,419 baseline.
 
-### Phase 85f51 current evidence checkpoint
+### Phase 85f54 current evidence checkpoint
 
 The retained checked-in canonical state remains **534 behavior rows** (**511
 Swift value/owner rows**, **23 explicit C adapters**) and **7,420 route shards**
@@ -141,14 +141,33 @@ no route record, admission, manifest, retained report, or canonical ledger
 mutation occurred, and the static sibling was not substituted. Runtime
 reachability remains blocked at WDW area 2.
 
-Phase 85f49 committed the authored Castle-to-WDW painting route to warp node
-`0x0A`. The normal owner-thread lifecycle lands in WDW area 2 before the
-dynamic `bhvWdwExpressElevator` can tick, so the matrix fails closed with
-`dynamic=0`, `static=0`, and exit 77. No trace was created, no route record or
+Phase 85f49's actual authored Castle-to-WDW reachability result targets warp
+node `0x0A`, but the normal owner-thread lifecycle lands in WDW area 2 before
+the dynamic `bhvWdwExpressElevator` can tick. The matrix therefore fails
+closed with `dynamic=0`, `static=0`, `admission=0`,
+`canonical_ledger_mutation=0`, `manifest_mutation=0`, and exit 77. No C or
+Swift trace was created (`trace=not-created`, `records=0`), no route record or
 admission was produced, and the static sibling was not substituted. The
 retained canonical report remains 25 terminal / 7,395 planned, the isolated
 Phase 85f33 result remains 26 terminal / 7,394 planned, and the M34, M35,
 human-acceptance, and full-goal floors remain 0%.
+
+Phase 85f50 refreshed the first-party status surfaces while preserving the
+retained canonical state. Phase 85f51 corrected the f49 ordering and status
+wording so the actual f49 reachability blocker supersedes the earlier f47-
+pending description; neither correction changed a manifest, report, route
+ledger, or acceptance state.
+
+Phase 85f52 discovered the next disjoint source-owned candidate,
+`bhvTTC2DRotator`, at route row `0x1af5669b06931d93`. The selected authored
+subject is the first TTC area-1 clock hand (`MODEL_TTC_CLOCK_HAND`,
+`oBehParams2ndByte=0`) reached through the normal Castle Inside TTC painting
+nodes `0x21`–`0x23`; the existing Swift value owner and isolated C contract
+are present. No native TTC lifecycle probe, schema-4 pair, admission, or
+canonical mutation was performed, so the candidate remains planned.
+
+Phase 85f53 is explicitly pending: no completed handoff, native TTC lifecycle
+probe, route pair, admission, or canonical mutation is recorded for it.
 
 Phases 85aq–85as completed disjoint Luna-max route-family triage and authored
 level/transition reachability attempts without promoting a row. Phase 85ar
@@ -352,8 +371,11 @@ broad/physical/release/human gates are open.
 - **[Phase 85f47](porting-handoff-full-swift-twin-phase85f47-wdw-elevator-seam-execute.md):** implements the source-owned dynamic WDW express-elevator receipt seam, but the authored lifecycle reaches WDW area 2 before the dynamic object emits a receipt; the matrix fails closed with exit 77 and no admission or ledger mutation.
 - **[Phase 85f48](porting-handoff-full-swift-twin-phase85f48-docs-refresh.md):** prior documentation refresh, retained for provenance; its f47-pending boundary is superseded by the committed f47 result above.
 - **[Phase 85f49](porting-handoff-full-swift-twin-phase85f49-wdw-area1-reachability.md):** the authored Castle-to-WDW painting route targets warp node `0x0A` but lands in WDW area 2 before the dynamic elevator can tick; the matrix fails closed with `dynamic=0`, `static=0`, exit 77, no trace, and no admission.
-- **[Phase 85f50](porting-handoff-full-swift-twin-phase85f50-docs-refresh.md):** documentation refresh recording the f47 seam result; its outdated f49 boundary is superseded by the committed f49 handoff above.
-- **[Phase 85f51](porting-handoff-full-swift-twin-phase85f51-docs-f49-correction.md):** corrects the f49 status wording and preserves the retained 25/7,395, isolated 26/7,394, and 0% floors.
+- **[Phase 85f50](porting-handoff-full-swift-twin-phase85f50-docs-refresh.md):** documentation refresh preserving the retained canonical state; its earlier f49 boundary is superseded by the actual f49 reachability handoff above.
+- **[Phase 85f51](porting-handoff-full-swift-twin-phase85f51-docs-f49-correction.md):** corrects the f49 status wording and ordering while preserving the retained 25/7,395, isolated 26/7,394, and 0% floors.
+- **[Phase 85f52](porting-handoff-full-swift-twin-phase85f52-next-route-discovery.md):** discovers authored `bhvTTC2DRotator` row `0x1af5669b06931d93` and selects the first TTC area-1 clock hand; the native lifecycle pair and admission remain pending.
+- **Phase 85f53 pending:** no completed handoff or route evidence is recorded for this phase.
+- **[Phase 85f54](porting-handoff-full-swift-twin-phase85f54-docs-refresh.md):** refreshes the current checkpoint and ordered index while preserving canonical counters and external acceptance floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
@@ -1370,7 +1392,7 @@ site, but no pointer-free owner/query receipt exists yet. Keep shard
 
 The following records preserve earlier evidence and planning gates whose source
 order predates the current f-series sequence; the ordered current index above
-and the Phase 85f51 entry are authoritative for the latest checkpoint.
+and the Phase 85f54 entry are authoritative for the latest checkpoint.
 
 ### 85du — Tank-fish mapping — complete / fail-closed
 

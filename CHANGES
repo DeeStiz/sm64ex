@@ -855,13 +855,22 @@ SM64 Modern native macOS — nightly continuation update (2026-08-23)
       0% M34/M35/human-acceptance floors while linking the f47 seam, prior f48
       refresh, committed f49 handoff, and this refresh in order. No source,
       manifest, report, route ledger, or acceptance state changed.
-230.) Reconcile Phase 85f51 first-party documentation after committed Phase
-      85f49's WDW reachability audit. The authored Castle-to-WDW painting route
+230.) Reconcile Phase 85f51 first-party documentation after Phase 85f49's WDW
+      reachability audit. The authored Castle-to-WDW painting route
       targets warp node `0x0A` but lands in WDW area 2 before the dynamic
       elevator can tick; the matrix fails closed with `dynamic=0`, `static=0`,
       and exit 77, with no trace, route record, or admission. Preserve the
       retained 25/7,395 and isolated 26/7,394 facts and the 0% M34/M35/
       human-acceptance/full-goal floors while linking f47–f51 in order.
+231.) Reconcile Phase 85f54 documentation after the f50/f51 corrections and
+      Phase 85f52 TTC 2D rotator discovery. Record f49's actual WDW area-2
+      reachability blocker (`dynamic=0`, `static=0`, `admission=0`,
+      `canonical_ledger_mutation=0`, `manifest_mutation=0`, exit 77,
+      `trace=not-created`), preserve the exact canonical 25/7,395 and isolated
+      26/7,394 counters/hashes/percentages and 0% M34/M35/human floors, retain
+      authored `bhvTTC2DRotator` row `0x1af5669b06931d93` as planned, and mark
+      Phase 85f53 explicitly pending. No source, manifest, report, route
+      ledger, or acceptance state changed.
 
 Historical pre-Phase-60 continuation entries (items 1–42) retain their
 original Phase 1–55 evidence and pre-Phase-55 7,419 denominator wording; they
