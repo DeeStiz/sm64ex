@@ -221,10 +221,6 @@ struct SM64SerialCanonicalMergeDryRunTool {
                 throw DryRunError.missingInput(path)
             }
         }
-        for output in [options.firstOutput, options.finalOutput] where FileManager.default.fileExists(atPath: output.path) {
-            throw DryRunError.outputExists(output)
-        }
-
         let proofArtifacts = try inputPaths
             .filter { $0.path.hasSuffix("-proof.tsv") || $0.lastPathComponent == "audio-asset-proof.tsv" || $0.lastPathComponent == "pendulum-proof.tsv" }
             .flatMap { try parseProofArtifacts($0).artifacts }
@@ -252,6 +248,9 @@ struct SM64SerialCanonicalMergeDryRunTool {
             guard !(immutableKeys + artifactKeys).contains(pathKey(output)) else {
                 throw DryRunError.outputCollision(output)
             }
+        }
+        for output in [options.firstOutput, options.finalOutput] where FileManager.default.fileExists(atPath: output.path) {
+            throw DryRunError.outputExists(output)
         }
 
         let actualManifestHash = try sha256(options.manifest)

@@ -228,7 +228,7 @@ unset INPUT_REPORT_OVERRIDE INPUT_PROOF_OVERRIDE
 
 # Fixture-only evidence cannot enter the first stage.
 FIXTURE_PROOF="$RUN_ROOT/fixture-input-proof.tsv"
-awk 'NR == 3 { $4 = 1; OFS = "|" } { print }' "$BASE_ROOT/input-proof.tsv" >"$FIXTURE_PROOF"
+awk -F'|' -v OFS='|' 'NR == 3 { $4 = 1 } { print }' "$BASE_ROOT/input-proof.tsv" >"$FIXTURE_PROOF"
 INPUT_PROOF_OVERRIDE="$FIXTURE_PROOF"
 build_args "$RUN_ROOT/fixture-first.tsv" "$RUN_ROOT/fixture-final.tsv"
 if "${SERIAL_ARGS[@]}" >"$RUN_ROOT/fixture-proof.log" 2>&1; then
@@ -242,7 +242,7 @@ unset INPUT_PROOF_OVERRIDE
 
 # Missing artifacts in either retained proof family fail before stage one.
 MISSING_PROOF="$RUN_ROOT/missing-intro-proof.tsv"
-awk -v missing="$RUN_ROOT/missing-intro-artifact.trace" 'NR == 3 { $7 = missing; OFS = "|" } { print }' \
+awk -F'|' -v OFS='|' -v missing="$RUN_ROOT/missing-intro-artifact.trace" 'NR == 3 { $7 = missing } { print }' \
   "$INTRO_ROOT/intro-transition-isolated-proof.tsv" >"$MISSING_PROOF"
 INTRO_PROOF_OVERRIDE="$MISSING_PROOF"
 build_args "$RUN_ROOT/missing-first.tsv" "$RUN_ROOT/missing-final.tsv"
