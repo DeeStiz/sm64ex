@@ -2,6 +2,34 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f98 Whomp discovery documentation refresh (2026-08-23):** records
+  the Phase 85f96 source-route discovery for Whomp's Fortress' authored
+  `bhvWhompKingBoss` row `0x28e0617bfc286cbe`. The source-authored subject is
+  the first area-1 `ACT_1` entry (source ordinal 0, `MODEL_WHOMP`, position
+  `(0,3584,0)`, behavior parameter `0`) reached by the ordinary Castle Inside
+  painting nodes `0x06`/`0x07`/`0x08` into WF area 1. The source owner contains
+  the King action, collision, interaction, cutscene, effect, and reward
+  lifecycle, while `WhompEnemy`/`WhompObjectBridge` preserve copied state and
+  the semantic reward child without native pointers. The generated row declares
+  `collision_queries,effects,object_state,script_events` and remains planned;
+  discovery produced no native WF load, helper call, synthetic spawn, object
+  injection, trace, route record, source edit, manifest/report/ledger mutation,
+  or admission. Phase 85f97 remains pending because no completed handoff
+  exists. Preserve the designated local 26/7,394 report at
+  `build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
+  with SHA-256
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
+  `26/7420 = 0.350404313%`, separate from the byte-identical 25/7,395 backup
+  with SHA-256
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d` and
+  `25/7420 = 0.336927224%`. The manifest remains SHA-256
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+  behavior mapping 95.693%, and M34/M35/human-acceptance/implementation/
+  full-goal floors remain 0%. Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f96-next-route-discovery.md`
+  and `.porting/porting-handoff-full-swift-twin-phase85f98-docs-refresh.md`;
+  no f97 handoff exists.
+
 - **Phase 85f95 JRB treasure documentation correction (2026-08-23):** corrects
   stale Phase 85f93-pending wording across the six first-party status surfaces
   and existing Phase 85f94 handoff. It records the committed source-owned JRB

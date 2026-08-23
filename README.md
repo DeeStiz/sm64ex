@@ -65,6 +65,45 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
+### Phase 85f96 current status
+
+Phase 85f96 completed the next source-route discovery for Whomp's Fortress'
+authored `bhvWhompKingBoss` route row `0x28e0617bfc286cbe`. The source
+behavior script creates the King Whomp subject for `ACT_1` as the first
+area-1 entry (source ordinal 0, `MODEL_WHOMP`, position `(0,3584,0)`,
+behavior parameter `0`); the ordinary Castle Inside painting nodes `0x06`,
+`0x07`, and `0x08` target WF area 1. The source owner contains the King
+action, collision, interaction, cutscene, effect, and reward lifecycle, while
+`WhompEnemy` and `WhompObjectBridge` preserve copied King state and the
+semantic reward child without exposing native pointers. The generated row
+declares `collision_queries,effects,object_state,script_events` and remains
+exactly one `planned` row.
+
+This is discovery/static owner evidence only. No native WF load, direct helper
+call, synthetic Whomp spawn, object injection, trace, route record, source
+edit, manifest/report/ledger mutation, or admission occurred. Phase 85f97
+remains pending because no completed handoff exists.
+
+The designated local canonical route evidence remains
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
+with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`. It
+contains 7,420 rows: 26 non-fixture terminal `passed` and 7,394 `planned`
+(`26/7420 = 0.350404313%`). The old retained report remains byte-identical
+as the write-once backup at
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/pre-publication-backup/canonical-route-ledger.tsv`
+with SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`. It
+contains 25 terminal `passed` and 7,395 `planned`
+(`25/7420 = 0.336927224%`); it is historical backup evidence, not the
+designated report. The source manifest remains unchanged at 7,420 rows with
+SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+Behavior mapping remains 95.693%, and the conservative M34, M35,
+human-acceptance, implementation, and full-goal floors remain 0%. No source,
+manifest, designated or backup report, route ledger, release, store, or
+external publication state changed.
+
 ### Phase 85f93 current status
 
 Phase 85f93 committed the source-owned JRB treasure-chest receipt seam in
@@ -911,8 +950,11 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f91 Snowman wind documentation correction](.porting/porting-handoff-full-swift-twin-phase85f91-docs-snowman-wind-correction.md),
 [Phase 85f92 JRB treasure discovery](.porting/porting-handoff-full-swift-twin-phase85f92-next-route-discovery.md),
 [Phase 85f93 JRB treasure-chest seam execute](.porting/porting-handoff-full-swift-twin-phase85f93-treasure-chest-seam-execute.md),
-[Phase 85f94 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f94-docs-refresh.md), and
-[Phase 85f95 JRB documentation correction](.porting/porting-handoff-full-swift-twin-phase85f95-docs-treasure-correction.md).
+[Phase 85f94 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f94-docs-refresh.md),
+[Phase 85f95 JRB documentation correction](.porting/porting-handoff-full-swift-twin-phase85f95-docs-treasure-correction.md),
+[Phase 85f96 Whomp discovery](.porting/porting-handoff-full-swift-twin-phase85f96-next-route-discovery.md),
+Phase 85f97 remains pending because no completed handoff exists, and
+[Phase 85f98 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f98-docs-refresh.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).

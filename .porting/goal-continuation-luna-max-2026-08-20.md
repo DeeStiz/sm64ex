@@ -21,6 +21,45 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
+### Phase 85f96 current evidence checkpoint
+
+Phase 85f96 completed the next source-route discovery for Whomp's Fortress'
+authored `bhvWhompKingBoss` route row `0x28e0617bfc286cbe`. The source
+behavior script creates the King Whomp subject for `ACT_1` as the first
+area-1 entry (source ordinal 0, `MODEL_WHOMP`, position `(0,3584,0)`,
+behavior parameter `0`); the ordinary Castle Inside painting nodes `0x06`,
+`0x07`, and `0x08` target WF area 1. The source owner contains the King
+action, collision, interaction, cutscene, effect, and reward lifecycle, while
+`WhompEnemy` and `WhompObjectBridge` preserve copied King state and the
+semantic reward child without exposing native pointers. The generated row
+declares `collision_queries,effects,object_state,script_events` and remains
+exactly one `planned` row.
+
+This is discovery/static owner evidence only. No native WF load, direct helper
+call, synthetic Whomp spawn, object injection, trace, route record, source
+edit, manifest/report/ledger mutation, or admission occurred. Phase 85f97
+remains pending because no completed handoff exists.
+
+The designated local canonical route evidence remains
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/canonical-route-ledger.tsv`
+with SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`. It
+contains 7,420 rows: 26 non-fixture terminal `passed` and 7,394 `planned`
+(`26/7420 = 0.350404313%`). The old retained report remains byte-identical
+as the write-once backup at
+`build/sm64-modern-phase85f81-serial-publication/run.elhzBC/pre-publication-backup/canonical-route-ledger.tsv`
+with SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`. It
+contains 25 terminal `passed` and 7,395 `planned`
+(`25/7420 = 0.336927224%`); it is historical backup evidence, not the
+designated report. The source manifest remains unchanged at 7,420 rows with
+SHA-256
+`23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`.
+Behavior mapping remains 95.693%, and the conservative M34, M35,
+human-acceptance, implementation, and full-goal floors remain 0%. No source,
+manifest, designated or backup report, route ledger, release, store, or
+external publication state changed.
+
 ### Phase 85f93 current evidence checkpoint
 
 Phase 85f93 committed the source-owned JRB treasure-chest receipt seam in
@@ -692,6 +731,9 @@ broad/physical/release/human gates are open.
 - **[Phase 85f93](porting-handoff-full-swift-twin-phase85f93-treasure-chest-seam-execute.md):** commits the source-owned receipt seam (`904bffa3`), but the authored Castle→JRB route remains at `level=1 area=1 roots=0 bottoms=0 tops=0` and exits 77 before trace or admission.
 - **[Phase 85f94](porting-handoff-full-swift-twin-phase85f94-docs-refresh.md):** refreshes the six first-party status surfaces with the f92 discovery and f93 seam result; its stale f93-pending wording is corrected by Phase 85f95.
 - **[Phase 85f95](porting-handoff-full-swift-twin-phase85f95-docs-treasure-correction.md):** corrects the f93 status across the six first-party surfaces and existing f94 handoff while preserving exact counters, hashes, percentages, and 0% floors.
+- **[Phase 85f96](porting-handoff-full-swift-twin-phase85f96-next-route-discovery.md):** discovers Whomp's Fortress' authored `bhvWhompKingBoss` row `0x28e0617bfc286cbe`; the first WF area-1 `ACT_1` King subject remains planned because no native route lifecycle, trace, or admission was produced.
+- **Phase 85f97:** remains pending because no completed handoff exists.
+- **[Phase 85f98](porting-handoff-full-swift-twin-phase85f98-docs-refresh.md):** records the f96 Whomp discovery across the six first-party status surfaces while preserving the designated 26/7,394 and backup 25/7,395 evidence, exact hashes/percentages, and 0% floors.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/
