@@ -2,6 +2,19 @@
 
 ## Latest validated slices (2026-08-23)
 
+- **Phase 85f108 Pokey documentation refresh (2026-08-23):** records Phase
+  85f106's SSL `bhvPokey`/`bhvPokeyBodyPart` discovery at rows
+  `0x132a22db8f8e0945` and `0x41715ab876625588`, and Phase 85f107's static seam
+  (`22d44cba`) with fingerprint `0x26090919531bbf4d`. The verdict remains
+  **STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION**; only the
+  ordinary Castle→SSL area-1 route may provide next runtime evidence. Preserve
+  the designated 26/7,394 and backup 25/7,395 reports, unchanged manifest
+  hashes, behavior mapping 95.693%, and 0% M34/M35/human/full floors.
+  Handoffs:
+  `.porting/porting-handoff-full-swift-twin-phase85f106-next-route-discovery.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f108-docs-refresh.md`.
+
 - **Phase 85f105 Donut Platform documentation refresh (2026-08-23):** records
   Phase 85f103's Rainbow Ride `bhvDonutPlatformSpawner` discovery at row
   `0x0114376397887ece` and Phase 85f104's static seam (`ea1e4772`) with

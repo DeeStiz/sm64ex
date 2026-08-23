@@ -21,6 +21,15 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
+### Phase 85f108 current evidence checkpoint
+
+Phase 85f106 selected SSL `bhvPokey` parent row `0x132a22db8f8e0945` and
+`bhvPokeyBodyPart` child row `0x41715ab876625588`; Phase 85f107 committed
+static seam `22d44cba` with fingerprint `0x26090919531bbf4d`. The verdict is
+**STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION**. Only the
+ordinary Castle→SSL area-1 route may provide next evidence; counters and all
+M34/M35/human/full floors remain unchanged.
+
 ### Phase 85f105 current evidence checkpoint
 
 Phase 85f103 selected Rainbow Ride's authored `bhvDonutPlatformSpawner` at
@@ -744,6 +753,9 @@ broad/physical/release/human gates are open.
 - **[Phase 85f103](porting-handoff-full-swift-twin-phase85f103-next-route-discovery.md):** discovers the authored Rainbow Ride `bhvDonutPlatformSpawner` at route row `0x0114376397887ece`; the selected row remains planned.
 - **[Phase 85f104](porting-handoff-full-swift-twin-phase85f104-donut-platform-seam-execute.md):** commits the static Donut Platform parent/31-child source-contract seam (`ea1e4772`), but no runtime receipt or admission exists.
 - **[Phase 85f105](porting-handoff-full-swift-twin-phase85f105-docs-refresh.md):** reconciles all first-party status surfaces with the Donut Platform static-only verdict, exact counters/hashes, Castle node `0x2A` boundary, and ordered f103–f105 handoffs.
+- **[Phase 85f106](porting-handoff-full-swift-twin-phase85f106-next-route-discovery.md):** discovers the authored SSL Pokey parent/body-part group at rows `0x132a22db8f8e0945` and `0x41715ab876625588`; both remain planned.
+- **[Phase 85f107](porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md):** commits the static Pokey parent/child source-contract seam (`22d44cba`), but no runtime receipt or admission exists.
+- **[Phase 85f108](porting-handoff-full-swift-twin-phase85f108-docs-refresh.md):** reconciles all first-party status surfaces with the Pokey static-only verdict, exact counters/hashes, and ordered f106–f108 handoffs.
 
 M34 now has structural/runtime evidence for validation, archive reuse,
 capture, and `gpudebug`, but attachment replay, non-clear pixels, source/

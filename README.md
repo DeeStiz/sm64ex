@@ -65,6 +65,22 @@ the native renderer and presentation path. The portable C engine remains the
 gameplay oracle and compatibility fallback; raw C object graphs do not cross
 the Swift concurrency boundary.
 
+### Phase 85f108 current status
+
+Phase 85f106 selected the SSL area-1 authored Pokey parent row
+`0x132a22db8f8e0945` and body-part child row `0x41715ab876625588`. Phase
+85f107 committed the static parent/child seam in `22d44cba`; its exact
+fingerprint is `0x26090919531bbf4d` and its verdict is **STATIC SEAM COMPLETE /
+RUNTIME RECEIPT ABSENT / NO ADMISSION**. The seam preserves the four authored
+macro tuples, five child ordinals, head/body models, offsets, alive mask, and
+semantic identities. No runtime receipt or admission exists.
+
+The only acceptable next evidence is the ordinary Castle→SSL area-1 route.
+No direct SSL load/warp, synthetic child, object injection, helper/probe
+call, trace, manifest/report/ledger mutation, or admission was performed; the
+parent and child rows remain planned. Canonical/backup counters remain
+26/7,394 and 25/7,395, and M34/M35/human/full floors remain 0%.
+
 ### Phase 85f105 current status
 
 Phase 85f103 selected Rainbow Ride's authored `bhvDonutPlatformSpawner` at
@@ -964,7 +980,10 @@ The current route audit and latest admission/merge handoffs are
 [Phase 85f102 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f102-docs-refresh.md),
 [Phase 85f103 Donut Platform discovery](.porting/porting-handoff-full-swift-twin-phase85f103-next-route-discovery.md),
 [Phase 85f104 Donut Platform static seam](.porting/porting-handoff-full-swift-twin-phase85f104-donut-platform-seam-execute.md), and
-[Phase 85f105 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f105-docs-refresh.md).
+[Phase 85f105 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f105-docs-refresh.md),
+[Phase 85f106 Pokey discovery](.porting/porting-handoff-full-swift-twin-phase85f106-next-route-discovery.md),
+[Phase 85f107 Pokey static seam](.porting/porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md), and
+[Phase 85f108 documentation refresh](.porting/porting-handoff-full-swift-twin-phase85f108-docs-refresh.md).
 
 The continuation plan and automatic handoff/commit protocol are recorded in
 [`goal-continuation-luna-max-2026-08-20.md`](.porting/goal-continuation-luna-max-2026-08-20.md).

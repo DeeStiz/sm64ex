@@ -2,6 +2,17 @@
 
 ## Status
 
+### Phase 85f108 current status
+
+Phase 85f106 selected the SSL Pokey parent/body-part rows
+`0x132a22db8f8e0945` and `0x41715ab876625588`; Phase 85f107 committed static
+seam `22d44cba` with fingerprint `0x26090919531bbf4d`. Its verdict is
+**STATIC SEAM COMPLETE / RUNTIME RECEIPT ABSENT / NO ADMISSION**. The source
+macro tuples, five child offsets/models, alive mask, and semantic identities
+remain frozen, while Castle→SSL area-1 runtime evidence is still required.
+Both rows remain planned; no report/ledger/manifest mutation occurred and
+all conservative floors remain 0%.
+
 ### Phase 85f105 current status
 
 Phase 85f103 selected Rainbow Ride's authored `bhvDonutPlatformSpawner` at
@@ -1405,7 +1416,10 @@ and [Phase 84c documentation reconciliation](porting-handoff-full-swift-twin-pha
 [Phase 85f102 documentation refresh](porting-handoff-full-swift-twin-phase85f102-docs-refresh.md),
 [Phase 85f103 Donut Platform discovery](porting-handoff-full-swift-twin-phase85f103-next-route-discovery.md),
 [Phase 85f104 Donut Platform static seam](porting-handoff-full-swift-twin-phase85f104-donut-platform-seam-execute.md), and
-[Phase 85f105 documentation refresh](porting-handoff-full-swift-twin-phase85f105-docs-refresh.md).
+[Phase 85f105 documentation refresh](porting-handoff-full-swift-twin-phase85f105-docs-refresh.md),
+[Phase 85f106 Pokey discovery](porting-handoff-full-swift-twin-phase85f106-next-route-discovery.md),
+[Phase 85f107 Pokey static seam](porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md), and
+[Phase 85f108 documentation refresh](porting-handoff-full-swift-twin-phase85f108-docs-refresh.md).
 
 Continuation Phase 20 (2026-08-20) adds an independent one-record common-input
 probe. The C and Swift peers produce byte-identical 200-byte schema-4 files

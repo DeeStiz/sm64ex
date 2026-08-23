@@ -16,6 +16,16 @@ fallback until a subsystem has passed its C-to-Swift parity gates.
 The status below is pinned to the current `nightly` continuation
 (2026-08-23).
 
+### Phase 85f108 current status
+
+Phase 85f106 selected the SSL area-1 authored Pokey parent row
+`0x132a22db8f8e0945` and body-part child row `0x41715ab876625588`; Phase
+85f107 committed static seam `22d44cba` with fingerprint
+`0x26090919531bbf4d`. The verdict is **STATIC SEAM COMPLETE / RUNTIME RECEIPT
+ABSENT / NO ADMISSION**. The macro tuples, five child offsets/models, alive
+mask, and semantic parent/child identities are frozen; only Castle→SSL area 1
+may provide next runtime evidence. No receipt or admission exists.
+
 ### Phase 85f105 current status
 
 Phase 85f103 selected Rainbow Ride's authored `bhvDonutPlatformSpawner` at
@@ -1336,7 +1346,10 @@ M34 capture](../.porting/porting-handoff-full-swift-twin-phase81-m34-ready-host-
 [Phase 85f102 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f102-docs-refresh.md),
 [Phase 85f103 Donut Platform discovery](../.porting/porting-handoff-full-swift-twin-phase85f103-next-route-discovery.md),
 [Phase 85f104 Donut Platform static seam](../.porting/porting-handoff-full-swift-twin-phase85f104-donut-platform-seam-execute.md), and
-[Phase 85f105 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f105-docs-refresh.md).
+[Phase 85f105 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f105-docs-refresh.md),
+[Phase 85f106 Pokey discovery](../.porting/porting-handoff-full-swift-twin-phase85f106-next-route-discovery.md),
+[Phase 85f107 Pokey static seam](../.porting/porting-handoff-full-swift-twin-phase85f107-pokey-seam-execute.md), and
+[Phase 85f108 documentation refresh](../.porting/porting-handoff-full-swift-twin-phase85f108-docs-refresh.md).
 Historical Phase 85a–85ap handoffs follow for provenance; the ordered Phase
 85f-series index above is authoritative for the current checkpoint.
 [Phase 85a Mario owner repair](../.porting/porting-handoff-full-swift-twin-phase85a-mario-state-route-repair.md),
