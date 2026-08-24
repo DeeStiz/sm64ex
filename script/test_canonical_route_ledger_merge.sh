@@ -10,6 +10,14 @@ set -euo pipefail
 bash -n "$0"
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# The historical Phase 85bu body below predates the 25-target merge contract.
+# Keep it available only for explicit archaeology; the normal orchestrator
+# entrypoint runs the bounded, immutable Phase 85f136 reconciliation harness.
+if [[ "${SM64_PHASE85BU_LEGACY_FULL_SMOKE:-0}" != 1 ]]; then
+  exec bash "$PROJECT_ROOT/script/test_phase85f136_merge_tool_drift_fix.sh" "$@"
+fi
+
 BUILD_ROOT="$PROJECT_ROOT/build/sm64-modern-phase85h-canonical-ledger"
 mkdir -p "$BUILD_ROOT"
 RUN_ROOT="$(mktemp -d "$BUILD_ROOT/run.XXXXXX")"

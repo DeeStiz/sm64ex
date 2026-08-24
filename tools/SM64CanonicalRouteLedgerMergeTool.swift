@@ -157,6 +157,12 @@ struct SM64CanonicalRouteLedgerMergeTool {
         let output: URL
     }
 
+    // This tool is the retained-backup stage of the serial publication flow.
+    // The designated 26-row report is a separate, authorization-gated stage;
+    // it must not be inferred or written by this 25-target tool.
+    private static let retainedBackupTerminalCount = targetIDs.count
+    private static let retainedBackupPlannedCount = manifestRowCount - retainedBackupTerminalCount
+
     private struct ManifestRow {
         let id: UInt64
         let domain: String
@@ -251,8 +257,9 @@ struct SM64CanonicalRouteLedgerMergeTool {
         guard Set(reportURLs.map(pathKey)).count == reportURLs.count else {
             throw MergeError.duplicateReportPath(reportURLs[0])
         }
-        guard options.output.resolvingSymlinksInPath().standardizedFileURL.path
-            != options.manifest.resolvingSymlinksInPath().standardizedFileURL.path else {
+        let outputPath = pathKey(options.output)
+        let preflightInputPaths = Set(([options.manifest] + reportURLs + proofURLs).map(pathKey))
+        guard !preflightInputPaths.contains(outputPath) else {
             throw MergeError.outputCollision(options.output)
         }
         guard !FileManager.default.fileExists(atPath: options.output.path) else {
@@ -306,7 +313,21 @@ struct SM64CanonicalRouteLedgerMergeTool {
             )
         }
         guard seenTargets == Set(expectedTargets) else {
-            throw MergeError.invalidManifest("Phase 85 reports do not cover all twenty-five target IDs")
+            throw MergeError.invalidManifest(
+                "Phase 85 reports do not cover all \(retainedBackupTerminalCount) target IDs"
+            )
+        }
+
+        // Reports, proofs, and every artifact named by a proof are immutable
+        // evidence. Reject an output path that aliases any of them before the
+        // first write; checking only the manifest would permit overwriting a
+        // source report or proof after it had been read.
+        let immutableInputPaths = Set(
+            ([options.manifest] + reportURLs + proofURLs + validated.flatMap { $0.proof.artifactURLs })
+                .map(pathKey)
+        )
+        guard !immutableInputPaths.contains(outputPath) else {
+            throw MergeError.outputCollision(options.output)
         }
 
         var merged: [LedgerRow] = manifestRows.map {
@@ -331,10 +352,10 @@ struct SM64CanonicalRouteLedgerMergeTool {
         do {
             let ledger = try SM64RouteShardExecutionLedger(manifest: manifestText, report: outputText)
             guard ledger.count == manifestRowCount,
-                  ledger.plannedCount == 7395,
-                  ledger.terminalCount == 25 else {
+                  ledger.plannedCount == retainedBackupPlannedCount,
+                  ledger.terminalCount == retainedBackupTerminalCount else {
                 throw MergeError.ledgerInvalid(
-                    "expected manifest_rows=7420 planned=7395 terminal=25, got "
+                    "expected manifest_rows=\(manifestRowCount) planned=\(retainedBackupPlannedCount) terminal=\(retainedBackupTerminalCount), got "
                         + "manifest_rows=\(ledger.count) planned=\(ledger.plannedCount) terminal=\(ledger.terminalCount)"
                 )
             }
@@ -353,7 +374,7 @@ struct SM64CanonicalRouteLedgerMergeTool {
         let targetSummary = expectedTargets.map { formatID($0) }.joined(separator: ",")
         print(
             "SM64 canonical route ledger merge passed "
-                + "manifest_rows=7420 qualified_rows=25 planned=7395 terminal=25 "
+                + "manifest_rows=\(manifestRowCount) qualified_rows=\(retainedBackupTerminalCount) planned=\(retainedBackupPlannedCount) terminal=\(retainedBackupTerminalCount) "
                 + "targets=[\(targetSummary)] fixture_only=0 "
                 + "manifest_sha256=\(manifestHash) output_sha256=\(outputHash) "
                 + "report_sha256s=[\(validated.map(\.reportHash).joined(separator: ","))] "
