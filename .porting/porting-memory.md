@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-24)
 
-- **Phase 85f141 documentation / M34-ready M35-blocked (2026-08-24):** carries
+- **Phase 85f143 intro-admission documentation (2026-08-24):** carries
   forward the three source-backed isolated f131 admissions without changing
   canonical state. Effects `0x3951f0333dc3c5da` has 58 records,
   interaction-state `0x3e1cdaca08b21f54` has 14, and wooden-door display-list
@@ -42,6 +42,18 @@
   approval pair above. M35 has Apple Development and Apple Distribution
   identities, but no Developer ID Application identity/private key or
   supported notary authentication; no distribution artifacts exist.
+  f142 re-ran the authored intro-transition row
+  `0x9a0f7b4f7ecf6c41|level_script|levels/intro/script.c|levels/intro/script.c|0x6c1f8a943cb27d50|0x2e7fdb4a0c5689b1|script_events,transition|planned|source-authored intro transition route;fixture_only=0`
+  with exactly two records at ticks `311,391`. C, independent Swift, ASan,
+  optimized Release, and fresh rerun traces are byte-identical 328-byte
+  artifacts at SHA `f10d8827ed3e5f83f7f8af8bc1b2abbd7059d5433f38577713d34d8be5c3c821`,
+  with `c_records=2`, `swift_records=2`, and `first_divergence=none`.
+  Tampered, partial, reordered, missing-record, single-artifact,
+  persistent-rerun, duplicate-admission, missing-artifact, and
+  output-collision cases reject; fixture-only, output-distinctness, and rerun
+  fences pass. The phase-local ID maps by exact source identity to canonical
+  terminal `0xca33981b30cb7815`, already `passed|2|2|2|`, so report, ledger,
+  route/behavior manifests, and history remain unchanged.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f130-route-tool-baseline.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f131-candidate-route-contracts.md`,
@@ -55,7 +67,9 @@
   `.porting/porting-handoff-full-swift-twin-phase85f138-timebase-gate-design.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f139-docs-timebase-gate.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f140-m34-m35-state-recheck.md`,
-  and `.porting/porting-handoff-full-swift-twin-phase85f141-docs-m34-ready-m35-blocked.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f141-docs-m34-ready-m35-blocked.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f142-more-route-admissions.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f143-docs-intro-admission.md`.
 
 - **Phase 85f129 canonical/M34/M35 audit documentation (2026-08-23):** records
   13 planned candidates across 11 route families with zero newly admissible

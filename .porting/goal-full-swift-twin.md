@@ -2,7 +2,7 @@
 
 ## Status
 
-### Phase 85f141 current status
+### Phase 85f143 current status
 
 Phase 85f130's read-only baseline confirmed that the new route/admission
 contracts are phase-local evidence; no serial merge or canonical mutation was
@@ -108,6 +108,22 @@ Application identity/private key and no supported `notarytool` authentication
 are present. No archive, export, DMG/ZIP distribution artifact, notarization,
 stapling, clean-machine, or human evidence exists.
 
+Phase 85f142 re-ran the source-backed authored intro-transition admission in a
+disjoint build root. The focused source row
+`0x9a0f7b4f7ecf6c41|level_script|levels/intro/script.c|levels/intro/script.c|0x6c1f8a943cb27d50|0x2e7fdb4a0c5689b1|script_events,transition|planned|source-authored intro transition route;fixture_only=0`
+contains exactly two records at ticks `311,391`. The source C owner,
+independent Swift value consumer, ASan, optimized Release, and fresh rerun
+traces are all byte-identical 328-byte artifacts with SHA-256
+`f10d8827ed3e5f83f7f8af8bc1b2abbd7059d5433f38577713d34d8be5c3c821`;
+`c_records=2`, `swift_records=2`, and `first_divergence=none`. Tampered,
+partial, reordered, missing-record, single-artifact, persistent-rerun,
+duplicate-admission, missing-artifact, and output-collision cases were all
+rejected; `fixture_only=0`, output distinctness, and the rerun fence passed.
+The phase-local ID maps by exact source identity to canonical terminal row
+`0xca33981b30cb7815`, already `passed|2|2|2|`; this is a reconfirmation, not a
+new canonical admission. The designated report, write-once backup, route and
+behavior manifests, ledger, and history therefore remain unchanged.
+
 The designated local canonical report remains 7,420 rows with 26 terminal
 `passed` and 7,394 `planned` (`26/7420 = 0.350404313%`) at SHA-256
 `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`; the
@@ -132,8 +148,10 @@ Ordered handoffs: [Phase 85f130 route/tool baseline](porting-handoff-full-swift-
 [Phase 85f137 documentation refresh](porting-handoff-full-swift-twin-phase85f137-docs-merge-tool-fix.md),
 [Phase 85f138 timebase-gate design](porting-handoff-full-swift-twin-phase85f138-timebase-gate-design.md),
 [Phase 85f139 documentation refresh](porting-handoff-full-swift-twin-phase85f139-docs-timebase-gate.md),
-[Phase 85f140 M34/M35 state recheck](porting-handoff-full-swift-twin-phase85f140-m34-m35-state-recheck.md), and
-[Phase 85f141 documentation refresh](porting-handoff-full-swift-twin-phase85f141-docs-m34-ready-m35-blocked.md).
+[Phase 85f140 M34/M35 state recheck](porting-handoff-full-swift-twin-phase85f140-m34-m35-state-recheck.md),
+[Phase 85f141 documentation refresh](porting-handoff-full-swift-twin-phase85f141-docs-m34-ready-m35-blocked.md),
+[Phase 85f142 intro-transition admission](porting-handoff-full-swift-twin-phase85f142-more-route-admissions.md), and
+[Phase 85f143 documentation refresh](porting-handoff-full-swift-twin-phase85f143-docs-intro-admission.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 

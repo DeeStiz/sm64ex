@@ -1,4 +1,29 @@
 SM64 Modern native macOS — nightly continuation update (2026-08-24)
+264.) Reconcile Phase 85f143 documentation after the Phase 85f142 authored
+      intro-transition admission. Record focused row
+      `0x9a0f7b4f7ecf6c41|level_script|levels/intro/script.c|levels/intro/script.c|0x6c1f8a943cb27d50|0x2e7fdb4a0c5689b1|script_events,transition|planned|source-authored intro transition route;fixture_only=0`
+      with exactly two records at ticks `311,391` and exact C/Swift/ASan/
+      optimized Release/fresh-rerun byte parity (328-byte SHA-256
+      `f10d8827ed3e5f83f7f8af8bc1b2abbd7059d5433f38577713d34d8be5c3c821`).
+      Preserve tampered, partial, reordered, missing-record, single-artifact,
+      persistent-rerun, duplicate-admission, missing-artifact, and
+      output-collision rejection, plus fixture-only, output-distinctness, and
+      rerun fences. Map the phase-local ID by exact source identity to already
+      terminal canonical row `0xca33981b30cb7815` (`passed|2|2|2|`), so the
+      designated 26/7,394 report, 25/7,395 backup, route/behavior manifests,
+      ledger, and history remain unchanged. Preserve the three f131 admissions,
+      M34 `m34_host_ready=1` but approval-gated production, and M35's Apple
+      Distribution-only state with no Developer ID Application identity/private
+      key or supported `notarytool` authentication. Keep hashes
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`,
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+      and `83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`,
+      95.693% mapping, and 0% M34/M35/human-acceptance/implementation/
+      full-goal floors. Link ordered f140 state, f141 docs, f142 admission,
+      and f143 docs handoffs. Documentation only; no source, report, ledger,
+      manifest, release, publication, credential, or acceptance state changed.
+
 263.) Reconcile Phase 85f141 documentation after the committed Phase 85f140
       M34/M35 state recheck. Record `m34_host_ready=1`, two online/awake
       displays, no recorded thermal warning, and Metal/`gpucapture`/`gpudebug`
