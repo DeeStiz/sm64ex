@@ -2,25 +2,62 @@
 
 ## Status
 
-### Phase 85f129 current status
+### Phase 85f135 current status
 
-Phase 85f126's read-only canonical merge-readiness audit found 13 pristine
-`planned` candidate rows across 11 route families and zero newly admissible
-rows. No candidate has the independent Debug C, Swift, ASan, Release,
-fresh-rerun, and admission proof required for serial canonical merge, so the
-merge remains unauthorized.
+Phase 85f130's read-only baseline confirmed that the new route/admission
+contracts are phase-local evidence; no serial merge or canonical mutation was
+authorized. Phase 85f131 then completed three source-backed isolated
+admissions, while leaving their identities represented only as unchanged
+`planned` rows in the designated 26/7,394 report:
 
-Phase 85f127 rechecked the M34 host and tools. `m34_host_ready=0` remains in
-force because the only display is offline/asleep, the console session is
-locked, no active GPU capture/debug session exists, and thermal telemetry is
-unknown. No release launch, capture/replay, attachment/pixel, cadence/soak,
-direct-display, physical, or human evidence is admissible.
+* Effects `0x3951f0333dc3c5da`: 58 records. C Debug/ASan/optimized Release,
+  Swift, and fresh-rerun traces are byte-identical at 7,496 bytes
+  (`68329f0a22e7d20f5ddb3b22777d74e626523d5c0467ccac569566eb6c998226`);
+  C/ASan/Release receipt sidecars match at 6,960 bytes
+  (`222011020b8d266cffa30df091166a9b3bc79a839b5e7d58728f85252d0bf74e`).
+  The admission reports `c_records=58`, `swift_records=58`,
+  `first_divergence=none`, C/Swift/ASan/Release equality, receipt equality,
+  tamper rejection, single-trace/single-receipt rejection, partial-trace
+  rejection, and persistent-rerun rejection.
+* Interaction-state `0x3e1cdaca08b21f54`: 14 records. C Debug/ASan/optimized
+  Release, Swift, and fresh-rerun traces match at 1,864 bytes
+  (`3a20e00c7f5d5a4989b3e0d0ade02ca0698254965f992fe4d92a212718bd5f96`);
+  `c_records=14`, `swift_records=14`, `first_divergence=none`,
+  C/Swift/ASan/Release equality, canonical-hash tamper rejection,
+  single-trace rejection, partial-trace rejection, and persistent-rerun
+  rejection all pass.
+* Wooden-door display-list `0x00cab93b5dd94425`: 2 records. C
+  Debug/ASan/optimized Release/fresh-rerun and Swift traces match at 328
+  bytes (`8f9e3422d49d8fc58c407b31ae6646e7082b351f026324162f8a44038b5c09f5`);
+  packet sidecars match at 285 bytes
+  (`3493f3c76a76293eaff4bdecac83729a83fdef88b713b39f5393c157ff0cb857`).
+  `c_records=2`, `swift_records=2`, `first_divergence=none`, pointer-free
+  packet/resource stability, C/Swift/ASan/Release/rerun equality, tamper,
+  single-artifact, partial-trace, and persistent-rerun fences all pass.
 
-Phase 85f128 rechecked stable-Xcode M35 readiness and distribution contracts;
-both contracts pass, but no valid Developer ID Application identity/private-
-key pair or supported `notarytool` authentication is present. No fresh
-archive/export, signed/notarized/stapled app, DMG/ZIP, clean-machine, or human
-acceptance artifact exists.
+These are source/value admissions only: the isolated reports are not a new
+canonical publication, and no designated report, route ledger, manifest, or
+history mutation occurred. They do not establish audible/haptic output,
+rendered pixels, GPU capture, physical-device behavior, performance, or human
+acceptance.
+
+Phase 85f132 rechecked the host with `m34_host_ready=1` (two online displays,
+unlocked console, Metal, `gpucapture`, and `gpudebug`). Phase 85f133's
+production attempt nevertheless stopped before Release build/launch because
+the timebase audit intentionally classified source-owned receipt
+instrumentation drift (`object_timer` 166/715 -> 166/734 and broad-token
+`random_calls` 79/289 -> 79/290; callable RNG syntax remains 79/289). No
+M34 runtime, capture, pixel, cadence, soak, thermal, or physical evidence was
+produced, and the retained fixture was not updated.
+
+Phase 85f134's isolated merge dry-run confirms the contract drift: the stale
+shell invokes 23 targets, the current Swift merge tool requires 25, and the
+retained designated report has 26 terminal rows. Its reconciled temporary
+25/7,395 output matched the write-once backup, not the designated 26/7,394
+report; no canonical mutation occurred. M35 contracts still pass, but the
+direct readiness gate remains blocked by absent Developer ID Application
+identity/private key and supported `notarytool` authentication. No archive,
+notarization, stapling, clean-machine, or human evidence exists.
 
 The designated local canonical report remains 7,420 rows with 26 terminal
 `passed` and 7,394 `planned` (`26/7420 = 0.350404313%`) at SHA-256
@@ -35,10 +72,13 @@ the behavior manifest remains unchanged at SHA-256
 Behavior mapping remains 95.693%, and the conservative M34, M35,
 human-acceptance, implementation, and full-goal floors remain 0%.
 
-Ordered handoffs: [Phase 85f126 canonical merge-readiness audit](porting-handoff-full-swift-twin-phase85f126-canonical-merge-readiness-audit.md),
-[Phase 85f127 M34 host recheck](porting-handoff-full-swift-twin-phase85f127-m34-host-recheck.md),
-[Phase 85f128 M35 readiness recheck](porting-handoff-full-swift-twin-phase85f128-m35-readiness-recheck.md), and
-[Phase 85f129 documentation/audit refresh](porting-handoff-full-swift-twin-phase85f129-docs-audits.md).
+Ordered handoffs: [Phase 85f130 route/tool baseline](porting-handoff-full-swift-twin-phase85f130-route-tool-baseline.md),
+[Phase 85f131 isolated admissions](porting-handoff-full-swift-twin-phase85f131-candidate-route-contracts.md),
+[Phase 85f132 baseline/M34/M35 recheck](porting-handoff-full-swift-twin-phase85f132-new-baseline-gates.md),
+[Phase 85f133 M34 production attempt](porting-handoff-full-swift-twin-phase85f133-m34-production-run.md),
+[Phase 85f134 timebase drift analysis](porting-handoff-full-swift-twin-phase85f134-m34-timebase-drift-analysis.md),
+[Phase 85f134 canonical merge dry-run](porting-handoff-full-swift-twin-phase85f134-canonical-merge-dryrun.md), and
+[Phase 85f135 documentation refresh](porting-handoff-full-swift-twin-phase85f135-docs-positive-admissions.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 
