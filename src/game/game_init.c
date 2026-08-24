@@ -610,6 +610,9 @@ static bool sAutomatedCastleArea2WarpRequested;
 static bool sAutomatedCastleWdwElevator;
 static bool sAutomatedCastleWdwElevatorArea2Requested;
 static bool sAutomatedCastleWdwElevatorWarpRequested;
+static bool sAutomatedCastleTtcRotator;
+static bool sAutomatedCastleTtcRotatorArea2Requested;
+static bool sAutomatedCastleTtcRotatorWarpRequested;
 static bool sAutomatedCotmcLevelScript;
 static bool sAutomatedBbhGeo;
 static bool sAutomatedRrDonut;
@@ -674,6 +677,34 @@ static void automated_castle_wdw_elevator_transition_step(void) {
     }
 }
 
+/*
+ * Keep the TTC route on the ordinary Castle Inside painting lifecycle.  The
+ * selected source family is PAINTING_WARP_NODE 0x21 (with 0x22/0x23 the
+ * authored siblings), which resolves to TTC area 1 node 0x0A.  This opt-in
+ * owner-thread gate requests that compiled destination and never registers a
+ * level, injects a macro object, or calls a behavior helper.
+ */
+static void automated_castle_ttc_rotator_transition_step(void) {
+    if (!sAutomatedCastleTtcRotator || gCurrentArea == NULL
+        || gMarioState == NULL || gMarioState->action == ACT_UNINITIALIZED) {
+        return;
+    }
+
+    if (!sAutomatedCastleTtcRotatorArea2Requested
+        && gCurrLevelNum == LEVEL_CASTLE && gCurrentArea->index == 1) {
+        initiate_warp(LEVEL_CASTLE, 2, 0x35, 0);
+        sAutomatedCastleTtcRotatorArea2Requested = true;
+    } else if (!sAutomatedCastleTtcRotatorWarpRequested
+               && sAutomatedCastleTtcRotatorArea2Requested
+               && gCurrLevelNum == LEVEL_CASTLE
+               && gCurrentArea->index == 2) {
+        initiate_warp(LEVEL_TTC, 1, 0x0A, 0);
+        sCurrPlayMode = 4; /* PLAY_MODE_CHANGE_LEVEL (level_update.c) */
+        D_80339ECA = 0;
+        sAutomatedCastleTtcRotatorWarpRequested = true;
+    }
+}
+
 // main game loop thread. runs forever as long as the game
 // continues.
 void thread5_game_loop(UNUSED void *arg) {
@@ -704,6 +735,10 @@ void thread5_game_loop(UNUSED void *arg) {
         getenv("SM64_MODERN_AUTOMATED_CASTLE_WDW_ELEVATOR") != NULL;
     sAutomatedCastleWdwElevatorArea2Requested = false;
     sAutomatedCastleWdwElevatorWarpRequested = false;
+    sAutomatedCastleTtcRotator =
+        getenv("SM64_MODERN_AUTOMATED_CASTLE_TTC_ROTATOR") != NULL;
+    sAutomatedCastleTtcRotatorArea2Requested = false;
+    sAutomatedCastleTtcRotatorWarpRequested = false;
     const bool automatedGameplay = getenv("SM64_MODERN_AUTOMATED_GAMEPLAY") != NULL;
     const bool automatedBobomb = getenv("SM64_MODERN_AUTOMATED_BOBOMB") != NULL;
     sAutomatedCotmcLevelScript =
@@ -717,7 +752,7 @@ void thread5_game_loop(UNUSED void *arg) {
     sAutomatedSlMoneybag =
         getenv("SM64_MODERN_AUTOMATED_SL_MONEYBAG") != NULL;
     if (automatedGameplay || automatedBobomb || sAutomatedCastleArea2
-        || sAutomatedCastleWdwElevator
+        || sAutomatedCastleWdwElevator || sAutomatedCastleTtcRotator
         || sAutomatedCotmcLevelScript || sAutomatedBbhGeo || sAutomatedRrDonut
         || sAutomatedJrbBreakParticles || sAutomatedHmcPlatform
         || sAutomatedSlMoneybag) {
@@ -732,7 +767,8 @@ void thread5_game_loop(UNUSED void *arg) {
                                                           : (sAutomatedBbhGeo ? LEVEL_BBH
                                                                               : (sAutomatedHmcPlatform ? LEVEL_HMC
                                                                                  : ((sAutomatedCastleArea2
-                                                                                    || sAutomatedCastleWdwElevator)
+                                                                                    || sAutomatedCastleWdwElevator
+                                                                                    || sAutomatedCastleTtcRotator)
                                                                                  ? LEVEL_CASTLE
                                                                                      : (sAutomatedJrbBreakParticles
                                                                                         ? LEVEL_JRB
@@ -767,6 +803,7 @@ void game_loop_one_iteration(void) {
     levelCommandAddr = level_script_execute(levelCommandAddr);
     automated_castle_area2_transition_step();
     automated_castle_wdw_elevator_transition_step();
+    automated_castle_ttc_rotator_transition_step();
     sm64_modern_bobomb_release_test_step();
     sm64_modern_mario_authority_test_step();
     sm64_modern_parity_capture_snapshots();

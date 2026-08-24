@@ -10,6 +10,10 @@
 #include "rendering_graph_node.h"
 #include "shadow.h"
 #include "sm64.h"
+#include "pc/sm64_modern_display_list_route_identity.h"
+#include "pc/sm64_modern_display_list_next_route_identity.h"
+#include "pc/sm64_modern_display_list_door_route_identity.h"
+#include "pc/sm64_modern_display_list_inside_castle_route_identity.h"
 
 /**
  * This file contains the code that processes the scene graph for rendering.
@@ -175,6 +179,20 @@ static void geo_process_master_list_sub(struct GraphNodeMasterList *node) {
  * render modes of layers.
  */
 static void geo_append_display_list(void *displayList, s16 layer) {
+
+    /*
+     * The route observer sits at the scene-graph owner boundary.  It copies
+     * the selected source leaf into fixed-width, pointer-free values before
+     * this raw Gfx pointer is handed to the legacy display-list command.
+     */
+    sm64_modern_display_list_route_observe_scene_graph_append(
+        displayList, (uint32_t) (uint16_t) layer);
+    sm64_modern_display_list_next_route_observe_scene_graph_append(
+        displayList, (uint32_t) (uint16_t) layer);
+    sm64_modern_display_list_door_route_observe_scene_graph_append(
+        displayList, (uint32_t) (uint16_t) layer);
+    sm64_modern_display_list_inside_castle_route_observe_scene_graph_append(
+        displayList, (uint32_t) (uint16_t) layer);
 
 #ifdef F3DEX_GBI_2
     gSPLookAt(gDisplayListHead++, &lookAt);

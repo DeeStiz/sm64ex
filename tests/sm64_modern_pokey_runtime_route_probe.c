@@ -32,6 +32,7 @@ struct HarnessState {
     uint32_t errors;
     int16_t left_x;
     int16_t left_y;
+    bool hold_forward;
 };
 
 static SM64ModernStatus input_read(
@@ -146,6 +147,11 @@ static uint32_t count_pokey_objects(void) {
 
 static void input_sweep(struct HarnessState *state, uint32_t step) {
     /* Broad, source-neutral movement only; no target coordinate is selected. */
+    if (state->hold_forward) {
+        state->left_x = 0;
+        state->left_y = -32768;
+        return;
+    }
     const uint32_t phase = step / 360u;
     state->left_x = 0;
     state->left_y = 0;
@@ -162,6 +168,8 @@ static int run_route(const char *save_directory) {
     if (!configure_timebase()) return 1;
 
     struct HarnessState state = {0};
+    const char *recipe = getenv("SM64_POKEY_ROUTE_RECIPE");
+    state.hold_forward = recipe && strcmp(recipe, "hold-forward") == 0;
     SM64ModernInputApiV1 input;
     memset(&input, 0, sizeof(input));
     input.header.abi_version = SM64_MODERN_ABI_VERSION_1;

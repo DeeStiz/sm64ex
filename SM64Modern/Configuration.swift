@@ -152,7 +152,7 @@ struct SM64ModernConfiguration: Equatable, Sendable {
             ),
             textureFiltering: 1,
             audio: Audio(
-                masterVolume: maxVolume,
+                masterVolume: (maxVolume + 1) / 2,
                 musicVolume: maxVolume,
                 sfxVolume: maxVolume,
                 environmentVolume: maxVolume

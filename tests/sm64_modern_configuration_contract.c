@@ -107,7 +107,7 @@ static void defaults(struct configuration *config) {
     config->window_h = 480;
     config->vsync = true;
     config->texture_filtering = 1;
-    config->master_volume = 127;
+    config->master_volume = (127 + 1) / 2;
     config->music_volume = 127;
     config->sfx_volume = 127;
     config->env_volume = 127;

@@ -122,6 +122,51 @@ enum SM64CameraPrimitives {
         )
     }
 
+    /// Value counterpart of `vec3f_set_dist_and_angle`. Keep this separate
+    /// from `focusOnMario`: the legacy camera first quantizes the current
+    /// position to s16 pitch/yaw, then reconstructs the point before applying
+    /// floor/ceiling and camera-height rules.
+    static func setDistanceAndAngle(
+        from: SM64ObjectVector3,
+        distance: Float,
+        pitch: Int16,
+        yaw: Int16
+    ) -> SM64ObjectVector3? {
+        guard finite(from), distance.isFinite, distance >= 0 else { return nil }
+        let cosinePitch = SM64CanonicalTrig.coss(pitch)
+        return SM64ObjectVector3(
+            x: from.x + distance * cosinePitch * SM64CanonicalTrig.sins(yaw),
+            y: from.y + distance * SM64CanonicalTrig.sins(pitch),
+            z: from.z + distance * cosinePitch * SM64CanonicalTrig.coss(yaw)
+        )
+    }
+
+    /// Value counterpart of the camera's source-authored `offset_rotated`
+    /// initialization helper. The source intentionally flips the Z axis in
+    /// the pitch rotation to match the N64 camera coordinate convention.
+    static func offsetRotated(
+        from: SM64ObjectVector3,
+        offset: SM64ObjectVector3,
+        pitch: Int16,
+        yaw: Int16
+    ) -> SM64ObjectVector3? {
+        guard finite(from), finite(offset) else { return nil }
+        let pitchZ = -(
+            offset.z * SM64CanonicalTrig.coss(pitch)
+                - offset.y * SM64CanonicalTrig.sins(pitch)
+        )
+        let pitchY = offset.z * SM64CanonicalTrig.sins(pitch)
+            + offset.y * SM64CanonicalTrig.coss(pitch)
+        let position = SM64ObjectVector3(
+            x: from.x + pitchZ * SM64CanonicalTrig.sins(yaw)
+                + offset.x * SM64CanonicalTrig.coss(yaw),
+            y: from.y + pitchY,
+            z: from.z + pitchZ * SM64CanonicalTrig.coss(yaw)
+                - offset.x * SM64CanonicalTrig.sins(yaw)
+        )
+        return finite(position) ? position : nil
+    }
+
     static func rotateInXZ(
         _ vector: SM64ObjectVector3, yaw: Int16
     ) -> SM64ObjectVector3? {

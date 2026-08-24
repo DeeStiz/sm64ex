@@ -57,6 +57,7 @@ enum SM64RouteShardTraceDomain: String, CaseIterable, Sendable {
         switch self {
         case .input: return 2 // SM64_MODERN_ORACLE_RECORD_INPUT
         case .scriptEvents, .transition: return 3 // SM64_MODERN_ORACLE_RECORD_EVENT
+        case .audioSequence: return 3 // SM64_MODERN_ORACLE_RECORD_EVENT
         case .effects: return 4 // SM64_MODERN_ORACLE_RECORD_EFFECT
         case .audioPCM: return 5 // SM64_MODERN_ORACLE_RECORD_AUDIO_PCM
         case .saveBytes: return 6 // SM64_MODERN_ORACLE_RECORD_SAVE_BYTES

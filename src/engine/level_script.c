@@ -922,9 +922,9 @@ struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {
     } else if (sCurrentCmd != NULL && sCurrentCmd->type == 0x12) {
         /*
          * CALL_LOOP is paused on the held native tick, but render_game still
-         * builds a fresh display list. Re-emit only the intro UI's render
-         * side-effects; invoking its update callback again would duplicate
-         * input, timers, demo progression, or menu state transitions.
+         * builds a fresh display list. Re-emit only render-side UI effects;
+         * invoking an update callback again would duplicate input, timers,
+         * demo progression, or menu state transitions.
          */
         typedef s32 (*LevelCallLoopFunc)(s16, s32);
         const LevelCallLoopFunc callback = CMD_GET(LevelCallLoopFunc, 4);
@@ -932,6 +932,7 @@ struct LevelCommand *level_script_execute(struct LevelCommand *cmd) {
             lvl_intro_render(CMD_GET(s16, 2));
         } else if (callback == lvl_init_or_update && CMD_GET(s16, 2) == 1) {
             level_update_native_step();
+            level_update_native_render();
         }
     }
 

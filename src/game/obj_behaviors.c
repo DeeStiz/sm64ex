@@ -34,6 +34,7 @@
 #include "spawn_sound.h"
 #include "pc/sm64_modern_gameplay_migration.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_rng_float_route_identity.h"
 #include "pc/sm64_modern_timebase.h"
 
 /**
@@ -575,10 +576,23 @@ s32 obj_return_home_if_safe(struct Object *obj, f32 homeX, f32 y, f32 homeZ, s32
 void obj_return_and_displace_home(struct Object *obj, f32 homeX, UNUSED f32 homeY, f32 homeZ, s32 baseDisp) {
     s16 angleToNewHome;
     f32 homeDistX, homeDistZ;
+    f32 randomValue;
 
-    if ((s32)(random_float() * 50.0f) == 0) {
-        obj->oHomeX = (f32)(baseDisp * 2) * random_float() - (f32) baseDisp + homeX;
-        obj->oHomeZ = (f32)(baseDisp * 2) * random_float() - (f32) baseDisp + homeZ;
+    randomValue = random_float();
+    sm64_modern_rng_float_route_observe_current_seed(
+        SM64_MODERN_RNG_FLOAT_ROUTE_CALLSITE_GATE,
+        randomValue);
+    if ((s32)(randomValue * 50.0f) == 0) {
+        randomValue = random_float();
+        sm64_modern_rng_float_route_observe_current_seed(
+            SM64_MODERN_RNG_FLOAT_ROUTE_CALLSITE_HOME_X,
+            randomValue);
+        obj->oHomeX = (f32)(baseDisp * 2) * randomValue - (f32) baseDisp + homeX;
+        randomValue = random_float();
+        sm64_modern_rng_float_route_observe_current_seed(
+            SM64_MODERN_RNG_FLOAT_ROUTE_CALLSITE_HOME_Z,
+            randomValue);
+        obj->oHomeZ = (f32)(baseDisp * 2) * randomValue - (f32) baseDisp + homeZ;
     }
 
     homeDistX = obj->oHomeX - obj->oPosX;

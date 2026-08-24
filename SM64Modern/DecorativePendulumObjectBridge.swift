@@ -62,7 +62,9 @@ struct SM64DecorativePendulumSchedulerTickResult: Equatable, Sendable {
 final class SM64DecorativePendulumObjectBridge {
     static let defaultBehaviorIdentity: UInt64 = 0x6268_765F_647065
     static let defaultModel: UInt32 = 0
-    static let clockSoundValue: Int32 = Int32(bitPattern: 0x3017_0008)
+    // SOUND_GENERAL_BIG_CLOCK expands through SOUND_ARG_LOAD with the low
+    // priority bit set; keep the exact native owner value at this seam.
+    static let clockSoundValue: Int32 = Int32(bitPattern: 0x3017_0081)
 
     private enum Trace {
         static let objectDomain: UInt32 = 3
@@ -154,14 +156,20 @@ final class SM64DecorativePendulumObjectBridge {
         _ id: SM64ObjectID,
         pool: SM64ObjectPool,
         simulationTick: UInt64 = 0,
-        collisionWorld: SM64SurfaceCollisionWorld? = nil
+        collisionWorld: SM64SurfaceCollisionWorld? = nil,
+        advanceLegacyDomain: Bool = true,
+        advanceNativeDomain: Bool = true,
+        keepGraphAnimation: Bool = true
     ) -> SM64DecorativePendulumObjectEffectRecord? {
         guard registered.contains(id) else { return nil }
         return update(
             id: id,
             pool: pool,
             simulationTick: simulationTick,
-            collisionWorld: collisionWorld ?? self.collisionWorld
+            collisionWorld: collisionWorld ?? self.collisionWorld,
+            advanceLegacyDomain: advanceLegacyDomain,
+            advanceNativeDomain: advanceNativeDomain,
+            keepGraphAnimation: keepGraphAnimation
         )
     }
 
@@ -228,20 +236,34 @@ final class SM64DecorativePendulumObjectBridge {
             record.homePosition = position
             record.faceAngles.roll = faceRoll
             record.angleVelocity.roll = SM64DecorativePendulumBehavior.initialize().angleVelocityRoll
+            // The scheduler adds the animation bit during the first pass. The
+            // source room initializer's render-active bit is published on the
+            // following owner tick, matching the native callback ordering.
             record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
         }
         return true
     }
 
     @discardableResult
-    func tick(state engineState: SM64SwiftEngineState) -> SM64DecorativePendulumSchedulerTickResult {
+    func tick(
+        state engineState: SM64SwiftEngineState,
+        advanceLegacyDomain: Bool = true,
+        advanceNativeDomain: Bool = true,
+        keepGraphAnimation: Bool = true
+    ) -> SM64DecorativePendulumSchedulerTickResult {
         beginExternalTick()
-        let schedulerResult = scheduler.update(state: engineState) { [weak self] id, pool in
+        let schedulerResult = scheduler.update(
+            state: engineState,
+            advanceLegacyDomain: advanceLegacyDomain
+        ) { [weak self] id, pool in
             _ = self?.updateInline(
                 id,
                 pool: pool,
                 simulationTick: engineState.globals.frame,
-                collisionWorld: self?.collisionWorld
+                collisionWorld: self?.collisionWorld,
+                advanceLegacyDomain: advanceLegacyDomain,
+                advanceNativeDomain: advanceNativeDomain,
+                keepGraphAnimation: keepGraphAnimation
             )
         }
         for id in schedulerResult.unloaded { remove(id) }
@@ -260,52 +282,101 @@ final class SM64DecorativePendulumObjectBridge {
         id: SM64ObjectID,
         pool: SM64ObjectPool,
         simulationTick: UInt64,
-        collisionWorld: SM64SurfaceCollisionWorld?
+        collisionWorld: SM64SurfaceCollisionWorld?,
+        advanceLegacyDomain: Bool,
+        advanceNativeDomain: Bool,
+        keepGraphAnimation: Bool
     ) -> SM64DecorativePendulumObjectEffectRecord? {
         guard let record = pool.record(for: id), record.id == id else { return nil }
 
         let scriptTimer = record.timer
         let hadInitialization = initializedObjects.contains(id)
-        emitLifecycleTrace(
-            simulationTick: simulationTick,
-            id: id,
-            action: record.action,
-            timer: scriptTimer,
-            activeFlags: UInt32(record.activeFlags)
-        )
-        if behaviorVMs[id] != nil,
-           !hadInitialization,
-           let collisionWorld {
-            initializeRoom(
-                id: id,
-                record: record,
-                simulationTick: simulationTick,
-                world: collisionWorld,
-                pool: pool
-            )
-            initializedObjects.insert(id)
-        }
-
-        let output = SM64DecorativePendulumBehavior.update(
-            SM64DecorativePendulumInput(
-                faceRoll: record.faceAngles.roll,
-                angleVelocityRoll: record.angleVelocity.roll
-            )
-        )
-        _ = pool.mutate(id) { record in
-            record.faceAngles.roll = output.faceRoll
-            record.angleVelocity.roll = output.angleVelocityRoll
-            if scriptTimer < 0x3FFF_FFFF {
-                record.timer &+= 1
+        if advanceNativeDomain {
+            // bhv_init_room sets IN_DIFFERENT_ROOM during the first owner
+            // callback. Native emits its lifecycle record before that bit is
+            // set, then clears it before the next callback.
+            if hadInitialization {
+                _ = pool.mutate(id) { $0.graphFlags |= 1 }
             }
-            record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+            let lifecycleFlags = UInt32(pool.record(for: id)?.activeFlags ?? record.activeFlags)
+            emitLifecycleTrace(
+                simulationTick: simulationTick,
+                id: id,
+                action: record.action,
+                timer: scriptTimer,
+                activeFlags: lifecycleFlags
+            )
+            if behaviorVMs[id] != nil,
+               !hadInitialization,
+               let collisionWorld {
+                initializeRoom(
+                    id: id,
+                    record: record,
+                    simulationTick: simulationTick,
+                    world: collisionWorld,
+                    pool: pool
+                )
+                initializedObjects.insert(id)
+                // Native publishes the lifecycle callback before the room
+                // bit is set; the object snapshot at the end of this first
+                // owner tick carries IN_DIFFERENT_ROOM.
+                _ = pool.mutate(id) { $0.activeFlags |= UInt16(1 << 3) }
+            }
+            if hadInitialization,
+               (pool.record(for: id)?.activeFlags ?? 0) & UInt16(1 << 3) != 0 {
+                // The first post-initialization lifecycle callback observes
+                // the room bit once more; clear it only after that receipt.
+                _ = pool.mutate(id) { $0.activeFlags &= ~UInt16(1 << 3) }
+            }
         }
 
-        let commandTraces = executeBehaviorSource(
-            id: id,
-            action: record.action,
-            timer: scriptTimer
-        )
+        let output: SM64DecorativePendulumOutput
+        if advanceNativeDomain {
+            output = SM64DecorativePendulumBehavior.update(
+                SM64DecorativePendulumInput(
+                    faceRoll: record.faceAngles.roll,
+                    angleVelocityRoll: record.angleVelocity.roll
+                )
+            )
+            _ = pool.mutate(id) { record in
+                record.faceAngles.roll = output.faceRoll
+                record.angleVelocity.roll = output.angleVelocityRoll
+                if advanceLegacyDomain && scriptTimer < 0x3FFF_FFFF {
+                    record.timer &+= 1
+                }
+                record.objectFlags |= SM64ObjectScheduler.objectFlagUpdateGfxPositionAndAngle
+            }
+        } else {
+            output = SM64DecorativePendulumOutput(
+                faceRoll: record.faceAngles.roll,
+                angleVelocityRoll: record.angleVelocity.roll,
+                playsClockSound: false
+            )
+        }
+
+        let commandTraces = advanceNativeDomain && advanceLegacyDomain
+            ? executeBehaviorSource(id: id, action: record.action, timer: scriptTimer)
+            : []
+        if advanceNativeDomain && !advanceLegacyDomain, behaviorVMs[id] != nil {
+            emitNativeBehaviorTrace(
+                simulationTick: simulationTick,
+                id: id,
+                action: record.action,
+                timer: scriptTimer,
+                activeFlags: UInt32(record.activeFlags)
+            )
+            // The held half-step still executes the source native body. Its
+            // clock edge is therefore an owner-thread effect at this same
+            // boundary; do not defer it into the next script VM step.
+            if output.playsClockSound {
+                emitSoundTrace(
+                    simulationTick: simulationTick,
+                    id: id,
+                    value: Self.clockSoundValue,
+                    pool: pool
+                )
+            }
+        }
         var nativeOrdinal = 0
         for trace in commandTraces {
             // cur_obj_play_sound_2 records its effect inside the native
@@ -333,12 +404,18 @@ final class SM64DecorativePendulumObjectBridge {
             )
         }
 
-        if output.playsClockSound {
+        if advanceNativeDomain && output.playsClockSound {
             effectRouter.enqueue(
                 objectID: id,
                 kind: .sound,
                 value: Self.clockSoundValue
             )
+        }
+        if !keepGraphAnimation {
+            // The authored Castle transition clears the graph animation bit
+            // while the object state remains observable for the final held
+            // redraws. Keep the render-active ownership bit intact.
+            _ = pool.mutate(id) { $0.graphFlags &= ~UInt16(1 << 5) }
         }
         let delivery = effectRouter.deliver(to: pool)
         deliveryLog.append(delivery)
@@ -484,11 +561,37 @@ final class SM64DecorativePendulumObjectBridge {
             recordID: Trace.behaviorCommandEvent,
             values: [
                 UInt64(trace.executedOpcode),
-                UInt64(UInt32(bitPattern: Int32(trace.procResult.rawValue))),
+                // Native BHV_PROC_CONTINUE is zero and BHV_PROC_BREAK is
+                // one; Swift's enum intentionally uses the opposite values
+                // for its control-flow status.
+                UInt64(trace.procResult == .continue ? 0 : 1),
                 UInt64(UInt32(bitPattern: action)),
                 UInt64(UInt32(bitPattern: timer)),
                 nextOpcode,
                 advanceLegacyDomain ? 1 : 0,
+            ]
+        )
+    }
+
+    private func emitNativeBehaviorTrace(
+        simulationTick: UInt64,
+        id: SM64ObjectID,
+        action: Int32,
+        timer: Int32,
+        activeFlags: UInt32
+    ) {
+        emitTrace(
+            simulationTick: simulationTick,
+            domain: Trace.scriptDomain,
+            recordKind: Trace.eventKind,
+            subjectID: UInt64(id.traceSubject),
+            recordID: 4,
+            values: [
+                UInt64(SM64BehaviorOpcode.callNative.rawValue),
+                0,
+                UInt64(UInt32(bitPattern: action)),
+                UInt64(UInt32(bitPattern: timer)),
+                UInt64(activeFlags),
             ]
         )
     }

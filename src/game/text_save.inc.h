@@ -5,6 +5,7 @@
 #include "pc/ini.h"
 #include "pc/platform.h"
 #include "pc/fs/fs.h"
+#include "pc/sm64_modern_text_migration.h"
 
 #define FILENAME_FORMAT "%s/sm64_save_file_%d.sav"
 #define NUM_COURSES 15
@@ -36,6 +37,78 @@ const char *cap_on_types[NUM_CAP_ON] = {
 const char *sound_modes[3] = {
     "stereo", "mono", "headset"
 };
+
+#define TEXT_SAVE_FNV_OFFSET UINT64_C(1469598103934665603)
+#define TEXT_SAVE_FNV_PRIME UINT64_C(1099511628211)
+
+static uint64_t text_save_hash_bytes(uint64_t hash,
+                                     const unsigned char *bytes,
+                                     size_t byte_count) {
+    for (size_t index = 0; index < byte_count; ++index) {
+        hash ^= bytes[index];
+        hash *= TEXT_SAVE_FNV_PRIME;
+    }
+    return hash;
+}
+
+static uint64_t text_save_hash_string(uint64_t hash, const char *value) {
+    return value
+        ? text_save_hash_bytes(hash, (const unsigned char *) value, strlen(value))
+        : hash;
+}
+
+// Hash only the authored text literals and lookup labels. The timestamp and
+// generated save values are deliberately excluded so the identity remains
+// deterministic across reruns while still binding the receipt to this source
+// file's real text payload.
+static uint64_t text_save_payload_identity(void) {
+    uint64_t hash = TEXT_SAVE_FNV_OFFSET;
+    static const char *const format_literals[] = {
+        "# Super Mario 64 save file\n",
+        "# Comment starts with #\n",
+        "# True = 1, False = 0\n",
+        "# %s\n",
+        "\n[menu]\n",
+        "coin_score_age = %d\n",
+        "sound_mode = %s\n",
+        "\n[flags]\n",
+        "%s = %d\n",
+        "\n[courses]\n",
+        "%s = \"%d, %07d, %d\"\n",
+        "\n[bonus]\n",
+        "%s = %s\n",
+        "\n[cap]\n",
+        "type = %s\n",
+        "level = %s\n",
+        "area = %d\n",
+    };
+    for (size_t index = 0; index < ARRAY_COUNT(format_literals); ++index) {
+        hash = text_save_hash_string(hash, format_literals[index]);
+    }
+    for (size_t index = 0; index < ARRAY_COUNT(sav_flags); ++index) {
+        hash = text_save_hash_string(hash, sav_flags[index]);
+    }
+    for (size_t index = 0; index < ARRAY_COUNT(sav_courses); ++index) {
+        hash = text_save_hash_string(hash, sav_courses[index]);
+    }
+    for (size_t index = 0; index < ARRAY_COUNT(sav_bonus_courses); ++index) {
+        hash = text_save_hash_string(hash, sav_bonus_courses[index]);
+    }
+    for (size_t index = 0; index < ARRAY_COUNT(cap_on_types); ++index) {
+        hash = text_save_hash_string(hash, cap_on_types[index]);
+    }
+    for (size_t index = 0; index < ARRAY_COUNT(sound_modes); ++index) {
+        hash = text_save_hash_string(hash, sound_modes[index]);
+    }
+    return hash;
+}
+
+static uint64_t text_save_payload_hash(void) {
+    return text_save_hash_bytes(
+        TEXT_SAVE_FNV_OFFSET,
+        (const unsigned char *) &gSaveBuffer,
+        sizeof(gSaveBuffer));
+}
 
 /* Get current timestamp string */
 static void get_timestamp(char* buffer) {
@@ -198,7 +271,13 @@ static s32 write_text_save(s32 fileIndex) {
           sizeof(gSaveBuffer.files[fileIndex][1]));
     
     fclose(file);
-    return 1;
+    const SM64ModernStatus receipt_status =
+        sm64_modern_text_record_save_write(
+            sm64_modern_text_hash_string("src/game/text_save.inc.h"),
+            text_save_payload_identity(),
+            text_save_payload_hash(),
+            (uint32_t) fileIndex);
+    return receipt_status == SM64_MODERN_STATUS_OK ? 1 : -1;
 }
 
 /**

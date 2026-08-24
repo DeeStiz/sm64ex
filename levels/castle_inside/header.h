@@ -75,6 +75,8 @@ extern struct Painting sl_painting;
 extern struct Painting thi_huge_painting;
 extern const Gfx inside_castle_seg7_dl_07023DB0[];
 extern const Gfx inside_castle_seg7_dl_07028FD0[];
+const Gfx *sm64_modern_inside_castle_display_list_070287C0_source(void);
+const Gfx *sm64_modern_inside_castle_display_list_07043A68_source(void);
 extern const Gfx inside_castle_seg7_dl_07029578[];
 extern const Gfx inside_castle_seg7_dl_0702A650[];
 extern const Gfx dl_castle_lobby_wing_cap_light[];

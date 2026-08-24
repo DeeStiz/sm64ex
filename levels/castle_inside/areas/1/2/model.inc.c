@@ -1654,6 +1654,15 @@ static const Gfx inside_castle_seg7_dl_07028A38[] = {
     gsSPEndDisplayList(),
 };
 
+/*
+ * Phase 85bk's route observer needs the authored leaf while it is still in
+ * this translation unit.  Keep the display list itself translation-unit
+ * local; this accessor is a C-only source seam and never crosses the ABI.
+ */
+const Gfx *sm64_modern_inside_castle_display_list_070287C0_source(void) {
+    return inside_castle_seg7_dl_070287C0;
+}
+
 // 0x07028FD0 - 0x07029078
 const Gfx inside_castle_seg7_dl_07028FD0[] = {
     gsDPPipeSync(),

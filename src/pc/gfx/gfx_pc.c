@@ -27,6 +27,7 @@
 #include "../platform.h"
 #include "../configfile.h"
 #include "../fs/fs.h"
+#include "../sm64_modern_render_callback_route_identity.h"
 
 #define SUPPORT_CHECK(x) assert(x)
 
@@ -1781,6 +1782,13 @@ void gfx_start_frame(void) {
 }
 
 void gfx_run(Gfx *commands) {
+    /*
+     * This is the source-owned render callback boundary reached by
+     * send_display_list() during the native lifecycle.  Record only the
+     * value-level callback identity; the borrowed display-list pointer stays
+     * inside the C renderer.
+     */
+    sm64_modern_render_callback_route_observe(commands != NULL ? 1u : 0u);
     gfx_sp_reset();
     
     //puts("New frame");

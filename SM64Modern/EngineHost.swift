@@ -1340,11 +1340,14 @@ final class EngineHost {
     private var oracleTraceSession: SM64ModernOracleTraceSession?
     private var progressionMigrationService: SwiftProgressionMigrationService?
     private var cameraMigrationService: SwiftCameraMigrationService?
+    private var globalStateMigrationService: SwiftGlobalStateMigrationService?
     private let gameplayService = SwiftGameplayService()
     private var automaticTerminationRequested = false
     private var inputService: AppleInputService?
     private var audioService: SM64ModernAppleAudioService?
     private var audioMigrationService: SwiftAudioMigrationService?
+    private var audioPCMReceiptService: SwiftAudioPCMReceiptService?
+    private var effectsMigrationService: SwiftEffectsMigrationService?
     private var frontendMigrationService: SwiftFrontEndMigrationService?
     private var pauseMenuMigrationService: SwiftPauseMenuMigrationService?
     private var audioPromotion: SM64AudioOwnerPromotion?
@@ -1505,6 +1508,10 @@ final class EngineHost {
 
         let initializeStatus = runtime.initialize()
         guard initializeStatus == SM64_MODERN_STATUS_OK else {
+            sm64_modern_uninstall_effects_migration_api()
+            effectsMigrationService = nil
+            sm64_modern_uninstall_global_state_migration_api()
+            globalStateMigrationService = nil
             _ = sm64_modern_camera_set_authority(0)
             sm64_modern_uninstall_camera_migration_api()
             cameraMigrationService = nil
@@ -1545,6 +1552,26 @@ final class EngineHost {
         let oracleTraceStatus = oracleTraceSession?.end() ?? SM64_MODERN_STATUS_OK
         oracleTraceSession = nil
         let shutdownStatus = runtime.shutdown()
+        let effectsService = effectsMigrationService
+        effectsMigrationService = nil
+        sm64_modern_uninstall_effects_migration_api()
+        if let effectsService {
+            let summary = effectsService.summary()
+            let lastTick = summary.lastTick.map(String.init) ?? "none"
+            engineLogger.notice(
+                "swift_effects_receipt_observer_finished receipts=\(summary.receipts, privacy: .public) records=\(summary.records, privacy: .public) last_tick=\(lastTick, privacy: .public)"
+            )
+        }
+        let globalStateService = globalStateMigrationService
+        globalStateMigrationService = nil
+        sm64_modern_uninstall_global_state_migration_api()
+        if let globalStateService {
+            let summary = globalStateService.summary()
+            let lastTick = summary.lastTick.map(String.init) ?? "none"
+            engineLogger.notice(
+                "swift_global_state_observer_finished snapshots=\(summary.snapshots, privacy: .public) records=\(summary.records, privacy: .public) last_tick=\(lastTick, privacy: .public)"
+            )
+        }
         cameraMigrationService = nil
         progressionMigrationService = nil
         engineRuntime = nil
@@ -2034,6 +2061,42 @@ final class EngineHost {
                 engineLogger.notice(
                     "camera_selection_bridge_installed abi=1 authority=swift geometry_authority=c"
                 )
+
+                let globalStateService = SwiftGlobalStateMigrationService(
+                    ownerThreadToken: engineThreadIdentifier
+                )
+                var globalStateMigration = globalStateService.makeAPI()
+                status = sm64_modern_install_global_state_migration_api(
+                    &globalStateMigration
+                )
+                guard status == SM64_MODERN_STATUS_OK else {
+                    _ = sm64_modern_camera_set_authority(0)
+                    sm64_modern_uninstall_camera_migration_api()
+                    cameraMigrationService = nil
+                    _ = sm64_modern_progression_set_persistence_authority(0)
+                    sm64_modern_uninstall_progression_migration_api()
+                    progressionMigrationService = nil
+                    return status
+                }
+                globalStateMigrationService = globalStateService
+                engineLogger.notice(
+                    "global_state_bridge_installed abi=1 authority=c swift_mirror=true owner_thread=true"
+                )
+
+                let effectsService = SwiftEffectsMigrationService(
+                    ownerThreadToken: engineThreadIdentifier
+                )
+                var effectsMigration = effectsService.makeAPI()
+                status = sm64_modern_install_effects_migration_api(
+                    &effectsMigration
+                )
+                guard status == SM64_MODERN_STATUS_OK else {
+                    return status
+                }
+                effectsMigrationService = effectsService
+                engineLogger.notice(
+                    "effects_receipt_bridge_installed abi=1 authority=c swift_mirror=true owner_thread=true"
+                )
             } catch {
                 engineLogger.error(
                     "progression_bridge_initialize_failed error=\(error.localizedDescription, privacy: .public)"
@@ -2043,6 +2106,10 @@ final class EngineHost {
         }
         status = self.lifecycle.initialize(&config, &platform)
         guard status == SM64_MODERN_STATUS_OK else {
+            sm64_modern_uninstall_effects_migration_api()
+            effectsMigrationService = nil
+            sm64_modern_uninstall_global_state_migration_api()
+            globalStateMigrationService = nil
             _ = sm64_modern_camera_set_authority(0)
             sm64_modern_uninstall_camera_migration_api()
             cameraMigrationService = nil
@@ -2056,6 +2123,8 @@ final class EngineHost {
             saveDirectory: paths.saveDirectory
         )
         guard oracleStart.status == SM64_MODERN_STATUS_OK else {
+            sm64_modern_uninstall_effects_migration_api()
+            effectsMigrationService = nil
             _ = self.lifecycle.shutdown()
             return oracleStart.status
         }
@@ -2068,6 +2137,8 @@ final class EngineHost {
         guard parityStart.status == SM64_MODERN_STATUS_OK else {
             _ = oracleTraceSession?.end()
             oracleTraceSession = nil
+            sm64_modern_uninstall_effects_migration_api()
+            effectsMigrationService = nil
             _ = self.lifecycle.shutdown()
             return parityStart.status
         }
@@ -2496,8 +2567,30 @@ final class EngineHost {
                 )
             }
             audioMigrationService = migrationService
+            let pcmReceiptService = SwiftAudioPCMReceiptService(
+                ownerThreadToken: engineThreadIdentifier
+            )
+            var pcmMigration = pcmReceiptService.makeAPI()
+            let pcmMigrationStatus = sm64_modern_install_audio_pcm_migration_api(
+                &pcmMigration
+            )
+            guard pcmMigrationStatus == SM64_MODERN_STATUS_OK else {
+                sm64_modern_uninstall_audio_migration_api()
+                audioMigrationService = nil
+                service.stop()
+                audioService = nil
+                throw NSError(
+                    domain: "io.github.deestiz.sm64modern.Audio",
+                    code: Int(pcmMigrationStatus),
+                    userInfo: [
+                        NSLocalizedDescriptionKey:
+                            "Could not install the Swift audio PCM receipt observer"
+                    ]
+                )
+            }
+            audioPCMReceiptService = pcmReceiptService
             audioLogger.notice(
-                "audio_sequence_bridge_installed abi=1 authority=swift pcm_authority=c"
+                "audio_sequence_bridge_installed abi=1 authority=swift pcm_authority=c pcm_receipt_observer=swift"
             )
         }
         if ProcessInfo.processInfo.environment["SM64_MODERN_AUDIO_PROMOTION"] == "1" {
@@ -2521,6 +2614,9 @@ final class EngineHost {
         let sequenceMigration = audioMigrationService
         audioMigrationService = nil
         sm64_modern_uninstall_audio_migration_api()
+        let pcmReceiptMigration = audioPCMReceiptService
+        audioPCMReceiptService = nil
+        sm64_modern_uninstall_audio_pcm_migration_api()
         let promotion = audioPromotion
         audioPromotion = nil
         if let audioService {
@@ -2541,6 +2637,13 @@ final class EngineHost {
             let summary = sequenceMigration.summary()
             audioLogger.notice(
                 "swift_audio_sequence_observer_finished events=\(summary.events, privacy: .public) ticks=\(summary.ticks, privacy: .public) queue=\(summary.queueCount, privacy: .public) fingerprint=\(summary.fingerprint, privacy: .public)"
+            )
+        }
+        if let pcmReceiptMigration {
+            let summary = pcmReceiptMigration.summary()
+            let lastTick = summary.lastTick.map(String.init) ?? "none"
+            audioLogger.notice(
+                "swift_audio_pcm_receipt_observer_finished receipts=\(summary.receipts, privacy: .public) records=\(summary.records, privacy: .public) last_tick=\(lastTick, privacy: .public) fingerprint=\(summary.fingerprint, privacy: .public)"
             )
         }
     }

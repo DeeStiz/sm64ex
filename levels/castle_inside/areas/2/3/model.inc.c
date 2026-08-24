@@ -275,6 +275,15 @@ static const Gfx inside_castle_seg7_dl_07043A68[] = {
     gsSPEndDisplayList(),
 };
 
+/*
+ * Phase 85bp keeps this authored leaf translation-unit local.  The route
+ * observer uses this C-only source seam to normalize its values at the
+ * scene-graph owner boundary; no Gfx pointer crosses the ABI.
+ */
+const Gfx *sm64_modern_inside_castle_display_list_07043A68_source(void) {
+    return inside_castle_seg7_dl_07043A68;
+}
+
 // 0x07043AA0 - 0x07043AD8
 static const Gfx inside_castle_seg7_dl_07043AA0[] = {
     gsDPSetTextureImage(G_IM_FMT_RGBA, G_IM_SIZ_16b, 1, inside_castle_seg7_texture_0700D800),

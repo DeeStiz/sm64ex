@@ -11,8 +11,14 @@ void spawn_triangle_break_particles(s16 numTris, s16 triModel, f32 triSize, s16 
         triangle->oAnimState = triAnimState;
         triangle->oPosY += 100.0f;
         triangle->oMoveAngleYaw = random_u16();
+        sm64_modern_rng_route_observe_u16_current_seed(
+            SM64_MODERN_RNG_ROUTE_CALLSITE_MOVE_YAW,
+            triangle->oMoveAngleYaw);
         triangle->oFaceAngleYaw = triangle->oMoveAngleYaw;
         triangle->oFaceAnglePitch = random_u16();
+        sm64_modern_rng_route_observe_u16_current_seed(
+            SM64_MODERN_RNG_ROUTE_CALLSITE_FACE_PITCH,
+            triangle->oFaceAnglePitch);
         triangle->oVelY = random_f32_around_zero(50.0f);
         if (triModel == 138 || triModel == 56) {
             triangle->oAngleVelPitch = 0xF00;

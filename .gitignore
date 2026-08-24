@@ -112,3 +112,5 @@ DerivedData/
 *.srm
 *.eep
 *.fla
+/.porting
+/phase85f103-scan

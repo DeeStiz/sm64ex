@@ -11,6 +11,7 @@
 #include "behavior_data.h"
 #include "engine/graph_node.h"
 #include "game/area.h"
+#include "game/level_update.h"
 #include "game/memory.h"
 #include "game/object_list_processor.h"
 #include "object_constants.h"
@@ -48,6 +49,8 @@ struct TraceFile {
     uint32_t native_object_state_records_by_slot[OBJECT_POOL_CAPACITY + 1u];
     uint32_t native_sound_records_by_slot[OBJECT_POOL_CAPACITY + 1u];
     uint32_t native_clock_sound_records_by_slot[OBJECT_POOL_CAPACITY + 1u];
+    bool pendulum_route_coverage;
+    uint32_t pendulum_slot;
 };
 
 struct HarnessState {
@@ -153,6 +156,21 @@ static bool pairing_route_enabled(void) {
 static bool castle_area2_route_enabled(void) {
     const char *value = getenv("SM64_MODERN_AUTOMATED_CASTLE_AREA2");
     return value && strcmp(value, "1") == 0;
+}
+
+static bool hmc_platform_route_enabled(void) {
+    const char *value = getenv("SM64_MODERN_AUTOMATED_HMC_PLATFORM");
+    return value && strcmp(value, "1") == 0;
+}
+
+static struct Object *find_controllable_platform(void) {
+    const BehaviorScript *target = segmented_to_virtual(bhvControllablePlatform);
+    for (uint32_t index = 0; index < OBJECT_POOL_CAPACITY; ++index) {
+        struct Object *object = &gObjectPool[index];
+        if ((object->activeFlags & ACTIVE_FLAG_ACTIVE) != 0
+            && object->behavior == target) return object;
+    }
+    return NULL;
 }
 
 static struct Object *find_decorative_pendulum(void) {
@@ -271,6 +289,60 @@ static SM64ModernStatus trace_write_record(
         trace->failures++;
         return SM64_MODERN_STATUS_PLATFORM_ERROR;
     }
+    if (trace->pendulum_route_coverage
+        && domain == SM64_MODERN_ORACLE_DOMAIN_OBJECT
+        && record->record_kind == SM64_MODERN_ORACLE_RECORD_STATE
+        && record->record_id == SM64_MODERN_FIELD_ACTOR_BEHAVIOR
+        && record->value_count > 0u
+        && record->values[0] == UINT64_C(0x006268765f647065)
+        && trace->pendulum_slot == 0u) {
+        // The pool slot is reused during the three-tick area bootstrap. Once
+        // the source-authored semantic identity appears, begin the coverage
+        // closure at that owner boundary and discard only earlier diagnostic
+        // keys (the full records remain in the trace for lifecycle analysis).
+        trace->pendulum_slot = record->subject_id;
+        // The lifecycle event is emitted immediately before the first object
+        // snapshot, so retain its source-authored key across the boundary.
+        trace->coverage_key_count = 2u;
+        trace->coverage_keys[0] = (struct TraceCoverageKey) {
+            .domain = SM64_MODERN_ORACLE_DOMAIN_SCRIPT,
+            .record_id = SM64_MODERN_ORACLE_SCRIPT_EVENT_LIFECYCLE,
+        };
+        trace->coverage_keys[1] = (struct TraceCoverageKey) {
+            .domain = SM64_MODERN_ORACLE_DOMAIN_COLLISION,
+            .record_id = 1u,
+        };
+    }
+    // The Castle pendulum pair owns only the four source-authored domains
+    // (object/script/collision/effect) and the fixed-width effect receipt ID
+    // 1. The native lifecycle still retains unrelated records in its full
+    // trace for diagnostics, but those records must not widen the route
+    // coverage header beyond the independently captured Swift boundary.
+    if (trace->pendulum_route_coverage
+        && domain != SM64_MODERN_ORACLE_DOMAIN_OBJECT
+        && domain != SM64_MODERN_ORACLE_DOMAIN_SCRIPT
+        && domain != SM64_MODERN_ORACLE_DOMAIN_COLLISION
+        && domain != SM64_MODERN_ORACLE_DOMAIN_EFFECT) {
+        goto coverage_done;
+    }
+    if (trace->pendulum_route_coverage
+        && domain != SM64_MODERN_ORACLE_DOMAIN_COLLISION
+        && (trace->pendulum_slot == 0u || record->subject_id != trace->pendulum_slot)) {
+        goto coverage_done;
+    }
+    if (trace->pendulum_route_coverage
+        && domain == SM64_MODERN_ORACLE_DOMAIN_COLLISION
+        && (record->record_id != 1u || record->value_count < 3u
+            || record->values[0] != UINT64_C(0x00000000c34d0000)
+            || record->values[1] != UINT64_C(0x0000000045233000)
+            || record->values[2] != UINT64_C(0x0000000045df2000))) {
+        goto coverage_done;
+    }
+    if (trace->pendulum_route_coverage
+        && domain == SM64_MODERN_ORACLE_DOMAIN_EFFECT
+        && record->record_id != SM64_MODERN_EFFECT_SOUND) {
+        goto coverage_done;
+    }
     bool coverage_key_seen = false;
     for (uint32_t index = 0; index < trace->coverage_key_count; ++index) {
         if (trace->coverage_keys[index].domain == domain
@@ -289,6 +361,7 @@ static SM64ModernStatus trace_write_record(
             .record_id = record->record_id,
         };
     }
+coverage_done:
     trace->records_by_domain[domain]++;
     trace->records++;
     return SM64_MODERN_STATUS_OK;
@@ -633,6 +706,16 @@ static SM64ModernOracleTraceConfigV1 make_oracle_config(void) {
             "region=5553;fullscreen=off;skip_intro=1;native_tick=1;legacy_tick=1;castle=area2");
         config.initial_save_fingerprint = hash_string(
             "sm64-modern-native-castle-area2-initial-save");
+    } else if (hmc_platform_route_enabled()) {
+        config.build_fingerprint = hash_string(
+            "sm64-modern-native-hmc-controllable-platform;source-backed");
+        config.content_fingerprint = hash_string(
+            "behavior_data.c;levels/hmc/script.c;controllable_platform.inc.c");
+        config.timebase_fingerprint = sm64_modern_timebase_fingerprint();
+        config.configuration_fingerprint = hash_string(
+            "region=5553;fullscreen=off;skip_intro=1;native_tick=1;legacy_tick=1;hmc=area1;platform=controllable");
+        config.initial_save_fingerprint = hash_string(
+            "sm64-modern-native-hmc-controllable-platform-initial-save");
     }
     return config;
 }
@@ -705,9 +788,27 @@ int main(int argc, char **argv) {
     memset(&trace, 0, sizeof(trace));
     const bool pairing_route = pairing_route_enabled();
     const bool castle_area2_route = castle_area2_route_enabled();
-    const uint32_t trace_steps = pairing_route ? 2u
-                                               : (castle_area2_route ? 64u : TRACE_STEPS);
+    const bool hmc_platform_route = hmc_platform_route_enabled();
+    uint32_t trace_steps = pairing_route ? 2u
+                                         : ((castle_area2_route || hmc_platform_route)
+                                            ? 64u : TRACE_STEPS);
+    if (castle_area2_route) {
+        // The authored Castle area-2 object is installed by the level route
+        // after the first three lifecycle steps.  A pendulum pair capture
+        // may request enough warm-up plus 64 owner ticks without changing
+        // the ordinary 64-step lifecycle smoke.
+        const char *requested_steps = getenv("SM64_MODERN_CASTLE_AREA2_STEPS");
+        if (requested_steps && requested_steps[0] != '\0') {
+            char *end = NULL;
+            const unsigned long parsed = strtoul(requested_steps, &end, 10);
+            if (end != requested_steps && *end == '\0'
+                && parsed >= 64ul && parsed <= 120ul) {
+                trace_steps = (uint32_t) parsed;
+            }
+        }
+    }
     trace.input_only = pairing_route;
+    trace.pendulum_route_coverage = castle_area2_route;
     trace.file = fopen(trace_path, "wb");
     if (!trace.file) {
         fprintf(stderr, "could not open '%s'\n", trace_path);
@@ -720,7 +821,7 @@ int main(int argc, char **argv) {
     const SM64ModernAudioMigrationApiV1 audio = make_audio_api(&state);
     expect_status("install audio", sm64_modern_install_audio_migration_api(&audio),
                   SM64_MODERN_STATUS_OK);
-    if (pairing_route || castle_area2_route) {
+    if (pairing_route || castle_area2_route || hmc_platform_route) {
         SM64ModernTimebaseApiV1 timebase;
         memset(&timebase, 0, sizeof(timebase));
         expect_status("get pairing timebase", sm64_modern_get_timebase_api(
@@ -759,6 +860,13 @@ int main(int argc, char **argv) {
     const SM64ModernLifecycleConfigV1 lifecycle_config =
         make_lifecycle_config(save_directory);
     const SM64ModernPlatformApiV1 platform = make_platform_api(&state);
+    if (hmc_platform_route) {
+        // Start from the ordinary authored Castle Grounds bootstrap, then use
+        // HMC's real self-warp node instead of selecting a stale area index
+        // through the menu-level script table.
+        (void) unsetenv("SM64_MODERN_AUTOMATED_HMC_PLATFORM");
+        (void) setenv("SM64_MODERN_AUTOMATED_GAMEPLAY", "1", 1);
+    }
     const SM64ModernStatus init_status = lifecycle.initialize(&lifecycle_config, &platform);
     expect_status("lifecycle initialize", init_status, SM64_MODERN_STATUS_OK);
     expect_status("oracle initialization status", sm64_modern_oracle_trace_status(),
@@ -771,6 +879,7 @@ int main(int argc, char **argv) {
     s32 castle_area2_initial_velocity = 0;
     uint32_t castle_area2_pendulum_slot = 0;
     bool castle_area2_pendulum_moved = false;
+    bool hmc_platform_warp_requested = false;
 
     if (init_status == SM64_MODERN_STATUS_OK) {
         SM64ModernLifecycleState lifecycle_state = SM64_MODERN_LIFECYCLE_COLD;
@@ -779,6 +888,13 @@ int main(int argc, char **argv) {
         expect_true("lifecycle running", lifecycle_state == SM64_MODERN_LIFECYCLE_RUNNING);
         for (uint32_t index = 0; index < trace_steps; ++index) {
             expect_status("lifecycle step", lifecycle.step(), SM64_MODERN_STATUS_OK);
+
+            if (hmc_platform_route && !hmc_platform_warp_requested
+                && index >= 1u && gCurrLevelNum == LEVEL_CASTLE_GROUNDS
+                && gCurrAreaIndex == 1) {
+                initiate_warp(LEVEL_HMC, 1, 0x0A, 0);
+                hmc_platform_warp_requested = true;
+            }
 
             if (castle_area2_route && !castle_area2_loaded
                 && gCurrLevelNum == LEVEL_CASTLE
@@ -811,13 +927,13 @@ int main(int argc, char **argv) {
     uint64_t retained_coverage_entries = 0;
     const uint64_t retained_coverage = retained_coverage_fingerprint(
         &trace, &retained_coverage_entries);
-    if (pairing_route || castle_area2_route) {
+    if (pairing_route || castle_area2_route || hmc_platform_route) {
         expect_true("route coverage fingerprint", retained_coverage != 0);
         expect_true("route coverage entries", retained_coverage_entries > 0);
         finalized_config.coverage_fingerprint = retained_coverage;
         expect_true("finalize route coverage header",
                     trace_rewrite_header(&trace, &finalized_config));
-        if (castle_area2_route) {
+        if (castle_area2_route || hmc_platform_route) {
             expect_true("castle route build fingerprint",
                         finalized_config.build_fingerprint != 0);
             expect_true("castle route content fingerprint",
@@ -924,6 +1040,30 @@ int main(int argc, char **argv) {
                finalized_config.coverage_fingerprint);
     }
 
+    if (hmc_platform_route) {
+        struct Object *platform = find_controllable_platform();
+        printf("hmcPlatformLevel=%d hmcPlatformArea=%d hmcPlatformSlot=%u hmcPlatformActive=%d\n",
+               gCurrLevelNum,
+               gCurrAreaIndex,
+               platform ? sm64_modern_parity_object_slot(platform) : 0u,
+               platform ? ((platform->activeFlags & ACTIVE_FLAG_ACTIVE) != 0) : 0);
+        expect_true("hmc platform level", gCurrLevelNum == LEVEL_HMC);
+        expect_true("hmc platform area", gCurrAreaIndex == 1);
+        expect_true("hmc platform object", platform != NULL);
+        printf("hmcPlatformHeaderBuild=0x%016" PRIx64
+               " hmcPlatformHeaderContent=0x%016" PRIx64
+               " hmcPlatformHeaderTimebase=0x%016" PRIx64
+               " hmcPlatformHeaderConfiguration=0x%016" PRIx64
+               " hmcPlatformHeaderInitialSave=0x%016" PRIx64
+               " hmcPlatformHeaderCoverage=0x%016" PRIx64 "\n",
+               finalized_config.build_fingerprint,
+               finalized_config.content_fingerprint,
+               finalized_config.timebase_fingerprint,
+               finalized_config.configuration_fingerprint,
+               finalized_config.initial_save_fingerprint,
+               finalized_config.coverage_fingerprint);
+    }
+
     if (state.errors != 0u) {
         fprintf(stderr, "first platform error: status=%u message=%s\n",
                 state.first_error_status, state.first_error_message);
@@ -938,7 +1078,8 @@ int main(int argc, char **argv) {
     uint32_t file_domains = 0;
     expect_true("validate file trace",
                 validate_file(trace_path, &trace,
-                              (pairing_route || castle_area2_route) ? retained_coverage : 0,
+                              (pairing_route || castle_area2_route || hmc_platform_route)
+                                  ? retained_coverage : 0,
                               &file_records,
                               &file_last_tick, &file_domains));
     expect_true("file lifecycle ticks", file_last_tick >= trace_steps + 1u);

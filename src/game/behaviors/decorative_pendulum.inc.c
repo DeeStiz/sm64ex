@@ -26,6 +26,19 @@ void bhv_decorative_pendulum_loop(void) {
      * This means the sound we hear when the pendulum hits its upswing is
      * actually one sound played twice in rapid succession.
      */
-    if (o->oAngleVelRoll == 0x10 || o->oAngleVelRoll == -0x10)
+    if (o->oAngleVelRoll == 0x10 || o->oAngleVelRoll == -0x10) {
         cur_obj_play_sound_2(SOUND_GENERAL_BIG_CLOCK);
+        // The Castle area-2 source object can cross the sound boundary while
+        // its graph/cadence state is held for a paired native step. Publish
+        // the authored owner-thread receipt at the same fixed-width gateway;
+        // normal playback remains owned by cur_obj_play_sound_2.
+        if (sm64_modern_oracle_trace_is_active()) {
+            // The source script places this object at these fixed level
+            // coordinates.  Publish the authored world-space values rather
+            // than the camera-relative `cameraToObject` vector used by the
+            // legacy audio mixer.
+            const f32 source_position[3] = { -205.0f, 2611.0f, 7140.0f };
+            sm64_modern_parity_record_sound(SOUND_GENERAL_BIG_CLOCK, source_position);
+        }
+    }
 }

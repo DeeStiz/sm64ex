@@ -45,6 +45,7 @@
 #include "thread6.h"
 #include "pc/sm64_modern_gameplay_migration.h"
 #include "pc/sm64_modern_gameplay_parity.h"
+#include "pc/sm64_modern_rng_route_identity.h"
 #include "pc/sm64_modern_timebase.h"
 
 #define o gCurrentObject

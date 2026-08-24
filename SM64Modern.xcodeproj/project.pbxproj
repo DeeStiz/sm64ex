@@ -649,6 +649,9 @@
 		C9898BA6327F09C305BCBA33 /* SparkleSpawnerBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE445288EF5D08C54068E0E6 /* SparkleSpawnerBehavior.swift */; };
 		CA856FD36F80B5C2DFBC96ED /* RockSolidObjectBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5842EABACD3E53858AEA177 /* RockSolidObjectBridge.swift */; };
 		CA8A138DB38DAC4CF33A3E53 /* AudioMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = CCDBF2CBB6E5BA6D35FB9A64 /* AudioMigration.swift */; };
+		A85000000000000000000001 /* GlobalStateMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85000000000000000000002 /* GlobalStateMigration.swift */; };
+		A85000000000000000000004 /* EffectsMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85000000000000000000005 /* EffectsMigration.swift */; };
+		A85000000000000000000006 /* AudioPCMReceiptMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A85000000000000000000007 /* AudioPCMReceiptMigration.swift */; };
 		CAA0BD48188AAEA1BF885A5E /* SmallPiranhaFlameBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1894287D9B318F717FB41E0 /* SmallPiranhaFlameBehavior.swift */; };
 		CACD5200AC0E7F7732C5DD89 /* WaterSplashBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC64DE97034E3B9CE609986F /* WaterSplashBehavior.swift */; };
 		CB08A00E26CDD84B050942B7 /* VanishCapBehavior.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7F5205E2EC11D427347FC76 /* VanishCapBehavior.swift */; };
@@ -1445,6 +1448,9 @@
 		CC510DADD4B2F20AC7EA6B5A /* ScuttlebugObjectBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScuttlebugObjectBridge.swift; sourceTree = "<group>"; };
 		CC64DE97034E3B9CE609986F /* WaterSplashBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterSplashBehavior.swift; sourceTree = "<group>"; };
 		CCDBF2CBB6E5BA6D35FB9A64 /* AudioMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioMigration.swift; sourceTree = "<group>"; };
+		A85000000000000000000002 /* GlobalStateMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalStateMigration.swift; sourceTree = "<group>"; };
+		A85000000000000000000005 /* EffectsMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EffectsMigration.swift; sourceTree = "<group>"; };
+		A85000000000000000000007 /* AudioPCMReceiptMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioPCMReceiptMigration.swift; sourceTree = "<group>"; };
 		CD2640155564E527078513ED /* MarioGravity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarioGravity.swift; sourceTree = "<group>"; };
 		CD3DDB587887AD2D964BF238 /* ArrowLiftBehavior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrowLiftBehavior.swift; sourceTree = "<group>"; };
 		CDB3A05071FA5292DBC04ABA /* CameraCUpExit.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraCUpExit.swift; sourceTree = "<group>"; };
@@ -1642,6 +1648,9 @@
 				A1EE12181A3E7D00C305344E /* ArrowLiftObjectBridge.swift */,
 				6FED187A5E0CCAF0E865A36D /* Audio.swift */,
 				CCDBF2CBB6E5BA6D35FB9A64 /* AudioMigration.swift */,
+				A85000000000000000000002 /* GlobalStateMigration.swift */,
+				A85000000000000000000005 /* EffectsMigration.swift */,
+				A85000000000000000000007 /* AudioPCMReceiptMigration.swift */,
 				5E1852868F5E323B208C3437 /* AudioMixer.swift */,
 				E51CE2557B77FAF7731F3B79 /* AudioPools.swift */,
 				F67CD09B5E85C6D4D207A193 /* AudioPromotion.swift */,
@@ -2542,6 +2551,9 @@
 				E5BBD5DFE06825D975AB9A3A /* ArrowLiftObjectBridge.swift in Sources */,
 				E1570F804670ACB1AD2469B0 /* Audio.swift in Sources */,
 				CA8A138DB38DAC4CF33A3E53 /* AudioMigration.swift in Sources */,
+				A85000000000000000000001 /* GlobalStateMigration.swift in Sources */,
+				A85000000000000000000004 /* EffectsMigration.swift in Sources */,
+				A85000000000000000000006 /* AudioPCMReceiptMigration.swift in Sources */,
 				D5578FD5FECA0729AE8EDAC2 /* AudioMixer.swift in Sources */,
 				6CFFFE57D9A674C3022869C0 /* AudioPools.swift in Sources */,
 				3A6DBB605E60A41CBB0AAF71 /* AudioPromotion.swift in Sources */,

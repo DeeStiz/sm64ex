@@ -24,6 +24,11 @@ struct MetalRect: Hashable, Sendable {
 
 struct MetalSceneDraw: Sendable {
     let shader: MetalShaderKey
+    /// The legacy renderer's current tile is part of the draw-state receipt.
+    /// Keep it in the immutable scene packet so the owner-thread snapshot can
+    /// be compared with the C render-packet oracle without consulting mutable
+    /// recorder state after the frame closes.
+    let currentTextureTile: UInt32
     let textureID0: UInt32
     let textureID1: UInt32
     let textureUpload0: MetalTextureUpload?
@@ -73,6 +78,7 @@ final class MetalSceneRecorder {
     private var shaders: [UInt32: MetalShaderKey] = [:]
     private var selectedShaderID: UInt32?
     private var selectedTextureIDs = [UInt32](repeating: 0, count: 2)
+    private var currentTextureTile: UInt32 = 0
     private var samplerKeys = [
         MetalSamplerKey(linear: false, wrapS: 0, wrapT: 0),
         MetalSamplerKey(linear: false, wrapS: 0, wrapT: 0),
@@ -114,6 +120,7 @@ final class MetalSceneRecorder {
 
     func selectTexture(tile: UInt32, id: UInt32) {
         guard tile < 2 else { return }
+        currentTextureTile = tile
         selectedTextureIDs[Int(tile)] = id
     }
 
@@ -159,6 +166,7 @@ final class MetalSceneRecorder {
         activeStorage.vertices.append(contentsOf: UnsafeBufferPointer(start: vertices, count: floatCount))
         activeStorage.draws.append(MetalSceneDraw(
             shader: shader,
+            currentTextureTile: currentTextureTile,
             textureID0: selectedTextureIDs[0],
             textureID1: selectedTextureIDs[1],
             textureUpload0: textureUpload0,
@@ -199,5 +207,6 @@ final class MetalSceneRecorder {
         reusableStorage.reset()
         latestPacket = nil
         selectedShaderID = nil
+        currentTextureTile = 0
     }
 }

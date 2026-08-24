@@ -1222,6 +1222,18 @@ void level_update_native_step(void) {
     sm64_modern_parity_leave_subsystem();
 }
 
+/*
+ * Re-emit the demo prompt on a held native redraw.  Demo playback is still
+ * owned by play_mode_normal() on the logical legacy tick; this render-only
+ * helper keeps the prompt present in the second presentation without
+ * repeating input, demo timers, warps, or other update-side effects.
+ */
+void level_update_native_render(void) {
+    if (sCurrPlayMode == PLAY_MODE_NORMAL && gCurrDemoInput != NULL) {
+        print_intro_text();
+    }
+}
+
 s32 init_level(void) {
     s32 val4 = 0;
 

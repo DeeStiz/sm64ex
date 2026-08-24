@@ -494,6 +494,17 @@ SM64_MODERN_CORE_EXCLUDED_O_FILES := $(SM64_MODERN_ENTRY_OBJ) \
                                         $(SM64_MODERN_NATIVE_BACKEND_O_FILES))
 SM64_MODERN_CORE_O_FILES = $(filter-out $(SM64_MODERN_CORE_EXCLUDED_O_FILES),$(O_FILES)) \
                            $(SOUND_OBJ_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES)
+
+# The second display-list route consumes a C-only accessor defined in the
+# source-authored castle model included by this translation unit.  Keep that
+# owner dependency explicit in the native-core graph so an existing object
+# cannot leave the route observer's symbol unresolved after the model seam is
+# added or changed.
+$(BUILD_DIR)/levels/castle_inside/leveldata.o: \
+  levels/castle_inside/areas/1/2/model.inc.c \
+  levels/castle_inside/areas/2/3/model.inc.c \
+  levels/castle_inside/header.h
+
 SM64_MODERN_ABI_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_abi_smoke.o
 SM64_MODERN_PARITY_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_gameplay_parity_smoke.o
 SM64_MODERN_MIGRATION_SMOKE_OBJ := $(BUILD_DIR)/tests/sm64_modern_gameplay_migration_smoke.o

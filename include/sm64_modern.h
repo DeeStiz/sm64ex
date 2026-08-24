@@ -136,6 +136,14 @@ typedef uint32_t SM64ModernOracleTraceRecordKind;
 #define SM64_MODERN_ORACLE_RECORD_RENDER_PACKET 7u
 #define SM64_MODERN_ORACLE_RECORD_COVERAGE 8u
 
+// The native audio owner publishes only a fixed-width receipt at the
+// owner-thread pre-device boundary. Raw samples, AVAudio pointers, and the
+// realtime render callback never cross this ABI.
+#define SM64_MODERN_AUDIO_PCM_SAMPLE_RATE_HZ 32000u
+#define SM64_MODERN_AUDIO_PCM_CHANNEL_COUNT 2u
+#define SM64_MODERN_AUDIO_PCM_FORMAT_S16_INTERLEAVED_STEREO 1u
+#define SM64_MODERN_ORACLE_AUDIO_EVENT_PCM 5u
+
 #define SM64_MODERN_TIMEBASE_RATE_LIMIT 1000u
 #define SM64_MODERN_TIMEBASE_MAX_CATCH_UP_LIMIT 8u
 
@@ -2013,6 +2021,113 @@ typedef struct SM64ModernAudioMigrationApiV1 {
     SM64ModernAudioSequenceObserveFn observe_sequence_event;
 } SM64ModernAudioMigrationApiV1;
 
+typedef struct SM64ModernAudioPCMReceiptV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t frame_count;
+    uint32_t sample_rate_hz;
+    uint32_t channel_count;
+    uint32_t sample_format;
+    uint32_t sequence;
+    uint32_t reserved;
+    uint64_t pcm_hash;
+} SM64ModernAudioPCMReceiptV1;
+
+typedef SM64ModernStatus (*SM64ModernAudioPCMObserveFn)(
+    void *context,
+    const SM64ModernAudioPCMReceiptV1 *receipt);
+
+typedef struct SM64ModernAudioPCMMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernAudioPCMObserveFn observe_pcm_receipt;
+} SM64ModernAudioPCMMigrationApiV1;
+
+// The native owner publishes effects as fixed-width values at the existing
+// owner-thread gateways.  This observer never receives C objects, behavior
+// pointers, PCM bytes, or AVAudio state; it only receives the exact schema-4
+// effect fields that are already about to be recorded.
+typedef struct SM64ModernEffectReceiptV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint64_t subject_id;
+    uint64_t effect_id;
+    uint32_t sequence;
+    uint32_t value_count;
+    uint32_t flags;
+    uint32_t reserved;
+    uint64_t values[SM64_MODERN_ORACLE_TRACE_VALUE_CAPACITY];
+    uint64_t canonical_hash;
+} SM64ModernEffectReceiptV1;
+
+typedef SM64ModernStatus (*SM64ModernEffectObserveFn)(
+    void *context,
+    const SM64ModernEffectReceiptV1 *receipt);
+
+typedef struct SM64ModernEffectsMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernEffectObserveFn observe_effect;
+} SM64ModernEffectsMigrationApiV1;
+
+// The native text owner publishes only a fixed-width source/text receipt at
+// the authored save-menu text writer.  The source path and payload identity
+// are deterministic hashes; no C strings, FILE pointers, or save buffers
+// cross this observer boundary.
+typedef uint32_t SM64ModernTextEventKind;
+
+#define SM64_MODERN_TEXT_EVENT_SAVE_WRITE 1u
+#define SM64_MODERN_TEXT_ORACLE_EVENT_LIFECYCLE 5u
+
+typedef struct SM64ModernTextReceiptV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint64_t source_identity;
+    uint64_t text_identity;
+    uint64_t payload_hash;
+    uint32_t event_id;
+    uint32_t file_index;
+    uint32_t sequence;
+    uint32_t reserved;
+    uint64_t canonical_hash;
+} SM64ModernTextReceiptV1;
+
+typedef SM64ModernStatus (*SM64ModernTextObserveFn)(
+    void *context,
+    const SM64ModernTextReceiptV1 *receipt);
+
+typedef struct SM64ModernTextMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernTextObserveFn observe_text;
+} SM64ModernTextMigrationApiV1;
+
+// Global-state migration is an owner-thread observer boundary. The C game
+// remains authoritative for the legacy timer, level/area/act/course lifecycle,
+// and process-global random seed; Swift receives this fixed-width snapshot at
+// the exact capture boundary without importing C globals or pointers.
+typedef struct SM64ModernGlobalStateSnapshotV1 {
+    SM64ModernAbiHeader header;
+    uint64_t simulation_tick;
+    uint32_t global_timer;
+    uint32_t level_number;
+    uint32_t area_index;
+    uint32_t act_number;
+    uint32_t course_number;
+    uint32_t random_seed;
+    uint32_t reserved;
+} SM64ModernGlobalStateSnapshotV1;
+
+typedef SM64ModernStatus (*SM64ModernGlobalStateObserveFn)(
+    void *context,
+    const SM64ModernGlobalStateSnapshotV1 *snapshot);
+
+typedef struct SM64ModernGlobalStateMigrationApiV1 {
+    SM64ModernAbiHeader header;
+    void *context;
+    SM64ModernGlobalStateObserveFn observe_snapshot;
+} SM64ModernGlobalStateMigrationApiV1;
+
 // Front-end/menu migration is currently a value-only observer boundary.  The
 // legacy C menu still owns live menu state, text rendering, save-slot writes,
 // and transition side effects; Swift receives the same owner-thread input and
@@ -2714,6 +2829,42 @@ SM64ModernStatus sm64_modern_audio_observe_sequence_event(
     uint64_t simulation_tick,
     const uint64_t *values,
     uint32_t value_count);
+SM64ModernStatus sm64_modern_validate_audio_pcm_migration_api(
+    const SM64ModernAudioPCMMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_audio_pcm_migration_api(
+    const SM64ModernAudioPCMMigrationApiV1 *migration);
+void sm64_modern_uninstall_audio_pcm_migration_api(void);
+SM64ModernStatus sm64_modern_audio_pcm_migration_status(void);
+SM64ModernStatus sm64_modern_audio_observe_pcm_receipt(
+    const SM64ModernAudioPCMReceiptV1 *receipt);
+SM64ModernStatus sm64_modern_validate_effects_migration_api(
+    const SM64ModernEffectsMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_effects_migration_api(
+    const SM64ModernEffectsMigrationApiV1 *migration);
+void sm64_modern_uninstall_effects_migration_api(void);
+SM64ModernStatus sm64_modern_effects_migration_status(void);
+SM64ModernStatus sm64_modern_effects_observe_receipt(
+    const SM64ModernEffectReceiptV1 *receipt);
+SM64ModernStatus sm64_modern_validate_text_migration_api(
+    const SM64ModernTextMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_text_migration_api(
+    const SM64ModernTextMigrationApiV1 *migration);
+void sm64_modern_uninstall_text_migration_api(void);
+SM64ModernStatus sm64_modern_text_migration_status(void);
+uint64_t sm64_modern_text_hash_string(const char *value);
+SM64ModernStatus sm64_modern_text_record_save_write(
+    uint64_t source_identity,
+    uint64_t text_identity,
+    uint64_t payload_hash,
+    uint32_t file_index);
+SM64ModernStatus sm64_modern_validate_global_state_migration_api(
+    const SM64ModernGlobalStateMigrationApiV1 *migration);
+SM64ModernStatus sm64_modern_install_global_state_migration_api(
+    const SM64ModernGlobalStateMigrationApiV1 *migration);
+void sm64_modern_uninstall_global_state_migration_api(void);
+SM64ModernStatus sm64_modern_global_state_migration_status(void);
+SM64ModernStatus sm64_modern_global_state_observe_snapshot(
+    const SM64ModernGlobalStateSnapshotV1 *snapshot);
 SM64ModernStatus sm64_modern_validate_frontend_migration_api(
     const SM64ModernFrontEndMigrationApiV1 *migration);
 SM64ModernStatus sm64_modern_install_frontend_migration_api(
@@ -2777,6 +2928,8 @@ SM64ModernStatus sm64_modern_oracle_trace_get_result(
 SM64ModernStatus sm64_modern_oracle_trace_status(void);
 uint32_t sm64_modern_oracle_trace_is_active(void);
 uint64_t sm64_modern_oracle_trace_simulation_tick(void);
+uint32_t sm64_modern_oracle_trace_next_sequence(
+    SM64ModernOracleTraceDomain domain);
 uint64_t sm64_modern_oracle_trace_hash_record(
     const SM64ModernOracleTraceRecordV1 *record);
 uint32_t sm64_modern_oracle_inventory_count(void);
@@ -2784,6 +2937,7 @@ SM64ModernStatus sm64_modern_oracle_inventory_entry(
     uint32_t index,
     SM64ModernOracleCoverageEntryV1 *out_entry);
 uint64_t sm64_modern_oracle_inventory_fingerprint(void);
+uint64_t sm64_modern_oracle_audio_asset_coverage_fingerprint(void);
 
 #ifdef __cplusplus
 }

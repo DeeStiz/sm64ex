@@ -70,7 +70,7 @@ grep -Fq 'canonical_route_admission=0' "$PAIR_REPORT"
 grep -Fq 'tamper_rejected=1 schema4_replay_round_trip=1' "$PAIR_REPORT"
 grep -Fq "native_slot=$NATIVE_SLOT" "$PAIR_REPORT"
 grep -Fq 'native_domains=3,6,7' "$PAIR_REPORT"
-grep -Fq 'missing_native=12 missing_swift=' "$PAIR_REPORT"
+grep -Fq 'missing_native= missing_swift=' "$PAIR_REPORT"
 
 # Persist the failed/blocked evidence through the existing live-only worker
 # and merge tools. The source-backed warp now proves room/render ownership,

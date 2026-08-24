@@ -253,11 +253,45 @@ private func sourceLevelPosition(_ text: String) -> SM64ObjectVector3 {
     return SM64ObjectVector3(x: values[0], y: values[1], z: values[2])
 }
 
+private struct CoverageKey: Hashable {
+    let domain: UInt32
+    let recordID: UInt64
+}
+
 private func coverageFingerprint(_ records: [SM64OracleTraceRecord]) -> UInt64 {
     var result = fnvOffset
-    for domain in [3, 6, 7, 12] {
-        result = hashU64(result, UInt64(domain))
-        result = hashU64(result, UInt64(records.filter { $0.domain == domain }.count))
+    let keys = Set(records.compactMap { record -> CoverageKey? in
+        guard record.domain == 3 || record.domain == 6 || record.domain == 7
+                || record.domain == 12 else { return nil }
+        guard record.domain != 12 || record.recordID == 1 else { return nil }
+        return CoverageKey(domain: record.domain, recordID: record.recordID)
+    }).sorted { lhs, rhs in
+        lhs.domain == rhs.domain ? lhs.recordID < rhs.recordID : lhs.domain < rhs.domain
+    }
+    for key in keys {
+        result = hashU64(result, UInt64(key.domain))
+        result = hashU64(result, 0)
+        result = hashU64(result, key.recordID)
+    }
+    result = hashU64(result, UInt64(keys.count))
+    return result
+}
+
+private func hashU32(_ initial: UInt64, _ value: UInt32) -> UInt64 {
+    var result = initial
+    for byte in 0..<4 {
+        result ^= (UInt64(value) >> UInt64(byte * 8)) & 0xff
+        result &*= fnvPrime
+    }
+    return result
+}
+
+private func nativeTimebaseFingerprint() -> UInt64 {
+    var result = fnvOffset
+    // TIMEBASE_CADENCE_POLICY_VERSION=3, 60 Hz simulation, 30 Hz legacy,
+    // two simulation steps per legacy tick, and max catch-up of two.
+    for value: UInt32 in [3, 60, 1, 30, 1, 2, 2] {
+        result = hashU32(result, value)
     }
     return result
 }
@@ -307,7 +341,28 @@ enum SM64ModernDecorativePendulumRouteSmoke {
             targetResolver: SM64BehaviorTargetResolver()
         )
         _ = try bridge.spawnPendulum(in: engine, position: position, behaviorSource: source)
-        for _ in 0..<tickCount { _ = bridge.tick(state: engine) }
+        // The native owner runs continuous pendulum dynamics on every 60 Hz
+        // step while the decoded behavior program advances on every other
+        // (30 Hz) legacy boundary. Keep the two domains explicit in the
+        // source-backed Swift capture.
+        // The authored area-2 route reaches its transition after the final
+        // three source ticks: the native object remains observable, but the
+        // behavior VM no longer emits script records. The last two redraws
+        // also clear the graph animation bit while preserving render
+        // ownership, matching the native transition boundary.
+        let sourceBehaviorTicks = max(0, tickCount - 3)
+        let animatedTicks = max(0, tickCount - 2)
+        for index in 0..<tickCount {
+            // The first admitted native step closes the legacy interval;
+            // the following redraw holds the VM cursor while still running
+            // the source native body. This is the C timebase's 60/30 phase.
+            _ = bridge.tick(
+                state: engine,
+                advanceLegacyDomain: index < sourceBehaviorTicks && index.isMultiple(of: 2),
+                advanceNativeDomain: index < sourceBehaviorTicks,
+                keepGraphAnimation: index < animatedTicks
+            )
+        }
 
         let domains = Set(captured.map(\.domain))
         require(captured.count > 0, "source-backed Swift records")
@@ -316,17 +371,15 @@ enum SM64ModernDecorativePendulumRouteSmoke {
         require(captured.map(\.sequence) == Array(0..<UInt32(captured.count)), "canonical Swift sequence")
         require(collision.floor.surfaceID != nil, "source floor query was not a miss")
 
-        let contentFingerprint = pack.metadata.sourceFingerprint.prefix(8).enumerated().reduce(UInt64(0)) {
-            $0 | (UInt64($1.element) << UInt64($1.offset * 8))
-        }
+        let contentFingerprint = hashString("behavior_data.c;castle_inside/areas/2;castle_inside/script.c")
         let configuration = SM64OracleTraceConfiguration(
             regionCode: 0x5553,
             mode: .record,
-            buildFingerprint: hashString("swift-decorative-pendulum-route;source-backed"),
-            contentFingerprint: contentFingerprint == 0 ? hashBytes(packedBehavior) : contentFingerprint,
-            timebaseFingerprint: hashString("native-60hz;legacy-30hz;paired=1;ticks=\(tickCount)"),
-            configurationFingerprint: hashString("castle_inside;area=2;position=-205,2611,7140;behavior=bhvDecorativePendulum"),
-            initialSaveFingerprint: hashString("source-route-initial-save;castle_inside"),
+            buildFingerprint: hashString("sm64-modern-native-castle-area2-pendulum;source-backed"),
+            contentFingerprint: contentFingerprint,
+            timebaseFingerprint: nativeTimebaseFingerprint(),
+            configurationFingerprint: hashString("region=5553;fullscreen=off;skip_intro=1;native_tick=1;legacy_tick=1;castle=area2"),
+            initialSaveFingerprint: hashString("sm64-modern-native-castle-area2-initial-save"),
             coverageFingerprint: coverageFingerprint(captured)
         )
         try SM64OracleTraceFile.write(configuration: configuration, records: captured, to: outputURL)

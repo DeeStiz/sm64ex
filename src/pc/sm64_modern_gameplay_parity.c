@@ -16,6 +16,9 @@
 #include "level_table.h"
 #include "object_fields.h"
 #include "sm64_modern_audio_migration.h"
+#include "sm64_modern_audio_pcm_migration.h"
+#include "sm64_modern_effects_migration.h"
+#include "sm64_modern_global_state_migration.h"
 #include "sm64_modern_gameplay_migration.h"
 #include "sm64_modern_gameplay_parity.h"
 #include "sm64_modern_timebase.h"
@@ -100,10 +103,208 @@ static uint32_t object_slot(const struct Object *object) {
     return (uint32_t) ((address - begin) / sizeof(gObjectPool[0])) + 1u;
 }
 
+static uint64_t behavior_name_hash(const char *name) {
+    uint64_t hash = PARITY_FNV_OFFSET;
+    for (const unsigned char *cursor = (const unsigned char *) name;
+         cursor && *cursor;
+         ++cursor) {
+        hash ^= *cursor;
+        hash *= PARITY_FNV_PRIME;
+    }
+    return hash;
+}
+
 static uint64_t behavior_identity(const void *behavior) {
     if (!behavior) {
         return 0;
     }
+    // The Swift object bridges use a semantic value-only identity for the
+    // authored normal door. Pointer deltas are not stable across Debug and
+    // AddressSanitizer data layouts, so preserve the source behavior identity
+    // at this owner boundary before falling back to the legacy anchor delta.
+    if (behavior == segmented_to_virtual(bhvDoor)) {
+        return UINT64_C(0x6268765f64726e); // "bhv_drn" / SM64DoorObjectBridge
+    }
+    // Decorative pendulum owns a fixed-width source identity for the
+    // Castle Inside area-2 route.  Do not expose the linked behavior pointer:
+    // its address changes across Debug, ASan, and Release layouts and would
+    // make the source-authored object record impossible to pair.
+    if (behavior == segmented_to_virtual(bhvDecorativePendulum)) {
+        return UINT64_C(0x6268765f647065); // "bhv_dpe" / pendulum bridge
+    }
+    // The RR Donut Platform route uses the source behavior names as its
+    // fixed-width owner identity.  Pointer deltas are not stable across
+    // Debug, ASan, and Release link layouts.
+    if (behavior == segmented_to_virtual(bhvDonutPlatformSpawner)) {
+        return behavior_name_hash("bhvDonutPlatformSpawner");
+    }
+    if (behavior == segmented_to_virtual(bhvDonutPlatform)) {
+        return behavior_name_hash("bhvDonutPlatform");
+    }
+    // The HMC controllable platform route owns both its authored parent and
+    // source-spawned arrow-platform children. Keep these identities semantic
+    // so Debug, ASan, and Release traces do not depend on behavior pointers.
+    if (behavior == segmented_to_virtual(bhvControllablePlatform)) {
+        return behavior_name_hash("bhvControllablePlatform");
+    }
+    if (behavior == segmented_to_virtual(bhvControllablePlatformSub)) {
+        return behavior_name_hash("bhvControllablePlatformSub");
+    }
+    // These are the authored behavior scripts reached by the canonical
+    // effects route. Pointer deltas are not stable across Debug, ASan, and
+    // Release link layouts, so publish a semantic source-name identity at
+    // the owner boundary. Unknown scripts retain the legacy anchor-relative
+    // value and therefore remain fail-closed until their own source identity
+    // is qualified.
+#define SOURCE_BEHAVIOR_IDENTITY(name) \
+    if (behavior == segmented_to_virtual(name)) { \
+        return behavior_name_hash(#name); \
+    }
+    SOURCE_BEHAVIOR_IDENTITY(bhvStaticObject)
+    SOURCE_BEHAVIOR_IDENTITY(bhvCannon)
+    SOURCE_BEHAVIOR_IDENTITY(bhvCannonBarrel)
+    SOURCE_BEHAVIOR_IDENTITY(bhvYoshi)
+    SOURCE_BEHAVIOR_IDENTITY(bhvCameraLakitu)
+    SOURCE_BEHAVIOR_IDENTITY(bhvYellowCoin)
+    SOURCE_BEHAVIOR_IDENTITY(bhvDoorWarp)
+    SOURCE_BEHAVIOR_IDENTITY(bhvExclamationBox)
+    SOURCE_BEHAVIOR_IDENTITY(bhvRotatingExclamationMark)
+    SOURCE_BEHAVIOR_IDENTITY(bhvTree)
+    SOURCE_BEHAVIOR_IDENTITY(bhvMessagePanel)
+    SOURCE_BEHAVIOR_IDENTITY(bhv1Up)
+    SOURCE_BEHAVIOR_IDENTITY(bhvHidden1up)
+    SOURCE_BEHAVIOR_IDENTITY(bhvHidden1upTrigger)
+    SOURCE_BEHAVIOR_IDENTITY(bhvHidden1upInPoleSpawner)
+    SOURCE_BEHAVIOR_IDENTITY(bhvTripletButterfly)
+    // Castle Inside area-2's authored Boo may be unloaded while the audio
+    // route allocates its source objects. Keep the object-despawn payload
+    // source-bound instead of exposing the build-layout-dependent behavior
+    // pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvBooInCastle)
+    // Castle Inside's authored painting death-warp objects use a BREAK-only
+    // script but still participate in actor snapshots. Their owner identity
+    // must remain semantic across Debug, ASan, and Release layouts.
+    SOURCE_BEHAVIOR_IDENTITY(bhvPaintingDeathWarp)
+    // Castle Inside's authored painting star-collect warp objects share the
+    // four painting coordinates with the adjacent death-warp objects. Their
+    // snapshots are retained separately at the same positions; publish the
+    // source behavior name instead of the layout-dependent pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvPaintingStarCollectWarp)
+    // Castle Inside area-1's second object at (2816, 1200, -256) is the
+    // authored 270-degree death warp. Its source position and yaw distinguish
+    // it from the adjacent 90-degree airborne star-collect warp; publish the
+    // source behavior name instead of the layout-dependent pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvDeathWarp)
+    // Castle Inside area-1's adjacent object at (2816, 1200, -256) is the
+    // authored 90-degree airborne star-collect warp. Its shared position with
+    // the 270-degree death warp requires source ordering plus yaw provenance;
+    // publish the source behavior name instead of the layout-dependent
+    // pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvAirborneStarCollectWarp)
+    // Castle Inside area-1's authored launch-death warp shares its source
+    // position and -135-degree angle with the adjacent launch-star warp.
+    // Publish the source behavior name instead of the layout-dependent
+    // pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvLaunchDeathWarp)
+    // Castle Inside area-1's adjacent launch-star warp shares the authored
+    // position and -135-degree angle with the launch-death warp. Publish its
+    // source behavior name instead of the layout-dependent pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvLaunchStarCollectWarp)
+    // Castle Inside area-1's authored hard-air knock-back warp shares its
+    // position with the adjacent airborne/death warp entries. Publish the
+    // source behavior name instead of the layout-dependent pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvHardAirKnockBackWarp)
+    // Castle Inside area-1's authored airborne-death warp shares its source
+    // position with the adjacent airborne and hard-air warp entries. Publish
+    // the source behavior name instead of the layout-dependent pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvAirborneDeathWarp)
+    // Castle Inside area-1's authored airborne warp shares its source
+    // position with the adjacent airborne-death and hard-air warp entries.
+    // Publish the source behavior name instead of the layout-dependent
+    // pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvAirborneWarp)
+    // Castle Inside area-1's two authored instant-active warp entries share
+    // one behavior but remain distinct source objects by parameter/order.
+    // Publish the source behavior name instead of the layout-dependent
+    // pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvInstantActiveWarp)
+    // Castle Inside area-1's authored subject-42 warp uses the source
+    // behavior name rather than the build-layout-dependent pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvWarp)
+    // Castle Inside area-1's second authored eight-star door is the subject-
+    // 49 object at the second source entry in levels/castle_inside/script.c.
+    // Publish the source behavior name so the full-trace route remains stable
+    // across Debug, ASan, and Release behavior-script layouts.
+    SOURCE_BEHAVIOR_IDENTITY(bhvStarDoor)
+    // Castle Inside area-1's authored macro_yellow_coin_2 entries use
+    // bhvOneCoin. Publish its source-name identity so the high-score audio
+    // route remains byte-stable across Debug, ASan, and Release layouts.
+    SOURCE_BEHAVIOR_IDENTITY(bhvOneCoin)
+    // Castle Inside area-1's first authored macro sign is bhvSignOnWall.
+    // Publish its source-name identity so the high-score route is stable
+    // across Debug, ASan, and Release behavior-script layouts. Unknown
+    // scripts still use the legacy anchor-relative fallback below.
+    SOURCE_BEHAVIOR_IDENTITY(bhvSignOnWall)
+    // Castle Inside's authored floor-trap route reaches both the parent
+    // script and its source-spawned child. Keep their owner identities
+    // semantic across Debug, ASan, and Release behavior-script layouts;
+    // unknown scripts still use the legacy anchor-relative fallback below.
+    SOURCE_BEHAVIOR_IDENTITY(bhvFloorTrapInCastle)
+    SOURCE_BEHAVIOR_IDENTITY(bhvCastleFloorTrap)
+    // Castle Inside area-1's authored Toad message object is the subject-51
+    // owner in the high-score audio route. Publish its source behavior name
+    // instead of the layout-dependent pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvToadMessage)
+    // Castle Inside area-2's authored tank-fish group at (2778, 507, 1255)
+    // participates in the audio route's actor snapshots. Publish its source
+    // behavior identity so linked-layout deltas cannot cross the Swift seam.
+    SOURCE_BEHAVIOR_IDENTITY(bhvTankFishGroup)
+    SOURCE_BEHAVIOR_IDENTITY(bhvFishGroup)
+    // Castle Inside area-1's fourth authored tank-fish group is subject 55.
+    // Publish its source behavior name so the aquarium owner remains stable
+    // across Debug, ASan, and Release behavior-script layouts.
+    SOURCE_BEHAVIOR_IDENTITY(bhvTankFishGroup)
+    // Castle Inside area-1's authored generic fish group is subject 59.
+    // Publish its source behavior name so the fish-group owner remains stable
+    // across Debug, ASan, and Release behavior-script layouts.
+    SOURCE_BEHAVIOR_IDENTITY(bhvFishGroup)
+    // The effects route allocates sparkle particles through the authored
+    // source behavior. Publish its semantic identity instead of the
+    // build-layout-dependent behavior pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvSparkleParticleSpawner)
+    SOURCE_BEHAVIOR_IDENTITY(bhvCloud)
+    SOURCE_BEHAVIOR_IDENTITY(bhvCloudPart)
+    SOURCE_BEHAVIOR_IDENTITY(bhvClockMinuteHand)
+    SOURCE_BEHAVIOR_IDENTITY(bhvClockHourHand)
+    SOURCE_BEHAVIOR_IDENTITY(bhvTTC2DRotator)
+    // Snowman's Land's source-authored Spindrift route uses the semantic
+    // behavior name rather than a Debug/ASan/Release pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvSpindrift)
+    // Snowman's Land's source-authored Snowman wind route crosses a private
+    // value-only receipt seam; keep its actor identity independent of the
+    // linked behavior-script layout.
+    SOURCE_BEHAVIOR_IDENTITY(bhvSLSnowmanWind)
+    // SSL's source-authored Spindel route also crosses a value-only seam;
+    // publish its semantic behavior name rather than a linked pointer delta.
+    SOURCE_BEHAVIOR_IDENTITY(bhvSpindel)
+    // Whomp's Fortress' source-authored King Whomp crosses a private
+    // value-only receipt seam. Keep both the King owner and the source star
+    // helper's behavior identity semantic across Debug, ASan, and Release;
+    // the route receipt separately names the reward child as bhvStar.
+    SOURCE_BEHAVIOR_IDENTITY(bhvWhompKingBoss)
+    SOURCE_BEHAVIOR_IDENTITY(bhvStar)
+    SOURCE_BEHAVIOR_IDENTITY(bhvStarSpawnCoordinates)
+    // The WDW express elevator family uses semantic source-name identities;
+    // behavior-script pointer deltas differ across Debug, ASan, and Release.
+    SOURCE_BEHAVIOR_IDENTITY(bhvWdwExpressElevator)
+    SOURCE_BEHAVIOR_IDENTITY(bhvWdwExpressElevatorPlatform)
+    // The Bob-omb Battlefield seesaw route uses the same fixed-width
+    // semantic identity as its Swift owner bridge. Do not expose the linked
+    // behavior-script address through the generic actor boundary.
+    if (behavior == segmented_to_virtual(bhvSeesawPlatform)) {
+        return UINT64_C(0x006268765f737377);
+    }
+#undef SOURCE_BEHAVIOR_IDENTITY
     // ASLR moves all linked behavior scripts together; an anchor-relative
     // identity stays stable for the exact build fingerprint in the trace.
     return (uint64_t) ((uintptr_t) behavior - (uintptr_t) bhvMario);
@@ -439,6 +640,51 @@ static void record_oracle_values(SM64ModernGameplaySubsystem subsystem,
                                 value_count);
 }
 
+static void observe_effect_receipt(uint32_t effect_id,
+                                   uint32_t subject_id,
+                                   const uint64_t *values,
+                                   uint32_t value_count) {
+    if (!sm64_modern_oracle_trace_is_active()) {
+        return;
+    }
+
+    SM64ModernEffectReceiptV1 receipt;
+    memset(&receipt, 0, sizeof(receipt));
+    receipt.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    receipt.header.struct_size = sizeof(receipt);
+    receipt.simulation_tick = sm64_modern_oracle_trace_simulation_tick();
+    receipt.subject_id = subject_id;
+    receipt.effect_id = effect_id;
+    receipt.sequence = sm64_modern_oracle_trace_next_sequence(
+        SM64_MODERN_ORACLE_DOMAIN_EFFECT);
+    receipt.value_count = value_count;
+    receipt.flags = 0;
+    if (values && value_count > 0u) {
+        memcpy(receipt.values, values, value_count * sizeof(receipt.values[0]));
+    }
+
+    // Hash the exact schema-4 record that record_oracle_values will create.
+    // Swift can therefore validate receipt bytes without trusting a pointer
+    // or a separate callback-side channel.
+    SM64ModernOracleTraceRecordV1 oracle_record;
+    memset(&oracle_record, 0, sizeof(oracle_record));
+    oracle_record.simulation_tick = receipt.simulation_tick;
+    oracle_record.domain = SM64_MODERN_ORACLE_DOMAIN_EFFECT;
+    oracle_record.record_kind = SM64_MODERN_ORACLE_RECORD_EFFECT;
+    oracle_record.subject_id = receipt.subject_id;
+    oracle_record.record_id = receipt.effect_id;
+    oracle_record.sequence = receipt.sequence;
+    oracle_record.value_count = receipt.value_count;
+    oracle_record.flags = receipt.flags;
+    memcpy(oracle_record.values, receipt.values, sizeof(oracle_record.values));
+    receipt.canonical_hash = sm64_modern_oracle_trace_hash_record(&oracle_record);
+
+    const SM64ModernStatus status = sm64_modern_effects_observe_receipt(&receipt);
+    if (status != SM64_MODERN_STATUS_OK && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = status;
+    }
+}
+
 static void record_values(SM64ModernGameplaySubsystem subsystem,
                           SM64ModernGameplayRecordKind kind,
                           uint32_t record_id,
@@ -463,6 +709,9 @@ static void record_values(SM64ModernGameplaySubsystem subsystem,
                                                              values,
                                                              value_count);
         process_actual_record(&record);
+    }
+    if (kind == SM64_MODERN_GAMEPLAY_RECORD_EFFECT) {
+        observe_effect_receipt(record_id, subject_id, values, value_count);
     }
     record_oracle_values(subsystem, kind, record_id, subject_id, values, value_count);
 }
@@ -903,6 +1152,25 @@ u32 sm64_modern_parity_audio_frame_count(u32 high_count, u32 default_count) {
 }
 
 static void capture_global_snapshot(void) {
+    SM64ModernGlobalStateSnapshotV1 snapshot;
+    memset(&snapshot, 0, sizeof(snapshot));
+    snapshot.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    snapshot.header.struct_size = sizeof(snapshot);
+    snapshot.simulation_tick = sm64_modern_oracle_trace_is_active()
+        ? sm64_modern_oracle_trace_simulation_tick()
+        : sm64_modern_timebase_simulation_tick();
+    snapshot.global_timer = gGlobalTimer;
+    snapshot.level_number = (uint16_t) gCurrLevelNum;
+    snapshot.area_index = (uint16_t) gCurrAreaIndex;
+    snapshot.act_number = (uint16_t) gCurrActNum;
+    snapshot.course_number = (uint16_t) gCurrCourseNum;
+    snapshot.random_seed = random_seed_get();
+    const SM64ModernStatus publication_status =
+        sm64_modern_global_state_observe_snapshot(&snapshot);
+    if (publication_status != SM64_MODERN_STATUS_OK
+        && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = publication_status;
+    }
     record_scalar(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL,
                   SM64_MODERN_FIELD_GLOBAL_TIMER, 0, gGlobalTimer);
     record_scalar(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL,
@@ -1032,8 +1300,11 @@ static void capture_actor_snapshot(void) {
     // Keep that authority mapping intact, but retain their object-domain
     // snapshots for the independent schema-4 oracle. Other GLOBAL levels stay
     // trace-silent here, as they did before the Castle route was captured.
-    const bool castle_oracle_objects = oracle_enabled && gCurrLevelNum == LEVEL_CASTLE;
-    if ((subsystem == SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL && !castle_oracle_objects)
+    const bool source_oracle_objects = oracle_enabled
+        && (gCurrLevelNum == LEVEL_CASTLE || gCurrLevelNum == LEVEL_RR
+            || gCurrLevelNum == LEVEL_HMC || gCurrLevelNum == LEVEL_TTC
+            || gCurrLevelNum == LEVEL_SL);
+    if ((subsystem == SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL && !source_oracle_objects)
         || (!subsystem_enabled(subsystem) && !oracle_enabled)) {
         return;
     }
@@ -1047,7 +1318,7 @@ static void capture_actor_snapshot(void) {
             SM64_MODERN_ORACLE_DOMAIN_OBJECT;
 #define RECORD_ACTOR_SCALAR(field, value) \
         do { \
-            if (castle_oracle_objects) { \
+            if (source_oracle_objects) { \
                 const uint64_t actor_value = (value); \
                 record_oracle_domain_values(oracle_domain, \
                                             SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT, \
@@ -1069,7 +1340,7 @@ static void capture_actor_snapshot(void) {
         const uint64_t position[3] = {
             float_bits(object->oPosX), float_bits(object->oPosY), float_bits(object->oPosZ),
         };
-        if (castle_oracle_objects) {
+        if (source_oracle_objects) {
             record_oracle_domain_values(oracle_domain,
                                         SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
                                         SM64_MODERN_FIELD_ACTOR_POSITION,
@@ -1083,7 +1354,7 @@ static void capture_actor_snapshot(void) {
         const uint64_t velocity[3] = {
             float_bits(object->oVelX), float_bits(object->oVelY), float_bits(object->oVelZ),
         };
-        if (castle_oracle_objects) {
+        if (source_oracle_objects) {
             record_oracle_domain_values(oracle_domain,
                                         SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
                                         SM64_MODERN_FIELD_ACTOR_VELOCITY,
@@ -1099,7 +1370,7 @@ static void capture_actor_snapshot(void) {
             (uint32_t) object->oMoveAngleYaw,
             (uint32_t) object->oMoveAngleRoll,
         };
-        if (castle_oracle_objects) {
+        if (source_oracle_objects) {
             record_oracle_domain_values(oracle_domain,
                                         SM64_MODERN_GAMEPLAY_RECORD_SNAPSHOT,
                                         SM64_MODERN_FIELD_ACTOR_MOVE_ANGLE,
@@ -1192,6 +1463,59 @@ void sm64_modern_parity_record_pcm(const s16 *samples, u32 frame_count) {
     record_values(SM64_MODERN_GAMEPLAY_SUBSYSTEM_GLOBAL,
                   SM64_MODERN_GAMEPLAY_RECORD_EFFECT,
                   SM64_MODERN_EFFECT_PCM_CHECKSUM, 0, values, 2);
+
+    // Publish only stable owner-thread values. The raw PCM remains local to
+    // native synthesis and is handed to the platform immediately afterward;
+    // neither this callback nor the Swift consumer sees samples or AVAudio
+    // objects. The sequence is captured before the schema-4 record advances
+    // the audio-domain counter so the independent Swift decoder can reproduce
+    // the exact fixed-width record.
+    const bool oracle_active = sm64_modern_oracle_trace_is_active() != 0;
+    const uint64_t simulation_tick = oracle_active
+        ? sm64_modern_oracle_trace_simulation_tick()
+        : sm64_modern_timebase_simulation_tick();
+    const uint32_t sequence = oracle_active
+        ? sm64_modern_oracle_trace_next_sequence(SM64_MODERN_ORACLE_DOMAIN_AUDIO)
+        : 0u;
+    const uint64_t oracle_values[5] = {
+        frame_count,
+        SM64_MODERN_AUDIO_PCM_SAMPLE_RATE_HZ,
+        SM64_MODERN_AUDIO_PCM_CHANNEL_COUNT,
+        SM64_MODERN_AUDIO_PCM_FORMAT_S16_INTERLEAVED_STEREO,
+        checksum,
+    };
+    if (oracle_active) {
+        const SM64ModernStatus oracle_status = sm64_modern_oracle_trace_record(
+            SM64_MODERN_ORACLE_DOMAIN_AUDIO,
+            SM64_MODERN_ORACLE_RECORD_AUDIO_PCM,
+            0,
+            SM64_MODERN_ORACLE_AUDIO_EVENT_PCM,
+            0,
+            oracle_values,
+            5);
+        if (oracle_status != SM64_MODERN_STATUS_OK
+            && sStatus == SM64_MODERN_STATUS_OK) {
+            sStatus = oracle_status;
+        }
+    }
+
+    SM64ModernAudioPCMReceiptV1 receipt;
+    memset(&receipt, 0, sizeof(receipt));
+    receipt.header.abi_version = SM64_MODERN_ABI_VERSION_1;
+    receipt.header.struct_size = sizeof(receipt);
+    receipt.simulation_tick = simulation_tick;
+    receipt.frame_count = frame_count;
+    receipt.sample_rate_hz = SM64_MODERN_AUDIO_PCM_SAMPLE_RATE_HZ;
+    receipt.channel_count = SM64_MODERN_AUDIO_PCM_CHANNEL_COUNT;
+    receipt.sample_format = SM64_MODERN_AUDIO_PCM_FORMAT_S16_INTERLEAVED_STEREO;
+    receipt.sequence = sequence;
+    receipt.pcm_hash = checksum;
+    const SM64ModernStatus observer_status =
+        sm64_modern_audio_observe_pcm_receipt(&receipt);
+    if (observer_status != SM64_MODERN_STATUS_OK
+        && sStatus == SM64_MODERN_STATUS_OK) {
+        sStatus = observer_status;
+    }
 }
 
 static uint64_t hash_bytes(const uint8_t *bytes, uint32_t byte_count) {

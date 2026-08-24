@@ -14,6 +14,8 @@ struct SM64PendulumTracePairTool {
         0x0000_0000_4523_3000,
         0x0000_0000_45df_2000,
     ]
+    private static let semanticBehaviorIdentity: UInt64 = 0x0062_6876_5f64_7065
+    private static let authoredTickWindow = 64
 
     private enum PairError: Error, CustomStringConvertible {
         case usage
@@ -171,6 +173,32 @@ struct SM64PendulumTracePairTool {
             throw PairError.invalid("native trace has no script native-behavior record for pendulum slot \(slot)")
         }
 
+        // The native lifecycle performs three warm-up ticks before the
+        // authored area-2 object owns the pool slot, and one trailing redraw
+        // remains after the 64-tick source window.  Establish the route
+        // boundary from the source semantic behavior record itself rather
+        // than comparing those unrelated slot occupants.  This is a
+        // source-authored lifecycle fence, not a post-hoc value rewrite.
+        let nativeBehaviorRecords = c.records.filter {
+            $0.domain == 3
+                && $0.recordKind == 1
+                && $0.subjectID == slot
+                && $0.recordID == 400
+                && $0.values.first == semanticBehaviorIdentity
+        }
+        let semanticTicks = nativeBehaviorRecords.map(\.simulationTick).sorted()
+        guard let authoredStart = semanticTicks.first else {
+            throw PairError.invalid("native pendulum slot never published the source semantic behavior identity")
+        }
+        let authoredEnd = authoredStart + UInt64(authoredTickWindow - 1)
+        let authoredTickSet = Set(semanticTicks)
+        guard semanticTicks.count >= authoredTickWindow,
+              (authoredStart...authoredEnd).allSatisfy({ authoredTickSet.contains($0) }) else {
+            throw PairError.invalid(
+                "native pendulum semantic behavior window is not the authored 64-tick interval"
+            )
+        }
+
         let sourceSubjects = Set(swift.records.filter {
             requiredDomains.contains($0.domain) && $0.domain != 7
         }.map(\.subjectID))
@@ -182,10 +210,17 @@ struct SM64PendulumTracePairTool {
             switch record.domain {
             case 3, 6:
                 return record.subjectID == slot
+                    && record.simulationTick >= authoredStart
+                    && record.simulationTick <= authoredEnd
             case 12:
-                return record.subjectID == slot && record.recordID == 1
+                return record.subjectID == slot
+                    && record.recordID == 1
+                    && record.simulationTick >= authoredStart
+                    && record.simulationTick <= authoredEnd
             case 7:
                 return record.recordID == 1
+                    && record.simulationTick >= authoredStart
+                    && record.simulationTick <= authoredEnd
                     && Array(record.values.prefix(3)) == pendulumPositionBits
             default:
                 return false

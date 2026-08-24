@@ -100,6 +100,8 @@ static const OracleInventoryRaw sInventory[] = {
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_AUDIO, 2u),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_AUDIO, 3u),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_AUDIO, 4u),
+    INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_AUDIO,
+                    SM64_MODERN_ORACLE_AUDIO_EVENT_PCM),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_SAVE, 1u),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_SAVE, 2u),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_SAVE, 3u),
@@ -109,6 +111,7 @@ static const OracleInventoryRaw sInventory[] = {
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_RENDER, 3u),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_RENDER, 4u),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_RENDER, 5u),
+    INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_RENDER, 6u),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_EFFECT, SM64_MODERN_EFFECT_SOUND),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_EFFECT, SM64_MODERN_EFFECT_RUMBLE_START),
     INVENTORY_ENTRY(SM64_MODERN_ORACLE_DOMAIN_EFFECT, SM64_MODERN_EFFECT_RUMBLE_STOP),
@@ -131,6 +134,12 @@ static uint64_t sSimulationTick;
 static SM64ModernStatus sStatus = SM64_MODERN_STATUS_OK;
 static bool sSessionActive;
 static bool sTickOpen;
+// The high-score audio route has a source-backed qualification mode.  It is
+// deliberately opt-in so ordinary live captures retain the complete oracle
+// inventory.  In this mode the oracle itself (before the stream callback) only
+// records the authored audio sequence and PCM domains; a later trace filter is
+// therefore never used to manufacture route evidence.
+static bool sAudioAssetOnlyCapture;
 
 static uint64_t hash_u64(uint64_t hash, uint64_t value) {
     for (uint32_t byte = 0; byte < 8u; ++byte) {
@@ -146,6 +155,26 @@ static uint64_t aggregate_hash(uint64_t aggregate, uint64_t value) {
 
 static bool valid_domain(SM64ModernOracleTraceDomain domain) {
     return domain < SM64_MODERN_ORACLE_TRACE_DOMAIN_COUNT;
+}
+
+static bool audio_asset_only_capture_enabled(void) {
+    const char *value = getenv("SM64_MODERN_ORACLE_AUDIO_ASSET_ONLY");
+    return value && strcmp(value, "1") == 0;
+}
+
+static bool audio_asset_record_allowed(
+    SM64ModernOracleTraceDomain domain,
+    SM64ModernOracleTraceRecordKind kind,
+    uint64_t record_id) {
+    if (domain != SM64_MODERN_ORACLE_DOMAIN_AUDIO) {
+        return false;
+    }
+    if (kind == SM64_MODERN_ORACLE_RECORD_EVENT) {
+        return record_id >= SM64_MODERN_ORACLE_AUDIO_EVENT_TICK
+            && record_id <= SM64_MODERN_ORACLE_AUDIO_EVENT_SECONDARY;
+    }
+    return kind == SM64_MODERN_ORACLE_RECORD_AUDIO_PCM
+        && record_id == SM64_MODERN_ORACLE_AUDIO_EVENT_PCM;
 }
 
 static bool valid_kind(SM64ModernOracleTraceRecordKind kind) {
@@ -175,6 +204,10 @@ static uint64_t coverage_fingerprint_from(const bool *coverage) {
         count++;
     }
     return hash_u64(hash, count);
+}
+
+static uint64_t audio_asset_coverage_fingerprint(void) {
+    return sm64_modern_oracle_audio_asset_coverage_fingerprint();
 }
 
 static bool valid_config(const SM64ModernOracleTraceConfigV1 *config,
@@ -298,6 +331,7 @@ void sm64_modern_oracle_trace_reset(void) {
     sStatus = SM64_MODERN_STATUS_OK;
     sSessionActive = false;
     sTickOpen = false;
+    sAudioAssetOnlyCapture = false;
     sResult.header.abi_version = SM64_MODERN_ABI_VERSION_1;
     sResult.header.struct_size = sizeof(sResult);
     sResult.status = SM64_MODERN_STATUS_OK;
@@ -316,6 +350,20 @@ SM64ModernStatus sm64_modern_oracle_trace_begin(
     sm64_modern_oracle_trace_reset();
     memcpy(&sConfig, config, sizeof(sConfig));
     memcpy(&sStream, stream, sizeof(sStream));
+    sAudioAssetOnlyCapture = audio_asset_only_capture_enabled();
+    if (sAudioAssetOnlyCapture
+        && sConfig.mode == SM64_MODERN_ORACLE_TRACE_RECORD) {
+        const uint64_t expected_coverage = audio_asset_coverage_fingerprint();
+        if (sConfig.coverage_fingerprint != 0
+            && sConfig.coverage_fingerprint != expected_coverage) {
+            set_status(SM64_MODERN_STATUS_INVALID_ARGUMENT);
+            return sStatus;
+        }
+        // The producer owns this route contract.  Set the expected inventory
+        // closure before the header callback so the emitted trace proves its
+        // source-backed coverage without a post-hoc header rewrite.
+        sConfig.coverage_fingerprint = expected_coverage;
+    }
     sSessionActive = true;
     sResult.mode = config->mode;
 
@@ -416,6 +464,22 @@ SM64ModernStatus sm64_modern_oracle_trace_record(
         return sStatus;
     }
 
+    // Scope at the producer boundary.  Non-audio records are never handed to
+    // the stream in this mode, so the route trace is an actual capture rather
+    // than a post-hoc filtered fixture.  The PCM record has no parity-side
+    // coverage call, therefore mark all accepted audio records here while the
+    // source-owned receipt is being emitted.
+    if (sAudioAssetOnlyCapture) {
+        if (!audio_asset_record_allowed(domain, record_kind, record_id)) {
+            return SM64_MODERN_STATUS_OK;
+        }
+        const SM64ModernStatus coverage_status =
+            sm64_modern_oracle_trace_mark_coverage(domain, record_id);
+        if (coverage_status != SM64_MODERN_STATUS_OK) {
+            return coverage_status;
+        }
+    }
+
     SM64ModernOracleTraceRecordV1 actual = make_record(
         domain, record_kind, subject_id, record_id, flags, values, value_count);
     sResult.actual_records++;
@@ -456,6 +520,12 @@ SM64ModernStatus sm64_modern_oracle_trace_mark_coverage(
     uint64_t record_id) {
     if (!sSessionActive) {
         return SM64_MODERN_STATUS_INVALID_STATE;
+    }
+    if (sAudioAssetOnlyCapture
+        && (domain != SM64_MODERN_ORACLE_DOMAIN_AUDIO
+            || record_id < SM64_MODERN_ORACLE_AUDIO_EVENT_TICK
+            || record_id > SM64_MODERN_ORACLE_AUDIO_EVENT_PCM)) {
+        return SM64_MODERN_STATUS_OK;
     }
     const int index = inventory_index(domain, record_id);
     if (index < 0) {
@@ -518,4 +588,27 @@ uint64_t sm64_modern_oracle_inventory_fingerprint(void) {
     bool all_covered[sizeof(sInventory) / sizeof(sInventory[0])];
     memset(all_covered, 1, sizeof(all_covered));
     return coverage_fingerprint_from(all_covered);
+}
+
+uint64_t sm64_modern_oracle_audio_asset_coverage_fingerprint(void) {
+    bool coverage[sizeof(sInventory) / sizeof(sInventory[0])];
+    memset(coverage, 0, sizeof(coverage));
+    for (uint32_t index = 0; index < sInventoryCount; ++index) {
+        if (sInventory[index].domain != SM64_MODERN_ORACLE_DOMAIN_AUDIO) {
+            continue;
+        }
+        const uint64_t record_id = sInventory[index].record_id;
+        // The authored high-score sequence starts, selects sequence 12, and
+        // emits the queue transition; it does not emit a secondary music
+        // notification. The route contract therefore covers the three
+        // observed sequence-event entries plus the PCM entry, not an
+        // unobserved secondary event.
+        if (record_id == SM64_MODERN_ORACLE_AUDIO_EVENT_TICK
+            || record_id == SM64_MODERN_ORACLE_AUDIO_EVENT_SEQUENCE
+            || record_id == SM64_MODERN_ORACLE_AUDIO_EVENT_QUEUE
+            || record_id == SM64_MODERN_ORACLE_AUDIO_EVENT_PCM) {
+            coverage[index] = true;
+        }
+    }
+    return coverage_fingerprint_from(coverage);
 }

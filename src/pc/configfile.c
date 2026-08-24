@@ -50,7 +50,7 @@ ConfigWindow configWindow       = {
     .settings_changed = false,
 };
 unsigned int configFiltering    = 1;          // 0=force nearest, 1=linear, (TODO) 2=three-point
-unsigned int configMasterVolume = MAX_VOLUME; // 0 - MAX_VOLUME
+unsigned int configMasterVolume = (MAX_VOLUME + 1) / 2; // 0 - MAX_VOLUME; quieter default
 unsigned int configMusicVolume = MAX_VOLUME;
 unsigned int configSfxVolume = MAX_VOLUME;
 unsigned int configEnvVolume = MAX_VOLUME;
