@@ -21,7 +21,7 @@ terminal rows with 7,394 planned. Its write-once backup preserves the prior
 25 terminal / 7,395 planned report. Historical M33–M35 notes retain their
 original 7,419 baseline.
 
-### Phase 85f139 current evidence checkpoint
+### Phase 85f141 current evidence checkpoint
 
 Phase 85f130's read-only baseline confirmed that the new route/admission
 contracts are phase-local evidence; no serial merge or canonical mutation was
@@ -111,6 +111,22 @@ This guarded classification did not run M34 production. M35 contracts still
 pass, but Developer ID Application identity/private key and supported
 `notarytool` authentication remain absent.
 
+Phase 85f140's unchanged read-only host recheck now reports
+`m34_host_ready=1`: two displays are online and awake, the console is
+unlocked, Metal/`gpucapture`/`gpudebug` are present, and the thermal readback
+reports no warning. GPU enumeration found the local device, but no capturable
+process or active `gpudebug` session existed because no target was built or
+launched. M34 production remains unrun and still requires the exact
+receipt-seam approval pair above; that pair is source-attributed preflight
+classification only and does not grant runtime, device, GPU, performance,
+thermal, physical, or human acceptance.
+
+M35 stable-Xcode readiness contracts still pass, but the local keychain has
+only Apple Development and Apple Distribution identities; no Developer ID
+Application identity/private key and no supported `notarytool` authentication
+are present. No archive, export, DMG/ZIP distribution artifact, notarization,
+stapling, clean-machine, or human evidence exists.
+
 The designated local canonical report remains 7,420 rows with 26 terminal
 `passed` and 7,394 `planned` (`26/7420 = 0.350404313%`) at SHA-256
 `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`; the
@@ -133,8 +149,10 @@ Ordered handoffs: [Phase 85f130 route/tool baseline](porting-handoff-full-swift-
 [Phase 85f135 documentation refresh](porting-handoff-full-swift-twin-phase85f135-docs-positive-admissions.md),
 [Phase 85f136 merge-tool drift fix](porting-handoff-full-swift-twin-phase85f136-merge-tool-drift-fix.md), and
 [Phase 85f137 documentation refresh](porting-handoff-full-swift-twin-phase85f137-docs-merge-tool-fix.md),
-[Phase 85f138 timebase-gate design](porting-handoff-full-swift-twin-phase85f138-timebase-gate-design.md), and
-[Phase 85f139 documentation refresh](porting-handoff-full-swift-twin-phase85f139-docs-timebase-gate.md).
+[Phase 85f138 timebase-gate design](porting-handoff-full-swift-twin-phase85f138-timebase-gate-design.md),
+[Phase 85f139 documentation refresh](porting-handoff-full-swift-twin-phase85f139-docs-timebase-gate.md),
+[Phase 85f140 M34/M35 state recheck](porting-handoff-full-swift-twin-phase85f140-m34-m35-state-recheck.md), and
+[Phase 85f141 documentation refresh](porting-handoff-full-swift-twin-phase85f141-docs-m34-ready-m35-blocked.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 

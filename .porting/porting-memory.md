@@ -2,7 +2,7 @@
 
 ## Latest validated slices (2026-08-24)
 
-- **Phase 85f139 timebase-gate documentation (2026-08-24):** carries
+- **Phase 85f141 documentation / M34-ready M35-blocked (2026-08-24):** carries
   forward the three source-backed isolated f131 admissions without changing
   canonical state. Effects `0x3951f0333dc3c5da` has 58 records,
   interaction-state `0x3e1cdaca08b21f54` has 14, and wooden-door display-list
@@ -35,6 +35,13 @@
   behavior manifest SHA
   `83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`,
   95.693% mapping, and 0% M34/M35/human/implementation/full-goal floors.
+  f140's unchanged host recheck now reports `m34_host_ready=1`: two displays
+  are online and awake, thermal readback reports no warning, and
+  Metal/`gpucapture`/`gpudebug` are present; no capturable process or active
+  session existed. M34 production still requires the exact receipt-seam
+  approval pair above. M35 has Apple Development and Apple Distribution
+  identities, but no Developer ID Application identity/private key or
+  supported notary authentication; no distribution artifacts exist.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f130-route-tool-baseline.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f131-candidate-route-contracts.md`,
@@ -46,7 +53,9 @@
   `.porting/porting-handoff-full-swift-twin-phase85f136-merge-tool-drift-fix.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f137-docs-merge-tool-fix.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f138-timebase-gate-design.md`,
-  and `.porting/porting-handoff-full-swift-twin-phase85f139-docs-timebase-gate.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f139-docs-timebase-gate.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f140-m34-m35-state-recheck.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f141-docs-m34-ready-m35-blocked.md`.
 
 - **Phase 85f129 canonical/M34/M35 audit documentation (2026-08-23):** records
   13 planned candidates across 11 route families with zero newly admissible
