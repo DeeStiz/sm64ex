@@ -4,8 +4,21 @@ set -euo pipefail
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 EXPECTED="$PROJECT_ROOT/tests/fixtures/sm64_modern_timebase_audit.tsv"
 CADENCE_MANIFEST="$PROJECT_ROOT/tests/fixtures/sm64_modern_timebase_cadence.tsv"
+RECEIPT_DRIFT_CONTRACT="$PROJECT_ROOT/tests/fixtures/sm64_modern_timebase_receipt_drift.tsv"
+RECEIPT_DRIFT_BASELINE_COMMIT="6f586de9ba16024ff0463b6f24869a896a4eeb62"
+TIMEBASE_AUDIT_MODE="${SM64_MODERN_TIMEBASE_AUDIT_MODE:-strict}"
+RECEIPT_DRIFT_APPROVAL="${SM64_MODERN_TIMEBASE_RECEIPT_SEAM_DRIFT_APPROVED:-}"
+RECEIPT_DRIFT_APPROVAL_TOKEN='M34_TIMEBASE_RECEIPT_SEAM_V1'
+CALLABLE_RANDOM_PATTERN='\brandom_(u16|float|sign|fixed_seed)\s*\('
 ACTUAL="$(mktemp "${TMPDIR:-/tmp}/sm64-modern-timebase-audit.XXXXXX")"
-trap '/bin/rm -f -- "$ACTUAL"' EXIT
+RECEIPT_EXPECTED_DELTAS=""
+RECEIPT_ACTUAL_DELTAS=""
+trap '/bin/rm -f -- "$ACTUAL" "$RECEIPT_EXPECTED_DELTAS" "$RECEIPT_ACTUAL_DELTAS"' EXIT
+
+audit_fail() {
+  echo "Timebase audit: $*" >&2
+  exit 1
+}
 
 count_category() {
   local category="$1"
@@ -18,6 +31,57 @@ count_category() {
   files="$(printf '%s\n' "$counts" | awk 'NF { files++ } END { print files + 0 }')"
   matches="$(printf '%s\n' "$counts" | awk -F: 'NF { total += $NF } END { print total + 0 }')"
   printf '%s\t%s\t%s\n' "$category" "$files" "$matches" >> "$ACTUAL"
+}
+
+count_current_file() {
+  local pattern="$1"
+  local source="$2"
+  local count
+  count="$(rg -o --count-matches "$pattern" "$PROJECT_ROOT/$source" 2>/dev/null \
+    | awk -F: '{ total += $NF } END { print total + 0 }' || true)"
+  printf '%s\n' "${count:-0}"
+}
+
+count_baseline_file() {
+  local pattern="$1"
+  local source="$2"
+  local count
+  count="$(git show "$RECEIPT_DRIFT_BASELINE_COMMIT:$source" \
+    | rg -o -- "$pattern" \
+    | wc -l | tr -d ' ' || true)"
+  printf '%s\n' "${count:-0}"
+}
+
+source_inventory_paths() {
+  {
+    git ls-tree -r --name-only "$RECEIPT_DRIFT_BASELINE_COMMIT" -- src/game src/engine || true
+    (cd "$PROJECT_ROOT" && rg --files src/game src/engine || true)
+  } | rg '\.c$' | sort -u || true
+}
+
+count_tree_category() {
+  local pattern="$1"
+  local tree="$2"
+  local source
+  local count
+  local files=0
+  local matches=0
+  local paths
+  paths="$(source_inventory_paths)"
+  while IFS= read -r source; do
+    [[ -n "$source" ]] || continue
+    if [[ "$tree" == baseline ]]; then
+      count="$(count_baseline_file "$pattern" "$source")"
+    else
+      [[ -f "$PROJECT_ROOT/$source" ]] || continue
+      count="$(count_current_file "$pattern" "$source")"
+    fi
+    if (( count > 0 )); then
+      files=$((files + 1))
+      matches=$((matches + count))
+    fi
+  done <<< "$paths"
+  printf '%s\t%s\n' "$files" "$matches"
 }
 
 printf 'category\tfiles\tmatches\n' > "$ACTUAL"
@@ -312,15 +376,202 @@ validate_cadence_manifest() {
   done
 }
 
+validate_receipt_drift_contract() {
+  local expected_header=$'category\tsource\tbaseline_matches\tcurrent_matches\tdelta\trequired_tokens\treceipt_commit\treceipt_subject'
+  local header
+  local line_number=1
+  local category
+  local source
+  local baseline_matches
+  local current_matches
+  local delta
+  local required_tokens
+  local receipt_commit
+  local receipt_subject
+  local extra
+  local pattern
+  local actual_baseline
+  local actual_current
+  local commit_subject
+  local token
+  local token_list
+  local rows=0
+  local paths
+  local category_name
+  local fixture_files
+  local fixture_matches
+  local delta_sum
+  local actual_files
+  local actual_matches
+  local expected_matches
+  local callable_baseline
+  local callable_current
+
+  [[ -f "$RECEIPT_DRIFT_CONTRACT" ]] \
+    || audit_fail "missing receipt-seam drift contract: $RECEIPT_DRIFT_CONTRACT"
+  header="$(head -n 1 "$RECEIPT_DRIFT_CONTRACT")"
+  [[ "$header" == "$expected_header" ]] \
+    || audit_fail "receipt-seam drift contract schema mismatch"
+  git cat-file -e "$RECEIPT_DRIFT_BASELINE_COMMIT^{commit}" 2>/dev/null \
+    || audit_fail "receipt-seam drift baseline commit is unavailable: $RECEIPT_DRIFT_BASELINE_COMMIT"
+  git merge-base --is-ancestor "$RECEIPT_DRIFT_BASELINE_COMMIT" HEAD \
+    || audit_fail "receipt-seam drift baseline is not an ancestor of HEAD"
+
+  RECEIPT_EXPECTED_DELTAS="$(mktemp "${TMPDIR:-/tmp}/sm64-modern-timebase-receipt-expected.XXXXXX")"
+  RECEIPT_ACTUAL_DELTAS="$(mktemp "${TMPDIR:-/tmp}/sm64-modern-timebase-receipt-actual.XXXXXX")"
+
+  while IFS=$'\t' read -r category source baseline_matches current_matches delta \
+    required_tokens receipt_commit receipt_subject extra; do
+    line_number=$((line_number + 1))
+    [[ -n "$category$source$baseline_matches$current_matches$delta$required_tokens$receipt_commit$receipt_subject" ]] \
+      || audit_fail "receipt-seam drift contract line $line_number is blank"
+    [[ -z "$extra" ]] \
+      || audit_fail "receipt-seam drift contract line $line_number has more than 8 columns"
+    case "$category" in
+      object_timer)
+        pattern='\boTimer\b'
+        ;;
+      random_calls)
+        pattern='\brandom_(u16|float|sign|fixed_seed)\b'
+        ;;
+      *)
+        audit_fail "receipt-seam drift contract line $line_number has unsupported category: $category"
+        ;;
+    esac
+    [[ "$source" == src/*.c && "$source" != */../* && "$source" != ../* ]] \
+      || audit_fail "receipt-seam drift contract line $line_number has an unsafe source: $source"
+    [[ -f "$PROJECT_ROOT/$source" ]] \
+      || audit_fail "receipt-seam drift contract line $line_number references missing source: $source"
+    git cat-file -e "$RECEIPT_DRIFT_BASELINE_COMMIT:$source" 2>/dev/null \
+      || audit_fail "receipt-seam drift contract line $line_number source is absent at baseline: $source"
+    awk -F '\t' -v category="$category" -v source="$source" \
+      'NR > 1 && $1 == category && $2 == source { found = 1 } END { exit !found }' \
+      "$RECEIPT_EXPECTED_DELTAS" \
+      && audit_fail "receipt-seam drift contract duplicates $category/$source" || true
+
+    [[ "$baseline_matches" =~ ^[0-9]+$ && "$current_matches" =~ ^[0-9]+$ \
+       && "$delta" =~ ^-?[0-9]+$ ]] \
+      || audit_fail "receipt-seam drift contract line $line_number has non-numeric counts"
+    actual_baseline="$(count_baseline_file "$pattern" "$source")"
+    actual_current="$(count_current_file "$pattern" "$source")"
+    [[ "$actual_baseline" == "$baseline_matches" ]] \
+      || audit_fail "receipt-seam drift baseline mismatch for $source: expected $baseline_matches, found $actual_baseline"
+    [[ "$actual_current" == "$current_matches" ]] \
+      || audit_fail "receipt-seam drift current mismatch for $source: expected $current_matches, found $actual_current"
+    [[ "$delta" -eq $((current_matches - baseline_matches)) ]] \
+      || audit_fail "receipt-seam drift delta mismatch for $source"
+
+    git cat-file -e "$receipt_commit^{commit}" 2>/dev/null \
+      || audit_fail "receipt-seam drift receipt commit is unavailable: $receipt_commit"
+    git merge-base --is-ancestor "$receipt_commit" HEAD \
+      || audit_fail "receipt-seam drift receipt commit is not an ancestor: $receipt_commit"
+    commit_subject="$(git show -s --format=%s "$receipt_commit")"
+    [[ "$commit_subject" == "$receipt_subject" ]] \
+      || audit_fail "receipt-seam drift receipt subject mismatch for $source"
+    if ! git diff-tree --no-commit-id --name-only -r "$receipt_commit" \
+      | rg -Fxq -- "$source"; then
+      audit_fail "receipt-seam drift receipt commit does not touch $source: $receipt_commit"
+    fi
+    IFS=';' read -r -a token_list <<< "$required_tokens"
+    for token in "${token_list[@]}"; do
+      [[ -n "$token" ]] || audit_fail "receipt-seam drift contract line $line_number has an empty required token"
+      rg -Fq -- "$token" "$PROJECT_ROOT/$source" \
+        || audit_fail "receipt-seam drift source token is missing for $source: $token"
+    done
+    printf '%s\t%s\t%s\t%s\t%s\n' \
+      "$category" "$source" "$baseline_matches" "$current_matches" "$delta" \
+      >> "$RECEIPT_EXPECTED_DELTAS"
+    rows=$((rows + 1))
+  done < <(tail -n +2 "$RECEIPT_DRIFT_CONTRACT")
+
+  [[ "$rows" -eq 8 ]] \
+    || audit_fail "receipt-seam drift contract must contain exactly 8 rows, found $rows"
+  for category_name in object_timer random_calls; do
+    awk -F '\t' -v category="$category_name" \
+      'NR > 1 && $1 == category { found = 1 } END { exit !found }' \
+      "$RECEIPT_DRIFT_CONTRACT" \
+      || audit_fail "receipt-seam drift contract is missing category: $category_name"
+  done
+
+  paths="$(source_inventory_paths)"
+  while IFS= read -r source; do
+    [[ -n "$source" ]] || continue
+    for category_name in object_timer random_calls; do
+      if [[ "$category_name" == object_timer ]]; then
+        pattern='\boTimer\b'
+      else
+        pattern='\brandom_(u16|float|sign|fixed_seed)\b'
+      fi
+      actual_baseline="$(count_baseline_file "$pattern" "$source")"
+      actual_current=0
+      if [[ -f "$PROJECT_ROOT/$source" ]]; then
+        actual_current="$(count_current_file "$pattern" "$source")"
+      fi
+      if [[ "$actual_baseline" -ne "$actual_current" ]]; then
+        printf '%s\t%s\t%s\t%s\t%s\n' \
+          "$category_name" "$source" "$actual_baseline" "$actual_current" \
+          "$((actual_current - actual_baseline))" >> "$RECEIPT_ACTUAL_DELTAS"
+      fi
+    done
+  done <<< "$paths"
+  if ! diff -u <(sort "$RECEIPT_EXPECTED_DELTAS") <(sort "$RECEIPT_ACTUAL_DELTAS"); then
+    audit_fail "receipt-seam drift per-file attribution changed; refresh the contract only after review"
+  fi
+
+  for category_name in object_timer random_calls; do
+    fixture_files="$(awk -F '\t' -v category="$category_name" \
+      'NR > 1 && $1 == category { print $2 }' "$EXPECTED")"
+    fixture_matches="$(awk -F '\t' -v category="$category_name" \
+      'NR > 1 && $1 == category { print $3 }' "$EXPECTED")"
+    delta_sum="$(awk -F '\t' -v category="$category_name" \
+      '$1 == category { total += $5 } END { print total + 0 }' "$RECEIPT_EXPECTED_DELTAS")"
+    actual_files="$(awk -F '\t' -v category="$category_name" \
+      'NR > 1 && $1 == category { print $2 }' "$ACTUAL")"
+    actual_matches="$(awk -F '\t' -v category="$category_name" \
+      'NR > 1 && $1 == category { print $3 }' "$ACTUAL")"
+    expected_matches=$((fixture_matches + delta_sum))
+    [[ "$actual_files" == "$fixture_files" ]] \
+      || audit_fail "receipt-seam drift changed file cardinality for $category_name: fixture $fixture_files, current $actual_files"
+    [[ "$actual_matches" == "$expected_matches" ]] \
+      || audit_fail "receipt-seam drift aggregate mismatch for $category_name: expected $expected_matches, found $actual_matches"
+  done
+
+  callable_baseline="$(count_tree_category "$CALLABLE_RANDOM_PATTERN" baseline)"
+  callable_current="$(count_tree_category "$CALLABLE_RANDOM_PATTERN" current)"
+  [[ "$callable_baseline" == $'79\t289' && "$callable_current" == $'79\t289' ]] \
+    || audit_fail "receipt-seam drift callable RNG inventory changed: baseline=$callable_baseline current=$callable_current"
+
+  printf 'timebase_receipt_drift_contract=pass rows=%s baseline=%s callable_rng=79/289\n' \
+    "$rows" "$RECEIPT_DRIFT_BASELINE_COMMIT"
+}
+
 if rg -q 'Timer\(timeInterval:' "$PROJECT_ROOT/SM64Modern/EngineHost.swift"; then
   echo "EngineHost regressed to a coalescing Foundation Timer" >&2
   exit 1
 fi
 rg -q 'RationalFixedStepScheduler' "$PROJECT_ROOT/SM64Modern/EngineHost.swift"
 
-if ! diff -u "$EXPECTED" "$ACTUAL"; then
-  echo "Time-dependent gameplay inventory changed; classify the drift before updating the fixture." >&2
-  exit 1
-fi
+case "$TIMEBASE_AUDIT_MODE" in
+  strict)
+    [[ -z "$RECEIPT_DRIFT_APPROVAL" ]] \
+      || audit_fail "receipt-seam approval requires SM64_MODERN_TIMEBASE_AUDIT_MODE=receipt-seam-drift"
+    if ! diff -u "$EXPECTED" "$ACTUAL"; then
+      echo "Time-dependent gameplay inventory changed; classify the drift before updating the fixture." >&2
+      exit 1
+    fi
+    ;;
+  receipt-seam-drift)
+    [[ "$RECEIPT_DRIFT_APPROVAL" == "$RECEIPT_DRIFT_APPROVAL_TOKEN" ]] \
+      || audit_fail "receipt-seam mode requires SM64_MODERN_TIMEBASE_RECEIPT_SEAM_DRIFT_APPROVED=$RECEIPT_DRIFT_APPROVAL_TOKEN"
+    validate_receipt_drift_contract
+    ;;
+  *)
+    audit_fail "unsupported SM64_MODERN_TIMEBASE_AUDIT_MODE: $TIMEBASE_AUDIT_MODE"
+    ;;
+esac
 validate_cadence_manifest
-echo "SM64 Modern timebase audit passed"
+if [[ "$TIMEBASE_AUDIT_MODE" == strict ]]; then
+  echo "SM64 Modern timebase audit passed"
+else
+  echo "SM64 Modern timebase audit passed mode=$TIMEBASE_AUDIT_MODE"
+fi

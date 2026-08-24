@@ -17,6 +17,9 @@ PROFILE_TICKS="${SM64_MODERN_M34_PROFILE_TICKS:-600}"
 WARMUP_TICKS="${SM64_MODERN_M34_PROFILE_WARMUP_TICKS:-60}"
 PROFILE_TIMEOUT="${SM64_MODERN_M34_PROFILE_TIMEOUT_SECONDS:-120}"
 SAVE_DIR="$OUTPUT_DIR/save"
+TIMEBASE_AUDIT_MODE="${SM64_MODERN_TIMEBASE_AUDIT_MODE:-strict}"
+TIMEBASE_DRIFT_APPROVAL="${SM64_MODERN_TIMEBASE_RECEIPT_SEAM_DRIFT_APPROVED:-}"
+TIMEBASE_DRIFT_APPROVAL_TOKEN='M34_TIMEBASE_RECEIPT_SEAM_V1'
 M9_ENV=(
   "SM64_MODERN_M9_OUTPUT_DIR=$OUTPUT_DIR"
   "SM64_MODERN_M9_DERIVED_DATA=$DERIVED_DATA"
@@ -36,6 +39,18 @@ if [[ -e "$TRACE_PATH" ]]; then
 fi
 
 printf 'M34 output: %s\n' "$OUTPUT_DIR"
+
+# The retained timebase fixture intentionally remains stale while the
+# receipt-seam classification is reviewed. M34 may consume that classification
+# only when both the explicit mode and the exact approval token are supplied;
+# the default production invocation remains fail-closed in m9_release.sh.
+if [[ -n "$TIMEBASE_DRIFT_APPROVAL" || "$TIMEBASE_AUDIT_MODE" == receipt-seam-drift ]]; then
+  [[ "$TIMEBASE_AUDIT_MODE" == receipt-seam-drift \
+     && "$TIMEBASE_DRIFT_APPROVAL" == "$TIMEBASE_DRIFT_APPROVAL_TOKEN" ]] \
+    || die "timebase receipt-seam production gate requires SM64_MODERN_TIMEBASE_AUDIT_MODE=receipt-seam-drift and SM64_MODERN_TIMEBASE_RECEIPT_SEAM_DRIFT_APPROVED=$TIMEBASE_DRIFT_APPROVAL_TOKEN"
+  printf 'M34 timebase gate: mode=%s approval=%s (source attribution validated by audit)\n' \
+    "$TIMEBASE_AUDIT_MODE" "$TIMEBASE_DRIFT_APPROVAL_TOKEN"
+fi
 
 env "${M9_ENV[@]}" "$PROJECT_ROOT/script/m9_release.sh" build \
   > "$OUTPUT_DIR/release-build.log" 2>&1

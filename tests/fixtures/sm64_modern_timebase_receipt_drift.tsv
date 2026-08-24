@@ -1,0 +1,9 @@
+category	source	baseline_matches	current_matches	delta	required_tokens	receipt_commit	receipt_subject
+object_timer	src/game/behaviors/express_elevator.inc.c	2	3	1	const u32 timer	380f14ae62300881b3c3f34ab5b0f97e78c1bc9c	feat: add WDW elevator receipt seam
+object_timer	src/game/behaviors/ttc_2d_rotator.inc.c	2	4	2	timerBefore;.timer_after	7651f380c7b6d1c68e35e7f70c13dbdcfc06a417	feat: add TTC rotator receipt seam
+object_timer	src/game/behaviors/spindrift.inc.c	1	3	2	timerBefore;.timer_after	eb3fbf8a5f68a8141896663b95bde22afee3cbbd	feat: add Spindrift receipt seam
+object_timer	src/game/behaviors/spindel.inc.c	6	8	2	timerBefore;.timer_after	91e53c7fde4c94a944396bbb819ee1bc8293290a	feat: add Spindel receipt seam
+object_timer	src/game/behaviors/sl_snowman_wind.inc.c	1	3	2	timerBefore;.timer_after	8e2ab88b770acee6ba9ca0135c008ef0db37a0c2	feat: add Snowman wind receipt seam
+object_timer	src/game/behaviors/treasure_chest.inc.c	3	11	8	timerBefore;.timer_after	904bffa395707ae2762a837655f6c4f8236cfcea	feat: add JRB treasure receipt seam
+object_timer	src/game/behaviors/whomp.inc.c	8	10	2	timerBefore;.timer_after	66ca19118321494c4e1b56ee428c81609939a9c4	feat: add Whomp King receipt seam
+random_calls	src/game/behaviors/ttc_2d_rotator.inc.c	1	2	1	.random_u16	7651f380c7b6d1c68e35e7f70c13dbdcfc06a417	feat: add TTC rotator receipt seam
