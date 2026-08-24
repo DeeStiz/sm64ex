@@ -2,10 +2,10 @@
 
 ## Latest validated slices (2026-08-24)
 
-- **Phase 85f137 merge-tool-fix documentation (2026-08-24):** carries forward
-  the three source-backed isolated f131 admissions without changing canonical
-  state. Effects `0x3951f0333dc3c5da` has 58 records, interaction-state
-  `0x3e1cdaca08b21f54` has 14, and wooden-door display-list
+- **Phase 85f139 timebase-gate documentation (2026-08-24):** carries
+  forward the three source-backed isolated f131 admissions without changing
+  canonical state. Effects `0x3951f0333dc3c5da` has 58 records,
+  interaction-state `0x3e1cdaca08b21f54` has 14, and wooden-door display-list
   `0x00cab93b5dd94425` has 2; each passed independent C Debug/Swift/ASan/
   optimized Release/fresh-rerun equality and its negative fences. Their
   identities remain unchanged `planned` rows in the designated 26/7,394
@@ -23,7 +23,13 @@
   terminal-rerun fences pass; the designated 26/7,394 report remains
   untouched at SHA
   `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`.
-  M35 contracts pass, but Developer ID identity/private key and supported
+  f138's default strict timebase audit still fails closed on the intentional
+  drift. Only the exact pair
+  `SM64_MODERN_TIMEBASE_AUDIT_MODE=receipt-seam-drift` plus
+  `SM64_MODERN_TIMEBASE_RECEIPT_SEAM_DRIFT_APPROVED=M34_TIMEBASE_RECEIPT_SEAM_V1`
+  passes eight-row source attribution; the retained audit fixture and
+  canonical artifacts remain unchanged. M34 production was not run. M35
+  contracts pass, but Developer ID identity/private key and supported
   `notarytool` authentication remain absent. Preserve route manifest SHA
   `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
   behavior manifest SHA
@@ -38,7 +44,9 @@
   `.porting/porting-handoff-full-swift-twin-phase85f134-canonical-merge-dryrun.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f135-docs-positive-admissions.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f136-merge-tool-drift-fix.md`,
-  and `.porting/porting-handoff-full-swift-twin-phase85f137-docs-merge-tool-fix.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f137-docs-merge-tool-fix.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f138-timebase-gate-design.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f139-docs-timebase-gate.md`.
 
 - **Phase 85f129 canonical/M34/M35 audit documentation (2026-08-23):** records
   13 planned candidates across 11 route families with zero newly admissible

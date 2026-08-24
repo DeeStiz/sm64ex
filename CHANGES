@@ -1,4 +1,27 @@
 SM64 Modern native macOS — nightly continuation update (2026-08-24)
+262.) Reconcile Phase 85f139 documentation after the Phase 85f138 guarded
+      timebase receipt-seam gate. Keep the default strict timebase audit
+      failing closed on `object_timer` 166/715 -> 166/734 and broad-token
+      `random_calls` 79/289 -> 79/290 (callable RNG remains 79/289). Record
+      that only the exact pair
+      `SM64_MODERN_TIMEBASE_AUDIT_MODE=receipt-seam-drift` plus
+      `SM64_MODERN_TIMEBASE_RECEIPT_SEAM_DRIFT_APPROVED=M34_TIMEBASE_RECEIPT_SEAM_V1`
+      passes eight-row source attribution; missing, generic, and unknown
+      approvals fail closed. Keep the retained timebase fixture and canonical
+      report, backup, route manifest, and behavior manifest unchanged. M34
+      production was not run. M35 contracts pass, but Developer ID identity/
+      private key and supported `notarytool` authentication remain absent.
+      Preserve the three f131 positive admissions, report/backup hashes
+      `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4` and
+      `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
+      route/behavior manifest hashes
+      `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715` and
+      `83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`,
+      95.693% mapping, and 0% M34/M35/human-acceptance/implementation/
+      full-goal floors. Link ordered f136 merge-tool, f137 docs, f138 gate,
+      and f139 docs handoffs. No source, report, route ledger, manifest,
+      release, publication, credential, or acceptance state changed.
+
 261.) Reconcile Phase 85f137 documentation after the corrected immutable
       Phase 85f136 merge harness. Record the bounded 25-target isolated output
       (`manifest_rows=7420 qualified_rows=25 planned=7395 terminal=25`) matching
