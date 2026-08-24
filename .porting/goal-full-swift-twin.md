@@ -2,7 +2,7 @@
 
 ## Status
 
-### Phase 85f135 current status
+### Phase 85f137 current status
 
 Phase 85f130's read-only baseline confirmed that the new route/admission
 contracts are phase-local evidence; no serial merge or canonical mutation was
@@ -59,6 +59,19 @@ direct readiness gate remains blocked by absent Developer ID Application
 identity/private key and supported `notarytool` authentication. No archive,
 notarization, stapling, clean-machine, or human evidence exists.
 
+Phase 85f136 corrected the immutable merge harness and stale shell/tool drift.
+The default `script/test_canonical_route_ledger_merge.sh` now dispatches to a
+bounded 25-target run whose isolated output is
+`manifest_rows=7420 qualified_rows=25 planned=7395 terminal=25` and matches the
+write-once backup SHA-256
+`aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
+Duplicate-target, missing-target, output-collision, stale-report, and
+terminal-rerun rejection fences all pass. The designated 26/7,394 report
+remains untouched at SHA-256
+`4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`; no
+canonical publication or report, ledger, manifest, or history mutation
+occurred.
+
 The designated local canonical report remains 7,420 rows with 26 terminal
 `passed` and 7,394 `planned` (`26/7420 = 0.350404313%`) at SHA-256
 `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`; the
@@ -77,8 +90,10 @@ Ordered handoffs: [Phase 85f130 route/tool baseline](porting-handoff-full-swift-
 [Phase 85f132 baseline/M34/M35 recheck](porting-handoff-full-swift-twin-phase85f132-new-baseline-gates.md),
 [Phase 85f133 M34 production attempt](porting-handoff-full-swift-twin-phase85f133-m34-production-run.md),
 [Phase 85f134 timebase drift analysis](porting-handoff-full-swift-twin-phase85f134-m34-timebase-drift-analysis.md),
-[Phase 85f134 canonical merge dry-run](porting-handoff-full-swift-twin-phase85f134-canonical-merge-dryrun.md), and
-[Phase 85f135 documentation refresh](porting-handoff-full-swift-twin-phase85f135-docs-positive-admissions.md).
+[Phase 85f134 canonical merge dry-run](porting-handoff-full-swift-twin-phase85f134-canonical-merge-dryrun.md),
+[Phase 85f135 documentation refresh](porting-handoff-full-swift-twin-phase85f135-docs-positive-admissions.md),
+[Phase 85f136 merge-tool drift fix](porting-handoff-full-swift-twin-phase85f136-merge-tool-drift-fix.md), and
+[Phase 85f137 documentation refresh](porting-handoff-full-swift-twin-phase85f137-docs-merge-tool-fix.md).
 No source, report, route ledger, manifest, release, store, credential,
 publication, or acceptance state changed.
 

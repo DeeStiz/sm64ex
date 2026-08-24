@@ -2,29 +2,32 @@
 
 ## Latest validated slices (2026-08-24)
 
-- **Phase 85f135 positive-admissions documentation (2026-08-24):** records
+- **Phase 85f137 merge-tool-fix documentation (2026-08-24):** carries forward
   the three source-backed isolated f131 admissions without changing canonical
   state. Effects `0x3951f0333dc3c5da` has 58 records, interaction-state
   `0x3e1cdaca08b21f54` has 14, and wooden-door display-list
-  `0x00cab93b5dd94425` has 2. Each passed independent C Debug/Swift/ASan/
-  optimized Release/fresh-rerun byte equality and its negative fences; exact
-  trace/sidecar hashes and fence results are retained in the f131 handoff.
-  The three identities remain unchanged `planned` rows in the designated
-  26/7,394 report; isolated reports are not canonical mutations. f132 makes
-  the M34 host ready (`m34_host_ready=1`, two online displays, unlocked
-  console, Metal/gpucapture/gpudebug), but f133 production stops before
-  Release at the intentional timebase inventory drift (`object_timer`
-  166/715 -> 166/734; broad-token `random_calls` 79/289 -> 79/290; callable
-  RNG remains 79/289), and f134 leaves the retained fixture unchanged. The
-  f134 merge dry-run records stale shell 23 targets versus tool 25 versus
-  designated report 26; its isolated 25/7,395 result matches the write-once
-  backup, not the designated report. M35 contracts pass, but Developer ID
-  identity/private key and supported `notarytool` authentication remain
-  absent. Preserve designated SHA
-  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`, backup
-  SHA `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`,
-  route manifest SHA `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
-  behavior manifest SHA `83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`,
+  `0x00cab93b5dd94425` has 2; each passed independent C Debug/Swift/ASan/
+  optimized Release/fresh-rerun equality and its negative fences. Their
+  identities remain unchanged `planned` rows in the designated 26/7,394
+  report. f132 made the M34 host ready (`m34_host_ready=1`, two online
+  displays, unlocked console, Metal/gpucapture/gpudebug), but f133 production
+  remains blocked before Release by intentional source-owned timebase drift
+  (`object_timer` 166/715 -> 166/734; broad-token `random_calls` 79/289 ->
+  79/290; callable RNG remains 79/289). f134 found stale shell/tool/report
+  counts (23/25/26); f136 fixes that drift with the immutable bounded
+  25-target harness. Its isolated output is
+  `manifest_rows=7420 qualified_rows=25 planned=7395 terminal=25` and matches
+  the write-once backup SHA
+  `aa8eadcb63a555ed3cca7bf2d8c592f2798270633dce4c2d16d0acc79bf87c3d`.
+  Duplicate-target, missing-target, output-collision, stale-report, and
+  terminal-rerun fences pass; the designated 26/7,394 report remains
+  untouched at SHA
+  `4982e0157b94cc1ca940983f9121d89b216c0375d413cccdf30257af7a37adc4`.
+  M35 contracts pass, but Developer ID identity/private key and supported
+  `notarytool` authentication remain absent. Preserve route manifest SHA
+  `23c9d3f1aff0a8980c0a7e5104867e123681cc681ebe7e10929284e9cac2b715`,
+  behavior manifest SHA
+  `83ed2a4dd580e462fa33f88f3fe126ae726f4a1f4139114f0de5d7d695355ccb`,
   95.693% mapping, and 0% M34/M35/human/implementation/full-goal floors.
   Ordered handoffs:
   `.porting/porting-handoff-full-swift-twin-phase85f130-route-tool-baseline.md`,
@@ -33,7 +36,9 @@
   `.porting/porting-handoff-full-swift-twin-phase85f133-m34-production-run.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f134-m34-timebase-drift-analysis.md`,
   `.porting/porting-handoff-full-swift-twin-phase85f134-canonical-merge-dryrun.md`,
-  and `.porting/porting-handoff-full-swift-twin-phase85f135-docs-positive-admissions.md`.
+  `.porting/porting-handoff-full-swift-twin-phase85f135-docs-positive-admissions.md`,
+  `.porting/porting-handoff-full-swift-twin-phase85f136-merge-tool-drift-fix.md`,
+  and `.porting/porting-handoff-full-swift-twin-phase85f137-docs-merge-tool-fix.md`.
 
 - **Phase 85f129 canonical/M34/M35 audit documentation (2026-08-23):** records
   13 planned candidates across 11 route families with zero newly admissible
